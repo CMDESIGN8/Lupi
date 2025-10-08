@@ -1,8 +1,8 @@
 // apps/client/src/App.jsx
 import React, { useState, useEffect } from 'react';
-import { Auth } from './components/Auth';
-import { CharacterCreation } from './components/CharacterCreation';
-import { supabase } from './lib/supabaseClient';
+import { Auth } from './src/components/Auth';
+import { CharacterCreation } from './src/components/CharacterCreation';
+import { supabase } from './src/lib/supabaseClient';
 import './App.css';
 
 function App() {
