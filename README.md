@@ -1,2 +1,0 @@
-# Lupi
-Lupi
