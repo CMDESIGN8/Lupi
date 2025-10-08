@@ -57,7 +57,13 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
   setLoading(true);
 
   try {
-    // Solo INSERT, no SELECT después
+    // Preparar datos
+    const skillsData = {};
+    Object.keys(characterData.skills).forEach(key => {
+      skillsData[key] = characterData.skills[key].value;
+    });
+
+    // Crear personaje
     const { data: character, error } = await supabase
       .from('characters')
       .insert([
@@ -65,16 +71,21 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
           user_id: user.id,
           nickname: characterData.nickname,
           available_skill_points: 0,
-          // ... skills data
+          ...skillsData
         }
       ])
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      if (error.code === '23505') { // Violación de unique constraint
+        throw new Error('Este nombre de personaje ya está en uso. Por favor elige otro.');
+      }
+      throw error;
+    }
 
     // Crear wallet
-    const walletAddress = `${characterData.nickname.toLowerCase()}.lupi`;
+    const walletAddress = `${characterData.nickname.toLowerCase().replace(/\s+/g, '')}.lupi`;
     const { error: walletError } = await supabase
       .from('wallets')
       .insert([
@@ -87,11 +98,12 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
 
     if (walletError) throw walletError;
 
-    // ✅ Pasar los datos DIRECTAMENTE sin consultar nuevamente
+    console.log('✅ Personaje creado exitosamente:', character);
+    alert(`¡Personaje creado exitosamente!\nWallet: ${walletAddress}`);
     onCharacterCreated(character);
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('❌ Error creando personaje:', error);
     alert(`Error: ${error.message}`);
   } finally {
     setLoading(false);

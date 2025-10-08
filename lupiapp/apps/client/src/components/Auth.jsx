@@ -12,53 +12,80 @@ export const Auth = ({ onAuthSuccess }) => {
   const [loading, setLoading] = useState(false);
 
   const handleAuth = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
+  setMessage('');
 
-    try {
-      if (isLogin) {
-        // Login
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password,
-        });
-        if (error) throw error;
-        onAuthSuccess(data.user);
-      } else {
-        // Registro
-        const { data, error } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
-          options: {
-            data: {
-              username: formData.username
-            }
-          }
-        });
-        if (error) throw error;
-        
-        if (data.user) {
-          // Crear perfil del usuario
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert([
-              {
-                id: data.user.id,
-                username: formData.username,
-                email: formData.email
-              }
-            ]);
-          
-          if (profileError) throw profileError;
-          onAuthSuccess(data.user);
+  try {
+    if (isLogin) {
+      // LOGIN
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Email o contraseña incorrectos');
         }
+        throw error;
       }
-    } catch (error) {
-      alert(`Error: ${error.message}`);
-    } finally {
-      setLoading(false);
+      
+      setMessage('¡Login exitoso!');
+      onAuthSuccess(data.user);
+      
+    } else {
+      // REGISTRO
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            username: formData.username
+          }
+        }
+      });
+
+      if (authError) {
+        if (authError.message.includes('User already registered')) {
+          throw new Error('Este email ya está registrado');
+        }
+        if (authError.message.includes('Password should be at least')) {
+          throw new Error('La contraseña debe tener al menos 6 caracteres');
+        }
+        throw authError;
+      }
+
+      if (authData.user) {
+        // Crear perfil
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: authData.user.id,
+              username: formData.username,
+              email: formData.email
+            }
+          ]);
+
+        if (profileError) {
+          if (profileError.code === '23505') { // Unique violation
+            throw new Error('Este nombre de usuario ya está en uso');
+          }
+          throw new Error('Error al crear el perfil');
+        }
+
+        setMessage('¡Cuenta creada exitosamente! Ya puedes iniciar sesión.');
+        // No llamamos onAuthSuccess inmediatamente
+      }
     }
-  };
+  } catch (error) {
+    console.error('Error de autenticación:', error);
+    setMessage(error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="auth-container">
