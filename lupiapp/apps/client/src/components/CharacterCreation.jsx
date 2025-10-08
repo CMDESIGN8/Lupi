@@ -53,55 +53,49 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
   };
 
   const handleCreateCharacter = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      // Preparar datos para la base de datos
-      const skillsData = {};
-      Object.keys(characterData.skills).forEach(key => {
-        skillsData[key] = characterData.skills[key].value;
-      });
+  try {
+    // ... código existente para crear personaje ...
 
-      // Crear personaje en la base de datos
-      const { data: character, error } = await supabase
-        .from('characters')
-        .insert([
-          {
-            user_id: user.id,
-            nickname: characterData.nickname,
-            available_skill_points: 0,
-            ...skillsData
-          }
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      // Crear wallet automáticamente
-      const walletAddress = `${characterData.nickname.toLowerCase()}.lupi`;
-      const { error: walletError } = await supabase
-        .from('wallets')
-        .insert([
-          {
-            character_id: character.id,
-            address: walletAddress,
-            lupicoins: 100.00
-          }
-        ]);
-
-      if (walletError) throw walletError;
-
-      alert(`¡Personaje creado exitosamente!\nWallet: ${walletAddress}`);
-      onCharacterCreated(character);
-
-    } catch (error) {
-      alert(`Error al crear personaje: ${error.message}`);
-    } finally {
-      setLoading(false);
+    if (error) {
+      console.error('Error creando personaje:', error);
+      throw error;
     }
-  };
+
+    // Crear wallet automáticamente
+    const walletAddress = `${characterData.nickname.toLowerCase().replace(/\s+/g, '')}.lupi`;
+    const { error: walletError } = await supabase
+      .from('wallets')
+      .insert([
+        {
+          character_id: character.id,
+          address: walletAddress,
+          lupicoins: 100.00
+        }
+      ]);
+
+    if (walletError) {
+      console.error('Error creando wallet:', walletError);
+      throw walletError;
+    }
+
+    console.log('Personaje creado exitosamente:', character);
+    alert(`¡Personaje creado exitosamente!\nWallet: ${walletAddress}`);
+    
+    // Forzar un pequeño delay y luego verificar
+    setTimeout(() => {
+      onCharacterCreated(character);
+    }, 1000);
+
+  } catch (error) {
+    console.error('Error completo:', error);
+    alert(`Error al crear personaje: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="character-creation">

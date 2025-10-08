@@ -11,43 +11,68 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar sesión al cargar
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Escuchar cambios de auth
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-      
-      if (session?.user) {
-        // Verificar si el usuario ya tiene personaje
-        checkExistingCharacter(session.user.id);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const checkExistingCharacter = async (userId) => {
-    try {
-      const { data, error } = await supabase
-        .from('characters')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (data && !error) {
-        setCharacter(data);
-      }
-    } catch (error) {
-      // No hay personaje, es normal
+  // Verificar sesión al cargar
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setUser(session?.user ?? null);
+    setLoading(false);
+    
+    if (session?.user) {
+      // Verificar si el usuario ya tiene personaje
+      checkExistingCharacter(session.user.id);
     }
-  };
+  });
+
+  // Escuchar cambios de auth
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log('Auth state changed:', event, session?.user?.id);
+    
+    setUser(session?.user ?? null);
+    setLoading(false);
+    
+    if (session?.user) {
+      // Verificar si el usuario ya tiene personaje
+      checkExistingCharacter(session.user.id);
+    } else {
+      // Si cerró sesión, limpiar character
+      setCharacter(null);
+    }
+  });
+
+  return () => subscription.unsubscribe();
+}, []);
+
+  // En App.jsx - función corregida
+const checkExistingCharacter = async (userId) => {
+  try {
+    console.log('Verificando personaje para usuario:', userId);
+    
+    const { data, error } = await supabase
+      .from('characters')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle(); // Usar maybeSingle en lugar de single
+
+    if (error) {
+      console.error('Error verificando personaje:', error);
+      // No lanzar error, simplemente no hay personaje
+      return null;
+    }
+
+    console.log('Personaje encontrado:', data);
+    
+    if (data) {
+      setCharacter(data);
+      return data;
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Error en checkExistingCharacter:', error);
+    return null;
+  }
+};
 
   const handleAuthSuccess = (user) => {
     setUser(user);
