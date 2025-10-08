@@ -1,8 +1,8 @@
 // apps/client/src/App.jsx
 import React, { useState, useEffect } from 'react';
-import { Auth } from './src/components/Auth';
-import { CharacterCreation } from './src/components/CharacterCreation';
-import { supabase } from './src/lib/supabaseClient';
+import { Auth } from './components/Auth';
+import { CharacterCreation } from './components/CharacterCreation';
+import { supabase } from './lib/supabaseClient';
 import './App.css';
 
 function App() {
@@ -11,82 +11,96 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  // Verificar sesión al cargar
-  supabase.auth.getSession().then(({ data: { session } }) => {
-    setUser(session?.user ?? null);
-    setLoading(false);
+    console.log('🔧 App mounted - checking session');
     
-    if (session?.user) {
-      // Verificar si el usuario ya tiene personaje
-      checkExistingCharacter(session.user.id);
-    }
-  });
+    // Verificar sesión inicial
+    checkSession();
+    
+    // Escuchar cambios de auth
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('🔄 Auth state changed:', event);
+        handleAuthChange(session);
+      }
+    );
 
-  // Escuchar cambios de auth
-  const {
-    data: { subscription },
-  } = supabase.auth.onAuthStateChange(async (event, session) => {
-    console.log('Auth state changed:', event, session?.user?.id);
-    
-    setUser(session?.user ?? null);
-    setLoading(false);
-    
-    if (session?.user) {
-      // Verificar si el usuario ya tiene personaje
-      checkExistingCharacter(session.user.id);
+    return () => {
+      console.log('🧹 Cleaning up auth listener');
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const checkSession = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('📋 Initial session:', session?.user?.id);
+      await handleAuthChange(session);
+    } catch (error) {
+      console.error('Error checking session:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAuthChange = async (session) => {
+    const currentUser = session?.user ?? null;
+    setUser(currentUser);
+
+    if (currentUser) {
+      console.log('👤 User logged in:', currentUser.id);
+      // NO hacemos consulta automática aquí
     } else {
-      // Si cerró sesión, limpiar character
+      console.log('🚪 User logged out');
       setCharacter(null);
     }
-  });
-
-  return () => subscription.unsubscribe();
-}, []);
-
-  // En App.jsx - función corregida
-const checkExistingCharacter = async (userId) => {
-  try {
-    console.log('Verificando personaje para usuario:', userId);
-    
-    const { data, error } = await supabase
-      .from('characters')
-      .select('*')
-      .eq('user_id', userId)
-      .maybeSingle(); // Usar maybeSingle en lugar de single
-
-    if (error) {
-      console.error('Error verificando personaje:', error);
-      // No lanzar error, simplemente no hay personaje
-      return null;
-    }
-
-    console.log('Personaje encontrado:', data);
-    
-    if (data) {
-      setCharacter(data);
-      return data;
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error en checkExistingCharacter:', error);
-    return null;
-  }
-};
+  };
 
   const handleAuthSuccess = (user) => {
+    console.log('✅ Auth success:', user.id);
     setUser(user);
-    checkExistingCharacter(user.id);
+    // NO verificamos personaje automáticamente
   };
 
   const handleCharacterCreated = (characterData) => {
+    console.log('🎮 Character created:', characterData);
     setCharacter(characterData);
+    // NO hacemos consulta adicional
   };
 
   const handleLogout = async () => {
+    console.log('🚪 Logging out...');
     await supabase.auth.signOut();
     setUser(null);
     setCharacter(null);
+  };
+
+  // Función MANUAL para verificar personaje (solo si es necesario)
+  const manualCheckCharacter = async () => {
+    if (!user) return;
+    
+    console.log('🔍 Manual character check for user:', user.id);
+    try {
+      const { data, error } = await supabase
+        .from('characters')
+        .select('id, nickname, level')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Manual check error:', error);
+        return;
+      }
+
+      if (data) {
+        console.log('🎯 Character found manually:', data);
+        setCharacter(data);
+      } else {
+        console.log('❌ No character found manually');
+        setCharacter(null);
+      }
+    } catch (error) {
+      console.error('Manual check failed:', error);
+    }
   };
 
   if (loading) {
@@ -100,6 +114,9 @@ const checkExistingCharacter = async (userId) => {
         {user && (
           <div className="user-info">
             <span>Hola, {user.email}</span>
+            <button onClick={manualCheckCharacter} style={{marginRight: '10px'}}>
+              Verificar Personaje
+            </button>
             <button onClick={handleLogout}>Cerrar Sesión</button>
           </div>
         )}
