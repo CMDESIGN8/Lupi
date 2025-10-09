@@ -80,68 +80,49 @@ export const Dashboard = ({ user }) => {
 
   return (
     <div className="dashboard">
-      <h2>🐺 Bienvenido a LupiApp, {character.nickname}!</h2>
+  {/* IZQUIERDA - Personaje */}
+  <div className="panel panel-left">
+    <h3>📊 Personaje</h3>
+    <div className="avatar"></div> {/* Más tarde reemplazar con sprite del personaje */}
+    <p>Nombre: <span>{character.nickname}</span></p>
+    <p>Nivel: <span>{character.level}</span></p>
+    <div className="exp-bar">
+      <div className="exp-fill glow-progress" style={{ width: `${expPorcentaje}%` }} />
+    </div>
+    <p>EXP: <span>{expActual}</span> / {expMax}</p>
+    {wallet && <p>Lupicoins: <span>{wallet.lupicoins}</span></p>}
+  </div>
 
-      <section className="character-info">
-        <h3>📊 Personaje</h3>
-        <p>Nivel: {character.level}</p>
+  {/* CENTRO - Skills */}
+  <div className="panel panel-center">
+    <h3>⚔️ Skills</h3>
+    <ul className="skills-grid">
+      {stats.map(({ key, label }) => (
+        <li key={key} className="skill-card">
+          <span className="skill-name">{label}</span>
+          <div className="skill-bar-container">
+            <div className="skill-bar" style={{ width: `${character[key]}%` }}></div>
+            <span className="skill-value">{character[key]}</span>
+          </div>
+          {character.available_skill_points > 0 && character[key] < 100 && (
+            <button className="skill-btn" onClick={() => increaseStat(key)}>➕</button>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
 
-        <div className="exp-bar">
-          <div
-            className="exp-fill glow-progress"
-            style={{ width: `${expPorcentaje}%` }}
-          />
-        </div>
-        <p>
-          EXP: <span>{expActual}</span> / {expMax} | Próximo Nivel:{" "}
-          <span>{expMax - expActual}</span>
-        </p>
-
-        <p>
-          🎯 Skill Points disponibles: <span>{character.available_skill_points || 0}</span>
-        </p>
-      </section>
-
-      {wallet && (
-        <section className="wallet-info">
-          <h3>💰 Wallet</h3>
-          <p>Dirección: {wallet.address}</p>
-          <p>Lupicoins: {wallet.lupicoins}</p>
-        </section>
-      )}
-
-      <section className="stats">
-        <h3>⚔️ Stats</h3>
-        <ul>
-          {stats.map(({ key, label }) => (
-            <li key={key} className="stat-item">
-              <span className="stat-name">{label}</span>
-              <div className="stat-bar">
-                <div
-                  className="fill glow-progress"
-                  style={{ width: `${character[key]}%` }}
-                ></div>
-              </div>
-              <span className="stat-value">{character[key]}</span>
-              {character.available_skill_points > 0 && character[key] < 100 && (
-                <button
-                  className="add-skill-btn"
-                  onClick={() => increaseStat(key)}
-                  disabled={addingSkill}
-                >
-                  ➕
-                </button>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <div className="actions">
-        <button onClick={handleTrain}>💪 Entrenar (+100 XP, +150 LC)</button>
-        <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
-      </div>
-
+  {/* DERECHA - Acciones */}
+  <div className="panel panel-right">
+    <h3>🛠️ Acciones</h3>
+    <div className="actions">
+      <button onClick={handleTrain}>💪 Entrenar</button>
+      <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
+      <button>🛒 Mercado</button>
+      <button>🎒 Inventario</button>
+      <button>⚽ Clubes</button>
+    </div>
+  </div>
       {showLevelUp && (
         <div className="levelup-popup">
           <h2>🎉 ¡Subiste a nivel {character.level}!</h2>

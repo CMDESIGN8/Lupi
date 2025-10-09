@@ -282,3 +282,57 @@
 .skill-btn:hover {
   transform: scale(1.1);
 }
+
+.dashboard {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  min-height: 80vh;
+  background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker));
+  color: var(--lupi-text);
+  font-family: 'Orbitron', sans-serif;
+  animation: fadeInUp 0.8s ease;
+}
+
+/* Paneles de 3 secciones */
+.panel {
+  background: var(--bg-card);
+  border: 2px solid var(--lupi-primary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-soft);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* Ajuste específico para cada sección */
+.panel-left { max-width: 250px; }
+.panel-center { flex: 2; }
+.panel-right { max-width: 200px; }
+
+/* Títulos neon */
+.panel h3 {
+  color: var(--lupi-primary);
+  text-shadow: var(--shadow-glow);
+  animation: neonFlicker 2s infinite;
+}
+
+/* Botones acción */
+.actions button {
+  width: 100%;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Avatar placeholder */
+.avatar {
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-sm);
+  box-shadow: var(--shadow-glow);
+}
