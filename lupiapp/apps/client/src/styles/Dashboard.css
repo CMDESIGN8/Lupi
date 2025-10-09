@@ -1,18 +1,16 @@
 @import url(../styles/globales.css);
 
+
 .dashboard { 
     padding: var(--spacing-lg); 
-    min-height: 80vh; 
-    background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
+    min-height: 80vh; background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
     color: var(--lupi-text); 
     font-family: 'Orbitron', sans-serif; 
     display: flex; 
-    flex-direction: row; /* Cambiado de column a row */
-    justify-content: space-between; /* Distribuye el espacio uniformemente */
-    align-items: flex-start; /* Alinea los paneles en la parte superior */
+    flex-direction: column; 
+    align-items: center; 
     gap: var(--spacing-lg); 
-    animation: fadeInUp 0.8s ease; 
-}
+    animation: fadeInUp 0.8s ease; }
 
 /* Títulos neon */
 .dashboard h2, .dashboard h3 {
@@ -21,34 +19,7 @@
   animation: neonFlicker 2s infinite;
 }
 
-/* Paneles principales - MODIFICADO */
-.panel {
-  flex: 1; /* Todos los paneles ocupan el mismo espacio */
-  border: 2px solid #00bfff;
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: #0c1320;
-  min-height: 500px; /* Altura mínima consistente */
-}
-
-/* Eliminar límites de ancho específicos */
-.panel-left, .panel-center, .panel-right {
-  max-width: none !important; /* Elimina las restricciones de ancho */
-  flex: 1 !important; /* Fuerza que todos ocupen el mismo espacio */
-}
-
-.panel h3 {
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #00f0ff;
-  text-shadow: 0 0 10px #00f0ff;
-}
-
-/* Secciones (mantenidas para compatibilidad) */
+/* Secciones */
 .character-info,
 .wallet-info,
 .stats {
@@ -57,6 +28,7 @@
   border-radius: var(--border-radius);
   padding: var(--spacing-md);
   width: 100%;
+  max-width: 800px;
   box-shadow: var(--shadow-soft);
   animation: fadeInUp 0.8s ease;
 }
@@ -151,7 +123,6 @@
   box-shadow: var(--shadow-glow-accent);
   transform: translateY(-2px);
 }
-
 /* Barra de experiencia */
 .exp-bar {
   width: 100%;
@@ -187,6 +158,7 @@
   100% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
 }
 
+
 .character-info p span {
   color: var(--highlight);
   font-weight: bold;
@@ -215,7 +187,6 @@
   color: var(--lupi-accent);
   text-shadow: 0 0 10px var(--lupi-accent), 0 0 20px var(--lupi-accent);
 }
-
 /* Botón de skill points */
 .add-skill-btn {
   margin-left: 8px;
@@ -241,7 +212,6 @@
   grid-template-columns: repeat(2, 1fr); /* 2 columnas */
   gap: 16px;
   margin-top: 16px;
-  flex-grow: 1; /* Ocupa el espacio disponible */
 }
 
 .stats-grid {
@@ -277,18 +247,12 @@
   box-shadow: 0 0 10px #00f0ff;
 }
 
-/* Botones acción */
-.actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-}
-
 .actions button {
   background: #00bfff;
   color: #0b0f1a;
   border: none;
   padding: 10px;
+  margin-bottom: 8px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
@@ -297,14 +261,45 @@
   align-items: center;
   gap: 8px;
   transition: all 0.2s;
-  width: 100%;
-  margin-bottom: 8px;
 }
 
 .actions button:hover {
   background: #00f0ff;
   color: #0b0f1a;
   box-shadow: 0 0 10px #00f0ff;
+}
+
+/* Paneles de 3 secciones */
+
+/* Ajuste específico para cada sección */
+.panel-left { max-width: 250px; }
+.panel-center { flex: 2; }
+.panel-right { max-width: 200px; }
+
+/* Títulos neon */
+.panel {
+  flex: 1;
+  border: 2px solid #00bfff;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #0c1320;
+}
+
+.panel h3 {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff;
+}
+
+/* Botones acción */
+.actions button {
+  width: 100%;
+  margin-bottom: var(--spacing-sm);
 }
 
 /* Avatar placeholder */
@@ -316,38 +311,4 @@
   box-shadow: 0 0 20px #00f0ff;
   background-size: cover;
   background-position: center;
-}
-
-/* Estilos específicos para el contenido de los paneles */
-.panel-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.character-details {
-  text-align: center;
-}
-
-.character-details p {
-  margin: 8px 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .dashboard {
-    flex-direction: column;
-  }
-  
-  .panel {
-    min-height: auto;
-    width: 100%;
-  }
-  
-  .skills-grid {
-    grid-template-columns: 1fr;
-  }
 }
