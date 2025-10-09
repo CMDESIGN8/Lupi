@@ -20,7 +20,6 @@ export const Dashboard = ({ user }) => {
       const charData = await getCharacter(userId);
 
       if (charData?.id) {
-        // Si ya había personaje cargado y detectamos que subió de nivel
         if (character && charData.level > character.level) {
           triggerLevelUp(charData);
         }
@@ -39,7 +38,6 @@ export const Dashboard = ({ user }) => {
   };
 
   const triggerLevelUp = (charData) => {
-    // Sumar 5 skill points
     const newChar = {
       ...charData,
       available_skill_points: (charData.available_skill_points || 0) + 5,
@@ -47,15 +45,28 @@ export const Dashboard = ({ user }) => {
 
     setCharacter(newChar);
     setShowLevelUp(true);
-
-    // Ocultar popup a los 3 seg
     setTimeout(() => setShowLevelUp(false), 3000);
+  };
+
+  // Incrementar stat con un skill point
+  const increaseStat = (statKey) => {
+    if (!character || (character.available_skill_points || 0) <= 0) return;
+
+    const updatedChar = {
+      ...character,
+      [statKey]: (character[statKey] || 0) + 1,
+      available_skill_points: character.available_skill_points - 1,
+    };
+
+    setCharacter(updatedChar);
+
+    // TODO: enviar update al backend para persistirlo
+    // fetch(`${API_URL}/characters/${character.id}`, { ... })
   };
 
   if (loading) return <p>⏳ Cargando tu dashboard...</p>;
   if (!character) return <p>⚠️ No tienes personaje creado aún.</p>;
 
-  // Calcular EXP
   const expActual = character.experience;
   const expMax = character.experience_to_next_level;
   const expFaltante = expMax - expActual;
@@ -83,7 +94,6 @@ export const Dashboard = ({ user }) => {
         <h3>📊 Personaje</h3>
         <p>Nivel: {character.level}</p>
 
-        {/* Barra de EXP */}
         <div className="exp-bar">
           <div
             className="exp-fill"
@@ -91,7 +101,7 @@ export const Dashboard = ({ user }) => {
           ></div>
         </div>
         <p>
-          EXP actual: <span>{expActual}</span> / {expMax}
+          EXP actual: <span>{expActual}</span> / {expMax}  
           &nbsp;| Falta: <span>{expFaltante}</span>
         </p>
 
@@ -113,7 +123,7 @@ export const Dashboard = ({ user }) => {
         <h3>⚔️ Stats</h3>
         <ul>
           {stats.map(({ key, label }) => (
-            <li key={key}>
+            <li key={key} className="stat-item">
               <span className="stat-name">{label}</span>
               <div className="stat-bar">
                 <div
@@ -122,6 +132,16 @@ export const Dashboard = ({ user }) => {
                 ></div>
               </div>
               <span className="stat-value">{character[key]}</span>
+
+              {/* Botón + solo si hay skill points */}
+              {character.available_skill_points > 0 && (
+                <button
+                  className="add-skill-btn"
+                  onClick={() => increaseStat(key)}
+                >
+                  ➕
+                </button>
+              )}
             </li>
           ))}
         </ul>
@@ -129,7 +149,6 @@ export const Dashboard = ({ user }) => {
 
       <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
 
-      {/* Popup Level Up */}
       {showLevelUp && (
         <div className="levelup-popup">
           <h2>🎉 ¡Subiste a nivel {character.level}!</h2>

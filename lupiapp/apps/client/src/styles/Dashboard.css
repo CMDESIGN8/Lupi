@@ -178,3 +178,23 @@
   color: var(--lupi-accent);
   text-shadow: 0 0 10px var(--lupi-accent), 0 0 20px var(--lupi-accent);
 }
+/* Botón de skill points */
+.add-skill-btn {
+  margin-left: 8px;
+  padding: 4px 8px;
+  background: var(--lupi-primary);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--lupi-dark);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-skill-btn:hover {
+  background: var(--lupi-accent);
+  color: var(--lupi-text);
+  box-shadow: var(--shadow-glow-accent);
+  transform: scale(1.1);
+}
+
