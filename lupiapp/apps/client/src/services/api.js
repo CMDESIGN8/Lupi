@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:4000"; // tu backend local
+const API_URL = "https://lupiback.onrender.com"; // URL de tu backend desplegado
 
 export async function getProfile(userId) {
   const res = await fetch(`${API_URL}/profiles?id=${userId}`);
