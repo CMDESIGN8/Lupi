@@ -5,11 +5,13 @@ import { CharacterCreation } from './src/components/CharacterCreation';
 import { Dashboard } from './src/components/Dashboard'; // nuevo dashboard importado
 import { supabase } from './src/lib/supabaseClient';
 import './App.css';
+import GuideTour from './src/components/GuideTour';
 
 function App() {
   const [user, setUser] = useState(null);
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     console.log('🔧 App mounted - checking session');
