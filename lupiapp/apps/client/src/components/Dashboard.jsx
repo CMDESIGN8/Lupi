@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
-import "./Dashboard.css";
+import "../styles/Dashboard.css";
 
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
