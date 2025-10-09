@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
 import "../styles/Dashboard.css";
 
@@ -7,38 +7,49 @@ export const Dashboard = ({ user }) => {
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLevelUp, setShowLevelUp] = useState(false);
-  const [addingSkill, setAddingSkill] = useState(false);
+  const [fetchCount, setFetchCount] = useState(0); // Para debug
 
-  useEffect(() => {
-    if (user) fetchData(user.id);
-  }, [user]);
-
-  const fetchData = async (userId) => {
+  // Usar useCallback para evitar recreaciones de la función
+  const fetchData = useCallback(async (userId) => {
+    if (!userId) return;
+    
     setLoading(true);
     try {
+      console.log(`🔄 Fetching data for user: ${userId}, count: ${fetchCount + 1}`);
+      setFetchCount(prev => prev + 1);
+      
       const charData = await getCharacter(userId);
       if (charData?.id) {
         setCharacter(charData);
         const walletData = await getWallet(charData.id);
         setWallet(walletData);
+      } else {
+        console.warn("⚠️ No character data received");
       }
     } catch (error) {
       console.error("❌ Error cargando datos:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchCount]);
+
+  useEffect(() => {
+    if (user?.id) {
+      console.log("🎯 Dashboard mounted with user:", user.id);
+      fetchData(user.id);
+    }
+  }, [user?.id, fetchData]);
 
   const increaseStat = async (statKey) => {
-  if (!character || character.available_skill_points <= 0) return;
+    if (!character || character.available_skill_points <= 0) return;
 
-  try {
-    const updated = await updateStat(character.id, statKey);
-    setCharacter(updated);
-  } catch (err) {
-    console.error("Error al agregar skill:", err);
-  }
-};
+    try {
+      const updated = await updateStat(character.id, statKey);
+      setCharacter(updated);
+    } catch (err) {
+      console.error("Error al agregar skill:", err);
+    }
+  };
 
   const handleTrain = async () => {
     if (!character) return;
@@ -57,8 +68,8 @@ export const Dashboard = ({ user }) => {
     }
   };
 
-  if (loading) return <p>⏳ Cargando...</p>;
-  if (!character) return <p>⚠️ No tienes personaje aún.</p>;
+  if (loading) return <div className="dashboard-loading">⏳ Cargando...</div>;
+  if (!character) return <div className="dashboard-error">⚠️ No tienes personaje aún.</div>;
 
   const expActual = character.experience;
   const expMax = character.experience_to_next_level;
@@ -78,24 +89,26 @@ export const Dashboard = ({ user }) => {
     { key: "resistencia_base", label: "🏃 Resistencia" },
   ];
 
-   return (
+  return (
     <div className="dashboard">
       {/* IZQUIERDA - Personaje */}
-      <div className="panel">
+      <div className="panel panel-left">
         <h3>📊 Personaje</h3>
         <div className="avatar"></div>
-        <p>Nombre: <span>{character.nickname}</span></p>
-        <p>Nivel: <span>{character.level}</span></p>
-        <div className="exp-bar">
-          <div className="exp-fill glow-progress" style={{ width: `${expPorcentaje}%` }} />
+        <div className="character-details">
+          <p>Nombre: <span>{character.nickname}</span></p>
+          <p>Nivel: <span>{character.level}</span></p>
+          <div className="exp-bar">
+            <div className="exp-fill" style={{ width: `${expPorcentaje}%` }} />
+          </div>
+          <p>EXP: <span>{expActual}</span> / {expMax}</p>
+          {wallet && <p>Lupicoins: <span>{wallet.lupicoins}</span></p>}
+          <p>Skill Points: <span>{character.available_skill_points}</span></p>
         </div>
-        <p>EXP: <span>{expActual}</span> / {expMax}</p>
-        {wallet && <p>Lupicoins: <span>{wallet.lupicoins}</span></p>}
-        <p>Skill Points: <span>{character.available_skill_points}</span></p>
       </div>
 
       {/* CENTRO - Skills */}
-      <div className="panel">
+      <div className="panel panel-center">
         <h3>⚔️ Skills</h3>
         <div className="skills-grid">
           {stats.map(({ key, label }) => (
@@ -105,7 +118,12 @@ export const Dashboard = ({ user }) => {
                 <span className="skill-value">{character[key]}</span>
               </div>
               {character.available_skill_points > 0 && character[key] < 100 && (
-                <button className="skill-btn" onClick={() => increaseStat(key)}>➕</button>
+                <button 
+                  className="skill-btn" 
+                  onClick={() => increaseStat(key)}
+                >
+                  ➕
+                </button>
               )}
             </div>
           ))}
@@ -113,7 +131,7 @@ export const Dashboard = ({ user }) => {
       </div>
 
       {/* DERECHA - Acciones */}
-      <div className="panel">
+      <div className="panel panel-right">
         <h3>🛠️ Acciones</h3>
         <div className="actions">
           <button onClick={handleTrain}>💪 Entrenar</button>
