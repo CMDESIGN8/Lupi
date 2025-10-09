@@ -1,127 +1,124 @@
-/* Fondo general del dashboard */
 .dashboard {
-  padding: 20px;
+  padding: var(--spacing-lg);
   min-height: 80vh;
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  color: #fff;
+  background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker));
+  color: var(--lupi-text);
   font-family: 'Orbitron', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 25px;
+  gap: var(--spacing-lg);
+  animation: fadeInUp 0.8s ease;
 }
 
-/* Títulos con glow neon */
-.dashboard h2, .dashboard h3, .dashboard h4 {
-  color: #00fff7;
-  text-shadow: 0 0 5px #00fff7, 0 0 10px #00fff7, 0 0 20px #00fff7;
-  margin-bottom: 10px;
+/* Títulos neon */
+.dashboard h2, .dashboard h3 {
+  color: var(--lupi-primary);
+  text-shadow: var(--shadow-glow);
+  animation: neonFlicker 2s infinite;
 }
 
-/* Cajas info */
+/* Secciones */
 .character-info,
 .wallet-info,
 .stats {
-  background: rgba(0,0,0,0.5);
-  border: 2px solid #00fff7;
-  border-radius: 15px;
-  padding: 15px 20px;
-  width: 90%;
+  background: var(--bg-card);
+  border: 2px solid var(--lupi-primary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  width: 100%;
   max-width: 800px;
-  box-shadow: 0 0 20px #00fff7;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+  box-shadow: var(--shadow-soft);
+  animation: fadeInUp 0.8s ease;
 }
 
-/* Wallet info */
+/* Wallet */
 .wallet-info p {
   font-weight: bold;
   font-size: 1.1em;
-  text-shadow: 0 0 3px #ff00f7;
+  text-shadow: 0 0 5px var(--lupi-accent);
 }
 
-/* Stats list */
+/* Stats */
 .stats ul {
   list-style: none;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 15px;
+  gap: var(--spacing-md);
 }
 
-/* Cada stat */
 .stats ul li {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid #00fff7;
-  border-radius: 10px;
-  padding: 10px;
+  gap: var(--spacing-xs);
+  background: var(--lupi-card);
+  border: 1px solid var(--lupi-secondary);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
   font-weight: bold;
-  text-shadow: 0 0 3px #00fff7;
-  cursor: default;
-}
-
-/* Nombre stat */
-.stats ul li span.stat-name {
-  font-size: 0.9em;
-  color: #00fff7;
   text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* Barra de progreso estilo RPG */
-.stats ul li .stat-bar {
+.stats ul li:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow-accent);
+}
+
+/* Nombre del stat */
+.stat-name {
+  font-size: 0.9em;
+  color: var(--lupi-text-secondary);
+  margin-bottom: 4px;
+}
+
+/* Barra estilo RPG */
+.stat-bar {
   position: relative;
   width: 100%;
   height: 12px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-sm);
   overflow: hidden;
 }
 
-.stats ul li .stat-bar .fill {
+.stat-bar .fill {
   height: 100%;
-  background: linear-gradient(90deg, #00fff7, #ff00f7);
-  border-radius: 8px;
+  background: linear-gradient(90deg, var(--lupi-primary), var(--lupi-accent));
+  border-radius: var(--border-radius-sm);
   width: 0%;
-  transition: width 1s ease-in-out, box-shadow 0.5s;
+  animation: growBar 1.2s ease-out forwards;
 }
 
-/* Animación al subir nivel o skill */
-.stats ul li .stat-bar .fill.level-up {
-  animation: neonGlow 1.2s ease-in-out infinite alternate;
+.stat-value {
+  margin-top: 4px;
+  font-size: 0.85em;
+  color: var(--highlight);
+  text-shadow: 0 0 5px var(--highlight);
 }
 
-@keyframes neonGlow {
-  0% { box-shadow: 0 0 5px #00fff7, 0 0 10px #ff00f7; }
-  100% { box-shadow: 0 0 15px #00fff7, 0 0 30px #ff00f7; }
+/* Animación de las barras */
+@keyframes growBar {
+  from { width: 0%; }
+  to { width: var(--stat-value, 100%); }
 }
 
-/* Botón con neon hover */
+/* Botón */
 .dashboard button {
-  margin-top: 10px;
-  padding: 10px 20px;
-  background: #00fff7;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--lupi-primary);
   border: none;
-  border-radius: 10px;
-  color: #000;
+  border-radius: var(--border-radius-sm);
+  color: var(--lupi-dark);
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .dashboard button:hover {
-  background: #ff00f7;
-  color: #fff;
-  box-shadow: 0 0 15px #ff00f7, 0 0 30px #00fff7;
+  background: var(--lupi-accent);
+  color: var(--lupi-text);
+  box-shadow: var(--shadow-glow-accent);
   transform: translateY(-2px);
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  .stats ul {
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  }
 }
