@@ -1,17 +1,5 @@
 @import url(../styles/globales.css);
 
-
-.dashboard { 
-    padding: var(--spacing-lg); 
-    min-height: 80vh; background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
-    color: var(--lupi-text); 
-    font-family: 'Orbitron', sans-serif; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: var(--spacing-lg); 
-    animation: fadeInUp 0.8s ease; }
-
 /* Títulos neon */
 .dashboard h2, .dashboard h3 {
   color: var(--lupi-primary);
@@ -123,20 +111,8 @@
   box-shadow: var(--shadow-glow-accent);
   transform: translateY(-2px);
 }
-/* Barra de experiencia */
-.exp-bar {
-  width: 100%;
-  height: 12px;
-  background: #222;
-  border-radius: 8px;
-  overflow: hidden;
-}
 
-.exp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #00f0ff, #00ccff);
-  transition: width 0.5s ease;
-}
+
 
 /* Glow animado sobre lo completado */
 .exp-fill::after {
@@ -214,6 +190,60 @@
   margin-top: 16px;
 }
 
+
+.dashboard {
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  font-family: 'Orbitron', sans-serif;
+  color: #00f0ff;
+  padding: 16px;
+  background: #0b0f1a; /* fondo oscuro */
+}
+
+.panel {
+  flex: 1;
+  border: 2px solid #00bfff;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #0c1320;
+}
+
+.panel h3 {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #00f0ff;
+  background-size: cover;
+  background-position: center;
+}
+
+.exp-bar {
+  width: 100%;
+  height: 12px;
+  background: #222;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #00ccff);
+  transition: width 0.5s ease;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -276,25 +306,6 @@
 .panel-center { flex: 2; }
 .panel-right { max-width: 200px; }
 
-/* Títulos neon */
-.panel {
-  flex: 1;
-  border: 2px solid #00bfff;
-  border-radius: 8px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  background: #0c1320;
-}
-
-.panel h3 {
-  text-align: center;
-  font-weight: bold;
-  margin-bottom: 8px;
-  color: #00f0ff;
-  text-shadow: 0 0 10px #00f0ff;
-}
 
 /* Botones acción */
 .actions button {
@@ -302,13 +313,3 @@
   margin-bottom: var(--spacing-sm);
 }
 
-/* Avatar placeholder */
-.avatar {
-  width: 120px;
-  height: 120px;
-  margin: 0 auto;
-  border-radius: 50%;
-  box-shadow: 0 0 20px #00f0ff;
-  background-size: cover;
-  background-position: center;
-}
