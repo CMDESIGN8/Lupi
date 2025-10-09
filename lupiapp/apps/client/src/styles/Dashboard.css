@@ -125,3 +125,56 @@
   box-shadow: var(--shadow-glow-accent);
   transform: translateY(-2px);
 }
+/* Barra de EXP */
+.exp-bar {
+  width: 100%;
+  height: 18px;
+  background: rgba(255,255,255,0.1);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  margin: var(--spacing-sm) 0;
+  box-shadow: inset 0 0 8px var(--lupi-dark);
+}
+
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--lupi-green), var(--lupi-primary));
+  border-radius: var(--border-radius-sm);
+  width: 0%;
+  animation: growExp 1.2s ease-out forwards;
+  box-shadow: var(--shadow-glow-accent);
+}
+
+@keyframes growExp {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.character-info p span {
+  color: var(--highlight);
+  font-weight: bold;
+  text-shadow: 0 0 5px var(--highlight);
+}
+
+/* Popup de Level Up */
+.levelup-popup {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--lupi-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  border: 2px solid var(--lupi-accent);
+  box-shadow: 0 0 25px var(--lupi-accent), 0 0 50px var(--lupi-accent);
+  color: var(--lupi-text);
+  text-align: center;
+  animation: glowPulse 1.5s infinite alternate, fadeInUp 0.6s ease;
+  z-index: 999;
+}
+
+.levelup-popup h2 {
+  font-size: 2rem;
+  color: var(--lupi-accent);
+  text-shadow: 0 0 10px var(--lupi-accent), 0 0 20px var(--lupi-accent);
+}

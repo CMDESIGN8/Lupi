@@ -1,11 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { getCharacter, getWallet } from "../services/api";
-import "../styles/Dashboard.css"; // importamos los estilos
-
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showLevelUp, setShowLevelUp] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -19,6 +16,11 @@ export const Dashboard = ({ user }) => {
       const charData = await getCharacter(userId);
 
       if (charData?.id) {
+        // Detectar si subió de nivel
+        if (character && charData.level > character.level) {
+          triggerLevelUp();
+        }
+
         setCharacter(charData);
         const walletData = await getWallet(charData.id);
         setWallet(walletData);
@@ -32,10 +34,20 @@ export const Dashboard = ({ user }) => {
     }
   };
 
+  const triggerLevelUp = () => {
+    setShowLevelUp(true);
+    setTimeout(() => setShowLevelUp(false), 3000); // popup 3 seg
+  };
+
   if (loading) return <p>⏳ Cargando tu dashboard...</p>;
   if (!character) return <p>⚠️ No tienes personaje creado aún.</p>;
 
-  // Campos que vamos a renderizar como stats RPG
+  // Calcular EXP faltante
+  const expActual = character.experience;
+  const expMax = character.experience_to_next_level;
+  const expFaltante = expMax - expActual;
+  const expPorcentaje = Math.min((expActual / expMax) * 100, 100);
+
   const stats = [
     { key: "pase", label: "📨 Pase" },
     { key: "potencia", label: "⚽ Potencia" },
@@ -57,8 +69,17 @@ export const Dashboard = ({ user }) => {
       <section className="character-info">
         <h3>📊 Personaje</h3>
         <p>Nivel: {character.level}</p>
+
+        {/* Barra de EXP */}
+        <div className="exp-bar">
+          <div
+            className="exp-fill"
+            style={{ width: `${expPorcentaje}%` }}
+          ></div>
+        </div>
         <p>
-          Experiencia: {character.experience}/{character.experience_to_next_level}
+          EXP actual: <span>{expActual}</span> / {expMax}  
+          &nbsp;| Falta: <span>{expFaltante}</span>
         </p>
       </section>
 
@@ -89,6 +110,13 @@ export const Dashboard = ({ user }) => {
       </section>
 
       <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
+
+      {/* Popup Level Up */}
+      {showLevelUp && (
+        <div className="levelup-popup">
+          <h2>🎉 ¡Subiste a nivel {character.level}!</h2>
+        </div>
+      )}
     </div>
   );
 };
