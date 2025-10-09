@@ -128,43 +128,45 @@
 /* Barra de experiencia */
 .exp-bar {
   width: 100%;
-  height: 18px;
-  background: rgba(255,255,255,0.1);
+  height: 20px;
+  background: rgba(255,255,255,0.05); /* fondo oscuro */
   border-radius: var(--border-radius-sm);
   overflow: hidden;
   margin: var(--spacing-sm) 0;
   box-shadow: inset 0 0 8px var(--lupi-dark);
 }
 
+/* Parte completada de la barra */
 .exp-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--lupi-green), var(--lupi-primary));
   border-radius: var(--border-radius-sm);
   width: 0%;
-  transition: width 1.2s ease-in-out; /* 👈 animación */
-  box-shadow: var(--shadow-glow-accent);
-}
-/* Glow al subir de nivel */
-.exp-bar.level-up {
-  animation: glowLevelUp 1s ease-in-out;
+  transition: width 1s ease-in-out;
+  box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary);
+  position: relative;
 }
 
-@keyframes glowLevelUp {
-  0% {
-    box-shadow: 0 0 5px var(--lupi-green), 0 0 10px var(--lupi-primary);
-  }
-  50% {
-    box-shadow: 0 0 15px var(--lupi-green), 0 0 30px var(--lupi-primary);
-  }
-  100% {
-    box-shadow: 0 0 5px var(--lupi-green), 0 0 10px var(--lupi-primary);
-  }
+/* Glow animado sobre lo completado */
+.exp-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 0 20px var(--lupi-green), 0 0 40px var(--lupi-primary);
+  opacity: 0.6;
+  animation: glowPulse 1.5s ease-in-out infinite alternate;
 }
 
-@keyframes growExp {
-  from { width: 0%; }
-  to { width: 100%; }
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
+  50% { box-shadow: 0 0 20px var(--lupi-green), 0 0 40px var(--lupi-primary); opacity: 0.8; }
+  100% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
 }
+
 
 .character-info p span {
   color: var(--highlight);
