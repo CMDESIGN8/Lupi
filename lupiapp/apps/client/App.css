@@ -118,11 +118,12 @@
   margin-left: 0.5rem;
 }
 
-/* Character Creation */
+/* Character Creation - ACTUALIZADO */
 .character-creation {
   width: 100%;
-  max-width: 800px;
-  margin: auto;
+  height: 100%;
+  padding: 20px;
+  overflow-y: auto;
 }
 
 .creation-card {
@@ -130,6 +131,10 @@
   padding: 2rem;
   border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 900px;
+  margin: 0 auto;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .form-group {
@@ -140,6 +145,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: bold;
+  color: #333;
 }
 
 .form-group input {
@@ -148,6 +154,8 @@
   border: 1px solid #ddd;
   border-radius: 5px;
   font-size: 1rem;
+  background: #fff;
+  color: #333;
 }
 
 .form-group small {
@@ -161,53 +169,90 @@
   border-radius: 5px;
   margin-bottom: 1.5rem;
   text-align: center;
+  border: 2px solid #28a745;
 }
 
 .points-display h3 {
   color: #333;
   margin: 0;
+  font-size: 1.2rem;
 }
 
+/* Skills Grid - ACTUALIZADO */
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fafafa;
 }
 
 .skill-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
-  background: #f8f9fa;
-  border-radius: 5px;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.skill-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.skill-name {
+  font-weight: bold;
+  color: #333;
+  min-width: 120px;
 }
 
 .skill-controls {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
 }
 
 .skill-controls button {
-  width: 30px;
-  height: 30px;
+  width: 35px;
+  height: 35px;
   border: 1px solid #ddd;
   background: white;
-  border-radius: 3px;
+  border-radius: 5px;
   cursor: pointer;
+  font-weight: bold;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.skill-controls button:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
 }
 
 .skill-controls button:disabled {
   background: #f0f0f0;
+  color: #999;
   cursor: not-allowed;
 }
 
 .skill-value {
   font-weight: bold;
-  min-width: 30px;
+  min-width: 40px;
   text-align: center;
+  font-size: 1.1rem;
+  color: #667eea;
 }
 
 .create-button {
@@ -219,17 +264,47 @@
   border-radius: 5px;
   font-size: 1.1rem;
   cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.create-button:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
 .create-button:disabled {
   background: #ccc;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .warning {
   color: #dc3545;
   text-align: center;
   margin-top: 1rem;
+  font-weight: bold;
+}
+
+/* Scrollbar para skills grid */
+.skills-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.skills-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.skills-grid::-webkit-scrollbar-thumb {
+  background: #667eea;
+  border-radius: 4px;
+}
+
+.skills-grid::-webkit-scrollbar-thumb:hover {
+  background: #5a6fd8;
 }
 
 /* Game Dashboard */
