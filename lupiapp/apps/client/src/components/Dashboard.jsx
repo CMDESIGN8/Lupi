@@ -81,9 +81,9 @@ export const Dashboard = ({ user }) => {
   return (
     <div className="dashboard">
   {/* IZQUIERDA - Personaje */}
-  <div className="panel panel-left">
+  <div className="panel">
     <h3>📊 Personaje</h3>
-    <div className="avatar"></div> {/* Más tarde reemplazar con sprite del personaje */}
+    <div className="avatar"></div>
     <p>Nombre: <span>{character.nickname}</span></p>
     <p>Nivel: <span>{character.level}</span></p>
     <div className="exp-bar">
@@ -91,10 +91,11 @@ export const Dashboard = ({ user }) => {
     </div>
     <p>EXP: <span>{expActual}</span> / {expMax}</p>
     {wallet && <p>Lupicoins: <span>{wallet.lupicoins}</span></p>}
+    <p>Skill Points: <span>{character.available_skill_points}</span></p>
   </div>
 
   {/* CENTRO - Skills */}
-  <div className="panel panel-center">
+  <div className="panel">
     <h3>⚔️ Skills</h3>
     <ul className="skills-grid">
       {stats.map(({ key, label }) => (
@@ -113,7 +114,7 @@ export const Dashboard = ({ user }) => {
   </div>
 
   {/* DERECHA - Acciones */}
-  <div className="panel panel-right">
+  <div className="panel">
     <h3>🛠️ Acciones</h3>
     <div className="actions">
       <button onClick={handleTrain}>💪 Entrenar</button>
