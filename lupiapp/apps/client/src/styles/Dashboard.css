@@ -1,23 +1,24 @@
-/* Dashboard general */
+/* Fondo general del dashboard */
 .dashboard {
   padding: 20px;
-  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   min-height: 80vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
   color: #fff;
-  font-family: 'Orbitron', sans-serif; /* tipografía futurista/neon */
+  font-family: 'Orbitron', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 25px;
 }
 
-/* Headers estilo neon */
+/* Títulos con glow neon */
 .dashboard h2, .dashboard h3, .dashboard h4 {
   color: #00fff7;
   text-shadow: 0 0 5px #00fff7, 0 0 10px #00fff7, 0 0 20px #00fff7;
+  margin-bottom: 10px;
 }
 
-/* Secciones */
+/* Cajas info */
 .character-info,
 .wallet-info,
 .stats {
@@ -30,34 +31,7 @@
   box-shadow: 0 0 20px #00fff7;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-}
-
-/* Stats grid */
-.stats ul {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 10px;
-  list-style: none;
-  padding: 0;
-}
-
-.stats ul li {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #00fff7;
-  border-radius: 10px;
-  padding: 8px 12px;
-  text-align: center;
-  font-weight: bold;
-  text-shadow: 0 0 3px #00fff7;
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: default;
-}
-
-/* Hover efecto neón */
-.stats ul li:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 15px #00fff7, 0 0 25px #00fff7;
+  gap: 15px;
 }
 
 /* Wallet info */
@@ -67,7 +41,65 @@
   text-shadow: 0 0 3px #ff00f7;
 }
 
-/* Botón refrescar */
+/* Stats list */
+.stats ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+/* Cada stat */
+.stats ul li {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid #00fff7;
+  border-radius: 10px;
+  padding: 10px;
+  font-weight: bold;
+  text-shadow: 0 0 3px #00fff7;
+  cursor: default;
+}
+
+/* Nombre stat */
+.stats ul li span.stat-name {
+  font-size: 0.9em;
+  color: #00fff7;
+  text-align: center;
+}
+
+/* Barra de progreso estilo RPG */
+.stats ul li .stat-bar {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.stats ul li .stat-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00fff7, #ff00f7);
+  border-radius: 8px;
+  width: 0%;
+  transition: width 1s ease-in-out, box-shadow 0.5s;
+}
+
+/* Animación al subir nivel o skill */
+.stats ul li .stat-bar .fill.level-up {
+  animation: neonGlow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes neonGlow {
+  0% { box-shadow: 0 0 5px #00fff7, 0 0 10px #ff00f7; }
+  100% { box-shadow: 0 0 15px #00fff7, 0 0 30px #ff00f7; }
+}
+
+/* Botón con neon hover */
 .dashboard button {
   margin-top: 10px;
   padding: 10px 20px;
@@ -78,19 +110,18 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s;
-  text-shadow: none;
 }
 
 .dashboard button:hover {
   background: #ff00f7;
   color: #fff;
-  box-shadow: 0 0 10px #ff00f7, 0 0 20px #ff00f7;
+  box-shadow: 0 0 15px #ff00f7, 0 0 30px #00fff7;
   transform: translateY(-2px);
 }
 
 /* Responsive */
 @media (max-width: 600px) {
   .stats ul {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   }
 }

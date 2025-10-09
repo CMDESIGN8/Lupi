@@ -51,6 +51,19 @@ export const Dashboard = ({ user }) => {
         <h3>📊 Tu Personaje</h3>
         <p>Nivel: {character.level}</p>
         <p>Experiencia: {character.experience}/{character.experience_to_next_level}</p>
+        <ul>
+  {Object.entries(character).map(([key, value]) => (
+    <li key={key}>
+      <span className="stat-name">{key.toUpperCase()}</span>
+      <div className="stat-bar">
+        <div 
+          className={`fill ${value.changed ? 'level-up' : ''}`} 
+          style={{ width: `${value}%` }}
+        ></div>
+      </div>
+    </li>
+  ))}
+</ul>
       </section>
 
       {wallet && (
@@ -60,6 +73,7 @@ export const Dashboard = ({ user }) => {
           <p>Lupicoins: {wallet.lupicoins}</p>
         </section>
       )}
+
 
       <section className="stats">
         <h3>⚔️ Stats</h3>
