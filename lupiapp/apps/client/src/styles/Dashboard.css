@@ -1,0 +1,96 @@
+/* Dashboard general */
+.dashboard {
+  padding: 20px;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  min-height: 80vh;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif; /* tipografía futurista/neon */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Headers estilo neon */
+.dashboard h2, .dashboard h3, .dashboard h4 {
+  color: #00fff7;
+  text-shadow: 0 0 5px #00fff7, 0 0 10px #00fff7, 0 0 20px #00fff7;
+}
+
+/* Secciones */
+.character-info,
+.wallet-info,
+.stats {
+  background: rgba(0,0,0,0.5);
+  border: 2px solid #00fff7;
+  border-radius: 15px;
+  padding: 15px 20px;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 0 20px #00fff7;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Stats grid */
+.stats ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+}
+
+.stats ul li {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #00fff7;
+  border-radius: 10px;
+  padding: 8px 12px;
+  text-align: center;
+  font-weight: bold;
+  text-shadow: 0 0 3px #00fff7;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+/* Hover efecto neón */
+.stats ul li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 15px #00fff7, 0 0 25px #00fff7;
+}
+
+/* Wallet info */
+.wallet-info p {
+  font-weight: bold;
+  font-size: 1.1em;
+  text-shadow: 0 0 3px #ff00f7;
+}
+
+/* Botón refrescar */
+.dashboard button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #00fff7;
+  border: none;
+  border-radius: 10px;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-shadow: none;
+}
+
+.dashboard button:hover {
+  background: #ff00f7;
+  color: #fff;
+  box-shadow: 0 0 10px #ff00f7, 0 0 20px #ff00f7;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .stats ul {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+}
