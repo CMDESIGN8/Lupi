@@ -1,3 +1,7 @@
+import React, { useEffect, useState } from "react";
+import { getCharacter, getWallet } from "../services/api";
+import "../styles/Dashboard.css"; // importamos los estilos
+
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
   const [wallet, setWallet] = useState(null);
