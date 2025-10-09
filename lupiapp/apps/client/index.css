@@ -28,6 +28,7 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden; /* Previene scroll no deseado */
+  background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
 }
 
 #root {
