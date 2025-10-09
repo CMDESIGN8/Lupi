@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Auth } from './src/components/Auth';
 import { CharacterCreation } from './src/components/CharacterCreation';
+import { Dashboard } from './src/components/Dashboard'; // nuevo dashboard importado
 import { supabase } from './src/lib/supabaseClient';
 import './App.css';
 
@@ -12,14 +13,12 @@ function App() {
 
   useEffect(() => {
     console.log('🔧 App mounted - checking session');
-    
-    // Verificar sesión inicial
     checkSession();
-    
+
     // Escuchar cambios de auth
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('🔄 Auth state changed:', event);
+      async (_event, session) => {
+        console.log('🔄 Auth state changed:', _event);
         handleAuthChange(session);
       }
     );
@@ -30,6 +29,7 @@ function App() {
     };
   }, []);
 
+  // Verificar sesión inicial
   const checkSession = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -48,23 +48,24 @@ function App() {
 
     if (currentUser) {
       console.log('👤 User logged in:', currentUser.id);
-      // NO hacemos consulta automática aquí
+      // Buscar personaje automáticamente
+      await fetchCharacter(currentUser.id);
     } else {
       console.log('🚪 User logged out');
       setCharacter(null);
     }
   };
 
-  const handleAuthSuccess = (user) => {
+  const handleAuthSuccess = async (user) => {
     console.log('✅ Auth success:', user.id);
     setUser(user);
-    // NO verificamos personaje automáticamente
+    // Buscar personaje si ya tenía uno
+    await fetchCharacter(user.id);
   };
 
   const handleCharacterCreated = (characterData) => {
     console.log('🎮 Character created:', characterData);
     setCharacter(characterData);
-    // NO hacemos consulta adicional
   };
 
   const handleLogout = async () => {
@@ -74,32 +75,27 @@ function App() {
     setCharacter(null);
   };
 
-  // Función MANUAL para verificar personaje (solo si es necesario)
-  const manualCheckCharacter = async () => {
-    if (!user) return;
-    
-    console.log('🔍 Manual character check for user:', user.id);
+  const fetchCharacter = async (userId) => {
     try {
       const { data, error } = await supabase
         .from('characters')
-        .select('id, nickname, level')
-        .eq('user_id', user.id)
+        .select('*')
+        .eq('user_id', userId)
         .maybeSingle();
 
       if (error) {
-        console.error('Manual check error:', error);
+        console.error('Error fetching character:', error);
         return;
       }
-
       if (data) {
-        console.log('🎯 Character found manually:', data);
+        console.log('🎯 Character found:', data);
         setCharacter(data);
       } else {
-        console.log('❌ No character found manually');
+        console.log('❌ No character found for this user');
         setCharacter(null);
       }
     } catch (error) {
-      console.error('Manual check failed:', error);
+      console.error('Fetch character failed:', error);
     }
   };
 
@@ -114,49 +110,26 @@ function App() {
         {user && (
           <div className="user-info">
             <span>Hola, {user.email}</span>
-            <button onClick={manualCheckCharacter} style={{marginRight: '10px'}}>
-              Verificar Personaje
-            </button>
             <button onClick={handleLogout}>Cerrar Sesión</button>
           </div>
         )}
       </header>
 
       <main className="app-main">
+        {/* Login/Registro */}
         {!user && <Auth onAuthSuccess={handleAuthSuccess} />}
-        
+
+        {/* Si hay usuario pero no personaje → creación */}
         {user && !character && (
           <CharacterCreation 
             user={user} 
             onCharacterCreated={handleCharacterCreated} 
           />
         )}
-        
+
+        {/* Si hay usuario y personaje → dashboard */}
         {user && character && (
-          <div className="game-dashboard">
-            <h2>¡Bienvenido a LupiApp, {character.nickname}!</h2>
-            <div className="character-info">
-              <h3>Tu Personaje:</h3>
-              <p>Nivel: {character.level}</p>
-              <p>Experiencia: {character.experience}/{character.experience_to_next_level}</p>
-              <p>Wallet: {character.nickname.toLowerCase()}.lupi</p>
-              
-              <h4>Stats:</h4>
-              <div className="stats-grid">
-                <span>📨 Pase: {character.pase}</span>
-                <span>⚽ Potencia: {character.potencia}</span>
-                <span>💨 Velocidad: {character.velocidad}</span>
-                <span>👑 Liderazgo: {character.liderazgo}</span>
-                <span>🥅 Tiro: {character.tiro}</span>
-                <span>🎯 Regate: {character.regate}</span>
-                <span>🔧 Técnica: {character.tecnica}</span>
-                <span>🧠 Estrategia: {character.estrategia}</span>
-                <span>📈 Inteligencia: {character.inteligencia}</span>
-                <span>🛡️ Defensa: {character.defensa}</span>
-                <span>🏃 Resistencia: {character.resistencia_base}</span>
-              </div>
-            </div>
-          </div>
+          <Dashboard user={user} character={character} />
         )}
       </main>
     </div>
