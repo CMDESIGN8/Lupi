@@ -80,47 +80,47 @@ export const Dashboard = ({ user }) => {
 
   return (
     <div className="dashboard">
-  {/* IZQUIERDA - Personaje */}
+  {/* FICHA TÉCNICA */}
   <div className="panel">
-    <h3>📊 Personaje</h3>
-    <div className="avatar"></div>
-    <p>Nombre: <span>{character.nickname}</span></p>
-    <p>Nivel: <span>{character.level}</span></p>
+    <h3>FICHA TÉCNICA</h3>
+    <div className="avatar" style={{ backgroundImage: `url(${character.avatar})` }} />
+    <p>Jugador: <span>{character.nickname}</span></p>
+    <p>LVL: <span>{character.level}</span></p>
+    <p>Posición: <span>{character.position}</span></p>
+    <p>Deporte: <span>{character.sport}</span></p>
+    <p>Club: <span>{character.club}</span></p>
+    <p>Wallet: <span>{wallet?.address}</span></p>
     <div className="exp-bar">
-      <div className="exp-fill glow-progress" style={{ width: `${expPorcentaje}%` }} />
+      <div className="exp-fill" style={{ width: `${(character.experience / character.experience_to_next_level) * 100}%` }} />
     </div>
-    <p>EXP: <span>{expActual}</span> / {expMax}</p>
-    {wallet && <p>Lupicoins: <span>{wallet.lupicoins}</span></p>}
-    <p>Skill Points: <span>{character.available_skill_points}</span></p>
+    <p>EXP: {character.experience}/{character.experience_to_next_level}</p>
   </div>
 
-  {/* CENTRO - Skills */}
+  {/* ESTADÍSTICAS */}
   <div className="panel">
-  <h3>⚔️ Skills</h3>
-  <ul className="skills-grid">
-    {stats.map(({ key, label }) => (
-      <li key={key} className="skill-card">
-        <div className="skill-info">
-          <span className="skill-name">{label}</span>
-          <span className="skill-value">{character[key]}</span>
-        </div>
-        {character.available_skill_points > 0 && character[key] < 100 && (
-          <button className="skill-btn" onClick={() => increaseStat(key)}>➕</button>
-        )}
-      </li>
-    ))}
-  </ul>
-</div>
+    <h3>ESTADÍSTICAS</h3>
+    <p>Puntos disponibles: {character.available_skill_points}</p>
+    <ul className="stats-grid">
+      {stats.map(({ key, label }) => (
+        <li className="skill-card" key={key}>
+          <div>{label}: {character[key]}</div>
+          {character.available_skill_points > 0 && <button className="skill-btn" onClick={() => increaseStat(key)}>↑</button>}
+        </li>
+      ))}
+    </ul>
+  </div>
 
-  {/* DERECHA - Acciones */}
+  {/* ACCIÓN RÁPIDA */}
   <div className="panel">
-    <h3>🛠️ Acciones</h3>
+    <h3>ACCIÓN RÁPIDA</h3>
     <div className="actions">
-      <button onClick={handleTrain}>💪 Entrenar</button>
-      <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
-      <button>🛒 Mercado</button>
-      <button>🎒 Inventario</button>
-      <button>⚽ Clubes</button>
+      <button>🌎 Mundo Lupi</button>
+      <button>💪 Entrenar</button>
+      <button>🏆 MMORPG Deportivo</button>
+      <button>🔍 Buscar Objeto</button>
+      <button>⚽ Misiones</button>
+      <button>🏠 Sala Común</button>
+      <button>➡️ Transferir</button>
     </div>
   </div>
       {showLevelUp && (
