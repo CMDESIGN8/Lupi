@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Lupi Game — Híbrido (PC + Móvil)</title>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<!-- Three.js r128 + examples loaders/controls -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+
+<style>
+  :root{
+    --bg:#070712;
+    --accent:#00ff88;
+    --accent2:#00aaff;
+    --pink:#b02cff;
+    --hud-bg:rgba(0,0,0,0.6);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Segoe UI,system-ui,Arial;}
+  html,body{height:100%;background:var(--bg);color:#fff;overflow:hidden;}
+  canvas{display:block;width:100%;height:100%;}
+  /* Start screen */
+  #gameStartScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;background:linear-gradient(180deg,#06060a, #0a0a1a);z-index:1000}
+  .game-logo{font-size:3.2rem;font-weight:900;background:linear-gradient(90deg,var(--accent),var(--accent2),var(--pink));-webkit-background-clip:text;color:transparent;text-shadow:0 0 30px rgba(0,255,136,0.15)}
+  .start-button{padding:0.8rem 1.6rem;border-radius:999px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#001; font-weight:700;cursor:pointer}
+  /* HUD */
+  #gameInterface{position:fixed;inset:0;pointer-events:none;z-index:900}
+  .game-hud{position:absolute;left:16px;top:16px;background:var(--hud-bg);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);pointer-events:auto}
+  .hud-row{display:flex;gap:12px;align-items:center}
+  .stat{min-width:88px}
+  .stat .value{font-weight:800;color:var(--accent);font-size:1.1rem}
+  .xp-bar{height:10px;background:rgba(255,255,255,0.06);border-radius:8px;margin-top:8px;overflow:hidden}
+  .xp-progress{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+  /* Mission panel */
+  .mission-menu{position:absolute;right:16px;top:16px;background:var(--hud-bg);padding:12px;border-radius:12px;pointer-events:auto;max-width:300px}
+  .controls-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:16px;background:rgba(0,0,0,0.5);padding:8px 12px;border-radius:999px;font-size:0.9rem;pointer-events:auto}
+  /* Notification */
+  #gameNotification{position:fixed;left:50%;top:10%;transform:translateX(-50%);background:rgba(0,0,0,0.8);padding:14px;border-radius:10px;border:1px solid var(--accent);display:none;z-index:950}
+  /* Pause */
+  #pauseMenu{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;z-index:980}
+  /* Mobile joystick */
+  #mobileControls{position:fixed;left:0;right:0;bottom:0;height:38%;pointer-events:none;z-index:920;display:none}
+  #joystickArea{position:absolute;left:12px;bottom:12px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.02);pointer-events:auto;touch-action:none}
+  #joystickKnob{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center}
+  #actionBtn{position:absolute;right:18px;bottom:40px;width:84px;height:84px;border-radius:50%;background:linear-gradient(90deg,var(--pink),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;pointer-events:auto;touch-action:none}
+  /* Small screens adjustments */
+  @media (max-width:900px){
+    #mobileControls{display:block}
+    .controls-hint{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- Start screen -->
+<div id="gameStartScreen">
+  <div class="game-logo">LUPI GAME</div>
+  <p style="color:#ddd;max-width:560px;text-align:center">Aventura híbrida — usa mouse/teclado en PC o joystick en móvil. Recolecta Lupicoins y completa misiones.</p>
+  <div style="display:flex;gap:12px">
+    <button class="start-button" id="startBtn">INICIAR AVENTURA</button>
+    <button class="start-button" id="startBtnNoLock" title="Inicia sin PointerLock (útil en móviles)">INICIAR (SIN BLOQUEO)</button>
+  </div>
+  <small style="color:#888;margin-top:6px">Presiona ESC para pausar | En PC haz click en la pantalla para capturar el mouse.</small>
+</div>
+
+<!-- Canvas -->
+<canvas id="gameCanvas"></canvas>
+
+<!-- Interface / HUD -->
+<div id="gameInterface">
+  <div class="game-hud" id="hud">
+    <div class="hud-row">
+      <div class="stat">
+        <div class="value" id="level">1</div>
+        <div style="font-size:0.75rem;color:#ccc">NIVEL</div>
+      </div>
+      <div class="stat">
+        <div class="value" id="lupicoins">0</div>
+        <div style="font-size:0.75rem;color:#ccc">LUPICOINS</div>
+      </div>
+      <div class="stat">
+        <div class="value" id="clubPower">100%</div>
+        <div style="font-size:0.75rem;color:#ccc">PODER CLUB</div>
+      </div>
+    </div>
+    <div class="xp-bar" aria-hidden="true">
+      <div class="xp-progress" id="xpProgress"></div>
+    </div>
+  </div>
+
+  <div class="mission-menu" id="missionMenu">
+    <div style="font-weight:800;color:var(--pink)">🎯 MISIÓN ACTUAL</div>
+    <div id="currentMission" style="color:#ddd;margin-top:6px;font-size:0.95rem">Recolecta 5 Lupicoins</div>
+    <div style="margin-top:8px;color:#ffd700;font-size:0.9rem">Recompensa: +100 Lupicoins</div>
+  </div>
+
+  <div class="controls-hint" id="controlsHint">🎮 WASD • Mouse • Touch joystick</div>
+</div>
+
+<div id="gameNotification"></div>
+
+<!-- Pause Menu -->
+<div id="pauseMenu">
+  <div style="font-size:2rem;color:var(--accent)">JUEGO EN PAUSA</div>
+  <div style="display:flex;gap:10px">
+    <button class="start-button" onclick="resumeGame()" style="pointer-events:auto">CONTINUAR</button>
+    <button class="start-button" onclick="exitGame()" style="pointer-events:auto">SALIR</button>
+  </div>
+</div>
+
+<!-- Mobile Controls -->
+<div id="mobileControls">
+  <div id="joystickArea"><div id="joystickKnob"></div></div>
+  <div id="actionBtn">GO</div>
+</div>
+
+<script>
+/* -------------------------
+   GAME: Three.js + Hybrid Controls
+   ------------------------- */
+
+/* Basic game state */
+let gameStarted = false;
+let usePointerLock = true;
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+/* Player stats */
+const playerStats = {
+  level: 1,
+  lupicoins: 0,
+  xp: 0,
+  xpNeeded: 100,
+  clubPower: 100
+};
+
+const missions = [
+  { objective: "Recolecta 5 Lupicoins", needed: 5, progress: 0, reward: 100, done: false },
+  { objective: "Recolecta 20 Lupicoins", needed: 20, progress: 0, reward: 500, done: false }
+];
+
+let currentMissionIndex = 0;
+
+/* Three.js essentials */
+let scene, camera, renderer, clock;
+let controls; // PointerLockControls if on PC
+const collectibles = [];
+const obstacles = [];
+let terrain;
+
+/* Movement */
+const moveState = { forward:0, back:0, left:0, right:0, speed:0.0 };
+let velocity = new THREE.Vector3();
+let canJump = false;
+
+/* For mobile joystick */
+const joystickArea = document.getElementById('joystickArea');
+const joystickKnob = document.getElementById('joystickKnob');
+let joystickActive = false;
+let joystickStart = {x:0,y:0};
+let joystickDir = {x:0,y:0};
+
+/* Audio using WebAudio (no external files) */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playPickupSound() {
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(880, audioCtx.currentTime);
+  g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.06, audioCtx.currentTime + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+  o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.3);
+}
+function playHitSound() {
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'square';
+  o.frequency.setValueAtTime(220, audioCtx.currentTime);
+  g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.05, audioCtx.currentTime + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.35);
+  o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 0.4);
+}
+
+/* Utility: show notification */
+const notificationEl = document.getElementById('gameNotification');
+let notifTimeout = null;
+function showNotification(title, text, timeout=1500) {
+  notificationEl.style.display = 'block';
+  notificationEl.innerHTML = `<strong style="color:var(--accent)">${title}</strong><div style="color:#ddd;margin-top:6px">${text}</div>`;
+  if (notifTimeout) clearTimeout(notifTimeout);
+  notifTimeout = setTimeout(()=>{ notificationEl.style.display='none'; }, timeout);
+}
+
+/* Init Three scene */
+function initScene() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0a1a);
+  clock = new THREE.Clock();
+
+  // Camera
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 500);
+  camera.position.set(0, 2, 5);
+
+  // Renderer
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // Lights
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x080820, 0.6);
+  scene.add(hemi);
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+  dir.position.set(8, 12, 6);
+  dir.castShadow = true;
+  dir.shadow.camera.left = -20; dir.shadow.camera.right = 20; dir.shadow.camera.top = 20; dir.shadow.camera.bottom = -20;
+  dir.shadow.mapSize.set(2048,2048);
+  scene.add(dir);
+
+  // Terrain
+  const g = new THREE.PlaneBufferGeometry(200,200,32,32);
+  const mat = new THREE.MeshStandardMaterial({color:0x123a12, roughness:0.9, metalness:0.05});
+  terrain = new THREE.Mesh(g, mat);
+  terrain.rotation.x = -Math.PI/2;
+  terrain.receiveShadow = true;
+  scene.add(terrain);
+
+  // Stadium (center)
+  const stadium = new THREE.Mesh(new THREE.CylinderGeometry(8,10,3,32), new THREE.MeshStandardMaterial({color:0x2a2a4a}));
+  stadium.position.set(0,1.5,0); stadium.castShadow = true; scene.add(stadium);
+
+  // Buildings for visual
+  for(let i=0;i<14;i++){
+    const bh = 2 + Math.random()*6;
+    const b = new THREE.Mesh(new THREE.BoxBufferGeometry(2, bh, 2), new THREE.MeshStandardMaterial({color: Math.random()*0xffffff}));
+    const ang = (i/14)*Math.PI*2;
+    const r = 18 + Math.random()*6;
+    b.position.set(Math.cos(ang)*r, bh/2, Math.sin(ang)*r);
+    b.castShadow = true; scene.add(b);
+  }
+
+  // Particles (simple points)
+  const pCount = 120;
+  const pos = new Float32Array(pCount*3);
+  for(let i=0;i<pCount;i++){
+    pos[i*3] = (Math.random()-0.5)*80;
+    pos[i*3+1] = Math.random()*12 + 1;
+    pos[i*3+2] = (Math.random()-0.5)*80;
+  }
+  const points = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial({size:0.06, color:0x00ff88, transparent:true, opacity:0.6}));
+  points.geometry.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  scene.add(points);
+
+  // Create collectibles and obstacles
+  createCollectibles(30);
+  createObstacles(10);
+
+  // Controls (Pointer Lock)
+  controls = new THREE.PointerLockControls(camera, renderer.domElement);
+
+  // Click to lock pointer on PC
+  document.addEventListener('click', () => {
+    if (!gameStarted) return;
+    if (!isTouchDevice && usePointerLock) {
+      controls.lock();
+    }
+  });
+
+  window.addEventListener('resize', onWindowResize);
+}
+
+/* Create collectibles */
+function createCollectibles(n=20) {
+  const geo = new THREE.SphereBufferGeometry(0.35, 12, 12);
+  const mat = new THREE.MeshStandardMaterial({color:0xffd700, emissive:0x442200, metalness:0.4, roughness:0.3});
+  for(let i=0;i<n;i++){
+    const m = new THREE.Mesh(geo, mat.clone());
+    m.position.set((Math.random()-0.5)*60, 0.4, (Math.random()-0.5)*60);
+    m.userData.type = 'collectible';
+    m.userData.collected = false;
+    m.castShadow = true;
+    scene.add(m);
+    collectibles.push(m);
+  }
+}
+
+/* Create obstacles */
+function createObstacles(n=8) {
+  for(let i=0;i<n;i++){
+    const size = 0.8 + Math.random()*2;
+    const m = new THREE.Mesh(new THREE.BoxBufferGeometry(size, size, size), new THREE.MeshStandardMaterial({color:0x662222}));
+    m.position.set((Math.random()-0.5)*50, size/2, (Math.random()-0.5)*50);
+    m.userData.type = 'obstacle';
+    m.userData.damage = Math.floor(5 + Math.random()*15);
+    m.castShadow = true;
+    scene.add(m);
+    obstacles.push(m);
+  }
+}
+
+/* Simple collision check */
+function checkCollisions() {
+  const p = camera.position;
+  // Collectibles
+  collectibles.forEach((c) => {
+    if (c.userData.collected) return;
+    const d = c.position.distanceTo(p);
+    if (d < 1.2) {
+      c.userData.collected = true;
+      scene.remove(c);
+      playerStats.lupicoins += 1;
+      playerStats.xp += 10;
+      // Update mission progress
+      updateMissionProgress(1);
+      playPickupSound();
+      showNotification('¡Lupicoin!', '+1 Lupicoin');
+      updateHUD();
+    }
+  });
+
+  // Obstacles
+  obstacles.forEach((o) => {
+    const d = o.position.distanceTo(p);
+    if (d < ( (o.geometry.parameters.width || 1)/2 + 0.8) ) {
+      // hit
+      // apply small pushback
+      const push = new THREE.Vector3().subVectors(camera.position, o.position).setY(0).normalize().multiplyScalar(0.5);
+      camera.position.add(push);
+      playerStats.clubPower = Math.max(0, playerStats.clubPower - o.userData.damage*0.01);
+      playerStats.xp = Math.max(0, playerStats.xp - 2);
+      playHitSound();
+      showNotification('¡Cuidado!', `-${o.userData.damage}% Poder`);
+      updateHUD();
+      // move obstacle a otro lugar to avoid repeat infinite hits
+      o.position.set((Math.random()-0.5)*50, o.position.y, (Math.random()-0.5)*50);
+    }
+  });
+}
+
+/* Update mission progress */
+function updateMissionProgress(amount) {
+  const m = missions[currentMissionIndex];
+  if (!m || m.done) return;
+  m.progress += amount;
+  if (m.progress >= m.needed) {
+    m.done = true;
+    // reward
+    playerStats.lupicoins += m.reward;
+    playerStats.xp += Math.floor(m.reward*0.2);
+    showNotification('¡Misión completada!', `${m.objective} — Recompensa: +${m.reward} Lupicoins`);
+    // advance to next mission if exists
+    if (currentMissionIndex + 1 < missions.length) currentMissionIndex++;
+    updateHUD();
+  }
+}
+
+/* HUD update */
+function updateHUD() {
+  document.getElementById('level').textContent = playerStats.level;
+  document.getElementById('lupicoins').textContent = playerStats.lupicoins;
+  document.getElementById('clubPower').textContent = Math.round(playerStats.clubPower) + '%';
+  const percent = Math.min(100, Math.floor( playerStats.xp / playerStats.xpNeeded * 100 ));
+  document.getElementById('xpProgress').style.width = percent + '%';
+
+  // mission UI
+  const m = missions[currentMissionIndex];
+  if (m) {
+    document.getElementById('currentMission').textContent = `${m.objective} (${m.progress}/${m.needed})`;
+  } else {
+    document.getElementById('currentMission').textContent = 'Todas las misiones completadas';
+  }
+}
+
+/* Movement + animation loop */
+let lastTime = 0;
+function animate(now=0) {
+  const delta = Math.min(0.05, (now - lastTime) / 1000); // cap delta
+  lastTime = now;
+
+  // apply input to velocity
+  const speed = 6.0;
+  let inputX = (moveState.right - moveState.left);
+  let inputZ = (moveState.back - moveState.forward) * 1; // forward is negative z normally
+
+  // if mobile joystick, override with joystickDir
+  if (joystickActive) {
+    inputX = joystickDir.x;
+    inputZ = -joystickDir.y;
+  }
+
+  // local direction (camera orientation)
+  const dir = new THREE.Vector3();
+  camera.getWorldDirection(dir);
+  dir.y = 0; dir.normalize();
+  const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0), dir).normalize();
+
+  // move vector
+  const moveVec = new THREE.Vector3();
+  moveVec.addScaledVector(dir, inputZ);
+  moveVec.addScaledVector(right, inputX);
+  if (moveVec.length() > 0.01) moveVec.normalize();
+
+  // smooth velocity
+  velocity.lerp(moveVec.multiplyScalar(speed), 0.12);
+
+  camera.position.addScaledVector(velocity, delta);
+
+  // slight bobbing for immersion when moving
+  if (velocity.length() > 0.1 && gameStarted) {
+    camera.position.y = 1.9 + Math.sin(performance.now()*0.004)*0.05;
+  } else {
+    camera.position.y = 1.9;
+  }
+
+  // collisions
+  checkCollisions();
+
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+
+/* Input handlers (keyboard) */
+function setupKeyboard() {
+  window.addEventListener('keydown', (e) => {
+    if (!gameStarted) return;
+    switch(e.code){
+      case 'KeyW': moveState.forward = 1; break;
+      case 'KeyS': moveState.back = 1; break;
+      case 'KeyA': moveState.left = 1; break;
+      case 'KeyD': moveState.right = 1; break;
+      case 'Escape': togglePauseMenu(); break;
+    }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (!gameStarted) return;
+    switch(e.code){
+      case 'KeyW': moveState.forward = 0; break;
+      case 'KeyS': moveState.back = 0; break;
+      case 'KeyA': moveState.left = 0; break;
+      case 'KeyD': moveState.right = 0; break;
+    }
+  });
+}
+
+/* Mobile joystick logic */
+function setupJoystick() {
+  if (!joystickArea) return;
+  let activeId = null;
+  joystickArea.addEventListener('pointerdown', (ev) => {
+    ev.preventDefault();
+    joystickActive = true;
+    joystickStart = {x: ev.clientX, y: ev.clientY};
+    activeId = ev.pointerId;
+    joystickArea.setPointerCapture(activeId);
+  });
+  joystickArea.addEventListener('pointermove', (ev) => {
+    if (!joystickActive || ev.pointerId !== activeId) return;
+    const dx = ev.clientX - joystickStart.x;
+    const dy = ev.clientY - joystickStart.y;
+    const max = 40;
+    const nx = Math.max(-1, Math.min(1, dx / max));
+    const ny = Math.max(-1, Math.min(1, dy / max));
+    joystickDir = {x: nx, y: ny};
+    joystickKnob.style.transform = `translate(${nx*36}px, ${ny*36}px)`;
+  });
+  joystickArea.addEventListener('pointerup', (ev) => {
+    if (ev.pointerId !== activeId) return;
+    joystickActive = false; activeId = null;
+    joystickDir = {x:0,y:0};
+    joystickKnob.style.transform = `translate(0px,0px)`;
+    joystickArea.releasePointerCapture && joystickArea.releasePointerCapture(ev.pointerId);
+  });
+  // action button (tap)
+  const actionBtn = document.getElementById('actionBtn');
+  actionBtn.addEventListener('pointerdown', (e)=>{ e.preventDefault(); doAction(); });
+}
+
+/* Action (for future interactions) */
+function doAction() {
+  // example: nearby collectibles get magnetized
+  const p = camera.position;
+  let found = 0;
+  collectibles.forEach((c) => {
+    if (c.userData.collected) return;
+    const d = c.position.distanceTo(p);
+    if (d < 6) {
+      // move towards player
+      c.position.lerp(p, 0.3);
+      found++;
+    }
+  });
+  if (found > 0) {
+    showNotification('Atracción', `${found} objetos se acercan`);
+  } else {
+    showNotification('Nada cerca', 'No hay objetos en rango');
+  }
+}
+
+/* Pointer lock mouse look (PC) */
+function setupPointerLock() {
+  // link control change
+  controls.addEventListener('lock', () => {
+    // hide cursor state handled by browser
+  });
+  controls.addEventListener('unlock', () => {
+    // unlocked
+  });
+}
+
+/* Window resize */
+function onWindowResize(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+/* Start/Stop */
+function startGame(lock=true) {
+  if (gameStarted) return;
+  gameStarted = true;
+  usePointerLock = !!lock;
+  document.getElementById('gameStartScreen').style.display = 'none';
+  // if pointer lock and not touch
+  if (!isTouchDevice && usePointerLock) {
+    controls.lock();
+  }
+  updateHUD();
+  animate();
+}
+
+/* Pause / resume / exit */
+function togglePauseMenu() {
+  const el = document.getElementById('pauseMenu');
+  if (el.style.display === 'flex') {
+    el.style.display = 'none';
+    gameStarted = true;
+    lastTime = performance.now();
+    animate();
+  } else {
+    el.style.display = 'flex';
+    gameStarted = false;
+  }
+}
+function resumeGame(){
+  document.getElementById('pauseMenu').style.display = 'none';
+  gameStarted = true;
+  lastTime = performance.now();
+  animate();
+}
+function exitGame(){
+  // simple exit: reload scene / show start
+  document.getElementById('pauseMenu').style.display = 'none';
+  document.getElementById('gameStartScreen').style.display = 'flex';
+  gameStarted = false;
+  // reset stats minimal
+  playerStats.lupicoins = 0;
+  playerStats.xp = 0;
+  playerStats.clubPower = 100;
+  updateHUD();
+}
+
+/* Setup UI buttons */
+document.getElementById('startBtn').addEventListener('click', ()=>{ startGame(true); });
+document.getElementById('startBtnNoLock').addEventListener('click', ()=>{ startGame(false); });
+
+/* Initial setup */
+initScene();
+setupKeyboard();
+setupJoystick();
+setupPointerLock();
+
+/* Show mobile controls if touch device */
+if (isTouchDevice) {
+  document.getElementById('mobileControls').style.display = 'block';
+}
+
+/* Initial HUD */
+updateHUD();
+
+/* Kick off a light intro notification after page load */
+window.addEventListener('load', () => {
+  setTimeout(()=> showNotification('Listo', 'Haz click o usa el joystick para empezar'), 700);
+});
+
+/* Prevent scrolling on mobile during touch interactions */
+document.body.addEventListener('touchmove', (e) => { if (gameStarted) e.preventDefault(); }, {passive:false});
+
+</script>
+</body>
+</html>

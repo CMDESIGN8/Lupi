@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Lupi Game — Corregido (carga lupi.glb)</title>
+
+<!-- three.js primero -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- loaders (GLTF) -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<style>
+  :root{
+    --bg:#070712; --accent:#00ff88;
+  }
+  html,body{height:100%;margin:0;background:var(--bg);color:#fff;overflow:hidden}
+  canvas{display:block;width:100%;height:100%}
+  /* simple HUD */
+  #hud { position: absolute; left: 12px; top: 12px; z-index: 20; background: rgba(0,0,0,0.35); padding: 8px 12px; border-radius:10px; font-family: Inter, sans-serif; }
+  #startScreen { position: absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index: 25; background: linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4)); }
+  .btn { background: linear-gradient(90deg,var(--accent), #00aaff); border:none; padding:10px 18px; border-radius:999px; cursor:pointer; font-weight:700; }
+  /* mobile joystick */
+  #mobileControls { position: absolute; left: 12px; bottom: 12px; width: 160px; height: 160px; z-index: 24; display:none; touch-action:none; }
+  #joystickBase { width:160px;height:160px;border-radius:50%; background: rgba(255,255,255,0.03); position:relative; }
+  #joystickKnob { width:64px;height:64px;border-radius:50%; background: rgba(255,255,255,0.06); position:absolute; left:50%; top:50%; transform: translate(-50%,-50%); }
+  @media (max-width:900px){ #mobileControls{display:block} #mouseHint{display:none} }
+  #mouseHint { position:absolute; bottom:12px; left:50%; transform:translateX(-50%); background: rgba(0,0,0,0.4); padding:6px 10px; border-radius:999px; z-index:20; }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+
+<!-- HUD / start -->
+<div id="hud">
+  <div>Level: <span id="level">1</span> • Lupicoins: <span id="lupicoins">0</span></div>
+</div>
+
+<div id="startScreen">
+  <div style="text-align:center;color:#ddd">
+    <h1 style="margin-bottom:8px">LUPI GAME</h1>
+    <p style="max-width:380px;margin:0 auto 12px">Se cargará <strong>lupi.glb</strong> desde la misma carpeta. Si no se carga, abre esto mediante un servidor HTTP.</p>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button class="btn" id="startBtn">INICIAR (PC)</button>
+      <button class="btn" id="startBtnNoLock">INICIAR (MÓVIL / SIN BLOQUEO)</button>
+    </div>
+    <div style="margin-top:8px;color:#888;font-size:12px">WASD para mover. En móvil: joystick.</div>
+  </div>
+</div>
+
+<div id="mouseHint">Click + arrastra para girar cámara</div>
+
+<!-- Mobile joystick -->
+<div id="mobileControls">
+  <div id="joystickBase"><div id="joystickKnob"></div></div>
+</div>
+
+<script>
+/* ============================
+   Versión corregida: carga lupi.glb y ajusta escala/iluminación/cámara
+   ============================ */
+
+let scene, camera, renderer, clock;
+let playerGroup, lupiModel = null;
+let collectibles = [], obstacles = [];
+let isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let gameStarted = false;
+
+/* movement */
+const move = { f:0, b:0, l:0, r:0 };
+let joystickActive = false, joystickDir = {x:0,y:0};
+
+/* init renderer + scene */
+function initScene(){
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0a1a);
+  clock = new THREE.Clock();
+
+  camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+  renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('gameCanvas'), antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.0;
+
+  /* Lights: ambient + hemi + directional + rim */
+  const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+  scene.add(ambient);
+
+  const hemi = new THREE.HemisphereLight(0x87ceeb, 0x444444, 0.25); // sky, ground
+  scene.add(hemi);
+
+  const dir = new THREE.DirectionalLight(0xffffff, 1.2);
+  dir.position.set(6,10,4);
+  dir.castShadow = true;
+  dir.shadow.mapSize.set(2048,2048);
+  dir.shadow.bias = -0.0005;
+  scene.add(dir);
+
+  const rim = new THREE.PointLight(0x88ccff, 0.35, 20);
+  rim.position.set(-6,4,-4);
+  scene.add(rim);
+
+  // ground
+  const groundMat = new THREE.MeshStandardMaterial({ color: 0x184218, roughness: 0.9, metalness: 0.05 });
+  const ground = new THREE.Mesh(new THREE.PlaneBufferGeometry(200,200), groundMat);
+  ground.rotation.x = -Math.PI/2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // player group (container for model and logic)
+  playerGroup = new THREE.Group();
+  playerGroup.position.set(0,0,0);
+  scene.add(playerGroup);
+
+  // create some simple collectibles & obstacles so you see interaction
+  createCollectibles(18);
+  createObstacles(10);
+
+  window.addEventListener('resize', onResize);
+}
+
+/* create collectibles */
+function createCollectibles(n){
+  const geo = new THREE.SphereBufferGeometry(0.25, 12, 12);
+  const mat = new THREE.MeshStandardMaterial({ color:0xffd54a, emissive:0x442200, metalness:0.3, roughness:0.5 });
+  for(let i=0;i<n;i++){
+    const m = new THREE.Mesh(geo, mat.clone());
+    m.position.set((Math.random()-0.5)*40, 0.25, (Math.random()-0.5)*40);
+    m.castShadow = true;
+    m.userData = { type:'coin', taken:false };
+    scene.add(m);
+    collectibles.push(m);
+  }
+}
+
+/* create obstacles */
+function createObstacles(n){
+  for(let i=0;i<n;i++){
+    const s = 0.8 + Math.random()*1.8;
+    const m = new THREE.Mesh(new THREE.BoxBufferGeometry(s,s,s), new THREE.MeshStandardMaterial({ color:0x8b2d2d }));
+    m.position.set((Math.random()-0.5)*40, s/2, (Math.random()-0.5)*40);
+    m.castShadow = true; m.receiveShadow = true;
+    m.userData = { type:'obstacle', damage: Math.floor(5+Math.random()*20) };
+    scene.add(m);
+    obstacles.push(m);
+  }
+}
+
+/* load GLB properly and fix scale/position */
+function loadLupi(){
+  const loader = new THREE.GLTFLoader();
+  loader.load('lupi.glb', (gltf) => {
+    // remove previous if exists
+    if (lupiModel) playerGroup.remove(lupiModel);
+
+    lupiModel = gltf.scene;
+    // enable shadows & tweak materials for a nicer read
+    lupiModel.traverse((ch) => {
+      if (ch.isMesh) {
+        ch.castShadow = true;
+        ch.receiveShadow = true;
+        if (ch.material) {
+          if (ch.material.map) ch.material.map.encoding = THREE.sRGBEncoding;
+          // safe adjustments if material lacks properties
+          if (typeof ch.material.metalness === 'undefined') ch.material.metalness = 0.1;
+          if (typeof ch.material.roughness === 'undefined') ch.material.roughness = 0.8;
+          ch.material.needsUpdate = true;
+        }
+      }
+    });
+
+    // compute bbox & auto-scale so model has reasonable size in world
+    const bbox = new THREE.Box3().setFromObject(lupiModel);
+    const size = new THREE.Vector3(); bbox.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    if (maxDim === 0) {
+      console.warn('Modelo con bbox 0 — se añade sin escalado.');
+    } else {
+      const targetHeight = 1.6; // target approx height in world units
+      const scale = targetHeight / maxDim;
+      lupiModel.scale.setScalar(scale);
+      // recalc bbox and center
+      const bbox2 = new THREE.Box3().setFromObject(lupiModel);
+      const center = new THREE.Vector3();
+      bbox2.getCenter(center);
+      // move model so base sits on ground
+      lupiModel.position.sub(center); // center at origin
+      bbox2.setFromObject(lupiModel);
+      const newSize = new THREE.Vector3(); bbox2.getSize(newSize);
+      lupiModel.position.y = newSize.y * 0.5; // lift so feet touch ground
+    }
+
+    playerGroup.add(lupiModel);
+
+    console.log('Lupi cargado y posicionado. bbox size:', size);
+  }, undefined, (err) => {
+    console.error('Error cargando lupi.glb:', err);
+    alert('Error cargando lupi.glb — revisa consola y asegúrate de servir por HTTP desde la misma carpeta.');
+  });
+}
+
+/* simple collision checks between playerGroup and small objects */
+function checkCollisions(){
+  const p = playerGroup.position;
+  collectibles.forEach(c => {
+    if (c.userData.taken) return;
+    const d = c.position.distanceTo(p);
+    if (d < 1.0) {
+      c.userData.taken = true;
+      scene.remove(c);
+      // update hud
+      const lup = document.getElementById('lupicoins');
+      lup.textContent = parseInt(lup.textContent || '0') + 1;
+      // simple feedback
+      flashNotification('¡LupiCoin!', '+1');
+    }
+  });
+  obstacles.forEach(o => {
+    const d = o.position.distanceTo(p);
+    if (d < 1.2) {
+      // push back a bit
+      const push = new THREE.Vector3().subVectors(p, o.position).setY(0).normalize().multiplyScalar(0.6);
+      playerGroup.position.add(push);
+      flashNotification('¡Cuidado!', '-Poder');
+      // move obstacle away to avoid repeated hits
+      o.position.set((Math.random()-0.5)*40, o.position.y, (Math.random()-0.5)*40);
+    }
+  });
+}
+
+/* simple notification (small) */
+let notifTO = null;
+function flashNotification(t, s){
+  const el = document.createElement('div');
+  el.style.position='absolute';
+  el.style.left='50%'; el.style.top='12%';
+  el.style.transform='translateX(-50%)';
+  el.style.background='rgba(0,0,0,0.75)';
+  el.style.padding='8px 12px'; el.style.borderRadius='8px'; el.style.zIndex=30;
+  el.style.color='#fff'; el.style.fontFamily='Inter, sans-serif';
+  el.innerHTML = `<strong style="color:${t.includes('¡')? 'var(--accent)' : '#fff'}">${t}</strong><div style="font-size:12px;color:#ddd">${s}</div>`;
+  document.body.appendChild(el);
+  clearTimeout(notifTO);
+  notifTO = setTimeout(()=> el.remove(), 900);
+}
+
+/* camera follow (third-person) */
+const camOffset = new THREE.Vector3(0, 1.6, 3.2);
+let camYaw = 0, camPitch = 0;
+function updateCamera(){
+  // keep camera behind + above player; allow slight yaw controlled by mouse dragging
+  const playerPos = playerGroup.position.clone();
+  // compute offset rotated by yaw
+  const offset = camOffset.clone();
+  // basic yaw/pitch effect
+  const cos = Math.cos(camYaw), sin = Math.sin(camYaw);
+  const rotOffset = new THREE.Vector3(offset.x * cos - offset.z * sin, offset.y, offset.x * sin + offset.z * cos);
+  const desired = playerPos.clone().add(rotOffset);
+  // smooth camera
+  camera.position.lerp(desired, 0.15);
+  camera.lookAt(playerPos.x, playerPos.y + 0.8, playerPos.z);
+}
+
+/* movement based on camera forward */
+function updatePlayer(delta){
+  let inputX = move.r - move.l;
+  let inputZ = move.f - move.b; // forward positive
+  if (joystickActive) { inputX = joystickDir.x; inputZ = joystickDir.y; }
+
+  if (Math.abs(inputX) < 0.01 && Math.abs(inputZ) < 0.01) return;
+
+  // camera forward
+  const camDir = new THREE.Vector3();
+  camera.getWorldDirection(camDir);
+  camDir.y = 0; camDir.normalize();
+  const camRight = new THREE.Vector3().crossVectors(camDir, new THREE.Vector3(0,1,0)).normalize();
+
+  const moveVec = new THREE.Vector3();
+  moveVec.addScaledVector(camDir, inputZ);
+  moveVec.addScaledVector(camRight, inputX);
+  if (moveVec.length() > 0.001) moveVec.normalize();
+
+  const speed = 4.0; // units per second
+  playerGroup.position.addScaledVector(moveVec, speed * delta);
+
+  // rotate model to face movement
+  if (lupiModel){
+    const target = playerGroup.position.clone().add(moveVec);
+    lupiModel.lookAt(target.x, playerGroup.position.y + 0.5, target.z);
+  }
+}
+
+/* main loop */
+let last = performance.now();
+function animate(){
+  requestAnimationFrame(animate);
+  const now = performance.now();
+  const delta = Math.min(0.05, (now - last)/1000);
+  last = now;
+
+  if (gameStarted){
+    updatePlayer(delta);
+    updateCamera();
+    checkCollisions();
+  }
+
+  renderer.render(scene, camera);
+}
+
+/* input handlers */
+window.addEventListener('keydown', (e) => {
+  if (!gameStarted) return;
+  switch(e.code){
+    case 'KeyW': move.f = 1; break;
+    case 'KeyS': move.b = 1; break;
+    case 'KeyA': move.l = 1; break;
+    case 'KeyD': move.r = 1; break;
+  }
+});
+window.addEventListener('keyup', (e) => {
+  if (!gameStarted) return;
+  switch(e.code){
+    case 'KeyW': move.f = 0; break;
+    case 'KeyS': move.b = 0; break;
+    case 'KeyA': move.l = 0; break;
+    case 'KeyD': move.r = 0; break;
+  }
+});
+
+/* simple mouse drag to rotate camera yaw/pitch */
+let dragging = false, lastMouse = {x:0,y:0};
+document.addEventListener('mousedown', (e)=>{ dragging = true; lastMouse.x = e.clientX; lastMouse.y = e.clientY; });
+document.addEventListener('mouseup', ()=>{ dragging = false; });
+document.addEventListener('mousemove', (e)=>{
+  if (!dragging || isTouch) return;
+  const dx = (e.clientX - lastMouse.x) * 0.002;
+  const dy = (e.clientY - lastMouse.y) * 0.002;
+  camYaw -= dx; camPitch = Math.max(-0.6, Math.min(0.6, camPitch - dy));
+  lastMouse.x = e.clientX; lastMouse.y = e.clientY;
+});
+
+/* mobile joystick */
+const base = document.getElementById('joystickBase');
+const knob = document.getElementById('joystickKnob');
+if (base){
+  let pointerId = null, start = {x:0,y:0};
+  base.addEventListener('pointerdown', (ev)=>{
+    ev.preventDefault();
+    pointerId = ev.pointerId;
+    base.setPointerCapture(pointerId);
+    joystickActive = true;
+    start.x = ev.clientX; start.y = ev.clientY;
+  });
+  base.addEventListener('pointermove', (ev)=>{
+    if (!joystickActive || ev.pointerId !== pointerId) return;
+    const dx = ev.clientX - start.x;
+    const dy = ev.clientY - start.y;
+    const max = 50;
+    const nx = Math.max(-1, Math.min(1, dx / max));
+    const ny = Math.max(-1, Math.min(1, -dy / max)); // invert Y so up is positive
+    joystickDir = { x: nx, y: ny };
+    knob.style.transform = `translate(${nx * 40}px, ${ny * 40}px)`;
+  });
+  base.addEventListener('pointerup', (ev)=>{
+    if (ev.pointerId !== pointerId) return;
+    base.releasePointerCapture(pointerId);
+    pointerId = null;
+    joystickActive = false;
+    joystickDir = {x:0,y:0};
+    knob.style.transform = '';
+  });
+}
+
+/* helpers */
+function onResize(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+/* UI / start buttons */
+document.getElementById('startBtn').addEventListener('click', ()=>{
+  startGame(true);
+});
+document.getElementById('startBtnNoLock').addEventListener('click', ()=>{
+  startGame(false);
+});
+
+function startGame(withPointerLock){
+  // hide start
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('mouseHint').style.display = 'block';
+  gameStarted = true;
+  // initial camera placement near player
+  camera.position.set(0,1.6,3.2);
+}
+
+/* small HUD update helper */
+function setHUD(name, value){
+  const el = document.getElementById(name);
+  if (el) el.textContent = value;
+}
+
+/* start everything */
+initScene();
+loadLupi();
+animate();
+
+</script>
+</body>
+</html> 

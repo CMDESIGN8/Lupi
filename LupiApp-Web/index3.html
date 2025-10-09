@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego 3D Runner con Three.js</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+        h1 {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: sans-serif;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="score">Puntuación: 0</h1>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.164.1/build/three.module.js"
+        }
+    }
+    </script>
+
+    <script type="module" src="game3d.js"></script>
+</body>
+</html>
