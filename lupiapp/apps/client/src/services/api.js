@@ -56,12 +56,3 @@ export const addSkillPoint = async (characterId, skillKey) => {
   return data.character;
 };
 
-export const trainCharacter = async (characterId) => {
-  const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/characters/${characterId}/train`, {
-    method: "POST",
-  });
-
-  if (!res.ok) throw new Error("Error entrenando personaje");
-  return await res.json();
-};
-
