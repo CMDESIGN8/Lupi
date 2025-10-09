@@ -1,15 +1,16 @@
 @import url(../styles/globales.css);
 
 
-.dashboard {
-  display: flex;
-  width: 100%;
-  gap: 16px;
-  font-family: 'Orbitron', sans-serif;
-  color: #00f0ff;
-  padding: 16px;
-  background: #0b0f1a; /* fondo oscuro */
-}
+.dashboard { 
+    padding: var(--spacing-lg); 
+    min-height: 80vh; background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
+    color: var(--lupi-text); 
+    font-family: 'Orbitron', sans-serif; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    gap: var(--spacing-lg); 
+    animation: fadeInUp 0.8s ease; }
 
 /* Títulos neon */
 .dashboard h2, .dashboard h3 {
