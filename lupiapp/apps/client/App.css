@@ -189,7 +189,7 @@
   padding: 10px;
   border: 1px solid #eee;
   border-radius: 8px;
-  background: #fafafa;
+  background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
 }
 
 .skill-item {
