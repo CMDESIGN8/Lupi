@@ -167,34 +167,20 @@ return (
   </div>{/* CENTRO - Skills */}
 
   <div className="panel panel-center"><h3>⚔️ Skills</h3>
-
-<ul className="skills-grid">
-
-  {stats.map(({ key, label }) => (
-
-    <li key={key} className="skill-card">
-
-      <span className="skill-name">{label}</span>
-
-      <div className="skill-bar-container">
-
-        <div className="skill-bar" style={{ width: `${character[key]}%` }}></div>
-
-        <span className="skill-value">{character[key]}</span>
-
-      </div>
-
-      {character.available_skill_points > 0 && character[key] < 100 && (
-
-        <button className="skill-btn" onClick={() => increaseStat(key)}>➕</button>
-
-      )}
-
-    </li>
-
-  ))}
-
-</ul>
+    
+  <ul className="skills-grid">
+    {stats.map(({ key, label }) => (
+      <li key={key} className="skill-card">
+        <div className="skill-info">
+          <span className="skill-name">{label}</span>
+          <span className="skill-value">{character[key]}</span>
+        </div>
+        {character.available_skill_points > 0 && character[key] < 100 && (
+          <button className="skill-btn" onClick={() => increaseStat(key)}>➕</button>
+        )}
+      </li>
+    ))}
+  </ul>
 
   </div>{/* DERECHA - Acciones */}
 
