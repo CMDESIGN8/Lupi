@@ -1,11 +1,10 @@
 @import url(../styles/globales.css);
 
-
 .dashboard {
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: 100vh; /* toda la altura de la pantalla */
+  height: 100vh;
   gap: var(--spacing-lg);
   padding: var(--spacing-lg);
   background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker));
@@ -21,18 +20,189 @@
   animation: neonFlicker 2s infinite;
 }
 
-/* Secciones */
-.character-info,
-.wallet-info,
-.stats {
+/* Paneles principales - MODIFICADO */
+.panel {
+  flex: 1; /* Todos los paneles ocupan el mismo espacio */
   background: var(--bg-card);
   border: 2px solid var(--lupi-primary);
   border-radius: var(--border-radius);
   padding: var(--spacing-md);
-  width: 100%;
-  max-width: 800px;
   box-shadow: var(--shadow-soft);
-  animation: fadeInUp 0.8s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  overflow-y: auto;
+  min-height: 500px; /* Altura mínima consistente */
+}
+
+/* Eliminar las clases específicas de ancho */
+.panel-left, .panel-center, .panel-right {
+  max-width: none !important; /* Eliminar límites de ancho */
+}
+
+/* Títulos de panel */
+.panel h3 {
+  color: var(--lupi-primary);
+  text-shadow: var(--shadow-glow);
+  animation: neonFlicker 2s infinite;
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+  font-size: 1.3em;
+}
+
+/* Avatar */
+.avatar {
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-sm);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Información del personaje */
+.character-info p {
+  margin: var(--spacing-sm) 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.character-info p span {
+  color: var(--highlight);
+  font-weight: bold;
+  text-shadow: 0 0 5px var(--highlight);
+}
+
+/* Barra de experiencia */
+.exp-bar {
+  width: 100%;
+  height: 20px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  margin: var(--spacing-sm) 0;
+  box-shadow: inset 0 0 8px var(--lupi-dark);
+}
+
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--lupi-green), var(--lupi-primary));
+  border-radius: var(--border-radius-sm);
+  width: 0%;
+  transition: width 1s ease-in-out;
+  box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary);
+  position: relative;
+}
+
+.exp-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 0 20px var(--lupi-green), 0 0 40px var(--lupi-primary);
+  opacity: 0.6;
+  animation: glowPulse 1.5s ease-in-out infinite alternate;
+}
+
+/* Grid de Skills */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+  flex-grow: 1; /* Ocupa el espacio disponible */
+}
+
+.skill-card {
+  background: var(--lupi-card);
+  padding: 10px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--lupi-secondary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: var(--lupi-text);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.skill-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow-accent);
+}
+
+.skill-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.skill-name {
+  font-weight: bold;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 5px #00fff0;
+  font-size: 0.9em;
+}
+
+.skill-value {
+  font-size: 0.85em;
+  color: var(--lupi-text-secondary);
+  margin-top: 2px;
+}
+
+.skill-btn {
+  background: var(--neon-blue);
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  transition: all 0.2s;
+  font-size: 0.8em;
+}
+
+.skill-btn:hover {
+  transform: scale(1.1);
+  background: var(--lupi-accent);
+}
+
+/* Acciones */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex-grow: 1;
+  justify-content: flex-start;
+}
+
+.actions button {
+  width: 100%;
+  padding: var(--spacing-sm);
+  background: var(--lupi-primary);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--lupi-dark);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.actions button:hover {
+  background: var(--lupi-accent);
+  color: var(--lupi-text);
+  box-shadow: var(--shadow-glow-accent);
+  transform: translateY(-2px);
 }
 
 /* Wallet */
@@ -42,7 +212,7 @@
   text-shadow: 0 0 5px var(--lupi-accent);
 }
 
-/* Stats */
+/* Stats (para compatibilidad) */
 .stats ul {
   list-style: none;
   padding: 0;
@@ -67,13 +237,6 @@
 .stats ul li:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-glow-accent);
-}
-
-/* Nombre del stat */
-.stat-name {
-  font-size: 0.9em;
-  color: var(--lupi-text-secondary);
-  margin-bottom: 4px;
 }
 
 /* Barra estilo RPG */
@@ -101,79 +264,6 @@
   text-shadow: 0 0 5px var(--highlight);
 }
 
-/* Animación de las barras */
-@keyframes growBar {
-  from { width: 0%; }
-  to { width: var(--stat-value, 100%); }
-}
-
-/* Botón */
-.dashboard button {
-  padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--lupi-primary);
-  border: none;
-  border-radius: var(--border-radius-sm);
-  color: var(--lupi-dark);
-  font-weight: bold;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.dashboard button:hover {
-  background: var(--lupi-accent);
-  color: var(--lupi-text);
-  box-shadow: var(--shadow-glow-accent);
-  transform: translateY(-2px);
-}
-/* Barra de experiencia */
-.exp-bar {
-  width: 100%;
-  height: 20px;
-  background: rgba(255,255,255,0.05); /* fondo oscuro */
-  border-radius: var(--border-radius-sm);
-  overflow: hidden;
-  margin: var(--spacing-sm) 0;
-  box-shadow: inset 0 0 8px var(--lupi-dark);
-}
-
-/* Parte completada de la barra */
-.exp-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--lupi-green), var(--lupi-primary));
-  border-radius: var(--border-radius-sm);
-  width: 0%;
-  transition: width 1s ease-in-out;
-  box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary);
-  position: relative;
-}
-
-/* Glow animado sobre lo completado */
-.exp-fill::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  border-radius: var(--border-radius-sm);
-  box-shadow: 0 0 20px var(--lupi-green), 0 0 40px var(--lupi-primary);
-  opacity: 0.6;
-  animation: glowPulse 1.5s ease-in-out infinite alternate;
-}
-
-@keyframes glowPulse {
-  0% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
-  50% { box-shadow: 0 0 20px var(--lupi-green), 0 0 40px var(--lupi-primary); opacity: 0.8; }
-  100% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
-}
-
-
-.character-info p span {
-  color: var(--highlight);
-  font-weight: bold;
-  text-shadow: 0 0 5px var(--highlight);
-}
-
 /* Popup de Level Up */
 .levelup-popup {
   position: fixed;
@@ -196,6 +286,7 @@
   color: var(--lupi-accent);
   text-shadow: 0 0 10px var(--lupi-accent), 0 0 20px var(--lupi-accent);
 }
+
 /* Botón de skill points */
 .add-skill-btn {
   margin-left: 8px;
@@ -216,101 +307,34 @@
   transform: scale(1.1);
 }
 
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columnas */
-  gap: 16px;
-  margin-top: 16px;
+/* Animaciones */
+@keyframes growBar {
+  from { width: 0%; }
+  to { width: var(--stat-value, 100%); }
 }
 
-.skill-card {
-  background: var(--bg-card);
-  padding: 12px;
-  border-radius: var(--border-radius-sm);
-  box-shadow: var(--shadow-soft);
-  display: flex;
-  justify-content: space-between; /* nombre y boton separados */
-  align-items: center;
-  font-weight: bold;
-  color: var(--lupi-text);
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
+  50% { box-shadow: 0 0 20px var(--lupi-green), 0 0 40px var(--lupi-primary); opacity: 0.8; }
+  100% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
 }
 
-.skill-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.skill-name {
-  font-weight: bold;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 5px #00fff0, 0 0 10px #00fff0;
-}
-
-.skill-value {
-  font-size: 0.9em;
-  color: var(--lupi-text-secondary);
-  margin-top: 2px;
-}
-
-.skill-btn {
-  background: var(--neon-blue);
-  border: none;
-  color: #fff;
-  font-weight: bold;
-  padding: 6px 10px;
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
-  box-shadow: var(--shadow-glow);
-  transition: transform 0.2s;
-}
-
-.skill-btn:hover {
-  transform: scale(1.1);
-}
-
-/* Paneles de 3 secciones */
-.panel {
-  flex: 1; /* todos toman el mismo espacio */
-  background: var(--bg-card);
-  border: 2px solid var(--lupi-primary);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
-  box-shadow: var(--shadow-soft);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  overflow-y: auto; /* si hay scroll en panel central */
-}
-
-/* Ajuste específico para cada sección */
-.panel-left { max-width: 250px; }
-.panel-center { flex: 2; }
-.panel-right { max-width: 200px; }
-
-/* Títulos neon */
-.panel h3 {
-  color: var(--lupi-primary);
-  text-shadow: var(--shadow-glow);
-  animation: neonFlicker 2s infinite;
-}
-
-/* Botones acción */
-.actions button {
-  width: 100%;
-  margin-bottom: var(--spacing-sm);
-}
-
-/* Avatar placeholder */
-.avatar {
-  width: 100%;
-  height: 150px;
-  background: linear-gradient(135deg, var(--neon-blue), var(--neon-cyan));
-  border-radius: var(--border-radius);
-  margin-bottom: var(--spacing-sm);
-  box-shadow: var(--shadow-glow);
-}
-/* Botones acción */
-.actions button {
-  width: 100%;
-  margin-bottom: var(--spacing-sm);
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .panel {
+    min-height: auto;
+  }
+  
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .actions button {
+    padding: var(--spacing-md);
+  }
 }
