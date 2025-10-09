@@ -168,7 +168,6 @@
 .skill-info {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
     background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
 }
 
