@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { getCharacter, getWallet } from "../services/api";
-import "../styles/Dashboard.css"; // importamos los estilos
+import "../styles/Dashboard.css";
 
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
@@ -20,9 +20,9 @@ export const Dashboard = ({ user }) => {
       const charData = await getCharacter(userId);
 
       if (charData?.id) {
-        // Detectar si subió de nivel
+        // Si ya había personaje cargado y detectamos que subió de nivel
         if (character && charData.level > character.level) {
-          triggerLevelUp();
+          triggerLevelUp(charData);
         }
 
         setCharacter(charData);
@@ -38,15 +38,24 @@ export const Dashboard = ({ user }) => {
     }
   };
 
-  const triggerLevelUp = () => {
+  const triggerLevelUp = (charData) => {
+    // Sumar 5 skill points
+    const newChar = {
+      ...charData,
+      available_skill_points: (charData.available_skill_points || 0) + 5,
+    };
+
+    setCharacter(newChar);
     setShowLevelUp(true);
-    setTimeout(() => setShowLevelUp(false), 3000); // popup 3 seg
+
+    // Ocultar popup a los 3 seg
+    setTimeout(() => setShowLevelUp(false), 3000);
   };
 
   if (loading) return <p>⏳ Cargando tu dashboard...</p>;
   if (!character) return <p>⚠️ No tienes personaje creado aún.</p>;
 
-  // Calcular EXP faltante
+  // Calcular EXP
   const expActual = character.experience;
   const expMax = character.experience_to_next_level;
   const expFaltante = expMax - expActual;
@@ -82,8 +91,13 @@ export const Dashboard = ({ user }) => {
           ></div>
         </div>
         <p>
-          EXP actual: <span>{expActual}</span> / {expMax}  
+          EXP actual: <span>{expActual}</span> / {expMax}
           &nbsp;| Falta: <span>{expFaltante}</span>
+        </p>
+
+        <p>
+          🎯 Skill Points disponibles:{" "}
+          <span>{character.available_skill_points || 0}</span>
         </p>
       </section>
 
@@ -119,6 +133,7 @@ export const Dashboard = ({ user }) => {
       {showLevelUp && (
         <div className="levelup-popup">
           <h2>🎉 ¡Subiste a nivel {character.level}!</h2>
+          <p>+5 Skill Points</p>
         </div>
       )}
     </div>
