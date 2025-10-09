@@ -7,10 +7,11 @@ export const Dashboard = ({ user }) => {
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLevelUp, setShowLevelUp] = useState(false);
-  const [addingSkill, setAddingSkill] = useState(false);
 
   useEffect(() => {
-    if (user) fetchData(user.id);
+    if (user) {
+      fetchData(user.id);
+    }
   }, [user]);
 
   const fetchData = async (userId) => {
@@ -30,39 +31,28 @@ export const Dashboard = ({ user }) => {
   };
 
   const increaseStat = async (statKey) => {
-    if (!character || character.available_skill_points <= 0 || character[statKey] >= 100) return;
-    setAddingSkill(true);
+    if (!character || character.available_skill_points <= 0) return;
 
-    try {
-      const updated = await updateStat(
-        character.id,
-        statKey,
-        character[statKey] + 1,
-        character.available_skill_points - 1
-      );
-      setCharacter(updated);
-    } catch (err) {
-      console.error("Error al agregar skill:", err);
-      alert(err.message || "Error al agregar skill");
-    } finally {
-      setAddingSkill(false);
-    }
+    const updated = await updateStat(
+      character.id,
+      statKey,
+      character[statKey] + 1,
+      character.available_skill_points - 1
+    );
+
+    setCharacter(updated);
   };
 
   const handleTrain = async () => {
     if (!character) return;
-    try {
-      const result = await trainCharacter(character.id);
-      if (result.character) {
-        setCharacter(result.character);
-        setWallet(result.wallet);
-        if (result.character.level > character.level) {
-          setShowLevelUp(true);
-          setTimeout(() => setShowLevelUp(false), 3000);
-        }
+    const result = await trainCharacter(character.id);
+    if (result.character) {
+      setCharacter(result.character);
+      setWallet(result.wallet);
+      if (result.character.level > character.level) {
+        setShowLevelUp(true);
+        setTimeout(() => setShowLevelUp(false), 3000);
       }
-    } catch (err) {
-      console.error("Error entrenando:", err);
     }
   };
 
@@ -71,6 +61,7 @@ export const Dashboard = ({ user }) => {
 
   const expActual = character.experience;
   const expMax = character.experience_to_next_level;
+  const expFaltante = expMax - expActual;
   const expPorcentaje = Math.min((expActual / expMax) * 100, 100);
 
   const stats = [
@@ -96,18 +87,19 @@ export const Dashboard = ({ user }) => {
         <p>Nivel: {character.level}</p>
 
         <div className="exp-bar">
-          <div
-            className="exp-fill glow-progress"
-            style={{ width: `${expPorcentaje}%` }}
-          />
-        </div>
-        <p>
-          EXP: <span>{expActual}</span> / {expMax} | Próximo Nivel:{" "}
-          <span>{expMax - expActual}</span>
-        </p>
+  <div
+    className="exp-fill"
+    style={{ width: `${expPorcentaje}%` }}
+  ></div>
+</div>
+<p>
+  EXP: <span>{expActual}</span> / {expMax} | Proximo Nivel:{" "}
+  <span>{expMax - expActual}</span>
+</p>
 
         <p>
-          🎯 Skill Points disponibles: <span>{character.available_skill_points || 0}</span>
+          🎯 Skill Points disponibles:{" "}
+          <span>{character.available_skill_points || 0}</span>
         </p>
       </section>
 
@@ -126,17 +118,13 @@ export const Dashboard = ({ user }) => {
             <li key={key} className="stat-item">
               <span className="stat-name">{label}</span>
               <div className="stat-bar">
-                <div
-                  className="fill glow-progress"
-                  style={{ width: `${character[key]}%` }}
-                ></div>
+                <div className="fill" style={{ width: `${character[key]}%` }}></div>
               </div>
               <span className="stat-value">{character[key]}</span>
-              {character.available_skill_points > 0 && character[key] < 100 && (
+              {character.available_skill_points > 0 && (
                 <button
                   className="add-skill-btn"
                   onClick={() => increaseStat(key)}
-                  disabled={addingSkill}
                 >
                   ➕
                 </button>
