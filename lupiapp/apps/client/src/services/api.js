@@ -23,3 +23,20 @@ export async function getWallet(characterId) {
   const res = await fetch(`${API_URL}/wallets/${characterId}`);
   return res.json();
 }
+
+export async function updateStat(characterId, statKey, newValue, availableSkillPoints) {
+  const res = await fetch(`${API_URL}/characters/${characterId}/stat`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ statKey, newValue, available_skill_points: availableSkillPoints }),
+  });
+  return res.json();
+}
+
+export async function trainCharacter(characterId) {
+  const res = await fetch(`${API_URL}/characters/${characterId}/train`, {
+    method: "POST",
+  });
+  return res.json();
+}
+

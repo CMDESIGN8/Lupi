@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { createClient } from "@supabase/supabase-js";
+import characterRoutes from "./routes/characters.js";
 
 dotenv.config();
 
@@ -67,6 +68,8 @@ app.get("/wallets/:characterId", async (req, res) => {
   if (error) return res.status(400).json({ error: error.message });
   res.json(data);
 });
+
+app.use("/characters", characterRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
