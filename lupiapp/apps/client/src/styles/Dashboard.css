@@ -125,7 +125,7 @@
   box-shadow: var(--shadow-glow-accent);
   transform: translateY(-2px);
 }
-/* Barra de EXP */
+/* Barra de experiencia */
 .exp-bar {
   width: 100%;
   height: 18px;
@@ -141,8 +141,24 @@
   background: linear-gradient(90deg, var(--lupi-green), var(--lupi-primary));
   border-radius: var(--border-radius-sm);
   width: 0%;
-  animation: growExp 1.2s ease-out forwards;
+  transition: width 1.2s ease-in-out; /* 👈 animación */
   box-shadow: var(--shadow-glow-accent);
+}
+/* Glow al subir de nivel */
+.exp-bar.level-up {
+  animation: glowLevelUp 1s ease-in-out;
+}
+
+@keyframes glowLevelUp {
+  0% {
+    box-shadow: 0 0 5px var(--lupi-green), 0 0 10px var(--lupi-primary);
+  }
+  50% {
+    box-shadow: 0 0 15px var(--lupi-green), 0 0 30px var(--lupi-primary);
+  }
+  100% {
+    box-shadow: 0 0 5px var(--lupi-green), 0 0 10px var(--lupi-primary);
+  }
 }
 
 @keyframes growExp {

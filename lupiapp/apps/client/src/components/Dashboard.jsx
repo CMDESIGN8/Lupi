@@ -87,12 +87,15 @@ export const Dashboard = ({ user }) => {
         <p>Nivel: {character.level}</p>
 
         <div className="exp-bar">
-          <div className="exp-fill" style={{ width: `${expPorcentaje}%` }}></div>
-        </div>
-        <p>
-          EXP: <span>{expActual}</span> / {expMax} | Falta:{" "}
-          <span>{expFaltante}</span>
-        </p>
+  <div
+    className="exp-fill"
+    style={{ width: `${expPorcentaje}%` }}
+  ></div>
+</div>
+<p>
+  EXP: <span>{expActual}</span> / {expMax} | Proximo Nivel:{" "}
+  <span>{expMax - expActual}</span>
+</p>
 
         <p>
           🎯 Skill Points disponibles:{" "}
