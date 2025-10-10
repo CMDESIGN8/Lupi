@@ -535,3 +535,45 @@ box-shadow: var(--shadow-glow);
 
 }
 
+/* Agrega al final de Dashboard.css */
+
+/* Estilos para el tour */
+.tour-button {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 191, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(0, 191, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 191, 255, 0);
+  }
+}
+
+/* Asegurar que los elementos del tour sean visibles */
+.react-joyride__tooltip {
+  z-index: 10000 !important;
+}
+
+.react-joyride__overlay {
+  z-index: 9999 !important;
+}
+
+.react-joyride__spotlight {
+  z-index: 9998 !important;
+}
+
+/* Mejorar la visibilidad de los targets */
+.panel-left,
+.panel-center,
+.panel-right,
+.skills-grid,
+.actions button:first-child,
+.exp-bar {
+  position: relative;
+}
+
