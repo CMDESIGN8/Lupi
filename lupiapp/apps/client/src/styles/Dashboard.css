@@ -699,7 +699,7 @@
   z-index: 9998 !important;
 }
 
-/* Efecto de gradiente animado en los bordes */
+/* Efecto de gradiente animado en los bordes - CORREGIDO */
 .panel-left {
   border-left: 4px solid;
   border-image: linear-gradient(45deg, var(--jersey-blue), transparent) 1;
@@ -707,9 +707,8 @@
 
 .panel-right {
   border-right: 4px solid;
-  border-image: linear-gradient (45deg, var(--jersey-red),transparent);
-  }
-/* Continuación del Dashboard.css */
+  border-image: linear-gradient(45deg, transparent, var(--jersey-red)) 1;
+}
 
 .panel-center {
   border-top: 4px solid;
