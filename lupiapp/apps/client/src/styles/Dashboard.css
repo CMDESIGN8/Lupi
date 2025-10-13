@@ -709,3 +709,389 @@
   border-right: 4px solid;
   border-image: linear-gradient(45deg, transparent, var(--jersey-red);
   }
+/* Continuación del Dashboard.css */
+
+.panel-center {
+  border-top: 4px solid;
+  border-bottom: 4px solid;
+  border-image: linear-gradient(90deg, var(--jersey-blue), var(--jersey-red)) 1;
+}
+
+/* Efectos de brillo en hover para paneles */
+.panel-left:hover {
+  box-shadow: inset 0 0 30px rgba(52, 152, 219, 0.3);
+}
+
+.panel-center:hover {
+  box-shadow: inset 0 0 30px rgba(46, 204, 113, 0.3);
+}
+
+.panel-right:hover {
+  box-shadow: inset 0 0 30px rgba(231, 76, 60, 0.3);
+}
+
+/* Badge de notificaciones */
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(45deg, var(--jersey-red), #c0392b);
+  color: var(--line-white);
+  border: 2px solid var(--goal-yellow);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse-notification 2s infinite;
+}
+
+@keyframes pulse-notification {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Efecto de estadio en el fondo general */
+.dashboard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    /* Gradas */
+    linear-gradient(45deg, 
+      transparent 0%, 
+      rgba(44, 62, 80, 0.8) 10%, 
+      transparent 20%,
+      rgba(52, 73, 94, 0.6) 30%,
+      transparent 40%,
+      rgba(44, 62, 80, 0.8) 50%,
+      transparent 60%,
+      rgba(52, 73, 94, 0.6) 70%,
+      transparent 80%,
+      rgba(44, 62, 80, 0.8) 90%,
+      transparent 100%
+    );
+  opacity: 0.1;
+  pointer-events: none;
+  animation: stadium-move 20s infinite linear;
+}
+
+@keyframes stadium-move {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100px); }
+}
+
+/* Efecto de focos del estadio */
+.dashboard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 10%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 10%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 20% 90%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 90%, rgba(241, 196, 15, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  animation: spotlight-pulse 4s infinite alternate;
+}
+
+@keyframes spotlight-pulse {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.6; }
+}
+
+/* Efectos de confeti para celebraciones */
+.confetti {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--goal-yellow);
+  opacity: 0.7;
+  animation: confetti-fall 5s linear forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-100px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Indicador de energía/stamina */
+.stamina-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--dirt-brown);
+  border-radius: 4px;
+  margin: var(--spacing-xs) 0;
+  overflow: hidden;
+  border: 1px solid var(--line-white);
+}
+
+.stamina-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--jersey-red), var(--goal-yellow), var(--grass-green));
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.stamina-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255,255,255,0.6) 50%, 
+    transparent 100%);
+  animation: stamina-shine 3s infinite;
+}
+
+@keyframes stamina-shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Badges de logros */
+.achievement-badge {
+  display: inline-block;
+  background: linear-gradient(45deg, var(--goal-yellow), #f39c12);
+  color: var(--dark-concrete);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius);
+  font-size: 0.8em;
+  font-weight: 700;
+  margin: var(--spacing-xs);
+  border: 2px solid var(--line-white);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  animation: badge-glow 2s infinite alternate;
+}
+
+@keyframes badge-glow {
+  0% { box-shadow: 0 0 5px var(--goal-yellow); }
+  100% { box-shadow: 0 0 15px var(--goal-yellow); }
+}
+
+/* Efecto de vibración para acciones importantes */
+@keyframes vibrate {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+.vibrate {
+  animation: vibrate 0.3s ease;
+}
+
+/* Tooltips personalizados */
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark-concrete);
+  color: var(--line-white);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--goal-yellow);
+  font-size: 0.8em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1000;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* Efectos de sonido visuales (ondas) */
+.sound-wave {
+  display: inline-block;
+  width: 4px;
+  height: 12px;
+  background: var(--neon-glow);
+  margin: 0 1px;
+  animation: sound-wave 1.2s infinite ease-in-out;
+}
+
+.sound-wave:nth-child(2) { animation-delay: 0.1s; }
+.sound-wave:nth-child(3) { animation-delay: 0.2s; }
+.sound-wave:nth-child(4) { animation-delay: 0.3s; }
+.sound-wave:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes sound-wave {
+  0%, 40%, 100% { transform: scaleY(0.4); }
+  20% { transform: scaleY(1); }
+}
+
+/* Modo competitivo */
+.competitive-mode .panel {
+  border-color: var(--jersey-red);
+  box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+}
+
+.competitive-mode .panel h3 {
+  background: linear-gradient(45deg, var(--jersey-red), #c0392b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Efectos de campeonato */
+.champion-border {
+  border: 4px solid;
+  border-image: linear-gradient(45deg, var(--goal-yellow), var(--jersey-red), var(--goal-yellow)) 1;
+  animation: champion-glow 3s infinite alternate;
+}
+
+@keyframes champion-glow {
+  0% { box-shadow: 0 0 20px var(--goal-yellow); }
+  100% { box-shadow: 0 0 40px var(--goal-yellow); }
+}
+
+/* Responsive adicional para tablets */
+@media (max-width: 1200px) and (min-width: 769px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .actions button {
+    padding: var(--spacing-md);
+    font-size: 0.9em;
+  }
+  
+  .character-details {
+    padding: var(--spacing-md);
+  }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .dashboard::before {
+    background-size: 100px 100px, 60px 60px, 140px 140px;
+  }
+}
+
+/* Modo de impresión */
+@media print {
+  .dashboard {
+    background: white !important;
+    color: black !important;
+  }
+  
+  .panel {
+    border: 1px solid black !important;
+    background: white !important;
+  }
+  
+  .skill-btn, .actions button {
+    display: none !important;
+  }
+}
+
+/* Soporte para modo oscuro del sistema */
+@media (prefers-color-scheme: dark) {
+  .dashboard {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  }
+}
+
+/* Accesibilidad - alto contraste */
+@media (prefers-contrast: high) {
+  :root {
+    --grass-green: #00ff00;
+    --field-green: #008800;
+    --goal-yellow: #ffff00;
+    --line-white: #ffffff;
+    --jersey-blue: #0000ff;
+    --jersey-red: #ff0000;
+  }
+  
+  .panel {
+    border-width: 4px;
+  }
+}
+
+/* Animaciones de entrada para elementos */
+.panel > * {
+  animation: slideInUp 0.6s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Efecto de desgaste en los bordes (estilo club de barrio) */
+.panel {
+  position: relative;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border: 1px solid rgba(255,255,255,0.1);
+  pointer-events: none;
+}
+
+/* Marcas de desgaste */
+.wear-mark {
+  position: absolute;
+  background: rgba(0,0,0,0.3);
+  border-radius: 50%;
+  opacity: 0.3;
+}
+
+.wear-mark-1 { top: 10%; left: 5%; width: 20px; height: 20px; }
+.wear-mark-2 { bottom: 15%; right: 8%; width: 15px; height: 15px; }
+.wear-mark-3 { top: 40%; left: 80%; width: 25px; height: 25px; }
+
+/* Efecto de polvo de cancha */
+.dust-particle {
+  position: absolute;
+  background: var(--dirt-brown);
+  border-radius: 50%;
+  opacity: 0.1;
+  animation: dust-float 10s infinite linear;
+}
+
+@keyframes dust-float {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-100px) rotate(360deg); }
+}
+
+/* FIN DEL CSS - Dashboard estilo RPG Deportivo Clubes de Barrio */
