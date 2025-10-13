@@ -171,8 +171,19 @@ export const Dashboard = ({ user }) => {
           <button>⚽ Clubes</button>
         </div>
       </div>
+      
+      {/* Componente de Guía */}
+      <GuideTour />
 
-       {/* NUEVO FOOTER ESPECTACULAR */}
+      {showLevelUp && (
+        <div className="levelup-popup">
+          <h2>🎉 ¡Subiste a nivel {character.level}!</h2>
+          <p>+5 Skill Points</p>
+        </div>
+      )}
+    </div>
+  );
+  {/* NUEVO FOOTER ESPECTACULAR */}
   <footer className="dashboard-footer">
     <div className="footer-left">
       <div className="footer-stats">
@@ -203,16 +214,4 @@ export const Dashboard = ({ user }) => {
       </span>
     </div>
   </footer>
-
-      {/* Componente de Guía */}
-      <GuideTour />
-
-      {showLevelUp && (
-        <div className="levelup-popup">
-          <h2>🎉 ¡Subiste a nivel {character.level}!</h2>
-          <p>+5 Skill Points</p>
-        </div>
-      )}
-    </div>
-  );
 };
