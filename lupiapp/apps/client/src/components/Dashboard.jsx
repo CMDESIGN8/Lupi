@@ -172,6 +172,38 @@ export const Dashboard = ({ user }) => {
         </div>
       </div>
 
+       {/* NUEVO FOOTER ESPECTACULAR */}
+  <footer className="dashboard-footer">
+    <div className="footer-left">
+      <div className="footer-stats">
+        <div className="stat-item">
+          <span className="stat-value">{character?.level || 1}</span>
+          <span className="stat-label">Nivel</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-value">{wallet?.lupicoins || 0}</span>
+          <span className="stat-label">Lupicoins</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-value">{character?.available_skill_points || 0}</span>
+          <span className="stat-label">Skill Points</span>
+        </div>
+      </div>
+    </div>
+    
+    <div className="footer-right">
+      <button className="footer-button" onClick={handleRefresh}>
+        🔄 Actualizar
+      </button>
+      <button className="footer-button" onClick={() => console.log('Ayuda')}>
+        ❓ Ayuda
+      </button>
+      <span style={{color: 'var(--lupi-text-secondary)', fontSize: '0.9em'}}>
+        🐺 LUPI SOCCER v1.0
+      </span>
+    </div>
+  </footer>
+
       {/* Componente de Guía */}
       <GuideTour />
 
