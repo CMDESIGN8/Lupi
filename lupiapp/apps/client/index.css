@@ -1,19 +1,41 @@
-/* index.css - CORREGIDO */
+/* index.css - ESTILO RPG DEPORTIVO INCREÍBLE */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&display=swap');
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Roboto Condensed', 'Orbitron', Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: rgba(255, 255, 255, 0.95);
+  background-color: #0c1320;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+
+  /* Colores del tema RPG Deportivo */
+  --grass-green: #2ecc71;
+  --field-green: #27ae60;
+  --dirt-brown: #8B4513;
+  --line-white: #ecf0f1;
+  --goal-yellow: #f1c40f;
+  --jersey-blue: #3498db;
+  --jersey-red: #e74c3c;
+  --dark-concrete: #2c3e50;
+  --light-concrete: #34495e;
+  --neon-glow: #00ff88;
+  --stadium-dark: #0c1320;
+  --stadium-light: #1a243f;
+  
+  /* Espaciado */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
 }
 
 * {
@@ -27,7 +49,8 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Previene scroll no deseado */
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--stadium-dark) 0%, var(--stadium-light) 100%);
 }
 
 #root {
@@ -35,52 +58,83 @@ html, body {
   height: 100vh;
   margin: 0;
   padding: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(46, 204, 113, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+    linear-gradient(135deg, var(--stadium-dark) 0%, var(--stadium-light) 100%);
 }
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--jersey-blue);
   text-decoration: inherit;
+  transition: all 0.3s ease;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--neon-glow);
+  text-shadow: 0 0 10px var(--neon-glow);
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  font-family: 'Orbitron', monospace;
 }
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
+  border: 2px solid transparent;
+  padding: 0.8em 1.6em;
   font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  font-weight: 600;
+  font-family: 'Roboto Condensed', sans-serif;
+  background: linear-gradient(135deg, var(--jersey-blue), var(--grass-green));
   color: white;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
 }
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s ease;
+}
+
 button:hover {
-  border-color: #646cff;
+  border-color: var(--goal-yellow);
+  box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
+  transform: translateY(-2px);
 }
+
+button:hover::before {
+  left: 100%;
+}
+
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 3px solid var(--goal-yellow);
+  outline-offset: 2px;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: #1a1a1a;
+    background-color: #f8f9fa;
   }
   a:hover {
-    color: #747bff;
+    color: var(--jersey-blue);
   }
   button {
-    background-color: #f9f9f9;
-    color: #213547;
+    background-color: var(--jersey-blue);
+    color: white;
   }
 }
