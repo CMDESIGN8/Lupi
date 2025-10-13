@@ -707,7 +707,7 @@
 
 .panel-right {
   border-right: 4px solid;
-  border-image: linear-gradient(45deg, transparent, var(--jersey-red);
+  border-image: linear-gradient (45deg, var(--jersey-red),transparent);
   }
 /* Continuación del Dashboard.css */
 
