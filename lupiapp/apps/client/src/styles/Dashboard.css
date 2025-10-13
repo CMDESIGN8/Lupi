@@ -1,36 +1,45 @@
 /* Dashboard.css - Estilo RPG Deportivo Clubes de Barrio */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&display=swap');
 
+/* ==============================
+   Dashboard RPG Deportivo - LupiApp Theme
+   ============================== */
+
+/* Variables globales */
 :root {
-  /* Colores principales - Club de barrio */
-  --grass-green: #2ecc71;
-  --field-green: #27ae60;
-  --dirt-brown: #8B4513;
-  --line-white: #ecf0f1;
-  --goal-yellow: #f1c40f;
-  --jersey-blue: #3498db;
-  --jersey-red: #e74c3c;
-  --dark-concrete: #2c3e50;
-  --light-concrete: #34495e;
-  --neon-glow: #00ff88;
-  
-  /* Espaciado */
+  /* Colores principales */
+  --lupi-primary: #09BCEB;
+  --lupi-secondary: #0084af;
+  --lupi-accent: #ff00aa;
+  --lupi-green: #a3e635;
+  --lupi-dark: #0a0420;
+  --lupi-darker: #050210;
+  --lupi-card: #13103a;
+  --lupi-text: #ffffff;
+  --lupi-text-secondary: #b3b3ff;
+  --bg-card: rgba(12,12,18,0.9);
+  --highlight: #e6e335;
+
+  /* Colores neon */
+  --neon-blue: #00ccff;
+  --neon-cyan: #00ffcc;
+  --neon-dark-blue: #0066ff;
+  --neon-bg-dark: #0a1a2f;
+  --neon-bg-darker: #051322;
+
+  /* Tamaños y espacios */
+  --border-radius: 16px;
+  --border-radius-sm: 8px;
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  
-  /* Bordes */
-  --border-radius-sm: 4px;
-  --border-radius: 8px;
-  --border-radius-lg: 12px;
-  
-  /* Sombras */
-  --shadow-soft: 0 2px 8px rgba(0,0,0,0.1);
-  --shadow-medium: 0 4px 12px rgba(0,0,0,0.15);
-  --shadow-glow: 0 0 10px var(--neon-glow);
-  --shadow-glow-green: 0 0 15px var(--grass-green);
+
+  /* Sombras y efectos */
+  --shadow-glow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+  --shadow-glow-accent: 0 0 15px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .dashboard { 
