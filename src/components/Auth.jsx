@@ -108,7 +108,14 @@ export const Auth = ({ onAuthSuccess }) => {
         </form>
 
         {/* ✅ Mostrar mensajes */}
-        {message && <p className="auth-message">{message}</p>}
+        {message && 
+        <p
+    className={`auth-message ${
+      message.includes('error') || message.includes('incorrecto') ? 'error' : 'success'
+    }`}
+  >
+    {message}
+  </p>}
 
         <p>
           {isLogin ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}

@@ -271,3 +271,51 @@ body {
   color: white;
   font-size: 1.2rem;
 }
+
+/* === Mensajes de Autenticación - Estilo LupiApp === */
+.auth-message {
+  margin-top: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  background: rgba(10, 4, 32, 0.8);
+  color: var(--lupi-primary, #09BCEB);
+  box-shadow: 0 0 10px rgba(9, 188, 235, 0.6),
+              0 0 20px rgba(150, 0, 255, 0.4);
+  transition: all 0.3s ease-in-out;
+  animation: pulse-glow 2s infinite alternate;
+}
+
+/* Animación de pulso */
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 0 0 8px rgba(9, 188, 235, 0.6),
+                0 0 18px rgba(150, 0, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 14px rgba(9, 188, 235, 0.8),
+                0 0 28px rgba(150, 0, 255, 0.6);
+  }
+}
+
+/* Mensajes de éxito y error */
+.auth-message.success {
+  color: #00f5d4;
+  text-shadow: 0 0 10px #00f5d4;
+}
+
+.auth-message.error {
+  color: #ff00aa;
+  text-shadow: 0 0 10px #ff00aa;
+}
+
+.auth-card {
+  background: rgba(20, 10, 40, 0.85);
+  border: 1px solid rgba(9, 188, 235, 0.3);
+  box-shadow: 0 0 30px rgba(9, 188, 235, 0.15),
+              0 0 50px rgba(150, 0, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
