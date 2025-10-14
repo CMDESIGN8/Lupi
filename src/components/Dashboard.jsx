@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { getCharacter, getWallet } from "../services/api";
-import "../styles/Dashboard.css";
+import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
+import "./Dashboard.css";
 
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
@@ -15,21 +15,13 @@ export const Dashboard = ({ user }) => {
   }, [user]);
 
   const fetchData = async (userId) => {
+    setLoading(true);
     try {
-      setLoading(true);
       const charData = await getCharacter(userId);
-
       if (charData?.id) {
-        // Si ya había personaje cargado y detectamos que subió de nivel
-        if (character && charData.level > character.level) {
-          triggerLevelUp(charData);
-        }
-
         setCharacter(charData);
         const walletData = await getWallet(charData.id);
         setWallet(walletData);
-      } else {
-        setCharacter(null);
       }
     } catch (error) {
       console.error("❌ Error cargando datos:", error);
@@ -38,24 +30,35 @@ export const Dashboard = ({ user }) => {
     }
   };
 
-  const triggerLevelUp = (charData) => {
-    // Sumar 5 skill points
-    const newChar = {
-      ...charData,
-      available_skill_points: (charData.available_skill_points || 0) + 5,
-    };
+  const increaseStat = async (statKey) => {
+    if (!character || character.available_skill_points <= 0) return;
 
-    setCharacter(newChar);
-    setShowLevelUp(true);
+    const updated = await updateStat(
+      character.id,
+      statKey,
+      character[statKey] + 1,
+      character.available_skill_points - 1
+    );
 
-    // Ocultar popup a los 3 seg
-    setTimeout(() => setShowLevelUp(false), 3000);
+    setCharacter(updated);
   };
 
-  if (loading) return <p>⏳ Cargando tu dashboard...</p>;
-  if (!character) return <p>⚠️ No tienes personaje creado aún.</p>;
+  const handleTrain = async () => {
+    if (!character) return;
+    const result = await trainCharacter(character.id);
+    if (result.character) {
+      setCharacter(result.character);
+      setWallet(result.wallet);
+      if (result.character.level > character.level) {
+        setShowLevelUp(true);
+        setTimeout(() => setShowLevelUp(false), 3000);
+      }
+    }
+  };
 
-  // Calcular EXP
+  if (loading) return <p>⏳ Cargando...</p>;
+  if (!character) return <p>⚠️ No tienes personaje aún.</p>;
+
   const expActual = character.experience;
   const expMax = character.experience_to_next_level;
   const expFaltante = expMax - expActual;
@@ -83,16 +86,12 @@ export const Dashboard = ({ user }) => {
         <h3>📊 Personaje</h3>
         <p>Nivel: {character.level}</p>
 
-        {/* Barra de EXP */}
         <div className="exp-bar">
-          <div
-            className="exp-fill"
-            style={{ width: `${expPorcentaje}%` }}
-          ></div>
+          <div className="exp-fill" style={{ width: `${expPorcentaje}%` }}></div>
         </div>
         <p>
-          EXP actual: <span>{expActual}</span> / {expMax}
-          &nbsp;| Falta: <span>{expFaltante}</span>
+          EXP: <span>{expActual}</span> / {expMax} | Falta:{" "}
+          <span>{expFaltante}</span>
         </p>
 
         <p>
@@ -113,23 +112,30 @@ export const Dashboard = ({ user }) => {
         <h3>⚔️ Stats</h3>
         <ul>
           {stats.map(({ key, label }) => (
-            <li key={key}>
+            <li key={key} className="stat-item">
               <span className="stat-name">{label}</span>
               <div className="stat-bar">
-                <div
-                  className="fill"
-                  style={{ width: `${character[key]}%` }}
-                ></div>
+                <div className="fill" style={{ width: `${character[key]}%` }}></div>
               </div>
               <span className="stat-value">{character[key]}</span>
+              {character.available_skill_points > 0 && (
+                <button
+                  className="add-skill-btn"
+                  onClick={() => increaseStat(key)}
+                >
+                  ➕
+                </button>
+              )}
             </li>
           ))}
         </ul>
       </section>
 
-      <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
+      <div className="actions">
+        <button onClick={handleTrain}>💪 Entrenar (+100 XP, +150 LC)</button>
+        <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
+      </div>
 
-      {/* Popup Level Up */}
       {showLevelUp && (
         <div className="levelup-popup">
           <h2>🎉 ¡Subiste a nivel {character.level}!</h2>
