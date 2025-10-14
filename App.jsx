@@ -1,18 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+// apps/client/src/App.jsx
+import React, { useState, useEffect } from 'react';
 import { Auth } from './src/components/Auth';
 import { CharacterCreation } from './src/components/CharacterCreation';
-import { Dashboard } from './src/components/Dashboard';
+import { Dashboard } from './src/components/Dashboard'; // nuevo dashboard importado
 import { supabase } from './src/lib/supabaseClient';
 import './App.css';
-import GuideTour from './src/components/GuideTour';
 
 function App() {
   const [user, setUser] = useState(null);
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
-  const fetchInProgress = useRef(false); // Para evitar llamadas duplicadas
 
   useEffect(() => {
     console.log('🔧 App mounted - checking session');
@@ -22,7 +19,7 @@ function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         console.log('🔄 Auth state changed:', _event);
-        await handleAuthChange(session);
+        handleAuthChange(session);
       }
     );
 
@@ -42,19 +39,16 @@ function App() {
       console.error('Error checking session:', error);
     } finally {
       setLoading(false);
-      setAuthChecked(true);
     }
   };
 
   const handleAuthChange = async (session) => {
     const currentUser = session?.user ?? null;
-    console.log('👤 Auth change - User:', currentUser?.id);
-    
     setUser(currentUser);
 
     if (currentUser) {
-      console.log('✅ User logged in:', currentUser.id);
-      // Buscar personaje automáticamente - SOLO UNA VEZ
+      console.log('👤 User logged in:', currentUser.id);
+      // Buscar personaje automáticamente
       await fetchCharacter(currentUser.id);
     } else {
       console.log('🚪 User logged out');
@@ -63,9 +57,10 @@ function App() {
   };
 
   const handleAuthSuccess = async (user) => {
-    console.log('🎯 Auth success - ya manejado por handleAuthChange');
-    // NO llamar fetchCharacter aquí - ya se llama desde handleAuthChange
+    console.log('✅ Auth success:', user.id);
     setUser(user);
+    // Buscar personaje si ya tenía uno
+    await fetchCharacter(user.id);
   };
 
   const handleCharacterCreated = (characterData) => {
@@ -81,103 +76,37 @@ function App() {
   };
 
   const fetchCharacter = async (userId) => {
-    // Evitar llamadas duplicadas
-    if (fetchInProgress.current) {
-      console.log('⏳ Fetch ya en progreso, ignorando llamada duplicada');
+  try {
+    console.log('🔍 Buscando personaje para usuario:', userId);
+    
+    const { data, error } = await supabase
+      .from('characters')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('❌ Error buscando personaje:', error);
       return;
     }
-
-    try {
-      fetchInProgress.current = true;
-      console.log('🔍 Buscando personaje para usuario:', userId);
-      setLoading(true);
-      
-      const { data, error } = await supabase
-        .from('characters')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (error) {
-        console.error('❌ Error buscando personaje:', error);
-        setCharacter(null);
-        return;
-      }
-      
-      console.log('📊 Resultado de búsqueda:', data);
-      
-      if (data) {
-        console.log('✅ Personaje encontrado:', data.nickname);
-        setCharacter(data);
-      } else {
-        console.log('❌ No se encontró personaje para este usuario');
-        setCharacter(null);
-      }
-    } catch (error) {
-      console.error('🔥 Fetch character failed:', error);
+    
+    console.log('📊 Resultado de búsqueda:', data);
+    
+    if (data) {
+      console.log('✅ Personaje encontrado:', data.nickname);
+      setCharacter(data);
+    } else {
+      console.log('❌ No se encontró personaje para este usuario');
       setCharacter(null);
-    } finally {
-      setLoading(false);
-      fetchInProgress.current = false;
     }
-  };
+  } catch (error) {
+    console.error('🔥 Fetch character failed:', error);
+  }
+};
 
-  // Función para recargar el personaje manualmente
-  const refreshCharacter = async () => {
-    if (user?.id) {
-      await fetchCharacter(user.id);
-    }
-  };
-
-  // Renderizado optimizado para evitar flashes
-  const renderContent = () => {
-    // Si está cargando y ya verificamos auth
-    if (loading && authChecked) {
-      return (
-        <div className="loading-screen">
-          <div className="loading-content">
-            <div className="loading-spinner"></div>
-            <p>Verificando tu personaje...</p>
-          </div>
-        </div>
-      );
-    }
-
-    // Si no hay usuario
-    if (!user) {
-      return <Auth onAuthSuccess={handleAuthSuccess} />;
-    }
-
-    // Si hay usuario pero no personaje
-    if (user && !character) {
-      return (
-        <CharacterCreation 
-          user={user} 
-          onCharacterCreated={handleCharacterCreated} 
-        />
-      );
-    }
-
-    // Si hay usuario y personaje
-    if (user && character) {
-      return (
-        <Dashboard 
-          user={user} 
-          character={character} 
-          onRefreshCharacter={refreshCharacter}
-        />
-      );
-    }
-
-    // Estado por defecto
-    return (
-      <div className="loading-screen">
-        <div className="loading-content">
-          <p>Cargando...</p>
-        </div>
-      </div>
-    );
-  };
+  if (loading) {
+    return <div className="loading">Cargando LupiApp...</div>;
+  }
 
   return (
     <div className="App">
@@ -192,30 +121,22 @@ function App() {
       </header>
 
       <main className="app-main">
-        {renderContent()}
+        {/* Login/Registro */}
+        {!user && <Auth onAuthSuccess={handleAuthSuccess} />}
 
-        {/* Debug info - solo en desarrollo */}
-        {process.env.NODE_ENV === 'development' && (
-          <div style={{ 
-            position: 'fixed', 
-            bottom: '10px', 
-            left: '10px', 
-            background: 'rgba(0,0,0,0.8)', 
-            color: 'white', 
-            padding: '10px', 
-            borderRadius: '5px',
-            fontSize: '12px',
-            zIndex: 9999 
-          }}>
-            <div>User: {user ? '✅' : '❌'}</div>
-            <div>Character: {character ? '✅' : '❌'}</div>
-            <div>Loading: {loading ? '🔄' : '✅'}</div>
-          </div>
+        {/* Si hay usuario pero no personaje → creación */}
+        {user && !character && (
+          <CharacterCreation 
+            user={user} 
+            onCharacterCreated={handleCharacterCreated} 
+          />
+        )}
+
+        {/* Si hay usuario y personaje → dashboard */}
+        {user && character && (
+          <Dashboard user={user} character={character} />
         )}
       </main>
-
-      {/* Componente de Guía - solo mostrar cuando hay dashboard */}
-      {user && character && <GuideTour />}
     </div>
   );
 }
