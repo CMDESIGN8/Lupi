@@ -1,0 +1,353 @@
+@import url(../styles/globales.css);
+
+.dashboard { 
+    padding: var(--spacing-lg); 
+    min-height: 80vh; 
+    background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
+    color: var(--lupi-text); 
+    font-family: 'Orbitron', sans-serif; 
+    display: flex; 
+    flex-direction: row; /* Cambiado de column a row */
+    justify-content: space-between; /* Distribuye el espacio uniformemente */
+    align-items: flex-start; /* Alinea los paneles en la parte superior */
+    gap: var(--spacing-lg); 
+    animation: fadeInUp 0.8s ease; 
+}
+
+/* Títulos neon */
+.dashboard h2, .dashboard h3 {
+  color: var(--lupi-primary);
+  text-shadow: var(--shadow-glow);
+  animation: neonFlicker 2s infinite;
+}
+
+/* Paneles principales - MODIFICADO */
+.panel {
+  flex: 1; /* Todos los paneles ocupan el mismo espacio */
+  border: 2px solid #00bfff;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #0c1320;
+  min-height: 500px; /* Altura mínima consistente */
+}
+
+/* Eliminar límites de ancho específicos */
+.panel-left, .panel-center, .panel-right {
+  max-width: none !important; /* Elimina las restricciones de ancho */
+  flex: 1 !important; /* Fuerza que todos ocupen el mismo espacio */
+}
+
+.panel h3 {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #00f0ff;
+  text-shadow: 0 0 10px #00f0ff;
+}
+
+/* Secciones (mantenidas para compatibilidad) */
+.character-info,
+.wallet-info,
+.stats {
+  background: var(--bg-card);
+  border: 2px solid var(--lupi-primary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  width: 100%;
+  box-shadow: var(--shadow-soft);
+  animation: fadeInUp 0.8s ease;
+}
+
+/* Wallet */
+.wallet-info p {
+  font-weight: bold;
+  font-size: 1.1em;
+  text-shadow: 0 0 5px var(--lupi-accent);
+}
+
+/* Stats */
+.stats ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.stats ul li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  background: var(--lupi-card);
+  border: 1px solid var(--lupi-secondary);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm);
+  font-weight: bold;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stats ul li:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow-accent);
+}
+
+/* Nombre del stat */
+.stat-name {
+  font-size: 0.9em;
+  color: var(--lupi-text-secondary);
+  margin-bottom: 4px;
+}
+
+/* Barra estilo RPG */
+.stat-bar {
+  position: relative;
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+}
+
+.stat-bar .fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--lupi-primary), var(--lupi-accent));
+  border-radius: var(--border-radius-sm);
+  width: 0%;
+  animation: growBar 1.2s ease-out forwards;
+}
+
+.stat-value {
+  margin-top: 4px;
+  font-size: 0.85em;
+  color: var(--highlight);
+  text-shadow: 0 0 5px var(--highlight);
+}
+
+/* Animación de las barras */
+@keyframes growBar {
+  from { width: 0%; }
+  to { width: var(--stat-value, 100%); }
+}
+
+/* Botón */
+.dashboard button {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--lupi-primary);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--lupi-dark);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dashboard button:hover {
+  background: var(--lupi-accent);
+  color: var(--lupi-text);
+  box-shadow: var(--shadow-glow-accent);
+  transform: translateY(-2px);
+}
+
+/* Barra de experiencia */
+.exp-bar {
+  width: 100%;
+  height: 12px;
+  background: #222;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #00ccff);
+  transition: width 0.5s ease;
+}
+
+/* Glow animado sobre lo completado */
+.exp-fill::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 0 20px var(--lupi-green), 0 0 40px var(--lupi-primary);
+  opacity: 0.6;
+  animation: glowPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
+  50% { box-shadow: 0 0 20px var(--lupi-green), 0 0 40px var(--lupi-primary); opacity: 0.8; }
+  100% { box-shadow: 0 0 10px var(--lupi-green), 0 0 20px var(--lupi-primary); opacity: 0.5; }
+}
+
+.character-info p span {
+  color: var(--highlight);
+  font-weight: bold;
+  text-shadow: 0 0 5px var(--highlight);
+}
+
+/* Popup de Level Up */
+.levelup-popup {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--lupi-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  border: 2px solid var(--lupi-accent);
+  box-shadow: 0 0 25px var(--lupi-accent), 0 0 50px var(--lupi-accent);
+  color: var(--lupi-text);
+  text-align: center;
+  animation: glowPulse 1.5s infinite alternate, fadeInUp 0.6s ease;
+  z-index: 999;
+}
+
+.levelup-popup h2 {
+  font-size: 2rem;
+  color: var(--lupi-accent);
+  text-shadow: 0 0 10px var(--lupi-accent), 0 0 20px var(--lupi-accent);
+}
+
+/* Botón de skill points */
+.add-skill-btn {
+  margin-left: 8px;
+  padding: 4px 8px;
+  background: var(--lupi-primary);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--lupi-dark);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-skill-btn:hover {
+  background: var(--lupi-accent);
+  color: var(--lupi-text);
+  box-shadow: var(--shadow-glow-accent);
+  transform: scale(1.1);
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+  gap: 16px;
+  margin-top: 16px;
+  flex-grow: 1; /* Ocupa el espacio disponible */
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.skill-card {
+  background: #10182f;
+  border: 1px solid #00bfff;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 0 5px #00f0ff;
+}
+
+.skill-btn {
+  background: #00bfff;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #0b0f1a;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.skill-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px #00f0ff;
+}
+
+/* Botones acción */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.actions button {
+  background: #00bfff;
+  color: #0b0f1a;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.actions button:hover {
+  background: #00f0ff;
+  color: #0b0f1a;
+  box-shadow: 0 0 10px #00f0ff;
+}
+
+/* Avatar placeholder */
+.avatar {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #00f0ff;
+  background-size: cover;
+  background-position: center;
+}
+
+/* Estilos específicos para el contenido de los paneles */
+.panel-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.character-details {
+  text-align: center;
+}
+
+.character-details p {
+  margin: 8px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+  
+  .panel {
+    min-height: auto;
+    width: 100%;
+  }
+  
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+}
