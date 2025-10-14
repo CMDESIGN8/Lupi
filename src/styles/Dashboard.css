@@ -1,22 +1,28 @@
-/* Dashboard.css - ACTUALIZADO */
+/* Dashboard.css - ACTUALIZADO SIN ZOOM */
 
 @import url(../styles/globales.css);
 
 .dashboard { 
-    padding: 0; /* Eliminamos padding para fullscreen */
-    height: 100%; /* Ocupa toda la altura disponible */
-    width: 100%; /* Ocupa todo el ancho disponible */
+    padding: 0;
+    height: 100%;
+    width: 100%;
     background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
     color: var(--lupi-text); 
     font-family: 'Orbitron', sans-serif; 
     display: flex; 
     flex-direction: row;
     justify-content: space-between;
-    align-items: stretch; /* Hace que los paneles tengan misma altura */
-    gap: 0; /* Sin gap para fullscreen */
-    animation: fadeInUp 0.8s ease; 
+    align-items: stretch;
+    gap: 0;
     box-sizing: border-box;
-    overflow: hidden; /* Previene scroll */
+    overflow: hidden;
+    transform: none !important; /* Previene cualquier zoom/transform */
+    zoom: 1 !important; /* Fuerza zoom normal */
+}
+
+/* Reset de transformaciones que puedan causar zoom */
+.dashboard * {
+    transform: none !important;
 }
 
 /* Estados de carga y error */
@@ -42,16 +48,18 @@
 .panel {
     flex: 1;
     border: 2px solid #00bfff;
-    border-radius: 0; /* Sin bordes redondeados para fullscreen */
+    border-radius: 0;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 16px;
     background: #0c1320;
-    height: 100%; /* Ocupa toda la altura */
+    height: 100%;
     box-sizing: border-box;
     box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
-    margin: 0; /* Sin margen */
+    margin: 0;
+    transform: none !important;
+    overflow: hidden;
 }
 
 /* Bordes internos entre paneles */
@@ -66,6 +74,7 @@
     color: #00f0ff;
     text-shadow: 0 0 10px #00f0ff;
     font-size: 1.3em;
+    transform: none !important;
 }
 
 /* Character details */
@@ -83,6 +92,7 @@
     margin: 0;
     padding: 8px 0;
     border-bottom: 1px solid rgba(0, 191, 255, 0.3);
+    font-size: 0.9em;
 }
 
 .character-details p:last-child {
@@ -126,26 +136,28 @@
     animation: glowPulse 1.5s ease-in-out infinite alternate;
 }
 
-/* Skills Grid */
+/* Skills Grid - MEJORADO */
 .skills-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 10px;
     flex: 1;
     overflow-y: auto;
     padding: 5px;
+    max-height: none;
 }
 
 .skill-card {
     background: #10182f;
     border: 1px solid #00bfff;
-    border-radius: 8px;
-    padding: 12px;
+    border-radius: 6px;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 0 5px #00f0ff;
     transition: all 0.3s ease;
+    min-height: 60px;
 }
 
 .skill-card:hover {
@@ -161,33 +173,38 @@
 
 .skill-name {
     font-weight: bold;
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: #fff;
+    line-height: 1.2;
 }
 
 .skill-value {
-    font-size: 0.8em;
+    font-size: 0.75em;
     color: #00f0ff;
-    margin-top: 4px;
+    margin-top: 2px;
     font-weight: bold;
 }
 
 .skill-btn {
     background: #00bfff;
     border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
     cursor: pointer;
     color: #0b0f1a;
     font-weight: bold;
     transition: all 0.2s;
-    font-size: 0.9em;
-    min-width: 40px;
+    font-size: 0.8em;
+    min-width: 35px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .skill-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 0 10px #00f0ff;
+    box-shadow: 0 0 8px #00f0ff;
     background: #00f0ff;
 }
 
@@ -202,7 +219,7 @@
 .actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     flex: 1;
     justify-content: flex-start;
 }
@@ -211,35 +228,36 @@
     background: #00bfff;
     color: #0b0f1a;
     border: none;
-    padding: 14px;
+    padding: 12px;
     border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     transition: all 0.3s ease;
     width: 100%;
-    font-size: 0.95em;
+    font-size: 0.9em;
     justify-content: flex-start;
+    transform: none !important;
 }
 
 .actions button:hover {
     background: #00f0ff;
     color: #0b0f1a;
-    box-shadow: 0 0 15px #00f0ff;
-    transform: translateY(-3px);
+    box-shadow: 0 0 12px #00f0ff;
+    transform: translateY(-2px) !important;
 }
 
 /* Avatar */
 .avatar {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 20px auto;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 15px auto;
     border-radius: 50%;
-    box-shadow: 0 0 25px #00f0ff;
+    box-shadow: 0 0 20px #00f0ff;
     background: linear-gradient(135deg, #00bfff, #00f0ff);
-    border: 3px solid #00bfff;
+    border: 2px solid #00bfff;
 }
 
 /* Level Up Popup */
@@ -247,28 +265,29 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) !important;
     background: #0c1320;
-    padding: 30px;
-    border-radius: 15px;
-    border: 3px solid #00f0ff;
-    box-shadow: 0 0 30px #00f0ff, 0 0 60px #00bfff;
+    padding: 25px;
+    border-radius: 12px;
+    border: 2px solid #00f0ff;
+    box-shadow: 0 0 25px #00f0ff, 0 0 50px #00bfff;
     color: #fff;
     text-align: center;
-    animation: glowPulse 1.5s infinite alternate, fadeInUp 0.6s ease;
+    animation: glowPulse 1.5s infinite alternate;
     z-index: 1000;
-    min-width: 300px;
+    min-width: 280px;
+    max-width: 90vw;
 }
 
 .levelup-popup h2 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: #00f0ff;
-    text-shadow: 0 0 10px #00f0ff, 0 0 20px #00bfff;
-    margin-bottom: 15px;
+    text-shadow: 0 0 8px #00f0ff, 0 0 16px #00bfff;
+    margin-bottom: 10px;
 }
 
 .levelup-popup p {
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: #fff;
     margin: 0;
 }
@@ -276,27 +295,16 @@
 /* Animaciones */
 @keyframes glowPulse {
     0% { 
-        box-shadow: 0 0 10px #00f0ff, 0 0 20px #00bfff; 
+        box-shadow: 0 0 8px #00f0ff, 0 0 16px #00bfff; 
         opacity: 0.7; 
     }
     50% { 
-        box-shadow: 0 0 20px #00f0ff, 0 0 40px #00bfff; 
+        box-shadow: 0 0 16px #00f0ff, 0 0 32px #00bfff; 
         opacity: 1; 
     }
     100% { 
-        box-shadow: 0 0 10px #00f0ff, 0 0 20px #00bfff; 
+        box-shadow: 0 0 8px #00f0ff, 0 0 16px #00bfff; 
         opacity: 0.7; 
-    }
-}
-
-@keyframes fadeInUp {
-    from { 
-        opacity: 0; 
-        transform: translate(-50%, -40%); 
-    }
-    to { 
-        opacity: 1; 
-        transform: translate(-50%, -50%); 
     }
 }
 
@@ -331,6 +339,7 @@
         min-height: 33.33vh;
         width: 100%;
         border-radius: 0;
+        padding: 15px;
     }
     
     .panel:not(:last-child) {
@@ -340,6 +349,7 @@
     
     .skills-grid {
         grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
     }
 }
 
@@ -349,16 +359,22 @@
     }
     
     .panel {
-        padding: 15px;
+        padding: 12px;
     }
     
     .skills-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
     }
     
     .actions button {
-        padding: 12px;
-        font-size: 0.9em;
+        padding: 10px;
+        font-size: 0.85em;
+    }
+    
+    .character-details p {
+        font-size: 0.85em;
+        padding: 6px 0;
     }
 }
 
@@ -368,8 +384,8 @@
     }
     
     .avatar {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
     }
     
     .levelup-popup {
@@ -378,6 +394,34 @@
     }
     
     .levelup-popup h2 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
+    
+    .skill-card {
+        padding: 8px;
+        min-height: 50px;
+    }
+    
+    .skill-name {
+        font-size: 0.8em;
+    }
+    
+    .skill-value {
+        font-size: 0.7em;
+    }
+}
+
+/* Prevenir zoom en dispositivos móviles */
+@viewport {
+    width: device-width;
+    zoom: 1.0;
+    user-zoom: fixed;
+}
+
+/* Prevenir zoom táctil */
+.dashboard {
+    touch-action: pan-x pan-y;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
