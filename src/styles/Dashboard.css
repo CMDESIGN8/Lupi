@@ -1,47 +1,51 @@
-/* Dashboard.css - Estilo RPG Deportivo Clubes de Barrio */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Roboto+Condensed:wght@300;400;700&display=swap');
+/* Dashboard.css - Tema LUPI Actualizado */
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap');
 
 :root {
-  /* 🎨 Colores principales - LupiApp versión "Club de Barrio Neon" */
-  --grass-green: #00ff99;       /* Verde neón para césped / energía */
-  --field-green: #00cc88;       /* Verde profundo con glow */
-  --dirt-brown: #1b0033;        /* Fondo púrpura oscuro estilo asfalto */
-  --line-white: #e0faff;        /* Blanco con tinte cyan */
-  --goal-yellow: #f5ff3d;       /* Amarillo neón */
-  --jersey-blue: #09BCEB;       /* Cyan principal Lupi */
-  --jersey-red: #ff00aa;        /* Rosa neón Lupi */
-  --dark-concrete: #0a0420;     /* Fondo base oscuro */
-  --light-concrete: #150a40;    /* Fondo secundario violeta */
-  --neon-glow: #9400ff;         /* Glow violeta eléctrico */
+  /* Colores principales del tema LUPI */
+  --lupi-primary: #09BCEB;
+  --lupi-secondary: #0084af;
+  --lupi-accent: #ff00aa;
+  --lupi-green: #a3e635;
+  --lupi-dark: #0a0420;
+  --lupi-darker: #050210;
+  --lupi-card: #13103a;
+  --lupi-text: #ffffff;
+  --lupi-text-secondary: #b3b3ff;
+  --bg-card: rgba(12,12,18,0.9);
+  --highlight: #e6e335;
+
+  /* Colores del dashboard de videojuego */
+  --game-bg-dark: #0a1a2f;
+  --game-bg-darker: #051322;
+  --game-border: #00ccff;
+  --game-accent: #0066ff;
+  --game-neon: #00ffcc;
+  --game-text-light: #88ddff;
   
-  /* Espaciado */
+  /* Tamaños */
+  --border-radius: 16px;
+  --border-radius-sm: 8px;
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
-  
-  /* Bordes */
-  --border-radius-sm: 4px;
-  --border-radius: 8px;
-  --border-radius-lg: 12px;
-  
-  /* Sombras */
-  --shadow-soft: 0 2px 8px rgba(0,0,0,0.1);
-  --shadow-medium: 0 4px 12px rgba(0,0,0,0.15);
-  --shadow-glow: 0 0 10px var(--neon-glow);
-  --shadow-glow-green: 0 0 15px var(--grass-green);
+
+  /* Sombras y efectos */
+  --shadow-glow: 0 0 10px var(--lupi-primary), 0 0 20px var(--lupi-primary);
+  --shadow-glow-accent: 0 0 15px var(--lupi-accent), 0 0 30px var(--lupi-accent);
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --game-shadow: 0 0 20px rgba(0, 170, 255, 0.2);
 }
 
 .dashboard { 
   padding: 0;
   height: 100vh;
   width: 100%;
-  background: 
-    linear-gradient(135deg, var(--dark-concrete) 0%, var(--light-concrete) 100%),
-    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%232c3e50"/><path d="M0 50 L100 50 M50 0 L50 100" stroke="%2334495e" stroke-width="0.5"/></svg>');
-  color: var(--line-white);
-  font-family: 'Roboto Condensed', sans-serif;
+  background: linear-gradient(135deg, var(--game-bg-dark) 0%, var(--game-bg-darker) 100%);
+  color: var(--lupi-text);
+  font-family: 'Oxanium', 'Rajdhani', sans-serif;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -52,7 +56,7 @@
   position: relative;
 }
 
-/* Efecto de campo de fútbol en el fondo */
+/* Efecto de conexiones de energía en el fondo */
 .dashboard::before {
   content: '';
   position: absolute;
@@ -61,15 +65,10 @@
   right: 0;
   bottom: 0;
   background: 
-    /* Líneas del campo */
-    linear-gradient(90deg, transparent 49%, var(--line-white) 49%, var(--line-white) 51%, transparent 51%),
-    linear-gradient(0deg, transparent 49%, var(--line-white) 49%, var(--line-white) 51%, transparent 51%),
-    /* Círculo central */
-    radial-gradient(circle at 50% 50%, transparent 45%, var(--line-white) 45%, var(--line-white) 46%, transparent 46%),
-    /* Áreas */
-    linear-gradient(90deg, transparent 10%, var(--line-white) 10%, var(--line-white) 11%, transparent 11%),
-    linear-gradient(90deg, transparent 89%, var(--line-white) 89%, var(--line-white) 90%, transparent 90%);
-  opacity: 0.05;
+    linear-gradient(90deg, transparent 49%, var(--game-border) 49%, var(--game-border) 51%, transparent 51%),
+    linear-gradient(0deg, transparent 49%, var(--game-border) 49%, var(--game-border) 51%, transparent 51%),
+    radial-gradient(circle at 50% 50%, transparent 45%, var(--game-border) 45%, var(--game-border) 46%, transparent 46%);
+  opacity: 0.03;
   pointer-events: none;
 }
 
@@ -81,72 +80,69 @@
   height: 100%;
   font-size: 1.4em;
   width: 100%;
-  color: var(--line-white);
-  font-family: 'Orbitron', monospace;
+  color: var(--lupi-text);
+  font-family: 'Oxanium', monospace;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
 .dashboard-loading {
-  background: linear-gradient(45deg, var(--dark-concrete), var(--light-concrete));
+  background: linear-gradient(45deg, var(--game-bg-dark), var(--game-bg-darker));
   position: relative;
 }
 
 .dashboard-loading::after {
-  content: '⚽';
+  content: '⚡';
   font-size: 2em;
   margin-left: var(--spacing-md);
-  animation: bounce 1s infinite;
+  animation: pulse 1s infinite;
 }
 
 .dashboard-error {
-  background: linear-gradient(45deg, #e74c3c, #c0392b);
+  background: linear-gradient(45deg, var(--lupi-accent), #cc0088);
   flex-direction: column;
   gap: var(--spacing-md);
 }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(180deg); }
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 
-/* Paneles principales */
+/* Paneles principales - Estilo Videojuego */
 .panel {
   flex: 1;
-  border: 3px solid var(--dirt-brown);
-  border-radius: 0;
+  background: rgba(0, 20, 40, 0.7);
+  border: 1px solid var(--game-border);
+  border-radius: 12px;
   padding: var(--spacing-lg);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
-  background: linear-gradient(160deg, rgba(44, 62, 80, 0.95) 0%, rgba(52, 73, 94, 0.9) 100%);
   height: 100%;
   box-sizing: border-box;
   margin: 0;
   position: relative;
   overflow: hidden;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+  box-shadow: var(--game-shadow);
+  animation: fadeInUp 0.8s ease;
 }
 
-/* Efecto de red de portería en los bordes */
+/* Efecto de borde superior brillante */
 .panel::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  border: 2px solid transparent;
-  background: 
-    linear-gradient(90deg, var(--line-white) 50%, transparent 50%) 0 0 / 10px 1px repeat-x,
-    linear-gradient(0deg, var(--line-white) 50%, transparent 50%) 0 0 / 1px 10px repeat-y;
-  opacity: 0.1;
-  pointer-events: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--game-border), transparent);
 }
 
 /* Bordes internos entre paneles */
 .panel:not(:last-child) {
-  border-right: 2px solid var(--dirt-brown);
+  border-right: 2px solid var(--lupi-secondary);
 }
 
 /* Títulos de panel */
@@ -154,157 +150,197 @@
   text-align: center;
   font-weight: 700;
   margin-bottom: var(--spacing-md);
-  color: var(--goal-yellow);
-  font-family: 'Orbitron', monospace;
+  color: var(--game-border);
+  font-family: 'Oxanium', monospace;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-size: 1.3em;
-  text-shadow: 2px 2px 0 var(--dirt-brown);
-  background: linear-gradient(45deg, var(--jersey-blue), var(--jersey-red));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  padding: var(--spacing-sm);
-  border: 2px solid var(--goal-yellow);
-  border-radius: var(--border-radius);
+  font-size: 1.4rem;
+  margin: 0 0 8px 0;
   position: relative;
 }
 
-.panel h3::after {
-  content: '';
-  position: absolute;
-  bottom: -5px;
-  left: 10%;
-  right: 10%;
+.header-line {
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--goal-yellow), transparent);
+  background: linear-gradient(90deg, transparent, var(--game-border), transparent);
+  margin-bottom: var(--spacing-md);
 }
 
-/* Character details */
+/* Character details - Estilo Videojuego */
 .character-details {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
   flex: 1;
-  background: rgba(52, 73, 94, 0.6);
+  background: rgba(0, 30, 60, 0.5);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius);
-  border: 2px solid var(--dirt-brown);
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+  border: 1px solid rgba(0, 170, 255, 0.3);
 }
 
-.character-details p {
+.info-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin: 0;
-  padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid rgba(236, 240, 241, 0.2);
-  font-size: 1em;
-  font-weight: 500;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0, 170, 255, 0.2);
 }
 
-.character-details p:last-child {
-  border-bottom: none;
+.info-label {
+  color: var(--game-text-light);
 }
 
-.character-details p span {
-  color: var(--neon-glow);
-  font-weight: 700;
-  text-shadow: 0 0 5px var(--grass-green);
-  font-family: 'Orbitron', monospace;
-  background: rgba(0,0,0,0.3);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  border: 1px solid var(--grass-green);
+.info-value {
+  font-weight: bold;
+  color: var(--game-border);
 }
 
-/* Barra de experiencia */
-.exp-bar {
-  width: 100%;
-  height: 20px;
-  background: var(--dirt-brown);
-  border-radius: 10px;
+.neon-text {
+  color: var(--game-neon);
+  text-shadow: 0 0 5px var(--game-neon), 0 0 10px var(--game-neon);
+}
+
+.highlight-text {
+  color: var(--lupi-green);
+  font-weight: bold;
+}
+
+/* Avatar Section */
+.avatar-section {
+  display: flex;
+  justify-content: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.avatar-container {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.avatar-container:hover {
+  transform: scale(1.05);
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--game-border);
+  box-shadow: 0 0 20px rgba(0, 204, 255, 0.6);
+  background: linear-gradient(135deg, var(--lupi-primary), var(--lupi-accent));
+  position: relative;
   overflow: hidden;
-  margin: var(--spacing-sm) 0;
-  border: 2px solid var(--line-white);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.avatar::before {
+  content: '👤';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+}
+
+.avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 5px;
+  text-align: center;
+  border-bottom-left-radius: 60px;
+  border-bottom-right-radius: 60px;
+}
+
+.avatar-name {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--game-neon);
+  font-weight: bold;
+}
+
+/* Barra de experiencia - Estilo Videojuego */
+.xp-section {
+  margin-top: var(--spacing-lg);
+}
+
+.xp-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--game-text-light);
+}
+
+.xp-bar {
+  height: 12px;
+  background: rgba(0, 50, 100, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
   position: relative;
 }
 
 .exp-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--grass-green), var(--neon-glow));
-  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: linear-gradient(90deg, var(--game-border), var(--game-accent));
+  border-radius: 6px;
+  transition: width 0.5s ease;
   position: relative;
 }
 
-.exp-fill::after {
-  content: '';
+.xp-glow {
   position: absolute;
   top: 0;
   left: 0;
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255,255,255,0.4) 50%, 
-    transparent 100%);
-  animation: shine 2s infinite;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: xp-glow 2s infinite;
 }
 
-@keyframes shine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+@keyframes xp-glow {
+  0% { opacity: 0; left: -100%; }
+  50% { opacity: 0.5; }
+  100% { opacity: 0; left: 100%; }
 }
 
-/* Skills Grid */
+.skill-points {
+  color: var(--game-text-light);
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+.points-count {
+  color: var(--game-neon);
+  font-weight: bold;
+}
+
+/* Skills Grid - Estilo Videojuego */
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-md);
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   flex: 1;
   overflow-y: auto;
   padding: var(--spacing-sm);
-  background: rgba(52, 73, 94, 0.6);
-  border-radius: var(--border-radius);
-  border: 2px solid var(--dirt-brown);
-  box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
 }
 
 .skill-card {
-  background: linear-gradient(145deg, rgba(44, 62, 80, 0.9), rgba(52, 73, 94, 0.8));
-  border: 2px solid var(--jersey-blue);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  min-height: 70px;
-}
-
-.skill-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.2), transparent);
-  transition: left 0.5s ease;
+  padding: 12px;
+  background: rgba(0, 30, 60, 0.5);
+  border: 1px solid rgba(0, 170, 255, 0.3);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  animation: fadeInUp 0.8s ease;
 }
 
 .skill-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--neon-glow);
-  box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
-}
-
-.skill-card:hover::before {
-  left: 100%;
+  background: rgba(0, 100, 200, 0.3);
+  border-color: var(--game-border);
+  transform: translateY(-2px);
 }
 
 .skill-info {
@@ -314,147 +350,94 @@
 }
 
 .skill-name {
-  font-weight: 700;
-  font-size: 0.9em;
-  color: var(--line-white);
-  text-shadow: 1px 1px 0 var(--dark-concrete);
-  margin-bottom: var(--spacing-xs);
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+  color: var(--lupi-text);
 }
 
 .skill-value {
-  font-size: 0.85em;
-  color: var(--goal-yellow);
-  font-weight: 700;
-  font-family: 'Orbitron', monospace;
-  background: rgba(0,0,0,0.4);
-  padding: 2px 8px;
-  border-radius: var(--border-radius-sm);
-  border: 1px solid var(--goal-yellow);
-  text-align: center;
-  display: inline-block;
-  width: fit-content;
+  font-weight: bold;
+  color: var(--game-border);
+}
+
+.skill-bonus {
+  color: var(--lupi-green);
+  font-size: 0.8rem;
+  margin-left: 5px;
 }
 
 .skill-btn {
-  background: linear-gradient(45deg, var(--grass-green), var(--field-green));
-  border: 2px solid var(--line-white);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  color: var(--line-white);
-  font-weight: 700;
-  transition: all 0.3s ease;
-  font-size: 1em;
-  min-width: 45px;
-  height: 40px;
+  background: linear-gradient(135deg, var(--lupi-primary), var(--game-accent));
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-shadow: 1px 1px 0 var(--dark-concrete);
-  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
 }
 
-.skill-btn:hover {
+.skill-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--game-border), var(--lupi-accent));
   transform: scale(1.1);
-  box-shadow: 0 0 15px var(--neon-glow);
-  background: linear-gradient(45deg, var(--neon-glow), var(--grass-green));
-  border-color: var(--neon-glow);
+  box-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
 }
 
 .skill-btn:disabled {
-  background: var(--light-concrete);
-  border-color: #7f8c8d;
-  color: #95a5a6;
+  background: #444;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+  opacity: 0.5;
 }
 
-/* Actions */
+/* Actions - Estilo Videojuego */
 .actions {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 15px;
   flex: 1;
   justify-content: flex-start;
-  background: rgba(52, 73, 94, 0.6);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius);
-  border: 2px solid var(--dirt-brown);
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
 }
 
 .actions button {
-  background: linear-gradient(45deg, var(--jersey-blue), var(--jersey-red));
-  color: var(--line-white);
-  border: 2px solid var(--line-white);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius);
-  font-weight: 700;
-  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  transition: all 0.3s ease;
+  gap: 12px;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
   width: 100%;
   font-size: 1em;
   justify-content: flex-start;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  text-shadow: 1px 1px 0 var(--dark-concrete);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  position: relative;
-  overflow: hidden;
+  animation: fadeInUp 0.8s ease;
 }
 
-.actions button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s ease;
+.actions button.primary {
+  background: linear-gradient(135deg, var(--game-border), var(--game-accent));
+  color: white;
 }
 
-.actions button:hover {
+.actions button.secondary {
+  background: linear-gradient(135deg, var(--lupi-secondary), #0044aa);
+  color: white;
+}
+
+.actions button:hover:not(:disabled) {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
-  border-color: var(--goal-yellow);
+  box-shadow: 0 5px 15px rgba(0, 170, 255, 0.4);
 }
 
-.actions button:hover::before {
-  left: 100%;
-}
-
-.actions button:active {
-  transform: translateY(-1px);
-}
-
-/* Avatar */
-.avatar {
-  width: 120px;
-  height: 120px;
-  margin: 0 auto var(--spacing-lg) auto;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--jersey-blue), var(--jersey-red));
-  border: 4px solid var(--goal-yellow);
-  box-shadow: 
-    0 0 20px var(--goal-yellow),
-    inset 0 0 20px rgba(0,0,0,0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.avatar::before {
-  content: '⚽';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3em;
-  text-shadow: 2px 2px 0 var(--dark-concrete);
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Level Up Popup */
@@ -463,46 +446,44 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: linear-gradient(160deg, var(--dark-concrete), var(--light-concrete));
+  background: linear-gradient(160deg, var(--game-bg-dark), var(--lupi-card));
   padding: var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  border: 4px solid var(--goal-yellow);
+  border-radius: var(--border-radius);
+  border: 4px solid var(--lupi-accent);
   box-shadow: 
-    0 0 30px var(--goal-yellow),
-    0 0 60px var(--grass-green);
-  color: var(--line-white);
+    var(--shadow-glow-accent),
+    0 0 60px var(--lupi-primary);
+  color: var(--lupi-text);
   text-align: center;
   animation: levelUpPulse 1.5s infinite alternate, popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 1000;
   min-width: 300px;
-  font-family: 'Orbitron', monospace;
+  font-family: 'Oxanium', monospace;
   text-transform: uppercase;
 }
 
 .levelup-popup h2 {
   font-size: 2.2rem;
-  color: var(--goal-yellow);
-  text-shadow: 
-    0 0 10px var(--goal-yellow),
-    0 0 20px var(--grass-green);
+  color: var(--lupi-accent);
+  text-shadow: var(--shadow-glow-accent);
   margin-bottom: var(--spacing-md);
   letter-spacing: 2px;
 }
 
 .levelup-popup p {
   font-size: 1.3em;
-  color: var(--neon-glow);
+  color: var(--lupi-green);
   margin: 0;
   font-weight: 700;
 }
 
 @keyframes levelUpPulse {
   0% { 
-    box-shadow: 0 0 20px var(--goal-yellow), 0 0 40px var(--grass-green);
+    box-shadow: 0 0 20px var(--lupi-accent), 0 0 40px var(--lupi-primary);
     transform: translate(-50%, -50%) scale(1);
   }
   100% { 
-    box-shadow: 0 0 30px var(--goal-yellow), 0 0 60px var(--grass-green);
+    box-shadow: 0 0 30px var(--lupi-accent), 0 0 60px var(--lupi-primary);
     transform: translate(-50%, -50%) scale(1.05);
   }
 }
@@ -518,27 +499,38 @@
   }
 }
 
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
 /* Scrollbar personalizado */
 .skills-grid::-webkit-scrollbar {
   width: 8px;
 }
 
 .skills-grid::-webkit-scrollbar-track {
-  background: var(--dark-concrete);
+  background: var(--game-bg-dark);
   border-radius: 4px;
 }
 
 .skills-grid::-webkit-scrollbar-thumb {
-  background: linear-gradient(var(--jersey-blue), var(--grass-green));
+  background: linear-gradient(var(--game-border), var(--game-accent));
   border-radius: 4px;
-  border: 1px solid var(--line-white);
+  border: 1px solid var(--lupi-text);
 }
 
 .skills-grid::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(var(--neon-glow), var(--goal-yellow));
+  background: linear-gradient(var(--lupi-green), var(--game-border));
 }
 
-/* Efectos de partículas de césped */
+/* Efectos de partículas de energía */
 .panel::after {
   content: '';
   position: absolute;
@@ -547,9 +539,9 @@
   right: 0;
   bottom: 0;
   background: 
-    radial-gradient(circle at 20% 80%, var(--grass-green) 1px, transparent 1px),
-    radial-gradient(circle at 80% 20%, var(--field-green) 1px, transparent 1px),
-    radial-gradient(circle at 40% 40%, var(--grass-green) 1px, transparent 1px);
+    radial-gradient(circle at 20% 80%, var(--game-border) 1px, transparent 1px),
+    radial-gradient(circle at 80% 20%, var(--lupi-accent) 1px, transparent 1px),
+    radial-gradient(circle at 40% 40%, var(--lupi-green) 1px, transparent 1px);
   background-size: 50px 50px, 30px 30px, 70px 70px;
   opacity: 0.03;
   pointer-events: none;
@@ -580,7 +572,7 @@
   
   .panel:not(:last-child) {
     border-right: none;
-    border-bottom: 2px solid var(--dirt-brown);
+    border-bottom: 2px solid var(--lupi-secondary);
   }
   
   .skills-grid {
@@ -613,7 +605,7 @@
     font-size: 0.9em;
   }
   
-  .character-details p {
+  .info-row {
     font-size: 0.9em;
     padding: var(--spacing-xs) 0;
   }
@@ -670,25 +662,13 @@
 /* Estilos para el tour */
 .tour-button {
   animation: pulse 2s infinite;
-  font-family: 'Orbitron', monospace;
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 15px rgba(46, 204, 113, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
-  }
+  font-family: 'Oxanium', monospace;
 }
 
 /* Asegurar que los elementos del tour sean visibles */
 .react-joyride__tooltip {
   z-index: 10000 !important;
-  font-family: 'Roboto Condensed', sans-serif;
+  font-family: 'Rajdhani', sans-serif;
 }
 
 .react-joyride__overlay {
@@ -699,398 +679,17 @@
   z-index: 9998 !important;
 }
 
-/* Efecto de gradiente animado en los bordes - CORREGIDO */
-.panel-left {
-  border-left: 4px solid;
-  border-image: linear-gradient(45deg, var(--jersey-blue), transparent) 1;
-}
-
-.panel-right {
-  border-right: 4px solid;
-  border-image: linear-gradient(45deg, transparent, var(--jersey-red)) 1;
-}
-
-.panel-center {
-  border-top: 4px solid;
-  border-bottom: 4px solid;
-  border-image: linear-gradient(90deg, var(--jersey-blue), var(--jersey-red)) 1;
-}
-
 /* Efectos de brillo en hover para paneles */
 .panel-left:hover {
-  box-shadow: inset 0 0 30px rgba(52, 152, 219, 0.3);
+  box-shadow: inset 0 0 30px rgba(9, 188, 235, 0.3), var(--game-shadow);
 }
 
 .panel-center:hover {
-  box-shadow: inset 0 0 30px rgba(46, 204, 113, 0.3);
+  box-shadow: inset 0 0 30px rgba(163, 230, 53, 0.3), var(--game-shadow);
 }
 
 .panel-right:hover {
-  box-shadow: inset 0 0 30px rgba(231, 76, 60, 0.3);
+  box-shadow: inset 0 0 30px rgba(255, 0, 170, 0.3), var(--game-shadow);
 }
 
-/* Badge de notificaciones */
-.notification-badge {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: linear-gradient(45deg, var(--jersey-red), #c0392b);
-  color: var(--line-white);
-  border: 2px solid var(--goal-yellow);
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 0.7em;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: pulse-notification 2s infinite;
-}
-
-@keyframes pulse-notification {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-}
-
-/* Efecto de estadio en el fondo general */
-.dashboard::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    /* Gradas */
-    linear-gradient(45deg, 
-      transparent 0%, 
-      rgba(44, 62, 80, 0.8) 10%, 
-      transparent 20%,
-      rgba(52, 73, 94, 0.6) 30%,
-      transparent 40%,
-      rgba(44, 62, 80, 0.8) 50%,
-      transparent 60%,
-      rgba(52, 73, 94, 0.6) 70%,
-      transparent 80%,
-      rgba(44, 62, 80, 0.8) 90%,
-      transparent 100%
-    );
-  opacity: 0.1;
-  pointer-events: none;
-  animation: stadium-move 20s infinite linear;
-}
-
-@keyframes stadium-move {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100px); }
-}
-
-/* Efecto de focos del estadio */
-.dashboard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 10%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 10%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 20% 90%, rgba(241, 196, 15, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 90%, rgba(241, 196, 15, 0.1) 0%, transparent 50%);
-  pointer-events: none;
-  animation: spotlight-pulse 4s infinite alternate;
-}
-
-@keyframes spotlight-pulse {
-  0% { opacity: 0.3; }
-  100% { opacity: 0.6; }
-}
-
-/* Efectos de confeti para celebraciones */
-.confetti {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: var(--goal-yellow);
-  opacity: 0.7;
-  animation: confetti-fall 5s linear forwards;
-}
-
-@keyframes confetti-fall {
-  0% {
-    transform: translateY(-100px) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(100vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* Indicador de energía/stamina */
-.stamina-bar {
-  width: 100%;
-  height: 8px;
-  background: var(--dirt-brown);
-  border-radius: 4px;
-  margin: var(--spacing-xs) 0;
-  overflow: hidden;
-  border: 1px solid var(--line-white);
-}
-
-.stamina-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--jersey-red), var(--goal-yellow), var(--grass-green));
-  transition: width 0.5s ease;
-  position: relative;
-}
-
-.stamina-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(255,255,255,0.6) 50%, 
-    transparent 100%);
-  animation: stamina-shine 3s infinite;
-}
-
-@keyframes stamina-shine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Badges de logros */
-.achievement-badge {
-  display: inline-block;
-  background: linear-gradient(45deg, var(--goal-yellow), #f39c12);
-  color: var(--dark-concrete);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius);
-  font-size: 0.8em;
-  font-weight: 700;
-  margin: var(--spacing-xs);
-  border: 2px solid var(--line-white);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  animation: badge-glow 2s infinite alternate;
-}
-
-@keyframes badge-glow {
-  0% { box-shadow: 0 0 5px var(--goal-yellow); }
-  100% { box-shadow: 0 0 15px var(--goal-yellow); }
-}
-
-/* Efecto de vibración para acciones importantes */
-@keyframes vibrate {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  50% { transform: translateX(2px); }
-  75% { transform: translateX(-2px); }
-  100% { transform: translateX(0); }
-}
-
-.vibrate {
-  animation: vibrate 0.3s ease;
-}
-
-/* Tooltips personalizados */
-.tooltip {
-  position: relative;
-  cursor: help;
-}
-
-.tooltip::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--dark-concrete);
-  color: var(--line-white);
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  border: 1px solid var(--goal-yellow);
-  font-size: 0.8em;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 1000;
-}
-
-.tooltip:hover::after {
-  opacity: 1;
-}
-
-/* Efectos de sonido visuales (ondas) */
-.sound-wave {
-  display: inline-block;
-  width: 4px;
-  height: 12px;
-  background: var(--neon-glow);
-  margin: 0 1px;
-  animation: sound-wave 1.2s infinite ease-in-out;
-}
-
-.sound-wave:nth-child(2) { animation-delay: 0.1s; }
-.sound-wave:nth-child(3) { animation-delay: 0.2s; }
-.sound-wave:nth-child(4) { animation-delay: 0.3s; }
-.sound-wave:nth-child(5) { animation-delay: 0.4s; }
-
-@keyframes sound-wave {
-  0%, 40%, 100% { transform: scaleY(0.4); }
-  20% { transform: scaleY(1); }
-}
-
-/* Modo competitivo */
-.competitive-mode .panel {
-  border-color: var(--jersey-red);
-  box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
-}
-
-.competitive-mode .panel h3 {
-  background: linear-gradient(45deg, var(--jersey-red), #c0392b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Efectos de campeonato */
-.champion-border {
-  border: 4px solid;
-  border-image: linear-gradient(45deg, var(--goal-yellow), var(--jersey-red), var(--goal-yellow)) 1;
-  animation: champion-glow 3s infinite alternate;
-}
-
-@keyframes champion-glow {
-  0% { box-shadow: 0 0 20px var(--goal-yellow); }
-  100% { box-shadow: 0 0 40px var(--goal-yellow); }
-}
-
-/* Responsive adicional para tablets */
-@media (max-width: 1200px) and (min-width: 769px) {
-  .skills-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .actions button {
-    padding: var(--spacing-md);
-    font-size: 0.9em;
-  }
-  
-  .character-details {
-    padding: var(--spacing-md);
-  }
-}
-
-/* High DPI screens */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  .dashboard::before {
-    background-size: 100px 100px, 60px 60px, 140px 140px;
-  }
-}
-
-/* Modo de impresión */
-@media print {
-  .dashboard {
-    background: white !important;
-    color: black !important;
-  }
-  
-  .panel {
-    border: 1px solid black !important;
-    background: white !important;
-  }
-  
-  .skill-btn, .actions button {
-    display: none !important;
-  }
-}
-
-/* Soporte para modo oscuro del sistema */
-@media (prefers-color-scheme: dark) {
-  .dashboard {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  }
-}
-
-/* Accesibilidad - alto contraste */
-@media (prefers-contrast: high) {
-  :root {
-    --grass-green: #00ff00;
-    --field-green: #008800;
-    --goal-yellow: #ffff00;
-    --line-white: #ffffff;
-    --jersey-blue: #0000ff;
-    --jersey-red: #ff0000;
-  }
-  
-  .panel {
-    border-width: 4px;
-  }
-}
-
-/* Animaciones de entrada para elementos */
-.panel > * {
-  animation: slideInUp 0.6s ease-out;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Efecto de desgaste en los bordes (estilo club de barrio) */
-.panel {
-  position: relative;
-}
-
-.panel::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  right: 2px;
-  bottom: 2px;
-  border: 1px solid rgba(255,255,255,0.1);
-  pointer-events: none;
-}
-
-/* Marcas de desgaste */
-.wear-mark {
-  position: absolute;
-  background: rgba(0,0,0,0.3);
-  border-radius: 50%;
-  opacity: 0.3;
-}
-
-.wear-mark-1 { top: 10%; left: 5%; width: 20px; height: 20px; }
-.wear-mark-2 { bottom: 15%; right: 8%; width: 15px; height: 15px; }
-.wear-mark-3 { top: 40%; left: 80%; width: 25px; height: 25px; }
-
-/* Efecto de polvo de cancha */
-.dust-particle {
-  position: absolute;
-  background: var(--dirt-brown);
-  border-radius: 50%;
-  opacity: 0.1;
-  animation: dust-float 10s infinite linear;
-}
-
-@keyframes dust-float {
-  0% { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(-100px) rotate(360deg); }
-}
-
-/* FIN DEL CSS - Dashboard estilo RPG Deportivo Clubes de Barrio */
+/* FIN DEL CSS - Dashboard con Tema Videojuego LUPI */
