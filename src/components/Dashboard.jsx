@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
+import GuideTour from "./GuideTour";
 import "../styles/Dashboard.css";
 
 export const Dashboard = ({ user }) => {
@@ -170,6 +171,9 @@ export const Dashboard = ({ user }) => {
           <button>⚽ Clubes</button>
         </div>
       </div>
+
+      {/* Componente de Guía */}
+      <GuideTour />
 
       {showLevelUp && (
         <div className="levelup-popup">
