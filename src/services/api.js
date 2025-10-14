@@ -1,5 +1,4 @@
-// src/services/api.js
-const API_URL = "https://lupiback.onrender.com";
+const API_URL = "https://lupiback.onrender.com"; // URL del backend desplegado
 
 export async function getProfile(userId) {
   const res = await fetch(`${API_URL}/profiles?id=${userId}`);
@@ -25,37 +24,35 @@ export async function getWallet(characterId) {
   return res.json();
 }
 
-// Añade estas funciones faltantes:
-export async function updateStat(characterId, statKey) {
-  const res = await fetch(`${API_URL}/characters/${characterId}/stats`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ stat: statKey }),
-  });
-  return res.json();
-}
-
-export const addSkillPoint = async (characterId, skillKey) => {
-  const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/characters/${characterId}/stat`, {
+export async function updateStat(characterId, statKey, newValue, availableSkillPoints) {
+  const res = await fetch(`${API_URL}/characters/${characterId}/stat`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ skillKey }),
+    body: JSON.stringify({
+      statKey,
+      newValue,
+      available_skill_points: availableSkillPoints
+    }),
   });
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.error || "Error al subir skill");
+    throw new Error(errorData.error || "Error al actualizar stat");
   }
 
   const data = await res.json();
   return data.character;
-};
+}
 
-export const trainCharacter = async (characterId) => {
-  const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/characters/${characterId}/train`, {
+export async function trainCharacter(characterId) {
+  const res = await fetch(`${API_URL}/characters/${characterId}/train`, {
     method: "POST",
   });
 
-  if (!res.ok) throw new Error("Error entrenando personaje");
-  return await res.json();
-};
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.error || "Error al entrenar personaje");
+  }
+
+  return res.json();
+}
