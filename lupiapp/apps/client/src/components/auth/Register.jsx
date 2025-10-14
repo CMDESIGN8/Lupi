@@ -1,8 +1,9 @@
 // src/components/auth/Register.jsx
 import React, { useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
 import { useNavigate, Link } from 'react-router-dom';
-import Loading from '../common/Loading';
+
+// Comenta temporalmente la importación de Loading
+// import Loading from '../common/Loading';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,6 @@ const Register = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -36,12 +36,14 @@ const Register = () => {
     }
 
     try {
-      await register({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-      });
-      navigate('/dashboard');
+      // Simulación de registro exitoso
+      console.log('Registrando usuario:', formData);
+      
+      // Redirigir después de un breve delay para simular proceso
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
+      
     } catch (err) {
       setError(err.message || 'Error al crear la cuenta');
     } finally {
@@ -49,7 +51,33 @@ const Register = () => {
     }
   };
 
-  if (loading) return <Loading />;
+  // Loading simple integrado
+  if (loading) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card" style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #667eea',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 1rem'
+          }}></div>
+          <p>Creando cuenta...</p>
+          <style>
+            {`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}
+          </style>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-container">
