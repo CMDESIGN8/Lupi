@@ -1,46 +1,64 @@
+// src/hooks/useAuth.js
 import { useState, useEffect } from 'react';
+import { useLocalStorage } from './useLocalStorage';
 import { authService } from '../services/auth';
 
 export const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useLocalStorage('authToken', null);
 
   useEffect(() => {
-    // Get initial user
-    authService.getCurrentUser().then(setUser).finally(() => setLoading(false));
-
-    // Listen for auth changes
-    const { data: { subscription } } = authService.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
+    const checkAuth = async () => {
+      if (token) {
+        try {
+          // Verificar token con el backend
+          const userData = await authService.getProfile();
+          setUser(userData);
+        } catch (error) {
+          console.error('Error verifying token:', error);
+          setToken(null);
+        }
+      }
       setLoading(false);
-    });
+    };
 
-    return () => subscription.unsubscribe();
-  }, []);
+    checkAuth();
+  }, [token, setToken]);
 
-  const signUp = async (email, password, userData) => {
-    const data = await authService.signUp(email, password, userData);
-    setUser(data.user);
-    return data;
+  const login = async (email, password) => {
+    try {
+      const response = await authService.login(email, password);
+      setToken(response.token);
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  const signIn = async (email, password) => {
-    const data = await authService.signIn(email, password);
-    setUser(data.user);
-    return data;
+  const register = async (userData) => {
+    try {
+      const response = await authService.register(userData);
+      setToken(response.token);
+      setUser(response.user);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   };
 
-  const signOut = async () => {
-    await authService.signOut();
+  const logout = () => {
+    setToken(null);
     setUser(null);
   };
 
   return {
     user,
     loading,
-    signUp,
-    signIn,
-    signOut,
-    isAuthenticated: !!user,
+    login,
+    register,
+    logout,
+    isAuthenticated: !!user
   };
 };
