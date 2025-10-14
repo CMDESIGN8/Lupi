@@ -35,9 +35,27 @@ export async function updateStat(characterId, statKey) {
   return res.json();
 }
 
-export async function trainCharacter(characterId) {
-  const res = await fetch(`${API_URL}/characters/${characterId}/train`, {
+export const addSkillPoint = async (characterId, skillKey) => {
+  const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/characters/${characterId}/stat`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ skillKey }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.error || "Error al subir skill");
+  }
+
+  const data = await res.json();
+  return data.character;
+};
+
+export const trainCharacter = async (characterId) => {
+  const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/characters/${characterId}/train`, {
     method: "POST",
   });
-  return res.json();
-}
+
+  if (!res.ok) throw new Error("Error entrenando personaje");
+  return await res.json();
+};
