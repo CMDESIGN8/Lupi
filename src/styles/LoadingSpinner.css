@@ -1,0 +1,28 @@
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 50px;
+}
+
+.spinner {
+  border: 6px solid #f3f3f3; /* gris claro */
+  border-top: 6px solid #09BCEB; /* cyan Lupi */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spinner-container p {
+  font-size: 1rem;
+  color: #09BCEB;
+  font-weight: bold;
+}
