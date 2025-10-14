@@ -1,109 +1,41 @@
-import React, { useState, useEffect } from "react";
-import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
-import GuideTour from "./GuideTour";
-import "../styles/Dashboard.css";
+import React, { useEffect, useState } from "react";
+import { getCharacter, getWallet } from "../services/api";
+import "./Dashboard.css"; // importamos los estilos
 
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showLevelUp, setShowLevelUp] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-    
-    const fetchData = async (userId) => {
-      if (!userId) return;
-      
-      setLoading(true);
-      try {
-        console.log(`🔄 Fetching data for user: ${userId}`);
-        
-        const charData = await getCharacter(userId);
-        if (charData?.id && isMounted) {
-          setCharacter(charData);
-          const walletData = await getWallet(charData.id);
-          if (isMounted) {
-            setWallet(walletData);
-          }
-        }
-      } catch (error) {
-        console.error("❌ Error cargando datos:", error);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    if (user?.id) {
+    if (user) {
       fetchData(user.id);
     }
+  }, [user]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [user?.id]);
-
-  const increaseStat = async (statKey) => {
-    if (!character || character.available_skill_points <= 0) return;
-
+  const fetchData = async (userId) => {
     try {
-      const updated = await updateStat(character.id, statKey);
-      setCharacter(updated);
-    } catch (err) {
-      console.error("Error al agregar skill:", err);
-    }
-  };
-
-  const handleTrain = async () => {
-    if (!character) return;
-    try {
-      const result = await trainCharacter(character.id);
-      if (result.character) {
-        setCharacter(result.character);
-        setWallet(result.wallet);
-        if (result.character.level > character.level) {
-          setShowLevelUp(true);
-          setTimeout(() => setShowLevelUp(false), 3000);
-        }
-      }
-    } catch (err) {
-      console.error("Error entrenando:", err);
-    }
-  };
-
-  const handleRefresh = () => {
-    if (user?.id) {
       setLoading(true);
-      getCharacter(user.id)
-        .then(charData => {
-          if (charData?.id) {
-            setCharacter(charData);
-            return getWallet(charData.id);
-          }
-        })
-        .then(walletData => {
-          if (walletData) {
-            setWallet(walletData);
-          }
-        })
-        .catch(error => {
-          console.error("❌ Error refrescando datos:", error);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      const charData = await getCharacter(userId);
+
+      if (charData?.id) {
+        setCharacter(charData);
+        const walletData = await getWallet(charData.id);
+        setWallet(walletData);
+      } else {
+        setCharacter(null);
+      }
+    } catch (error) {
+      console.error("❌ Error cargando datos:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) return <div className="dashboard-loading">⏳ Cargando...</div>;
-  if (!character) return <div className="dashboard-error">⚠️ No tienes personaje aún.</div>;
+  if (loading) return <p>⏳ Cargando tu dashboard...</p>;
+  if (!character) return <p>⚠️ No tienes personaje creado aún.</p>;
 
-  const expActual = character.experience;
-  const expMax = character.experience_to_next_level;
-  const expPorcentaje = Math.min((expActual / expMax) * 100, 100);
-
+  // Campos que vamos a renderizar como stats RPG
   const stats = [
     { key: "pase", label: "📨 Pase" },
     { key: "potencia", label: "⚽ Potencia" },
@@ -120,67 +52,43 @@ export const Dashboard = ({ user }) => {
 
   return (
     <div className="dashboard">
-      {/* IZQUIERDA - Personaje */}
-      <div className="panel panel-left">
+      <h2>🐺 Bienvenido a LupiApp, {character.nickname}!</h2>
+
+      <section className="character-info">
         <h3>📊 Personaje</h3>
-        <div className="avatar"></div>
-        <div className="character-details">
-          <p>Nombre: <span>{character.nickname}</span></p>
-          <p>Nivel: <span>{character.level}</span></p>
-          <div className="exp-bar">
-            <div className="exp-fill" style={{ width: `${expPorcentaje}%` }} />
-          </div>
-          <p>EXP: <span>{expActual}</span> / {expMax}</p>
-          {wallet && <p>Lupicoins: <span>{wallet.lupicoins}</span></p>}
-          <p>Skill Points: <span>{character.available_skill_points}</span></p>
-        </div>
-      </div>
+        <p>Nivel: {character.level}</p>
+        <p>
+          Experiencia: {character.experience}/{character.experience_to_next_level}
+        </p>
+      </section>
 
-      {/* CENTRO - Skills */}
-      <div className="panel panel-center">
-        <h3>⚔️ Skills</h3>
-        <div className="skills-grid">
-          {stats.map(({ key, label }) => (
-            <div key={key} className="skill-card">
-              <div className="skill-info">
-                <span className="skill-name">{label}</span>
-                <span className="skill-value">{character[key]}/100</span>
-              </div>
-              {character.available_skill_points > 0 && character[key] < 100 && (
-                <button 
-                  className="skill-btn" 
-                  onClick={() => increaseStat(key)}
-                  title="Aumentar skill"
-                >
-                  ➕
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* DERECHA - Acciones */}
-      <div className="panel panel-right">
-        <h3>🛠️ Acciones</h3>
-        <div className="actions">
-          <button onClick={handleTrain}>💪 Entrenar</button>
-          <button onClick={handleRefresh}>🔄 Refrescar</button>
-          <button>🛒 Mercado</button>
-          <button>🎒 Inventario</button>
-          <button>⚽ Clubes</button>
-        </div>
-      </div>
-
-      {/* Componente de Guía */}
-      <GuideTour />
-
-      {showLevelUp && (
-        <div className="levelup-popup">
-          <h2>🎉 ¡Subiste a nivel {character.level}!</h2>
-          <p>+5 Skill Points</p>
-        </div>
+      {wallet && (
+        <section className="wallet-info">
+          <h3>💰 Wallet</h3>
+          <p>Dirección: {wallet.address}</p>
+          <p>Lupicoins: {wallet.lupicoins}</p>
+        </section>
       )}
+
+      <section className="stats">
+        <h3>⚔️ Stats</h3>
+        <ul>
+          {stats.map(({ key, label }) => (
+            <li key={key}>
+              <span className="stat-name">{label}</span>
+              <div className="stat-bar">
+                <div
+                  className="fill"
+                  style={{ width: `${character[key]}%` }}
+                ></div>
+              </div>
+              <span className="stat-value">{character[key]}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
     </div>
   );
 };
