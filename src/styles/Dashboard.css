@@ -1,19 +1,22 @@
+/* Dashboard.css - ACTUALIZADO */
+
 @import url(../styles/globales.css);
 
 .dashboard { 
-    padding: var(--spacing-lg); 
-    min-height: 80vh; 
+    padding: 0; /* Eliminamos padding para fullscreen */
+    height: 100%; /* Ocupa toda la altura disponible */
+    width: 100%; /* Ocupa todo el ancho disponible */
     background: linear-gradient(135deg, var(--lupi-dark), var(--lupi-darker)); 
     color: var(--lupi-text); 
     font-family: 'Orbitron', sans-serif; 
     display: flex; 
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-start;
-    gap: var(--spacing-lg); 
+    align-items: stretch; /* Hace que los paneles tengan misma altura */
+    gap: 0; /* Sin gap para fullscreen */
     animation: fadeInUp 0.8s ease; 
-    width: 100%;
     box-sizing: border-box;
+    overflow: hidden; /* Previene scroll */
 }
 
 /* Estados de carga y error */
@@ -21,7 +24,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 200px;
+    height: 100%;
     font-size: 1.2em;
     width: 100%;
     color: var(--lupi-text);
@@ -35,25 +38,25 @@
     color: #ff4444;
 }
 
-/* Paneles */
+/* Paneles - ACTUALIZADO */
 .panel {
     flex: 1;
     border: 2px solid #00bfff;
-    border-radius: 8px;
+    border-radius: 0; /* Sin bordes redondeados para fullscreen */
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 16px;
     background: #0c1320;
-    min-height: 500px;
+    height: 100%; /* Ocupa toda la altura */
     box-sizing: border-box;
     box-shadow: 0 0 15px rgba(0, 191, 255, 0.3);
+    margin: 0; /* Sin margen */
 }
 
-/* Forzar que todos los paneles tengan el mismo ancho */
-.panel-left, .panel-center, .panel-right {
-    flex: 1 !important;
-    min-width: 0;
+/* Bordes internos entre paneles */
+.panel:not(:last-child) {
+    border-right: 1px solid rgba(0, 191, 255, 0.3);
 }
 
 .panel h3 {
@@ -70,6 +73,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    flex: 1;
 }
 
 .character-details p {
@@ -127,7 +131,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
-    flex-grow: 1;
+    flex: 1;
     overflow-y: auto;
     padding: 5px;
 }
@@ -199,7 +203,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    flex-grow: 1;
+    flex: 1;
     justify-content: flex-start;
 }
 
@@ -319,12 +323,19 @@
 @media (max-width: 1024px) {
     .dashboard {
         flex-direction: column;
-        gap: 20px;
+        gap: 0;
     }
     
     .panel {
-        min-height: auto;
+        height: auto;
+        min-height: 33.33vh;
         width: 100%;
+        border-radius: 0;
+    }
+    
+    .panel:not(:last-child) {
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 191, 255, 0.3);
     }
     
     .skills-grid {
@@ -334,7 +345,7 @@
 
 @media (max-width: 768px) {
     .dashboard {
-        padding: 15px;
+        padding: 0;
     }
     
     .panel {
