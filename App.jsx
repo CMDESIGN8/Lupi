@@ -76,28 +76,33 @@ function App() {
   };
 
   const fetchCharacter = async (userId) => {
-    try {
-      const { data, error } = await supabase
-        .from('characters')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle();
+  try {
+    console.log('🔍 Buscando personaje para usuario:', userId);
+    
+    const { data, error } = await supabase
+      .from('characters')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching character:', error);
-        return;
-      }
-      if (data) {
-        console.log('🎯 Character found:', data);
-        setCharacter(data);
-      } else {
-        console.log('❌ No character found for this user');
-        setCharacter(null);
-      }
-    } catch (error) {
-      console.error('Fetch character failed:', error);
+    if (error) {
+      console.error('❌ Error buscando personaje:', error);
+      return;
     }
-  };
+    
+    console.log('📊 Resultado de búsqueda:', data);
+    
+    if (data) {
+      console.log('✅ Personaje encontrado:', data.nickname);
+      setCharacter(data);
+    } else {
+      console.log('❌ No se encontró personaje para este usuario');
+      setCharacter(null);
+    }
+  } catch (error) {
+    console.error('🔥 Fetch character failed:', error);
+  }
+};
 
   if (loading) {
     return <div className="loading">Cargando LupiApp...</div>;
