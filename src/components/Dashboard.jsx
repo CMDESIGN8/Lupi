@@ -7,38 +7,44 @@ export const Dashboard = ({ user }) => {
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLevelUp, setShowLevelUp] = useState(false);
-  const [fetchCount, setFetchCount] = useState(0); // Para debug
+  const [dataFetched, setDataFetched] = useState(false); // Para evitar múltiples fetches
 
-  // Usar useCallback para evitar recreaciones de la función
+  // fetchData sin dependencias problemáticas
   const fetchData = useCallback(async (userId) => {
-    if (!userId) return;
+    if (!userId || dataFetched) return;
     
     setLoading(true);
     try {
-      console.log(`🔄 Fetching data for user: ${userId}, count: ${fetchCount + 1}`);
-      setFetchCount(prev => prev + 1);
+      console.log(`🔄 Fetching data for user: ${userId}`);
       
       const charData = await getCharacter(userId);
       if (charData?.id) {
         setCharacter(charData);
         const walletData = await getWallet(charData.id);
         setWallet(walletData);
+        setDataFetched(true); // Marcar como ya fetcheado
       } else {
         console.warn("⚠️ No character data received");
       }
     } catch (error) {
       console.error("❌ Error cargando datos:", error);
+      setDataFetched(false); // Permitir reintento en caso de error
     } finally {
       setLoading(false);
     }
-  }, [fetchCount]);
+  }, [dataFetched]); // Solo depende de dataFetched
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && !dataFetched) {
       console.log("🎯 Dashboard mounted with user:", user.id);
       fetchData(user.id);
     }
-  }, [user?.id, fetchData]);
+  }, [user?.id, dataFetched, fetchData]);
+
+  // Función manual para refrescar
+  const handleRefresh = () => {
+    setDataFetched(false);
+  };
 
   const increaseStat = async (statKey) => {
     if (!character || character.available_skill_points <= 0) return;
@@ -135,7 +141,7 @@ export const Dashboard = ({ user }) => {
         <h3>🛠️ Acciones</h3>
         <div className="actions">
           <button onClick={handleTrain}>💪 Entrenar</button>
-          <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
+          <button onClick={handleRefresh}>🔄 Refrescar</button>
           <button>🛒 Mercado</button>
           <button>🎒 Inventario</button>
           <button>⚽ Clubes</button>
