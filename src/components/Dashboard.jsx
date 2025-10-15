@@ -29,6 +29,23 @@ export const Dashboard = ({ user }) => {
     }
   };
 
+  // Lógica de addSkillPoint
+const addSkillPoint = async (skillKey) => {
+  try {
+    const res = await fetch(`${API_URL}/characters/${character.id}/stat`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ skillKey }),
+    });
+
+    if (!res.ok) throw new Error("No se pudo actualizar skill");
+    const data = await res.json();
+    setCharacter(data.character);
+  } catch (err) {
+    console.error("Error al subir skill:", err);
+  }
+};
+
   const increaseStat = async (statKey) => {
     if (!character || character.available_skill_points <= 0 || character[statKey] >= 100) return;
     setAddingSkill(true);
