@@ -47,24 +47,15 @@ const addSkillPoint = async (skillKey) => {
 };
 
   const increaseStat = async (statKey) => {
-    if (!character || character.available_skill_points <= 0 || character[statKey] >= 100) return;
-    setAddingSkill(true);
+  if (!character || character.available_skill_points <= 0) return;
 
-    try {
-      const updated = await updateStat(
-        character.id,
-        statKey,
-        character[statKey] + 1,
-        character.available_skill_points - 1
-      );
-      setCharacter(updated);
-    } catch (err) {
-      console.error("Error al agregar skill:", err);
-      alert(err.message || "Error al agregar skill");
-    } finally {
-      setAddingSkill(false);
-    }
-  };
+  try {
+    const updated = await updateStat(character.id, statKey);
+    setCharacter(updated);
+  } catch (err) {
+    console.error("Error al agregar skill:", err);
+  }
+};
 
   const handleTrain = async () => {
     if (!character) return;

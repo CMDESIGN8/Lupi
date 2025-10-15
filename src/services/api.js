@@ -24,20 +24,16 @@ export async function getWallet(characterId) {
   return res.json();
 }
 
-export async function updateStat(characterId, statKey, newValue, availableSkillPoints) {
+export async function updateStat(characterId, skillKey, newValue, availableSkillPoints) {
   const res = await fetch(`${API_URL}/characters/${characterId}/stat`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      statKey,
-      newValue,
-      available_skill_points: availableSkillPoints
-    }),
+    body: JSON.stringify({ skillKey }),
   });
 
   if (!res.ok) {
     const errorData = await res.json();
-    throw new Error(errorData.error || "Error al actualizar stat");
+    throw new Error(errorData.error || "Error al subir skill");
   }
 
   const data = await res.json();
