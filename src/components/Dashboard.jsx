@@ -1,170 +1,113 @@
-import React, { useState, useEffect } from "react";
-import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
-import "../styles/Dashboard.css";
+import React, { useEffect, useState } from "react";
+import { updateStat, trainCharacter } from "../services/api";
+import { motion } from "framer-motion";
+import "../styles/dashboard.css";
 
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
-  const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showLevelUp, setShowLevelUp] = useState(false);
-  const [addingSkill, setAddingSkill] = useState(false);
+  const [levelUp, setLevelUp] = useState(false);
 
+  // Cargar personaje al iniciar
   useEffect(() => {
-    if (user) fetchData(user.id);
+    const loadCharacter = async () => {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/characters/by-user/${user.id}`);
+        const data = await res.json();
+        setCharacter(data);
+      } catch (err) {
+        console.error("Error al cargar personaje:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCharacter();
   }, [user]);
 
-  const fetchData = async (userId) => {
-    setLoading(true);
-    try {
-      const charData = await getCharacter(userId);
-      if (charData?.id) {
-        setCharacter(charData);
-        const walletData = await getWallet(charData.id);
-        setWallet(walletData);
-      }
-    } catch (error) {
-      console.error("❌ Error cargando datos:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Lógica de addSkillPoint
-const addSkillPoint = async (skillKey) => {
-  try {
-    const res = await fetch(`${API_URL}/characters/${character.id}/stat`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ skillKey }),
-    });
-
-    if (!res.ok) throw new Error("No se pudo actualizar skill");
-    const data = await res.json();
-    setCharacter(data.character);
-  } catch (err) {
-    console.error("Error al subir skill:", err);
-  }
-};
-
-  const increaseStat = async (statKey) => {
-  if (!character || character.available_skill_points <= 0) return;
-
-  try {
-    const updated = await updateStat(character.id, statKey);
-    setCharacter(updated);
-  } catch (err) {
-    console.error("Error al agregar skill:", err);
-  }
-};
-
   const handleTrain = async () => {
-    if (!character) return;
     try {
-      const result = await trainCharacter(character.id);
-      if (result.character) {
-        setCharacter(result.character);
-        setWallet(result.wallet);
-        if (result.character.level > character.level) {
-          setShowLevelUp(true);
-          setTimeout(() => setShowLevelUp(false), 3000);
-        }
+      const updated = await trainCharacter(character.id);
+      if (updated.level > character.level) {
+        setLevelUp(true);
+        setTimeout(() => setLevelUp(false), 2000);
       }
+      setCharacter(updated);
     } catch (err) {
-      console.error("Error entrenando:", err);
+      console.error("Error al entrenar:", err);
     }
   };
 
-  if (loading) return <p>⏳ Cargando...</p>;
-  if (!character) return <p>⚠️ No tienes personaje aún.</p>;
+  const increaseStat = async (skillKey) => {
+    try {
+      const updated = await updateStat(character.id, skillKey);
+      setCharacter(updated);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
-  const expActual = character.experience;
-  const expMax = character.experience_to_next_level;
-  const expPorcentaje = Math.min((expActual / expMax) * 100, 100);
-
-  const stats = [
-    { key: "pase", label: "📨 Pase" },
-    { key: "potencia", label: "⚽ Potencia" },
-    { key: "velocidad", label: "💨 Velocidad" },
-    { key: "liderazgo", label: "👑 Liderazgo" },
-    { key: "tiro", label: "🥅 Tiro" },
-    { key: "regate", label: "🎯 Regate" },
-    { key: "tecnica", label: "🔧 Técnica" },
-    { key: "estrategia", label: "🧠 Estrategia" },
-    { key: "inteligencia", label: "📈 Inteligencia" },
-    { key: "defensa", label: "🛡️ Defensa" },
-    { key: "resistencia_base", label: "🏃 Resistencia" },
-  ];
+  if (loading) return <p>Cargando...</p>;
+  if (!character) return <p>No hay personaje creado.</p>;
 
   return (
     <div className="dashboard">
-      <h2>🐺 Bienvenido a LupiApp, {character.nickname}!</h2>
-
-      <section className="character-info">
-        <h3>📊 Personaje</h3>
-        <p>Nivel: {character.level}</p>
-
-        <div className="exp-bar">
-          <div
-            className="exp-fill glow-progress"
-            style={{ width: `${expPorcentaje}%` }}
-          />
-        </div>
-        <p>
-          EXP: <span>{expActual}</span> / {expMax} | Próximo Nivel:{" "}
-          <span>{expMax - expActual}</span>
-        </p>
-
-        <p>
-          🎯 Skill Points disponibles: <span>{character.available_skill_points || 0}</span>
-        </p>
-      </section>
-
-      {wallet && (
-        <section className="wallet-info">
-          <h3>💰 Wallet</h3>
-          <p>Dirección: {wallet.address}</p>
-          <p>Lupicoins: {wallet.lupicoins}</p>
-        </section>
+      {levelUp && (
+        <motion.div
+          className="level-up-popup"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 0.3 }}
+        >
+          🎉 ¡Nivel {character.level} alcanzado!
+        </motion.div>
       )}
 
-      <section className="stats">
-        <h3>⚔️ Stats</h3>
-        <ul>
-          {stats.map(({ key, label }) => (
-            <li key={key} className="stat-item">
-              <span className="stat-name">{label}</span>
-              <div className="stat-bar">
+      <div className="character-card">
+        <h2>{character.username}</h2>
+        <p>Nivel {character.level}</p>
+        <p>XP: {character.experience} / {character.level * 100}</p>
+
+        <div className="xp-bar">
+          <div
+            className="xp-fill"
+            style={{
+              width: `${(character.experience / (character.level * 100)) * 100}%`
+            }}
+          ></div>
+        </div>
+
+        <motion.button
+          className="train-btn"
+          whileTap={{ scale: 0.9 }}
+          onClick={handleTrain}
+        >
+          🏋️ Entrenar
+        </motion.button>
+
+        <p>Skill Points: {character.available_skill_points}</p>
+
+        <div className="skills">
+          {["strength", "agility", "intelligence"].map((key) => (
+            <div key={key} className="skill-row">
+              <span>{key.toUpperCase()}</span>
+              <div className="skill-bar">
                 <div
-                  className="fill glow-progress"
-                  style={{ width: `${character[key]}%` }}
+                  className={`skill-fill ${character[key] >= 100 ? "max" : ""}`}
+                  style={{
+                    width: `${character[key]}%`
+                  }}
                 ></div>
               </div>
-              <span className="stat-value">{character[key]}</span>
-              {character.available_skill_points > 0 && character[key] < 100 && (
-                <button
-                  className="add-skill-btn"
-                  onClick={() => increaseStat(key)}
-                  disabled={addingSkill}
-                >
-                  ➕
-                </button>
-              )}
-            </li>
+              <button
+                onClick={() => increaseStat(key)}
+                disabled={character.available_skill_points <= 0 || character[key] >= 100}
+              >
+                +
+              </button>
+            </div>
           ))}
-        </ul>
-      </section>
-
-      <div className="actions">
-        <button onClick={handleTrain}>💪 Entrenar (+100 XP, +150 LC)</button>
-        <button onClick={() => fetchData(user.id)}>🔄 Refrescar</button>
-      </div>
-
-      {showLevelUp && (
-        <div className="levelup-popup">
-          <h2>🎉 ¡Subiste a nivel {character.level}!</h2>
-          <p>+5 Skill Points</p>
         </div>
-      )}
+      </div>
     </div>
   );
 };
