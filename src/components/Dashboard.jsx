@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
+import BotMatchmaking from "../components/BotMatchmaking";
 import "../styles/Dashboard.css";
-import BotMatchmaking from "../components/BotMatchmaking"; // Importar el componente
 
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
@@ -10,6 +10,7 @@ export const Dashboard = ({ user }) => {
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [addingSkill, setAddingSkill] = useState(false);
   const [training, setTraining] = useState(false);
+  const [currentSection, setCurrentSection] = useState("dashboard"); // <-- ESTADO AÑADIDO
 
   useEffect(() => {
     if (user) fetchData(user.id);
@@ -31,59 +32,6 @@ export const Dashboard = ({ user }) => {
     }
   };
 
-  const testBotMatch = async (difficulty) => {
-  if (!character) return;
-  
-  try {
-    // 1. Obtener lista de bots
-    const botsResponse = await fetch(`${API_URL}/bots`);
-    const botsData = await botsResponse.json();
-    
-    // 2. Encontrar bot por dificultad
-    const bot = botsData.bots.find(b => b.difficulty === difficulty);
-    if (!bot) {
-      alert('Bot no encontrado');
-      return;
-    }
-    
-    // 3. Iniciar partida
-    const matchResponse = await fetch(`${API_URL}/bots/match`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        characterId: character.id,
-        botId: bot.id
-      })
-    });
-    
-    const matchData = await matchResponse.json();
-    
-    if (!matchResponse.ok) {
-      alert(matchData.error);
-      return;
-    }
-    
-    // 4. Simular partida
-    const simulateResponse = await fetch(`${API_URL}/bots/${matchData.match.id}/simulate`, {
-      method: 'POST'
-    });
-    
-    const simulateData = await simulateResponse.json();
-    
-    if (simulateResponse.ok) {
-      alert(`Resultado: ${simulateData.message}`);
-      // Recargar datos
-      fetchData(user.id);
-    } else {
-      alert(simulateData.error);
-    }
-    
-  } catch (error) {
-    console.error('Error en partida contra bot:', error);
-    alert('Error al jugar contra bot');
-  }
-};
-
   const increaseStat = async (statKey) => {
     if (!character || character.available_skill_points <= 0) return;
     setAddingSkill(true);
@@ -92,7 +40,7 @@ export const Dashboard = ({ user }) => {
       setCharacter(updatedCharacter);
     } catch (err) {
       console.error("Error al agregar skill:", err);
-      alert(err.message); // Mostrar error al usuario
+      alert(err.message);
     } finally {
       setAddingSkill(false);
     }
@@ -113,12 +61,17 @@ export const Dashboard = ({ user }) => {
       }
     } catch (err) {
       console.error("Error entrenando:", err);
-      alert(err.message); // Mostrar error al usuario
+      alert(err.message);
     } finally {
       setTraining(false);
     }
   };
 
+  const handleMatchUpdate = () => {
+    fetchData(user.id); // Recargar datos después de partida
+  };
+
+  // Si está cargando
   if (loading) return (
     <div className="loading-screen">
       <div className="loading-spinner"></div>
@@ -126,6 +79,7 @@ export const Dashboard = ({ user }) => {
     </div>
   );
   
+  // Si no tiene personaje
   if (!character) return (
     <div className="no-character">
       <p>⚠️ No tienes personaje aún.</p>
@@ -135,11 +89,35 @@ export const Dashboard = ({ user }) => {
     </div>
   );
 
+  // Renderizar sección de bots si está activa
+  if (currentSection === "bot-match") {
+    return (
+      <div className="dashboard">
+        {/* Header con botón para volver */}
+        <div className="section-header">
+          <button 
+            className="back-button"
+            onClick={() => setCurrentSection("dashboard")}
+          >
+            ← Volver al Dashboard
+          </button>
+          <h1>⚽ ENTRENAMIENTO CONTRA BOTS</h1>
+        </div>
+
+        <BotMatchmaking 
+          character={character} 
+          onMatchUpdate={handleMatchUpdate}
+        />
+      </div>
+    );
+  }
+
+  // ========== DASHBOARD PRINCIPAL ==========
   const expActual = character.experience || 0;
   const expMax = character.experience_to_next_level || 100;
   const expPorcentaje = Math.min((expActual / expMax) * 100, 100);
 
-  // Stats para el gráfico radial (6 stats principales) - CON DATOS REALES
+  // Stats para el gráfico radial
   const mainStats = [
     { 
       key: "pase", 
@@ -179,7 +157,7 @@ export const Dashboard = ({ user }) => {
     }
   ];
 
-  // Calcular promedio general con datos reales
+  // Calcular promedio general
   const totalStats = mainStats.reduce((sum, stat) => sum + stat.value, 0);
   const averageRating = Math.round(totalStats / mainStats.length);
 
@@ -270,7 +248,7 @@ export const Dashboard = ({ user }) => {
     );
   };
 
-  // Todas las stats para la lista - CON DATOS REALES
+  // Todas las stats para la lista
   const allStats = [
     { key: "pase", label: "📨 Pase", icon: "⚽" },
     { key: "potencia", label: "Potencia", icon: "💪" },
@@ -285,7 +263,7 @@ export const Dashboard = ({ user }) => {
     { key: "resistencia_base", label: "Resistencia", icon: "🏃" },
   ];
 
-  // Obtener valor real del personaje o 0 si no existe
+  // Obtener valor real del personaje
   const getCharacterStat = (statKey) => {
     return character[statKey] || 0;
   };
@@ -294,7 +272,7 @@ export const Dashboard = ({ user }) => {
     <div className="dashboard">
       {/* Game Header */}
       <div className="game-header">
-        <h1> FOOTBALL MODE </h1>
+        <h1>⚽ LUPIAPP - FOOTBALL MODE</h1>
         <div className="header-stats">
           <div className="header-stat">
             <span className="stat-label">NIVEL</span>
@@ -328,13 +306,13 @@ export const Dashboard = ({ user }) => {
               </div>
             </div>
 
-            {/* Gráfico FIFA Style con datos reales */}
+            {/* Gráfico FIFA Style */}
             <div className="fifa-chart-section">
               <h3>📊 ESTADÍSTICAS PRINCIPALES</h3>
               
               <RadarChart stats={mainStats} size={280} />
               
-              {/* Resumen de stats con datos reales */}
+              {/* Resumen de stats */}
               <div className="stats-summary">
                 <div className="stats-string">
                   {mainStats.map(stat => (
@@ -346,7 +324,7 @@ export const Dashboard = ({ user }) => {
                 </div>
               </div>
 
-              {/* Leyenda de stats con datos reales */}
+              {/* Leyenda de stats */}
               <div className="stats-legend">
                 {mainStats.map(stat => (
                   <div key={stat.key} className="legend-item">
@@ -416,7 +394,7 @@ export const Dashboard = ({ user }) => {
             </div>
           </section>
 
-          {/* Skills Section con datos reales */}
+          {/* Skills Section */}
           <section className="skills-section">
             <div className="skills-header">
               <h3>🎯 TODAS LAS HABILIDADES</h3>
@@ -474,17 +452,20 @@ export const Dashboard = ({ user }) => {
         </div>
       </div>
 
-      {/* Acciones Globales */}
+      {/* Acciones Globales - CON EL BOTÓN CORREGIDO */}
       <div className="global-actions">
         <button onClick={() => fetchData(user.id)} className="refresh-btn">
           🔄 ACTUALIZAR DATOS
         </button>
-       <button 
-  className="match-btn"
-  onClick={() => setCurrentSection("bot-match")}
->
-  ⚽ ENTRENAR CONTRA BOTS
-</button>
+        
+        {/* BOTÓN QUE LLEVA A LA SECCIÓN DE BOTS */}
+        <button 
+          className="match-btn"
+          onClick={() => setCurrentSection("bot-match")} // <-- ESTA ES LA FUNCIÓN
+        >
+          ⚽ ENTRENAR CONTRA BOTS
+        </button>
+        
         <button className="market-btn">
           🛒 MERCADO
         </button>
