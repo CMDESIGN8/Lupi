@@ -391,14 +391,6 @@ export const Dashboard = ({ user }) => {
               {training ? "🔄 ENTRENANDO..." : "💪 ENTRENAR AHORA"}
             </button>
           </section>
-          <section className="bot-training-section">
-  <h3>🤖 ENTRENAMIENTO CONTRA BOTS</h3>
-  <div className="bot-selection">
-    <button onClick={() => testBotMatch('easy')}>Vs Rookie Bot</button>
-    <button onClick={() => testBotMatch('medium')}>Vs Training Bot</button>
-    <button onClick={() => testBotMatch('hard')}>Vs Pro Bot</button>
-  </div>
-</section>
         </div>
 
         {/* Columna Derecha - Wallet y Habilidades */}
@@ -487,9 +479,12 @@ export const Dashboard = ({ user }) => {
         <button onClick={() => fetchData(user.id)} className="refresh-btn">
           🔄 ACTUALIZAR DATOS
         </button>
-        <button className="match-btn">
-          ⚽ BUSCAR PARTIDO
-        </button>
+       <button 
+  className="match-btn"
+  onClick={() => setCurrentSection("bot-match")}
+>
+  ⚽ ENTRENAR CONTRA BOTS
+</button>
         <button className="market-btn">
           🛒 MERCADO
         </button>
