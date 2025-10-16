@@ -99,7 +99,7 @@ export const Dashboard = ({ user }) => {
             className="back-button"
             onClick={() => setCurrentSection("dashboard")}
           >
-        </div>
+        </button>>
 
         <BotMatchmaking 
           character={character} 
