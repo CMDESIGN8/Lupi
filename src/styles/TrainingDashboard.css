@@ -1,4 +1,4 @@
-/* styles/TrainingDashboard.css - LAYOUT 70/30 */
+/* styles/TrainingDashboard.css - VERSIÓN MEJORADA CON CANCHA DETALLADA */
 
 .training-dashboard {
   min-height: 100vh;
@@ -22,7 +22,7 @@
 
 .training-dashboard .header-main h1 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 2rem;
   background: linear-gradient(135deg, #4cc9f0, #4361ee);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -33,12 +33,12 @@
 .training-dashboard .header-main p {
   margin: 0.5rem 0 0 0;
   color: #94a3b8;
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .training-dashboard .player-stats {
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 
 .training-dashboard .stat-item {
@@ -51,14 +51,14 @@
 
 .training-dashboard .stat-label {
   display: block;
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: #cbd5e1;
   margin-bottom: 0.25rem;
 }
 
 .training-dashboard .stat-value {
   display: block;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   color: #4cc9f0;
   font-family: 'Orbitron', monospace;
@@ -73,10 +73,10 @@
   margin-bottom: 1.5rem;
 }
 
-/* PANEL IZQUIERDO 70% - CAMPO */
+/* PANEL IZQUIERDO 70% - CAMPO MEJORADO */
 .training-dashboard .left-panel {
   background: rgba(15, 23, 42, 0.6);
-  border-radius: 15px;
+  border-radius: 20px;
   border: 2px solid #475569;
   overflow: hidden;
 }
@@ -87,41 +87,313 @@
   flex-direction: column;
 }
 
+/* CANCHA MEJORADA - VERSIÓN DETALLADA */
 .training-dashboard .soccer-field {
   flex: 1;
   position: relative;
-  background: linear-gradient(135deg, #1a472a 0%, #2d5a3a 100%);
-  margin: 1rem;
-  border-radius: 12px;
+  background: 
+    linear-gradient(135deg, #1a472a 0%, #2d5a3a 100%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255,255,255,0.03) 10px,
+      rgba(255,255,255,0.03) 20px
+    );
+  margin: 1.5rem;
+  border-radius: 15px;
   border: 3px solid #cbd5e1;
   overflow: hidden;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
 }
 
-/* (Mantener estilos del campo, jugadores y balón del CSS anterior) */
+.training-dashboard .field-grass {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: 
+    /* Línea de mitad de cancha */
+    linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 51%),
+    /* Círculo central */
+    radial-gradient(circle at 50% 50%, transparent 60px, rgba(255,255,255,0.2) 60px, rgba(255,255,255,0.2) 62px, transparent 62px);
+}
 
+/* CÍRCULO CENTRAL MEJORADO */
+.training-dashboard .center-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+.training-dashboard .center-spot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255,255,255,0.2);
+}
+
+/* ÁREAS DE PENAL MEJORADAS */
+.training-dashboard .penalty-area {
+  position: absolute;
+  top: 20%;
+  height: 60%;
+  width: 18%;
+  border: 2px solid rgba(255,255,255,0.4);
+  box-shadow: 0 0 8px rgba(255,255,255,0.1);
+}
+
+.training-dashboard .penalty-area.left {
+  left: 0;
+  border-right: none;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.training-dashboard .penalty-area.right {
+  right: 0;
+  border-left: none;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+/* PEQUEÑAS ÁREAS DE META */
+.training-dashboard .small-area {
+  position: absolute;
+  top: 35%;
+  height: 30%;
+  width: 8%;
+  border: 2px solid rgba(255,255,255,0.4);
+}
+
+.training-dashboard .small-area.left {
+  left: 0;
+  border-right: none;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.training-dashboard .small-area.right {
+  right: 0;
+  border-left: none;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+/* PORTERÍAS */
+.training-dashboard .goal {
+  position: absolute;
+  top: 40%;
+  height: 20%;
+  width: 2%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+  border: 2px solid rgba(255,255,255,0.5);
+  box-shadow: 0 0 15px rgba(255,255,255,0.2);
+}
+
+.training-dashboard .goal.left {
+  left: -1%;
+  border-right: none;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+
+.training-dashboard .goal.right {
+  right: -1%;
+  border-left: none;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
+
+/* PUNTOS DE PENAL */
+.training-dashboard .penalty-spot {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+.training-dashboard .penalty-spot.left {
+  left: 12%;
+}
+
+.training-dashboard .penalty-spot.right {
+  right: 12%;
+}
+
+/* JUGADORES MEJORADOS */
+.training-dashboard .player {
+  position: absolute;
+  text-align: center;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+}
+
+.training-dashboard .player-user {
+  top: 30%;
+  left: 20%;
+}
+
+.training-dashboard .player-bot {
+  top: 30%;
+  right: 20%;
+}
+
+.training-dashboard .player-icon {
+  font-size: 3rem;
+  filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.7));
+  transition: transform 0.3s ease;
+}
+
+.training-dashboard .player:hover .player-icon {
+  transform: scale(1.1);
+}
+
+.training-dashboard .player-name {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+  background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(67, 97, 238, 0.3));
+  padding: 0.3rem 0.8rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+}
+
+/* BALÓN ANIMADO MEJORADO */
+.training-dashboard .soccer-ball {
+  position: absolute;
+  font-size: 2rem;
+  filter: 
+    drop-shadow(2px 2px 4px rgba(0,0,0,0.5))
+    drop-shadow(0 0 8px rgba(255,255,255,0.3));
+  z-index: 20;
+  transition: all 0.3s ease;
+  animation: ballFloat 2s ease-in-out infinite;
+}
+
+@keyframes ballFloat {
+  0%, 100% { 
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+  25% { 
+    transform: translate(-50%, -50%) rotate(90deg) scale(1.1);
+  }
+  50% { 
+    transform: translate(-50%, -50%) rotate(180deg) scale(1);
+  }
+  75% { 
+    transform: translate(-50%, -50%) rotate(270deg) scale(1.1);
+  }
+}
+
+/* EFECTOS VISUALES MEJORADOS */
+.training-dashboard .field-effect {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.training-dashboard .shot-effect {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(248,113,113,0.4) 0%, transparent 70%);
+  animation: shotPulse 0.8s ease-out;
+  top: 20%;
+  left: 40%;
+}
+
+.training-dashboard .dribble-effect {
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(76,201,240,0.3) 0%, transparent 70%);
+  animation: dribbleSpin 1s ease-out;
+  top: 40%;
+  left: 50%;
+}
+
+@keyframes shotPulse {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes dribbleSpin {
+  0% {
+    transform: scale(0.8) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+/* ESTADO DEL PARTIDO */
 .training-dashboard .match-status {
-  padding: 1rem;
+  padding: 1.5rem;
   text-align: center;
   background: rgba(15, 23, 42, 0.8);
   border-top: 2px solid #475569;
 }
 
-.training-dashboard .simulation-in-progress h3 {
-  color: #4cc9f0;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
+.training-dashboard .simulation-in-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.training-dashboard .pulse-animation {
+  width: 20px;
+  height: 20px;
+  background: #4cc9f0;
+  border-radius: 50%;
+  animation: trainingPulse 1.5s infinite;
+  box-shadow: 0 0 10px #4cc9f0;
+}
+
+@keyframes trainingPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
 }
 
 .training-dashboard .waiting-for-match h3 {
   color: #94a3b8;
   margin-bottom: 0.5rem;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
+}
+
+.training-dashboard .waiting-for-match p {
+  color: #64748b;
+  margin: 0;
+  font-size: 1rem;
 }
 
 /* PANEL DERECHO 30% - COMENTARIOS */
 .training-dashboard .right-panel {
   background: rgba(15, 23, 42, 0.6);
-  border-radius: 15px;
+  border-radius: 20px;
   border: 2px solid #475569;
   overflow: hidden;
   display: flex;
@@ -138,7 +410,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 1.2rem;
   background: rgba(30, 41, 59, 0.9);
   border-bottom: 1px solid #475569;
 }
@@ -146,24 +418,30 @@
 .training-dashboard .commentary-header h3 {
   margin: 0;
   color: #4cc9f0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-family: 'Orbitron', monospace;
 }
 
 .training-dashboard .match-time {
   background: #dc2626;
   color: white;
-  padding: 0.3rem 0.8rem;
+  padding: 0.4rem 1rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   font-weight: bold;
   font-family: 'Orbitron', monospace;
+  animation: timePulse 2s infinite;
+}
+
+@keyframes timePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
 }
 
 .training-dashboard .commentary-feed {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: 1.2rem;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
@@ -174,18 +452,22 @@
   text-align: center;
   color: #94a3b8;
   padding: 2rem;
-}
-
-.training-dashboard .no-commentary p {
-  margin: 0.5rem 0;
+  font-style: italic;
 }
 
 .training-dashboard .commentary-event {
-  background: rgba(30, 41, 59, 0.6);
-  border-radius: 10px;
-  padding: 0.8rem;
+  background: rgba(30, 41, 59, 0.7);
+  border-radius: 12px;
+  padding: 1rem;
   border-left: 4px solid #4cc9f0;
   animation: commentSlideIn 0.5s ease;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.training-dashboard .commentary-event:hover {
+  transform: translateX(-5px);
+  border-left-width: 6px;
 }
 
 .training-dashboard .commentary-event.low {
@@ -194,44 +476,55 @@
 
 .training-dashboard .commentary-event.medium {
   border-left-color: #4361ee;
+  background: rgba(30, 41, 59, 0.8);
 }
 
 .training-dashboard .commentary-event.high {
   border-left-color: #f87171;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(248, 113, 113, 0.1));
 }
 
 .training-dashboard .commentary-event.very-high {
   border-left-color: #dc2626;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(220, 38, 38, 0.2));
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(220, 38, 38, 0.2));
+  animation: importantEvent 0.6s ease;
+}
+
+@keyframes importantEvent {
+  0% { transform: scale(0.95); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
 }
 
 .training-dashboard .commentary-event.user {
-  border-right: 4px solid #4cc9f0;
+  border-right: 3px solid #4cc9f0;
 }
 
 .training-dashboard .commentary-event.bot {
-  border-right: 4px solid #f87171;
+  border-right: 3px solid #f87171;
 }
 
 .training-dashboard .event-time {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: #94a3b8;
   font-weight: bold;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.4rem;
   font-family: 'Orbitron', monospace;
 }
 
 .training-dashboard .event-text {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: #e2e8f0;
-  margin-bottom: 0.3rem;
-  line-height: 1.3;
+  margin-bottom: 0.4rem;
+  line-height: 1.4;
+  font-weight: 500;
 }
 
 .training-dashboard .event-team {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: #cbd5e1;
   font-style: italic;
+  text-align: right;
 }
 
 @keyframes commentSlideIn {
@@ -247,38 +540,41 @@
 
 /* ESTADÍSTICAS RÁPIDAS */
 .training-dashboard .live-stats {
-  padding: 1rem;
+  padding: 1.2rem;
   background: rgba(30, 41, 59, 0.8);
   border-top: 1px solid #475569;
 }
 
 .training-dashboard .live-stats h4 {
-  margin: 0 0 0.8rem 0;
+  margin: 0 0 1rem 0;
   color: #4cc9f0;
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-family: 'Orbitron', monospace;
+  text-align: center;
 }
 
 .training-dashboard .stats-overview {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.8rem;
 }
 
 .training-dashboard .stat-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
+  padding: 0.3rem 0;
 }
 
 .training-dashboard .possession-bar {
   display: flex;
-  width: 100px;
-  height: 20px;
+  width: 120px;
+  height: 24px;
   background: rgba(255,255,255,0.1);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.2);
 }
 
 .training-dashboard .possession-fill {
@@ -286,10 +582,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   font-weight: bold;
   color: black;
   transition: width 0.5s ease;
+  font-family: 'Orbitron', monospace;
 }
 
 .training-dashboard .possession-fill.user {
@@ -345,106 +642,116 @@
 /* GRID DE BOTS */
 .training-dashboard .bots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
 
 .training-dashboard .bot-card {
   background: rgba(30, 41, 59, 0.6);
-  border-radius: 10px;
-  padding: 1rem;
+  border-radius: 12px;
+  padding: 1.2rem;
   border: 1px solid #475569;
   transition: all 0.3s ease;
 }
 
 .training-dashboard .bot-card:hover {
   border-color: #4cc9f0;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(76, 201, 240, 0.2);
 }
 
 .training-dashboard .bot-header {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.8rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .training-dashboard .bot-avatar {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
+  border: 2px solid rgba(255,255,255,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .training-dashboard .bot-info h4 {
   margin: 0;
-  font-size: 1rem;
+  font-size: 1.1rem;
+  color: #e2e8f0;
 }
 
 .training-dashboard .bot-meta {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.2rem;
+  gap: 0.6rem;
+  margin-top: 0.3rem;
 }
 
 .training-dashboard .level-badge, 
 .training-dashboard .difficulty-badge {
-  font-size: 0.6rem;
-  padding: 0.2rem 0.4rem;
-  border-radius: 8px;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 10px;
   background: rgba(255,255,255,0.1);
+  font-weight: 600;
 }
 
 .training-dashboard .bot-stats {
-  margin-bottom: 0.8rem;
+  margin-bottom: 1rem;
 }
 
 .training-dashboard .stat-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.7rem;
-  margin-bottom: 0.2rem;
+  font-size: 0.8rem;
+  margin-bottom: 0.3rem;
   color: #cbd5e1;
+  padding: 0.2rem 0;
 }
 
 .training-dashboard .play-btn {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.8rem;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   color: white;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
   font-family: 'Rajdhani', sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .training-dashboard .play-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none !important;
 }
 
 .training-dashboard .play-btn:not(:disabled):hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+  box-shadow: 0 8px 20px rgba(76, 201, 240, 0.4);
 }
 
 /* HISTORIAL */
 .training-dashboard .history-section h3 {
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.2rem 0;
   color: #4cc9f0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-family: 'Orbitron', monospace;
+  text-align: center;
 }
 
 .training-dashboard .history-list {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.8rem;
 }
 
 .training-dashboard .history-item {
@@ -452,56 +759,77 @@
   justify-content: space-between;
   align-items: center;
   background: rgba(30, 41, 59, 0.6);
-  padding: 0.8rem;
-  border-radius: 8px;
+  padding: 1rem;
+  border-radius: 10px;
   border-left: 4px solid #4cc9f0;
+  transition: all 0.3s ease;
+}
+
+.training-dashboard .history-item:hover {
+  border-left-width: 6px;
+  transform: translateX(-5px);
 }
 
 .training-dashboard .match-result {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1rem;
 }
 
 .training-dashboard .result-badge {
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  border-radius: 8px;
   font-weight: bold;
-  font-size: 0.7rem;
-  min-width: 20px;
+  font-size: 0.8rem;
+  min-width: 25px;
   text-align: center;
+  font-family: 'Orbitron', monospace;
 }
 
-.training-dashboard .result-badge.win { background: #4ade80; color: #166534; }
-.training-dashboard .result-badge.lose { background: #f87171; color: #991b1b; }
-.training-dashboard .result-badge.draw { background: #fbbf24; color: #92400e; }
+.training-dashboard .result-badge.win { 
+  background: linear-gradient(135deg, #4ade80, #16a34a);
+  color: #166534; 
+}
+
+.training-dashboard .result-badge.lose { 
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  color: #991b1b; 
+}
+
+.training-dashboard .result-badge.draw { 
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #92400e; 
+}
 
 .training-dashboard .score {
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  font-family: 'Orbitron', monospace;
 }
 
 .training-dashboard .match-info {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.2rem;
+  gap: 0.3rem;
 }
 
 .training-dashboard .match-date {
-  font-size: 0.6rem;
+  font-size: 0.75rem;
   color: #94a3b8;
 }
 
 .training-dashboard .match-rewards {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   color: #4cc9f0;
+  font-weight: 600;
 }
 
 .training-dashboard .no-history {
   text-align: center;
-  padding: 2rem;
+  padding: 2.5rem;
   color: #94a3b8;
+  font-style: italic;
 }
 
 /* RESPONSIVE */
@@ -512,7 +840,7 @@
   }
   
   .training-dashboard .right-panel {
-    height: 300px;
+    height: 350px;
   }
 }
 
@@ -534,5 +862,15 @@
   
   .training-dashboard .bots-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .training-dashboard .soccer-field {
+    margin: 1rem;
+  }
+  
+  .training-dashboard .penalty-area,
+  .training-dashboard .small-area,
+  .training-dashboard .penalty-spot {
+    display: none;
   }
 }
