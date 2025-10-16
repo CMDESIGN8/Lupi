@@ -28,14 +28,26 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
   };
 
   const fetchMatchHistory = async () => {
-    try {
-      const response = await fetch(`https://lupiback.onrender.com/bots/history/${character.id}`);
-      const data = await response.json();
-      setMatchHistory(data.matches || []);
-    } catch (error) {
-      console.error("Error cargando historial:", error);
+  try {
+    const response = await fetch(`https://lupiback.onrender.com/bots/history/${character.id}`);
+    
+    if (!response.ok) {
+      // Si la respuesta no es exitosa, lanzar error
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  };
+    
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("La respuesta no es JSON");
+    }
+    
+    const data = await response.json();
+    setMatchHistory(data.matches || []);
+  } catch (error) {
+    console.error("Error cargando historial:", error);
+    setMatchHistory([]); // Establecer array vacío en caso de error
+  }
+};
 
   const startBotMatch = async (bot) => {
     if (!character) return;
