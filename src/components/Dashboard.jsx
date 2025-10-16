@@ -390,9 +390,7 @@ export const Dashboard = ({ user }) => {
               {training ? "🔄 ENTRENANDO..." : "💪 ENTRENAR AHORA"}
             </button>
           </section>
-        </div>
-
-        <section className="bot-training-section">
+          <section className="bot-training-section">
   <h3>🤖 ENTRENAMIENTO CONTRA BOTS</h3>
   <div className="bot-selection">
     <button onClick={() => testBotMatch('easy')}>Vs Rookie Bot</button>
@@ -400,6 +398,7 @@ export const Dashboard = ({ user }) => {
     <button onClick={() => testBotMatch('hard')}>Vs Pro Bot</button>
   </div>
 </section>
+        </div>
 
         {/* Columna Derecha - Wallet y Habilidades */}
         <div className="right-column">
