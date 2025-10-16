@@ -100,6 +100,7 @@ export const Dashboard = ({ user }) => {
             onClick={() => setCurrentSection("dashboard")}
           >
         </button>>
+          </div>
 
         <BotMatchmaking 
           character={character} 
