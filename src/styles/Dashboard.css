@@ -1068,3 +1068,73 @@ body {
   padding: 0;
   margin: 0;
 }
+
+/* Agregar al styles/Dashboard.css */
+
+/* Estados de carga y deshabilitado */
+.train-btn:disabled,
+.upgrade-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.train-btn:disabled:hover {
+  box-shadow: 0 0 20px rgba(0, 187, 249, 0.5) !important;
+}
+
+/* Badge para nivel máximo */
+.max-level-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--accent);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-family: 'Orbitron', monospace;
+  border: 1px solid var(--secondary);
+}
+
+/* Mensaje de no personaje */
+.no-character {
+  text-align: center;
+  padding: 40px;
+  background: rgba(15, 20, 50, 0.7);
+  border-radius: 15px;
+  border: 1px solid var(--primary);
+}
+
+.no-character button {
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: #000;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.no-character button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 187, 249, 0.5);
+}
+
+/* Mejoras responsive */
+@media (max-width: 768px) {
+  .stats-string {
+    gap: 8px;
+  }
+  
+  .stat-abbr {
+    font-size: 0.8rem;
+  }
+  
+  .stat-number {
+    font-size: 1rem;
+  }
+}
