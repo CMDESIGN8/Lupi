@@ -867,19 +867,13 @@ body {
 }
 
 .radar-chart {
-  width: 250px;
-  height: 250px;
-  position: relative;
-}
-
-.radar-chart svg {
-  width: 100%;
-  height: 100%;
+  width: 280px;
+  height: 280px;
 }
 
 .radar-axis {
-  stroke: rgba(67, 97, 238, 0.3);
-  stroke-width: 1;
+  stroke: rgba(67, 97, 238, 0.4);
+  stroke-width: 1.5;
 }
 
 .radar-circle {
@@ -892,7 +886,6 @@ body {
   fill: rgba(0, 187, 249, 0.3);
   stroke: var(--secondary);
   stroke-width: 2;
-  stroke-dasharray: 5, 5;
   animation: pulsePolygon 3s ease-in-out infinite;
 }
 
@@ -917,7 +910,7 @@ body {
 .radar-label {
   fill: var(--secondary);
   font-family: 'Orbitron', monospace;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -925,7 +918,38 @@ body {
 .radar-value {
   fill: var(--cyan);
   font-family: 'Orbitron', monospace;
-  font-size: 9px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* Resumen de stats */
+.stats-summary {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.stats-string {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.stat-abbr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+}
+
+.stat-number {
+  color: var(--cyan);
+  font-size: 1.1rem;
   font-weight: 800;
 }
 
@@ -960,16 +984,43 @@ body {
   font-size: 1rem;
 }
 
+/* Botón de wallet primary */
+.wallet-btn.primary {
+  background: rgba(0, 187, 249, 0.3);
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
 /* Responsive para el gráfico */
 @media (max-width: 768px) {
+  .radar-chart {
+    width: 240px;
+    height: 240px;
+  }
+  
+  .stats-legend {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stats-string {
+    gap: 10px;
+  }
+  
+  .stat-abbr {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
   .radar-chart {
     width: 200px;
     height: 200px;
   }
   
   .stats-legend {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
+}
   
   .player-avatar {
     width: 100px;
