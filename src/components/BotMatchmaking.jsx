@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "../styles/BotMatchmaking.css";
 
 const BotMatchmaking = ({ character, onMatchUpdate }) => {
   const [bots, setBots] = useState([]);
