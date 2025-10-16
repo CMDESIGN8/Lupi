@@ -28,6 +28,11 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
   setSelectedBot(bot);
   
   try {
+    console.log("🔍 Iniciando partida con:", { 
+      characterId: character.id, 
+      botId: bot.id 
+    });
+
     // 1️⃣ Crear partida contra bot
     const matchResponse = await fetch(`https://lupiback.onrender.com/bots/match`, {
       method: "POST",
@@ -39,14 +44,23 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
     });
 
     const matchData = await matchResponse.json();
-    console.log("🧩 MatchData recibido:", matchData);
+    console.log("🧩 MatchData completo:", matchData);
+    console.log("📋 Match ID recibido:", matchData.match?.id);
+    console.log("📋 Tipo del ID:", typeof matchData.match?.id);
 
-    if (!matchResponse.ok || !matchData.match?.id) {
+    if (!matchResponse.ok) {
+      console.error("❌ Error del servidor:", matchData);
       alert(matchData.error || "Error al iniciar partida");
       return;
     }
 
-    // 2️⃣ Simular partida usando el ID correcto de la partida
+    if (!matchData.match?.id) {
+      console.error("❌ No se recibió ID de partida");
+      alert("No se pudo obtener el ID de la partida");
+      return;
+    }
+
+    // 2️⃣ Simular partida
     await simulateMatch(matchData.match.id, bot);
     
   } catch (error) {
