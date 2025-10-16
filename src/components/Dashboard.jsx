@@ -8,6 +8,7 @@ export const Dashboard = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [addingSkill, setAddingSkill] = useState(false);
+  const [training, setTraining] = useState(false);
 
   useEffect(() => {
     if (user) fetchData(user.id);
@@ -33,10 +34,11 @@ export const Dashboard = ({ user }) => {
     if (!character || character.available_skill_points <= 0) return;
     setAddingSkill(true);
     try {
-      const updated = await updateStat(character.id, statKey);
-      setCharacter(updated);
+      const updatedCharacter = await updateStat(character.id, statKey);
+      setCharacter(updatedCharacter);
     } catch (err) {
       console.error("Error al agregar skill:", err);
+      alert(err.message); // Mostrar error al usuario
     } finally {
       setAddingSkill(false);
     }
@@ -44,6 +46,7 @@ export const Dashboard = ({ user }) => {
 
   const handleTrain = async () => {
     if (!character) return;
+    setTraining(true);
     try {
       const result = await trainCharacter(character.id);
       if (result.character) {
@@ -56,6 +59,9 @@ export const Dashboard = ({ user }) => {
       }
     } catch (err) {
       console.error("Error entrenando:", err);
+      alert(err.message); // Mostrar error al usuario
+    } finally {
+      setTraining(false);
     }
   };
 
@@ -66,10 +72,17 @@ export const Dashboard = ({ user }) => {
     </div>
   );
   
-  if (!character) return <p>⚠️ No tienes personaje aún.</p>;
+  if (!character) return (
+    <div className="no-character">
+      <p>⚠️ No tienes personaje aún.</p>
+      <button onClick={() => window.location.href = '/create-character'}>
+        Crear Personaje
+      </button>
+    </div>
+  );
 
-  const expActual = character.experience;
-  const expMax = character.experience_to_next_level;
+  const expActual = character.experience || 0;
+  const expMax = character.experience_to_next_level || 100;
   const expPorcentaje = Math.min((expActual / expMax) * 100, 100);
 
   // Stats para el gráfico radial (6 stats principales) - CON DATOS REALES
@@ -231,7 +244,7 @@ export const Dashboard = ({ user }) => {
         <div className="header-stats">
           <div className="header-stat">
             <span className="stat-label">NIVEL</span>
-            <span className="stat-value">{character.level}</span>
+            <span className="stat-value">{character.level || 1}</span>
           </div>
           <div className="header-stat">
             <span className="stat-label">SKILL POINTS</span>
@@ -254,8 +267,8 @@ export const Dashboard = ({ user }) => {
                 <div className="overall-rating">{averageRating}</div>
               </div>
               <div className="player-info">
-                <h2 className="player-name">{character.nickname || "LLP"}</h2>
-                <div className="player-level">NIVEL {character.level}</div>
+                <h2 className="player-name">{character.nickname || "Jugador"}</h2>
+                <div className="player-level">NIVEL {character.level || 1}</div>
                 <div className="player-class">Delantero Estrella</div>
                 <div className="player-position">POSICIÓN: DELANTERO</div>
               </div>
@@ -316,8 +329,12 @@ export const Dashboard = ({ user }) => {
                 <span>+150 Lupicoins</span>
               </div>
             </div>
-            <button className="train-btn" onClick={handleTrain}>
-              💪 ENTRENAR AHORA
+            <button 
+              className="train-btn" 
+              onClick={handleTrain}
+              disabled={training}
+            >
+              {training ? "🔄 ENTRENANDO..." : "💪 ENTRENAR AHORA"}
             </button>
           </section>
         </div>
@@ -336,7 +353,7 @@ export const Dashboard = ({ user }) => {
             <div className="wallet-info">
               <div className="wallet-address">
                 <span className="address-label">Dirección:</span>
-                <span className="address-value">{wallet?.address || 'LLP/LLP'}</span>
+                <span className="address-value">{wallet?.address || 'Cargando...'}</span>
               </div>
             </div>
             <div className="wallet-actions">
@@ -359,6 +376,7 @@ export const Dashboard = ({ user }) => {
               {allStats.map(({ key, label, icon }) => {
                 const currentValue = getCharacterStat(key);
                 const currentLevel = Math.floor(currentValue / 10);
+                const canUpgrade = character.available_skill_points > 0 && currentValue < 100;
                 
                 return (
                   <div key={key} className="skill-card">
@@ -380,7 +398,7 @@ export const Dashboard = ({ user }) => {
                       <span className="skill-value">{currentValue}</span>
                     </div>
 
-                    {character.available_skill_points > 0 && currentValue < 100 && (
+                    {canUpgrade && (
                       <button
                         className="upgrade-btn"
                         onClick={() => increaseStat(key)}
@@ -389,6 +407,10 @@ export const Dashboard = ({ user }) => {
                       >
                         {addingSkill ? "..." : "⬆️"}
                       </button>
+                    )}
+
+                    {!canUpgrade && currentValue >= 100 && (
+                      <div className="max-level-badge">MAX</div>
                     )}
                   </div>
                 );
