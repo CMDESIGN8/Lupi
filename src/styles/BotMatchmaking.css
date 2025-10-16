@@ -558,3 +558,143 @@
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
 }
+
+/* Historial de partidos */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.history-toggle-btn {
+  background: linear-gradient(135deg, #7209b7, #3a0ca3);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.history-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(114, 9, 183, 0.4);
+}
+
+.match-history-panel {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-top: 1rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.7);
+  padding: 1rem;
+  border-radius: 10px;
+  border-left: 4px solid #4cc9f0;
+}
+
+.history-item .result-badge.win {
+  border-left-color: #4ade80;
+}
+
+.history-item .result-badge.lose {
+  border-left-color: #f87171;
+}
+
+.history-item .result-badge.draw {
+  border-left-color: #fbbf24;
+}
+
+.match-result {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 100px;
+}
+
+.result-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.result-badge.win {
+  background: #4ade80;
+  color: #166534;
+}
+
+.result-badge.lose {
+  background: #f87171;
+  color: #991b1b;
+}
+
+.result-badge.draw {
+  background: #fbbf24;
+  color: #92400e;
+}
+
+.score {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.match-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.match-type {
+  font-weight: bold;
+  color: #4cc9f0;
+}
+
+.match-date {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.match-rewards {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  min-width: 100px;
+}
+
+.match-rewards span {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.no-history {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+}
+
+.win-probability {
+  background: rgba(30, 41, 59, 0.6);
+  padding: 0.5rem;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
