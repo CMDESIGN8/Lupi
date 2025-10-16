@@ -1,6 +1,204 @@
 import React, { useState, useEffect } from "react";
 
-import "../styles/BotMatchmaking.css";
+// Los estilos se han movido aquí para resolver el error de importación.
+const Styles = () => (
+  <style>{`
+    /* --- Estilos para el Modal de Resultado --- */
+    .simulation-overlay.result-modal {
+      cursor: pointer;
+    }
+
+    .simulation-content.result-content {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      padding: 30px 40px;
+      border-radius: 15px;
+      text-align: center;
+      border: 2px solid #3498db;
+      max-width: 400px;
+      cursor: default;
+    }
+
+    .result-content h2 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      margin-bottom: 10px;
+      color: #5dade2;
+      font-weight: 700;
+    }
+
+    .result-score {
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 10px 0;
+      color: #fff;
+    }
+
+    .result-opponent {
+      font-size: 1.2rem;
+      color: #bdc3c7;
+      margin-bottom: 25px;
+    }
+
+    .result-rewards {
+      background-color: rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 25px;
+    }
+
+    .result-rewards h3 {
+      margin: 0 0 10px;
+      color: #f1c40f;
+      font-size: 1.3rem;
+    }
+
+    .result-rewards p {
+      margin: 5px 0;
+      font-size: 1.1rem;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 1.1rem;
+    }
+
+    .close-modal-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    .close-modal-btn:hover {
+      background-color: #2980b9;
+    }
+
+    /* --- Estilos base --- */
+    .bot-matchmaking {
+      padding: 20px;
+      font-family: 'Arial', sans-serif;
+      max-width: 900px;
+      margin: auto;
+    }
+    .bots-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .bots-header h1 {
+      font-size: 2rem;
+    }
+    .bots-subtitle {
+      font-size: 1rem;
+      color: #666;
+    }
+    .simulation-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .simulation-content {
+      text-align: center;
+      color: white;
+    }
+    .simulation-spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #fff;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .bots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .bot-card {
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .bot-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .bot-avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      margin-right: 15px;
+    }
+    .bot-name {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+    .bot-meta {
+      display: flex;
+      gap: 10px;
+      font-size: 0.8rem;
+    }
+    .bot-level {
+      font-weight: bold;
+    }
+    .rewards-section {
+      margin-top: auto;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    .play-btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 15px;
+      transition: transform 0.2s;
+    }
+    .play-btn:hover {
+      transform: scale(1.05);
+    }
+    .play-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .no-character-message {
+      text-align: center;
+      padding: 20px;
+      background-color: #fffbe6;
+      border: 1px solid #ffe58f;
+      border-radius: 5px;
+      margin-top: 20px;
+    }
+  `}</style>
+);
 
 
 const BotMatchmaking = ({ character, onMatchUpdate }) => {
