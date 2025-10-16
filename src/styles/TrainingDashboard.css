@@ -9,20 +9,53 @@
 }
 
 /* HEADER */
-/* En el CSS, modifica el header para que sea más compacto */
-.training-dashboard .dashboard-header {
-  display: flex;
-  justify-content: center; /* Centrado en lugar de espacio entre */
-  margin-bottom: 1.5rem;
+.training-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  color: white;
   padding: 1rem;
-  background: rgba(30, 41, 59, 0.8);
-  border-radius: 15px;
-  border: 1px solid #334155;
+  font-family: 'Rajdhani', sans-serif;
 }
 
-/* Elimina el header-main si existe en tu CSS */
-.training-dashboard .header-main {
-  display: none;
+/* HEADER COMPLETAMENTE ELIMINADO */
+.training-dashboard .dashboard-header {
+  display: none; /* ELIMINADO */
+}
+
+/* LAYOUT PRINCIPAL 70/30 - MÁS ESPACIO SIN HEADER */
+.training-dashboard .main-layout {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  gap: 1.5rem;
+  height: 65vh; /* Más alto sin header */
+  margin-bottom: 1.5rem;
+}
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .training-dashboard .main-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  
+  .training-dashboard .right-panel {
+    height: 350px;
+  }
+}
+
+@media (max-width: 768px) {
+  .training-dashboard {
+    padding: 0.5rem;
+  }
+  
+  .training-dashboard .bots-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .training-dashboard .penalty-area,
+  .training-dashboard .small-area,
+  .training-dashboard .penalty-spot {
+    display: none;
+  }
 }
 
 .training-dashboard .header-main h1 {
