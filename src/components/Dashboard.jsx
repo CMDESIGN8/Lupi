@@ -49,7 +49,7 @@ export const Dashboard = ({ user }) => {
       if (result.character) {
         setCharacter(result.character);
         setWallet(result.wallet);
-        if (result.character.level > character.level) {
+        if (result.leveledUp) {
           setShowLevelUp(true);
           setTimeout(() => setShowLevelUp(false), 3000);
         }
@@ -72,17 +72,47 @@ export const Dashboard = ({ user }) => {
   const expMax = character.experience_to_next_level;
   const expPorcentaje = Math.min((expActual / expMax) * 100, 100);
 
-  // Stats para el gráfico radial (6 stats principales)
+  // Stats para el gráfico radial (6 stats principales) - CON DATOS REALES
   const mainStats = [
-    { key: "pase", label: "Pase", value: character.pase || 50, short: "PAS" },
-    { key: "tiro", label: "Tiro", value: character.tiro || 50, short: "TIR" },
-    { key: "regate", label: "Regate", value: character.regate || 51, short: "REG" },
-    { key: "velocidad", label: "Velocidad", value: character.velocidad || 51, short: "VEL" },
-    { key: "defensa", label: "Defensa", value: character.defensa || 50, short: "DEF" },
-    { key: "fisico", label: "Físico", value: character.potencia || 51, short: "FIS" }
+    { 
+      key: "pase", 
+      label: "Pase", 
+      value: character.pase || 0, 
+      short: "PAS" 
+    },
+    { 
+      key: "tiro", 
+      label: "Tiro", 
+      value: character.tiro || 0, 
+      short: "TIR" 
+    },
+    { 
+      key: "regate", 
+      label: "Regate", 
+      value: character.regate || 0, 
+      short: "REG" 
+    },
+    { 
+      key: "velocidad", 
+      label: "Velocidad", 
+      value: character.velocidad || 0, 
+      short: "VEL" 
+    },
+    { 
+      key: "defensa", 
+      label: "Defensa", 
+      value: character.defensa || 0, 
+      short: "DEF" 
+    },
+    { 
+      key: "potencia", 
+      label: "Físico", 
+      value: character.potencia || 0, 
+      short: "FIS" 
+    }
   ];
 
-  // Calcular promedio general
+  // Calcular promedio general con datos reales
   const totalStats = mainStats.reduce((sum, stat) => sum + stat.value, 0);
   const averageRating = Math.round(totalStats / mainStats.length);
 
@@ -173,7 +203,7 @@ export const Dashboard = ({ user }) => {
     );
   };
 
-  // Todas las stats para la lista
+  // Todas las stats para la lista - CON DATOS REALES
   const allStats = [
     { key: "pase", label: "📨 Pase", icon: "⚽" },
     { key: "potencia", label: "Potencia", icon: "💪" },
@@ -188,11 +218,16 @@ export const Dashboard = ({ user }) => {
     { key: "resistencia_base", label: "Resistencia", icon: "🏃" },
   ];
 
+  // Obtener valor real del personaje o 0 si no existe
+  const getCharacterStat = (statKey) => {
+    return character[statKey] || 0;
+  };
+
   return (
     <div className="dashboard">
       {/* Game Header */}
       <div className="game-header">
-        <h1>FOOTBALL MODE</h1>
+        <h1>⚽ LUPIAPP - FOOTBALL MODE</h1>
         <div className="header-stats">
           <div className="header-stat">
             <span className="stat-label">NIVEL</span>
@@ -220,19 +255,19 @@ export const Dashboard = ({ user }) => {
               </div>
               <div className="player-info">
                 <h2 className="player-name">{character.nickname || "LLP"}</h2>
-                <div className="player-level">NIVEL {character.level || 1}</div>
+                <div className="player-level">NIVEL {character.level}</div>
                 <div className="player-class">Delantero Estrella</div>
                 <div className="player-position">POSICIÓN: DELANTERO</div>
               </div>
             </div>
 
-            {/* Gráfico FIFA Style */}
+            {/* Gráfico FIFA Style con datos reales */}
             <div className="fifa-chart-section">
               <h3>📊 ESTADÍSTICAS PRINCIPALES</h3>
               
               <RadarChart stats={mainStats} size={280} />
               
-              {/* Resumen de stats */}
+              {/* Resumen de stats con datos reales */}
               <div className="stats-summary">
                 <div className="stats-string">
                   {mainStats.map(stat => (
@@ -244,7 +279,7 @@ export const Dashboard = ({ user }) => {
                 </div>
               </div>
 
-              {/* Leyenda de stats */}
+              {/* Leyenda de stats con datos reales */}
               <div className="stats-legend">
                 {mainStats.map(stat => (
                   <div key={stat.key} className="legend-item">
@@ -310,7 +345,7 @@ export const Dashboard = ({ user }) => {
             </div>
           </section>
 
-          {/* Skills Section */}
+          {/* Skills Section con datos reales */}
           <section className="skills-section">
             <div className="skills-header">
               <h3>🎯 TODAS LAS HABILIDADES</h3>
@@ -321,37 +356,43 @@ export const Dashboard = ({ user }) => {
             </div>
 
             <div className="skills-grid">
-              {allStats.map(({ key, label, icon }) => (
-                <div key={key} className="skill-card">
-                  <div className="skill-header">
-                    <div className="skill-icon">{icon}</div>
-                    <div className="skill-info">
-                      <span className="skill-name">{label}</span>
-                      <span className="skill-level">Nv. {Math.floor((character[key] || 50) / 10)}</span>
+              {allStats.map(({ key, label, icon }) => {
+                const currentValue = getCharacterStat(key);
+                const currentLevel = Math.floor(currentValue / 10);
+                
+                return (
+                  <div key={key} className="skill-card">
+                    <div className="skill-header">
+                      <div className="skill-icon">{icon}</div>
+                      <div className="skill-info">
+                        <span className="skill-name">{label}</span>
+                        <span className="skill-level">Nv. {currentLevel}</span>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="skill-progress">
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{ width: `${character[key] || 50}%` }}
-                      ></div>
+                    
+                    <div className="skill-progress">
+                      <div className="progress-bar">
+                        <div
+                          className="progress-fill"
+                          style={{ width: `${currentValue}%` }}
+                        ></div>
+                      </div>
+                      <span className="skill-value">{currentValue}</span>
                     </div>
-                    <span className="skill-value">{character[key] || 50}</span>
-                  </div>
 
-                  {character.available_skill_points > 0 && (character[key] || 50) < 100 && (
-                    <button
-                      className="upgrade-btn"
-                      onClick={() => increaseStat(key)}
-                      disabled={addingSkill}
-                    >
-                      {addingSkill ? "..." : "⬆️"}
-                    </button>
-                  )}
-                </div>
-              ))}
+                    {character.available_skill_points > 0 && currentValue < 100 && (
+                      <button
+                        className="upgrade-btn"
+                        onClick={() => increaseStat(key)}
+                        disabled={addingSkill}
+                        title={`Mejorar ${label}`}
+                      >
+                        {addingSkill ? "..." : "⬆️"}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </section>
         </div>
