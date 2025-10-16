@@ -28,7 +28,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
     setSelectedBot(bot);
     
     try {
-      // 1. Iniciar partida
+      // 1️⃣ Crear partida contra bot
       const matchResponse = await fetch(`https://lupiback.onrender.com/bots/match`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,13 +39,14 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
       });
 
       const matchData = await matchResponse.json();
-      
-      if (!matchResponse.ok) {
-        alert(matchData.error);
+      console.log("🧩 MatchData recibido:", matchData);
+
+      if (!matchResponse.ok || !matchData.match?.id) {
+        alert(matchData.error || "Error al iniciar partida");
         return;
       }
 
-      // 2. Simular partida inmediatamente
+      // 2️⃣ Simular partida
       await simulateMatch(matchData.match.id, bot);
       
     } catch (error) {
@@ -66,9 +67,9 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
       });
 
       const data = await response.json();
+      console.log("🎮 Resultado simulación:", data);
       
       if (response.ok) {
-        // Mostrar resultado
         setTimeout(() => {
           if (data.simulation.winnerId === character.id) {
             alert(`🎉 ¡GANASTE! ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
@@ -78,15 +79,12 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
             alert(`😞 Perdiste ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
           }
         }, 500);
-        
-        // Actualizar datos del personaje
+
         if (onMatchUpdate) {
-          setTimeout(() => {
-            onMatchUpdate();
-          }, 1000);
+          setTimeout(() => onMatchUpdate(), 1000);
         }
       } else {
-        alert(data.error);
+        alert(data.error || "Error al simular partida");
       }
     } catch (error) {
       console.error("Error simulando partida:", error);
@@ -98,9 +96,9 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case 'easy': return '#4cc9f0'; // Cyan
-      case 'medium': return '#4361ee'; // Azul
-      case 'hard': return '#7209b7'; // Violeta
+      case 'easy': return '#4cc9f0';
+      case 'medium': return '#4361ee';
+      case 'hard': return '#7209b7';
       default: return '#00bbf9';
     }
   };
@@ -117,27 +115,24 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
   const getWinProbability = (playerStats, botStats) => {
     const playerAvg = (playerStats.pase + playerStats.tiro + playerStats.regate + playerStats.velocidad + playerStats.defensa + playerStats.potencia) / 6;
     const botAvg = (botStats.pase + botStats.tiro + botStats.regate + botStats.velocidad + botStats.defensa + botStats.potencia) / 6;
-    
     const levelDiff = playerStats.level - botStats.level;
     const advantage = (playerAvg - botAvg) + (levelDiff * 5);
     const probability = 50 + (advantage * 0.5);
-    
     return Math.max(10, Math.min(90, probability)).toFixed(0);
   };
 
-  const getBotAvatar = (botLevel, difficulty) => {
-    if (botLevel <= 2) return "🥅"; // Portero novato
-    if (botLevel <= 4) return "⚽"; // Jugador básico
-    if (botLevel <= 6) return "👟"; // Jugador experimentado
-    if (botLevel <= 8) return "🔥"; // Jugador estrella
-    return "🏆"; // Leyenda
+  const getBotAvatar = (botLevel) => {
+    if (botLevel <= 2) return "🥅";
+    if (botLevel <= 4) return "⚽";
+    if (botLevel <= 6) return "👟";
+    if (botLevel <= 8) return "🔥";
+    return "🏆";
   };
 
   const getRewards = (botLevel, isWinner = true) => {
     const baseExp = isWinner ? 150 : 75;
     const baseCoins = isWinner ? 200 : 100;
     const levelBonus = Math.max(0, botLevel - (character?.level || 1)) * 0.1;
-    
     return {
       exp: Math.round(baseExp * (1 + levelBonus)),
       coins: Math.round(baseCoins * (1 + levelBonus))
@@ -146,7 +141,6 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
 
   return (
     <div className="bot-matchmaking">
-      {/* Header Section */}
       <div className="bots-header">
         <h1>🤖 ENTRENAMIENTO CONTRA BOTS</h1>
         <p className="bots-subtitle">
@@ -155,7 +149,6 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
         </p>
       </div>
 
-      {/* Simulation Overlay */}
       {simulating && (
         <div className="simulation-overlay">
           <div className="simulation-content">
@@ -166,26 +159,22 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
         </div>
       )}
 
-      {/* Bots Grid */}
       <div className="bots-grid">
         {bots.map(bot => {
-          const winProbability = character ? 
-            getWinProbability(character, bot) : 50;
+          const winProbability = character ? getWinProbability(character, bot) : 50;
           const winRewards = getRewards(bot.level, true);
           const loseRewards = getRewards(bot.level, false);
           
           return (
             <div key={bot.id} className="bot-card">
-              {/* Bot Header */}
               <div className="bot-header">
                 <div 
                   className="bot-avatar"
                   style={{ 
-                    background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                    borderColor: getDifficultyColor(bot.difficulty)
+                    background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`
                   }}
                 >
-                  {getBotAvatar(bot.level, bot.difficulty)}
+                  {getBotAvatar(bot.level)}
                 </div>
                 <div className="bot-info">
                   <h3 className="bot-name">{bot.name}</h3>
@@ -201,88 +190,6 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
                 </div>
               </div>
 
-              {/* Stats Grid */}
-              <div className="bot-stats-grid">
-                <div className="stat-item">
-                  <span className="stat-label">Pase</span>
-                  <div className="stat-value">{bot.pase}</div>
-                  <div className="stat-bar">
-                    <div 
-                      className="stat-fill" 
-                      style={{ width: `${bot.pase}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Tiro</span>
-                  <div className="stat-value">{bot.tiro}</div>
-                  <div className="stat-bar">
-                    <div 
-                      className="stat-fill" 
-                      style={{ width: `${bot.tiro}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Regate</span>
-                  <div className="stat-value">{bot.regate}</div>
-                  <div className="stat-bar">
-                    <div 
-                      className="stat-fill" 
-                      style={{ width: `${bot.regate}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Velocidad</span>
-                  <div className="stat-value">{bot.velocidad}</div>
-                  <div className="stat-bar">
-                    <div 
-                      className="stat-fill" 
-                      style={{ width: `${bot.velocidad}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Defensa</span>
-                  <div className="stat-value">{bot.defensa}</div>
-                  <div className="stat-bar">
-                    <div 
-                      className="stat-fill" 
-                      style={{ width: `${bot.defensa}%` }}
-                    ></div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">Físico</span>
-                  <div className="stat-value">{bot.potencia}</div>
-                  <div className="stat-bar">
-                    <div 
-                      className="stat-fill" 
-                      style={{ width: `${bot.potencia}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Match Prediction */}
-              {character && (
-                <div className="prediction-section">
-                  <div className="prediction-label">Probabilidad de victoria:</div>
-                  <div className="prediction-value">
-                    <span 
-                      style={{ 
-                        color: winProbability > 60 ? '#4cc9f0' : 
-                               winProbability > 40 ? '#4361ee' : '#7209b7'
-                      }}
-                    >
-                      {winProbability}%
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Rewards Section */}
               <div className="rewards-section">
                 <div className="rewards-title">Recompensas:</div>
                 <div className="rewards-grid">
@@ -303,7 +210,6 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
                 </div>
               </div>
 
-              {/* Action Button */}
               <button
                 className={`play-btn ${bot.difficulty}`}
                 onClick={() => startBotMatch(bot)}
@@ -312,11 +218,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
                   background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`
                 }}
               >
-                {loading && selectedBot?.id === bot.id ? (
-                  "🔄 CARGANDO..."
-                ) : (
-                  `⚽ ENTRENAR CONTRA ${bot.name}`
-                )}
+                {loading && selectedBot?.id === bot.id ? "🔄 CARGANDO..." : `⚽ ENTRENAR CONTRA ${bot.name}`}
               </button>
             </div>
           );
