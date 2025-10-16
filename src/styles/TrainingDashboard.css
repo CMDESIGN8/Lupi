@@ -1,12 +1,14 @@
+/* styles/TrainingDashboard.css - ESTILOS AISLADOS DEL DASHBOARD DE ENTRENAMIENTO */
 .training-dashboard {
   min-height: 100vh;
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   color: white;
   padding: 1rem;
+  font-family: 'Rajdhani', sans-serif;
 }
 
-/* HEADER */
-.dashboard-header {
+/* HEADER - Namespaced */
+.training-dashboard .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -17,27 +19,28 @@
   border: 1px solid #334155;
 }
 
-.header-main h1 {
+.training-dashboard .header-main h1 {
   margin: 0;
   font-size: 2rem;
   background: linear-gradient(135deg, #4cc9f0, #4361ee);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-family: 'Orbitron', monospace;
 }
 
-.header-main p {
+.training-dashboard .header-main p {
   margin: 0.5rem 0 0 0;
   color: #94a3b8;
   font-size: 1.1rem;
 }
 
-.player-stats {
+.training-dashboard .player-stats {
   display: flex;
   gap: 2rem;
 }
 
-.stat-item {
+.training-dashboard .stat-item {
   text-align: center;
   padding: 0.5rem 1rem;
   background: rgba(15, 23, 42, 0.6);
@@ -45,22 +48,23 @@
   border: 1px solid #475569;
 }
 
-.stat-label {
+.training-dashboard .stat-label {
   display: block;
   font-size: 0.8rem;
   color: #cbd5e1;
   margin-bottom: 0.25rem;
 }
 
-.stat-value {
+.training-dashboard .stat-value {
   display: block;
   font-size: 1.2rem;
   font-weight: bold;
   color: #4cc9f0;
+  font-family: 'Orbitron', monospace;
 }
 
 /* LAYOUT PRINCIPAL */
-.dashboard-layout {
+.training-dashboard .dashboard-layout {
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 2rem;
@@ -68,20 +72,20 @@
 }
 
 /* PANEL CENTRAL - CAMPO DE JUEGO */
-.central-panel {
+.training-dashboard .central-panel {
   background: rgba(15, 23, 42, 0.6);
   border-radius: 20px;
   border: 2px solid #475569;
   overflow: hidden;
 }
 
-.field-container {
+.training-dashboard .field-container {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.soccer-field {
+.training-dashboard .soccer-field {
   flex: 1;
   position: relative;
   background: linear-gradient(135deg, #1a472a 0%, #2d5a3a 100%);
@@ -91,7 +95,7 @@
   overflow: hidden;
 }
 
-.field-grass {
+.training-dashboard .field-grass {
   position: relative;
   width: 100%;
   height: 100%;
@@ -100,7 +104,7 @@
     linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.3) 49%, rgba(255,255,255,0.3) 51%, transparent 51%);
 }
 
-.center-circle {
+.training-dashboard .center-circle {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -111,7 +115,7 @@
   border-radius: 50%;
 }
 
-.center-spot {
+.training-dashboard .center-spot {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -123,28 +127,28 @@
 }
 
 /* JUGADORES EN EL CAMPO */
-.player {
+.training-dashboard .player {
   position: absolute;
   text-align: center;
   transition: all 0.5s ease;
 }
 
-.player-user {
+.training-dashboard .player-user {
   top: 30%;
   left: 20%;
 }
 
-.player-bot {
+.training-dashboard .player-bot {
   top: 30%;
   right: 20%;
 }
 
-.player-icon {
+.training-dashboard .player-icon {
   font-size: 3rem;
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
 }
 
-.player-name {
+.training-dashboard .player-name {
   margin-top: 0.5rem;
   font-weight: bold;
   font-size: 0.9rem;
@@ -154,16 +158,16 @@
 }
 
 /* BALÓN ANIMADO */
-.soccer-ball {
+.training-dashboard .soccer-ball {
   position: absolute;
   top: 50%;
   left: 50%;
   font-size: 2rem;
-  animation: ballMove 3s ease-in-out infinite;
+  animation: trainingBallMove 3s ease-in-out infinite;
   filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
 }
 
-@keyframes ballMove {
+@keyframes trainingBallMove {
   0%, 100% { 
     transform: translate(-50%, -50%) scale(1);
   }
@@ -179,7 +183,7 @@
 }
 
 /* EVENTOS DE PARTIDA */
-.match-events {
+.training-dashboard .match-events {
   position: absolute;
   top: 10%;
   left: 0;
@@ -190,59 +194,59 @@
   gap: 0.5rem;
 }
 
-.match-event {
+.training-dashboard .match-event {
   background: rgba(0,0,0,0.8);
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-weight: bold;
-  animation: fadeIn 0.5s ease;
+  animation: trainingFadeIn 0.5s ease;
 }
 
-@keyframes fadeIn {
+@keyframes trainingFadeIn {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 /* ESTADO DEL PARTIDO */
-.match-status {
+.training-dashboard .match-status {
   padding: 2rem;
   text-align: center;
   background: rgba(15, 23, 42, 0.8);
 }
 
-.simulation-in-progress {
+.training-dashboard .simulation-in-progress {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 1rem;
 }
 
-.pulse-animation {
+.training-dashboard .pulse-animation {
   width: 20px;
   height: 20px;
   background: #4cc9f0;
   border-radius: 50%;
-  animation: pulse 1.5s infinite;
+  animation: trainingPulse 1.5s infinite;
 }
 
-@keyframes pulse {
+@keyframes trainingPulse {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.2); opacity: 0.7; }
 }
 
-.waiting-for-match h3 {
+.training-dashboard .waiting-for-match h3 {
   color: #94a3b8;
   margin-bottom: 0.5rem;
 }
 
-.waiting-for-match p {
+.training-dashboard .waiting-for-match p {
   color: #64748b;
   margin: 0;
 }
 
 /* PANEL LATERAL */
-.side-panel {
+.training-dashboard .side-panel {
   background: rgba(15, 23, 42, 0.8);
   border-radius: 20px;
   border: 2px solid #475569;
@@ -251,13 +255,13 @@
   flex-direction: column;
 }
 
-.panel-tabs {
+.training-dashboard .panel-tabs {
   display: flex;
   background: rgba(30, 41, 59, 0.9);
   border-bottom: 1px solid #475569;
 }
 
-.tab-button {
+.training-dashboard .tab-button {
   flex: 1;
   padding: 1rem;
   background: none;
@@ -266,32 +270,34 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-family: 'Rajdhani', sans-serif;
 }
 
-.tab-button.active {
+.training-dashboard .tab-button.active {
   background: linear-gradient(135deg, #4361ee, #3a0ca3);
   color: white;
 }
 
-.tab-button:hover:not(.active) {
+.training-dashboard .tab-button:hover:not(.active) {
   background: rgba(255,255,255,0.1);
 }
 
-.panel-content {
+.training-dashboard .panel-content {
   flex: 1;
   padding: 1.5rem;
   overflow-y: auto;
 }
 
 /* LISTA DE BOTS EN PANEL LATERAL */
-.bots-list h3, .history-panel h3 {
+.training-dashboard .bots-list h3, 
+.training-dashboard .history-panel h3 {
   margin: 0 0 1.5rem 0;
   text-align: center;
   color: #4cc9f0;
   font-size: 1.2rem;
 }
 
-.bot-card-side {
+.training-dashboard .bot-card-side {
   background: rgba(30, 41, 59, 0.6);
   border-radius: 12px;
   padding: 1rem;
@@ -300,19 +306,19 @@
   transition: all 0.3s ease;
 }
 
-.bot-card-side:hover {
+.training-dashboard .bot-card-side:hover {
   border-color: #4cc9f0;
   transform: translateY(-2px);
 }
 
-.bot-header-side {
+.training-dashboard .bot-header-side {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 1rem;
 }
 
-.bot-avatar-side {
+.training-dashboard .bot-avatar-side {
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -322,29 +328,30 @@
   font-size: 1.5rem;
 }
 
-.bot-info-side h4 {
+.training-dashboard .bot-info-side h4 {
   margin: 0;
   font-size: 1.1rem;
 }
 
-.bot-meta-side {
+.training-dashboard .bot-meta-side {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.25rem;
 }
 
-.level-badge, .difficulty-badge {
+.training-dashboard .level-badge, 
+.training-dashboard .difficulty-badge {
   font-size: 0.7rem;
   padding: 0.2rem 0.5rem;
   border-radius: 10px;
   background: rgba(255,255,255,0.1);
 }
 
-.bot-stats-side {
+.training-dashboard .bot-stats-side {
   margin-bottom: 1rem;
 }
 
-.stat-row {
+.training-dashboard .stat-row {
   display: flex;
   justify-content: space-between;
   font-size: 0.8rem;
@@ -352,7 +359,7 @@
   color: #cbd5e1;
 }
 
-.challenge-btn {
+.training-dashboard .challenge-btn {
   width: 100%;
   padding: 0.75rem;
   border: none;
@@ -361,26 +368,27 @@
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-family: 'Rajdhani', sans-serif;
 }
 
-.challenge-btn:disabled {
+.training-dashboard .challenge-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.challenge-btn:not(:disabled):hover {
+.training-dashboard .challenge-btn:not(:disabled):hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
 }
 
 /* HISTORIAL EN PANEL LATERAL */
-.history-list-side {
+.training-dashboard .history-list-side {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.history-item-side {
+.training-dashboard .history-item-side {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -390,13 +398,13 @@
   border-left: 4px solid #4cc9f0;
 }
 
-.match-result-side {
+.training-dashboard .match-result-side {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.result-badge-side {
+.training-dashboard .result-badge-side {
   padding: 0.2rem 0.5rem;
   border-radius: 6px;
   font-weight: bold;
@@ -405,33 +413,33 @@
   text-align: center;
 }
 
-.result-badge-side.win { background: #4ade80; color: #166534; }
-.result-badge-side.lose { background: #f87171; color: #991b1b; }
-.result-badge-side.draw { background: #fbbf24; color: #92400e; }
+.training-dashboard .result-badge-side.win { background: #4ade80; color: #166534; }
+.training-dashboard .result-badge-side.lose { background: #f87171; color: #991b1b; }
+.training-dashboard .result-badge-side.draw { background: #fbbf24; color: #92400e; }
 
-.score-side {
+.training-dashboard .score-side {
   font-weight: bold;
   font-size: 1rem;
 }
 
-.match-info-side {
+.training-dashboard .match-info-side {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.25rem;
 }
 
-.match-date {
+.training-dashboard .match-date {
   font-size: 0.7rem;
   color: #94a3b8;
 }
 
-.match-rewards-side {
+.training-dashboard .match-rewards-side {
   font-size: 0.8rem;
   color: #4cc9f0;
 }
 
-.no-history {
+.training-dashboard .no-history {
   text-align: center;
   padding: 2rem;
   color: #94a3b8;
@@ -439,12 +447,33 @@
 
 /* RESPONSIVE */
 @media (max-width: 1024px) {
-  .dashboard-layout {
+  .training-dashboard .dashboard-layout {
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
   }
   
-  .side-panel {
+  .training-dashboard .side-panel {
     height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .training-dashboard {
+    padding: 0.5rem;
+  }
+  
+  .training-dashboard .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .training-dashboard .player-stats {
+    justify-content: center;
+  }
+  
+  .training-dashboard .soccer-field {
+    margin: 1rem;
   }
 }
