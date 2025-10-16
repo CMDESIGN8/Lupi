@@ -698,3 +698,49 @@
   font-size: 0.9rem;
   color: #cbd5e1;
 }
+
+.training-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  color: white;
+  padding: 1rem;
+}
+
+/* HEADER */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem 2rem;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 15px;
+  border: 1px solid #334155;
+}
+
+.header-main h1 {
+  margin: 0;
+  font-size: 2rem;
+  background: linear-gradient(135deg, #4cc9f0, #4361ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-main p {
+  margin: 0.5rem 0 0 0;
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+.player-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 10px;
+  border: 1px solid #
