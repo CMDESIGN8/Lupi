@@ -22,77 +22,80 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
   };
 
   const startBotMatch = async (bot) => {
-    if (!character) return;
-    
-    setLoading(true);
-    setSelectedBot(bot);
-    
-    try {
-      // 1️⃣ Crear partida contra bot
-      const matchResponse = await fetch(`https://lupiback.onrender.com/bots/match`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          characterId: character.id, 
-          botId: bot.id 
-        }),
-      });
+  if (!character) return;
+  
+  setLoading(true);
+  setSelectedBot(bot);
+  
+  try {
+    // 1️⃣ Crear partida contra bot
+    const matchResponse = await fetch(`https://lupiback.onrender.com/bots/match`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        characterId: character.id, 
+        botId: bot.id 
+      }),
+    });
 
-      const matchData = await matchResponse.json();
-      console.log("🧩 MatchData recibido:", matchData);
+    const matchData = await matchResponse.json();
+    console.log("🧩 MatchData recibido:", matchData);
 
-      if (!matchResponse.ok || !matchData.match?.id) {
-        alert(matchData.error || "Error al iniciar partida");
-        return;
-      }
-
-      // 2️⃣ Simular partida
-      await simulateMatch(matchData.match.id, bot);
-      
-    } catch (error) {
-      console.error("Error en partida contra bot:", error);
-      alert("Error al jugar contra bot");
-    } finally {
-      setLoading(false);
-      setSelectedBot(null);
+    if (!matchResponse.ok || !matchData.match?.id) {
+      alert(matchData.error || "Error al iniciar partida");
+      return;
     }
-  };
 
-  const simulateMatch = async (matchId, bot) => {
-    setSimulating(true);
+    // 2️⃣ Simular partida usando el ID correcto de la partida
+    await simulateMatch(matchData.match.id, bot);
     
-    try {
-      const response = await fetch(`https://lupiback.onrender.com/bots/${matchId}/simulate`, {
-        method: "POST",
-      });
+  } catch (error) {
+    console.error("Error en partida contra bot:", error);
+    alert("Error al jugar contra bot");
+  } finally {
+    setLoading(false);
+    setSelectedBot(null);
+  }
+};
 
-      const data = await response.json();
-      console.log("🎮 Resultado simulación:", data);
-      
-      if (response.ok) {
-        setTimeout(() => {
-          if (data.simulation.winnerId === character.id) {
-            alert(`🎉 ¡GANASTE! ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
-          } else if (data.simulation.player1Score === data.simulation.player2Score) {
-            alert(`🤝 EMPATE ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
-          } else {
-            alert(`😞 Perdiste ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
-          }
-        }, 500);
+const simulateMatch = async (matchId, bot) => {
+  setSimulating(true);
+  
+  try {
+    // Asegurar que matchId sea un número
+    const numericMatchId = Number(matchId);
+    
+    const response = await fetch(`https://lupiback.onrender.com/bots/${numericMatchId}/simulate`, {
+      method: "POST",
+    });
 
-        if (onMatchUpdate) {
-          setTimeout(() => onMatchUpdate(), 1000);
+    const data = await response.json();
+    console.log("🎮 Resultado simulación:", data);
+    
+    if (response.ok) {
+      setTimeout(() => {
+        if (data.simulation.winnerId === character.id) {
+          alert(`🎉 ¡GANASTE! ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
+        } else if (data.simulation.player1Score === data.simulation.player2Score) {
+          alert(`🤝 EMPATE ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
+        } else {
+          alert(`😞 Perdiste ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
         }
-      } else {
-        alert(data.error || "Error al simular partida");
+      }, 500);
+
+      if (onMatchUpdate) {
+        setTimeout(() => onMatchUpdate(), 1000);
       }
-    } catch (error) {
-      console.error("Error simulando partida:", error);
-      alert("Error al simular partida");
-    } finally {
-      setSimulating(false);
+    } else {
+      alert(data.error || "Error al simular partida");
     }
-  };
+  } catch (error) {
+    console.error("Error simulando partida:", error);
+    alert("Error al simular partida");
+  } finally {
+    setSimulating(false);
+  }
+};
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
