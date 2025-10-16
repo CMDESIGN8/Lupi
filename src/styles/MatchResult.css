@@ -1,0 +1,192 @@
+.match-result-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.match-result-card {
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  border: 3px solid #4cc9f0;
+  box-shadow: 0 0 40px rgba(76, 201, 240, 0.3);
+  animation: slideUp 0.5s ease;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+.match-result-card.win {
+  border-color: #4ade80;
+  box-shadow: 0 0 40px rgba(74, 222, 128, 0.3);
+}
+
+.match-result-card.lose {
+  border-color: #f87171;
+  box-shadow: 0 0 40px rgba(248, 113, 113, 0.3);
+}
+
+.match-result-card.draw {
+  border-color: #fbbf24;
+  box-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
+}
+
+.result-icon {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  animation: bounce 0.6s ease;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-20px); }
+  60% { transform: translateY(-10px); }
+}
+
+.result-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #4cc9f0, #4361ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.match-result-card.win .result-title {
+  background: linear-gradient(135deg, #4ade80, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.match-result-card.lose .result-title {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.match-result-card.draw .result-title {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.result-score {
+  font-size: 4rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  background: linear-gradient(135deg, #4cc9f0, #4361ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.match-result-card.win .result-score {
+  background: linear-gradient(135deg, #4ade80, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.match-result-card.lose .result-score {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.match-result-card.draw .result-score {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.result-opponent {
+  font-size: 1.3rem;
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+}
+
+.rewards-display {
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  border: 1px solid #475569;
+}
+
+.rewards-display h4 {
+  margin: 0 0 1rem 0;
+  color: #4cc9f0;
+  font-size: 1.1rem;
+}
+
+.reward-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 1.1rem;
+}
+
+.reward-amount {
+  font-weight: bold;
+  color: #4cc9f0;
+}
+
+.level-up-badge {
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: white;
+  padding: 1rem;
+  border-radius: 15px;
+  font-weight: bold;
+  margin: 1rem 0;
+  animation: pulse 2s infinite;
+  font-size: 1.1rem;
+}
+
+.auto-close-timer {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 1rem 0;
+  animation: pulse 2s infinite;
+}
+
+.close-result-btn {
+  background: linear-gradient(135deg, #4361ee, #3a0ca3);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  width: 100%;
+}
+
+.close-result-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 20px rgba(67, 97, 238, 0.4);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(50px
