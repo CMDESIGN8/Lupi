@@ -147,79 +147,40 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
 
 
 const simulateMatch = async (matchId, bot) => {
-
   setSimulating(true);
-
   
-
   try {
-
-    // Asegurar que matchId sea un número
-
-    const numericMatchId = Number(matchId);
-
-    
-
-    const response = await fetch(`https://lupiback.onrender.com/bots/${numericMatchId}/simulate`, {
-
+    // ✅ CORRECTO - Usar el UUID como string
+    const response = await fetch(`https://lupiback.onrender.com/bots/${matchId}/simulate`, {
       method: "POST",
-
     });
 
-
-
     const data = await response.json();
-
     console.log("🎮 Resultado simulación:", data);
-
     
-
     if (response.ok) {
-
       setTimeout(() => {
-
         if (data.simulation.winnerId === character.id) {
-
           alert(`🎉 ¡GANASTE! ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
-
         } else if (data.simulation.player1Score === data.simulation.player2Score) {
-
           alert(`🤝 EMPATE ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
-
         } else {
-
           alert(`😞 Perdiste ${data.simulation.player1Score}-${data.simulation.player2Score}\nContra ${bot.name}`);
-
         }
-
       }, 500);
 
-
-
       if (onMatchUpdate) {
-
         setTimeout(() => onMatchUpdate(), 1000);
-
       }
-
     } else {
-
       alert(data.error || "Error al simular partida");
-
     }
-
   } catch (error) {
-
     console.error("Error simulando partida:", error);
-
     alert("Error al simular partida");
-
   } finally {
-
     setSimulating(false);
-
   }
-
 };
 
 
