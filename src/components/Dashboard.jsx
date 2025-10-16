@@ -192,7 +192,7 @@ export const Dashboard = ({ user }) => {
     <div className="dashboard">
       {/* Game Header */}
       <div className="game-header">
-        <h1>⚽ LUPIAPP - FOOTBALL MODE</h1>
+        <h1>FOOTBALL MODE</h1>
         <div className="header-stats">
           <div className="header-stat">
             <span className="stat-label">NIVEL</span>
