@@ -27,10 +27,15 @@ const TrainingDashboard = ({
     possession: 50
   });
   const animationRef = useRef(null);
+  const simulationTimerRef = useRef(null);
 
   useEffect(() => {
     if (simulating) {
       startMatchAnimation();
+      // Configurar timer para detener la simulación después de 15 segundos
+      simulationTimerRef.current = setTimeout(() => {
+        // La simulación se detendrá automáticamente cuando termine el partido
+      }, 15000);
     } else {
       resetAnimations();
     }
@@ -38,6 +43,9 @@ const TrainingDashboard = ({
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
+      }
+      if (simulationTimerRef.current) {
+        clearTimeout(simulationTimerRef.current);
       }
     };
   }, [simulating]);
@@ -62,11 +70,12 @@ const TrainingDashboard = ({
 
   const startMatchAnimation = () => {
     const events = [];
+    const totalEvents = 18; // Más eventos para 15 segundos
     
     // Configurar animación del balón
     animateBall();
     
-    // Generar eventos de partido en tiempo real
+    // Generar eventos de partido en tiempo real (15 segundos)
     const eventTypes = [
       {
         type: 'shot',
@@ -124,13 +133,13 @@ const TrainingDashboard = ({
       }
     ];
 
-    for (let i = 0; i < 15; i++) {
+    for (let i = 0; i < totalEvents; i++) {
       setTimeout(() => {
         const randomEvent = eventTypes[Math.floor(Math.random() * eventTypes.length)];
         const eventWithTime = {
           ...randomEvent,
           id: Date.now() + i,
-          time: `${Math.floor(i / 2)}'${(i % 2) * 30}`
+          time: `${Math.floor(i * 15 / totalEvents)}'` // Tiempo real basado en 15 segundos
         };
         
         setMatchEvents(prev => [eventWithTime, ...prev.slice(0, 14)]); // Mantener últimos 15 eventos
@@ -143,13 +152,13 @@ const TrainingDashboard = ({
           movePlayersForEvent(randomEvent.type, randomEvent.team);
         }
 
-      }, i * 800);
+      }, i * (15000 / totalEvents)); // Distribuir eventos en 15 segundos
     }
   };
 
   const animateBall = () => {
     const startTime = Date.now();
-    const duration = 12000;
+    const duration = 15000; // 15 segundos
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -272,37 +281,9 @@ const TrainingDashboard = ({
     return 'lose';
   };
 
-  const calculatePlayerRating = () => {
-    const totalActions = matchStats.shots + matchStats.passes + matchStats.tackles + matchStats.dribbles;
-    if (totalActions === 0) return 6.0;
-    
-    const effectiveness = (matchStats.passes * 0.3 + matchStats.tackles * 0.4 + matchStats.dribbles * 0.3) / totalActions;
-    return Math.min(10, 6 + effectiveness * 4).toFixed(1);
-  };
-
   return (
     <div className="training-dashboard">
-      {/* HEADER SOLO CON ESTADÍSTICAS - SIN TÍTULO GRANDE */}
-      <div className="dashboard-header">
-        <div className="player-stats">
-          <div className="stat-item">
-            <span className="stat-label">Nivel</span>
-            <span className="stat-value">{character.level}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Rating</span>
-            <span className="stat-value">{calculatePlayerRating()}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Partidos</span>
-            <span className="stat-value">{matchHistory.length}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Posesión</span>
-            <span className="stat-value">{matchStats.possession}%</span>
-          </div>
-        </div>
-      </div>
+      {/* HEADER COMPLETAMENTE ELIMINADO */}
 
       <div className="main-layout">
         {/* PANEL IZQUIERDO 70% - CAMPO DE JUEGO */}
@@ -365,7 +346,7 @@ const TrainingDashboard = ({
               {!simulating && (
                 <div className="field-message">
                   <h3>⚽ SIMULADOR PROFESIONAL</h3>
-                  <p>Selecciona un oponente para iniciar la simulación con comentarios en vivo</p>
+                  <p>Selecciona un oponente para iniciar la simulación de 15 segundos</p>
                 </div>
               )}
 
@@ -514,7 +495,7 @@ const TrainingDashboard = ({
                     }}
                   >
                     {loading && selectedBot?.id === bot.id ? "🔄" : "⚔️"} 
-                    {loading && selectedBot?.id === bot.id ? " INICIANDO..." : " JUGAR"}
+                    {loading && selectedBot?.id === bot.id ? " INICIANDO..." : " JUGAR 15s"}
                   </button>
                 </div>
               ))}
