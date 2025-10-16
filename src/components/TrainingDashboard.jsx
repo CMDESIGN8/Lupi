@@ -42,6 +42,12 @@ const TrainingDashboard = ({
     };
   }, [simulating]);
 
+   const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate("/dashboard"); // vuelve al dashboard principal
+  };
+
   const resetAnimations = () => {
     setMatchEvents([]);
     setBallPosition({ x: 50, y: 50 });
