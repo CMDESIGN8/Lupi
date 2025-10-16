@@ -1,16 +1,19 @@
-.bot-matchmaking {
+/* styles/BotMatchmaking.css - ESTILOS BASE AISLADOS */
+.bot-matchmaking-container {
   min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   position: relative;
+  font-family: 'Rajdhani', sans-serif;
 }
 
-.bot-matchmaking.no-character {
+.bot-matchmaking-container.no-character {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 50vh;
 }
 
-.no-character-message {
+.bot-matchmaking-container .no-character-message {
   text-align: center;
   padding: 2rem;
   background: rgba(30, 41, 59, 0.8);
@@ -19,12 +22,12 @@
   color: white;
 }
 
-.no-character-message h3 {
+.bot-matchmaking-container .no-character-message h3 {
   color: #fbbf24;
   margin-bottom: 1rem;
 }
 
-.no-character-message p {
+.bot-matchmaking-container .no-character-message p {
   color: #cbd5e1;
   margin: 0;
 }
