@@ -29,7 +29,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
 
   const fetchMatchHistory = async () => {
     try {
-      const response = await fetch(`https://lupiback.onrender.com/matches/history/${character.id}`);
+      const response = await fetch(`https://lupiback.onrender.com/bots/history/${character.id}`);
       const data = await response.json();
       setMatchHistory(data.matches || []);
     } catch (error) {
