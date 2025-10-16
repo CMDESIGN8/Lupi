@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
 import "../styles/Dashboard.css";
+import BotMatchmaking from "../components/BotMatchmaking"; // Importar el componente
 
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
