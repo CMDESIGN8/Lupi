@@ -554,6 +554,12 @@ const TrainingDashboard = ({
               )}
             </div>
           )}
+          <div className="bottom-navigation">
+  <button className="back-button" onClick={onBack}>
+    ← Volver al Dashboard
+  </button>
+  <h2>⚽ ENTRENAMIENTO CONTRA BOTS</h2>
+</div>
         </div>
       </div>
     </div>
