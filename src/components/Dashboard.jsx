@@ -74,13 +74,104 @@ export const Dashboard = ({ user }) => {
 
   // Stats para el gráfico radial (6 stats principales)
   const mainStats = [
-    { key: "pase", label: "Pase", value: character.pase, short: "PAS" },
-    { key: "tiro", label: "Tiro", value: character.tiro, short: "TIR" },
-    { key: "regate", label: "Regate", value: character.regate, short: "REG" },
-    { key: "velocidad", label: "Velocidad", value: character.velocidad, short: "VEL" },
-    { key: "defensa", label: "Defensa", value: character.defensa, short: "DEF" },
-    { key: "fisico", label: "Físico", value: character.potencia, short: "FIS" }
+    { key: "pase", label: "Pase", value: character.pase || 50, short: "PAS" },
+    { key: "tiro", label: "Tiro", value: character.tiro || 50, short: "TIR" },
+    { key: "regate", label: "Regate", value: character.regate || 51, short: "REG" },
+    { key: "velocidad", label: "Velocidad", value: character.velocidad || 51, short: "VEL" },
+    { key: "defensa", label: "Defensa", value: character.defensa || 50, short: "DEF" },
+    { key: "fisico", label: "Físico", value: character.potencia || 51, short: "FIS" }
   ];
+
+  // Calcular promedio general
+  const totalStats = mainStats.reduce((sum, stat) => sum + stat.value, 0);
+  const averageRating = Math.round(totalStats / mainStats.length);
+
+  // Función para generar el gráfico radial
+  const RadarChart = ({ stats, size = 200 }) => {
+    const center = size / 2;
+    const radius = size * 0.4;
+    
+    const points = stats.map((stat, index) => {
+      const angle = (index * 2 * Math.PI) / stats.length - Math.PI / 2;
+      const value = (stat.value / 100) * radius;
+      return {
+        x: center + value * Math.cos(angle),
+        y: center + value * Math.sin(angle),
+        label: stat.short,
+        value: stat.value
+      };
+    });
+
+    const polygonPoints = points.map(point => `${point.x},${point.y}`).join(' ');
+
+    return (
+      <div className="radar-chart-container">
+        <svg width={size} height={size} className="radar-chart">
+          {/* Círculos concéntricos */}
+          <circle cx={center} cy={center} r={radius * 0.75} className="radar-circle" />
+          <circle cx={center} cy={center} r={radius * 0.5} className="radar-circle" />
+          <circle cx={center} cy={center} r={radius * 0.25} className="radar-circle" />
+          
+          {/* Ejes */}
+          {points.map((point, index) => (
+            <line
+              key={`axis-${index}`}
+              x1={center}
+              y1={center}
+              x2={center + radius * Math.cos((index * 2 * Math.PI) / stats.length - Math.PI / 2)}
+              y2={center + radius * Math.sin((index * 2 * Math.PI) / stats.length - Math.PI / 2)}
+              className="radar-axis"
+            />
+          ))}
+          
+          {/* Polígono de stats */}
+          <polygon
+            points={polygonPoints}
+            className="radar-polygon"
+          />
+          
+          {/* Puntos */}
+          {points.map((point, index) => (
+            <circle
+              key={`point-${index}`}
+              cx={point.x}
+              cy={point.y}
+              r="4"
+              className="radar-point"
+            />
+          ))}
+          
+          {/* Etiquetas */}
+          {points.map((point, index) => {
+            const angle = (index * 2 * Math.PI) / stats.length - Math.PI / 2;
+            const labelRadius = radius + 20;
+            return (
+              <g key={`label-${index}`}>
+                <text
+                  x={center + labelRadius * Math.cos(angle)}
+                  y={center + labelRadius * Math.sin(angle)}
+                  className="radar-label"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                >
+                  {point.label}
+                </text>
+                <text
+                  x={center + (labelRadius + 15) * Math.cos(angle)}
+                  y={center + (labelRadius + 15) * Math.sin(angle)}
+                  className="radar-value"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                >
+                  {point.value}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
+    );
+  };
 
   // Todas las stats para la lista
   const allStats = [
@@ -96,10 +187,6 @@ export const Dashboard = ({ user }) => {
     { key: "defensa", label: "Defensa", icon: "🛡️" },
     { key: "resistencia_base", label: "Resistencia", icon: "🏃" },
   ];
-
-  // Calcular promedio general
-  const totalStats = allStats.reduce((sum, stat) => sum + character[stat.key], 0);
-  const averageRating = Math.round(totalStats / allStats.length);
 
   return (
     <div className="dashboard">
@@ -132,8 +219,8 @@ export const Dashboard = ({ user }) => {
                 <div className="overall-rating">{averageRating}</div>
               </div>
               <div className="player-info">
-                <h2 className="player-name">{character.nickname}</h2>
-                <div className="player-level">NIVEL {character.level}</div>
+                <h2 className="player-name">{character.nickname || "LLP"}</h2>
+                <div className="player-level">NIVEL {character.level || 1}</div>
                 <div className="player-class">Delantero Estrella</div>
                 <div className="player-position">POSICIÓN: DELANTERO</div>
               </div>
@@ -142,74 +229,21 @@ export const Dashboard = ({ user }) => {
             {/* Gráfico FIFA Style */}
             <div className="fifa-chart-section">
               <h3>📊 ESTADÍSTICAS PRINCIPALES</h3>
-              <div className="radar-chart-container">
-                <div className="radar-chart">
-                  {mainStats.map((stat, index) => {
-                    const angle = (index * 360) / mainStats.length;
-                    const value = (stat.value / 100) * 80; // Escalar a 80% del radio máximo
-                    const x = 100 + Math.cos((angle - 90) * Math.PI / 180) * value;
-                    const y = 100 + Math.sin((angle - 90) * Math.PI / 180) * value;
-                    
-                    return (
-                      <React.Fragment key={stat.key}>
-                        {/* Línea del eje */}
-                        <line
-                          x1="100"
-                          y1="100"
-                          x2={100 + Math.cos((angle - 90) * Math.PI / 180) * 80}
-                          y2={100 + Math.sin((angle - 90) * Math.PI / 180) * 80}
-                          className="radar-axis"
-                        />
-                        {/* Punto de valor */}
-                        <circle
-                          cx={x}
-                          cy={y}
-                          r="4"
-                          className="radar-point"
-                        />
-                        {/* Etiqueta */}
-                        <text
-                          x={100 + Math.cos((angle - 90) * Math.PI / 180) * 95}
-                          y={100 + Math.sin((angle - 90) * Math.PI / 180) * 95}
-                          className="radar-label"
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                        >
-                          {stat.short}
-                        </text>
-                        {/* Valor numérico */}
-                        <text
-                          x={100 + Math.cos((angle - 90) * Math.PI / 180) * 105}
-                          y={100 + Math.sin((angle - 90) * Math.PI / 180) * 105}
-                          className="radar-value"
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                        >
-                          {stat.value}
-                        </text>
-                      </React.Fragment>
-                    );
-                  })}
-                  
-                  {/* Polígono de stats */}
-                  <polygon
-                    points={mainStats.map((stat, index) => {
-                      const angle = (index * 360) / mainStats.length;
-                      const value = (stat.value / 100) * 80;
-                      const x = 100 + Math.cos((angle - 90) * Math.PI / 180) * value;
-                      const y = 100 + Math.sin((angle - 90) * Math.PI / 180) * value;
-                      return `${x},${y}`;
-                    }).join(' ')}
-                    className="radar-polygon"
-                  />
-                  
-                  {/* Círculos concéntricos */}
-                  <circle cx="100" cy="100" r="60" className="radar-circle" />
-                  <circle cx="100" cy="100" r="40" className="radar-circle" />
-                  <circle cx="100" cy="100" r="20" className="radar-circle" />
+              
+              <RadarChart stats={mainStats} size={280} />
+              
+              {/* Resumen de stats */}
+              <div className="stats-summary">
+                <div className="stats-string">
+                  {mainStats.map(stat => (
+                    <span key={stat.key} className="stat-abbr">
+                      {stat.short}
+                      <span className="stat-number">{stat.value}</span>
+                    </span>
+                  ))}
                 </div>
               </div>
-              
+
               {/* Leyenda de stats */}
               <div className="stats-legend">
                 {mainStats.map(stat => (
@@ -234,25 +268,6 @@ export const Dashboard = ({ user }) => {
               </div>
               <div className="next-level">
                 Próximo nivel: <span>{expMax - expActual} EXP</span>
-              </div>
-            </div>
-
-            <div className="quick-stats">
-              <div className="quick-stat">
-                <span className="quick-label">Partidos</span>
-                <span className="quick-value">47</span>
-              </div>
-              <div className="quick-stat">
-                <span className="quick-label">Victorias</span>
-                <span className="quick-value">32</span>
-              </div>
-              <div className="quick-stat">
-                <span className="quick-label">Goles</span>
-                <span className="quick-value">28</span>
-              </div>
-              <div className="quick-stat">
-                <span className="quick-label">Asistencias</span>
-                <span className="quick-value">15</span>
               </div>
             </div>
           </section>
@@ -286,11 +301,11 @@ export const Dashboard = ({ user }) => {
             <div className="wallet-info">
               <div className="wallet-address">
                 <span className="address-label">Dirección:</span>
-                <span className="address-value">{wallet?.address || 'No disponible'}</span>
+                <span className="address-value">{wallet?.address || 'LLP/LLP'}</span>
               </div>
             </div>
             <div className="wallet-actions">
-              <button className="wallet-btn">TRANSFERIR</button>
+              <button className="wallet-btn primary">TRANSFERIR</button>
               <button className="wallet-btn">HISTORIAL</button>
             </div>
           </section>
@@ -312,7 +327,7 @@ export const Dashboard = ({ user }) => {
                     <div className="skill-icon">{icon}</div>
                     <div className="skill-info">
                       <span className="skill-name">{label}</span>
-                      <span className="skill-level">Nv. {Math.floor(character[key] / 10)}</span>
+                      <span className="skill-level">Nv. {Math.floor((character[key] || 50) / 10)}</span>
                     </div>
                   </div>
                   
@@ -320,13 +335,13 @@ export const Dashboard = ({ user }) => {
                     <div className="progress-bar">
                       <div
                         className="progress-fill"
-                        style={{ width: `${character[key]}%` }}
+                        style={{ width: `${character[key] || 50}%` }}
                       ></div>
                     </div>
-                    <span className="skill-value">{character[key]}</span>
+                    <span className="skill-value">{character[key] || 50}</span>
                   </div>
 
-                  {character.available_skill_points > 0 && character[key] < 100 && (
+                  {character.available_skill_points > 0 && (character[key] || 50) < 100 && (
                     <button
                       className="upgrade-btn"
                       onClick={() => increaseStat(key)}
