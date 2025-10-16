@@ -9,15 +9,20 @@
 }
 
 /* HEADER */
+/* En el CSS, modifica el header para que sea más compacto */
 .training-dashboard .dashboard-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center; /* Centrado en lugar de espacio entre */
   margin-bottom: 1.5rem;
-  padding: 1rem 2rem;
+  padding: 1rem;
   background: rgba(30, 41, 59, 0.8);
   border-radius: 15px;
   border: 1px solid #334155;
+}
+
+/* Elimina el header-main si existe en tu CSS */
+.training-dashboard .header-main {
+  display: none;
 }
 
 .training-dashboard .header-main h1 {
