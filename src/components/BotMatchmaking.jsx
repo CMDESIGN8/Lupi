@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../styles/BotMatchmaking.css";
+import TrainingDashboard from "./TrainingDashboard";
+import MatchResult from "./MatchResult";
 
 const BotMatchmaking = ({ character, onMatchUpdate }) => {
   const [bots, setBots] = useState([]);
