@@ -791,3 +791,231 @@ body {
     gap: 20px;
   }
 }
+
+/* styles/Dashboard.css - Con Gráfico FIFA */
+
+/* ... (mantener todo el CSS anterior) ... */
+
+/* Player Avatar con Rating */
+.player-avatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  border: 3px solid var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 25px rgba(0, 187, 249, 0.5);
+}
+
+.overall-rating {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #000;
+  box-shadow: 0 0 15px rgba(114, 9, 183, 0.5);
+}
+
+.player-position {
+  color: var(--cyan);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 5px;
+}
+
+/* Gráfico FIFA Style */
+.fifa-chart-section {
+  margin: 25px 0;
+  padding: 20px;
+  background: rgba(20, 25, 60, 0.6);
+  border-radius: 15px;
+  border: 1px solid var(--primary);
+}
+
+.fifa-chart-section h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.2rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  margin-bottom: 20px;
+  border: none;
+  padding: 0;
+}
+
+.radar-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.radar-chart {
+  width: 250px;
+  height: 250px;
+  position: relative;
+}
+
+.radar-chart svg {
+  width: 100%;
+  height: 100%;
+}
+
+.radar-axis {
+  stroke: rgba(67, 97, 238, 0.3);
+  stroke-width: 1;
+}
+
+.radar-circle {
+  fill: none;
+  stroke: rgba(67, 97, 238, 0.2);
+  stroke-width: 1;
+}
+
+.radar-polygon {
+  fill: rgba(0, 187, 249, 0.3);
+  stroke: var(--secondary);
+  stroke-width: 2;
+  stroke-dasharray: 5, 5;
+  animation: pulsePolygon 3s ease-in-out infinite;
+}
+
+@keyframes pulsePolygon {
+  0%, 100% {
+    fill: rgba(0, 187, 249, 0.3);
+    stroke: var(--secondary);
+  }
+  50% {
+    fill: rgba(67, 97, 238, 0.4);
+    stroke: var(--primary);
+  }
+}
+
+.radar-point {
+  fill: var(--secondary);
+  stroke: var(--primary);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 5px var(--secondary));
+}
+
+.radar-label {
+  fill: var(--secondary);
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.radar-value {
+  fill: var(--cyan);
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+/* Leyenda de Stats */
+.stats-legend {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.legend-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(67, 97, 238, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(67, 97, 238, 0.3);
+}
+
+.legend-label {
+  color: var(--secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.legend-value {
+  color: var(--cyan);
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+/* Responsive para el gráfico */
+@media (max-width: 768px) {
+  .radar-chart {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .stats-legend {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .player-avatar {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .overall-rating {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mejoras para skills grid */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.skill-card {
+  background: rgba(20, 25, 60, 0.6);
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  padding: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.skill-card:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 5px 15px rgba(0, 187, 249, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Header de skills actualizado */
+.skills-header h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.3rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
