@@ -120,7 +120,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
 
   if (!character) {
     return (
-      <div className="bot-matchmaking no-character">
+      <div className="bot-matchmaking-container no-character">
         <div className="no-character-message">
           <h3>⚠️ PERSONAJE REQUERIDO</h3>
           <p>Necesitas crear un personaje para acceder al entrenamiento</p>
@@ -130,7 +130,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
   }
 
   return (
-    <div className="bot-matchmaking">
+    <div className="bot-matchmaking-container">
       <TrainingDashboard
         character={character}
         bots={bots}
