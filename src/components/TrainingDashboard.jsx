@@ -143,11 +143,6 @@ const TrainingDashboard = ({
           movePlayersForEvent(randomEvent.type, randomEvent.team);
         }
 
-        // Reproducir sonido para eventos importantes (preparado para implementar)
-        if (randomEvent.type === 'goal') {
-          // playGoalSound();
-        }
-
       }, i * 800);
     }
   };
@@ -287,12 +282,8 @@ const TrainingDashboard = ({
 
   return (
     <div className="training-dashboard">
+      {/* HEADER SOLO CON ESTADÍSTICAS - SIN TÍTULO GRANDE */}
       <div className="dashboard-header">
-        <div className="header-main">
-          <h1>🏟️ SIMULADOR DE PARTIDOS</h1>
-          <p>Sistema profesional de entrenamiento con comentarios en vivo</p>
-        </div>
-        
         <div className="player-stats">
           <div className="stat-item">
             <span className="stat-label">Nivel</span>
@@ -306,86 +297,84 @@ const TrainingDashboard = ({
             <span className="stat-label">Partidos</span>
             <span className="stat-value">{matchHistory.length}</span>
           </div>
+          <div className="stat-item">
+            <span className="stat-label">Posesión</span>
+            <span className="stat-value">{matchStats.possession}%</span>
+          </div>
         </div>
       </div>
 
       <div className="main-layout">
         {/* PANEL IZQUIERDO 70% - CAMPO DE JUEGO */}
         <div className="left-panel">
-          <div className="field-container">
-            <div className="soccer-field">
-              <div className="field-grass">
-                <div className="center-circle"></div>
-                <div className="center-spot"></div>
-                <div className="penalty-area left"></div>
-                <div className="penalty-area right"></div>
-                <div className="goal left"></div>
-                <div className="goal right"></div>
-                
-                {/* Jugador */}
-                <div 
-                  className="player player-user"
-                  style={{
-                    left: `${playerPositions.user.x}%`,
-                    top: `${playerPositions.user.y}%`
-                  }}
-                >
-                  <div className="player-icon">👤</div>
-                  <div className="player-name">{character.nickname}</div>
-                </div>
-                
-                {/* Bot */}
-                <div 
-                  className="player player-bot"
-                  style={{
-                    left: `${playerPositions.bot.x}%`,
-                    top: `${playerPositions.bot.y}%`
-                  }}
-                >
-                  <div className="player-icon">
-                    {selectedBot ? getBotAvatar(selectedBot.level) : "🤖"}
-                  </div>
-                  <div className="player-name">
-                    {selectedBot?.name || "RIVAL"}
-                  </div>
-                </div>
-
-                {/* Balón animado */}
-                {simulating && (
-                  <div 
-                    className="soccer-ball"
-                    style={{
-                      left: `${ballPosition.x}%`,
-                      top: `${ballPosition.y}%`
-                    }}
-                  >
-                    ⚽
-                  </div>
-                )}
-
-                {/* Efectos visuales */}
-                {simulating && (
-                  <>
-                    <div className="field-effect shot-effect"></div>
-                    <div className="field-effect dribble-effect"></div>
-                  </>
-                )}
+          <div className="soccer-field">
+            <div className="field-grass">
+              <div className="center-circle"></div>
+              <div className="center-spot"></div>
+              <div className="penalty-area left"></div>
+              <div className="penalty-area right"></div>
+              <div className="small-area left"></div>
+              <div className="small-area right"></div>
+              <div className="goal left"></div>
+              <div className="goal right"></div>
+              <div className="penalty-spot left"></div>
+              <div className="penalty-spot right"></div>
+              
+              {/* Jugador */}
+              <div 
+                className="player player-user"
+                style={{
+                  left: `${playerPositions.user.x}%`,
+                  top: `${playerPositions.user.y}%`
+                }}
+              >
+                <div className="player-icon">👤</div>
+                <div className="player-name">{character.nickname}</div>
               </div>
-            </div>
-
-            {/* Estado del partido */}
-            <div className="match-status">
-              {simulating ? (
-                <div className="simulation-in-progress">
-                  <div className="pulse-animation"></div>
-                  <h3>PARTIDA EN CURSO - TIEMPO REAL</h3>
-                  <p>vs {selectedBot?.name} | Sistema de Comentarios Activo</p>
+              
+              {/* Bot */}
+              <div 
+                className="player player-bot"
+                style={{
+                  left: `${playerPositions.bot.x}%`,
+                  top: `${playerPositions.bot.y}%`
+                }}
+              >
+                <div className="player-icon">
+                  {selectedBot ? getBotAvatar(selectedBot.level) : "🤖"}
                 </div>
-              ) : (
-                <div className="waiting-for-match">
+                <div className="player-name">
+                  {selectedBot?.name || "RIVAL"}
+                </div>
+              </div>
+
+              {/* Balón animado */}
+              {simulating && (
+                <div 
+                  className="soccer-ball"
+                  style={{
+                    left: `${ballPosition.x}%`,
+                    top: `${ballPosition.y}%`
+                  }}
+                >
+                  ⚽
+                </div>
+              )}
+
+              {/* Mensaje central cuando no hay simulación */}
+              {!simulating && (
+                <div className="field-message">
                   <h3>⚽ SIMULADOR PROFESIONAL</h3>
                   <p>Selecciona un oponente para iniciar la simulación con comentarios en vivo</p>
                 </div>
+              )}
+
+              {/* Efectos visuales */}
+              {simulating && (
+                <>
+                  <div className="field-effect shot-effect"></div>
+                  <div className="field-effect dribble-effect"></div>
+                </>
               )}
             </div>
           </div>
