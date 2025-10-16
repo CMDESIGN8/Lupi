@@ -909,3 +909,23 @@
     display: none;
   }
 }
+
+.bottom-navigation {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding: 1rem;
+}
+
+.bottom-navigation .back-button {
+  background: transparent;
+  border: none;
+  color: #4cc9f0;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.bottom-navigation .back-button:hover {
+  color: #00eaff;
+}
+
