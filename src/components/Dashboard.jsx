@@ -30,6 +30,59 @@ export const Dashboard = ({ user }) => {
     }
   };
 
+  const testBotMatch = async (difficulty) => {
+  if (!character) return;
+  
+  try {
+    // 1. Obtener lista de bots
+    const botsResponse = await fetch(`${API_URL}/bots`);
+    const botsData = await botsResponse.json();
+    
+    // 2. Encontrar bot por dificultad
+    const bot = botsData.bots.find(b => b.difficulty === difficulty);
+    if (!bot) {
+      alert('Bot no encontrado');
+      return;
+    }
+    
+    // 3. Iniciar partida
+    const matchResponse = await fetch(`${API_URL}/bots/match`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        characterId: character.id,
+        botId: bot.id
+      })
+    });
+    
+    const matchData = await matchResponse.json();
+    
+    if (!matchResponse.ok) {
+      alert(matchData.error);
+      return;
+    }
+    
+    // 4. Simular partida
+    const simulateResponse = await fetch(`${API_URL}/bots/${matchData.match.id}/simulate`, {
+      method: 'POST'
+    });
+    
+    const simulateData = await simulateResponse.json();
+    
+    if (simulateResponse.ok) {
+      alert(`Resultado: ${simulateData.message}`);
+      // Recargar datos
+      fetchData(user.id);
+    } else {
+      alert(simulateData.error);
+    }
+    
+  } catch (error) {
+    console.error('Error en partida contra bot:', error);
+    alert('Error al jugar contra bot');
+  }
+};
+
   const increaseStat = async (statKey) => {
     if (!character || character.available_skill_points <= 0) return;
     setAddingSkill(true);
@@ -338,6 +391,15 @@ export const Dashboard = ({ user }) => {
             </button>
           </section>
         </div>
+
+        <section className="bot-training-section">
+  <h3>🤖 ENTRENAMIENTO CONTRA BOTS</h3>
+  <div className="bot-selection">
+    <button onClick={() => testBotMatch('easy')}>Vs Rookie Bot</button>
+    <button onClick={() => testBotMatch('medium')}>Vs Training Bot</button>
+    <button onClick={() => testBotMatch('hard')}>Vs Pro Bot</button>
+  </div>
+</section>
 
         {/* Columna Derecha - Wallet y Habilidades */}
         <div className="right-column">
