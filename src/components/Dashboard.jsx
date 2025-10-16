@@ -99,9 +99,6 @@ export const Dashboard = ({ user }) => {
             className="back-button"
             onClick={() => setCurrentSection("dashboard")}
           >
-            ← Volver al Dashboard
-          </button>
-          <h1>⚽ ENTRENAMIENTO CONTRA BOTS</h1>
         </div>
 
         <BotMatchmaking 
