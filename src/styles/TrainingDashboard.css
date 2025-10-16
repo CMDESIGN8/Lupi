@@ -1,4 +1,4 @@
-/* styles/TrainingDashboard.css - VERSIÓN SIN PANEL DE ESTADO */
+/* styles/TrainingDashboard.css - VERSIÓN MEJORADA CON CANCHA DETALLADA */
 
 .training-dashboard {
   min-height: 100vh;
@@ -8,36 +8,89 @@
   font-family: 'Rajdhani', sans-serif;
 }
 
-/* HEADER COMPLETAMENTE ELIMINADO */
+/* HEADER */
 .training-dashboard .dashboard-header {
-  display: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem 2rem;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 15px;
+  border: 1px solid #334155;
 }
 
-/* LAYOUT PRINCIPAL 70/30 - MÁS ESPACIO SIN HEADER */
+.training-dashboard .header-main h1 {
+  margin: 0;
+  font-size: 2rem;
+  background: linear-gradient(135deg, #4cc9f0, #4361ee);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Orbitron', monospace;
+}
+
+.training-dashboard .header-main p {
+  margin: 0.5rem 0 0 0;
+  color: #94a3b8;
+  font-size: 1.1rem;
+}
+
+.training-dashboard .player-stats {
+  display: flex;
+  gap: 2rem;
+}
+
+.training-dashboard .stat-item {
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 10px;
+  border: 1px solid #475569;
+}
+
+.training-dashboard .stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  margin-bottom: 0.25rem;
+}
+
+.training-dashboard .stat-value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4cc9f0;
+  font-family: 'Orbitron', monospace;
+}
+
+/* LAYOUT PRINCIPAL 70/30 */
 .training-dashboard .main-layout {
   display: grid;
   grid-template-columns: 70% 30%;
   gap: 1.5rem;
-  height: 65vh;
+  height: 55vh;
   margin-bottom: 1.5rem;
 }
 
-/* PANEL IZQUIERDO 70% - CAMPO COMPLETO */
+/* PANEL IZQUIERDO 70% - CAMPO MEJORADO */
 .training-dashboard .left-panel {
   background: rgba(15, 23, 42, 0.6);
   border-radius: 20px;
   border: 2px solid #475569;
   overflow: hidden;
-  position: relative;
 }
 
-/* CANCHA QUE USA TODO EL ESPACIO */
+.training-dashboard .field-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* CANCHA MEJORADA - VERSIÓN DETALLADA */
 .training-dashboard .soccer-field {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  flex: 1;
+  position: relative;
   background: 
     linear-gradient(135deg, #1a472a 0%, #2d5a3a 100%),
     repeating-linear-gradient(
@@ -47,7 +100,8 @@
       rgba(255,255,255,0.03) 10px,
       rgba(255,255,255,0.03) 20px
     );
-  border-radius: 18px;
+  margin: 1.5rem;
+  border-radius: 15px;
   border: 3px solid #cbd5e1;
   overflow: hidden;
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
@@ -247,46 +301,6 @@
   }
 }
 
-/* MENSAJE CENTRAL EN LA CANCHA */
-.training-dashboard .field-message {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 5;
-  background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(67, 97, 238, 0.3));
-  padding: 2rem 3rem;
-  border-radius: 20px;
-  border: 2px solid rgba(255,255,255,0.3);
-  backdrop-filter: blur(15px);
-  animation: messagePulse 3s ease-in-out infinite;
-}
-
-.training-dashboard .field-message h3 {
-  margin: 0 0 1rem 0;
-  color: #4cc9f0;
-  font-size: 1.5rem;
-  font-family: 'Orbitron', monospace;
-}
-
-.training-dashboard .field-message p {
-  margin: 0;
-  color: #cbd5e1;
-  font-size: 1.1rem;
-}
-
-@keyframes messagePulse {
-  0%, 100% { 
-    transform: translate(-50%, -50%) scale(1);
-    box-shadow: 0 0 20px rgba(76, 201, 240, 0.3);
-  }
-  50% { 
-    transform: translate(-50%, -50%) scale(1.02);
-    box-shadow: 0 0 30px rgba(76, 201, 240, 0.5);
-  }
-}
-
 /* EFECTOS VISUALES MEJORADOS */
 .training-dashboard .field-effect {
   position: absolute;
@@ -333,6 +347,47 @@
     transform: scale(1.5) rotate(180deg);
     opacity: 0;
   }
+}
+
+/* ESTADO DEL PARTIDO */
+.training-dashboard .match-status {
+  padding: 1.5rem;
+  text-align: center;
+  background: rgba(15, 23, 42, 0.8);
+  border-top: 2px solid #475569;
+}
+
+.training-dashboard .simulation-in-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.training-dashboard .pulse-animation {
+  width: 20px;
+  height: 20px;
+  background: #4cc9f0;
+  border-radius: 50%;
+  animation: trainingPulse 1.5s infinite;
+  box-shadow: 0 0 10px #4cc9f0;
+}
+
+@keyframes trainingPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+.training-dashboard .waiting-for-match h3 {
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.training-dashboard .waiting-for-match p {
+  color: #64748b;
+  margin: 0;
+  font-size: 1rem;
 }
 
 /* PANEL DERECHO 30% - COMENTARIOS */
@@ -794,8 +849,23 @@
     padding: 0.5rem;
   }
   
+  .training-dashboard .dashboard-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    padding: 1rem;
+  }
+  
+  .training-dashboard .player-stats {
+    justify-content: center;
+  }
+  
   .training-dashboard .bots-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .training-dashboard .soccer-field {
+    margin: 1rem;
   }
   
   .training-dashboard .penalty-area,
@@ -803,42 +873,4 @@
   .training-dashboard .penalty-spot {
     display: none;
   }
-}
-
-.bottom-navigation {
-  text-align: center;
-  margin-top: 1.5rem;
-  padding: 1rem;
-}
-
-.bottom-navigation .back-button {
-  background: transparent;
-  border: none;
-  color: #4cc9f0;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.bottom-navigation .back-button:hover {
-  color: #00eaff;
-}
-
-/* SCROLLBAR PERSONALIZADO */
-.training-dashboard ::-webkit-scrollbar {
-  width: 6px;
-}
-
-.training-dashboard ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
-  border-radius: 3px;
-}
-
-.training-dashboard ::-webkit-scrollbar-thumb {
-  background: #4cc9f0;
-  border-radius: 3px;
-}
-
-.training-dashboard ::-webkit-scrollbar-thumb:hover {
-  background: #4361ee;
-                   }
+  }
