@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/TrainingDashboard.css";
 
 const TrainingDashboard = ({ 
@@ -27,6 +28,13 @@ const TrainingDashboard = ({
     possession: 50
   });
   const animationRef = useRef(null);
+  const eventTimersRef = useRef([]);
+
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    navigate("/dashboard");
+  };
 
   useEffect(() => {
     if (simulating) {
@@ -39,14 +47,10 @@ const TrainingDashboard = ({
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
+      eventTimersRef.current.forEach(timer => clearTimeout(timer));
+      eventTimersRef.current = [];
     };
   }, [simulating]);
-
-   const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate("/dashboard"); // vuelve al dashboard principal
-  };
 
   const resetAnimations = () => {
     setMatchEvents([]);
@@ -67,12 +71,14 @@ const TrainingDashboard = ({
   };
 
   const startMatchAnimation = () => {
-    const events = [];
+    // Limpiar timers anteriores
+    eventTimersRef.current.forEach(timer => clearTimeout(timer));
+    eventTimersRef.current = [];
     
-    // Configurar animación del balón
+    // Configurar animación del balón por 15 segundos
     animateBall();
     
-    // Generar eventos de partido en tiempo real
+    // Generar eventos distribuidos en 15 segundos (15000ms)
     const eventTypes = [
       {
         type: 'shot',
@@ -130,13 +136,20 @@ const TrainingDashboard = ({
       }
     ];
 
-    for (let i = 0; i < 15; i++) {
-      setTimeout(() => {
+    // Distribuir 8-10 eventos en 15 segundos (cada 1.5-2 segundos)
+    const totalEvents = 8 + Math.floor(Math.random() * 3); // 8-10 eventos
+    const baseInterval = 15000 / totalEvents; // Intervalo base
+
+    for (let i = 0; i < totalEvents; i++) {
+      // Variar el timing ligeramente para que no sea perfectamente regular
+      const delay = i * baseInterval + (Math.random() * 1000 - 500);
+      
+      const timer = setTimeout(() => {
         const randomEvent = eventTypes[Math.floor(Math.random() * eventTypes.length)];
         const eventWithTime = {
           ...randomEvent,
           id: Date.now() + i,
-          time: `${Math.floor(i / 2)}'${(i % 2) * 30}`
+          time: `${Math.floor(delay / 1000)}'` // Tiempo real en segundos
         };
         
         setMatchEvents(prev => [eventWithTime, ...prev.slice(0, 14)]); // Mantener últimos 15 eventos
@@ -149,13 +162,15 @@ const TrainingDashboard = ({
           movePlayersForEvent(randomEvent.type, randomEvent.team);
         }
 
-      }, i * 800);
+      }, delay);
+      
+      eventTimersRef.current.push(timer);
     }
   };
 
   const animateBall = () => {
     const startTime = Date.now();
-    const duration = 12000;
+    const duration = 15000; // 15 segundos
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
@@ -167,6 +182,9 @@ const TrainingDashboard = ({
         
         setBallPosition({ x, y });
         animationRef.current = requestAnimationFrame(animate);
+      } else {
+        // Cuando termina la animación, el balón vuelve al centro
+        setBallPosition({ x: 50, y: 50 });
       }
     };
     
@@ -237,13 +255,15 @@ const TrainingDashboard = ({
       }
     }
     
-    // Volver a posición después de un tiempo
-    setTimeout(() => {
+    // Volver a posición después de 2 segundos
+    const resetTimer = setTimeout(() => {
       setPlayerPositions({
         user: { x: 20, y: 30 },
         bot: { x: 80, y: 30 }
       });
-    }, 1500);
+    }, 2000);
+    
+    eventTimersRef.current.push(resetTimer);
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -288,28 +308,6 @@ const TrainingDashboard = ({
 
   return (
     <div className="training-dashboard">
-      {/* HEADER SOLO CON ESTADÍSTICAS - SIN TÍTULO GRANDE */}
-      <div className="dashboard-header">
-        <div className="player-stats">
-          <div className="stat-item">
-            <span className="stat-label">Nivel</span>
-            <span className="stat-value">{character.level}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Rating</span>
-            <span className="stat-value">{calculatePlayerRating()}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Partidos</span>
-            <span className="stat-value">{matchHistory.length}</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-label">Posesión</span>
-            <span className="stat-value">{matchStats.possession}%</span>
-          </div>
-        </div>
-      </div>
-
       <div className="main-layout">
         {/* PANEL IZQUIERDO 70% - CAMPO DE JUEGO */}
         <div className="left-panel">
@@ -371,7 +369,7 @@ const TrainingDashboard = ({
               {!simulating && (
                 <div className="field-message">
                   <h3>⚽ SIMULADOR PROFESIONAL</h3>
-                  <p>Selecciona un oponente para iniciar la simulación con comentarios en vivo</p>
+                  <p>Selecciona un oponente para iniciar la simulación de 15 segundos</p>
                 </div>
               )}
 
@@ -392,7 +390,7 @@ const TrainingDashboard = ({
             <div className="commentary-header">
               <h3>📻 COMENTARIOS EN VIVO</h3>
               <div className="match-time">
-                {simulating ? "EN VIVO" : "PRE-PARTIDO"}
+                {simulating ? "15s EN VIVO" : "PRE-PARTIDO"}
               </div>
             </div>
             
@@ -520,7 +518,7 @@ const TrainingDashboard = ({
                     }}
                   >
                     {loading && selectedBot?.id === bot.id ? "🔄" : "⚔️"} 
-                    {loading && selectedBot?.id === bot.id ? " INICIANDO..." : " JUGAR"}
+                    {loading && selectedBot?.id === bot.id ? " INICIANDO..." : " JUGAR 15s"}
                   </button>
                 </div>
               ))}
@@ -560,12 +558,14 @@ const TrainingDashboard = ({
               )}
             </div>
           )}
-          <div className="bottom-navigation">
-  <button className="back-button" onClick={handleBack}>
-  ← Volver al Dashboard
-</button>
-  <h2>⚽ ENTRENAMIENTO CONTRA BOTS</h2>
-</div>
+        </div>
+        
+        {/* NAVEGACIÓN INFERIOR */}
+        <div className="bottom-navigation">
+          <button className="back-button" onClick={handleBack}>
+            ← Volver al Dashboard
+          </button>
+          <h2>⚽ ENTRENAMIENTO CONTRA BOTS</h2>
         </div>
       </div>
     </div>
