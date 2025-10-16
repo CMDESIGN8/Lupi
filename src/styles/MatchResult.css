@@ -206,3 +206,100 @@
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
 }
+
+/* ESTADÍSTICAS DE RENDIMIENTO */
+.performance-stats {
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border: 1px solid #475569;
+}
+
+.performance-stats h4 {
+  margin: 0 0 1rem 0;
+  color: #4cc9f0;
+  font-size: 1.1rem;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+
+.performance-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.performance-stat:hover {
+  border-color: #4cc9f0;
+  transform: translateY(-2px);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: #cbd5e1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.3rem;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #4cc9f0;
+  font-family: 'Orbitron', monospace;
+}
+
+/* RESUMEN DEL PARTIDO */
+.match-summary {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 4px solid #4cc9f0;
+}
+
+.match-summary p {
+  margin: 0;
+  color: #cbd5e1;
+  font-style: italic;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* RESPONSIVE PARA ESTADÍSTICAS */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .performance-stat {
+    padding: 0.6rem;
+  }
+  
+  .stat-value {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .performance-stats {
+    padding: 1rem;
+  }
+}
