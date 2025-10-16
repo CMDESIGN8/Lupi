@@ -22,6 +22,11 @@
   display: none; /* ELIMINADO */
 }
 
+/* Oculta el header global solo en la página de entrenamiento */
+.training-dashboard .header-main {
+  display: none !important;
+}
+
 /* LAYOUT PRINCIPAL 70/30 - MÁS ESPACIO SIN HEADER */
 .training-dashboard .main-layout {
   display: grid;
