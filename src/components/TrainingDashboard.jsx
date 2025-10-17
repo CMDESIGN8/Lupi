@@ -1033,63 +1033,100 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
               </div>
             </div>
 
-            {/* GRÁFICO DE HABILIDADES ESTILO FIFA */}
-            <div className="skills-chart-section">
-              <h4 className="section-title">ESTADÍSTICAS</h4>
-              <div className="skills-grid">
-                <div className="skill-item">
-                  <div className="skill-header">
-                    <span className="skill-name">TIRO</span>
-                    <span className="skill-value">{bot.tiro || 50}</span>
-                  </div>
-                  <div className="skill-bar">
-                    <div 
-                      className="skill-fill shooting" 
-                      style={{ width: `${bot.tiro || 50}%` }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="skill-item">
-                  <div className="skill-header">
-                    <span className="skill-name">VELOCIDAD</span>
-                    <span className="skill-value">{bot.velocidad || 50}</span>
-                  </div>
-                  <div className="skill-bar">
-                    <div 
-                      className="skill-fill pace" 
-                      style={{ width: `${bot.velocidad || 50}%` }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="skill-item">
-                  <div className="skill-header">
-                    <span className="skill-name">DEFENSA</span>
-                    <span className="skill-value">{bot.defensa || 50}</span>
-                  </div>
-                  <div className="skill-bar">
-                    <div 
-                      className="skill-fill defending" 
-                      style={{ width: `${bot.defensa || 50}%` }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="skill-item">
-                  <div className="skill-header">
-                    <span className="skill-name">POTENCIA</span>
-                    <span className="skill-value">{bot.potencia || 50}</span>
-                  </div>
-                  <div className="skill-bar">
-                    <div 
-                      className="skill-fill physical" 
-                      style={{ width: `${bot.potencia || 50}%` }}
-                    ></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* GRÁFICO RADAR ESTILO FIFA */}
+<div className="skills-radar-section">
+  <h4 className="section-title">ESTADÍSTICAS</h4>
+  <div className="radar-container">
+    <div className="radar-chart">
+      <div className="radar-grid">
+        {/* Líneas del grid del radar */}
+        <div className="radar-ring ring-1"></div>
+        <div className="radar-ring ring-2"></div>
+        <div className="radar-ring ring-3"></div>
+        <div className="radar-ring ring-4"></div>
+        <div className="radar-ring ring-5"></div>
+        
+        {/* Ejes del radar */}
+        <div className="radar-axis axis-1"></div>
+        <div className="radar-axis axis-2"></div>
+        <div className="radar-axis axis-3"></div>
+        <div className="radar-axis axis-4"></div>
+        
+        {/* Puntos de datos */}
+        <div 
+          className="radar-point shooting-point" 
+          style={{ 
+            '--shooting-value': `${(bot.tiro || 50) / 100}`,
+            '--point-index': '0'
+          }}
+        >
+          <div className="point-value">{bot.tiro || 50}</div>
+          <div className="point-label">TIRO</div>
+        </div>
+        
+        <div 
+          className="radar-point pace-point" 
+          style={{ 
+            '--pace-value': `${(bot.velocidad || 50) / 100}`,
+            '--point-index': '1'
+          }}
+        >
+          <div className="point-value">{bot.velocidad || 50}</div>
+          <div className="point-label">VELOCIDAD</div>
+        </div>
+        
+        <div 
+          className="radar-point defending-point" 
+          style={{ 
+            '--defending-value': `${(bot.defensa || 50) / 100}`,
+            '--point-index': '2'
+          }}
+        >
+          <div className="point-value">{bot.defensa || 50}</div>
+          <div className="point-label">DEFENSA</div>
+        </div>
+        
+        <div 
+          className="radar-point physical-point" 
+          style={{ 
+            '--physical-value': `${(bot.potencia || 50) / 100}`,
+            '--point-index': '3'
+          }}
+        >
+          <div className="point-value">{bot.potencia || 50}</div>
+          <div className="point-label">POTENCIA</div>
+        </div>
+        
+        {/* Área del polígono */}
+        <div className="radar-polygon"></div>
+      </div>
+    </div>
+    
+    {/* Leyenda de estadísticas */}
+    <div className="radar-legend">
+      <div className="legend-item">
+        <div className="legend-color shooting-color"></div>
+        <span className="legend-text">Tiro</span>
+        <span className="legend-value">{bot.tiro || 50}</span>
+      </div>
+      <div className="legend-item">
+        <div className="legend-color pace-color"></div>
+        <span className="legend-text">Velocidad</span>
+        <span className="legend-value">{bot.velocidad || 50}</span>
+      </div>
+      <div className="legend-item">
+        <div className="legend-color defending-color"></div>
+        <span className="legend-text">Defensa</span>
+        <span className="legend-value">{bot.defensa || 50}</span>
+      </div>
+      <div className="legend-item">
+        <div className="legend-color physical-color"></div>
+        <span className="legend-text">Potencia</span>
+        <span className="legend-value">{bot.potencia || 50}</span>
+      </div>
+    </div>
+  </div>
+</div>
 
             {/* PREDICCIÓN DE PARTIDO */}
             <div className="match-prediction-section">
