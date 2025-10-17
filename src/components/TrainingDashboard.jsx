@@ -790,20 +790,7 @@ return (
               <div className="penalty-spot left"></div>
               <div className="penalty-spot right"></div>
               
-              {/* Barra de Momentum en el campo */}
-              <div className="momentum-overlay">
-                <div className="momentum-bar-field">
-                  <div 
-                    className="momentum-fill-field" 
-                    style={{ width: `${simulationState.momentum}%` }}
-                    data-value={simulationState.momentum}
-                  >
-                    <span className="momentum-text">
-                      Momentum: {Math.round(simulationState.momentum)}%
-                    </span>
-                  </div>
-                </div>
-              </div>
+              
 
               {simulating && selectedBot && simulationState.isActive && (
                 <>
