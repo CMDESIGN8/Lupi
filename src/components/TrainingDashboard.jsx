@@ -734,6 +734,20 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
     bot: { x: 75, y: 60 }
   };
 
+  useEffect(() => {
+  const interval = setInterval(() => {
+    const header = document.querySelector(".app-header.professional");
+    const target = document.querySelector(".section-header");
+
+    if (header && target && !target.contains(header)) {
+      target.appendChild(header);
+      clearInterval(interval); // Detiene el intervalo cuando ya lo movió
+    }
+  }, 300);
+
+  return () => clearInterval(interval);
+}, []);
+
 return (
     <div className="training-dashboard super-pro">
       {/* HEADER SUPERIOR DE LA APLICACIÓN */}
