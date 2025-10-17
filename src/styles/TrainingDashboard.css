@@ -1615,3 +1615,323 @@
     height: 50vh;
   }
 }
+
+/* TARJETAS DE BOTS ESTILO FIFA */
+.bot-card.professional.fifa-style {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.95));
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 2px solid #475569;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.bot-card.professional.fifa-style::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, transparent, rgba(76, 201, 240, 0.1), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.bot-card.professional.fifa-style:hover::before {
+  opacity: 1;
+}
+
+.bot-card.professional.fifa-style:hover {
+  border-color: #4cc9f0;
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(76, 201, 240, 0.2);
+}
+
+/* OVERALL RATING */
+.bot-overall {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+}
+
+.overall-rating {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #4cc9f0;
+  font-family: 'Orbitron', monospace;
+  text-shadow: 0 2px 8px rgba(76, 201, 240, 0.5);
+}
+
+.overall-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* HABILIDAD ESPECIAL */
+.special-ability {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(30, 41, 59, 0.8));
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.ability-icon {
+  font-size: 1rem;
+}
+
+.ability-text {
+  font-size: 0.85rem;
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+/* GRÁFICO DE ESTADÍSTICAS RADAR */
+.stats-radar {
+  margin: 1rem 0;
+}
+
+.radar-chart {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  position: relative;
+}
+
+.radar-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.radar-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: calc(var(--value) * 100%);
+  background: linear-gradient(90deg, 
+    rgba(76, 201, 240, 0.3), 
+    rgba(67, 97, 238, 0.3));
+  z-index: 1;
+  transition: width 0.5s ease;
+}
+
+.radar-stat > * {
+  position: relative;
+  z-index: 2;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #4cc9f0;
+  font-family: 'Orbitron', monospace;
+}
+
+/* PROBABILIDADES Y PREDICCIÓN */
+.match-prediction {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.probability-bar {
+  margin-bottom: 1rem;
+}
+
+.probability-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+
+.probability-visual {
+  display: flex;
+  height: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.prob-win {
+  background: linear-gradient(90deg, #4cc9f0, #4361ee);
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.prob-win::after {
+  content: 'VICTORIA';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.6rem;
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.prob-draw {
+  background: linear-gradient(90deg, #fbbf24, #d97706);
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.prob-draw::after {
+  content: 'EMPATE';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.6rem;
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.prob-lose {
+  background: linear-gradient(90deg, #f87171, #dc2626);
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.prob-lose::after {
+  content: 'DERROTA';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.6rem;
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* RECOMPENSAS */
+.rewards-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reward-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.reward-icon {
+  font-size: 0.9rem;
+}
+
+.reward-amount {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.reward-bonus {
+  font-size: 0.7rem;
+  color: #4cc9f0;
+  text-align: center;
+  background: rgba(76, 201, 240, 0.1);
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  border: 1px solid rgba(76, 201, 240, 0.3);
+}
+
+/* BOTÓN DE JUGAR MEJORADO */
+.play-btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.match-duration {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  font-weight: normal;
+}
+
+/* BOT HEADER MEJORADO */
+.bot-header.professional {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.bot-info.professional h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  color: #e2e8f0;
+}
+
+.bot-meta.professional {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* LOADING SPINNER */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .radar-chart {
+    grid-template-columns: 1fr;
+  }
+  
+  .bot-header.professional {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .bot-overall {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+  
+  .probability-labels {
+    flex-direction: column;
+    gap: 0.2rem;
+    text-align: center;
+  }
+}
