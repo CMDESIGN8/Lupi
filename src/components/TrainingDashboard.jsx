@@ -682,7 +682,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       <div className="app-header professional">
         <div className="header-content">
           <div className="header-section">
-            <h2>⚽ SIMULADOR TÁCTICO PRO</h2>
+            <h2>⚽ Comenzar Partido</h2>
             <div className="match-info-header">
               {simulating && selectedBot ? (
                 <span className="opponent-info">vs {selectedBot.name}</span>
@@ -891,7 +891,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
               
               {!simulating && (
                 <div className="field-message improved">
-                  <h3>⚽ SIMULADOR TÁCTICO PRO</h3>
+                  <h3>⚽ Comenzar Partido</h3>
                   <p>Selecciona un oponente para iniciar la simulación</p>
                 </div>
               )}
@@ -959,14 +959,12 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
   <div className="bots-grid professional">
     {safeBots.length > 0 ? (
       safeBots.map(bot => {
-        // Calcular probabilidades basadas en stats
         const userOverall = calculatePlayerRating(character, 'balanced');
         const botOverall = calculatePlayerRating(bot, 'balanced');
-        const winProbability = Math.max(10, Math.min(90, 
+        const winProbability = Math.max(15, Math.min(85, 
           (userOverall / (userOverall + botOverall)) * 100
         ));
         
-        // Recompensas basadas en dificultad
         const baseExp = 50 + (bot.level * 10);
         const baseCoins = 30 + (bot.level * 5);
         const difficultyMultiplier = {
@@ -982,45 +980,37 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           coins: Math.round(baseCoins * difficultyMultiplier)
         };
 
-        // Habilidades especiales basadas en stats
         const getSpecialAbility = () => {
-          if (bot.tiro >= 80) return "Tiro de larga distancia";
-          if (bot.velocidad >= 80) return "Regate explosivo";
-          if (bot.defensa >= 80) return "Marcaje férreo";
-          if (bot.potencia >= 80) return "Fuerza física";
-          if (bot.tiro >= 70 && bot.velocidad >= 70) return "Juego combinado";
-          return "Juego equilibrado";
+          if (bot.tiro >= 80) return { name: "Tiro de Larga Distancia", icon: "🎯", color: "#f59e0b" };
+          if (bot.velocidad >= 80) return { name: "Regate Explosivo", icon: "⚡", color: "#10b981" };
+          if (bot.defensa >= 80) return { name: "Marcaje Férreo", icon: "🛡️", color: "#3b82f6" };
+          if (bot.potencia >= 80) return { name: "Fuerza Física", icon: "💪", color: "#ef4444" };
+          if (bot.tiro >= 70 && bot.velocidad >= 70) return { name: "Juego Combinado", icon: "🔗", color: "#8b5cf6" };
+          return { name: "Juego Equilibrado", icon: "⚖️", color: "#6b7280" };
         };
 
         const specialAbility = getSpecialAbility();
 
         return (
-          <div key={bot.id} className="bot-card professional fifa-style">
-            {/* HEADER CON AVATAR Y INFO BÁSICA */}
-            <div className="bot-header professional">
-              <div 
-                className="bot-avatar professional" 
-                style={{ 
-                  background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                  boxShadow: `0 0 20px ${getDifficultyColor(bot.difficulty)}50`
-                }}
-              >
-                {getBotAvatar(bot.level)}
-                <div className="bot-level">Lvl {bot.level || 1}</div>
-              </div>
-              <div className="bot-info professional">
-                <h4>{bot.name || 'Bot'}</h4>
-                <div className="bot-overall">
-                  <span className="overall-rating">{Math.round(botOverall)}</span>
-                  <span className="overall-label">OVR</span>
+          <div key={bot.id} className="bot-card professional gamer-style">
+            {/* HEADER CON NOMBRE Y OVERALL */}
+            <div className="bot-card-header">
+              <div className="bot-name-section">
+                <h3 className="bot-name">{bot.name || 'Pro Bot'}</h3>
+                <div className="bot-overall-badge">
+                  <span className="overall-number">{Math.round(botOverall)}</span>
+                  <span className="overall-text">OVR</span>
                 </div>
-                <div className="bot-meta professional">
-                  <span className="level-badge professional">Nivel {bot.level || 1}</span>
+              </div>
+              
+              <div className="bot-meta-info">
+                <div className="level-difficulty">
+                  <span className="level-badge">NIVEL {bot.level || 1}</span>
                   <span 
-                    className="difficulty-badge professional" 
+                    className="difficulty-badge"
                     style={{ 
-                      color: getDifficultyColor(bot.difficulty),
-                      borderColor: getDifficultyColor(bot.difficulty)
+                      background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
+                      boxShadow: `0 0 10px ${getDifficultyColor(bot.difficulty)}50`
                     }}
                   >
                     {getDifficultyText(bot.difficulty)}
@@ -1030,91 +1020,165 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
             </div>
 
             {/* HABILIDAD ESPECIAL */}
-            <div className="special-ability">
-              <span className="ability-icon">⭐</span>
-              <span className="ability-text">{specialAbility}</span>
+            <div 
+              className="special-ability-card"
+              style={{ borderLeft: `4px solid ${specialAbility.color}` }}
+            >
+              <div className="ability-icon" style={{ color: specialAbility.color }}>
+                {specialAbility.icon}
+              </div>
+              <div className="ability-info">
+                <span className="ability-label">HABILIDAD ESPECIAL</span>
+                <span className="ability-name">{specialAbility.name}</span>
+              </div>
             </div>
 
-            {/* GRÁFICO DE ESTADÍSTICAS ESTILO FIFA */}
-            <div className="stats-radar">
-              <div className="radar-chart">
-                <div className="radar-stat" style={{ '--value': (bot.tiro || 50) / 100 }}>
-                  <span className="stat-label">Tiro</span>
-                  <span className="stat-value">{bot.tiro || 50}</span>
+            {/* GRÁFICO DE HABILIDADES ESTILO FIFA */}
+            <div className="skills-chart-section">
+              <h4 className="section-title">ESTADÍSTICAS</h4>
+              <div className="skills-grid">
+                <div className="skill-item">
+                  <div className="skill-header">
+                    <span className="skill-name">TIRO</span>
+                    <span className="skill-value">{bot.tiro || 50}</span>
+                  </div>
+                  <div className="skill-bar">
+                    <div 
+                      className="skill-fill shooting" 
+                      style={{ width: `${bot.tiro || 50}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="radar-stat" style={{ '--value': (bot.velocidad || 50) / 100 }}>
-                  <span className="stat-label">Velocidad</span>
-                  <span className="stat-value">{bot.velocidad || 50}</span>
+                
+                <div className="skill-item">
+                  <div className="skill-header">
+                    <span className="skill-name">VELOCIDAD</span>
+                    <span className="skill-value">{bot.velocidad || 50}</span>
+                  </div>
+                  <div className="skill-bar">
+                    <div 
+                      className="skill-fill pace" 
+                      style={{ width: `${bot.velocidad || 50}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="radar-stat" style={{ '--value': (bot.defensa || 50) / 100 }}>
-                  <span className="stat-label">Defensa</span>
-                  <span className="stat-value">{bot.defensa || 50}</span>
+                
+                <div className="skill-item">
+                  <div className="skill-header">
+                    <span className="skill-name">DEFENSA</span>
+                    <span className="skill-value">{bot.defensa || 50}</span>
+                  </div>
+                  <div className="skill-bar">
+                    <div 
+                      className="skill-fill defending" 
+                      style={{ width: `${bot.defensa || 50}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="radar-stat" style={{ '--value': (bot.potencia || 50) / 100 }}>
-                  <span className="stat-label">Potencia</span>
-                  <span className="stat-value">{bot.potencia || 50}</span>
+                
+                <div className="skill-item">
+                  <div className="skill-header">
+                    <span className="skill-name">POTENCIA</span>
+                    <span className="skill-value">{bot.potencia || 50}</span>
+                  </div>
+                  <div className="skill-bar">
+                    <div 
+                      className="skill-fill physical" 
+                      style={{ width: `${bot.potencia || 50}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* PROBABILIDADES Y RECOMPENSAS */}
-            <div className="match-prediction">
-              <div className="probability-bar">
-                <div className="probability-labels">
-                  <span>Tú: {Math.round(winProbability)}%</span>
-                  <span>Empate: {Math.round((100 - winProbability) * 0.3)}%</span>
-                  <span>Bot: {Math.round((100 - winProbability) * 0.7)}%</span>
+            {/* PREDICCIÓN DE PARTIDO */}
+            <div className="match-prediction-section">
+              <h4 className="section-title">PREDICCIÓN DEL PARTIDO</h4>
+              <div className="prediction-grid">
+                <div className="prediction-item win">
+                  <div className="prediction-label">VICTORIA</div>
+                  <div className="prediction-percentage">{Math.round(winProbability)}%</div>
+                  <div className="prediction-bar">
+                    <div 
+                      className="prediction-fill" 
+                      style={{ width: `${winProbability}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="probability-visual">
-                  <div 
-                    className="prob-win" 
-                    style={{ width: `${winProbability}%` }}
-                    title={`Probabilidad de victoria: ${Math.round(winProbability)}%`}
-                  ></div>
-                  <div 
-                    className="prob-draw" 
-                    style={{ width: `${(100 - winProbability) * 0.3}%` }}
-                    title={`Probabilidad de empate: ${Math.round((100 - winProbability) * 0.3)}%`}
-                  ></div>
-                  <div 
-                    className="prob-lose" 
-                    style={{ width: `${(100 - winProbability) * 0.7}%` }}
-                    title={`Probabilidad de derrota: ${Math.round((100 - winProbability) * 0.7)}%`}
-                  ></div>
+                
+                <div className="prediction-item draw">
+                  <div className="prediction-label">EMPATE</div>
+                  <div className="prediction-percentage">{Math.round((100 - winProbability) * 0.3)}%</div>
+                  <div className="prediction-bar">
+                    <div 
+                      className="prediction-fill" 
+                      style={{ width: `${(100 - winProbability) * 0.3}%` }}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="prediction-item lose">
+                  <div className="prediction-label">DERROTA</div>
+                  <div className="prediction-percentage">{Math.round((100 - winProbability) * 0.7)}%</div>
+                  <div className="prediction-bar">
+                    <div 
+                      className="prediction-fill" 
+                      style={{ width: `${(100 - winProbability) * 0.7}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              <div className="rewards-info">
-                <div className="reward-item">
-                  <span className="reward-icon">⭐</span>
-                  <span className="reward-amount">+{rewards.exp} EXP</span>
+            {/* RECOMPENSAS */}
+            <div className="rewards-section">
+              <h4 className="section-title">RECOMPENSAS</h4>
+              <div className="rewards-grid">
+                <div className="reward-card exp">
+                  <div className="reward-icon">⭐</div>
+                  <div className="reward-info">
+                    <div className="reward-amount">+{rewards.exp} EXP</div>
+                    <div className="reward-label">Experiencia</div>
+                  </div>
                 </div>
-                <div className="reward-item">
-                  <span className="reward-icon">🪙</span>
-                  <span className="reward-amount">+{rewards.coins} Monedas</span>
+                
+                <div className="reward-card coins">
+                  <div className="reward-icon">🪙</div>
+                  <div className="reward-info">
+                    <div className="reward-amount">+{rewards.coins}</div>
+                    <div className="reward-label">Monedas</div>
+                  </div>
                 </div>
-                <div className="reward-bonus">
-                  +{Math.round(difficultyMultiplier * 100 - 100)}% Bonus Dificultad
+                
+                <div className="reward-card bonus">
+                  <div className="reward-icon">🎯</div>
+                  <div className="reward-info">
+                    <div className="reward-amount">+{Math.round(difficultyMultiplier * 100 - 100)}%</div>
+                    <div className="reward-label">Bonus</div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* BOTÓN DE JUGAR */}
             <button 
-              className={`play-btn professional ${bot.difficulty}`} 
+              className={`play-btn gamer-style ${bot.difficulty}`} 
               onClick={() => onStartMatch(bot)} 
               disabled={loading || simulating}
               style={{ 
                 background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                boxShadow: `0 4px 15px ${getDifficultyColor(bot.difficulty)}40`
+                boxShadow: `0 4px 20px ${getDifficultyColor(bot.difficulty)}60`
               }}
             >
               {loading && selectedBot?.id === bot.id ? (
-                <span className="loading-spinner">🔄 CARGANDO...</span>
+                <div className="loading-content">
+                  <div className="loading-spinner"></div>
+                  <span>PREPARANDO PARTIDO...</span>
+                </div>
               ) : (
-                <div className="play-btn-content">
-                  <span>⚔️ JUGAR PARTIDO</span>
-                  <span className="match-duration">90' • {Math.round(botOverall)} OVR</span>
+                <div className="play-content">
+                  <span className="play-text">⚔️ JUGAR PARTIDO</span>
+                  <span className="play-details">90' • {Math.round(botOverall)} OVR</span>
                 </div>
               )}
             </button>
