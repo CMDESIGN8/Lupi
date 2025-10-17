@@ -1049,8 +1049,9 @@ return (
         
         <div className="panel-content professional">
   {activePanel === "bots" ? (
-    <div className="bots-grid professional">
-      {bots?.map(bot => (
+  <div className="bots-grid professional">
+    {bots && Array.isArray(bots) && bots.length > 0 ? (
+      bots.map(bot => (
         <div key={bot.id} className="bot-card professional">
           <div className="bot-header professional">
             <div 
@@ -1064,29 +1065,29 @@ return (
               <div className="bot-level">Lvl {bot.level}</div>
             </div>
             <div className="bot-info professional">
-              <h4>{bot.name}</h4>
+              <h4>{bot.name || 'Bot'}</h4> {/* ✅ Valor por defecto */}
               <div className="bot-stats">
                 <div className="stat-bar">
-                  <span>Tiro: {bot.tiro}</span>
+                  <span>Tiro: {bot.tiro || 0}</span> {/* ✅ Valor por defecto */}
                   <div className="bar">
                     <div 
                       className="fill" 
-                      style={{ width: `${bot.tiro}%` }}
+                      style={{ width: `${bot.tiro || 0}%` }}
                     ></div>
                   </div>
                 </div>
                 <div className="stat-bar">
-                  <span>Velocidad: {bot.velocidad}</span>
+                  <span>Velocidad: {bot.velocidad || 0}</span> {/* ✅ Valor por defecto */}
                   <div className="bar">
                     <div 
                       className="fill" 
-                      style={{ width: `${bot.velocidad}%` }}
+                      style={{ width: `${bot.velocidad || 0}%` }}
                     ></div>
                   </div>
                 </div>
               </div>
               <div className="bot-meta professional">
-                <span className="level-badge professional">Nivel {bot.level}</span>
+                <span className="level-badge professional">Nivel {bot.level || 1}</span> {/* ✅ Valor por defecto */}
                 <span 
                   className="difficulty-badge professional" 
                   style={{ 
@@ -1116,9 +1117,24 @@ return (
             <div className="btn-glow"></div>
           </button>
         </div>
-      ))}
-    </div>
-  ) : activePanel === "history" ? (
+      ))
+    ) : (
+      <div className="no-bots-message">
+        <div className="empty-state">
+          <div className="empty-icon">🤖</div>
+          <h4>No hay oponentes disponibles</h4>
+          <p>Intenta recargar la página o verifica tu conexión</p>
+          <button 
+            className="retry-btn"
+            onClick={() => window.location.reload()}
+          >
+            🔄 Recargar
+          </button>
+        </div>
+      </div>
+    )}
+  </div>
+) : activePanel === "history" ? (
     <div className="history-section professional">
       <h3>📊 HISTORIAL DE PARTIDOS</h3>
       {!matchHistory || matchHistory.length === 0 ? (
