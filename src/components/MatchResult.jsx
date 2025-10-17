@@ -2,8 +2,8 @@ import React, { useEffect } from "react";
 import "../styles/MatchResult.css";
 
 const MatchResult = ({ result, character, onClose, finalStats }) => {
-  // result: contiene información de recompensas (exp, coins, etc.)
-  // finalStats: contiene las estadísticas del partido (goles, disparos, etc.)
+  // Usar finalStats si están disponibles, sino usar las de result
+  const stats = finalStats || result.simulation?.userStats;
 
   const getResultType = () => {
     if (result.simulation.winnerId === character.id) return 'win';
@@ -13,20 +13,16 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
 
   const resultType = getResultType();
 
-  // Cierre automático después de un tiempo
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
-    }, 10000); // 10 segundos
+    }, 10000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  // Si no hay estadísticas, no renderizar nada para evitar errores
-  if (!finalStats) {
+  if (!stats) {
     return null;
   }
-
-  const { user: userStats } = finalStats;
 
   return (
     <div className="match-result-overlay">
@@ -50,24 +46,30 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
           <div className="stats-grid">
             <div className="performance-stat">
               <span className="stat-label">Disparos</span>
-              <span className="stat-value">{userStats.shots}</span>
+              <span className="stat-value">{stats.shots || 0}</span>
             </div>
             <div className="performance-stat">
               <span className="stat-label">Goles</span>
-              <span className="stat-value">{userStats.goals}</span>
+              <span className="stat-value">{stats.goals || 0}</span>
             </div>
-             <div className="performance-stat">
+            <div className="performance-stat">
               <span className="stat-label">Pases</span>
-              <span className="stat-value">{userStats.passes}</span>
+              <span className="stat-value">{stats.passes || 0}</span>
             </div>
             <div className="performance-stat">
               <span className="stat-label">Entradas</span>
-              <span className="stat-value">{userStats.tackles}</span>
+              <span className="stat-value">{stats.tackles || 0}</span>
             </div>
             <div className="performance-stat">
               <span className="stat-label">Posesión</span>
-              <span className="stat-value">{userStats.possession}%</span>
+              <span className="stat-value">{stats.possession || 50}%</span>
             </div>
+            {stats.passAccuracy && (
+              <div className="performance-stat">
+                <span className="stat-label">Precisión pases</span>
+                <span className="stat-value">{stats.passAccuracy}%</span>
+              </div>
+            )}
           </div>
         </div>
 
