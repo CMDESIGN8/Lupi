@@ -1,4 +1,4 @@
-/* styles/TrainingDashboard.css - VERSIÓN MEJORADA CON CANCHA DETALLADA */
+/* styles/TrainingDashboard.css - VERSIÓN SIN PANEL DE ESTADO */
 
 .training-dashboard {
   min-height: 100vh;
@@ -69,28 +69,26 @@
   display: grid;
   grid-template-columns: 70% 30%;
   gap: 1.5rem;
-  height: 55vh;
+  height: 60vh; /* Aumentado para usar más espacio */
   margin-bottom: 1.5rem;
 }
 
-/* PANEL IZQUIERDO 70% - CAMPO MEJORADO */
+/* PANEL IZQUIERDO 70% - CAMPO COMPLETO */
 .training-dashboard .left-panel {
   background: rgba(15, 23, 42, 0.6);
   border-radius: 20px;
   border: 2px solid #475569;
   overflow: hidden;
-}
-
-.training-dashboard .field-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-/* CANCHA MEJORADA - VERSIÓN DETALLADA */
-.training-dashboard .soccer-field {
-  flex: 1;
   position: relative;
+}
+
+/* CANCHA QUE USA TODO EL ESPACIO */
+.training-dashboard .soccer-field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: 
     linear-gradient(135deg, #1a472a 0%, #2d5a3a 100%),
     repeating-linear-gradient(
@@ -100,8 +98,7 @@
       rgba(255,255,255,0.03) 10px,
       rgba(255,255,255,0.03) 20px
     );
-  margin: 1.5rem;
-  border-radius: 15px;
+  border-radius: 18px;
   border: 3px solid #cbd5e1;
   overflow: hidden;
   box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
@@ -301,6 +298,46 @@
   }
 }
 
+/* MENSAJE CENTRAL EN LA CANCHA */
+.training-dashboard .field-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(67, 97, 238, 0.3));
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  backdrop-filter: blur(15px);
+  animation: messagePulse 3s ease-in-out infinite;
+}
+
+.training-dashboard .field-message h3 {
+  margin: 0 0 1rem 0;
+  color: #4cc9f0;
+  font-size: 1.5rem;
+  font-family: 'Orbitron', monospace;
+}
+
+.training-dashboard .field-message p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 1.1rem;
+}
+
+@keyframes messagePulse {
+  0%, 100% { 
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 20px rgba(76, 201, 240, 0.3);
+  }
+  50% { 
+    transform: translate(-50%, -50%) scale(1.02);
+    box-shadow: 0 0 30px rgba(76, 201, 240, 0.5);
+  }
+}
+
 /* EFECTOS VISUALES MEJORADOS */
 .training-dashboard .field-effect {
   position: absolute;
@@ -347,47 +384,6 @@
     transform: scale(1.5) rotate(180deg);
     opacity: 0;
   }
-}
-
-/* ESTADO DEL PARTIDO */
-.training-dashboard .match-status {
-  padding: 1.5rem;
-  text-align: center;
-  background: rgba(15, 23, 42, 0.8);
-  border-top: 2px solid #475569;
-}
-
-.training-dashboard .simulation-in-progress {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-.training-dashboard .pulse-animation {
-  width: 20px;
-  height: 20px;
-  background: #4cc9f0;
-  border-radius: 50%;
-  animation: trainingPulse 1.5s infinite;
-  box-shadow: 0 0 10px #4cc9f0;
-}
-
-@keyframes trainingPulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.7; }
-}
-
-.training-dashboard .waiting-for-match h3 {
-  color: #94a3b8;
-  margin-bottom: 0.5rem;
-  font-size: 1.3rem;
-}
-
-.training-dashboard .waiting-for-match p {
-  color: #64748b;
-  margin: 0;
-  font-size: 1rem;
 }
 
 /* PANEL DERECHO 30% - COMENTARIOS */
@@ -864,13 +860,9 @@
     grid-template-columns: 1fr;
   }
   
-  .training-dashboard .soccer-field {
-    margin: 1rem;
-  }
-  
   .training-dashboard .penalty-area,
   .training-dashboard .small-area,
   .training-dashboard .penalty-spot {
     display: none;
   }
-  }
+}
