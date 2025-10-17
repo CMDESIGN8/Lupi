@@ -1172,4 +1172,8 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
     </div>
   )}
 </div>    
+          </div>
+      </div>
+  );
+};
 export default TrainingDashboard;
