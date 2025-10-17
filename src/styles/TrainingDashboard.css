@@ -1461,6 +1461,7 @@
   flex: 1;
   padding: 1rem;
   overflow-y: auto;
+  height: 100%;
   background: rgba(15, 23, 42, 0.3);
 }
 
