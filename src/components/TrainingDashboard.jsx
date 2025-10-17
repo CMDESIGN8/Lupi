@@ -739,7 +739,7 @@ return (
       {/* HEADER SUPERIOR DE LA APLICACIÓN */}
       <div className="app-header professional">
         <div className="dashboard-header">
-          <div className="header-section">
+          <div className="dashboard-header">
             <h2>⚽ SIMULADOR TÁCTICO PRO</h2>
             <div className="match-info-header">
               {simulating && selectedBot && (
@@ -748,7 +748,7 @@ return (
             </div>
           </div>
           
-          <div className="header-section">
+          <div className="dashboard-header">
             <div className="match-status">
               <div className="score-display-header">
                 {matchStats ? `${matchStats.user.goals || 0} - ${matchStats.bot.goals || 0}` : '0 - 0'}
@@ -763,7 +763,7 @@ return (
             </div>
           </div>
           
-          <div className="header-section">
+          <div className="dashboard-header">
             <div className="controls-header">
               <SimulationControls 
                 speed={simulationState.speed} 
