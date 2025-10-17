@@ -180,7 +180,6 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
   const closeResult = () => {
     setMatchResult(null);
     setFinalStats(null);
-    setSelectedBot(null);
   };
 
   if (!character) {
@@ -204,17 +203,11 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
         simulating={simulating}
         selectedBot={selectedBot}
         onStartMatch={startBotMatch}
-        onMatchFinish={handleMatchFinish} // ✅ Pasar la nueva función
+        onMatchFinish={handleMatchFinish}
+        matchResult={matchResult}
+        onCloseResult={closeResult}
+        finalStats={finalStats}
       />
-      
-      {matchResult && (
-        <MatchResult
-          result={matchResult}
-          character={character}
-          onClose={closeResult}
-          finalStats={finalStats} // ✅ Pasar estadísticas finales
-        />
-      )}
     </div>
   );
 };
