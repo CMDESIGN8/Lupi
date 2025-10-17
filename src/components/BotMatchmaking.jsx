@@ -41,15 +41,16 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
     }
   };
 
-  const fetchBots = async () => {
-    try {
-      const response = await fetch(`https://lupiback.onrender.com/bots`);
-      const data = await response.json();
-      setBots(data.bots || []);
-    } catch (error) {
-      console.error("Error cargando bots:", error);
-    }
-  };
+ const fetchBots = async () => {
+  try {
+    const response = await fetch(`https://lupiback.onrender.com/bots`);
+    const data = await response.json();
+    setBots(data.bots || []); // ✅ Asegurar que sea array
+  } catch (error) {
+    console.error("Error cargando bots:", error);
+    setBots([]); // ✅ En caso de error, establecer array vacío
+  }
+};
 
   const startBotMatch = async (bot) => {
     if (!character) return;
