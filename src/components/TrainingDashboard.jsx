@@ -52,7 +52,7 @@ const SimulationControls = ({ speed, setSpeed, onPause, onResume, isActive, mome
 );
 
 // 🏆 COMPONENTE PRINCIPAL SUPER PRO
-const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating, selectedBot, onStartMatch, onMatchFinish }) => {
+const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating, selectedBot, onStartMatch, onMatchFinish, matchResult, onCloseResult }) => {
   const [activePanel, setActivePanel] = useState("bots");
 
   // 🎮 ESTADO DE SIMULACIÓN AVANZADO
@@ -979,7 +979,7 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
           <button className={`tab-button professional ${activePanel === "history" ? "active" : ""}`} onClick={() => setActivePanel("history")}>
             📊 HISTORIAL
           </button>
-          <button className={`tab-button professional ${activePanel === "stats" ? "active" : ""}`} onClick={() => setActivePanel("stats")}>
+          <button className={`tab-button ${activePanel === "results" ? "active" : ""}`} onClick={() => setActivePanel("results")}>
             📈 ESTADÍSTICAS
           </button>
         </div>
@@ -1095,34 +1095,74 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
               )}
             </div>
           ) : (
-            <div className="stats-section professional">
-              <h3>📈 ESTADÍSTICAS GLOBALES</h3>
-              <div className="global-stats">
-                <div className="stat-card">
-                  <h4>Partidos Jugados</h4>
-                  <div className="stat-value">{matchHistory?.length || 0}</div>
-                </div>
-                <div className="stat-card">
-                  <h4>Victorias</h4>
-                  <div className="stat-value win">
-                    {matchHistory?.filter(m => getResultType(m, character?.id) === 'win').length || 0}
+            <div className="results-section">
+              <h3>ÚLTIMO RESULTADO</h3>
+              {matchResult ? (
+                <div className="match-result-panel">
+                  <div className="result-header">
+                    <div className="result-score-large">
+                      {matchResult.simulation.player1Score} - {matchResult.simulation.player2Score}
+                    </div>
+                    <div className={`result-type ${
+                      matchResult.simulation.winnerId === character.id ? 'win' : 
+                      matchResult.simulation.player1Score === matchResult.simulation.player2Score ? 'draw' : 'lose'
+                    }`}>
+                      {matchResult.simulation.winnerId === character.id ? 'VICTORIA' : 
+                       matchResult.simulation.player1Score === matchResult.simulation.player2Score ? 'EMPATE' : 'DERROTA'}
+                    </div>
                   </div>
-                </div>
-                <div className="stat-card">
-                  <h4>Empates</h4>
-                  <div className="stat-value draw">
-                    {matchHistory?.filter(m => getResultType(m, character?.id) === 'draw').length || 0}
+                  
+                  <p className="result-opponent">vs {matchResult.botName}</p>
+                  
+                  <div className="performance-grid">
+                    <div className="performance-stat-panel">
+                      <div className="stat-label-panel">Disparos</div>
+                      <div className="stat-value-panel">{finalStats?.user?.shots || 0}</div>
+                    </div>
+                    <div className="performance-stat-panel">
+                      <div className="stat-label-panel">Goles</div>
+                      <div className="stat-value-panel">{finalStats?.user?.goals || 0}</div>
+                    </div>
+                    <div className="performance-stat-panel">
+                      <div className="stat-label-panel">Pases</div>
+                      <div className="stat-value-panel">{finalStats?.user?.passes || 0}</div>
+                    </div>
+                    <div className="performance-stat-panel">
+                      <div className="stat-label-panel">Entradas</div>
+                      <div className="stat-value-panel">{finalStats?.user?.tackles || 0}</div>
+                    </div>
                   </div>
-                </div>
-                <div className="stat-card">
-                  <h4>Goles Anotados</h4>
-                  <div className="stat-value">
-                    {matchHistory?.reduce((total, match) => total + (match.player1_score || 0), 0) || 0}
+                  
+                  <div className="rewards-panel">
+                    <h4>🏆 RECOMPENSAS</h4>
+                    <div className="reward-item-panel">
+                      <span>Experiencia:</span>
+                      <span className="reward-amount-panel">+{matchResult.rewards.exp} EXP</span>
+                    </div>
+                    <div className="reward-item-panel">
+                      <span>Lupicoins:</span>
+                      <span className="reward-amount-panel">+{matchResult.rewards.coins} 🪙</span>
+                    </div>
+                    
+                    {matchResult.leveledUp && (
+                      <div className="level-up-badge">
+                        🎉 ¡Subiste al nivel {matchResult.newLevel}!
+                      </div>
+                    )}
                   </div>
+                  
+                  <button className="close-result-btn" onClick={onCloseResult}>
+                    CERRAR RESULTADO
+                  </button>
                 </div>
-              </div>
+              ) : (
+                <div className="no-history">
+                  <p>No hay resultados recientes</p>
+                  <p>Juega un partido para ver tus estadísticas aquí</p>
+                </div>
+              )}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
