@@ -1141,14 +1141,6 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                     <div className="reward-label">Monedas</div>
                   </div>
                 </div>
-                
-                <div className="reward-card bonus">
-                  <div className="reward-icon">🎯</div>
-                  <div className="reward-info">
-                    <div className="reward-amount">+{Math.round(difficultyMultiplier * 100 - 100)}%</div>
-                    <div className="reward-label">Bonus</div>
-                  </div>
-                </div>
               </div>
             </div>
 
