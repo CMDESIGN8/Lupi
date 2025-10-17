@@ -221,6 +221,21 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
   return ( 
     <div className="training-dashboard"> 
       {/* HEADER SOLO CON ESTADÍSTICAS - SIN TÍTULO GRANDE */} 
+      <div className="dashboard-header"> 
+        <div className="player-stats"> 
+          <div className="stat-item"> 
+            <span className="stat-label">Nivel</span> 
+            <span className="stat-value">{character?.level || 1}</span> 
+          </div> 
+          <div className="stat-item"> 
+            <span className="stat-label">Rating</span> 
+            <span className="stat-value">{calculatePlayerRating()}</span> 
+          </div> 
+          <div className="stat-item"> 
+            <span className="stat-label">Partidos</span> 
+            <span className="stat-value">{matchHistory?.length || 0}</span> 
+          </div> 
+        </div> 
       </div> 
 
       <div className="main-layout"> 
@@ -423,22 +438,6 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
             </div> 
           )} 
         </div> 
-<div className="dashboard-header"> 
-        <div className="player-stats"> 
-          <div className="stat-item"> 
-            <span className="stat-label">Nivel</span> 
-            <span className="stat-value">{character?.level || 1}</span> 
-          </div> 
-          <div className="stat-item"> 
-            <span className="stat-label">Rating</span> 
-            <span className="stat-value">{calculatePlayerRating()}</span> 
-          </div> 
-          <div className="stat-item"> 
-            <span className="stat-label">Partidos</span> 
-            <span className="stat-value">{matchHistory?.length || 0}</span> 
-          </div> 
-        </div> 
-        
       </div> 
     </div> 
   ); 
