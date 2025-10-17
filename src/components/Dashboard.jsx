@@ -13,6 +13,15 @@ export const Dashboard = ({ user }) => {
   const [currentSection, setCurrentSection] = useState("dashboard"); // <-- ESTADO AÑADIDO
 
   useEffect(() => {
+    const header = document.querySelector(".app-header.professional");
+    const target = document.querySelector(".section-header");
+
+    if (header && target && !target.contains(header)) {
+      target.appendChild(header);
+    }
+  }, []);
+
+  useEffect(() => {
     if (user) fetchData(user.id);
   }, [user]);
 
