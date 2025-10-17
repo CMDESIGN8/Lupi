@@ -1439,7 +1439,6 @@
 }
 
 /* PANELES LATERALES COMPLETOS */
-.training-dashboard .left-panel.stats-panel,
 .training-dashboard .right-panel.events-panel {
   display: flex;
     flex-direction: column;
