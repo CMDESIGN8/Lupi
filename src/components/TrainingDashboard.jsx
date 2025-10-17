@@ -10,30 +10,11 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
     bot: { x: 80, y: 30 } 
   }); 
   const [matchStats, setMatchStats] = useState({ 
-    shots: { user: 0, bot: 0 },
-    shotsOnTarget: { user: 0, bot: 0 },
-    passes: { user: 0, bot: 0 },
-    tackles: { user: 0, bot: 0 },
-    dribbles: { user: 0, bot: 0 },
-    goals: { user: 0, bot: 0 },
-    saves: { user: 0, bot: 0 },
-    possession: { user: 50, bot: 50 },
-    fouls: { user: 0, bot: 0 },
-    corners: { user: 0, bot: 0 },
-    offsides: { user: 0, bot: 0 }
+    shots: 0, passes: 0, tackles: 0, dribbles: 0, goals: 0, saves: 0, possession: 50 
   }); 
-
-  const [currentMinute, setCurrentMinute] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [matchResult, setMatchResult] = useState(null);
-  const [teamLineups, setTeamLineups] = useState({
-    user: [],
-    bot: []
-  });
 
   const animationRef = useRef(null);
   const timeoutRefs = useRef([]);
-  const matchTimerRef = useRef(null);
 
   // Limpiar todos los timeouts y animaciones
   const clearAllAnimations = useCallback(() => {
@@ -42,18 +23,12 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
       animationRef.current = null;
     }
     
-    if (matchTimerRef.current) {
-      clearInterval(matchTimerRef.current);
-      matchTimerRef.current = null;
-    }
-    
     timeoutRefs.current.forEach(timeout => clearTimeout(timeout));
     timeoutRefs.current = [];
   }, []);
 
   useEffect(() => { 
     if (simulating) { 
-      initializeMatch();
       startMatchAnimation(); 
     } else { 
       resetAnimations(); 
@@ -64,80 +39,6 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
     };
   }, [simulating, clearAllAnimations]); 
 
-  const initializeMatch = useCallback(() => {
-    setCurrentMinute(0);
-    setIsPaused(false);
-    setMatchResult(null);
-    
-    // Inicializar alineaciones
-    const userPlayers = generateLineup(character, 'user');
-    const botPlayers = generateLineup(selectedBot, 'bot');
-    setTeamLineups({ user: userPlayers, bot: botPlayers });
-    
-    // Iniciar cronómetro del partido
-    matchTimerRef.current = setInterval(() => {
-      setCurrentMinute(prev => {
-        if (prev >= 90) {
-          endMatch();
-          return 90;
-        }
-        return prev + 1;
-      });
-    }, 1000); // 1 segundo = 1 minuto de juego
-  }, [character, selectedBot]);
-
-  const generateLineup = (team, teamType) => {
-    const positions = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'FW', 'FW', 'FW'];
-    return positions.map((pos, index) => ({
-      id: `${teamType}-${index}`,
-      position: pos,
-      number: index + 1,
-      name: teamType === 'user' ? `${character?.nickname} ${index + 1}` : `${selectedBot?.name} ${index + 1}`,
-      x: getInitialPosition(pos, teamType).x,
-      y: getInitialPosition(pos, teamType).y
-    }));
-  };
-
-  const getInitialPosition = (position, teamType) => {
-    const baseX = teamType === 'user' ? 25 : 75;
-    
-    const positions = {
-      'GK': { x: baseX, y: 50 },
-      'DF': { x: baseX + (teamType === 'user' ? 10 : -10), y: [30, 50, 70][Math.floor(Math.random() * 3)] },
-      'MF': { x: baseX + (teamType === 'user' ? 25 : -25), y: [25, 50, 75][Math.floor(Math.random() * 3)] },
-      'FW': { x: baseX + (teamType === 'user' ? 40 : -40), y: [35, 50, 65][Math.floor(Math.random() * 3)] }
-    };
-    
-    return positions[position] || { x: baseX, y: 50 };
-  };
-
-  const endMatch = () => {
-    clearAllAnimations();
-    setIsPaused(true);
-    
-    const result = {
-      userScore: matchStats.goals.user,
-      botScore: matchStats.goals.bot,
-      winner: matchStats.goals.user > matchStats.goals.bot ? 'user' : 
-              matchStats.goals.user < matchStats.goals.bot ? 'bot' : 'draw'
-    };
-    
-    setMatchResult(result);
-    
-    // Agregar evento final
-    const finalEvent = {
-      id: Date.now(),
-      type: 'final',
-      text: result.winner === 'draw' ? '⚽ FINAL DEL PARTIDO - EMPATE' : 
-            `🏆 FINAL DEL PARTIDO - ${result.winner === 'user' ? character?.nickname : selectedBot?.name} GANA`,
-      team: 'neutral',
-      intensity: 'very-high',
-      time: '90\''
-    };
-    
-    setMatchEvents(prev => [finalEvent, ...prev]);
-  };
-
   const resetAnimations = useCallback(() => { 
     clearAllAnimations();
     setMatchEvents([]); 
@@ -147,347 +48,135 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
       bot: { x: 80, y: 30 } 
     }); 
     setMatchStats({ 
-      shots: { user: 0, bot: 0 },
-      shotsOnTarget: { user: 0, bot: 0 },
-      passes: { user: 0, bot: 0 },
-      tackles: { user: 0, bot: 0 },
-      dribbles: { user: 0, bot: 0 },
-      goals: { user: 0, bot: 0 },
-      saves: { user: 0, bot: 0 },
-      possession: { user: 50, bot: 50 },
-      fouls: { user: 0, bot: 0 },
-      corners: { user: 0, bot: 0 },
-      offsides: { user: 0, bot: 0 }
+      shots: 0, passes: 0, tackles: 0, dribbles: 0, goals: 0, saves: 0, possession: 50 
     }); 
-    setCurrentMinute(0);
-    setIsPaused(false);
-    setMatchResult(null);
-    setTeamLineups({ user: [], bot: [] });
   }, [clearAllAnimations]); 
 
   const startMatchAnimation = useCallback(() => { 
-    // Evento inicial
-    addMatchEvent({
-      type: 'kickoff',
-      text: '⚽ ¡COMIENZA EL PARTIDO!',
-      team: 'neutral',
-      intensity: 'medium'
-    });
+    // Configurar animación del balón 
+    animateBall(); 
 
-    // Generar eventos del partido basados en estadísticas de equipos
-    generateMatchEvents();
-  }, [character, selectedBot]); 
+    // Generar eventos de partido en tiempo real 
+    const eventTypes = [ 
+      { type: 'shot', text: '¡Disparo del delantero!', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'high' }, 
+      { type: 'save', text: 'El arquero despeja el peligro', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'medium' }, 
+      { type: 'pass', text: 'Pase preciso al mediocampo', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'low' }, 
+      { type: 'tackle', text: 'Entrada limpia del defensa', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'medium' }, 
+      { type: 'dribble', text: 'Regate magistral del jugador', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'medium' }, 
+      { type: 'cross', text: 'Centro al área', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'low' }, 
+      { type: 'corner', text: 'Saque de esquina', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'medium' }, 
+      { type: 'freekick', text: 'Tiro libre directo', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'high' }, 
+      { type: 'goal', text: '¡¡¡GOOOOL!!!', team: Math.random() > 0.5 ? 'user' : 'bot', intensity: 'very-high' } 
+    ]; 
 
-  const generateMatchEvents = useCallback(() => {
-    const eventInterval = setInterval(() => {
-      if (!simulating || isPaused || currentMinute >= 90) {
-        clearInterval(eventInterval);
-        return;
-      }
-
-      // Probabilidad de evento basada en minuto y estadísticas
-      const eventProbability = getEventProbability();
+    for (let i = 0; i < 15; i++) { 
+      const timeout = setTimeout(() => { 
+        const randomEvent = eventTypes[Math.floor(Math.random() * eventTypes.length)]; 
+        const eventWithTime = { 
+          ...randomEvent, 
+          id: Date.now() + i, 
+          time: `${Math.floor(i / 2)}'${(i % 2) * 30}`.padStart(3, '0')
+        }; 
+        
+        setMatchEvents(prev => [eventWithTime, ...prev.slice(0, 14)]); 
+        
+        // Actualizar estadísticas 
+        updateMatchStats(randomEvent.type, randomEvent.team); 
+        
+        // Mover jugadores para eventos importantes 
+        if (randomEvent.intensity === 'high' || randomEvent.intensity === 'very-high') { 
+          movePlayersForEvent(randomEvent.type, randomEvent.team); 
+        } 
+      }, i * 800); 
       
-      if (Math.random() < eventProbability) {
-        const event = generateRealisticEvent();
-        if (event) {
-          addMatchEvent(event);
-          updateMatchStats(event);
-          animateEvent(event);
-        }
-      }
-    }, 1500); // Evento cada 1.5 segundos
+      timeoutRefs.current.push(timeout);
+    } 
+  }, []); 
 
-    timeoutRefs.current.push(eventInterval);
-  }, [simulating, isPaused, currentMinute, character, selectedBot]);
-
-  const getEventProbability = () => {
-    // Más eventos en minutos clave
-    if (currentMinute < 5) return 0.3; // Inicio tranquilo
-    if (currentMinute > 85) return 0.8; // Final emocionante
-    if (currentMinute > 40 && currentMinute < 45) return 0.7; // Final primera parte
-    if (currentMinute > 80) return 0.6; // Final del partido
+  const animateBall = useCallback(() => { 
+    const startTime = Date.now(); 
+    const duration = 12000; 
     
-    return 0.4; // Probabilidad base
-  };
-
-  const generateRealisticEvent = () => {
-    const eventTypes = [
-      { type: 'pass', weight: 40 },
-      { type: 'dribble', weight: 15 },
-      { type: 'tackle', weight: 12 },
-      { type: 'shot', weight: 10 },
-      { type: 'cross', weight: 8 },
-      { type: 'corner', weight: 5 },
-      { type: 'freekick', weight: 4 },
-      { type: 'foul', weight: 3 },
-      { type: 'offside', weight: 2 },
-      { type: 'goal', weight: 1 }
-    ];
-
-    const totalWeight = eventTypes.reduce((sum, event) => sum + event.weight, 0);
-    let random = Math.random() * totalWeight;
-    
-    let selectedEvent;
-    for (const event of eventTypes) {
-      random -= event.weight;
-      if (random <= 0) {
-        selectedEvent = event.type;
-        break;
-      }
-    }
-
-    const team = Math.random() * 100 < (50 + (character?.level - selectedBot?.level) * 5) ? 'user' : 'bot';
-    
-    return createEventData(selectedEvent, team);
-  };
-
-  const createEventData = (eventType, team) => {
-    const baseEvents = {
-      pass: [
-        'Pase corto al mediocampo',
-        'Pase largo al delantero',
-        'Pase filtrado entre líneas',
-        'Pase de pared efectivo',
-        'Cambio de juego al otro lado'
-      ],
-      dribble: [
-        'Regate magistral',
-        'Gambeta espectacular',
-        'Amago y cambio de dirección',
-        'Túnel al defensor',
-        'Control orientado y avance'
-      ],
-      tackle: [
-        'Entrada limpia',
-        'Barrida precisa',
-        'Recuperación del balón',
-        'Anticipación perfecta',
-        'Carga fuerte pero legal'
-      ],
-      shot: [
-        'Disparo desde fuera del área',
-        'Remate de cabeza',
-        'Tiro colocado',
-        'Chut potente',
-        'Vaselina al arquero'
-      ],
-      cross: [
-        'Centro al área',
-        'Centro atrás',
-        'Centro raso',
-        'Centro elevado',
-        'Centro desde la línea de fondo'
-      ],
-      corner: [
-        'Saque de esquina',
-        'Corner corto',
-        'Corner al primer palo',
-        'Corner al punto de penal'
-      ],
-      freekick: [
-        'Tiro libre directo',
-        'Falta estratégica',
-        'Tiro libre al área',
-        'Falta cerca del área'
-      ],
-      foul: [
-        'Falta táctica',
-        'Entrada dura',
-        'Juego peligroso',
-        'Tirón de camiseta'
-      ],
-      offside: [
-        'Fuera de juego',
-        'Trampa del fuera de juego',
-        'Posición adelantada'
-      ],
-      goal: [
-        '¡¡¡GOOOOL!!!',
-        'Gol espectacular',
-        'Gol de cabeza',
-        'Gol desde fuera del área',
-        'Gol en jugada colectiva'
-      ]
-    };
-
-    const intensities = {
-      pass: 'low', dribble: 'medium', tackle: 'medium', shot: 'high',
-      cross: 'medium', corner: 'medium', freekick: 'high', foul: 'medium',
-      offside: 'low', goal: 'very-high'
-    };
-
-    const texts = baseEvents[eventType];
-    const text = texts ? texts[Math.floor(Math.random() * texts.length)] : 'Acción del partido';
-
-    return {
-      type: eventType,
-      text: text,
-      team: team,
-      intensity: intensities[eventType] || 'medium',
-      time: `${currentMinute}'`
-    };
-  };
-
-  const addMatchEvent = (event) => {
-    const eventWithId = {
-      ...event,
-      id: Date.now() + Math.random(),
-      time: `${currentMinute}'`
-    };
-    
-    setMatchEvents(prev => [eventWithId, ...prev.slice(0, 19)]); // Mantener últimos 20 eventos
-  };
-
-  const updateMatchStats = (event) => {
-    setMatchStats(prev => {
-      const newStats = { ...prev };
-      const team = event.team;
+    const animate = () => { 
+      const elapsed = Date.now() - startTime; 
+      const progress = elapsed / duration; 
       
-      if (team !== 'neutral') {
-        switch (event.type) {
-          case 'pass':
-            newStats.passes[team]++;
-            newStats.possession[team] = Math.min(100, newStats.possession[team] + 1);
-            newStats.possession[team === 'user' ? 'bot' : 'user'] = Math.max(0, newStats.possession[team === 'user' ? 'bot' : 'user'] - 1);
-            break;
-          case 'shot':
-            newStats.shots[team]++;
-            if (Math.random() > 0.4) newStats.shotsOnTarget[team]++;
-            break;
-          case 'tackle':
-            newStats.tackles[team]++;
-            break;
-          case 'dribble':
-            newStats.dribbles[team]++;
-            break;
-          case 'goal':
-            newStats.goals[team]++;
-            newStats.shots[team]++;
-            newStats.shotsOnTarget[team]++;
-            break;
-          case 'foul':
-            newStats.fouls[team]++;
-            break;
-          case 'corner':
-            newStats.corners[team]++;
-            break;
-          case 'offside':
-            newStats.offsides[team]++;
-            break;
-        }
-      }
+      if (progress < 1) { 
+        const x = 50 + 35 * Math.sin(progress * Math.PI * 3); 
+        const y = 50 + 25 * Math.sin(progress * Math.PI * 6); 
+        setBallPosition({ x, y }); 
+        animationRef.current = requestAnimationFrame(animate); 
+      } else {
+        animationRef.current = null;
+      } 
+    }; 
+    
+    animationRef.current = requestAnimationFrame(animate); 
+  }, []); 
+
+  const updateMatchStats = useCallback((eventType, team) => { 
+    setMatchStats(prev => { 
+      const newStats = { ...prev }; 
       
-      return newStats;
-    });
-  };
+      switch (eventType) { 
+        case 'shot': newStats.shots++; break; 
+        case 'pass': newStats.passes++; break; 
+        case 'tackle': newStats.tackles++; break; 
+        case 'dribble': newStats.dribbles++; break; 
+        case 'goal': newStats.goals++; break; 
+        case 'save': newStats.saves++; break; 
+        default: break;
+      } 
+      
+      // Actualizar posesión basada en eventos 
+      if (team === 'user') { 
+        newStats.possession = Math.min(100, newStats.possession + 2); 
+      } else { 
+        newStats.possession = Math.max(0, newStats.possession - 2); 
+      } 
+      
+      return newStats; 
+    }); 
+  }, []); 
 
-  const animateEvent = (event) => {
-    if (event.type === 'goal') {
-      // Animación especial para gol
-      celebrateGoal(event.team);
-    } else if (event.intensity === 'high' || event.intensity === 'very-high') {
-      // Mover jugadores para eventos importantes
-      movePlayersForEvent(event.type, event.team);
-    }
+  const movePlayersForEvent = useCallback((eventType, team) => { 
+    if (eventType === 'shot') { 
+      if (team === 'user') { 
+        setPlayerPositions(prev => ({ 
+          user: { x: 65, y: 25 }, 
+          bot: { x: 35, y: 75 } 
+        })); 
+      } else { 
+        setPlayerPositions(prev => ({ 
+          user: { x: 35, y: 75 }, 
+          bot: { x: 65, y: 25 } 
+        })); 
+      } 
+    } else if (eventType === 'goal') { 
+      // Celebración de gol 
+      if (team === 'user') { 
+        setPlayerPositions(prev => ({ 
+          user: { x: 70, y: 20 }, 
+          bot: { x: 30, y: 80 } 
+        })); 
+      } else { 
+        setPlayerPositions(prev => ({ 
+          user: { x: 30, y: 80 }, 
+          bot: { x: 70, y: 20 } 
+        })); 
+      } 
+    } 
     
-    // Animación del balón
-    animateBallMovement(event.type, event.team);
-  };
-
-  const celebrateGoal = (team) => {
-    const celebrationPositions = team === 'user' 
-      ? { user: { x: 70, y: 20 }, bot: { x: 30, y: 80 } }
-      : { user: { x: 30, y: 80 }, bot: { x: 70, y: 20 } };
-    
-    setPlayerPositions(celebrationPositions);
-    
-    // Volver a posición después de celebración
-    timeoutRefs.current.push(setTimeout(() => {
+    // Volver a posición después de un tiempo 
+    const timeout = setTimeout(() => { 
       setPlayerPositions({ 
         user: { x: 20, y: 30 }, 
         bot: { x: 80, y: 30 } 
-      });
-      setBallPosition({ x: 50, y: 50 }); // Saque de centro
-    }, 3000));
-  };
-
-  const movePlayersForEvent = (eventType, team) => {
-    let newPositions = {};
+      }); 
+    }, 1500); 
     
-    if (eventType === 'shot') {
-      newPositions = team === 'user' 
-        ? { user: { x: 65, y: 25 }, bot: { x: 35, y: 75 } }
-        : { user: { x: 35, y: 75 }, bot: { x: 65, y: 25 } };
-    } else if (eventType === 'corner') {
-      newPositions = team === 'user'
-        ? { user: { x: 70, y: 15 }, bot: { x: 30, y: 85 } }
-        : { user: { x: 30, y: 85 }, bot: { x: 70, y: 15 } };
-    }
-    
-    if (Object.keys(newPositions).length > 0) {
-      setPlayerPositions(newPositions);
-      
-      timeoutRefs.current.push(setTimeout(() => {
-        setPlayerPositions({ 
-          user: { x: 20, y: 30 }, 
-          bot: { x: 80, y: 30 } 
-        });
-      }, 2000));
-    }
-  };
-
-  const animateBallMovement = (eventType, team) => {
-    const startTime = Date.now();
-    const duration = 1000;
-    
-    const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = elapsed / duration;
-      
-      if (progress < 1) {
-        let x, y;
-        
-        switch (eventType) {
-          case 'shot':
-            x = team === 'user' ? 50 + 25 * progress : 50 - 25 * progress;
-            y = 50 - 20 * Math.sin(progress * Math.PI);
-            break;
-          case 'pass':
-            x = 50 + 15 * Math.sin(progress * Math.PI * 2);
-            y = 50 + 10 * Math.sin(progress * Math.PI * 4);
-            break;
-          default:
-            x = 50 + 10 * Math.sin(progress * Math.PI);
-            y = 50 + 5 * Math.sin(progress * Math.PI * 2);
-        }
-        
-        setBallPosition({ x, y });
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        animationRef.current = null;
-      }
-    };
-    
-    animationRef.current = requestAnimationFrame(animate);
-  };
-
-  const togglePause = () => {
-    setIsPaused(!isPaused);
-    if (!isPaused) {
-      clearInterval(matchTimerRef.current);
-    } else {
-      matchTimerRef.current = setInterval(() => {
-        setCurrentMinute(prev => {
-          if (prev >= 90) {
-            endMatch();
-            return 90;
-          }
-          return prev + 1;
-        });
-      }, 1000);
-    }
-  };
+    timeoutRefs.current.push(timeout);
+  }, []); 
 
   const getDifficultyColor = useCallback((difficulty) => { 
     switch (difficulty) { 
@@ -521,35 +210,23 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
     return 'lose'; 
   }, []); 
 
+  const calculatePlayerRating = useCallback(() => { 
+    const totalActions = matchStats.shots + matchStats.passes + matchStats.tackles + matchStats.dribbles; 
+    if (totalActions === 0) return '6.0'; 
+    
+    const effectiveness = (matchStats.passes * 0.3 + matchStats.tackles * 0.4 + matchStats.dribbles * 0.3) / totalActions; 
+    return Math.min(10, 6 + effectiveness * 4).toFixed(1); 
+  }, [matchStats]); 
+
   return ( 
     <div className="training-dashboard"> 
-      {/* SCOREBOARD PROFESIONAL */}
-      {simulating && (
-        <div className="scoreboard">
-          <div className="team-score user-team">
-            <span className="team-name">{character?.nickname || "JUGADOR"}</span>
-            <span className="score">{matchStats.goals.user}</span>
-          </div>
-          <div className="match-info">
-            <div className="minute">{currentMinute}'</div>
-            <div className="match-status">{isPaused ? 'PAUSA' : 'EN VIVO'}</div>
-          </div>
-          <div className="team-score bot-team">
-            <span className="score">{matchStats.goals.bot}</span>
-            <span className="team-name">{selectedBot?.name || "RIVAL"}</span>
-          </div>
-          <button className="pause-btn" onClick={togglePause}>
-            {isPaused ? '▶️' : '⏸️'}
-          </button>
-        </div>
-      )}
+      {/* HEADER ELIMINADO - SOLO QUEDA EL LAYOUT PRINCIPAL */}
 
       <div className="main-layout"> 
-        {/* CAMPO DE JUEGO PROFESIONAL */} 
+        {/* PANEL IZQUIERDO 70% - CAMPO DE JUEGO */} 
         <div className="left-panel"> 
           <div className="soccer-field"> 
             <div className="field-grass"> 
-              {/* Líneas del campo */}
               <div className="center-circle"></div> 
               <div className="center-spot"></div> 
               <div className="penalty-area left"></div> 
@@ -561,23 +238,21 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
               <div className="penalty-spot left"></div> 
               <div className="penalty-spot right"></div> 
 
-              {/* Jugadores del equipo usuario */}
-              {teamLineups.user.map(player => (
-                <div key={player.id} className="player player-user" 
-                     style={{ left: `${player.x}%`, top: `${player.y}%` }}>
-                  <div className="player-icon">{player.position === 'GK' ? '🧤' : '👤'}</div>
-                  <div className="player-number">{player.number}</div>
-                </div>
-              ))}
+              {/* Jugador */} 
+              <div className="player player-user" style={{ left: `${playerPositions.user.x}%`, top: `${playerPositions.user.y}%` }} > 
+                <div className="player-icon">👤</div> 
+                <div className="player-name">{character?.nickname || "JUGADOR"}</div> 
+              </div> 
 
-              {/* Jugadores del equipo bot */}
-              {teamLineups.bot.map(player => (
-                <div key={player.id} className="player player-bot" 
-                     style={{ left: `${player.x}%`, top: `${player.y}%` }}>
-                  <div className="player-icon">{player.position === 'GK' ? '🧤' : '🤖'}</div>
-                  <div className="player-number">{player.number}</div>
-                </div>
-              ))}
+              {/* Bot */} 
+              <div className="player player-bot" style={{ left: `${playerPositions.bot.x}%`, top: `${playerPositions.bot.y}%` }} > 
+                <div className="player-icon"> 
+                  {selectedBot ? getBotAvatar(selectedBot.level) : "🤖"} 
+                </div> 
+                <div className="player-name"> 
+                  {selectedBot?.name || "RIVAL"} 
+                </div> 
+              </div> 
 
               {/* Balón animado */} 
               {simulating && ( 
@@ -589,42 +264,29 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
               {/* Mensaje central cuando no hay simulación */} 
               {!simulating && ( 
                 <div className="field-message"> 
-                  <h3>⚽ SIMULADOR PC FÚTBOL</h3> 
-                  <p>Selecciona un oponente para iniciar la simulación profesional</p> 
+                  <h3>⚽ SIMULADOR PROFESIONAL</h3> 
+                  <p>Selecciona un oponente para iniciar la simulación con comentarios en vivo</p> 
                 </div> 
               )} 
 
-              {/* RESULTADO FINAL */}
-              {matchResult && (
-                <div className="match-result-overlay">
-                  <div className="result-card">
-                    <h3>🏆 FINAL DEL PARTIDO</h3>
-                    <div className="final-score">
-                      <span>{character?.nickname} {matchResult.userScore}</span>
-                      <span>-</span>
-                      <span>{matchResult.botScore} {selectedBot?.name}</span>
-                    </div>
-                    <div className="result-message">
-                      {matchResult.winner === 'draw' ? 'EMPATE' : 
-                       `VICTORIA DE ${matchResult.winner === 'user' ? character?.nickname : selectedBot?.name}`}
-                    </div>
-                    <button className="close-result" onClick={resetAnimations}>
-                      CERRAR
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* Efectos visuales */} 
+              {simulating && ( 
+                <> 
+                  <div className="field-effect shot-effect"></div> 
+                  <div className="field-effect dribble-effect"></div> 
+                </> 
+              )} 
             </div> 
           </div> 
         </div> 
 
-        {/* PANEL DERECHO - COMENTARIOS Y ESTADÍSTICAS PROFESIONALES */} 
+        {/* PANEL DERECHO 30% - COMENTARIOS DEL PARTIDO */} 
         <div className="right-panel"> 
           <div className="match-commentary"> 
             <div className="commentary-header"> 
               <h3>📻 COMENTARIOS EN VIVO</h3> 
               <div className="match-time"> 
-                {simulating ? `${currentMinute}'` : "PRE-PARTIDO"} 
+                {simulating ? "EN VIVO" : "PRE-PARTIDO"} 
               </div> 
             </div> 
             <div className="commentary-feed"> 
@@ -639,59 +301,41 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
                     <div className="event-time">{event.time}</div> 
                     <div className="event-text">{event.text}</div> 
                     <div className="event-team"> 
-                      {event.team === 'user' ? character?.nickname : 
-                       event.team === 'bot' ? selectedBot?.name : 'PARTIDO'}
+                      {event.team === 'user' ? character?.nickname : selectedBot?.name} 
                     </div> 
                   </div> 
                 )) 
               )} 
             </div> 
 
-            {/* ESTADÍSTICAS DETALLADAS */} 
+            {/* Estadísticas rápidas */} 
             <div className="live-stats"> 
-              <h4>📊 ESTADÍSTICAS DETALLADAS</h4> 
-              <div className="stats-grid">
-                <div className="stat-category">
-                  <h5>ATAQUE</h5>
-                  <div className="stat-row">
-                    <span>Disparos:</span>
-                    <span>{matchStats.shots.user} - {matchStats.shots.bot}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>Al arco:</span>
-                    <span>{matchStats.shotsOnTarget.user} - {matchStats.shotsOnTarget.bot}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>Corners:</span>
-                    <span>{matchStats.corners.user} - {matchStats.corners.bot}</span>
-                  </div>
-                </div>
-                <div className="stat-category">
-                  <h5>DEFENSA</h5>
-                  <div className="stat-row">
-                    <span>Entradas:</span>
-                    <span>{matchStats.tackles.user} - {matchStats.tackles.bot}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>Faltas:</span>
-                    <span>{matchStats.fouls.user} - {matchStats.fouls.bot}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>Offsides:</span>
-                    <span>{matchStats.offsides.user} - {matchStats.offsides.bot}</span>
-                  </div>
-                </div>
-                <div className="stat-category">
-                  <h5>POSESIÓN</h5>
-                  <div className="possession-display">
-                    <div className="possession-team user">{matchStats.possession.user}%</div>
-                    <div className="possession-bar">
-                      <div className="possession-fill user" style={{ width: `${matchStats.possession.user}%` }}></div>
-                    </div>
-                    <div className="possession-team bot">{matchStats.possession.bot}%</div>
-                  </div>
-                </div>
-              </div>
+              <h4>📊 ESTADÍSTICAS RÁPIDAS</h4> 
+              <div className="stats-overview"> 
+                <div className="stat-row"> 
+                  <span>Posesión:</span> 
+                  <div className="possession-bar"> 
+                    <div className="possession-fill user" style={{ width: `${matchStats.possession}%` }} > 
+                      {matchStats.possession}% 
+                    </div> 
+                    <div className="possession-fill bot" style={{ width: `${100 - matchStats.possession}%` }} > 
+                      {100 - matchStats.possession}% 
+                    </div> 
+                  </div> 
+                </div> 
+                <div className="stat-row"> 
+                  <span>Disparos:</span> 
+                  <span>{matchStats.shots}</span> 
+                </div> 
+                <div className="stat-row"> 
+                  <span>Pases:</span> 
+                  <span>{matchStats.passes}</span> 
+                </div> 
+                <div className="stat-row"> 
+                  <span>Entradas:</span> 
+                  <span>{matchStats.tackles}</span> 
+                </div> 
+              </div> 
             </div> 
           </div> 
         </div> 
