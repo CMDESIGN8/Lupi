@@ -561,7 +561,6 @@
 
 .training-dashboard .panel-content { 
   padding: 2rem; 
-  max-height: 300px; 
   overflow-y: auto;
   background: rgba(15, 23, 42, 0.3);
 }
@@ -1025,7 +1024,6 @@
   }
   .training-dashboard .panel-content {
     padding: 1rem;
-    max-height: 250px;
   }
   .training-dashboard .performance-grid {
     grid-template-columns: 1fr;
