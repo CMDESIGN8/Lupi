@@ -980,188 +980,190 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
             📊 HISTORIAL
           </button>
           <button className={`tab-button ${activePanel === "results" ? "active" : ""}`} onClick={() => setActivePanel("results")}>
-            📈 ESTADÍSTICAS
+            📈 ESTADÍSTICAS & 🏆 RESULTADOS
           </button>
         </div>
         
         <div className="panel-content professional">
-          {activePanel === "bots" ? (
-            <div className="bots-grid professional">
-              {bots?.map(bot => (
-                <div key={bot.id} className="bot-card professional">
-                  <div className="bot-header professional">
+  {activePanel === "bots" ? (
+    <div className="bots-grid professional">
+      {bots?.map(bot => (
+        <div key={bot.id} className="bot-card professional">
+          <div className="bot-header professional">
+            <div 
+              className="bot-avatar professional" 
+              style={{ 
+                background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
+                boxShadow: `0 0 20px ${getDifficultyColor(bot.difficulty)}50`
+              }}
+            >
+              {getBotAvatar(bot.level)}
+              <div className="bot-level">Lvl {bot.level}</div>
+            </div>
+            <div className="bot-info professional">
+              <h4>{bot.name}</h4>
+              <div className="bot-stats">
+                <div className="stat-bar">
+                  <span>Tiro: {bot.tiro}</span>
+                  <div className="bar">
                     <div 
-                      className="bot-avatar professional" 
-                      style={{ 
-                        background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                        boxShadow: `0 0 20px ${getDifficultyColor(bot.difficulty)}50`
-                      }}
-                    >
-                      {getBotAvatar(bot.level)}
-                      <div className="bot-level">Lvl {bot.level}</div>
-                    </div>
-                    <div className="bot-info professional">
-                      <h4>{bot.name}</h4>
-                      <div className="bot-stats">
-                        <div className="stat-bar">
-                          <span>Tiro: {bot.tiro}</span>
-                          <div className="bar">
-                            <div 
-                              className="fill" 
-                              style={{ width: `${bot.tiro}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                        <div className="stat-bar">
-                          <span>Velocidad: {bot.velocidad}</span>
-                          <div className="bar">
-                            <div 
-                              className="fill" 
-                              style={{ width: `${bot.velocidad}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="bot-meta professional">
-                        <span className="level-badge professional">Nivel {bot.level}</span>
-                        <span 
-                          className="difficulty-badge professional" 
-                          style={{ 
-                            color: getDifficultyColor(bot.difficulty),
-                            borderColor: getDifficultyColor(bot.difficulty)
-                          }}
-                        >
-                          {getDifficultyText(bot.difficulty)}
-                        </span>
-                      </div>
-                    </div>
+                      className="fill" 
+                      style={{ width: `${bot.tiro}%` }}
+                    ></div>
                   </div>
-                  <button 
-                    className={`play-btn professional ${bot.difficulty}`} 
-                    onClick={() => onStartMatch(bot)} 
-                    disabled={loading || simulating}
-                    style={{ 
-                      background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                      boxShadow: `0 4px 15px ${getDifficultyColor(bot.difficulty)}40`
-                    }}
-                  >
-                    {loading && selectedBot?.id === bot.id ? (
-                      <span className="loading-spinner">🔄</span>
-                    ) : (
-                      "⚔️ JUGAR"
-                    )}
-                    <div className="btn-glow"></div>
-                  </button>
                 </div>
-              ))}
+                <div className="stat-bar">
+                  <span>Velocidad: {bot.velocidad}</span>
+                  <div className="bar">
+                    <div 
+                      className="fill" 
+                      style={{ width: `${bot.velocidad}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div className="bot-meta professional">
+                <span className="level-badge professional">Nivel {bot.level}</span>
+                <span 
+                  className="difficulty-badge professional" 
+                  style={{ 
+                    color: getDifficultyColor(bot.difficulty),
+                    borderColor: getDifficultyColor(bot.difficulty)
+                  }}
+                >
+                  {getDifficultyText(bot.difficulty)}
+                </span>
+              </div>
             </div>
-          ) : activePanel === "history" ? (
-            <div className="history-section professional">
-              <h3>📊 HISTORIAL DE PARTIDOS</h3>
-              {!matchHistory || matchHistory.length === 0 ? (
-                <div className="no-history professional">
-                  <p>No hay partidas registradas.</p>
-                  <div className="empty-state">
-                    <div>⚽</div>
-                    <p>Juega tu primer partido para comenzar tu historial</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="history-list professional">
-                  {matchHistory.map((match) => (
-                    <div key={match.id} className="history-item professional">
-                      <div className="match-result professional">
-                        <span className={`result-badge professional ${getResultType(match, character?.id)}`}>
-                          {getResultType(match, character?.id) === 'win' ? 'V' : 
-                           getResultType(match, character?.id) === 'draw' ? 'E' : 'D'}
-                        </span>
-                        <span className="score professional">{match.player1_score} - {match.player2_score}</span>
-                        <span className="opponent-name">vs {match.opponent_name || 'RIVAL'}</span>
-                      </div>
-                      <div className="match-info professional">
-                        <span className="match-date">
-                          {new Date(match.finished_at).toLocaleDateString('es-ES', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric'
-                          })}
-                        </span>
-                        <span className="match-rewards">+{match.rewards_exp} EXP</span>
-                        <span className="match-duration">{match.duration || 90}'</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+          </div>
+          <button 
+            className={`play-btn professional ${bot.difficulty}`} 
+            onClick={() => onStartMatch(bot)} 
+            disabled={loading || simulating}
+            style={{ 
+              background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
+              boxShadow: `0 4px 15px ${getDifficultyColor(bot.difficulty)}40`
+            }}
+          >
+            {loading && selectedBot?.id === bot.id ? (
+              <span className="loading-spinner">🔄</span>
+            ) : (
+              "⚔️ JUGAR"
+            )}
+            <div className="btn-glow"></div>
+          </button>
+        </div>
+      ))}
+    </div>
+  ) : activePanel === "history" ? (
+    <div className="history-section professional">
+      <h3>📊 HISTORIAL DE PARTIDOS</h3>
+      {!matchHistory || matchHistory.length === 0 ? (
+        <div className="no-history professional">
+          <p>No hay partidas registradas.</p>
+          <div className="empty-state">
+            <div>⚽</div>
+            <p>Juega tu primer partido para comenzar tu historial</p>
+          </div>
+        </div>
+      ) : (
+        <div className="history-list professional">
+          {matchHistory.map((match) => (
+            <div key={match.id} className="history-item professional">
+              <div className="match-result professional">
+                <span className={`result-badge professional ${getResultType(match, character?.id)}`}>
+                  {getResultType(match, character?.id) === 'win' ? 'V' : 
+                   getResultType(match, character?.id) === 'draw' ? 'E' : 'D'}
+                </span>
+                <span className="score professional">{match.player1_score} - {match.player2_score}</span>
+                <span className="opponent-name">vs {match.opponent_name || 'RIVAL'}</span>
+              </div>
+              <div className="match-info professional">
+                <span className="match-date">
+                  {new Date(match.finished_at).toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  })}
+                </span>
+                <span className="match-rewards">+{match.rewards_exp} EXP</span>
+                <span className="match-duration">{match.duration || 90}'</span>
+              </div>
             </div>
-          ) : (
-            <div className="results-section">
-              <h3>ÚLTIMO RESULTADO</h3>
-              {matchResult ? (
-                <div className="match-result-panel">
-                  <div className="result-header">
-                    <div className="result-score-large">
-                      {matchResult.simulation.player1Score} - {matchResult.simulation.player2Score}
-                    </div>
-                    <div className={`result-type ${
-                      matchResult.simulation.winnerId === character.id ? 'win' : 
-                      matchResult.simulation.player1Score === matchResult.simulation.player2Score ? 'draw' : 'lose'
-                    }`}>
-                      {matchResult.simulation.winnerId === character.id ? 'VICTORIA' : 
-                       matchResult.simulation.player1Score === matchResult.simulation.player2Score ? 'EMPATE' : 'DERROTA'}
-                    </div>
-                  </div>
-                  
-                  <p className="result-opponent">vs {matchResult.botName}</p>
-                  
-                  <div className="performance-grid">
-                    <div className="performance-stat-panel">
-                      <div className="stat-label-panel">Disparos</div>
-                      <div className="stat-value-panel">{finalStats?.user?.shots || 0}</div>
-                    </div>
-                    <div className="performance-stat-panel">
-                      <div className="stat-label-panel">Goles</div>
-                      <div className="stat-value-panel">{finalStats?.user?.goals || 0}</div>
-                    </div>
-                    <div className="performance-stat-panel">
-                      <div className="stat-label-panel">Pases</div>
-                      <div className="stat-value-panel">{finalStats?.user?.passes || 0}</div>
-                    </div>
-                    <div className="performance-stat-panel">
-                      <div className="stat-label-panel">Entradas</div>
-                      <div className="stat-value-panel">{finalStats?.user?.tackles || 0}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="rewards-panel">
-                    <h4>🏆 RECOMPENSAS</h4>
-                    <div className="reward-item-panel">
-                      <span>Experiencia:</span>
-                      <span className="reward-amount-panel">+{matchResult.rewards.exp} EXP</span>
-                    </div>
-                    <div className="reward-item-panel">
-                      <span>Lupicoins:</span>
-                      <span className="reward-amount-panel">+{matchResult.rewards.coins} 🪙</span>
-                    </div>
-                    
-                    {matchResult.leveledUp && (
-                      <div className="level-up-badge">
-                        🎉 ¡Subiste al nivel {matchResult.newLevel}!
-                      </div>
-                    )}
-                  </div>
-                  
-                  <button className="close-result-btn" onClick={onCloseResult}>
-                    CERRAR RESULTADO
-                  </button>
-                </div>
-              ) : (
-                <div className="no-history">
-                  <p>No hay resultados recientes</p>
-                  <p>Juega un partido para ver tus estadísticas aquí</p>
-                </div>
-              )}
+          ))}
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className="results-section">
+      <h3>ÚLTIMO RESULTADO</h3>
+      {matchResult ? (
+        <div className="match-result-panel">
+          <div className="result-header">
+            <div className="result-score-large">
+              {matchResult.simulation.player1Score} - {matchResult.simulation.player2Score}
             </div>
+            <div className={`result-type ${
+              matchResult.simulation.winnerId === character.id ? 'win' : 
+              matchResult.simulation.player1Score === matchResult.simulation.player2Score ? 'draw' : 'lose'
+            }`}>
+              {matchResult.simulation.winnerId === character.id ? 'VICTORIA' : 
+               matchResult.simulation.player1Score === matchResult.simulation.player2Score ? 'EMPATE' : 'DERROTA'}
+            </div>
+          </div>
+          
+          <p className="result-opponent">vs {matchResult.botName}</p>
+          
+          <div className="performance-grid">
+            <div className="performance-stat-panel">
+              <div className="stat-label-panel">Disparos</div>
+              <div className="stat-value-panel">{finalStats?.user?.shots || 0}</div>
+            </div>
+            <div className="performance-stat-panel">
+              <div className="stat-label-panel">Goles</div>
+              <div className="stat-value-panel">{finalStats?.user?.goals || 0}</div>
+            </div>
+            <div className="performance-stat-panel">
+              <div className="stat-label-panel">Pases</div>
+              <div className="stat-value-panel">{finalStats?.user?.passes || 0}</div>
+            </div>
+            <div className="performance-stat-panel">
+              <div className="stat-label-panel">Entradas</div>
+              <div className="stat-value-panel">{finalStats?.user?.tackles || 0}</div>
+            </div>
+          </div>
+          
+          <div className="rewards-panel">
+            <h4>🏆 RECOMPENSAS</h4>
+            <div className="reward-item-panel">
+              <span>Experiencia:</span>
+              <span className="reward-amount-panel">+{matchResult.rewards.exp} EXP</span>
+            </div>
+            <div className="reward-item-panel">
+              <span>Lupicoins:</span>
+              <span className="reward-amount-panel">+{matchResult.rewards.coins} 🪙</span>
+            </div>
+            
+            {matchResult.leveledUp && (
+              <div className="level-up-badge">
+                🎉 ¡Subiste al nivel {matchResult.newLevel}!
+              </div>
+            )}
+          </div>
+          
+          <button className="close-result-btn" onClick={onCloseResult}>
+            CERRAR RESULTADO
+          </button>
+        </div>
+      ) : (
+        <div className="no-history">
+          <p>No hay resultados recientes</p>
+          <p>Juega un partido para ver tus estadísticas aquí</p>
+        </div>
+      )}
+    </div>
+  )}
+</div>
           ) : null}
         </div>
       </div>
