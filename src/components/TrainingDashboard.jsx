@@ -763,7 +763,7 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
          simulationState.matchTime < 90 ? '2º TIEMPO' : 'FINAL'}
       </span>
     </div>
-  </div>
+  
   
   <div className="commentary-header-bottom">
     <SimulationControls 
