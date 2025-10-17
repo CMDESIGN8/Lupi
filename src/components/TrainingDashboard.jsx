@@ -736,21 +736,7 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
 
   return (
     <div className="training-dashboard super-pro">
-      <div className="main-layout">
-        <div className="left-panel">
-          <div className="soccer-field professional">
-            <div className="field-grass">
-              <div className="center-circle"></div>
-              <div className="center-spot"></div>
-              <div className="penalty-area left"></div>
-              <div className="penalty-area right"></div>
-              <div className="small-area left"></div>
-              <div className="small-area right"></div>
-              <div className="goal left"></div>
-              <div className="goal right"></div>
-              <div className="penalty-spot left"></div>
-              <div className="penalty-spot right"></div>
-              <div clssName="taining-dashboard header>
+      <div clssName="taining-dashboard header>
   <div className="commentary-header-top">
       <h3>🎙️ COMENTARIO EN VIVO</h3>
     <div className="match-time professional">
@@ -772,6 +758,22 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
       momentum={simulationState.momentum}
     />
   </div>
+            </div>
+      <div className="main-layout">
+        <div className="left-panel">
+          <div className="soccer-field professional">
+            <div className="field-grass">
+              <div className="center-circle"></div>
+              <div className="center-spot"></div>
+              <div className="penalty-area left"></div>
+              <div className="penalty-area right"></div>
+              <div className="small-area left"></div>
+              <div className="small-area right"></div>
+              <div className="goal left"></div>
+              <div className="goal right"></div>
+              <div className="penalty-spot left"></div>
+              <div className="penalty-spot right"></div>
+              
               {/* Barra de Momentum */}
               <div className="momentum-overlay">
                 <div className="momentum-bar-field">
