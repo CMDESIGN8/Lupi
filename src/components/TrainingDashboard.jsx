@@ -750,19 +750,21 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
 
 return (
     <div className="training-dashboard super-pro">
-      {/* HEADER SUPERIOR DE LA APLICACIÓN */}
+      {/* HEADER SUPERIOR PROFESIONAL CON DATOS DEL PARTIDO */}
       <div className="app-header professional">
-        <div className="dashboard-header">
-          <div className="dashboard-header">
+        <div className="header-content">
+          <div className="header-section">
             <h2>⚽ SIMULADOR TÁCTICO PRO</h2>
             <div className="match-info-header">
-              {simulating && selectedBot && (
+              {simulating && selectedBot ? (
                 <span className="opponent-info">vs {selectedBot.name}</span>
+              ) : (
+                <span className="opponent-info">Selecciona un oponente</span>
               )}
             </div>
           </div>
           
-          <div className="dashboard-header">
+          <div className="header-section">
             <div className="match-status">
               <div className="score-display-header">
                 {matchStats ? `${matchStats.user.goals || 0} - ${matchStats.bot.goals || 0}` : '0 - 0'}
@@ -777,7 +779,7 @@ return (
             </div>
           </div>
           
-          <div className="dashboard-header">
+          <div className="header-section">
             <div className="controls-header">
               <SimulationControls 
                 speed={simulationState.speed} 
@@ -789,9 +791,126 @@ return (
         </div>
       </div>
 
-      <div className="main-layout">
-        <div className="left-panel">
-          <div className="soccer-field professional">
+      {/* LAYOUT PRINCIPAL MODIFICADO */}
+      <div className="main-layout improved">
+        {/* PANEL IZQUIERDO - ESTADÍSTICAS */}
+        <div className="left-panel stats-panel">
+          <div className="panel-header">
+            <h3>📊 ESTADÍSTICAS EN VIVO</h3>
+          </div>
+          <div className="panel-content stats-content">
+            {matchStats ? (
+              <div className="advanced-stats improved">
+                <div className="stats-category">
+                  <h4>⚽ ATAQUE</h4>
+                  <div className="stat-row">
+                    <span>Disparos:</span>
+                    <span>{matchStats.user.shots} - {matchStats.bot.shots}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Goles:</span>
+                    <span>{matchStats.user.goals} - {matchStats.bot.goals}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Precisión:</span>
+                    <span>{matchStats.user.shotAccuracy}% - {matchStats.bot.shotAccuracy}%</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Centros:</span>
+                    <span>{matchStats.user.crosses} - {matchStats.bot.crosses}</span>
+                  </div>
+                </div>
+                
+                <div className="stats-category">
+                  <h4>🛡️ DEFENSA</h4>
+                  <div className="stat-row">
+                    <span>Entradas:</span>
+                    <span>{matchStats.user.tackles} - {matchStats.bot.tackles}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Faltas:</span>
+                    <span>{matchStats.user.fouls} - {matchStats.bot.fouls}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Paradas:</span>
+                    <span>{matchStats.user.saves} - {matchStats.bot.saves}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Esquinas:</span>
+                    <span>{matchStats.user.corners} - {matchStats.bot.corners}</span>
+                  </div>
+                </div>
+                
+                <div className="stats-category">
+                  <h4>🎯 POSESIÓN</h4>
+                  <div className="stat-row possession-row">
+                    <span>Posesión:</span>
+                    <div className="possession-bar-mini">
+                      <div 
+                        className="possession-fill user" 
+                        style={{ width: `${matchStats.user.possession}%` }}
+                      >
+                        {matchStats.user.possession}%
+                      </div>
+                      <div 
+                        className="possession-fill bot" 
+                        style={{ width: `${matchStats.bot.possession}%` }}
+                      >
+                        {matchStats.bot.possession}%
+                      </div>
+                    </div>
+                  </div>
+                  <div className="stat-row">
+                    <span>Pases:</span>
+                    <span>{matchStats.user.passes} - {matchStats.bot.passes}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Precisión pases:</span>
+                    <span>{matchStats.user.passAccuracy}% - {matchStats.bot.passAccuracy}%</span>
+                  </div>
+                </div>
+
+                {/* MOMENTUM Y PRESIÓN */}
+                <div className="stats-category">
+                  <h4>📈 MOMENTUM</h4>
+                  <div className="momentum-display">
+                    <div className="momentum-bar-large">
+                      <div 
+                        className="momentum-fill-large" 
+                        style={{ width: `${simulationState.momentum}%` }}
+                      >
+                        <span className="momentum-value">{simulationState.momentum}%</span>
+                      </div>
+                    </div>
+                    <div className="pressure-stats">
+                      <div className="pressure-item">
+                        <span>{character?.nickname}:</span>
+                        <span className="pressure-value">{simulationState.pressure.user}%</span>
+                      </div>
+                      <div className="pressure-item">
+                        <span>{selectedBot?.name}:</span>
+                        <span className="pressure-value">{simulationState.pressure.bot}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="no-stats">
+                <p>Las estadísticas aparecerán aquí cuando inicies un partido</p>
+                <div className="stats-placeholder">
+                  <div className="placeholder-item"></div>
+                  <div className="placeholder-item"></div>
+                  <div className="placeholder-item"></div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* PANEL CENTRAL - CANCHA */}
+        <div className="center-panel">
+          <div className="soccer-field improved">
             <div className="field-grass">
               <div className="center-circle"></div>
               <div className="center-spot"></div>
@@ -804,59 +923,41 @@ return (
               <div className="penalty-spot left"></div>
               <div className="penalty-spot right"></div>
               
-              
-
               {simulating && selectedBot && simulationState.isActive && (
                 <>
                   {/* Jugador Usuario */}
                   <div 
-                    className="player player-user professional" 
+                    className="player player-user improved" 
                     style={{ 
                       left: `${currentPlayerPositions.user.x}%`, 
-                      top: `${currentPlayerPositions.user.y}%`,
-                      '--pressure': `${simulationState.pressure.user}%`
+                      top: `${currentPlayerPositions.user.y}%`
                     }}
                   >
                     <div className="player-icon">👤</div>
                     <div className="player-name">{character?.nickname || "JUGADOR"}</div>
-                    <div className="player-stats">
-                      <span>Tiro: {character.tiro}</span>
-                      <span>Vel: {character.velocidad}</span>
-                    </div>
-                    <div className="player-pressure-indicator"></div>
                   </div>
                   
                   {/* Jugador Bot */}
                   <div 
-                    className="player player-bot professional" 
+                    className="player player-bot improved" 
                     style={{ 
                       left: `${currentPlayerPositions.bot.x}%`, 
-                      top: `${currentPlayerPositions.bot.y}%`,
-                      '--pressure': `${simulationState.pressure.bot}%`
+                      top: `${currentPlayerPositions.bot.y}%`
                     }}
                   >
                     <div className="player-icon">{getBotAvatar(selectedBot.level)}</div>
                     <div className="player-name">{selectedBot?.name || "RIVAL"}</div>
-                    <div className="player-stats">
-                      <span>Tiro: {selectedBot.tiro}</span>
-                      <span>Vel: {selectedBot.velocidad}</span>
-                    </div>
-                    <div className="player-pressure-indicator"></div>
                   </div>
                   
-                  {/* Balón con efectos */}
+                  {/* Balón */}
                   <div 
-                    className="soccer-ball professional" 
+                    className="soccer-ball improved" 
                     style={{ 
                       left: `${ballPosition.x}%`, 
-                      top: `${ballPosition.y}%`,
-                      '--pulse': simulationState.lastAction === MATCH_CONFIG.EVENT_TYPES.GOAL ? '1' : '0'
+                      top: `${ballPosition.y}%`
                     }}
                   >
                     ⚽
-                    {simulationState.lastAction === MATCH_CONFIG.EVENT_TYPES.GOAL && (
-                      <div className="goal-effect">✨</div>
-                    )}
                   </div>
 
                   {/* Indicador de Posesión */}
@@ -871,14 +972,13 @@ return (
               )}
               
               {!simulating && (
-                <div className="field-message professional">
+                <div className="field-message improved">
                   <h3>⚽ SIMULADOR TÁCTICO PRO</h3>
-                  <p>Selecciona un oponente para iniciar la simulación profesional.</p>
+                  <p>Selecciona un oponente para iniciar la simulación</p>
                   <div className="feature-list">
                     <span>🎯 Sistema de Momentum</span>
                     <span>🏃 Posicionamiento Dinámico</span>
                     <span>📊 Estadísticas Avanzadas</span>
-                    <span>⚡ Múltiples Velocidades</span>
                   </div>
                 </div>
               )}
@@ -886,116 +986,54 @@ return (
           </div>
         </div>
 
-        <div className="right-panel">
-          <div className="match-commentary professional">
-            {/* SOLO EL FEED DE COMENTARIOS - SIN HEADER */}
-            <div className="commentary-feed professional">
-              {matchEvents.length === 0 ? (
-                <div className="no-commentary professional">
-                  <p>Esperando el inicio del partido...</p>
-                  <div className="pre-match-info">
-                    <div>Formación: {simulationState.formaciones.user}</div>
-                    <div>Condiciones: Óptimas</div>
-                    <div>Árbitro: Sistema VAR</div>
+        {/* PANEL DERECHO - EVENTOS/COMENTARIOS */}
+        <div className="right-panel events-panel">
+          <div className="panel-header">
+            <h3>📝 EVENTOS DEL PARTIDO</h3>
+          </div>
+          <div className="panel-content events-content">
+            {matchEvents.length === 0 ? (
+              <div className="no-events">
+                <p>Esperando el inicio del partido...</p>
+                <div className="match-info-side">
+                  <div className="info-item">
+                    <strong>Formación:</strong> {simulationState.formaciones.user}
+                  </div>
+                  <div className="info-item">
+                    <strong>Condiciones:</strong> Óptimas
+                  </div>
+                  <div className="info-item">
+                    <strong>Árbitro:</strong> Sistema VAR
                   </div>
                 </div>
-              ) : (
-                matchEvents.map((event) => (
+              </div>
+            ) : (
+              <div className="events-feed">
+                {matchEvents.map((event) => (
                   <div 
                     key={event.id} 
-                    className={`commentary-event professional ${event.intensity} ${event.team} ${event.action}`}
+                    className={`event-item ${event.intensity} ${event.team}`}
                   >
-                    <span className="event-time">{event.time}</span>
-                    <span className="event-action">{getActionIcon(event.action)}</span>
-                    <span className="event-text">{event.text}</span>
+                    <div className="event-header">
+                      <span className="event-time">{event.time}</span>
+                      <span className="event-action-icon">{getActionIcon(event.action)}</span>
+                      <span className="event-team">
+                        {event.team === 'user' ? character.nickname : selectedBot.name}
+                      </span>
+                    </div>
+                    <div className="event-text">{event.text}</div>
                     {event.sub_type && (
-                      <span className="event-subtype">{event.sub_type}</span>
+                      <div className="event-subtype">{event.sub_type}</div>
                     )}
                   </div>
-                ))
-              )}
-            </div>
-
-            {/* Estadísticas Avanzadas */}
-            {matchStats && (
-              <div className="advanced-stats">
-                <h4>📈 ESTADÍSTICAS DETALLADAS</h4>
-                <div className="stats-grid">
-                  <div className="stat-category">
-                    <h5>⚽ ATAQUE</h5>
-                    <div className="stat-row">
-                      <span>Disparos:</span>
-                      <span>{matchStats.user.shots} - {matchStats.bot.shots}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Goles:</span>
-                      <span>{matchStats.user.goals} - {matchStats.bot.goals}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Precisión:</span>
-                      <span>{matchStats.user.shotAccuracy}% - {matchStats.bot.shotAccuracy}%</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Centros:</span>
-                      <span>{matchStats.user.crosses} - {matchStats.bot.crosses}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="stat-category">
-                    <h5>🛡️ DEFENSA</h5>
-                    <div className="stat-row">
-                      <span>Entradas:</span>
-                      <span>{matchStats.user.tackles} - {matchStats.bot.tackles}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Faltas:</span>
-                      <span>{matchStats.user.fouls} - {matchStats.bot.fouls}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Paradas:</span>
-                      <span>{matchStats.user.saves} - {matchStats.bot.saves}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Esquinas:</span>
-                      <span>{matchStats.user.corners} - {matchStats.bot.corners}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="stat-category">
-                    <h5>🎯 POSESIÓN</h5>
-                    <div className="stat-row">
-                      <span>Posesión:</span>
-                      <div className="possession-bar-mini">
-                        <div 
-                          className="possession-fill user" 
-                          style={{ width: `${matchStats.user.possession}%` }}
-                        >
-                          {matchStats.user.possession}%
-                        </div>
-                        <div 
-                          className="possession-fill bot" 
-                          style={{ width: `${matchStats.bot.possession}%` }}
-                        >
-                          {matchStats.bot.possession}%
-                        </div>
-                      </div>
-                    </div>
-                    <div className="stat-row">
-                      <span>Pases:</span>
-                      <span>{matchStats.user.passes} - {matchStats.bot.passes}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span>Precisión pases:</span>
-                      <span>{matchStats.user.passAccuracy}% - {matchStats.bot.passAccuracy}%</span>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
             )}
           </div>
         </div>
       </div>
 
+      {/* PANEL INFERIOR (BOTS, HISTORIAL, RESULTADOS) - SE MANTIENE IGUAL */}
       <div className="bottom-panel professional">
         <div className="panel-tabs professional">
           <button className={`tab-button professional ${activePanel === "bots" ? "active" : ""}`} onClick={() => setActivePanel("bots")}>
@@ -1005,7 +1043,7 @@ return (
             📊 HISTORIAL
           </button>
           <button className={`tab-button ${activePanel === "results" ? "active" : ""}`} onClick={() => setActivePanel("results")}>
-            📈 ESTADÍSTICAS & 🏆 RESULTADOS
+            📈 RESULTADOS
           </button>
         </div>
         
