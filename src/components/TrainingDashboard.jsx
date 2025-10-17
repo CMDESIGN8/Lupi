@@ -682,12 +682,12 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       <div className="app-header professional">
         <div className="header-content">
           <div className="header-section">
-            <h2>⚽ Campo de Entrenamiento</h2>
+            <h2>⚽ Campo de Entrenamiento </h2>
             <div className="match-info-header">
               {simulating && selectedBot ? (
                 <span className="opponent-info">vs {selectedBot.name}</span>
               ) : (
-                <span className="opponent-info">Selecciona un oponente</span>
+                <span className="opponent-info">Selecciona un oponente para iniciar la simulación con comentarios en vivo<</span>
               )}
             </div>
           </div>
@@ -892,7 +892,13 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
               {!simulating && (
                 <div className="field-message improved">
                   <h3>⚽ Comenzar Partido</h3>
-                  <p>Selecciona un oponente para iniciar la simulación</p>
+                  <p>Selecciona un oponente para iniciar la simulación con comentarios en vivo<</p>
+                    <div className="feature-list">
+                    <span>🎯 Sistema de Momentum</span>
+                    <span>🏃 Posicionamiento Dinámico</span>
+                    <span>📊 Estadísticas Avanzadas</span>
+                    <span>⚡ Múltiples Velocidades</span>
+                  </div>
                 </div>
               )}
             </div>
