@@ -751,19 +751,19 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
               <div className="penalty-spot left"></div>
               <div className="penalty-spot right"></div>
               <div clssName="taining-dashboard header>
-                <div className="commentary-header-top">
-    <h3>🎙️ COMENTARIO EN VIVO</h3>
+  <div className="commentary-header-top">
+      <h3>🎙️ COMENTARIO EN VIVO</h3>
     <div className="match-time professional">
-      <span className="score-display">
-        {matchStats ? `${matchStats.user.goals || 0} - ${matchStats.bot.goals || 0}` : '0 - 0'}
-      </span>
-      <span className="time">{simulationState.matchTime}'</span>
-      <span className="phase">
-        {simulationState.matchTime <= 45 ? '1º TIEMPO' : 
-         simulationState.matchTime < 90 ? '2º TIEMPO' : 'FINAL'}
-      </span>
-    </div>
-  
+        <span className="score-display">
+          {matchStats ? `${matchStats.user.goals || 0} - ${matchStats.bot.goals || 0}` : '0 - 0'}
+        </span>
+        <span className="time">{simulationState.matchTime}'</span>
+        <span className="phase">
+          {simulationState.matchTime <= 45 ? '1º TIEMPO' : 
+           simulationState.matchTime < 90 ? '2º TIEMPO' : 'FINAL'}
+              </span>
+      </div>
+  </div>
   
   <div className="commentary-header-bottom">
     <SimulationControls 
