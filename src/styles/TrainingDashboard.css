@@ -63,6 +63,8 @@
 }
 
 .training-dashboard .soccer-field {
+  width: 100%;
+  height: 100%;
   position: absolute;
   top: 10px; left: 10px; right: 10px; bottom: 10px;
   background: 
@@ -1430,7 +1432,7 @@
 /* LAYOUT MEJORADO - ESTADÍSTICAS Y EVENTOS COMPLETOS */
 .training-dashboard .main-layout.improved {
   display: grid;
-  grid-template-columns: 320px 1fr 320px;
+  grid-template-columns: 20% 60% 20%;
   gap: 1rem;
   height: 65vh;
   margin-bottom: 1rem;
@@ -1439,13 +1441,16 @@
 /* PANELES LATERALES COMPLETOS */
 .training-dashboard .left-panel.stats-panel,
 .training-dashboard .right-panel.events-panel {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.98));
-  border-radius: 15px;
-  border: 2px solid #4cc9f0;
-  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  backdrop-filter: blur(10px);
+    flex-direction: column;
+    background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .98));
+    border-radius: 15px;
+    border: 2px solid #4cc9f0;
+    overflow: hidden;
+    height: 100%;
+    box-shadow: 0 10px 30px #0000004d, inset 0 1px #ffffff1a;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   height: 100%;
 }
 
@@ -1583,9 +1588,10 @@
 
 /* CANCHA CENTRAL MEJORADA */
 .training-dashboard .center-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
 }
 
 .training-dashboard .soccer-field.improved {
