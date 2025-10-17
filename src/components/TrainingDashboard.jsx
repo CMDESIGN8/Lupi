@@ -736,7 +736,8 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
 
   return (
     <div className="training-dashboard super-pro">
-      <div clssName="taining-dashboard header>
+      <div className="main-layout">
+        <div clssName="taining-dashboard header>
   <div className="commentary-header-top">
       <h3>🎙️ COMENTARIO EN VIVO</h3>
     <div className="match-time professional">
@@ -759,7 +760,6 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
     />
   </div>
             </div>
-      <div className="main-layout">
         <div className="left-panel">
           <div className="soccer-field professional">
             <div className="field-grass">
