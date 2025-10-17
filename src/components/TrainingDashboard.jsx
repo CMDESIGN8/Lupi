@@ -772,7 +772,6 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
       momentum={simulationState.momentum}
     />
   </div>
-                </div>
               {/* Barra de Momentum */}
               <div className="momentum-overlay">
                 <div className="momentum-bar-field">
