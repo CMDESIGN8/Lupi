@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/TrainingDashboard.css";
 
 // Componente para los controles de simulación para mantener el JSX principal más limpio
-const SimulationControls = ({ speed, setSpeed, onPause, onResume, isActive }) => (
+const SimulationControls = ({ speed, setSpeed }) => (
   <div className="simulation-controls">
     <button onClick={() => setSpeed(1500)} title="Velocidad Lenta" className={speed === 1500 ? 'active' : ''}>🐢</button>
     <button onClick={() => setSpeed(800)} title="Velocidad Normal" className={speed === 800 ? 'active' : ''}>▶️</button>
@@ -14,128 +14,51 @@ const SimulationControls = ({ speed, setSpeed, onPause, onResume, isActive }) =>
 const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating, selectedBot, onStartMatch, onMatchFinish }) => {
   const [activePanel, setActivePanel] = useState("bots");
 
-  // --- NUEVO ESTADO DE SIMULACIÓN ---
   const [simulationState, setSimulationState] = useState({
     isActive: false,
     isFinished: false,
     matchTime: 0,
-    speed: 800, // ms por "minuto" de partido
-    possession: 'neutral', // 'user', 'bot', o 'neutral'
-    ballZone: 'center', // 'user_defense', 'center', 'bot_defense'
+    speed: 800,
+    possession: 'neutral',
+    ballZone: 'center',
   });
 
-  const [matchStats, setMatchStats] = useState({
-    user: { shots: 0, goals: 0, passes: 0, tackles: 0, possession: 50, name: character?.nickname || 'JUGADOR' },
-    bot: { shots: 0, goals: 0, passes: 0, tackles: 0, possession: 50, name: selectedBot?.name || 'RIVAL' }
-  });
-
+  const [matchStats, setMatchStats] = useState(null);
   const [matchEvents, setMatchEvents] = useState([]);
   const simulationIntervalRef = useRef(null);
 
-  // --- MOTOR DE SIMULACIÓN ---
   const stopSimulation = useCallback(() => {
     if (simulationIntervalRef.current) {
       clearInterval(simulationIntervalRef.current);
       simulationIntervalRef.current = null;
     }
   }, []);
-
-  useEffect(() => {
-    if (simulating && !simulationState.isActive && selectedBot) {
-        // --- INICIAR PARTIDO ---
-        setMatchEvents([]);
-        setMatchStats({
-          user: { shots: 0, goals: 0, passes: 0, tackles: 0, possession: 50, name: character.nickname },
-          bot: { shots: 0, goals: 0, passes: 0, tackles: 0, possession: 50, name: selectedBot.name }
-        });
-        setSimulationState(prev => ({ ...prev, isActive: true, isFinished: false, matchTime: 0, possession: 'neutral', ballZone: 'center' }));
-
-        simulationIntervalRef.current = setInterval(() => {
-            setSimulationState(prev => {
-                const newTime = prev.matchTime + 1;
-                if (newTime >= 90) {
-                    stopSimulation();
-                    // Finaliza el partido y llama a la función del padre
-                    if (onMatchFinish) {
-                        onMatchFinish(matchStats); // Pasamos las estadísticas finales
-                    }
-                    return { ...prev, isActive: false, isFinished: true };
-                }
-                
-                // Simula un minuto
-                simulateMinute(character, selectedBot, newTime);
-                return { ...prev, matchTime: newTime };
-            });
-        }, simulationState.speed);
-    }
-
-    return () => stopSimulation();
-  }, [simulating, selectedBot, simulationState.speed]); // Se re-crea el intervalo si la velocidad cambia
-
-
-  const simulateMinute = useCallback((user, bot, currentTime) => {
-    // 1. Determinar iniciativa basado en la calidad general de los equipos
-    const userRating = (user.tiro + user.potencia + user.defensa + user.velocidad);
-    const botRating = (bot.tiro + bot.potencia + bot.defensa + bot.velocidad);
-    const initiativeChance = userRating / (userRating + botRating);
-    const hasUserInitiative = Math.random() < initiativeChance;
-    const currentPossession = hasUserInitiative ? 'user' : 'bot';
-
-    // 2. Generar evento
-    const attackingTeam = currentPossession === 'user' ? user : bot;
-    const defendingTeam = currentPossession === 'user' ? bot : user;
-    const event = generateMatchEvent(currentPossession, attackingTeam, defendingTeam, currentTime);
-
-    // 3. Actualizar estado
-    setSimulationState(prev => ({
-        ...prev,
-        possession: currentPossession,
-        ballZone: event.zone
-    }));
-
-    setMatchEvents(prev => [event, ...prev.slice(0, 14)]);
-
-    setMatchStats(prev => {
-        const newStats = JSON.parse(JSON.stringify(prev)); // Deep copy
-        
-        if (event.stat_type) {
-            newStats[currentPossession][event.stat_type]++;
-        }
-        
-        // Actualizar posesión
-        const totalMinutes = currentTime;
-        const userPossessionMinutes = (prev.user.possession / 100) * (totalMinutes -1) + (currentPossession === 'user' ? 1 : 0);
-        newStats.user.possession = Math.round((userPossessionMinutes / totalMinutes) * 100);
-        newStats.bot.possession = 100 - newStats.user.possession;
-
-        return newStats;
-    });
-
-  }, []);
-
-  const generateMatchEvent = (team, attacker, defender, time) => {
-      const attackerName = team === 'user' ? character.nickname : selectedBot.name;
-      const defenderName = team === 'user' ? selectedBot.name : character.nickname;
+  
+  // ✅ CORRECCIÓN 1: Se han añadido 'character' y 'selectedBot' al array de dependencias.
+  // Ahora esta función se recreará con los datos actualizados cuando un bot sea seleccionado.
+  const generateMatchEvent = useCallback((team, attacker, defender, time) => {
+      // ✅ CORRECCIÓN 2: Se añade encadenamiento opcional (?.) y valores por defecto para robustez.
+      const attackerName = team === 'user' ? character?.nickname : selectedBot?.name || 'RIVAL';
+      const defenderName = team === 'user' ? selectedBot?.name || 'RIVAL' : character?.nickname;
       
       let text, intensity, zone, stat_type;
       const random = Math.random();
 
-      if (random < 0.65) { // 65% chance de pase/avance
+      if (random < 0.65) {
           text = `${attackerName} mueve el balón en el mediocampo.`;
           intensity = 'low';
           zone = 'center';
           stat_type = 'passes';
-      } else if (random < 0.85) { // 20% chance de entrada/recuperación
+      } else if (random < 0.85) {
           text = `¡Buena recuperación de ${defenderName} en defensa!`;
           intensity = 'medium';
           zone = 'center';
           stat_type = 'tackles';
-          team = team === 'user' ? 'bot' : 'user'; // Posesión cambia
-      } else { // 15% chance de ocasión de ataque
+          team = team === 'user' ? 'bot' : 'user';
+      } else {
           zone = team === 'user' ? 'bot_defense' : 'user_defense';
           stat_type = 'shots';
           
-          // Probabilidad de gol basada en Ataque vs Defensa
           const goalProbability = (attacker.tiro + attacker.potencia) / ((attacker.tiro + attacker.potencia) + (defender.defensa + defender.velocidad) * 1.5);
           
           if (Math.random() < goalProbability) {
@@ -148,12 +71,73 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
           }
       }
 
-      return {
-          id: Date.now() + time,
-          time: `${time}'`,
-          text, intensity, zone, stat_type, team
-      };
-  };
+      return { id: Date.now() + time, time: `${time}'`, text, intensity, zone, stat_type, team };
+  }, [character, selectedBot]); // <-- DEPENDENCIAS AÑADIDAS
+
+  const simulateMinute = useCallback((currentTime) => {
+    if (!character || !selectedBot) return; // Guardia de seguridad
+
+    const userRating = (character.tiro + character.potencia + character.defensa + character.velocidad);
+    const botRating = (selectedBot.tiro + selectedBot.potencia + selectedBot.defensa + selectedBot.velocidad);
+    const initiativeChance = userRating / (userRating + botRating);
+    const hasUserInitiative = Math.random() < initiativeChance;
+    const currentPossession = hasUserInitiative ? 'user' : 'bot';
+
+    const attackingTeam = currentPossession === 'user' ? character : selectedBot;
+    const defendingTeam = currentPossession === 'user' ? selectedBot : character;
+    const event = generateMatchEvent(currentPossession, attackingTeam, defendingTeam, currentTime);
+
+    setSimulationState(prev => ({ ...prev, possession: currentPossession, ballZone: event.zone }));
+    setMatchEvents(prev => [event, ...prev.slice(0, 14)]);
+
+    setMatchStats(prev => {
+        const newStats = JSON.parse(JSON.stringify(prev));
+        if (event.stat_type) {
+            newStats[event.team][event.stat_type]++;
+        }
+        
+        const totalMinutes = currentTime;
+        const userPossessionMinutes = (prev.user.possession / 100) * (totalMinutes -1) + (event.team === 'user' ? 1 : 0);
+        newStats.user.possession = Math.round((userPossessionMinutes / totalMinutes) * 100);
+        newStats.bot.possession = 100 - newStats.user.possession;
+
+        return newStats;
+    });
+  }, [character, selectedBot, generateMatchEvent]); // <-- DEPENDENCIAS AÑADIDAS
+
+
+  useEffect(() => {
+    if (simulating && !simulationState.isActive && selectedBot && character) {
+        setMatchEvents([]);
+        setMatchStats({
+          user: { shots: 0, goals: 0, passes: 0, tackles: 0, possession: 50, name: character.nickname },
+          bot: { shots: 0, goals: 0, passes: 0, tackles: 0, possession: 50, name: selectedBot.name }
+        });
+        setSimulationState(prev => ({ ...prev, isActive: true, isFinished: false, matchTime: 0, possession: 'neutral', ballZone: 'center' }));
+
+        simulationIntervalRef.current = setInterval(() => {
+            setSimulationState(prev => {
+                const newTime = prev.matchTime + 1;
+                if (newTime >= 90) {
+                    stopSimulation();
+                    if (onMatchFinish) {
+                        setMatchStats(currentStats => {
+                            onMatchFinish(currentStats);
+                            return currentStats;
+                        });
+                    }
+                    return { ...prev, isActive: false, isFinished: true };
+                }
+                
+                simulateMinute(newTime);
+                return { ...prev, matchTime: newTime };
+            });
+        }, simulationState.speed);
+    }
+
+    return () => stopSimulation();
+  }, [simulating, simulationState.isActive, simulationState.speed, character, selectedBot, onMatchFinish, simulateMinute, stopSimulation]);
+
 
   const getBallPosition = () => {
       const { ballZone } = simulationState;
@@ -226,22 +210,24 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
                 ))
               )}
             </div>
-            <div className="live-stats">
-              <h4>📊 ESTADÍSTICAS</h4>
-              <div className="stats-overview">
-                <div className="stat-row">
-                  <span>Posesión:</span>
-                  <div className="possession-bar">
-                    <div className="possession-fill user" style={{ width: `${matchStats.user.possession}%` }}>{matchStats.user.possession}%</div>
-                    <div className="possession-fill bot" style={{ width: `${matchStats.bot.possession}%` }}>{matchStats.bot.possession}%</div>
+            {matchStats && (
+              <div className="live-stats">
+                <h4>📊 ESTADÍSTICAS</h4>
+                <div className="stats-overview">
+                  <div className="stat-row">
+                    <span>Posesión:</span>
+                    <div className="possession-bar">
+                      <div className="possession-fill user" style={{ width: `${matchStats.user.possession}%` }}>{matchStats.user.possession}%</div>
+                      <div className="possession-fill bot" style={{ width: `${matchStats.bot.possession}%` }}>{matchStats.bot.possession}%</div>
+                    </div>
+                  </div>
+                  <div className="stat-row">
+                    <span>Disparos:</span>
+                    <span>{matchStats.user.shots} - {matchStats.bot.shots}</span>
                   </div>
                 </div>
-                <div className="stat-row">
-                  <span>Disparos:</span>
-                  <span>{matchStats.user.shots} - {matchStats.bot.shots}</span>
-                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
