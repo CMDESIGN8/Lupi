@@ -662,6 +662,20 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
   // ✅ CORRECCIÓN: Verificación segura para el array de bots
   const safeBots = Array.isArray(bots) ? bots : [];
 
+  useEffect(() => {
+  const interval = setInterval(() => {
+    const header = document.querySelector(".app-header.professional");
+    const target = document.querySelector(".section-header");
+
+    if (header && target && !target.contains(header)) {
+      target.appendChild(header);
+      clearInterval(interval); // Detiene el intervalo cuando ya lo movió
+    }
+  }, 300);
+
+  return () => clearInterval(interval);
+}, []);
+
   return (
     <div className="training-dashboard super-pro">
       {/* HEADER SUPERIOR PROFESIONAL */}
@@ -942,85 +956,182 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
         
         <div className="panel-content professional">
           {activePanel === "bots" ? (
-            <div className="bots-grid professional">
-              {safeBots.length > 0 ? (
-                safeBots.map(bot => (
-                  <div key={bot.id} className="bot-card professional">
-                    <div className="bot-header professional">
-                      <div 
-                        className="bot-avatar professional" 
-                        style={{ 
-                          background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                          boxShadow: `0 0 20px ${getDifficultyColor(bot.difficulty)}50`
-                        }}
-                      >
-                        {getBotAvatar(bot.level)}
-                        <div className="bot-level">Lvl {bot.level || 1}</div>
-                      </div>
-                      <div className="bot-info professional">
-                        <h4>{bot.name || 'Bot'}</h4>
-                        <div className="bot-stats">
-                          <div className="stat-bar">
-                            <span>Tiro: {bot.tiro || 0}</span>
-                            <div className="bar">
-                              <div 
-                                className="fill" 
-                                style={{ width: `${bot.tiro || 0}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                          <div className="stat-bar">
-                            <span>Velocidad: {bot.velocidad || 0}</span>
-                            <div className="bar">
-                              <div 
-                                className="fill" 
-                                style={{ width: `${bot.velocidad || 0}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="bot-meta professional">
-                          <span className="level-badge professional">Nivel {bot.level || 1}</span>
-                          <span 
-                            className="difficulty-badge professional" 
-                            style={{ 
-                              color: getDifficultyColor(bot.difficulty),
-                              borderColor: getDifficultyColor(bot.difficulty)
-                            }}
-                          >
-                            {getDifficultyText(bot.difficulty)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <button 
-                      className={`play-btn professional ${bot.difficulty}`} 
-                      onClick={() => onStartMatch(bot)} 
-                      disabled={loading || simulating}
-                      style={{ 
-                        background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                        boxShadow: `0 4px 15px ${getDifficultyColor(bot.difficulty)}40`
-                      }}
-                    >
-                      {loading && selectedBot?.id === bot.id ? (
-                        <span className="loading-spinner">🔄</span>
-                      ) : (
-                        "⚔️ JUGAR"
-                      )}
-                    </button>
-                  </div>
-                ))
+  <div className="bots-grid professional">
+    {safeBots.length > 0 ? (
+      safeBots.map(bot => {
+        // Calcular probabilidades basadas en stats
+        const userOverall = calculatePlayerRating(character, 'balanced');
+        const botOverall = calculatePlayerRating(bot, 'balanced');
+        const winProbability = Math.max(10, Math.min(90, 
+          (userOverall / (userOverall + botOverall)) * 100
+        ));
+        
+        // Recompensas basadas en dificultad
+        const baseExp = 50 + (bot.level * 10);
+        const baseCoins = 30 + (bot.level * 5);
+        const difficultyMultiplier = {
+          easy: 1,
+          medium: 1.3,
+          hard: 1.7,
+          expert: 2.2,
+          legendary: 3
+        }[bot.difficulty] || 1;
+        
+        const rewards = {
+          exp: Math.round(baseExp * difficultyMultiplier),
+          coins: Math.round(baseCoins * difficultyMultiplier)
+        };
+
+        // Habilidades especiales basadas en stats
+        const getSpecialAbility = () => {
+          if (bot.tiro >= 80) return "Tiro de larga distancia";
+          if (bot.velocidad >= 80) return "Regate explosivo";
+          if (bot.defensa >= 80) return "Marcaje férreo";
+          if (bot.potencia >= 80) return "Fuerza física";
+          if (bot.tiro >= 70 && bot.velocidad >= 70) return "Juego combinado";
+          return "Juego equilibrado";
+        };
+
+        const specialAbility = getSpecialAbility();
+
+        return (
+          <div key={bot.id} className="bot-card professional fifa-style">
+            {/* HEADER CON AVATAR Y INFO BÁSICA */}
+            <div className="bot-header professional">
+              <div 
+                className="bot-avatar professional" 
+                style={{ 
+                  background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
+                  boxShadow: `0 0 20px ${getDifficultyColor(bot.difficulty)}50`
+                }}
+              >
+                {getBotAvatar(bot.level)}
+                <div className="bot-level">Lvl {bot.level || 1}</div>
+              </div>
+              <div className="bot-info professional">
+                <h4>{bot.name || 'Bot'}</h4>
+                <div className="bot-overall">
+                  <span className="overall-rating">{Math.round(botOverall)}</span>
+                  <span className="overall-label">OVR</span>
+                </div>
+                <div className="bot-meta professional">
+                  <span className="level-badge professional">Nivel {bot.level || 1}</span>
+                  <span 
+                    className="difficulty-badge professional" 
+                    style={{ 
+                      color: getDifficultyColor(bot.difficulty),
+                      borderColor: getDifficultyColor(bot.difficulty)
+                    }}
+                  >
+                    {getDifficultyText(bot.difficulty)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* HABILIDAD ESPECIAL */}
+            <div className="special-ability">
+              <span className="ability-icon">⭐</span>
+              <span className="ability-text">{specialAbility}</span>
+            </div>
+
+            {/* GRÁFICO DE ESTADÍSTICAS ESTILO FIFA */}
+            <div className="stats-radar">
+              <div className="radar-chart">
+                <div className="radar-stat" style={{ '--value': (bot.tiro || 50) / 100 }}>
+                  <span className="stat-label">Tiro</span>
+                  <span className="stat-value">{bot.tiro || 50}</span>
+                </div>
+                <div className="radar-stat" style={{ '--value': (bot.velocidad || 50) / 100 }}>
+                  <span className="stat-label">Velocidad</span>
+                  <span className="stat-value">{bot.velocidad || 50}</span>
+                </div>
+                <div className="radar-stat" style={{ '--value': (bot.defensa || 50) / 100 }}>
+                  <span className="stat-label">Defensa</span>
+                  <span className="stat-value">{bot.defensa || 50}</span>
+                </div>
+                <div className="radar-stat" style={{ '--value': (bot.potencia || 50) / 100 }}>
+                  <span className="stat-label">Potencia</span>
+                  <span className="stat-value">{bot.potencia || 50}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* PROBABILIDADES Y RECOMPENSAS */}
+            <div className="match-prediction">
+              <div className="probability-bar">
+                <div className="probability-labels">
+                  <span>Tú: {Math.round(winProbability)}%</span>
+                  <span>Empate: {Math.round((100 - winProbability) * 0.3)}%</span>
+                  <span>Bot: {Math.round((100 - winProbability) * 0.7)}%</span>
+                </div>
+                <div className="probability-visual">
+                  <div 
+                    className="prob-win" 
+                    style={{ width: `${winProbability}%` }}
+                    title={`Probabilidad de victoria: ${Math.round(winProbability)}%`}
+                  ></div>
+                  <div 
+                    className="prob-draw" 
+                    style={{ width: `${(100 - winProbability) * 0.3}%` }}
+                    title={`Probabilidad de empate: ${Math.round((100 - winProbability) * 0.3)}%`}
+                  ></div>
+                  <div 
+                    className="prob-lose" 
+                    style={{ width: `${(100 - winProbability) * 0.7}%` }}
+                    title={`Probabilidad de derrota: ${Math.round((100 - winProbability) * 0.7)}%`}
+                  ></div>
+                </div>
+              </div>
+
+              <div className="rewards-info">
+                <div className="reward-item">
+                  <span className="reward-icon">⭐</span>
+                  <span className="reward-amount">+{rewards.exp} EXP</span>
+                </div>
+                <div className="reward-item">
+                  <span className="reward-icon">🪙</span>
+                  <span className="reward-amount">+{rewards.coins} Monedas</span>
+                </div>
+                <div className="reward-bonus">
+                  +{Math.round(difficultyMultiplier * 100 - 100)}% Bonus Dificultad
+                </div>
+              </div>
+            </div>
+
+            {/* BOTÓN DE JUGAR */}
+            <button 
+              className={`play-btn professional ${bot.difficulty}`} 
+              onClick={() => onStartMatch(bot)} 
+              disabled={loading || simulating}
+              style={{ 
+                background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
+                boxShadow: `0 4px 15px ${getDifficultyColor(bot.difficulty)}40`
+              }}
+            >
+              {loading && selectedBot?.id === bot.id ? (
+                <span className="loading-spinner">🔄 CARGANDO...</span>
               ) : (
-                <div className="no-bots-message">
-                  <div className="empty-state">
-                    <div className="empty-icon">🤖</div>
-                    <h4>No hay oponentes disponibles</h4>
-                    <p>Intenta recargar la página</p>
-                  </div>
+                <div className="play-btn-content">
+                  <span>⚔️ JUGAR PARTIDO</span>
+                  <span className="match-duration">90' • {Math.round(botOverall)} OVR</span>
                 </div>
               )}
-            </div>
-          ) : null}
+            </button>
+          </div>
+        );
+      })
+    ) : (
+      <div className="no-bots-message">
+        <div className="empty-state">
+          <div className="empty-icon">🤖</div>
+          <h4>No hay oponentes disponibles</h4>
+          <p>Intenta recargar la página</p>
+        </div>
+      </div>
+    )}
+  </div>
+) : null}
         </div>
       </div>
     </div>
