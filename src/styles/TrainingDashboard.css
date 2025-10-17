@@ -1267,13 +1267,22 @@
 
 /* HEADER SUPERIOR DE LA APLICACIÓN */
 .app-header.professional {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+  display: flex;
+  flex-direction: column; /* organiza contenido en columna */
+  align-items: center; /* centra horizontalmente */
+  justify-content: center; /* centra verticalmente */
+
+  background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .95));
   border-bottom: 3px solid #4cc9f0;
   padding: 1rem 2rem;
-  margin-bottom: 1.5rem;
+  margin: 0 auto 1.5rem auto; /* centra el bloque y deja margen abajo */
   border-radius: 0 0 15px 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px #0000004d;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+  width: fit-content; /* ajusta ancho al contenido */
+  max-width: 90%; /* evita desbordes */
+  text-align: center;
 }
 
 .header-content {
