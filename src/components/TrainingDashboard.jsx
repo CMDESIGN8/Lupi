@@ -734,32 +734,48 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
     bot: { x: 75, y: 60 }
   };
 
-  return (
+return (
     <div className="training-dashboard super-pro">
-      <div className="main-layout">
-        <div clssName="taining-dashboard header>
-  <div className="commentary-header-top">
-      <h3>🎙️ COMENTARIO EN VIVO</h3>
-    <div className="match-time professional">
-        <span className="score-display">
-          {matchStats ? `${matchStats.user.goals || 0} - ${matchStats.bot.goals || 0}` : '0 - 0'}
-        </span>
-        <span className="time">{simulationState.matchTime}'</span>
-        <span className="phase">
-          {simulationState.matchTime <= 45 ? '1º TIEMPO' : 
-           simulationState.matchTime < 90 ? '2º TIEMPO' : 'FINAL'}
-              </span>
-      </div>
-  </div>
-  
-  <div className="commentary-header-bottom">
-    <SimulationControls 
-      speed={simulationState.speed} 
-      setSpeed={(s) => setSimulationState(prev => ({ ...prev, speed: s }))}
-      momentum={simulationState.momentum}
-    />
-  </div>
+      {/* HEADER SUPERIOR DE LA APLICACIÓN */}
+      <div className="app-header professional">
+        <div className="header-content">
+          <div className="header-section">
+            <h2>⚽ SIMULADOR TÁCTICO PRO</h2>
+            <div className="match-info-header">
+              {simulating && selectedBot && (
+                <span className="opponent-info">vs {selectedBot.name}</span>
+              )}
             </div>
+          </div>
+          
+          <div className="header-section">
+            <div className="match-status">
+              <div className="score-display-header">
+                {matchStats ? `${matchStats.user.goals || 0} - ${matchStats.bot.goals || 0}` : '0 - 0'}
+              </div>
+              <div className="time-display">
+                <span className="match-time-header">{simulationState.matchTime}'</span>
+                <span className="phase-header">
+                  {simulationState.matchTime <= 45 ? '1º TIEMPO' : 
+                   simulationState.matchTime < 90 ? '2º TIEMPO' : 'FINAL'}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="header-section">
+            <div className="controls-header">
+              <SimulationControls 
+                speed={simulationState.speed} 
+                setSpeed={(s) => setSimulationState(prev => ({ ...prev, speed: s }))}
+                momentum={simulationState.momentum}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="main-layout">
         <div className="left-panel">
           <div className="soccer-field professional">
             <div className="field-grass">
@@ -774,7 +790,7 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
               <div className="penalty-spot left"></div>
               <div className="penalty-spot right"></div>
               
-              {/* Barra de Momentum */}
+              {/* Barra de Momentum en el campo */}
               <div className="momentum-overlay">
                 <div className="momentum-bar-field">
                   <div 
@@ -783,7 +799,7 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
                     data-value={simulationState.momentum}
                   >
                     <span className="momentum-text">
-                      Momentum: {simulationState.momentum}%
+                      Momentum: {Math.round(simulationState.momentum)}%
                     </span>
                   </div>
                 </div>
@@ -871,10 +887,7 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
 
         <div className="right-panel">
           <div className="match-commentary professional">
-            <div className="commentary-header professional">
-  
-  </div>
-            
+            {/* SOLO EL FEED DE COMENTARIOS - SIN HEADER */}
             <div className="commentary-feed professional">
               {matchEvents.length === 0 ? (
                 <div className="no-commentary professional">
