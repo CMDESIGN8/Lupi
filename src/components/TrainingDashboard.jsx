@@ -1180,7 +1180,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                 </div>
                 
                 <div className="reward-card coins">
-                  <div className="reward-icon">🪙</div>
+                  <div className="reward-icon">💰</div>
                   <div className="reward-info">
                     <div className="reward-amount">+{rewards.coins}</div>
                     <div className="reward-label">Monedas</div>
