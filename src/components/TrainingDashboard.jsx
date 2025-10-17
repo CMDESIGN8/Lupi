@@ -159,7 +159,7 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
           const newTime = prev.matchTime + 1;
           
           // Finalizar partido a los 90 minutos
-          if (newTime >= 10) { // Cambiado a 10 para pruebas, luego poner 90
+          if (newTime >= 90) { // Cambiado a 10 para pruebas, luego poner 90
             console.log("🏁 FINALIZANDO PARTIDO");
             clearInterval(simulationIntervalRef.current);
             
