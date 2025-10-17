@@ -738,7 +738,7 @@ return (
     <div className="training-dashboard super-pro">
       {/* HEADER SUPERIOR DE LA APLICACIÓN */}
       <div className="app-header professional">
-        <div className="header-content">
+        <div className="dashboard-header">
           <div className="header-section">
             <h2>⚽ SIMULADOR TÁCTICO PRO</h2>
             <div className="match-info-header">
