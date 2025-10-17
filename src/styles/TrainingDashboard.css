@@ -43,7 +43,7 @@
   display: grid;
   grid-template-columns: 65% 35%;
   gap: 1.5rem;
-  height: 65vh;
+  height: 100vh;
   margin-bottom: 1.5rem;
   position: relative;
 }
@@ -53,7 +53,8 @@
   background: rgba(15, 23, 42, 0.8);
   border-radius: 20px;
   border: 2px solid #4cc9f0;
-  overflow: hidden;
+  height: 100%;
+  overflow-y: auto; /* para que se pueda scrollear si hay mucho contenido */
   position: relative;
   box-shadow: 
     0 10px 30px rgba(0, 0, 0, 0.3),
@@ -1361,7 +1362,8 @@
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.9));
   border-radius: 20px;
   border: 2px solid #4cc9f0;
-  overflow: hidden;
+  height: 100%;
+  overflow-y: auto; /* para que se pueda scrollear si hay mucho contenido */
   display: flex;
   flex-direction: column;
   box-shadow: 
