@@ -39,7 +39,7 @@ const SimulationControls = ({ speed, setSpeed, momentum }) => (
       <button onClick={() => setSpeed(150)} title="Muy Rápido" className={speed === 150 ? 'active' : ''}>⚡</button>
     </div>
     <div className="momentum-indicator">
-      <div className="momentum-label">Momentum</div>
+      <div className="momentum-label">Posesion</div>
       <div className="momentum-bar">
         <div 
           className="momentum-fill" 
