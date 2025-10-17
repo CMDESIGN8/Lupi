@@ -220,10 +220,7 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
 
   return ( 
     <div className="training-dashboard"> 
-      {/* HEADER SOLO CON ESTADÍSTICAS - SIN TÍTULO GRANDE */} 
-      <div className="dashboard-header"> 
-        </div> 
-      </div> 
+      {/* HEADER ELIMINADO - SOLO QUEDA EL LAYOUT PRINCIPAL */}
 
       <div className="main-layout"> 
         {/* PANEL IZQUIERDO 70% - CAMPO DE JUEGO */} 
