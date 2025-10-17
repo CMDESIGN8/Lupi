@@ -1167,7 +1167,6 @@ const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating,
           ) : null}
         </div>
       </div>
-    </div>
   );
 };
 
