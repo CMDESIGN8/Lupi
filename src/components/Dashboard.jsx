@@ -95,11 +95,6 @@ export const Dashboard = ({ user }) => {
       <div className="dashboard">
         {/* Header con botón para volver */}
         <div className="section-header">
-          <button 
-            className="back-button"
-            onClick={() => setCurrentSection("dashboard")}
-          >
-        </button>>
           </div>
 
         <BotMatchmaking 
