@@ -2018,3 +2018,151 @@
     justify-content: space-between;
   }
 }
+
+/* GRÁFICO RADAR SIMPLE */
+.simple-radar-container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.radar-chart-simple {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Anillos del radar */
+.radar-ring-simple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ring-1 { width: 40px; height: 40px; }
+.ring-2 { width: 80px; height: 80px; }
+.ring-3 { width: 120px; height: 120px; }
+.ring-4 { width: 160px; height: 160px; }
+.ring-5 { width: 180px; height: 180px; }
+
+/* Ejes */
+.radar-axis-simple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform-origin: center left;
+}
+
+.axis-1 { width: 90px; transform: translate(0, -50%) rotate(0deg); }
+.axis-2 { width: 90px; transform: translate(0, -50%) rotate(90deg); }
+.axis-3 { width: 90px; transform: translate(0, -50%) rotate(180deg); }
+.axis-4 { width: 90px; transform: translate(0, -50%) rotate(270deg); }
+
+/* Polígono principal */
+.radar-polygon-simple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 180px;
+  height: 180px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.4),
+    rgba(16, 185, 129, 0.4),
+    rgba(59, 130, 246, 0.4),
+    rgba(139, 92, 246, 0.4)
+  );
+  clip-path: polygon(
+    calc(50% + 0px * var(--shooting, 0.5)) calc(50% - 90px * var(--shooting, 0.5)),
+    calc(50% + 90px * var(--pace, 0.5)) calc(50% + 0px * var(--pace, 0.5)),
+    calc(50% + 0px * var(--defending, 0.5)) calc(50% + 90px * var(--defending, 0.5)),
+    calc(50% - 90px * var(--physical, 0.5)) calc(50% + 0px * var(--physical, 0.5))
+  );
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Puntos y labels */
+.radar-point-simple {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.point-tiro { top: 10%; left: 50%; transform: translateX(-50%); }
+.point-velocidad { top: 50%; right: 10%; transform: translateY(-50%); }
+.point-defensa { bottom: 10%; left: 50%; transform: translateX(-50%); }
+.point-potencia { top: 50%; left: 10%; transform: translateY(-50%); }
+
+.point-label {
+  font-size: 0.6rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.point-value {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #4cc9f0;
+  font-family: 'Orbitron', sans-serif;
+  background: rgba(15, 23, 42, 0.8);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Efectos hover */
+.radar-polygon-simple {
+  transition: all 0.3s ease;
+}
+
+.radar-chart-simple:hover .radar-polygon-simple {
+  opacity: 0.8;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .radar-chart-simple {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .ring-1 { width: 30px; height: 30px; }
+  .ring-2 { width: 60px; height: 60px; }
+  .ring-3 { width: 90px; height: 90px; }
+  .ring-4 { width: 120px; height: 120px; }
+  .ring-5 { width: 140px; height: 140px; }
+  
+  .axis-1, .axis-2, .axis-3, .axis-4 { width: 70px; }
+  
+  .radar-polygon-simple {
+    width: 140px;
+    height: 140px;
+    clip-path: polygon(
+      calc(50% + 0px * var(--shooting, 0.5)) calc(50% - 70px * var(--shooting, 0.5)),
+      calc(50% + 70px * var(--pace, 0.5)) calc(50% + 0px * var(--pace, 0.5)),
+      calc(50% + 0px * var(--defending, 0.5)) calc(50% + 70px * var(--defending, 0.5)),
+      calc(50% - 70px * var(--physical, 0.5)) calc(50% + 0px * var(--physical, 0.5))
+    );
+  }
+  
+  .point-label {
+    font-size: 0.5rem;
+  }
+  
+  .point-value {
+    font-size: 0.7rem;
+  }
+}
