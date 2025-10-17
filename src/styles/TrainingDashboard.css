@@ -26,6 +26,18 @@
   z-index: -1;
 }
 
+/* HEADER */ .training-dashboard { 
+  min-height: 100vh; 
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%); 
+  color: white; 
+  padding: 1rem; 
+  font-family: 'Rajdhani', sans-serif; 
+}
+
+.training-dashboard .header-main {
+  display: flex;
+}
+
 /* LAYOUT PRINCIPAL MEJORADO */
 .training-dashboard .main-layout {
   display: grid;
