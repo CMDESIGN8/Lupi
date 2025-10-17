@@ -682,7 +682,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       <div className="app-header professional">
         <div className="header-content">
           <div className="header-section">
-            <h2>⚽ Comenzar Partido</h2>
+            <h2>⚽ Campo de Entrenamiento</h2>
             <div className="match-info-header">
               {simulating && selectedBot ? (
                 <span className="opponent-info">vs {selectedBot.name}</span>
