@@ -2181,3 +2181,169 @@
     font-size: 0.7rem;
   }
 }
+
+/* ESTILOS ESPECÍFICOS PARA FÚTSAL */
+
+.training-dashboard.futsal-version .soccer-field.futsal-field {
+  background: 
+    linear-gradient(135deg, #1e4d2b 0%, #2d7a3d 100%),
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px);
+  border-radius: 8px;
+}
+
+/* Áreas de penalti de futsal */
+.training-dashboard .penalty-area.futsal-penalty {
+  top: 25%;
+  height: 50%;
+  width: 15%;
+  border-radius: 0 8px 8px 0;
+}
+
+.training-dashboard .penalty-area.futsal-penalty.right {
+  border-radius: 8px 0 0 8px;
+}
+
+/* Porterías de futsal */
+.training-dashboard .goal.futsal-goal {
+  top: 42%;
+  height: 16%;
+  width: 1.5%;
+}
+
+/* Segundo punto de penalti */
+.training-dashboard .second-penalty {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.6);
+  border-radius: 50%;
+}
+
+.training-dashboard .second-penalty.left { left: 8%; }
+.training-dashboard .second-penalty.right { right: 8%; }
+
+/* Jugadores específicos */
+.training-dashboard .player.goalkeeper .player-icon {
+  font-size: 2.2rem;
+}
+
+.training-dashboard .player.field-player .player-icon {
+  font-size: 2rem;
+}
+
+/* Indicador de faltas */
+.training-dashboard .fouls-indicator {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2rem;
+  background: rgba(0,0,0,0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.training-dashboard .fouls-user {
+  color: #4cc9f0;
+}
+
+.training-dashboard .fouls-bot {
+  color: #f87171;
+}
+
+/* Selector de formación */
+.formation-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.formation-selector label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.formation-selector select {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid #4cc9f0;
+  border-radius: 6px;
+  color: white;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Tiempo de partido en controles */
+.match-time-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  border: 2px solid rgba(255,255,255,0.3);
+  min-width: 80px;
+}
+
+.match-time-display .time {
+  font-size: 1.1rem;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+}
+
+.match-time-display .phase {
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+
+/* Estadísticas específicas de futsal */
+.stats-category h4 {
+  font-size: 0.85rem;
+}
+
+.stat-row {
+  font-size: 0.8rem;
+}
+
+/* Preview de formación */
+.formation-preview {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.formation-info {
+  text-align: center;
+  padding: 1rem;
+}
+
+.formation-info h4 {
+  color: #4cc9f0;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive para futsal */
+@media (max-width: 768px) {
+  .training-dashboard.futsal-version .main-layout.improved {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 50vh auto;
+  }
+  
+  .formation-selector {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .fouls-indicator {
+    font-size: 0.7rem;
+    gap: 1rem;
+  }
+}
