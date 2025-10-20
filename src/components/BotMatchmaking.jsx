@@ -11,7 +11,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
   const [matchHistory, setMatchHistory] = useState([]);
   const [matchResult, setMatchResult] = useState(null);
   const [finalStats, setFinalStats] = useState(null);
-  const [showResult, setShowResult] = useState(false); // ✅ NUEVO ESTADO para controlar visibilidad
+  const [showResult, setShowResult] = useState(false);
 
   useEffect(() => {
     fetchBots();
@@ -20,15 +20,11 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
     }
   }, [character]);
 
+  // ✅ ELIMINAMOS EL TIMER AUTOMÁTICO - SOLO SE CIERRA MANUALMENTE
   useEffect(() => {
     if (matchResult) {
       console.log("🔄 MatchResult actualizado, mostrando resultado...", matchResult);
       setShowResult(true);
-      
-      const timer = setTimeout(() => {
-        closeResult();
-      }, 10000);
-      return () => clearTimeout(timer);
     }
   }, [matchResult]);
 
@@ -92,7 +88,6 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
     }
   };
 
-  // ✅ FUNCIÓN MEJORADA: Manejar finalización de simulación visual
   const handleMatchFinish = async (matchStats) => {
     console.log("🏁 Simulación visual terminada, guardando resultados...", matchStats);
     
@@ -126,13 +121,11 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
           console.log("📦 Respuesta del backend (simulate):", simulateData);
           
           if (simulateResponse.ok) {
-            // ✅ ESTABLECER RESULTADO CON DATOS DEL BACKEND
             setMatchResult({
               ...simulateData,
               botName: selectedBot.name,
               simulation: {
                 ...simulateData.simulation,
-                // Mantener las estadísticas visuales también
                 userStats: matchStats?.user,
                 botStats: matchStats?.bot
               }
@@ -143,12 +136,10 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
             if (onMatchUpdate) setTimeout(() => onMatchUpdate(), 1000);
           } else {
             console.error("❌ Error en simulación backend:", simulateData);
-            // ✅ CREAR RESULTADO CON STATS VISUALES
             createVisualResult(matchStats);
           }
         } else {
           console.error("❌ Error creando match en backend");
-          // ✅ CREAR RESULTADO CON STATS VISUALES
           createVisualResult(matchStats);
         }
       } else {
@@ -157,15 +148,12 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
       }
     } catch (error) {
       console.error("❌ Error guardando resultado:", error);
-      // ✅ CREAR RESULTADO CON STATS VISUALES
       createVisualResult(matchStats);
     } finally {
       setSimulating(false);
-      // No resetear selectedBot inmediatamente, esperar a que se muestre el resultado
     }
   };
 
-  // ✅ NUEVA FUNCIÓN: Crear resultado basado en simulación visual
   const createVisualResult = (matchStats) => {
     const userGoals = matchStats?.user?.goals || 0;
     const botGoals = matchStats?.bot?.goals || 0;
@@ -189,13 +177,12 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
     console.log("🎨 Creando resultado visual:", visualResult);
     setMatchResult(visualResult);
     
-    // Actualizar historial localmente
     fetchMatchHistory();
     if (onMatchUpdate) setTimeout(() => onMatchUpdate(), 1000);
   };
 
   const closeResult = () => {
-    console.log("🔒 Cerrando resultado...");
+    console.log("🔒 Cerrando resultado manualmente...");
     setShowResult(false);
     setMatchResult(null);
     setFinalStats(null);
@@ -215,7 +202,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
 
   return (
     <div className="bot-matchmaking-container">
-      {/* ✅ MOSTRAR TrainingDashboard SOLO SI NO HAY RESULTADO VISIBLE */}
+      {/* MOSTRAR TrainingDashboard SOLO SI NO HAY RESULTADO VISIBLE */}
       {!showResult && (
         <TrainingDashboard
           character={character}
@@ -232,7 +219,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
         />
       )}
       
-      {/* ✅ MOSTRAR MatchResult CUANDO HAY RESULTADO Y showResult ES TRUE */}
+      {/* MOSTRAR MatchResult CUANDO HAY RESULTADO - PERMANECE HASTA CERRAR MANUALMENTE */}
       {showResult && matchResult && (
         <MatchResult
           result={matchResult}
