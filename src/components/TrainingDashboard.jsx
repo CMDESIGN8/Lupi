@@ -818,10 +818,10 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
 
   const getBotAvatar = useCallback((botLevel) => { 
     const level = botLevel || 1;
-    if (level <= 2) return "🥅"; 
-    if (level <= 4) return "⚽"; 
-    if (level <= 6) return "👟"; 
-    if (level <= 8) return "🔥"; 
+    if (level <= 2) return "👽"; 
+    if (level <= 4) return "👻"; 
+    if (level <= 6) return "🤖"; 
+    if (level <= 8) return "🧑🏼"; 
     if (level <= 10) return "🏆";
     return "👑"; 
   }, []);
