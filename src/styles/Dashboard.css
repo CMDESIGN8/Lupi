@@ -1057,18 +1057,6 @@ body {
   transform: translateY(-2px);
 }
 
-/* Header de skills actualizado */
-.skills-header h3 {
-  font-family: 'Orbitron', monospace;
-  font-size: 1.3rem;
-  background: linear-gradient(90deg, var(--secondary), var(--primary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-}
-
 /* Agregar al styles/Dashboard.css */
 
 /* Estados de carga y deshabilitado */
