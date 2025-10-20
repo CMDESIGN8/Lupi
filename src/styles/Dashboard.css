@@ -146,7 +146,7 @@ body {
   font-size: 2rem;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--violet);
   margin-bottom: 5px;
 }
 
