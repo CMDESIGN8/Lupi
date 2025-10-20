@@ -11,12 +11,11 @@ const MATCH_CONFIG = {
     GOAL: 'goal',
     FOUL: 'foul',
     CORNER: 'corner',
-    OFFSIDE: 'offside', // No existe en futsal pero lo mantenemos
+    OFFSIDE: 'offside',
     SAVE: 'save',
     CROSS: 'cross',
-    PIVOT: 'pivot',
     WALL_PASS: 'wall_pass',
-    POWER_PLAY: 'power_play', // Portero-jugador
+    POWER_PLAY: 'power_play',
     DOUBLE_PENALTY: 'double_penalty'
   },
   ZONES: {
@@ -90,8 +89,8 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       user: '3-1',
       bot: '2-2'
     },
-    powerPlay: false, // Portero-jugador
-    accumulatedFouls: { user: 0, bot: 0 } // Faltas acumuladas para doble penalti
+    powerPlay: false,
+    accumulatedFouls: { user: 0, bot: 0 }
   });
 
   const [matchStats, setMatchStats] = useState(null);
@@ -103,7 +102,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
   const calculatePlayerRating = useCallback((player, role = 'balanced') => {
     if (!player) return 50;
     const weights = {
-      balanced: { tiro: 0.25, potencia: 0.20, defensa: 0.25, velocidad: 0.30 },
+      balanced: { tiro: 0.30, potencia: 0.25, defensa: 0.25, velocidad: 0.20 },
       pivot: { tiro: 0.35, potencia: 0.25, defensa: 0.15, velocidad: 0.25 },
       defender: { tiro: 0.15, potencia: 0.20, defensa: 0.40, velocidad: 0.25 },
       winger: { tiro: 0.25, potencia: 0.25, defensa: 0.20, velocidad: 0.30 },
@@ -119,6 +118,51 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     );
   }, []);
 
+  // 📊 CALCULAR PORCENTAJES DE VICTORIA/DERROTA
+  const calculateWinProbability = useCallback(() => {
+    if (!matchStats || !character || !selectedBot) return { user: 50, bot: 50 };
+
+    const userRating = calculatePlayerRating(character, 'balanced');
+    const botRating = calculatePlayerRating(selectedBot, 'balanced');
+    
+    // Factores que influyen en la probabilidad
+    const baseProbability = (userRating / (userRating + botRating)) * 100;
+    
+    // Ajustes según estadísticas en tiempo real
+    let userAdjustment = 0;
+    let botAdjustment = 0;
+
+    // Momentum actual
+    const momentumFactor = (simulationState.momentum - 50) / 2;
+    userAdjustment += momentumFactor;
+    botAdjustment -= momentumFactor;
+
+    // Eficiencia de disparos
+    const userShotEfficiency = matchStats.user.shotAccuracy || 0;
+    const botShotEfficiency = matchStats.bot.shotAccuracy || 0;
+    userAdjustment += (userShotEfficiency - 50) / 20;
+    botAdjustment += (botShotEfficiency - 50) / 20;
+
+    // Posesión del balón
+    const possessionFactor = (matchStats.user.possession - 50) / 10;
+    userAdjustment += possessionFactor;
+    botAdjustment -= possessionFactor;
+
+    // Presión defensiva
+    const pressureFactor = (simulationState.pressure.user - simulationState.pressure.bot) / 15;
+    userAdjustment += pressureFactor;
+    botAdjustment -= pressureFactor;
+
+    // Aplicar ajustes
+    const userProbability = Math.max(5, Math.min(95, baseProbability + userAdjustment));
+    const botProbability = Math.max(5, Math.min(95, 100 - userProbability));
+
+    return {
+      user: Math.round(userProbability),
+      bot: Math.round(botProbability)
+    };
+  }, [matchStats, character, selectedBot, simulationState, calculatePlayerRating]);
+
   // 🏃 SISTEMA DE POSICIONAMIENTO PARA FÚTSAL
   const calculatePlayerPositions = useCallback((ballZone, possession, matchTime, formation = '3-1') => {
     const baseFormations = {
@@ -128,14 +172,14 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           { x: 40, y: 25 }, // Defensa izquierdo
           { x: 40, y: 50 }, // Defensa central
           { x: 40, y: 75 }, // Defensa derecho
-          { x: 70, y: 50 }  // Pívot
+          { x: 70, y: 50 }  // Delantero
         ],
         bot: [
           { x: 80, y: 50 }, // Portero
           { x: 60, y: 25 }, // Defensa izquierdo
           { x: 60, y: 50 }, // Defensa central
           { x: 60, y: 75 }, // Defensa derecho
-          { x: 30, y: 50 }  // Pívot
+          { x: 30, y: 50 }  // Delantero
         ]
       },
       '2-2': {
@@ -143,15 +187,15 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           { x: 20, y: 50 }, // Portero
           { x: 45, y: 30 }, // Ala izquierdo
           { x: 45, y: 70 }, // Ala derecho
-          { x: 65, y: 30 }, // Pívot izquierdo
-          { x: 65, y: 70 }  // Pívot derecho
+          { x: 65, y: 30 }, // Delantero izquierdo
+          { x: 65, y: 70 }  // Delantero derecho
         ],
         bot: [
           { x: 80, y: 50 }, // Portero
           { x: 55, y: 30 }, // Ala izquierdo
           { x: 55, y: 70 }, // Ala derecho
-          { x: 35, y: 30 }, // Pívot izquierdo
-          { x: 35, y: 70 }  // Pívot derecho
+          { x: 35, y: 30 }, // Delantero izquierdo
+          { x: 35, y: 70 }  // Delantero derecho
         ]
       }
     };
@@ -207,7 +251,6 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       [MATCH_CONFIG.EVENT_TYPES.FOUL]: 0.06,
       [MATCH_CONFIG.EVENT_TYPES.CORNER]: 0.04,
       [MATCH_CONFIG.EVENT_TYPES.CROSS]: 0.03,
-      [MATCH_CONFIG.EVENT_TYPES.PIVOT]: 0.05,
       [MATCH_CONFIG.EVENT_TYPES.WALL_PASS]: 0.04,
       [MATCH_CONFIG.EVENT_TYPES.SAVE]: 0.02,
       [MATCH_CONFIG.EVENT_TYPES.POWER_PLAY]: 0.01
@@ -216,7 +259,6 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     // Ajustes por zona
     if (ballZone === MATCH_CONFIG.ZONES.BOT_DEFENSE) {
       baseProbabilities[MATCH_CONFIG.EVENT_TYPES.SHOT] += 0.10;
-      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.PIVOT] += 0.03;
       baseProbabilities[MATCH_CONFIG.EVENT_TYPES.PASS] -= 0.08;
     } else if (ballZone === MATCH_CONFIG.ZONES.USER_DEFENSE) {
       baseProbabilities[MATCH_CONFIG.EVENT_TYPES.TACKLE] += 0.08;
@@ -306,7 +348,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
         };
 
       case MATCH_CONFIG.EVENT_TYPES.SHOT:
-        const shotQuality = calculatePlayerRating(attacker, 'pivot');
+        const shotQuality = calculatePlayerRating(attacker, 'balanced');
         const saveQuality = calculatePlayerRating(defender, 'goalkeeper');
         const goalProbability = (shotQuality / (shotQuality + saveQuality * 1.5)) * (1 + (simulationState.momentum - 50) / 100);
         
@@ -349,19 +391,6 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
             sub_type: 'missed'
           };
         }
-
-      case MATCH_CONFIG.EVENT_TYPES.PIVOT:
-        const pivotTexts = [
-          `${attackerName} hace un excelente movimiento de pivote.`,
-          `Gran jugada de pivote de ${attackerName}, controla el balón en zona de peligro.`,
-        ];
-        return {
-          ...baseEvent,
-          text: getRandomText(pivotTexts),
-          intensity: MATCH_CONFIG.INTENSITY.MEDIUM,
-          zone: MATCH_CONFIG.ZONES.BOT_DEFENSE,
-          stat_type: 'pivots'
-        };
 
       case MATCH_CONFIG.EVENT_TYPES.WALL_PASS:
         const wallPassTexts = [
@@ -558,8 +587,6 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       change = possession === 'user' ? -6 : 6;
     } else if (event.sub_type === 'saved') {
       change = possession === 'user' ? -10 : 6;
-    } else if (event.action === MATCH_CONFIG.EVENT_TYPES.PIVOT) {
-      change = possession === 'user' ? 8 : -8;
     }
 
     change += (Math.random() - 0.5) * 4;
@@ -701,14 +728,14 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           shots: 0, goals: 0, passes: 0, tackles: 0, fouls: 0, 
           possession: 50, shotAccuracy: 0, passAccuracy: 100, 
           completed_passes: 0, saves: 0, name: character.nickname,
-          pivots: 0, wall_passes: 0, power_plays: 0, penalties: 0,
+          wall_passes: 0, power_plays: 0, penalties: 0,
           accumulatedFouls: 0
         },
         bot: { 
           shots: 0, goals: 0, passes: 0, tackles: 0, fouls: 0, 
           possession: 50, shotAccuracy: 0, passAccuracy: 100, 
           completed_passes: 0, saves: 0, name: selectedBot.name,
-          pivots: 0, wall_passes: 0, power_plays: 0, penalties: 0,
+          wall_passes: 0, power_plays: 0, penalties: 0,
           accumulatedFouls: 0
         }
       });
@@ -783,7 +810,6 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       [MATCH_CONFIG.EVENT_TYPES.TACKLE]: '🛑',
       [MATCH_CONFIG.EVENT_TYPES.FOUL]: '⚠️',
       [MATCH_CONFIG.EVENT_TYPES.CORNER]: '↶',
-      [MATCH_CONFIG.EVENT_TYPES.PIVOT]: '🔄',
       [MATCH_CONFIG.EVENT_TYPES.WALL_PASS]: '🧱',
       [MATCH_CONFIG.EVENT_TYPES.POWER_PLAY]: '🎯',
       [MATCH_CONFIG.EVENT_TYPES.DOUBLE_PENALTY]: '🎯',
@@ -905,6 +931,9 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     selectedFormation
   );
 
+  // Calcular probabilidades de victoria
+  const winProbabilities = calculateWinProbability();
+
   // ✅ CORRECCIÓN: Verificación segura para el array de bots
   const safeBots = Array.isArray(bots) ? bots : [];
 
@@ -967,6 +996,35 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           <div className="panel-content stats-content">
             {matchStats ? (
               <div className="advanced-stats improved">
+                {/* SECCIÓN DE PROBABILIDADES */}
+                <div className="stats-category">
+                  <h4>🎯 PROBABILIDADES</h4>
+                  <div className="probability-display">
+                    <div className="probability-item user">
+                      <span className="probability-label">{character?.nickname}:</span>
+                      <div className="probability-bar">
+                        <div 
+                          className="probability-fill user" 
+                          style={{ width: `${winProbabilities.user}%` }}
+                        >
+                          <span className="probability-value">{winProbabilities.user}%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="probability-item bot">
+                      <span className="probability-label">{selectedBot?.name}:</span>
+                      <div className="probability-bar">
+                        <div 
+                          className="probability-fill bot" 
+                          style={{ width: `${winProbabilities.bot}%` }}
+                        >
+                          <span className="probability-value">{winProbabilities.bot}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 <div className="stats-category">
                   <h4>⚽ ATAQUE</h4>
                   <div className="stat-row">
@@ -982,8 +1040,8 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                     <span>{matchStats.user.shotAccuracy || 0}% - {matchStats.bot.shotAccuracy || 0}%</span>
                   </div>
                   <div className="stat-row">
-                    <span>Pivotes:</span>
-                    <span>{matchStats.user.pivots || 0} - {matchStats.bot.pivots || 0}</span>
+                    <span>Pases:</span>
+                    <span>{matchStats.user.passes || 0} - {matchStats.bot.passes || 0}</span>
                   </div>
                 </div>
                 
@@ -998,12 +1056,12 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                     <span>{matchStats.user.fouls || 0} - {matchStats.bot.fouls || 0}</span>
                   </div>
                   <div className="stat-row">
-                    <span>Faltas Acum:</span>
-                    <span>{matchStats.user.accumulatedFouls || 0} - {matchStats.bot.accumulatedFouls || 0}</span>
-                  </div>
-                  <div className="stat-row">
                     <span>Paradas:</span>
                     <span>{matchStats.user.saves || 0} - {matchStats.bot.saves || 0}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Faltas Acum:</span>
+                    <span>{matchStats.user.accumulatedFouls || 0} - {matchStats.bot.accumulatedFouls || 0}</span>
                   </div>
                 </div>
                 
@@ -1027,16 +1085,12 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                     </div>
                   </div>
                   <div className="stat-row">
-                    <span>Pases:</span>
-                    <span>{matchStats.user.passes || 0} - {matchStats.bot.passes || 0}</span>
+                    <span>Precisión pases:</span>
+                    <span>{matchStats.user.passAccuracy || 0}% - {matchStats.bot.passAccuracy || 0}%</span>
                   </div>
                   <div className="stat-row">
                     <span>Paredes:</span>
                     <span>{matchStats.user.wall_passes || 0} - {matchStats.bot.wall_passes || 0}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>Precisión pases:</span>
-                    <span>{matchStats.user.passAccuracy || 0}% - {matchStats.bot.passAccuracy || 0}%</span>
                   </div>
                 </div>
 
@@ -1276,11 +1330,11 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                             </div>
                           </div>
                           <div className="stat-bar">
-                            <span>Pivote: {bot.pivote || 0}</span>
+                            <span>Defensa: {bot.defensa || 0}</span>
                             <div className="bar">
                               <div 
                                 className="fill" 
-                                style={{ width: `${bot.pivote || 0}%` }}
+                                style={{ width: `${bot.defensa || 0}%` }}
                               ></div>
                             </div>
                           </div>
