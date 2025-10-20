@@ -10,7 +10,8 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
   const [selectedBot, setSelectedBot] = useState(null);
   const [matchHistory, setMatchHistory] = useState([]);
   const [matchResult, setMatchResult] = useState(null);
-  const [finalStats, setFinalStats] = useState(null); // ✅ NUEVO ESTADO
+  const [finalStats, setFinalStats] = useState(null);
+  const [showResult, setShowResult] = useState(false); // ✅ NUEVO ESTADO para controlar visibilidad
 
   useEffect(() => {
     fetchBots();
@@ -21,9 +22,12 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
 
   useEffect(() => {
     if (matchResult) {
+      console.log("🔄 MatchResult actualizado, mostrando resultado...", matchResult);
+      setShowResult(true);
+      
       const timer = setTimeout(() => {
         closeResult();
-      }, 10000); // 10 segundos para ver resultados
+      }, 10000);
       return () => clearTimeout(timer);
     }
   }, [matchResult]);
@@ -41,16 +45,16 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
     }
   };
 
- const fetchBots = async () => {
-  try {
-    const response = await fetch(`https://lupiback.onrender.com/bots`);
-    const data = await response.json();
-    setBots(data.bots || []); // ✅ Asegurar que sea array
-  } catch (error) {
-    console.error("Error cargando bots:", error);
-    setBots([]); // ✅ En caso de error, establecer array vacío
-  }
-};
+  const fetchBots = async () => {
+    try {
+      const response = await fetch(`https://lupiback.onrender.com/bots`);
+      const data = await response.json();
+      setBots(data.bots || []);
+    } catch (error) {
+      console.error("Error cargando bots:", error);
+      setBots([]);
+    }
+  };
 
   const startBotMatch = async (bot) => {
     if (!character) return;
@@ -77,7 +81,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
         return;
       }
 
-      // ✅ INICIAR SIMULACIÓN VISUAL (sin llamar al backend aún)
+      // ✅ INICIAR SIMULACIÓN VISUAL
       setSimulating(true);
       
     } catch (error) {
@@ -85,20 +89,21 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
       alert("Error al jugar contra bot");
     } finally {
       setLoading(false);
-      // No resetear selectedBot aquí para que TrainingDashboard pueda usarlo
     }
   };
 
-  // ✅ NUEVA FUNCIÓN: Manejar finalización de simulación visual
+  // ✅ FUNCIÓN MEJORADA: Manejar finalización de simulación visual
   const handleMatchFinish = async (matchStats) => {
-    console.log("🏁 Simulación visual terminada, guardando resultados...");
+    console.log("🏁 Simulación visual terminada, guardando resultados...", matchStats);
     
     // Guardar estadísticas para mostrar en MatchResult
     setFinalStats(matchStats);
     
     try {
-      // Ahora llamar al backend para guardar el resultado real
+      // Llamar al backend para guardar el resultado real
       if (selectedBot) {
+        console.log("📡 Enviando resultado al backend...");
+        
         const matchResponse = await fetch(`https://lupiback.onrender.com/bots/match`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -109,6 +114,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
         });
 
         const matchData = await matchResponse.json();
+        console.log("📦 Respuesta del backend (match):", matchData);
 
         if (matchResponse.ok && matchData.match?.id) {
           // Simular el partido en el backend para obtener recompensas
@@ -117,14 +123,16 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
           });
 
           const simulateData = await simulateResponse.json();
+          console.log("📦 Respuesta del backend (simulate):", simulateData);
           
           if (simulateResponse.ok) {
+            // ✅ ESTABLECER RESULTADO CON DATOS DEL BACKEND
             setMatchResult({
               ...simulateData,
               botName: selectedBot.name,
               simulation: {
                 ...simulateData.simulation,
-                // ✅ Asegurar que tenemos las estadísticas de la simulación visual
+                // Mantener las estadísticas visuales también
                 userStats: matchStats?.user,
                 botStats: matchStats?.bot
               }
@@ -134,53 +142,64 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
             fetchMatchHistory();
             if (onMatchUpdate) setTimeout(() => onMatchUpdate(), 1000);
           } else {
-            console.error("Error en simulación backend:", simulateData);
-            // Mostrar resultado igual con stats visuales
-            setMatchResult({
-              simulation: {
-                player1Score: matchStats?.user?.goals || 0,
-                player2Score: matchStats?.bot?.goals || 0,
-                winnerId: (matchStats?.user?.goals || 0) > (matchStats?.bot?.goals || 0) ? character.id : selectedBot.id,
-                userStats: matchStats?.user,
-                botStats: matchStats?.bot
-              },
-              rewards: {
-                exp: 50 + (matchStats?.user?.goals || 0) * 10,
-                coins: 30 + (matchStats?.user?.goals || 0) * 5
-              },
-              botName: selectedBot.name,
-              leveledUp: false
-            });
+            console.error("❌ Error en simulación backend:", simulateData);
+            // ✅ CREAR RESULTADO CON STATS VISUALES
+            createVisualResult(matchStats);
           }
+        } else {
+          console.error("❌ Error creando match en backend");
+          // ✅ CREAR RESULTADO CON STATS VISUALES
+          createVisualResult(matchStats);
         }
+      } else {
+        console.error("❌ No hay bot seleccionado");
+        createVisualResult(matchStats);
       }
     } catch (error) {
-      console.error("Error guardando resultado:", error);
-      // Mostrar resultado con stats visuales aunque falle el backend
-      setMatchResult({
-        simulation: {
-          player1Score: matchStats?.user?.goals || 0,
-          player2Score: matchStats?.bot?.goals || 0,
-          winnerId: (matchStats?.user?.goals || 0) > (matchStats?.bot?.goals || 0) ? character.id : selectedBot.id,
-          userStats: matchStats?.user,
-          botStats: matchStats?.bot
-        },
-        rewards: {
-          exp: 50 + (matchStats?.user?.goals || 0) * 10,
-          coins: 30 + (matchStats?.user?.goals || 0) * 5
-        },
-        botName: selectedBot?.name || 'RIVAL',
-        leveledUp: false
-      });
+      console.error("❌ Error guardando resultado:", error);
+      // ✅ CREAR RESULTADO CON STATS VISUALES
+      createVisualResult(matchStats);
     } finally {
       setSimulating(false);
-      setSelectedBot(null);
+      // No resetear selectedBot inmediatamente, esperar a que se muestre el resultado
     }
   };
 
+  // ✅ NUEVA FUNCIÓN: Crear resultado basado en simulación visual
+  const createVisualResult = (matchStats) => {
+    const userGoals = matchStats?.user?.goals || 0;
+    const botGoals = matchStats?.bot?.goals || 0;
+    
+    const visualResult = {
+      simulation: {
+        player1Score: userGoals,
+        player2Score: botGoals,
+        winnerId: userGoals > botGoals ? character.id : (userGoals === botGoals ? null : selectedBot?.id),
+        userStats: matchStats?.user,
+        botStats: matchStats?.bot
+      },
+      rewards: {
+        exp: 50 + (userGoals * 10) + (userGoals > botGoals ? 50 : 0),
+        coins: 30 + (userGoals * 5) + (userGoals > botGoals ? 25 : 0)
+      },
+      botName: selectedBot?.name || 'RIVAL',
+      leveledUp: false
+    };
+    
+    console.log("🎨 Creando resultado visual:", visualResult);
+    setMatchResult(visualResult);
+    
+    // Actualizar historial localmente
+    fetchMatchHistory();
+    if (onMatchUpdate) setTimeout(() => onMatchUpdate(), 1000);
+  };
+
   const closeResult = () => {
+    console.log("🔒 Cerrando resultado...");
+    setShowResult(false);
     setMatchResult(null);
     setFinalStats(null);
+    setSelectedBot(null);
   };
 
   if (!character) {
@@ -196,19 +215,32 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
 
   return (
     <div className="bot-matchmaking-container">
-      <TrainingDashboard
-        character={character}
-        bots={bots}
-        matchHistory={matchHistory}
-        loading={loading}
-        simulating={simulating}
-        selectedBot={selectedBot}
-        onStartMatch={startBotMatch}
-        onMatchFinish={handleMatchFinish}
-        matchResult={matchResult}
-        onCloseResult={closeResult}
-        finalStats={finalStats}
-      />
+      {/* ✅ MOSTRAR TrainingDashboard SOLO SI NO HAY RESULTADO VISIBLE */}
+      {!showResult && (
+        <TrainingDashboard
+          character={character}
+          bots={bots}
+          matchHistory={matchHistory}
+          loading={loading}
+          simulating={simulating}
+          selectedBot={selectedBot}
+          onStartMatch={startBotMatch}
+          onMatchFinish={handleMatchFinish}
+          matchResult={matchResult}
+          onCloseResult={closeResult}
+          finalStats={finalStats}
+        />
+      )}
+      
+      {/* ✅ MOSTRAR MatchResult CUANDO HAY RESULTADO Y showResult ES TRUE */}
+      {showResult && matchResult && (
+        <MatchResult
+          result={matchResult}
+          character={character}
+          onClose={closeResult}
+          finalStats={finalStats}
+        />
+      )}
     </div>
   );
 };
