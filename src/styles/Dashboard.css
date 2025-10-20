@@ -1,416 +1,594 @@
-/* styles/TrainingDashboard.css - VERSIÓN COMPLETA Y FUNCIONAL */
+/* styles/Dashboard.css - Versión Reorganizada */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
 
-/* ===== VARIABLES Y CONFIGURACIÓN GLOBAL ===== */
 :root {
-  /* Colores principales */
-  --primary-dark: #0f172a;
-  --primary-medium: #1e293b;
-  --primary-light: #334155;
-  --accent-blue: #4cc9f0;
-  --accent-purple: #4361ee;
-  --accent-red: #dc2626;
-  --accent-green: #16a34a;
-  --accent-yellow: #fbbf24;
-  
-  /* Colores futsal */
-  --futsal-blue: #1e40af;
-  --futsal-light-blue: #3b82f6;
-  --futsal-dark-blue: #1e3a8a;
-  
-  /* Gradientes */
-  --gradient-bg: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-  --gradient-primary: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 50%, var(--primary-light) 100%);
-  --gradient-accent: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-  --gradient-danger: linear-gradient(135deg, var(--accent-red), #b91c1c);
-  --gradient-futsal: linear-gradient(135deg, var(--futsal-blue) 0%, var(--futsal-light-blue) 100%);
-  
-  /* Efectos */
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.2);
-  --shadow-glow: 0 0 20px rgba(76, 201, 240, 0.4);
-  --border-glow: 2px solid var(--accent-blue);
+  --primary: #4361ee;
+  --secondary: #00bbf9;
+  --accent: #7209b7;
+  --violet: #7b2cbf;
+  --cyan: #4cc9f0;
+  --dark: #0a0a1a;
+  --darker: #000000;
+  --blue-dark: #001122;
 }
 
-/* ===== ESTILOS BASE ===== */
-.training-dashboard {
-  min-height: 100vh;
-  background: var(--gradient-bg);
-  color: white;
-  padding: 1rem;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, var(--blue-dark) 100%);
+  color: #fff;
   font-family: 'Rajdhani', sans-serif;
-  position: relative;
   overflow-x: hidden;
+  min-height: 100vh;
 }
 
-/* Efecto de partículas en el fondo */
-.training-dashboard::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(76, 201, 240, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(67, 97, 238, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(114, 9, 183, 0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-/* ===== LAYOUT PRINCIPAL ===== */
-.training-dashboard .main-layout {
-  display: grid;
-  grid-template-columns: 280px 1fr 280px;
-  gap: 1.5rem;
-  height: 65vh;
-  margin-bottom: 1.5rem;
-  position: relative;
-}
-
-/* ===== PANELES GENERALES ===== */
-.training-dashboard .left-panel,
-.training-dashboard .right-panel,
-.training-dashboard .bottom-panel,
-.training-dashboard .center-panel {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.95));
+.dashboard {
+  max-width: 1400px;
+  margin: 20px auto;
+  padding: 20px;
+  background: rgba(5, 10, 30, 0.85);
+  border: 1px solid var(--secondary);
   border-radius: 20px;
-  border: var(--border-glow);
-  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  position: relative;
-  overflow: hidden;
-}
-
-.training-dashboard .left-panel {
-  overflow-y: auto;
-}
-
-.training-dashboard .right-panel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.training-dashboard .center-panel {
-  height: 100%;
-}
-
-/* ===== CANCHA DE FÚTSAL AZUL ===== */
-.training-dashboard .soccer-field {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background: 
-    linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%),
-    repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.05) 15px, rgba(255,255,255,0.05) 30px);
-  border-radius: 15px;
-  border: 3px solid #e2e8f0;
-  overflow: hidden;
   box-shadow: 
-    inset 0 0 50px rgba(0, 0, 0, 0.4),
-    var(--shadow-md);
-}
-
-.training-dashboard .field-grass {
+    0 0 40px rgba(67, 97, 238, 0.3),
+    inset 0 0 30px rgba(114, 9, 183, 0.1);
   position: relative;
-  width: 100%; 
-  height: 100%;
-  background: 
-    linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 51%),
-    radial-gradient(circle at 50% 50%, transparent 70px, rgba(255,255,255,0.3) 70px, rgba(255,255,255,0.3) 72px, transparent 72px);
-}
-
-/* Elementos del campo en azul más claro */
-.training-dashboard .center-circle, 
-.training-dashboard .center-spot, 
-.training-dashboard .penalty-area, 
-.training-dashboard .small-area, 
-.training-dashboard .goal, 
-.training-dashboard .penalty-spot,
-.training-dashboard .second-penalty {
-  position: absolute;
-  border: 3px solid rgba(255,255,255,0.7);
-}
-
-.training-dashboard .center-circle { 
-  top: 50%; left: 50%; transform: translate(-50%, -50%); 
-  width: 140px; height: 140px; 
-  border-radius: 50%; 
-}
-
-.training-dashboard .center-spot { 
-  top: 50%; left: 50%; transform: translate(-50%, -50%); 
-  width: 12px; height: 12px; 
-  background: rgba(255,255,255,0.8); 
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255,255,255,0.5);
-  border: none;
-}
-
-.training-dashboard .penalty-area { 
-  top: 18%; height: 64%; width: 20%; 
-}
-
-.training-dashboard .penalty-area.left { 
-  left: 0; border-right: none; 
-  border-top-right-radius: 20px; border-bottom-right-radius: 20px; 
-}
-
-.training-dashboard .penalty-area.right { 
-  right: 0; border-left: none; 
-  border-top-left-radius: 20px; border-bottom-left-radius: 20px; 
-}
-
-.training-dashboard .penalty-area.futsal-penalty {
-  top: 25%; height: 50%; width: 15%;
-  border-radius: 0 8px 8px 0;
-}
-
-.training-dashboard .penalty-area.futsal-penalty.right {
-  border-radius: 8px 0 0 8px;
-}
-
-.training-dashboard .small-area { 
-  top: 32%; height: 36%; width: 10%; 
-}
-
-.training-dashboard .small-area.left { 
-  left: 0; border-right: none; 
-  border-top-right-radius: 12px; border-bottom-right-radius: 12px; 
-}
-
-.training-dashboard .small-area.right { 
-  right: 0; border-left: none; 
-  border-top-left-radius: 12px; border-bottom-left-radius: 12px; 
-}
-
-.training-dashboard .goal { 
-  top: 38%; height: 24%; width: 2.5%; 
-  background: rgba(255,255,255,0.2);
-}
-
-.training-dashboard .goal.left { left: -1.2%; }
-.training-dashboard .goal.right { right: -1.2%; }
-
-.training-dashboard .goal.futsal-goal {
-  top: 42%; height: 16%; width: 1.5%;
-}
-
-.training-dashboard .penalty-spot { 
-  top: 50%; transform: translateY(-50%); 
-  width: 10px; height: 10px; 
-  background: rgba(255,255,255,0.8); 
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(255,255,255,0.4);
-  border: none;
-}
-
-.training-dashboard .penalty-spot.left { left: 11%; }
-.training-dashboard .penalty-spot.right { right: 11%; }
-
-.training-dashboard .second-penalty {
-  top: 50%; transform: translateY(-50%);
-  width: 6px; height: 6px;
-  background: rgba(255,255,255,0.8);
-  border-radius: 50%;
-  border: none;
-}
-
-.training-dashboard .second-penalty.left { left: 8%; }
-.training-dashboard .second-penalty.right { right: 8%; }
-
-/* ===== JUGADORES Y BALÓN ===== */
-.training-dashboard .player {
-  position: absolute;
-  text-align: center;
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 10;
-  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.6));
-  transform: translate(-50%, -50%);
-}
-
-.training-dashboard .player-icon { 
-  font-size: 2.5rem; 
-  animation: playerPulse 3s infinite;
-}
-
-.training-dashboard .player.goalkeeper .player-icon {
-  font-size: 2.2rem;
-}
-
-.training-dashboard .player.field-player .player-icon {
-  font-size: 2rem;
-}
-
-.training-dashboard .player-name { 
-  margin-top: 0.3rem; 
-  font-weight: 700; 
-  font-size: 0.85rem; 
-  background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(30,41,59,0.9));
-  padding: 0.3rem 0.8rem; 
-  border-radius: 12px; 
-  border: 1px solid rgba(255,255,255,0.2);
-  backdrop-filter: blur(5px);
-  color: #FFFFFF;
-  white-space: nowrap;
-}
-
-.training-dashboard .soccer-ball {
-  position: absolute;
-  font-size: 2.2rem;
-  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.7));
-  z-index: 20;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: ballFloat 4s ease-in-out infinite;
-  transform: translate(-50%, -50%);
-}
-
-/* ===== MENSAJES Y ESTADOS ===== */
-.training-dashboard .field-message {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 5;
-  background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9));
-  padding: 3rem 4rem;
-  border-radius: 20px;
-  border: 2px solid rgba(76, 201, 240, 0.3);
+  overflow: hidden;
   backdrop-filter: blur(15px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
 
-.training-dashboard .field-message h3 { 
-  margin: 0 0 1.5rem 0; 
-  color: var(--accent-blue); 
-  font-family: 'Orbitron', monospace;
-  font-size: 1.8rem;
-  text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
-}
-
-.training-dashboard .field-message p { 
-  margin: 0; 
-  color: #e2e8f0; 
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
-/* ===== SISTEMA DE COMENTARIOS ===== */
-.training-dashboard .match-commentary {
-  flex: 1; 
-  display: flex; 
-  flex-direction: column;
-}
-
-.training-dashboard .commentary-header {
+/* Game Header */
+.game-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.2rem;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-  border-bottom: var(--border-glow);
-  position: relative;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(15, 20, 50, 0.7);
+  border-radius: 15px;
+  border: 1px solid var(--primary);
 }
 
-.training-dashboard .commentary-header::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
-}
-
-.training-dashboard .commentary-header h3 { 
-  margin: 0; 
-  color: var(--accent-blue); 
-  font-size: 1.3rem; 
+.game-header h1 {
   font-family: 'Orbitron', monospace;
-  text-shadow: 0 2px 8px rgba(76, 201, 240, 0.4);
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 20px rgba(0, 187, 249, 0.5);
 }
 
-.training-dashboard .commentary-feed {
-  flex: 1; 
-  overflow-y: auto; 
-  padding: 1.2rem; 
-  display: flex; 
-  flex-direction: column; 
-  gap: 0.8rem;
-  background: rgba(15, 23, 42, 0.3);
+.header-stats {
+  display: flex;
+  gap: 30px;
 }
 
-.training-dashboard .commentary-event {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
-  border-radius: 12px;
-  padding: 1rem;
-  border-left: 5px solid var(--accent-blue);
-  animation: commentSlideIn 0.5s ease;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255,255,255,0.1);
+.header-stat {
+  text-align: center;
+  padding: 10px 20px;
+  background: rgba(67, 97, 238, 0.2);
+  border-radius: 10px;
+  border: 1px solid var(--secondary);
 }
 
-.training-dashboard .commentary-event:hover {
-  transform: translateX(5px);
-  border-left-width: 8px;
-}
-
-.training-dashboard .commentary-event.low { border-left-color: #64748b; }
-.training-dashboard .commentary-event.medium { border-left-color: var(--accent-blue); }
-.training-dashboard .commentary-event.high { 
-  border-left-color: var(--accent-yellow); 
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(30, 41, 59, 0.9));
-}
-.training-dashboard .commentary-event.very-high { 
-  border-left-color: #f87171; 
-  background: linear-gradient(135deg, rgba(248, 113, 113, 0.2), rgba(30, 41, 59, 0.9));
-  animation: highlightPulse 2s infinite;
-}
-
-.training-dashboard .event-time { 
-  font-size: 0.75rem; 
-  color: #94a3b8; 
-  font-weight: bold; 
-  margin-bottom: 0.4rem; 
-  font-family: 'Orbitron', monospace;
+.stat-label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--secondary);
+  text-transform: uppercase;
   letter-spacing: 1px;
 }
 
-.training-dashboard .event-text { 
-  font-size: 0.95rem; 
-  color: #e2e8f0; 
-  line-height: 1.5;
-  font-weight: 500;
+.stat-value {
+  display: block;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--cyan);
 }
 
-/* ===== CONTROLES DE SIMULACIÓN ===== */
-.training-dashboard .simulation-controls { 
-  display: flex; 
-  gap: 0.5rem; 
-  align-items: center;
-  padding: 1rem;
+/* Dashboard Layout */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 25px;
+  margin-bottom: 25px;
 }
 
-.training-dashboard .simulation-controls.professional {
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.training-dashboard .speed-controls {
+/* Left Column - Athlete Profile */
+.left-column {
   display: flex;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 25px;
 }
 
-.training-dashboard .simulation-controls button {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--accent-blue);
+.athlete-profile {
+  background: rgba(15, 20, 50, 0.7);
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  padding: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.player-avatar {
+  width: 100px;
+  height: 100px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  border: 3px solid var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 25px rgba(0, 187, 249, 0.5);
+}
+
+.avatar-icon {
+  font-size: 2.5rem;
+}
+
+.player-info {
+  flex: 1;
+}
+
+.player-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 5px;
+}
+
+.player-level {
+  background: var(--accent);
   color: white;
-  font-size: 1.1rem;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  display: inline-block;
+  margin-bottom: 5px;
+  border: 2px solid var(--secondary);
+}
+
+.player-class {
+  color: var(--secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Experience Section */
+.exp-section {
+  margin: 25px 0;
+}
+
+.exp-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.exp-label {
+  color: var(--secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.exp-numbers {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+.exp-bar {
+  width: 100%;
+  height: 20px;
+  background: rgba(10, 15, 35, 0.9);
+  border: 2px solid var(--primary);
   border-radius: 10px;
-  width: 40px; 
+  margin: 10px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary), var(--primary), var(--accent));
+  border-radius: 8px;
+  transition: width 0.6s ease-in-out;
+  position: relative;
+}
+
+.glow-progress {
+  animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0% {
+    box-shadow: 
+      0 0 15px var(--secondary),
+      inset 0 0 10px rgba(255, 255, 255, 0.4);
+  }
+  100% {
+    box-shadow: 
+      0 0 25px var(--primary),
+      inset 0 0 15px rgba(255, 255, 255, 0.6);
+  }
+}
+
+.next-level {
+  text-align: center;
+  color: var(--secondary);
+  font-size: 0.9rem;
+}
+
+.next-level span {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+/* Quick Stats */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.quick-stat {
+  background: rgba(67, 97, 238, 0.2);
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+}
+
+.quick-label {
+  display: block;
+  color: var(--secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.quick-value {
+  display: block;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+/* Training Section */
+.training-section {
+  background: rgba(15, 20, 50, 0.7);
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  padding: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.training-section h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 15px;
+  border: none;
+  padding: 0;
+}
+
+.training-info {
+  margin-bottom: 20px;
+}
+
+.training-info p {
+  color: var(--secondary);
+  margin-bottom: 10px;
+}
+
+.training-rewards {
+  display: flex;
+  gap: 15px;
+}
+
+.training-rewards span {
+  background: rgba(76, 201, 240, 0.2);
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  font-size: 0.9rem;
+}
+
+.train-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  border: none;
+  padding: 15px;
+  border-radius: 12px;
+  color: #000;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 187, 249, 0.5);
+}
+
+.train-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 187, 249, 0.7);
+}
+
+/* Right Column */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Wallet Card */
+.wallet-card {
+  background: rgba(15, 20, 50, 0.7);
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  padding: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.wallet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.wallet-header h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.wallet-balance {
+  text-align: right;
+}
+
+.balance-amount {
+  display: block;
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+.balance-label {
+  display: block;
+  color: var(--secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.wallet-address {
+  margin-bottom: 20px;
+}
+
+.address-label {
+  color: var(--secondary);
+  font-size: 0.9rem;
+}
+
+.address-value {
+  color: var(--cyan);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.9rem;
+  word-break: break-all;
+  display: block;
+  margin-top: 5px;
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.wallet-btn {
+  flex: 1;
+  background: rgba(67, 97, 238, 0.3);
+  border: 1px solid var(--primary);
+  color: var(--secondary);
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Orbitron', monospace;
+  font-weight: 600;
+}
+
+.wallet-btn:hover {
+  background: rgba(67, 97, 238, 0.5);
+  border-color: var(--secondary);
+}
+
+/* Skills Section */
+.skills-section {
+  background: rgba(15, 20, 50, 0.7);
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  padding: 25px;
+  backdrop-filter: blur(10px);
+}
+
+.skills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.skills-header h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.skills-points {
+  text-align: right;
+}
+
+.points-available {
+  display: block;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+.points-label {
+  display: block;
+  color: var(--secondary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  max-height: 500px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* Scrollbar personalizado para skills */
+.skills-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.skills-grid::-webkit-scrollbar-track {
+  background: rgba(10, 15, 35, 0.8);
+  border-radius: 4px;
+}
+
+.skills-grid::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--secondary), var(--primary));
+  border-radius: 4px;
+}
+
+.skill-card {
+  background: rgba(20, 25, 60, 0.6);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.skill-card:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 5px 15px rgba(0, 187, 249, 0.3);
+  transform: translateY(-2px);
+}
+
+.skill-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.skill-icon {
+  width: 40px;
   height: 40px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.skill-info {
+  flex: 1;
+}
+
+.skill-name {
+  display: block;
+  font-weight: 600;
+  color: var(--secondary);
+  margin-bottom: 2px;
+}
+
+.skill-level {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--cyan);
+  font-family: 'Orbitron', monospace;
+}
+
+.skill-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(10, 15, 35, 0.9);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.skill-value {
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  color: var(--cyan);
+  min-width: 30px;
+  text-align: right;
+}
+
+.upgrade-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(76, 201, 240, 0.2);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
@@ -418,658 +596,149 @@
   justify-content: center;
 }
 
-.training-dashboard .simulation-controls button:hover { 
-  background: rgba(76, 201, 240, 0.3); 
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
-}
-
-.training-dashboard .simulation-controls button.active { 
-  background: var(--gradient-accent);
-  color: var(--primary-dark); 
+.upgrade-btn:hover:not(:disabled) {
+  background: rgba(76, 201, 240, 0.4);
   transform: scale(1.1);
-  box-shadow: var(--shadow-glow);
 }
 
-.training-dashboard .match-time {
-  background: var(--gradient-danger);
-  color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 25px;
-  font-size: 1rem;
-  font-weight: bold;
+.upgrade-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Global Actions */
+.global-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+.global-actions button {
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  border: none;
+  padding: 15px 25px;
+  border-radius: 12px;
+  color: #000;
   font-family: 'Orbitron', monospace;
-  min-width: 100px;
-  text-align: center;
-  border: 2px solid rgba(255,255,255,0.3);
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
-  animation: timePulse 2s infinite;
-}
-
-/* ===== ESTADÍSTICAS ===== */
-.training-dashboard .live-stats { 
-  padding: 1.2rem; 
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
-  border-top: var(--border-glow);
-  position: relative;
-}
-
-.training-dashboard .live-stats::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
-}
-
-.training-dashboard .stats-overview { 
-  display: flex; 
-  flex-direction: column; 
-  gap: 0.7rem; 
-}
-
-.training-dashboard .stat-row { 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  font-size: 0.9rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.training-dashboard .stat-row:last-child {
-  border-bottom: none;
-}
-
-.training-dashboard .possession-bar { 
-  display: flex; 
-  width: 150px; 
-  height: 24px; 
-  background: rgba(0,0,0,0.4); 
-  border-radius: 12px; 
-  overflow: hidden; 
-  border: 2px solid #475569;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
-}
-
-.training-dashboard .possession-fill { 
-  height: 100%; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  font-size: 0.75rem; 
-  font-weight: bold; 
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-}
-
-.training-dashboard .possession-fill.user { 
-  background: var(--gradient-accent);
-  color: white;
-}
-
-.training-dashboard .possession-fill.bot { 
-  background: linear-gradient(135deg, #f87171, #dc2626);
-  color: white;
-}
-
-/* ===== PANELES DE CONTENIDO ===== */
-.training-dashboard .panel-tabs { 
-  display: flex; 
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-  border-bottom: var(--border-glow);
-  position: relative;
-}
-
-.training-dashboard .panel-tabs::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
-}
-
-.training-dashboard .tab-button { 
-  flex: 1; 
-  padding: 1.2rem; 
-  background: none; 
-  border: none; 
-  color: #cbd5e1; 
-  font-weight: 700; 
-  cursor: pointer; 
-  transition: all 0.4s ease; 
-  font-family: 'Rajdhani', sans-serif; 
+  font-weight: 700;
   font-size: 1rem;
-  position: relative;
-  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 187, 249, 0.5);
 }
 
-.training-dashboard .tab-button::before {
-  content: '';
-  position: absolute;
+.global-actions button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0, 187, 249, 0.7);
+}
+
+/* Level Up Popup */
+.levelup-popup {
+  position: fixed;
   top: 0;
-  left: -100%;
+  left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(76, 201, 240, 0.2), transparent);
-  transition: left 0.5s ease;
-}
-
-.training-dashboard .tab-button:hover::before {
-  left: 100%;
-}
-
-.training-dashboard .tab-button.active { 
-  background: linear-gradient(135deg, var(--accent-purple), #3a0ca3);
-  color: white;
-  text-shadow: 0 2px 8px rgba(255,255,255,0.3);
-}
-
-.training-dashboard .tab-button:hover:not(.active) { 
-  background: rgba(76, 201, 240, 0.1);
-  color: var(--accent-blue);
-}
-
-.training-dashboard .panel-content { 
-  padding: 1.5rem; 
-  overflow-y: auto;
-  background: rgba(15, 23, 42, 0.3);
-  height: calc(100% - 60px);
-}
-
-/* ===== BOTS Y OPCIONES MEJORADOS ===== */
-.training-dashboard .bots-grid { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-  gap: 1.5rem; 
-  padding: 1rem;
-}
-
-.training-dashboard .bot-card { 
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
-  border-radius: 20px;
-  padding: 1.5rem;
-  border: 2px solid #475569;
-  transition: all 0.4s ease;
-  backdrop-filter: blur(10px);
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
-
-.training-dashboard .bot-card:hover { 
-  border-color: var(--accent-blue); 
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(76, 201, 240, 0.3);
-}
-
-.training-dashboard .bot-header { 
-  display: flex; 
-  align-items: flex-start; 
-  gap: 1.2rem; 
-  margin-bottom: 1.5rem; 
-}
-
-.training-dashboard .bot-avatar { 
-  width: 70px; 
-  height: 70px; 
-  border-radius: 50%; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  font-size: 2.5rem;
-  border: 3px solid rgba(255,255,255,0.3);
-  box-shadow: var(--shadow-lg);
-  position: relative;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.training-dashboard .bot-level {
-  position: absolute;
-  bottom: -5px;
-  right: -5px;
-  background: var(--gradient-accent);
-  color: white;
-  font-size: 0.7rem;
-  font-weight: bold;
-  padding: 0.2rem 0.5rem;
-  border-radius: 10px;
-  border: 2px solid var(--primary-dark);
-}
-
-.training-dashboard .bot-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.training-dashboard .bot-info h4 { 
-  margin: 0 0 0.8rem 0; 
-  font-size: 1.4rem;
-  color: var(--accent-blue);
-  font-family: 'Orbitron', monospace;
-  text-shadow: 0 2px 8px rgba(76, 201, 240, 0.3);
-}
-
-.training-dashboard .bot-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
-}
-
-.training-dashboard .stat-bar {
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  font-size: 0.85rem;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.5s ease;
 }
 
-.training-dashboard .stat-bar span:first-child {
-  min-width: 80px;
-  color: #cbd5e1;
+.levelup-content {
+  background: linear-gradient(135deg, rgba(0, 187, 249, 0.95), rgba(67, 97, 238, 0.95));
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 0 60px var(--secondary);
+  border: 3px solid #ffffff;
+  backdrop-filter: blur(20px);
+  animation: popupAppear 0.6s ease-out;
+}
+
+.levelup-content h2 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #000;
+  -webkit-text-fill-color: black;
+}
+
+.levelup-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin: 25px 0;
+}
+
+.level-stat {
+  text-align: center;
+}
+
+.level-stat span:first-child {
+  display: block;
+  color: #000;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.level-number {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #000;
+}
+
+.skill-points {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.levelup-content p {
+  color: #000;
   font-weight: 600;
 }
 
-.training-dashboard .stat-bar .bar {
-  flex: 1;
-  height: 8px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.training-dashboard .stat-bar .fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.8s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Colores de barras según estadística */
-.training-dashboard .stat-bar:nth-child(1) .fill {
-  background: linear-gradient(90deg, #ef4444, #f97316);
-}
-
-.training-dashboard .stat-bar:nth-child(2) .fill {
-  background: linear-gradient(90deg, #3b82f6, #06b6d4);
-}
-
-.training-dashboard .stat-bar:nth-child(3) .fill {
-  background: linear-gradient(90deg, #10b981, #84cc16);
-}
-
-.training-dashboard .bot-meta { 
-  display: flex; 
-  gap: 0.8rem; 
-  margin-top: 1rem;
-  flex-wrap: wrap;
-}
-
-.training-dashboard .level-badge, 
-.training-dashboard .difficulty-badge { 
-  font-size: 0.75rem; 
-  padding: 0.4rem 1rem; 
-  border-radius: 15px; 
-  background: rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.3);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.training-dashboard .difficulty-badge { 
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-  color: white;
-  border: none;
-  box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
-}
-
-/* Colores de dificultad */
-.training-dashboard .play-btn.easy {
-  background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.training-dashboard .play-btn.medium {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-}
-
-.training-dashboard .play-btn.hard {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-.training-dashboard .play-btn.expert {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-}
-
-.training-dashboard .play-btn.legendary {
-  background: linear-gradient(135deg, #f97316, #ea580c);
-}
-
-.training-dashboard .play-btn { 
-  width: 100%; 
-  padding: 1.2rem; 
-  border: none; 
-  border-radius: 15px; 
-  color: white; 
-  font-weight: bold; 
-  cursor: pointer; 
-  transition: all 0.4s ease; 
-  font-family: 'Rajdhani', sans-serif; 
-  font-size: 1.1rem;
-  position: relative;
-  overflow: hidden;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 800;
-  margin-top: 1rem;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-}
-
-.training-dashboard .play-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: left 0.6s ease;
-}
-
-.training-dashboard .play-btn:hover::before {
-  left: 100%;
-}
-
-.training-dashboard .play-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.4);
-  filter: brightness(1.1);
-}
-
-.training-dashboard .play-btn:active {
-  transform: translateY(-1px);
-}
-
-.training-dashboard .play-btn:disabled { 
-  opacity: 0.6; 
-  cursor: not-allowed;
-  transform: none !important;
-  filter: none !important;
-}
-
-/* ===== HEADER PROFESIONAL ===== */
-.app-header.professional {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .95));
-  border-bottom: 3px solid var(--accent-blue);
-  padding: 1rem 2rem;
-  margin: 0 auto 1.5rem auto;
-  border-radius: 0 0 15px 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  backdrop-filter: blur(10px);
-  width: fit-content;
-  max-width: 90%;
-  text-align: center;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-  width: 100%;
-}
-
-.header-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
-}
-
-.app-header.professional h2 {
-  margin: 0;
-  color: var(--accent-blue);
-  font-family: 'Orbitron', monospace;
-  font-size: 1.5rem;
-  text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
-}
-
-.match-status {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.score-display-header {
-  font-size: 2rem;
-  font-weight: bold;
-  font-family: 'Orbitron', monospace;
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ===== COMPONENTES ESPECÍFICOS FÚTSAL ===== */
-.formation-selector {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.formation-selector label {
-  font-size: 0.8rem;
-  color: #94a3b8;
-}
-
-.formation-selector select {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid var(--accent-blue);
-  border-radius: 6px;
-  color: white;
-  padding: 0.3rem 0.5rem;
-  font-size: 0.8rem;
-}
-
-.training-dashboard .fouls-indicator {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 2rem;
-  background: rgba(0,0,0,0.7);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  z-index: 25;
-}
-
-.training-dashboard .fouls-user {
-  color: var(--accent-blue);
-}
-
-.training-dashboard .fouls-bot {
-  color: #f87171;
-}
-
-.match-time-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--gradient-danger);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 15px;
-  border: 2px solid rgba(255,255,255,0.3);
-  min-width: 80px;
-}
-
-.match-time-display .time {
-  font-size: 1.1rem;
-  font-weight: bold;
-  font-family: 'Orbitron', monospace;
-}
-
-.match-time-display .phase {
-  font-size: 0.7rem;
-  opacity: 0.9;
-}
-
-/* ===== NUEVOS COMPONENTES ===== */
-.training-dashboard .possession-indicator-field {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(0,0,0,0.7);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  z-index: 25;
-}
-
-.training-dashboard .possession-arrow {
-  width: 0;
-  height: 0;
-  border-style: solid;
-}
-
-.training-dashboard .possession-arrow.user {
-  border-width: 5px 0 5px 8px;
-  border-color: transparent transparent transparent var(--accent-blue);
-}
-
-.training-dashboard .possession-arrow.bot {
-  border-width: 5px 8px 5px 0;
-  border-color: transparent var(--accent-red) transparent transparent;
-}
-
-.training-dashboard .advanced-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.training-dashboard .stats-category h4 {
-  margin: 0 0 1rem 0;
-  color: var(--accent-blue);
-  font-size: 1.1rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 0.5rem;
-}
-
-.training-dashboard .possession-bar-mini {
-  display: flex;
-  width: 120px;
-  height: 20px;
-  background: rgba(0,0,0,0.4);
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid #475569;
-}
-
-.training-dashboard .momentum-display {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.training-dashboard .momentum-bar-large {
-  width: 100%;
-  height: 25px;
-  background: rgba(0,0,0,0.4);
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px solid #475569;
-  position: relative;
-}
-
-.training-dashboard .momentum-fill-large {
-  height: 100%;
-  background: var(--gradient-accent);
-  transition: width 0.5s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: bold;
-  font-size: 0.8rem;
-}
-
-.training-dashboard .pressure-stats {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.training-dashboard .pressure-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-  font-size: 0.8rem;
-}
-
-.training-dashboard .pressure-value {
-  font-weight: bold;
-  color: var(--accent-blue);
-}
-
-/* ===== ANIMACIONES ===== */
-@keyframes playerPulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.05); }
-}
-
-@keyframes ballFloat {
-  0%, 100% { transform: translate(-50%, -50%) translateY(0px) rotate(0deg); }
-  50% { transform: translate(-50%, -50%) translateY(-5px) rotate(180deg); }
-}
-
-@keyframes timePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-@keyframes commentSlideIn { 
-  from { opacity: 0; transform: translateX(30px); } 
-  to { opacity: 1; transform: translateX(0); } 
-}
-
-@keyframes highlightPulse {
-  0%, 100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0); }
-  50% { box-shadow: 0 0 20px rgba(248, 113, 113, 0.4); }
-}
-
-@keyframes resultSlideIn {
-  from {
+@keyframes popupAppear {
+  0% {
     opacity: 0;
-    transform: translateY(20px);
+    transform: scale(0.3);
   }
-  to {
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
+}
+
+/* Loading Screen */
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(67, 97, 238, 0.3);
+  border-top: 4px solid var(--secondary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
@@ -1077,484 +746,434 @@
   100% { transform: rotate(360deg); }
 }
 
-@keyframes legendaryGlow {
-  0% { box-shadow: 0 0 10px rgba(249, 115, 22, 0.5); }
-  100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.8), 0 0 30px rgba(249, 115, 22, 0.6); }
-}
-
-@keyframes eliteAvatar {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-@keyframes eliteCard {
-  0%, 100% { box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); }
-  50% { box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
-}
-
-/* ===== SCROLLBAR PERSONALIZADO ===== */
-.training-dashboard .panel-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-.training-dashboard .panel-content::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-
-.training-dashboard .panel-content::-webkit-scrollbar-thumb {
-  background: var(--gradient-accent);
-  border-radius: 4px;
-}
-
-.training-dashboard .panel-content::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, var(--accent-purple), #3a0ca3);
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
-@media (max-width: 1200px) {
-  .training-dashboard .main-layout { 
-    grid-template-columns: 250px 1fr 250px; 
-  }
-  .training-dashboard .bots-grid { 
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-  }
-}
-
+/* Responsive */
 @media (max-width: 1024px) {
-  .training-dashboard .main-layout { 
-    grid-template-columns: 1fr; 
-    height: auto; 
-    grid-template-rows: auto 400px auto;
+  .dashboard-layout {
+    grid-template-columns: 1fr;
   }
-  .training-dashboard .left-panel { 
-    height: 400px; 
-  }
-  .training-dashboard .right-panel { 
-    height: 400px; 
-  }
-  .training-dashboard .center-panel {
-    order: -1;
-    height: 50vh;
-  }
-  .header-content {
+  
+  .game-header {
     flex-direction: column;
-    gap: 1rem;
+    gap: 20px;
+    text-align: center;
+  }
+  
+  .header-stats {
+    justify-content: center;
   }
 }
 
 @media (max-width: 768px) {
-  .training-dashboard { 
-    padding: 0.5rem; 
+  .dashboard {
+    padding: 15px;
+    margin: 10px;
   }
-  .training-dashboard .main-layout {
-    gap: 1rem;
-  }
-  .training-dashboard .bots-grid { 
-    grid-template-columns: 1fr; 
-    gap: 1rem;
-    padding: 0.5rem;
-  }
-  .training-dashboard .panel-content {
-    padding: 1rem;
-  }
-  .training-dashboard .player-icon {
-    font-size: 2rem;
-  }
-  .training-dashboard .soccer-ball {
-    font-size: 1.8rem;
-  }
-  .training-dashboard .field-message {
-    padding: 2rem;
-  }
-  .training-dashboard .field-message h3 {
-    font-size: 1.4rem;
-  }
-  .app-header.professional {
-    padding: 0.8rem 1rem;
-    max-width: 95%;
-  }
-  .app-header.professional h2 {
-    font-size: 1.2rem;
-  }
-  .score-display-header {
-    font-size: 1.6rem;
-  }
-  .formation-selector {
+  
+  .profile-header {
     flex-direction: column;
-    gap: 0.3rem;
-  }
-  .fouls-indicator {
-    font-size: 0.7rem;
-    gap: 1rem;
-  }
-  .header-content {
-    gap: 0.5rem;
-  }
-  .training-dashboard .bot-header { 
-    flex-direction: column;
-    align-items: center;
     text-align: center;
-    gap: 1rem;
   }
-  .training-dashboard .bot-info h4 {
-    font-size: 1.3rem;
+  
+  .quick-stats {
+    grid-template-columns: 1fr;
   }
-  .training-dashboard .bot-stats {
-    gap: 0.6rem;
-  }
-  .training-dashboard .stat-bar {
+  
+  .global-actions {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.4rem;
   }
-  .training-dashboard .stat-bar .bar {
-    width: 100%;
+  
+  .skills-grid {
+    max-height: 400px;
+  }
+  
+  .levelup-stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+/* styles/Dashboard.css - Con Gráfico FIFA */
+
+/* ... (mantener todo el CSS anterior) ... */
+
+/* Player Avatar con Rating */
+.player-avatar {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border-radius: 50%;
+  border: 3px solid var(--secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 25px rgba(0, 187, 249, 0.5);
+}
+
+.overall-rating {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #000;
+  box-shadow: 0 0 15px rgba(114, 9, 183, 0.5);
+}
+
+.player-position {
+  color: var(--cyan);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 5px;
+}
+
+/* Gráfico FIFA Style */
+.fifa-chart-section {
+  margin: 25px 0;
+  padding: 20px;
+  background: rgba(20, 25, 60, 0.6);
+  border-radius: 15px;
+  border: 1px solid var(--primary);
+}
+
+.fifa-chart-section h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.2rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+  margin-bottom: 20px;
+  border: none;
+  padding: 0;
+}
+
+.radar-chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.radar-chart {
+  width: 280px;
+  height: 280px;
+}
+
+.radar-axis {
+  stroke: rgba(67, 97, 238, 0.4);
+  stroke-width: 1.5;
+}
+
+.radar-circle {
+  fill: none;
+  stroke: rgba(67, 97, 238, 0.2);
+  stroke-width: 1;
+}
+
+.radar-polygon {
+  fill: rgba(0, 187, 249, 0.3);
+  stroke: var(--secondary);
+  stroke-width: 2;
+  animation: pulsePolygon 3s ease-in-out infinite;
+}
+
+@keyframes pulsePolygon {
+  0%, 100% {
+    fill: rgba(0, 187, 249, 0.3);
+    stroke: var(--secondary);
+  }
+  50% {
+    fill: rgba(67, 97, 238, 0.4);
+    stroke: var(--primary);
+  }
+}
+
+.radar-point {
+  fill: var(--secondary);
+  stroke: var(--primary);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 5px var(--secondary));
+}
+
+.radar-label {
+  fill: var(--secondary);
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.radar-value {
+  fill: var(--cyan);
+  font-family: 'Orbitron', monospace;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+/* Resumen de stats */
+.stats-summary {
+  margin: 15px 0;
+  text-align: center;
+}
+
+.stats-string {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.stat-abbr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  color: var(--secondary);
+  text-transform: uppercase;
+}
+
+.stat-number {
+  color: var(--cyan);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+/* Leyenda de Stats */
+.stats-legend {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.legend-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(67, 97, 238, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(67, 97, 238, 0.3);
+}
+
+.legend-label {
+  color: var(--secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.legend-value {
+  color: var(--cyan);
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+/* Botón de wallet primary */
+.wallet-btn.primary {
+  background: rgba(0, 187, 249, 0.3);
+  border-color: var(--secondary);
+  color: var(--secondary);
+}
+
+/* Responsive para el gráfico */
+@media (max-width: 768px) {
+  .radar-chart {
+    width: 240px;
+    height: 240px;
+  }
+  
+  .stats-legend {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .stats-string {
+    gap: 10px;
+  }
+  
+  .stat-abbr {
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 480px) {
-  .training-dashboard .result-score-large {
-    font-size: 2rem;
+  .radar-chart {
+    width: 200px;
+    height: 200px;
   }
-  .header-section {
-    width: 100%;
+  
+  .stats-legend {
+    grid-template-columns: 1fr;
   }
-  .training-dashboard .main-layout {
-    grid-template-rows: auto 300px auto;
+}
+  
+  .player-avatar {
+    width: 100px;
+    height: 100px;
   }
-  .training-dashboard .left-panel,
-  .training-dashboard .right-panel {
-    height: 300px;
+  
+  .overall-rating {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
   }
-  .training-dashboard .bot-card {
-    padding: 1.2rem;
+/* Mejoras para skills grid */
+.skills-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.skill-card {
+  background: rgba(20, 25, 60, 0.6);
+  border: 1px solid var(--primary);
+  border-radius: 10px;
+  padding: 12px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.skill-card:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 5px 15px rgba(0, 187, 249, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Header de skills actualizado */
+.skills-header h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.3rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Agregar al styles/Dashboard.css */
+
+/* Estados de carga y deshabilitado */
+.train-btn:disabled,
+.upgrade-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.train-btn:disabled:hover {
+  box-shadow: 0 0 20px rgba(0, 187, 249, 0.5) !important;
+}
+
+/* Badge para nivel máximo */
+.max-level-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--accent);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-family: 'Orbitron', monospace;
+  border: 1px solid var(--secondary);
+}
+
+/* Mensaje de no personaje */
+.no-character {
+  text-align: center;
+  padding: 40px;
+  background: rgba(15, 20, 50, 0.7);
+  border-radius: 15px;
+  border: 1px solid var(--primary);
+}
+
+.no-character button {
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: #000;
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.no-character button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(0, 187, 249, 0.5);
+}
+
+/* Mejoras responsive */
+@media (max-width: 768px) {
+  .stats-string {
+    gap: 8px;
   }
-  .training-dashboard .bot-avatar {
-    width: 60px;
-    height: 60px;
-    font-size: 2rem;
+  
+  .stat-abbr {
+    font-size: 0.8rem;
   }
-  .training-dashboard .play-btn {
-    padding: 1rem;
+  
+  .stat-number {
     font-size: 1rem;
   }
 }
 
-
-/* ===== MEJORAS PARA LAS CARDS DE BOTS ===== */
-.training-dashboard .bot-card.improved {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.98));
-  border-radius: 25px;
-  padding: 1.8rem;
-  border: 2px solid;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(15px);
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-}
-
-.training-dashboard .bot-card.improved::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
-  transform: scaleX(0);
-  transition: transform 0.4s ease;
-}
-
-.training-dashboard .bot-card.improved:hover::before {
-  transform: scaleX(1);
-}
-
-.training-dashboard .bot-card.improved:hover {
-  transform: translateY(-10px) scale(1.02);
-  border-color: var(--accent-blue);
-  box-shadow: 0 25px 50px rgba(76, 201, 240, 0.3);
-}
-
-/* ===== SECCIÓN DE RECOMPENSAS ===== */
-.training-dashboard .rewards-section {
-  margin: 1.5rem 0;
-  padding: 1.2rem;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.8));
+/* Navegación entre secciones */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(15, 20, 50, 0.7);
   border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-  overflow: hidden;
+  border: 1px solid var(--primary);
 }
 
-.training-dashboard .rewards-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, transparent, rgba(76, 201, 240, 0.05), transparent);
-  pointer-events: none;
-}
-
-.training-dashboard .rewards-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-}
-
-.training-dashboard .rewards-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--accent-yellow);
-  text-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
-}
-
-.training-dashboard .rewards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 0.8rem;
-}
-
-.training-dashboard .reward-item {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.6rem 0.8rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+.back-button {
+  background: rgba(67, 97, 238, 0.3);
+  border: 1px solid var(--primary);
+  color: var(--secondary);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.training-dashboard .reward-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-.training-dashboard .reward-icon {
-  font-size: 1.1rem;
-  flex-shrink: 0;
-}
-
-.training-dashboard .reward-value {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  line-height: 1.2;
-}
-
-/* Colores específicos para tipos de recompensas */
-.training-dashboard .reward-item.coins {
-  border-left: 3px solid var(--accent-yellow);
-}
-
-.training-dashboard .reward-item.xp {
-  border-left: 3px solid var(--accent-blue);
-}
-
-.training-dashboard .reward-item.item {
-  border-left: 3px solid var(--accent-purple);
-}
-
-.training-dashboard .reward-item.unlock {
-  border-left: 3px solid var(--accent-green);
-}
-
-/* ===== MEJORAS RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .training-dashboard .rewards-grid {
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
-  }
-  
-  .training-dashboard .bot-card.improved {
-    padding: 1.4rem;
-  }
-  
-  .training-dashboard .rewards-section {
-    padding: 1rem;
-    margin: 1rem 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .training-dashboard .bot-card.improved {
-    padding: 1.2rem;
-  }
-  
-  .training-dashboard .reward-item {
-    padding: 0.5rem 0.7rem;
-  }
-  
-  .training-dashboard .reward-value {
-    font-size: 0.75rem;
-  }
-}
-
-/* ===== ANIMACIONES ADICIONALES PARA RECOMPENSAS ===== */
-@keyframes rewardGlow {
-  0%, 100% { box-shadow: 0 0 5px rgba(251, 191, 36, 0.3); }
-  50% { box-shadow: 0 0 15px rgba(251, 191, 36, 0.6); }
-}
-
-.training-dashboard .rewards-section {
-  animation: rewardGlow 3s ease-in-out infinite;
-}
-
-/* ===== MEJORAS PARA BOTONES DE BOTS ===== */
-.training-dashboard .play-btn.professional {
-  position: relative;
-  overflow: hidden;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  margin-top: 1.5rem;
-}
-
-.training-dashboard .play-btn.professional::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.6s ease;
-}
-
-.training-dashboard .play-btn.professional:hover::after {
-  left: 100%;
-}
-
-/* ===== EFECTOS DE DIFICULTAD MEJORADOS ===== */
-.training-dashboard .bot-card.improved.easy {
-  border-color: #4cc9f0;
-}
-
-.training-dashboard .bot-card.improved.medium {
-  border-color: #4361ee;
-}
-
-.training-dashboard .bot-card.improved.hard {
-  border-color: #7209b7;
-}
-
-.training-dashboard .bot-card.improved.expert {
-  border-color: #f72585;
-  animation: eliteCard 2s ease-in-out infinite;
-}
-
-.training-dashboard .bot-card.improved.legendary {
-  border-color: #ff9e00;
-  animation: legendaryGlow 1.5s ease-in-out infinite;
-}
-
-/* ===== MEJORAS PARA PROBABILIDADES ===== */
-.training-dashboard .probability-display {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.training-dashboard .probability-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.training-dashboard .probability-label {
-  min-width: 80px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #cbd5e1;
-}
-
-.training-dashboard .probability-bar {
-  flex: 1;
-  height: 25px;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 12px;
-  overflow: hidden;
-  border: 2px solid #475569;
-  position: relative;
-}
-
-.training-dashboard .probability-fill {
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: bold;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
-}
-
-.training-dashboard .probability-fill.user {
-  background: linear-gradient(135deg, #4cc9f0, #4361ee);
-  color: white;
-}
-
-.training-dashboard .probability-fill.bot {
-  background: linear-gradient(135deg, #f87171, #dc2626);
-  color: white;
-}
-
-.training-dashboard .probability-value {
   font-family: 'Orbitron', monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-/* ===== CORRECCIONES DE TEXTO ===== */
-.training-dashboard .stat-row span:first-child {
-  min-width: 120px;
-  color: #cbd5e1;
   font-weight: 600;
 }
 
-.training-dashboard .stats-category h4 {
-  margin: 0 0 1rem 0;
-  color: var(--accent-blue);
-  font-size: 1.1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.back-button:hover {
+  background: rgba(67, 97, 238, 0.5);
+  border-color: var(--secondary);
+  transform: translateX(-5px);
 }
 
-/* ===== MEJORAS RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .training-dashboard .probability-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-  
-  .training-dashboard .probability-label {
-    min-width: auto;
-  }
-  
-  .training-dashboard .probability-bar {
-    width: 100%;
-  }
-  
-  .training-dashboard .stat-row span:first-child {
-    min-width: 100px;
-  }
-}
-
-/* ===== ANIMACIONES PARA PROBABILIDADES ===== */
-@keyframes probabilityPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-.training-dashboard .probability-fill {
-  animation: probabilityPulse 2s ease-in-out infinite;
+.section-header h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
 }
