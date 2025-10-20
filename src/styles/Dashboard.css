@@ -4,8 +4,8 @@
 :root {
   --primary: #4361ee;
   --secondary: #00bbf9;
-  --accent: #7209b7;
-  --violet: #7b2cbf;
+  --accent: #00ff88;
+  --violet: #00ff88;
   --cyan: #4cc9f0;
   --dark: #0a0a1a;
   --darker: #000000;
@@ -146,7 +146,7 @@ body {
   font-size: 2rem;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--violet);
   margin-bottom: 5px;
 }
 
@@ -286,7 +286,7 @@ body {
   font-size: 1.5rem;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--violet);
   margin-bottom: 15px;
   border: none;
   padding: 0;
@@ -363,7 +363,7 @@ body {
   font-size: 1.5rem;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--violet);
   border: none;
   padding: 0;
   margin: 0;
@@ -450,7 +450,7 @@ body {
   font-size: 1.5rem;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--violet);
   border: none;
   padding: 0;
   margin: 0;
