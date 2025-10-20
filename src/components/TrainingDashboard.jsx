@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/TrainingDashboard.css";
+import FutsalField from "./FutsalField";
 
 // 🎮 CONSTANTES DE CONFIGURACIÓN PROFESIONAL
 const MATCH_CONFIG = {
