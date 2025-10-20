@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "../styles/MatchResult.css";
 
 const MatchResult = ({ result, character, onClose, finalStats }) => {
@@ -35,13 +35,6 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
   const leveledUp = result.leveledUp || false;
   const newLevel = result.newLevel || (character?.level || 1) + 1;
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 10000);
-    return () => clearTimeout(timer);
-  }, [onClose]);
-
   return (
     <div className="match-result-overlay">
       <div className={`match-result-card ${resultType}`}>
@@ -58,10 +51,30 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
         </div>
         
         <p className="result-opponent">vs {result.botName || 'RIVAL'}</p>
-        
+
+        {/* SECCIÓN DE RECOMPENSAS - SIEMPRE VISIBLE */}
+        <div className="rewards-display">
+          <h4>🏆 RECOMPENSAS GANADAS</h4>
+          <div className="reward-item">
+            <span>Experiencia:</span>
+            <span className="reward-amount">+{rewards.exp} EXP</span>
+          </div>
+          <div className="reward-item">
+            <span>Lupicoins:</span>
+            <span className="reward-amount">+{rewards.coins} 🪙</span>
+          </div>
+          
+          {leveledUp && (
+            <div className="level-up-badge">
+              🎉 ¡Subiste al nivel {newLevel}!
+            </div>
+          )}
+        </div>
+
+        {/* ESTADÍSTICAS OPCIONALES - SOLO SI HAY DATOS */}
         {stats && (
           <div className="performance-stats">
-            <h4>📈 TU RENDIMIENTO</h4>
+            <h4>📈 ESTADÍSTICAS DEL PARTIDO</h4>
             <div className="stats-grid">
               <div className="performance-stat">
                 <span className="stat-label">Disparos</span>
@@ -93,28 +106,7 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
           </div>
         )}
 
-        <div className="rewards-display">
-          <h4>🏆 RECOMPENSAS</h4>
-          <div className="reward-item">
-            <span>Experiencia:</span>
-            <span className="reward-amount">+{rewards.exp} EXP</span>
-          </div>
-          <div className="reward-item">
-            <span>Lupicoins:</span>
-            <span className="reward-amount">+{rewards.coins} 🪙</span>
-          </div>
-          
-          {leveledUp && (
-            <div className="level-up-badge">
-              🎉 ¡Subiste al nivel {newLevel}!
-            </div>
-          )}
-        </div>
-
-        <div className="auto-close-timer">
-          ⏱️ Se cerrará en 10 segundos...
-        </div>
-
+        {/* BOTÓN PARA CERRAR MANUALMENTE */}
         <button className="close-result-btn" onClick={onClose}>
           CONTINUAR
         </button>
