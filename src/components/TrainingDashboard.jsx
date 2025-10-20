@@ -943,7 +943,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       <div className="app-header professional">
         <div className="header-content">
           <div className="header-section">
-            <h2>🥅 SIMULADOR FÚTSAL PRO</h2>
+            <h2>🥅 SIMULADOR FÚTSAL</h2>
             <div className="match-info-header">
               {simulating && selectedBot ? (
                 <span className="opponent-info">vs {selectedBot.name} | {MATCH_CONFIG.FORMATIONS[selectedFormation]}</span>
@@ -1222,7 +1222,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
               
               {!simulating && (
                 <div className="field-message improved">
-                  <h3>🥅 SIMULADOR FÚTSAL PRO</h3>
+                  <h3>🥅 SIMULADOR FÚTSAL</h3>
                   <p>Selecciona formación y oponente para iniciar</p>
                   <div className="formation-preview">
                     <strong>Formación: {MATCH_CONFIG.FORMATIONS[selectedFormation]}</strong>
