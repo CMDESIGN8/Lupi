@@ -26,12 +26,24 @@
   z-index: -1;
 }
 
+/* HEADER */ .training-dashboard { 
+  min-height: 100vh; 
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%); 
+  color: white; 
+  padding: 1rem; 
+  font-family: 'Rajdhani', sans-serif; 
+}
+
+.training-dashboard .header-main {
+  display: flex;
+}
+
 /* LAYOUT PRINCIPAL MEJORADO */
 .training-dashboard .main-layout {
   display: grid;
   grid-template-columns: 65% 35%;
   gap: 1.5rem;
-  height: 65vh;
+  height: 100vh;
   margin-bottom: 1.5rem;
   position: relative;
 }
@@ -41,7 +53,8 @@
   background: rgba(15, 23, 42, 0.8);
   border-radius: 20px;
   border: 2px solid #4cc9f0;
-  overflow: hidden;
+  height: 100%;
+  overflow-y: auto; /* para que se pueda scrollear si hay mucho contenido */
   position: relative;
   box-shadow: 
     0 10px 30px rgba(0, 0, 0, 0.3),
@@ -170,6 +183,7 @@
   border-radius: 12px; 
   border: 1px solid rgba(255,255,255,0.2);
   backdrop-filter: blur(5px);
+  color: #FFFFFF;
 }
 
 @keyframes playerPulse {
@@ -547,7 +561,6 @@
 
 .training-dashboard .panel-content { 
   padding: 2rem; 
-  max-height: 300px; 
   overflow-y: auto;
   background: rgba(15, 23, 42, 0.3);
 }
@@ -1011,7 +1024,6 @@
   }
   .training-dashboard .panel-content {
     padding: 1rem;
-    max-height: 250px;
   }
   .training-dashboard .performance-grid {
     grid-template-columns: 1fr;
@@ -1348,7 +1360,8 @@
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.9));
   border-radius: 20px;
   border: 2px solid #4cc9f0;
-  overflow: hidden;
+  height: 100%;
+  overflow-y: auto; /* para que se pueda scrollear si hay mucho contenido */
   display: flex;
   flex-direction: column;
   box-shadow: 
@@ -1402,5 +1415,203 @@
   
   .time-display {
     padding: 0.3rem 0.8rem;
+  }
+}
+
+/* LAYOUT MEJORADO - ESTADÍSTICAS Y EVENTOS COMPLETOS */
+.training-dashboard .main-layout.improved {
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  gap: 1rem;
+  height: 65vh;
+  margin-bottom: 1rem;
+}
+
+/* PANELES LATERALES COMPLETOS */
+.training-dashboard .left-panel.stats-panel,
+.training-dashboard .right-panel.events-panel {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.98));
+  border-radius: 15px;
+  border: 2px solid #4cc9f0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+  height: 100%;
+}
+
+.training-dashboard .panel-header {
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+  border-bottom: 2px solid #4cc9f0;
+}
+
+.training-dashboard .panel-header h3 {
+  margin: 0;
+  color: #4cc9f0;
+  font-size: 1.1rem;
+  font-family: 'Orbitron', monospace;
+  text-align: center;
+}
+
+.training-dashboard .panel-content.stats-content,
+.training-dashboard .panel-content.events-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.3);
+}
+
+/* ESTADÍSTICAS MEJORADAS */
+.training-dashboard .advanced-stats.improved {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+.training-dashboard .stats-category {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.training-dashboard .stats-category h4 {
+  margin: 0 0 1rem 0;
+  color: #4cc9f0;
+  font-size: 0.9rem;
+  font-family: 'Orbitron', monospace;
+  border-bottom: 1px solid #4cc9f0;
+  padding-bottom: 0.5rem;
+}
+
+.training-dashboard .stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.85rem;
+}
+
+.training-dashboard .stat-row:last-child {
+  border-bottom: none;
+}
+
+/* EVENTOS MEJORADOS */
+.training-dashboard .events-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  height: 100%;
+}
+
+.training-dashboard .event-item {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+  border-radius: 8px;
+  padding: 0.8rem;
+  border-left: 4px solid #4cc9f0;
+  animation: eventSlideIn 0.3s ease;
+}
+
+.training-dashboard .event-item.user {
+  border-left-color: #4cc9f0;
+}
+
+.training-dashboard .event-item.bot {
+  border-left-color: #f87171;
+}
+
+.training-dashboard .event-item.high {
+  border-left-color: #fbbf24;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(30, 41, 59, 0.9));
+}
+
+.training-dashboard .event-item.very-high {
+  border-left-color: #f87171;
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.2), rgba(30, 41, 59, 0.9));
+}
+
+.training-dashboard .event-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.training-dashboard .event-time {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+}
+
+.training-dashboard .event-action-icon {
+  font-size: 0.8rem;
+}
+
+.training-dashboard .event-team {
+  font-size: 0.75rem;
+  color: #4cc9f0;
+  font-weight: bold;
+  margin-left: auto;
+}
+
+.training-dashboard .event-text {
+  font-size: 0.8rem;
+  color: #e2e8f0;
+  line-height: 1.3;
+}
+
+.training-dashboard .event-subtype {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 0.2rem;
+  font-style: italic;
+}
+
+/* CANCHA CENTRAL MEJORADA */
+.training-dashboard .center-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.training-dashboard .soccer-field.improved {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: 
+    linear-gradient(135deg, #1a472a 0%, #2a6e3f 100%),
+    repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.03) 15px, rgba(255,255,255,0.03) 30px);
+  border-radius: 15px;
+  border: 3px solid #e2e8f0;
+  overflow: hidden;
+}
+
+/* PANEL INFERIOR SIMPLIFICADO */
+.training-dashboard .bottom-panel.professional {
+  margin-top: 1rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .training-dashboard .main-layout.improved {
+    grid-template-columns: 280px 1fr 280px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .training-dashboard .main-layout.improved {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 400px auto;
+    height: auto;
+  }
+  
+  .training-dashboard .center-panel {
+    order: -1;
+    height: 50vh;
   }
 }
