@@ -1452,3 +1452,109 @@
   border-color: #ff9e00;
   animation: legendaryGlow 1.5s ease-in-out infinite;
 }
+
+/* ===== MEJORAS PARA PROBABILIDADES ===== */
+.training-dashboard .probability-display {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.training-dashboard .probability-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.training-dashboard .probability-label {
+  min-width: 80px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.training-dashboard .probability-bar {
+  flex: 1;
+  height: 25px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #475569;
+  position: relative;
+}
+
+.training-dashboard .probability-fill {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.training-dashboard .probability-fill.user {
+  background: linear-gradient(135deg, #4cc9f0, #4361ee);
+  color: white;
+}
+
+.training-dashboard .probability-fill.bot {
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  color: white;
+}
+
+.training-dashboard .probability-value {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ===== CORRECCIONES DE TEXTO ===== */
+.training-dashboard .stat-row span:first-child {
+  min-width: 120px;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.training-dashboard .stats-category h4 {
+  margin: 0 0 1rem 0;
+  color: var(--accent-blue);
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== MEJORAS RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .training-dashboard .probability-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .training-dashboard .probability-label {
+    min-width: auto;
+  }
+  
+  .training-dashboard .probability-bar {
+    width: 100%;
+  }
+  
+  .training-dashboard .stat-row span:first-child {
+    min-width: 100px;
+  }
+}
+
+/* ===== ANIMACIONES PARA PROBABILIDADES ===== */
+@keyframes probabilityPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.training-dashboard .probability-fill {
+  animation: probabilityPulse 2s ease-in-out infinite;
+}
