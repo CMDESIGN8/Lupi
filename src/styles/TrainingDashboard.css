@@ -1,4 +1,4 @@
-/* styles/TrainingDashboard.css - VERSIÓN CARTAS FIFA/MMORPG */
+/* styles/TrainingDashboard.css - VERSIÓN COMPLETA Y FUNCIONAL */
 
 /* ===== VARIABLES Y CONFIGURACIÓN GLOBAL ===== */
 :root {
@@ -11,19 +11,11 @@
   --accent-red: #dc2626;
   --accent-green: #16a34a;
   --accent-yellow: #fbbf24;
-  --accent-orange: #f97316;
   
   /* Colores futsal */
   --futsal-blue: #1e40af;
   --futsal-light-blue: #3b82f6;
   --futsal-dark-blue: #1e3a8a;
-  
-  /* Colores cartas FIFA */
-  --card-bronze: linear-gradient(135deg, #cd7f32, #8b4513);
-  --card-silver: linear-gradient(135deg, #c0c0c0, #a8a8a8);
-  --card-gold: linear-gradient(135deg, #ffd700, #daa520);
-  --card-special: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  --card-legendary: linear-gradient(135deg, #ff6b00, #ff0000);
   
   /* Gradientes */
   --gradient-bg: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
@@ -274,335 +266,510 @@
   transform: translate(-50%, -50%);
 }
 
-/* ===== CARTAS FIFA/MMORPG - NUEVO DISEÑO ===== */
-.training-dashboard .bots-grid { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
-  gap: 2rem; 
-  padding: 1.5rem;
+/* ===== MENSAJES Y ESTADOS ===== */
+.training-dashboard .field-message {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9));
+  padding: 3rem 4rem;
+  border-radius: 20px;
+  border: 2px solid rgba(76, 201, 240, 0.3);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
 }
 
-.training-dashboard .bot-card {
-  background: linear-gradient(165deg, #1a1f2e 0%, #2d3748 50%, #1a202c 100%);
-  border-radius: 20px;
-  padding: 0;
-  border: 3px solid;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  backdrop-filter: blur(15px);
-  position: relative;
-  overflow: hidden;
-  box-shadow: 
-    0 10px 40px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,255,255,0.1);
-  min-height: 420px;
-  display: flex;
+.training-dashboard .field-message h3 { 
+  margin: 0 0 1.5rem 0; 
+  color: var(--accent-blue); 
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem;
+  text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
+}
+
+.training-dashboard .field-message p { 
+  margin: 0; 
+  color: #e2e8f0; 
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* ===== SISTEMA DE COMENTARIOS ===== */
+.training-dashboard .match-commentary {
+  flex: 1; 
+  display: flex; 
   flex-direction: column;
 }
 
-/* Bordes según rareza */
-.training-dashboard .bot-card.rookie {
-  border-color: #cd7f32;
-  background: linear-gradient(165deg, #2a1f1a 0%, #3d2c1e 50%, #2a1f1a 100%);
-}
-
-.training-dashboard .bot-card.training {
-  border-color: #c0c0c0;
-  background: linear-gradient(165deg, #2a2a2a 0%, #3d3d3d 50%, #2a2a2a 100%);
-}
-
-.training-dashboard .bot-card.pro {
-  border-color: #ffd700;
-  background: linear-gradient(165deg, #2a2a1a 0%, #3d3d1e 50%, #2a2a1a 100%);
-}
-
-.training-dashboard .bot-card.elite {
-  border-color: #8b5cf6;
-  background: linear-gradient(165deg, #1a1a2a 0%, #2e1e3d 50%, #1a1a2a 100%);
-  animation: eliteGlow 3s ease-in-out infinite;
-}
-
-/* Efectos hover */
-.training-dashboard .bot-card:hover {
-  transform: translateY(-12px) scale(1.02);
-  box-shadow: 
-    0 25px 60px rgba(0,0,0,0.6),
-    0 0 30px rgba(255,255,255,0.1);
-}
-
-.training-dashboard .bot-card.rookie:hover {
-  box-shadow: 
-    0 25px 60px rgba(205, 127, 50, 0.3),
-    0 0 30px rgba(205, 127, 50, 0.2);
-}
-
-.training-dashboard .bot-card.training:hover {
-  box-shadow: 
-    0 25px 60px rgba(192, 192, 192, 0.3),
-    0 0 30px rgba(192, 192, 192, 0.2);
-}
-
-.training-dashboard .bot-card.pro:hover {
-  box-shadow: 
-    0 25px 60px rgba(255, 215, 0, 0.4),
-    0 0 40px rgba(255, 215, 0, 0.3);
-}
-
-.training-dashboard .bot-card.elite:hover {
-  box-shadow: 
-    0 25px 60px rgba(139, 92, 246, 0.5),
-    0 0 50px rgba(139, 92, 246, 0.4);
-}
-
-/* Header de la carta */
-.training-dashboard .card-header {
-  background: linear-gradient(90deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-  padding: 1.5rem 2rem;
-  border-bottom: 2px solid rgba(255,255,255,0.1);
+.training-dashboard .commentary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+  border-bottom: var(--border-glow);
   position: relative;
-  overflow: hidden;
 }
 
-.training-dashboard .card-header::before {
+.training-dashboard .commentary-header::after {
   content: '';
   position: absolute;
-  top: 0;
+  bottom: -2px;
   left: 0;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.6s ease;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
 }
 
-.training-dashboard .bot-card:hover .card-header::before {
-  transform: translateX(100%);
-}
-
-.training-dashboard .bot-name {
-  font-size: 1.8rem;
-  font-weight: 800;
-  margin: 0;
+.training-dashboard .commentary-header h3 { 
+  margin: 0; 
+  color: var(--accent-blue); 
+  font-size: 1.3rem; 
   font-family: 'Orbitron', monospace;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  background: linear-gradient(135deg, #ffffff, #cbd5e1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  text-shadow: 0 2px 8px rgba(76, 201, 240, 0.4);
 }
 
-.training-dashboard .bot-title {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  margin: 0.3rem 0 0 0;
-  font-weight: 600;
-  text-transform: uppercase;
+.training-dashboard .commentary-feed {
+  flex: 1; 
+  overflow-y: auto; 
+  padding: 1.2rem; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.8rem;
+  background: rgba(15, 23, 42, 0.3);
+}
+
+.training-dashboard .commentary-event {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+  border-radius: 12px;
+  padding: 1rem;
+  border-left: 5px solid var(--accent-blue);
+  animation: commentSlideIn 0.5s ease;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.training-dashboard .commentary-event:hover {
+  transform: translateX(5px);
+  border-left-width: 8px;
+}
+
+.training-dashboard .commentary-event.low { border-left-color: #64748b; }
+.training-dashboard .commentary-event.medium { border-left-color: var(--accent-blue); }
+.training-dashboard .commentary-event.high { 
+  border-left-color: var(--accent-yellow); 
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(30, 41, 59, 0.9));
+}
+.training-dashboard .commentary-event.very-high { 
+  border-left-color: #f87171; 
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.2), rgba(30, 41, 59, 0.9));
+  animation: highlightPulse 2s infinite;
+}
+
+.training-dashboard .event-time { 
+  font-size: 0.75rem; 
+  color: #94a3b8; 
+  font-weight: bold; 
+  margin-bottom: 0.4rem; 
+  font-family: 'Orbitron', monospace;
   letter-spacing: 1px;
 }
 
-/* Contenido principal de la carta */
-.training-dashboard .card-content {
-  padding: 2rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.training-dashboard .event-text { 
+  font-size: 0.95rem; 
+  color: #e2e8f0; 
+  line-height: 1.5;
+  font-weight: 500;
 }
 
-/* Avatar y nivel */
-.training-dashboard .bot-avatar-container {
-  display: flex;
+/* ===== CONTROLES DE SIMULACIÓN ===== */
+.training-dashboard .simulation-controls { 
+  display: flex; 
+  gap: 0.5rem; 
   align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 1rem;
+  padding: 1rem;
 }
 
-.training-dashboard .bot-avatar {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
+.training-dashboard .simulation-controls.professional {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.training-dashboard .speed-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.training-dashboard .simulation-controls button {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--accent-blue);
+  color: white;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  width: 40px; 
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 3.5rem;
-  border: 4px solid;
-  box-shadow: 
-    0 8px 25px rgba(0,0,0,0.4),
-    inset 0 2px 10px rgba(255,255,255,0.1);
+}
+
+.training-dashboard .simulation-controls button:hover { 
+  background: rgba(76, 201, 240, 0.3); 
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
+}
+
+.training-dashboard .simulation-controls button.active { 
+  background: var(--gradient-accent);
+  color: var(--primary-dark); 
+  transform: scale(1.1);
+  box-shadow: var(--shadow-glow);
+}
+
+.training-dashboard .match-time {
+  background: var(--gradient-danger);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+  min-width: 100px;
+  text-align: center;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+  animation: timePulse 2s infinite;
+}
+
+/* ===== ESTADÍSTICAS ===== */
+.training-dashboard .live-stats { 
+  padding: 1.2rem; 
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+  border-top: var(--border-glow);
+  position: relative;
+}
+
+.training-dashboard .live-stats::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+}
+
+.training-dashboard .stats-overview { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 0.7rem; 
+}
+
+.training-dashboard .stat-row { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.training-dashboard .stat-row:last-child {
+  border-bottom: none;
+}
+
+.training-dashboard .possession-bar { 
+  display: flex; 
+  width: 150px; 
+  height: 24px; 
+  background: rgba(0,0,0,0.4); 
+  border-radius: 12px; 
+  overflow: hidden; 
+  border: 2px solid #475569;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.training-dashboard .possession-fill { 
+  height: 100%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 0.75rem; 
+  font-weight: bold; 
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.training-dashboard .possession-fill.user { 
+  background: var(--gradient-accent);
+  color: white;
+}
+
+.training-dashboard .possession-fill.bot { 
+  background: linear-gradient(135deg, #f87171, #dc2626);
+  color: white;
+}
+
+/* ===== PANELES DE CONTENIDO ===== */
+.training-dashboard .panel-tabs { 
+  display: flex; 
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+  border-bottom: var(--border-glow);
+  position: relative;
+}
+
+.training-dashboard .panel-tabs::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+}
+
+.training-dashboard .tab-button { 
+  flex: 1; 
+  padding: 1.2rem; 
+  background: none; 
+  border: none; 
+  color: #cbd5e1; 
+  font-weight: 700; 
+  cursor: pointer; 
+  transition: all 0.4s ease; 
+  font-family: 'Rajdhani', sans-serif; 
+  font-size: 1rem;
   position: relative;
   overflow: hidden;
-  background: rgba(0,0,0,0.3);
 }
 
-.training-dashboard .bot-card.rookie .bot-avatar {
-  border-color: #cd7f32;
-  background: var(--card-bronze);
+.training-dashboard .tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(76, 201, 240, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
-.training-dashboard .bot-card.training .bot-avatar {
-  border-color: #c0c0c0;
-  background: var(--card-silver);
+.training-dashboard .tab-button:hover::before {
+  left: 100%;
 }
 
-.training-dashboard .bot-card.pro .bot-avatar {
-  border-color: #ffd700;
-  background: var(--card-gold);
-}
-
-.training-dashboard .bot-card.elite .bot-avatar {
-  border-color: #8b5cf6;
-  background: var(--card-special);
-  animation: avatarFloat 3s ease-in-out infinite;
-}
-
-.training-dashboard .level-badge {
-  background: linear-gradient(135deg, #1e40af, #3b82f6);
+.training-dashboard .tab-button.active { 
+  background: linear-gradient(135deg, var(--accent-purple), #3a0ca3);
   color: white;
-  padding: 0.8rem 1.2rem;
-  border-radius: 15px;
-  font-weight: 800;
-  font-size: 1.1rem;
-  border: 2px solid rgba(255,255,255,0.3);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-  text-align: center;
-  min-width: 80px;
+  text-shadow: 0 2px 8px rgba(255,255,255,0.3);
 }
 
-/* Estadísticas */
+.training-dashboard .tab-button:hover:not(.active) { 
+  background: rgba(76, 201, 240, 0.1);
+  color: var(--accent-blue);
+}
+
+.training-dashboard .panel-content { 
+  padding: 1.5rem; 
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.3);
+  height: calc(100% - 60px);
+}
+
+/* ===== BOTS Y OPCIONES MEJORADOS ===== */
+.training-dashboard .bots-grid { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+  gap: 1.5rem; 
+  padding: 1rem;
+}
+
+.training-dashboard .bot-card { 
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+  border-radius: 20px;
+  padding: 1.5rem;
+  border: 2px solid #475569;
+  transition: all 0.4s ease;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+.training-dashboard .bot-card:hover { 
+  border-color: var(--accent-blue); 
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(76, 201, 240, 0.3);
+}
+
+.training-dashboard .bot-header { 
+  display: flex; 
+  align-items: flex-start; 
+  gap: 1.2rem; 
+  margin-bottom: 1.5rem; 
+}
+
+.training-dashboard .bot-avatar { 
+  width: 70px; 
+  height: 70px; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-size: 2.5rem;
+  border: 3px solid rgba(255,255,255,0.3);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.training-dashboard .bot-level {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  background: var(--gradient-accent);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0.2rem 0.5rem;
+  border-radius: 10px;
+  border: 2px solid var(--primary-dark);
+}
+
+.training-dashboard .bot-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.training-dashboard .bot-info h4 { 
+  margin: 0 0 0.8rem 0; 
+  font-size: 1.4rem;
+  color: var(--accent-blue);
+  font-family: 'Orbitron', monospace;
+  text-shadow: 0 2px 8px rgba(76, 201, 240, 0.3);
+}
+
 .training-dashboard .bot-stats {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
 }
 
-.training-dashboard .stat-item {
+.training-dashboard .stat-bar {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.8rem;
+  font-size: 0.85rem;
 }
 
-.training-dashboard .stat-label {
-  min-width: 100px;
+.training-dashboard .stat-bar span:first-child {
+  min-width: 80px;
   color: #cbd5e1;
+  font-weight: 600;
+}
+
+.training-dashboard .stat-bar .bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.training-dashboard .stat-bar .fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Colores de barras según estadística */
+.training-dashboard .stat-bar:nth-child(1) .fill {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.training-dashboard .stat-bar:nth-child(2) .fill {
+  background: linear-gradient(90deg, #3b82f6, #06b6d4);
+}
+
+.training-dashboard .stat-bar:nth-child(3) .fill {
+  background: linear-gradient(90deg, #10b981, #84cc16);
+}
+
+.training-dashboard .bot-meta { 
+  display: flex; 
+  gap: 0.8rem; 
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.training-dashboard .level-badge, 
+.training-dashboard .difficulty-badge { 
+  font-size: 0.75rem; 
+  padding: 0.4rem 1rem; 
+  border-radius: 15px; 
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.3);
   font-weight: 700;
-  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.training-dashboard .stat-value {
-  font-weight: 800;
-  font-size: 1.1rem;
+.training-dashboard .difficulty-badge { 
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
   color: white;
-  min-width: 40px;
+  border: none;
+  box-shadow: 0 4px 12px rgba(76, 201, 240, 0.3);
 }
 
-.training-dashboard .stat-bar-container {
-  flex: 1;
-  height: 12px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 6px;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.2);
+/* Colores de dificultad */
+.training-dashboard .play-btn.easy {
+  background: linear-gradient(135deg, #10b981, #059669);
 }
 
-.training-dashboard .stat-bar {
-  height: 100%;
-  border-radius: 6px;
-  transition: width 1.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+.training-dashboard .play-btn.medium {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.training-dashboard .play-btn.hard {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.training-dashboard .play-btn.expert {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+}
+
+.training-dashboard .play-btn.legendary {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+}
+
+.training-dashboard .play-btn { 
+  width: 100%; 
+  padding: 1.2rem; 
+  border: none; 
+  border-radius: 15px; 
+  color: white; 
+  font-weight: bold; 
+  cursor: pointer; 
+  transition: all 0.4s ease; 
+  font-family: 'Rajdhani', sans-serif; 
+  font-size: 1.1rem;
   position: relative;
   overflow: hidden;
-}
-
-.training-dashboard .stat-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transform: translateX(-100%);
-  animation: shine 2s infinite;
-}
-
-/* Colores de barras por estadística */
-.training-dashboard .stat-item:nth-child(1) .stat-bar {
-  background: linear-gradient(90deg, #ef4444, #f97316);
-}
-
-.training-dashboard .stat-item:nth-child(2) .stat-bar {
-  background: linear-gradient(90deg, #3b82f6, #06b6d4);
-}
-
-.training-dashboard .stat-item:nth-child(3) .stat-bar {
-  background: linear-gradient(90deg, #10b981, #84cc16);
-}
-
-/* Footer de la carta */
-.training-dashboard .card-footer {
-  padding: 1.5rem 2rem;
-  background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
-  border-top: 2px solid rgba(255,255,255,0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.training-dashboard .difficulty-badge {
-  padding: 0.6rem 1.2rem;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 1px;
-  border: 2px solid;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.training-dashboard .bot-card.rookie .difficulty-badge {
-  background: var(--card-bronze);
-  border-color: #cd7f32;
-  color: #ffd700;
-}
-
-.training-dashboard .bot-card.training .difficulty-badge {
-  background: var(--card-silver);
-  border-color: #c0c0c0;
-  color: #1e293b;
-}
-
-.training-dashboard .bot-card.pro .difficulty-badge {
-  background: var(--card-gold);
-  border-color: #ffd700;
-  color: #1e293b;
-}
-
-.training-dashboard .bot-card.elite .difficulty-badge {
-  background: var(--card-special);
-  border-color: #8b5cf6;
-  color: white;
-  animation: badgePulse 2s ease-in-out infinite;
-}
-
-/* Botón JUGAR estilo FIFA */
-.training-dashboard .play-btn {
-  padding: 1rem 2rem;
-  border: none;
-  border-radius: 12px;
-  color: white;
   font-weight: 800;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  font-family: 'Orbitron', monospace;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-  min-width: 120px;
+  margin-top: 1rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
 .training-dashboard .play-btn::before {
@@ -612,7 +779,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
   transition: left 0.6s ease;
 }
 
@@ -621,85 +788,254 @@
 }
 
 .training-dashboard .play-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.5);
-  filter: brightness(1.2);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+  filter: brightness(1.1);
 }
 
-/* Colores de botones por dificultad */
-.training-dashboard .bot-card.rookie .play-btn {
-  background: linear-gradient(135deg, #10b981, #059669);
-  border: 2px solid #10b981;
+.training-dashboard .play-btn:active {
+  transform: translateY(-1px);
 }
 
-.training-dashboard .bot-card.training .play-btn {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  border: 2px solid #f59e0b;
-}
-
-.training-dashboard .bot-card.pro .play-btn {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  border: 2px solid #ef4444;
-}
-
-.training-dashboard .bot-card.elite .play-btn {
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  border: 2px solid #8b5cf6;
-  animation: buttonGlow 2s ease-in-out infinite;
-}
-
-.training-dashboard .play-btn:disabled {
-  opacity: 0.5;
+.training-dashboard .play-btn:disabled { 
+  opacity: 0.6; 
   cursor: not-allowed;
   transform: none !important;
   filter: none !important;
 }
 
-/* ===== ANIMACIONES ESPECIALES ===== */
-@keyframes eliteGlow {
-  0%, 100% { 
-    box-shadow: 
-      0 10px 40px rgba(139, 92, 246, 0.3),
-      inset 0 1px 0 rgba(255,255,255,0.1);
-  }
-  50% { 
-    box-shadow: 
-      0 15px 50px rgba(139, 92, 246, 0.6),
-      0 0 30px rgba(139, 92, 246, 0.4),
-      inset 0 1px 0 rgba(255,255,255,0.1);
-  }
+/* ===== HEADER PROFESIONAL ===== */
+.app-header.professional {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .95));
+  border-bottom: 3px solid var(--accent-blue);
+  padding: 1rem 2rem;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
+  width: fit-content;
+  max-width: 90%;
+  text-align: center;
 }
 
-@keyframes avatarFloat {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-10px) scale(1.05); }
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
 }
 
-@keyframes badgePulse {
-  0%, 100% { 
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-    transform: scale(1);
-  }
-  50% { 
-    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.8);
-    transform: scale(1.05);
-  }
+.header-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
 }
 
-@keyframes buttonGlow {
-  0%, 100% { 
-    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
-  }
-  50% { 
-    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.8), 0 0 15px rgba(139, 92, 246, 0.6);
-  }
+.app-header.professional h2 {
+  margin: 0;
+  color: var(--accent-blue);
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
 }
 
-@keyframes shine {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+.match-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
+.score-display-header {
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== COMPONENTES ESPECÍFICOS FÚTSAL ===== */
+.formation-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.formation-selector label {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.formation-selector select {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid var(--accent-blue);
+  border-radius: 6px;
+  color: white;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+.training-dashboard .fouls-indicator {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2rem;
+  background: rgba(0,0,0,0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  z-index: 25;
+}
+
+.training-dashboard .fouls-user {
+  color: var(--accent-blue);
+}
+
+.training-dashboard .fouls-bot {
+  color: #f87171;
+}
+
+.match-time-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--gradient-danger);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  border: 2px solid rgba(255,255,255,0.3);
+  min-width: 80px;
+}
+
+.match-time-display .time {
+  font-size: 1.1rem;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+}
+
+.match-time-display .phase {
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+
+/* ===== NUEVOS COMPONENTES ===== */
+.training-dashboard .possession-indicator-field {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  z-index: 25;
+}
+
+.training-dashboard .possession-arrow {
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.training-dashboard .possession-arrow.user {
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent var(--accent-blue);
+}
+
+.training-dashboard .possession-arrow.bot {
+  border-width: 5px 8px 5px 0;
+  border-color: transparent var(--accent-red) transparent transparent;
+}
+
+.training-dashboard .advanced-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.training-dashboard .stats-category h4 {
+  margin: 0 0 1rem 0;
+  color: var(--accent-blue);
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 0.5rem;
+}
+
+.training-dashboard .possession-bar-mini {
+  display: flex;
+  width: 120px;
+  height: 20px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #475569;
+}
+
+.training-dashboard .momentum-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.training-dashboard .momentum-bar-large {
+  width: 100%;
+  height: 25px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #475569;
+  position: relative;
+}
+
+.training-dashboard .momentum-fill-large {
+  height: 100%;
+  background: var(--gradient-accent);
+  transition: width 0.5s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.training-dashboard .pressure-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.training-dashboard .pressure-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+  font-size: 0.8rem;
+}
+
+.training-dashboard .pressure-value {
+  font-weight: bold;
+  color: var(--accent-blue);
+}
+
+/* ===== ANIMACIONES ===== */
 @keyframes playerPulse {
   0%, 100% { transform: translate(-50%, -50%) scale(1); }
   50% { transform: translate(-50%, -50%) scale(1.05); }
@@ -710,13 +1046,78 @@
   50% { transform: translate(-50%, -50%) translateY(-5px) rotate(180deg); }
 }
 
+@keyframes timePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes commentSlideIn { 
+  from { opacity: 0; transform: translateX(30px); } 
+  to { opacity: 1; transform: translateX(0); } 
+}
+
+@keyframes highlightPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(248, 113, 113, 0); }
+  50% { box-shadow: 0 0 20px rgba(248, 113, 113, 0.4); }
+}
+
+@keyframes resultSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes legendaryGlow {
+  0% { box-shadow: 0 0 10px rgba(249, 115, 22, 0.5); }
+  100% { box-shadow: 0 0 20px rgba(249, 115, 22, 0.8), 0 0 30px rgba(249, 115, 22, 0.6); }
+}
+
+@keyframes eliteAvatar {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes eliteCard {
+  0%, 100% { box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); }
+  50% { box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
+}
+
+/* ===== SCROLLBAR PERSONALIZADO ===== */
+.training-dashboard .panel-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.training-dashboard .panel-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.training-dashboard .panel-content::-webkit-scrollbar-thumb {
+  background: var(--gradient-accent);
+  border-radius: 4px;
+}
+
+.training-dashboard .panel-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--accent-purple), #3a0ca3);
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
   .training-dashboard .main-layout { 
     grid-template-columns: 250px 1fr 250px; 
   }
   .training-dashboard .bots-grid { 
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
   }
 }
 
@@ -736,44 +1137,106 @@
     order: -1;
     height: 50vh;
   }
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
 }
 
 @media (max-width: 768px) {
+  .training-dashboard { 
+    padding: 0.5rem; 
+  }
+  .training-dashboard .main-layout {
+    gap: 1rem;
+  }
   .training-dashboard .bots-grid { 
     grid-template-columns: 1fr; 
-    gap: 1.5rem;
+    gap: 1rem;
+    padding: 0.5rem;
+  }
+  .training-dashboard .panel-content {
     padding: 1rem;
   }
-  
-  .training-dashboard .bot-avatar-container {
+  .training-dashboard .player-icon {
+    font-size: 2rem;
+  }
+  .training-dashboard .soccer-ball {
+    font-size: 1.8rem;
+  }
+  .training-dashboard .field-message {
+    padding: 2rem;
+  }
+  .training-dashboard .field-message h3 {
+    font-size: 1.4rem;
+  }
+  .app-header.professional {
+    padding: 0.8rem 1rem;
+    max-width: 95%;
+  }
+  .app-header.professional h2 {
+    font-size: 1.2rem;
+  }
+  .score-display-header {
+    font-size: 1.6rem;
+  }
+  .formation-selector {
     flex-direction: column;
+    gap: 0.3rem;
+  }
+  .fouls-indicator {
+    font-size: 0.7rem;
+    gap: 1rem;
+  }
+  .header-content {
+    gap: 0.5rem;
+  }
+  .training-dashboard .bot-header { 
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     gap: 1rem;
   }
-  
-  .training-dashboard .card-footer {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
+  .training-dashboard .bot-info h4 {
+    font-size: 1.3rem;
   }
-  
-  .training-dashboard .bot-name {
-    font-size: 1.5rem;
+  .training-dashboard .bot-stats {
+    gap: 0.6rem;
+  }
+  .training-dashboard .stat-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .training-dashboard .stat-bar .bar {
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
+  .training-dashboard .result-score-large {
+    font-size: 2rem;
+  }
+  .header-section {
+    width: 100%;
+  }
+  .training-dashboard .main-layout {
+    grid-template-rows: auto 300px auto;
+  }
+  .training-dashboard .left-panel,
+  .training-dashboard .right-panel {
+    height: 300px;
+  }
   .training-dashboard .bot-card {
-    min-height: 380px;
+    padding: 1.2rem;
   }
-  
-  .training-dashboard .card-content {
-    padding: 1.5rem;
-  }
-  
   .training-dashboard .bot-avatar {
-    width: 80px;
-    height: 80px;
-    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+  .training-dashboard .play-btn {
+    padding: 1rem;
+    font-size: 1rem;
   }
 }
