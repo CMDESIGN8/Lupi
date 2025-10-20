@@ -146,15 +146,13 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           { x: 65, y: 30 }, // Pívot izquierdo
           { x: 65, y: 70 }  // Pívot derecho
         ],
-        bot: {
-          user: [
-            { x: 80, y: 50 }, // Portero
-            { x: 55, y: 30 }, // Ala izquierdo
-            { x: 55, y: 70 }, // Ala derecho
-            { x: 35, y: 30 }, // Pívot izquierdo
-            { x: 35, y: 70 }  // Pívot derecho
-          ]
-        }
+        bot: [
+          { x: 80, y: 50 }, // Portero
+          { x: 55, y: 30 }, // Ala izquierdo
+          { x: 55, y: 70 }, // Ala derecho
+          { x: 35, y: 30 }, // Pívot izquierdo
+          { x: 35, y: 70 }  // Pívot derecho
+        ]
       }
     };
 
@@ -826,6 +824,79 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     return "👑"; 
   }, []);
 
+  // 🎁 SISTEMA DE RECOMPENSAS MEJORADO
+  const getRewardsForBot = useCallback((bot) => {
+    const baseRewards = {
+      easy: {
+        coins: 50,
+        xp: 25,
+        items: ["Balón básico", "Camiseta básica"],
+        unlock: null
+      },
+      medium: {
+        coins: 100,
+        xp: 50,
+        items: ["Balón profesional", "Botines mejorados"],
+        unlock: "Formación 2-2"
+      },
+      hard: {
+        coins: 200,
+        xp: 100,
+        items: ["Guantes de portero", "Equipación especial"],
+        unlock: "Formación 4-0"
+      },
+      expert: {
+        coins: 400,
+        xp: 200,
+        items: ["Balón de competición", "Equipación élite"],
+        unlock: "Formación 3-2"
+      },
+      legendary: {
+        coins: 800,
+        xp: 400,
+        items: ["Trofeo legendario", "Equipación única"],
+        unlock: "Todos los botones desbloqueados"
+      }
+    };
+    
+    return baseRewards[bot.difficulty] || baseRewards.easy;
+  }, []);
+
+  // 🎨 RENDERIZADO DE RECOMPENSAS
+  const renderRewards = useCallback((bot) => {
+    const rewards = getRewardsForBot(bot);
+    
+    return (
+      <div className="rewards-section">
+        <div className="rewards-header">
+          <span className="rewards-title">🎁 Recompensas</span>
+        </div>
+        <div className="rewards-grid">
+          <div className="reward-item coins">
+            <span className="reward-icon">🪙</span>
+            <span className="reward-value">{rewards.coins} monedas</span>
+          </div>
+          <div className="reward-item xp">
+            <span className="reward-icon">⭐</span>
+            <span className="reward-value">{rewards.xp} XP</span>
+          </div>
+          {rewards.items.map((item, index) => (
+            <div key={index} className="reward-item item">
+              <span className="reward-icon">🎁</span>
+              <span className="reward-value">{item}</span>
+            </div>
+          ))}
+          {rewards.unlock && (
+            <div className="reward-item unlock">
+              <span className="reward-icon">🔓</span>
+              <span className="reward-value">{rewards.unlock}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }, [getRewardsForBot]);
+
   const ballPosition = getBallPosition();
   const currentPlayerPositions = playerPositions.user ? playerPositions : calculatePlayerPositions(
     MATCH_CONFIG.ZONES.CENTER, 
@@ -1171,7 +1242,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
             <div className="bots-grid professional">
               {safeBots.length > 0 ? (
                 safeBots.map(bot => (
-                  <div key={bot.id} className="bot-card professional">
+                  <div key={bot.id} className="bot-card professional improved">
                     <div className="bot-header professional">
                       <div 
                         className="bot-avatar professional" 
@@ -1228,6 +1299,10 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                         </div>
                       </div>
                     </div>
+                    
+                    {/* SECCIÓN DE RECOMPENSAS */}
+                    {renderRewards(bot)}
+                    
                     <button 
                       className={`play-btn professional ${bot.difficulty}`} 
                       onClick={() => onStartMatch(bot)} 
