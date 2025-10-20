@@ -852,7 +852,7 @@ body {
   font-size: 1.2rem;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--violet);
   text-align: center;
   margin-bottom: 20px;
   border: none;
@@ -1063,7 +1063,7 @@ body {
   font-size: 1.3rem;
   background: linear-gradient(90deg, var(--secondary), var(--primary));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--violet);
   border: none;
   padding: 0;
   margin: 0;
