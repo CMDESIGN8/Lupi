@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/TrainingDashboard.css";
 
-// 🎮 CONSTANTES DE CONFIGURACIÓN PARA FÚTSAL
+// 🎮 CONSTANTES DE CONFIGURACIÓN PROFESIONAL
 const MATCH_CONFIG = {
-  DURATION: 40, // 2 tiempos de 20 min en futsal
+  DURATION: 90,
   EVENT_TYPES: {
     PASS: 'pass',
     TACKLE: 'tackle', 
@@ -11,19 +11,13 @@ const MATCH_CONFIG = {
     GOAL: 'goal',
     FOUL: 'foul',
     CORNER: 'corner',
-    OFFSIDE: 'offside', // No existe en futsal pero lo mantenemos
+    OFFSIDE: 'offside',
     SAVE: 'save',
-    CROSS: 'cross',
-    PIVOT: 'pivot',
-    WALL_PASS: 'wall_pass',
-    POWER_PLAY: 'power_play', // Portero-jugador
-    DOUBLE_PENALTY: 'double_penalty'
+    CROSS: 'cross'
   },
   ZONES: {
     USER_DEFENSE: 'user_defense',
-    LEFT_WING: 'left_wing',
     CENTER: 'center',
-    RIGHT_WING: 'right_wing',
     BOT_DEFENSE: 'bot_defense'
   },
   INTENSITY: {
@@ -31,18 +25,11 @@ const MATCH_CONFIG = {
     MEDIUM: 'medium',
     HIGH: 'high',
     VERY_HIGH: 'very-high'
-  },
-  FORMATIONS: {
-    '3-1': '3-1 (Clásica)',
-    '2-2': '2-2 (Cuadrado)',
-    '4-0': '4-0 (Rombo)',
-    '3-2': '3-2 (Ofensiva)',
-    '2-1-1': '2-1-1 (Diamante)'
   }
 };
 
-// 🎪 COMPONENTE DE CONTROLES MEJORADO PARA FÚTSAL
-const SimulationControls = ({ speed, setSpeed, momentum, matchTime }) => (
+// 🎪 COMPONENTE DE CONTROLES MEJORADO
+const SimulationControls = ({ speed, setSpeed, onPause, onResume, isActive, momentum }) => (
   <div className="simulation-controls professional">
     <div className="speed-controls">
       <button onClick={() => setSpeed(2000)} title="Muy Lento" className={speed === 2000 ? 'active' : ''}>🐌</button>
@@ -50,13 +37,6 @@ const SimulationControls = ({ speed, setSpeed, momentum, matchTime }) => (
       <button onClick={() => setSpeed(800)} title="Normal" className={speed === 800 ? 'active' : ''}>▶️</button>
       <button onClick={() => setSpeed(400)} title="Rápido" className={speed === 400 ? 'active' : ''}>⏩</button>
       <button onClick={() => setSpeed(150)} title="Muy Rápido" className={speed === 150 ? 'active' : ''}>⚡</button>
-    </div>
-    <div className="match-time-display">
-      <div className="time">{matchTime}'</div>
-      <div className="phase">
-        {matchTime <= 20 ? '1º TIEMPO' : 
-         matchTime < 40 ? '2º TIEMPO' : 'FINAL'}
-      </div>
     </div>
     <div className="momentum-indicator">
       <div className="momentum-label">Momentum</div>
@@ -71,12 +51,11 @@ const SimulationControls = ({ speed, setSpeed, momentum, matchTime }) => (
   </div>
 );
 
-// 🏆 COMPONENTE PRINCIPAL FÚTSAL PRO
-const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simulating, selectedBot, onStartMatch, onMatchFinish, matchResult, onCloseResult, finalStats }) => {
+// 🏆 COMPONENTE PRINCIPAL SUPER PRO
+const TrainingDashboard = ({ character, bots, matchHistory, loading, simulating, selectedBot, onStartMatch, onMatchFinish, matchResult, onCloseResult }) => {
   const [activePanel, setActivePanel] = useState("bots");
-  const [selectedFormation, setSelectedFormation] = useState('3-1');
 
-  // 🎮 ESTADO DE SIMULACIÓN PARA FÚTSAL
+  // 🎮 ESTADO DE SIMULACIÓN AVANZADO
   const [simulationState, setSimulationState] = useState({
     isActive: false,
     matchTime: 0,
@@ -87,159 +66,119 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     pressure: { user: 50, bot: 50 },
     lastAction: null,
     formaciones: {
-      user: '3-1',
-      bot: '2-2'
-    },
-    powerPlay: false, // Portero-jugador
-    accumulatedFouls: { user: 0, bot: 0 } // Faltas acumuladas para doble penalti
+      user: '4-3-3',
+      bot: '4-4-2'
+    }
   });
 
   const [matchStats, setMatchStats] = useState(null);
   const [matchEvents, setMatchEvents] = useState([]);
   const [playerPositions, setPlayerPositions] = useState({});
+  const [matchHistoryState, setMatchHistoryState] = useState([]);
   const simulationIntervalRef = useRef(null);
 
-  // 🎯 SISTEMA DE HABILIDADES PARA FÚTSAL
+  // 🎯 SISTEMA DE HABILIDADES AVANZADO
   const calculatePlayerRating = useCallback((player, role = 'balanced') => {
-    if (!player) return 50;
     const weights = {
       balanced: { tiro: 0.25, potencia: 0.20, defensa: 0.25, velocidad: 0.30 },
-      pivot: { tiro: 0.35, potencia: 0.25, defensa: 0.15, velocidad: 0.25 },
+      attacker: { tiro: 0.35, potencia: 0.25, defensa: 0.15, velocidad: 0.25 },
       defender: { tiro: 0.15, potencia: 0.20, defensa: 0.40, velocidad: 0.25 },
-      winger: { tiro: 0.25, potencia: 0.25, defensa: 0.20, velocidad: 0.30 },
-      goalkeeper: { tiro: 0.10, potencia: 0.15, defensa: 0.50, velocidad: 0.25 }
+      midfielder: { tiro: 0.25, potencia: 0.25, defensa: 0.25, velocidad: 0.25 }
     };
     
-    const weight = weights[role] || weights.balanced;
+    const weight = weights[role];
     return (
-      ((player.tiro || 50) * weight.tiro) +
-      ((player.potencia || 50) * weight.potencia) + 
-      ((player.defensa || 50) * weight.defensa) +
-      ((player.velocidad || 50) * weight.velocidad)
+      (player.tiro * weight.tiro) +
+      (player.potencia * weight.potencia) + 
+      (player.defensa * weight.defensa) +
+      (player.velocidad * weight.velocidad)
     );
   }, []);
 
-  // 🏃 SISTEMA DE POSICIONAMIENTO PARA FÚTSAL
-  const calculatePlayerPositions = useCallback((ballZone, possession, matchTime, formation = '3-1') => {
-    const baseFormations = {
-      '3-1': {
-        user: [
-          { x: 20, y: 50 }, // Portero
-          { x: 40, y: 25 }, // Defensa izquierdo
-          { x: 40, y: 50 }, // Defensa central
-          { x: 40, y: 75 }, // Defensa derecho
-          { x: 70, y: 50 }  // Pívot
-        ],
-        bot: [
-          { x: 80, y: 50 }, // Portero
-          { x: 60, y: 25 }, // Defensa izquierdo
-          { x: 60, y: 50 }, // Defensa central
-          { x: 60, y: 75 }, // Defensa derecho
-          { x: 30, y: 50 }  // Pívot
-        ]
-      },
-      '2-2': {
-        user: [
-          { x: 20, y: 50 }, // Portero
-          { x: 45, y: 30 }, // Ala izquierdo
-          { x: 45, y: 70 }, // Ala derecho
-          { x: 65, y: 30 }, // Pívot izquierdo
-          { x: 65, y: 70 }  // Pívot derecho
-        ],
-        bot: {
-          user: [
-            { x: 80, y: 50 }, // Portero
-            { x: 55, y: 30 }, // Ala izquierdo
-            { x: 55, y: 70 }, // Ala derecho
-            { x: 35, y: 30 }, // Pívot izquierdo
-            { x: 35, y: 70 }  // Pívot derecho
-          ]
-        }
-      }
+  // 🏃 SISTEMA DE POSICIONAMIENTO DINÁMICO
+  const calculatePlayerPositions = useCallback((ballZone, possession, matchTime) => {
+    const basePositions = {
+      user: { x: 25, y: 30 },
+      bot: { x: 75, y: 60 }
     };
 
-    const formationPositions = baseFormations[formation] || baseFormations['3-1'];
-    const timeVariation = (Math.sin(matchTime * 0.1) * 3) + (Math.random() * 6 - 3);
+    // Variación basada en el tiempo para movimiento natural
+    const timeVariation = (Math.sin(matchTime * 0.1) * 5) + (Math.random() * 10 - 5);
 
-    // Ajustar posiciones según la zona del balón
-    const adjustedPositions = JSON.parse(JSON.stringify(formationPositions));
-    
-    if (ballZone === MATCH_CONFIG.ZONES.USER_DEFENSE) {
-      adjustedPositions.user.forEach(pos => {
-        pos.x += Math.random() * 10 - 5;
-        pos.y += Math.random() * 15 - 7.5;
-      });
-      adjustedPositions.bot.forEach(pos => {
-        pos.x -= Math.random() * 8;
-        pos.y += Math.random() * 10 - 5;
-      });
-    } else if (ballZone === MATCH_CONFIG.ZONES.BOT_DEFENSE) {
-      adjustedPositions.user.forEach(pos => {
-        pos.x += Math.random() * 8;
-        pos.y += Math.random() * 10 - 5;
-      });
-      adjustedPositions.bot.forEach(pos => {
-        pos.x -= Math.random() * 10 - 5;
-        pos.y += Math.random() * 15 - 7.5;
-      });
-    } else {
-      // Zona central - posiciones más equilibradas
-      adjustedPositions.user.forEach(pos => {
-        pos.x += Math.random() * 8 - 4;
-        pos.y += Math.random() * 12 - 6;
-      });
-      adjustedPositions.bot.forEach(pos => {
-        pos.x += Math.random() * 8 - 4;
-        pos.y += Math.random() * 12 - 6;
-      });
+    switch(ballZone) {
+      case MATCH_CONFIG.ZONES.USER_DEFENSE:
+        return {
+          user: { 
+            x: 15 + Math.random() * 15 + timeVariation, 
+            y: 25 + Math.random() * 40 
+          },
+          bot: { 
+            x: 70 + Math.random() * 10 + timeVariation, 
+            y: 55 + Math.random() * 20 
+          }
+        };
+      case MATCH_CONFIG.ZONES.BOT_DEFENSE:
+        return {
+          user: { 
+            x: 65 + Math.random() * 15 + timeVariation, 
+            y: 25 + Math.random() * 40 
+          },
+          bot: { 
+            x: 20 + Math.random() * 10 + timeVariation, 
+            y: 55 + Math.random() * 20 
+          }
+        };
+      default: // CENTER
+        return {
+          user: { 
+            x: 30 + Math.random() * 20 + timeVariation, 
+            y: 20 + Math.random() * 60 
+          },
+          bot: { 
+            x: 60 + Math.random() * 20 + timeVariation, 
+            y: 20 + Math.random() * 60 
+          }
+        };
     }
-
-    return {
-      user: adjustedPositions.user,
-      bot: adjustedPositions.bot
-    };
   }, []);
 
-  // 🎲 SISTEMA DE PROBABILIDADES PARA FÚTSAL
-  const calculateActionProbabilities = useCallback((attacker, defender, ballZone, momentum, matchTime, accumulatedFouls) => {
+  // 🎲 SISTEMA DE PROBABILIDADES AVANZADO
+  const calculateActionProbabilities = useCallback((attacker, defender, ballZone, momentum, matchTime) => {
     const baseProbabilities = {
-      [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.45,
-      [MATCH_CONFIG.EVENT_TYPES.TACKLE]: 0.15,
-      [MATCH_CONFIG.EVENT_TYPES.SHOT]: 0.15,
-      [MATCH_CONFIG.EVENT_TYPES.FOUL]: 0.06,
-      [MATCH_CONFIG.EVENT_TYPES.CORNER]: 0.04,
-      [MATCH_CONFIG.EVENT_TYPES.CROSS]: 0.03,
-      [MATCH_CONFIG.EVENT_TYPES.PIVOT]: 0.05,
-      [MATCH_CONFIG.EVENT_TYPES.WALL_PASS]: 0.04,
-      [MATCH_CONFIG.EVENT_TYPES.SAVE]: 0.02,
-      [MATCH_CONFIG.EVENT_TYPES.POWER_PLAY]: 0.01
+      [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.55,
+      [MATCH_CONFIG.EVENT_TYPES.TACKLE]: 0.18,
+      [MATCH_CONFIG.EVENT_TYPES.SHOT]: 0.12,
+      [MATCH_CONFIG.EVENT_TYPES.FOUL]: 0.04,
+      [MATCH_CONFIG.EVENT_TYPES.CORNER]: 0.03,
+      [MATCH_CONFIG.EVENT_TYPES.CROSS]: 0.05,
+      [MATCH_CONFIG.EVENT_TYPES.OFFSIDE]: 0.02,
+      [MATCH_CONFIG.EVENT_TYPES.SAVE]: 0.01
     };
 
-    // Ajustes por zona
+    // Modificar probabilidades según zona
     if (ballZone === MATCH_CONFIG.ZONES.BOT_DEFENSE) {
-      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.SHOT] += 0.10;
-      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.PIVOT] += 0.03;
-      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.PASS] -= 0.08;
+      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.SHOT] += 0.08;
+      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.CROSS] += 0.03;
+      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.PASS] -= 0.10;
     } else if (ballZone === MATCH_CONFIG.ZONES.USER_DEFENSE) {
       baseProbabilities[MATCH_CONFIG.EVENT_TYPES.TACKLE] += 0.08;
-      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.FOUL] += 0.02;
+      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.CLEARANCE] += 0.05;
     }
 
-    // Momentum afecta acciones ofensivas
+    // Modificar por momentum (parte emocional)
     const momentumFactor = (momentum - 50) / 100;
-    baseProbabilities[MATCH_CONFIG.EVENT_TYPES.SHOT] += momentumFactor * 0.08;
+    baseProbabilities[MATCH_CONFIG.EVENT_TYPES.SHOT] += momentumFactor * 0.06;
     baseProbabilities[MATCH_CONFIG.EVENT_TYPES.PASS] -= momentumFactor * 0.03;
 
-    // Faltas acumuladas aumentan probabilidad de doble penalti
-    const totalFouls = accumulatedFouls.user + accumulatedFouls.bot;
-    if (totalFouls >= 5 && Math.random() < 0.3) {
-      baseProbabilities[MATCH_CONFIG.EVENT_TYPES.DOUBLE_PENALTY] = 0.15;
-    }
+    // Modificar según tiempo de partido (fatiga)
+    const fatigueFactor = matchTime / MATCH_CONFIG.DURATION;
+    baseProbabilities[MATCH_CONFIG.EVENT_TYPES.FOUL] += fatigueFactor * 0.03;
+    baseProbabilities[MATCH_CONFIG.EVENT_TYPES.PASS] -= fatigueFactor * 0.02;
 
     return baseProbabilities;
   }, []);
 
-  // ⚽ GENERADOR DE EVENTOS PARA FÚTSAL
+  // ⚽ GENERADOR DE EVENTOS PROFESIONAL
   const generateMatchEvent = useCallback((currentPossession, currentTime) => {
     if (!character || !selectedBot) return null;
 
@@ -249,15 +188,16 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     const attackerName = currentPossession === 'user' ? character.nickname : selectedBot.name;
     const defenderName = currentPossession === 'user' ? selectedBot.name : character.nickname;
 
+    // Calcular probabilidades avanzadas
     const probabilities = calculateActionProbabilities(
       attacker, 
       defender, 
       simulationState.ballZone, 
       simulationState.momentum,
-      currentTime,
-      simulationState.accumulatedFouls
+      currentTime
     );
     
+    // Seleccionar acción basada en probabilidades
     const random = Math.random();
     let cumulative = 0;
     let selectedAction = MATCH_CONFIG.EVENT_TYPES.PASS;
@@ -270,6 +210,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       }
     }
 
+    // Generar evento específico
     return generateEventByType(
       selectedAction, 
       attacker, 
@@ -281,7 +222,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     );
   }, [character, selectedBot, simulationState, calculateActionProbabilities]);
 
-  // 🎪 GENERADOR ESPECÍFICO POR TIPO DE EVENTO FÚTSAL
+  // 🎪 GENERADOR ESPECÍFICO POR TIPO DE EVENTO
   const generateEventByType = (actionType, attacker, defender, attackerName, defenderName, time, possession) => {
     const baseEvent = {
       id: Date.now() + time + Math.random(),
@@ -295,9 +236,11 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     switch(actionType) {
       case MATCH_CONFIG.EVENT_TYPES.GOAL:
         const goalTexts = [
-          `¡¡¡GOOOOL DE ${attackerName}!!! Remate espectacular.`,
-          `¡GOLAZO! ${attackerName} define con clase.`,
-          `¡GOOL! ${attackerName} aprovecha la oportunidad.`,
+          `¡¡¡GOOOOL DE ${attackerName}!!! Un disparo espectacular.`,
+          `¡¡¡GOLAZO DE ${attackerName}!!! Remate imparable.`,
+          `¡GOOL! ${attackerName} define con clase.`,
+          `¡INCREÍBLE! ${attackerName} anota un gol magistral.`,
+          `¡SEÑORES GOL DE ${attackerName}! Celebra con emoción.`
         ];
         return {
           ...baseEvent,
@@ -308,26 +251,29 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
         };
 
       case MATCH_CONFIG.EVENT_TYPES.SHOT:
-        const shotQuality = calculatePlayerRating(attacker, 'pivot');
-        const saveQuality = calculatePlayerRating(defender, 'goalkeeper');
-        const goalProbability = (shotQuality / (shotQuality + saveQuality * 1.5)) * (1 + (simulationState.momentum - 50) / 100);
+        const shotQuality = calculatePlayerRating(attacker, 'attacker');
+        const saveQuality = calculatePlayerRating(defender, 'defender');
+        const goalProbability = (shotQuality / (shotQuality + saveQuality * 1.3)) * (1 + (simulationState.momentum - 50) / 100);
         
-        if (Math.random() < goalProbability * 0.7) {
+        if (Math.random() < goalProbability * 0.8) { // Reducir probabilidad de gol
           return {
             ...baseEvent,
             action: MATCH_CONFIG.EVENT_TYPES.GOAL,
             text: getRandomText([
               `¡¡¡GOOOOL DE ${attackerName}!!! Remate imparable.`,
               `¡GOL! ${attackerName} encuentra el ángulo perfecto.`,
+              `¡SE ABRE EL MARCADOR! ${attackerName} anota.`
             ]),
             intensity: MATCH_CONFIG.INTENSITY.VERY_HIGH,
             zone: MATCH_CONFIG.ZONES.BOT_DEFENSE,
             stat_type: 'goals'
           };
-        } else if (Math.random() < 0.4) {
+        } else if (Math.random() < 0.3) {
+          // Portería salvada
           const saveTexts = [
             `¡Qué parada del portero! Ataja el remate de ${attackerName}.`,
             `El guardameta detiene el potente disparo de ${attackerName}.`,
+            `¡Increíble salvada! ${attackerName} no puede creerlo.`
           ];
           return {
             ...baseEvent,
@@ -338,9 +284,12 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
             sub_type: 'saved'
           };
         } else {
+          // Disparo fallado
           const missTexts = [
             `¡Casi! ${attackerName} dispara pero se va por poco.`,
             `¡Qué oportunidad! ${attackerName} falla el remate.`,
+            `${attackerName} dispara pero da en el palo. ¡Qué mala suerte!`,
+            `El balón se va por encima del travesaño. ${attackerName} se lleva las manos a la cabeza.`
           ];
           return {
             ...baseEvent,
@@ -352,62 +301,13 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           };
         }
 
-      case MATCH_CONFIG.EVENT_TYPES.PIVOT:
-        const pivotTexts = [
-          `${attackerName} hace un excelente movimiento de pivote.`,
-          `Gran jugada de pivote de ${attackerName}, controla el balón en zona de peligro.`,
-        ];
-        return {
-          ...baseEvent,
-          text: getRandomText(pivotTexts),
-          intensity: MATCH_CONFIG.INTENSITY.MEDIUM,
-          zone: MATCH_CONFIG.ZONES.BOT_DEFENSE,
-          stat_type: 'pivots'
-        };
-
-      case MATCH_CONFIG.EVENT_TYPES.WALL_PASS:
-        const wallPassTexts = [
-          `¡Bonita pared entre ${attackerName} y su compañero!`,
-          `${attackerName} realiza una pared perfecta para desequilibrar.`,
-        ];
-        return {
-          ...baseEvent,
-          text: getRandomText(wallPassTexts),
-          intensity: MATCH_CONFIG.INTENSITY.MEDIUM,
-          zone: getNextZone(simulationState.ballZone, possession),
-          stat_type: 'wall_passes'
-        };
-
-      case MATCH_CONFIG.EVENT_TYPES.POWER_PLAY:
-        const powerPlayTexts = [
-          `¡Estrategia arriesgada! ${attackerName} juega sin portero.`,
-          `El equipo de ${attackerName} saca al portero jugador.`,
-        ];
-        return {
-          ...baseEvent,
-          text: getRandomText(powerPlayTexts),
-          intensity: MATCH_CONFIG.INTENSITY.HIGH,
-          zone: simulationState.ballZone,
-          stat_type: 'power_plays'
-        };
-
-      case MATCH_CONFIG.EVENT_TYPES.DOUBLE_PENALTY:
-        const penaltyTexts = [
-          `¡DOBLE PENALTI! Falta acumulada, gran oportunidad para ${attackerName}.`,
-          `Penalti doble concedido, ${attackerName} se prepara para lanzar.`,
-        ];
-        return {
-          ...baseEvent,
-          text: getRandomText(penaltyTexts),
-          intensity: MATCH_CONFIG.INTENSITY.VERY_HIGH,
-          zone: MATCH_CONFIG.ZONES.BOT_DEFENSE,
-          stat_type: 'penalties'
-        };
-
       case MATCH_CONFIG.EVENT_TYPES.PASS:
         const passTexts = [
           `${attackerName} realiza un pase preciso al compañero.`,
-          `${attackerName} cambia el juego con visión.`,
+          `${attackerName} cambia el juego de banda con visión.`,
+          `Buena combinación entre los jugadores del equipo.`,
+          `${attackerName} avanza con el balón controlado.`,
+          `Pase filtrado de ${attackerName} que abre el juego.`
         ];
         return {
           ...baseEvent,
@@ -421,6 +321,8 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
         const tackleTexts = [
           `¡Gran entrada de ${defenderName}! Recupera el balón limpiamente.`,
           `${defenderName} intercepta el pase con anticipación.`,
+          `Buena presión defensiva del equipo. Recuperan la posesión.`,
+          `¡Qué robo de balón de ${defenderName}! Inicia el contragolpe.`
         ];
         return {
           ...baseEvent,
@@ -428,27 +330,50 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           intensity: MATCH_CONFIG.INTENSITY.MEDIUM,
           zone: simulationState.ballZone,
           stat_type: 'tackles',
-          team: possession === 'user' ? 'bot' : 'user'
+          team: possession === 'user' ? 'bot' : 'user' // Cambio de posesión
         };
 
       case MATCH_CONFIG.EVENT_TYPES.FOUL:
         const foulTexts = [
-          `Falta cometida por ${defenderName} sobre ${attackerName}.`,
-          `${defenderName} comete una infracción, falta señalada.`,
+          `Falta dura cometida por ${attackerName}. El árbitro pita.`,
+          `${attackerName} comete falta. Tarjeta amarilla.`,
+          `Falta táctica de ${attackerName}. Detiene el contraataque.`
         ];
         return {
           ...baseEvent,
           text: getRandomText(foulTexts),
           intensity: MATCH_CONFIG.INTENSITY.MEDIUM,
           zone: simulationState.ballZone,
-          stat_type: 'fouls',
-          team: possession === 'user' ? 'bot' : 'user'
+          stat_type: 'fouls'
+        };
+
+      case MATCH_CONFIG.EVENT_TYPES.CROSS:
+        const crossTexts = [
+          `${attackerName} envía un centro peligroso al área.`,
+          `Centro medido de ${attackerName} buscando a su compañero.`,
+          `${attackerName} manda el balón al segundo palo.`
+        ];
+        return {
+          ...baseEvent,
+          text: getRandomText(crossTexts),
+          intensity: MATCH_CONFIG.INTENSITY.MEDIUM,
+          zone: MATCH_CONFIG.ZONES.BOT_DEFENSE,
+          stat_type: 'crosses'
+        };
+
+      case MATCH_CONFIG.EVENT_TYPES.CORNER:
+        return {
+          ...baseEvent,
+          text: `Saque de esquina a favor del equipo de ${attackerName}.`,
+          intensity: MATCH_CONFIG.INTENSITY.MEDIUM,
+          zone: MATCH_CONFIG.ZONES.BOT_DEFENSE,
+          stat_type: 'corners'
         };
 
       default:
         return {
           ...baseEvent,
-          text: `${attackerName} controla el balón.`,
+          text: `${attackerName} controla el balón en el mediocampo.`,
           intensity: MATCH_CONFIG.INTENSITY.LOW,
           zone: MATCH_CONFIG.ZONES.CENTER,
           stat_type: 'passes'
@@ -456,24 +381,16 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     }
   };
 
-  // 🗺️ SISTEMA DE TRANSICIÓN DE ZONAS FÚTSAL
+  // 🗺️ SISTEMA DE TRANSICIÓN DE ZONAS MEJORADO
   const getNextZone = (currentZone, possession) => {
     const zoneProgression = {
       [MATCH_CONFIG.ZONES.USER_DEFENSE]: {
-        user: [MATCH_CONFIG.ZONES.USER_DEFENSE, MATCH_CONFIG.ZONES.LEFT_WING, MATCH_CONFIG.ZONES.RIGHT_WING, MATCH_CONFIG.ZONES.CENTER],
+        user: [MATCH_CONFIG.ZONES.USER_DEFENSE, MATCH_CONFIG.ZONES.CENTER],
         bot: [MATCH_CONFIG.ZONES.USER_DEFENSE, MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.CENTER]
       },
-      [MATCH_CONFIG.ZONES.LEFT_WING]: {
-        user: [MATCH_CONFIG.ZONES.LEFT_WING, MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.BOT_DEFENSE],
-        bot: [MATCH_CONFIG.ZONES.LEFT_WING, MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.USER_DEFENSE]
-      },
-      [MATCH_CONFIG.ZONES.RIGHT_WING]: {
-        user: [MATCH_CONFIG.ZONES.RIGHT_WING, MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.BOT_DEFENSE],
-        bot: [MATCH_CONFIG.ZONES.RIGHT_WING, MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.USER_DEFENSE]
-      },
       [MATCH_CONFIG.ZONES.CENTER]: {
-        user: [MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.BOT_DEFENSE, MATCH_CONFIG.ZONES.LEFT_WING, MATCH_CONFIG.ZONES.RIGHT_WING],
-        bot: [MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.USER_DEFENSE, MATCH_CONFIG.ZONES.LEFT_WING, MATCH_CONFIG.ZONES.RIGHT_WING]
+        user: [MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.BOT_DEFENSE, MATCH_CONFIG.ZONES.CENTER],
+        bot: [MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.USER_DEFENSE, MATCH_CONFIG.ZONES.CENTER]
       },
       [MATCH_CONFIG.ZONES.BOT_DEFENSE]: {
         user: [MATCH_CONFIG.ZONES.BOT_DEFENSE, MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.BOT_DEFENSE],
@@ -485,10 +402,11 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     return possibleZones[Math.floor(Math.random() * possibleZones.length)];
   };
 
-  // 🔄 MOTOR PRINCIPAL DE SIMULACIÓN FÚTSAL
+  // 🔄 MOTOR PRINCIPAL DE SIMULACIÓN MEJORADO
   const simulateMinute = useCallback((currentTime) => {
     if (!character || !selectedBot || !simulationState.isActive) return;
 
+    // Calcular iniciativa con momentum y factores avanzados
     const userRating = calculatePlayerRating(character, 'balanced');
     const botRating = calculatePlayerRating(selectedBot, 'balanced');
     const momentumFactor = (simulationState.momentum - 50) / 50;
@@ -498,28 +416,23 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                           momentumFactor * 0.15 + 
                           pressureFactor * 0.1;
     
+    // Añadir aleatoriedad controlada
     initiativeChance += (Math.random() - 0.5) * 0.2;
     
     const hasUserInitiative = Math.random() < Math.max(0.15, Math.min(0.85, initiativeChance));
     const currentPossession = hasUserInitiative ? 'user' : 'bot';
 
+    // Generar evento
     const event = generateMatchEvent(currentPossession, currentTime);
     if (!event) return;
 
-    // Actualizar faltas acumuladas
-    if (event.action === MATCH_CONFIG.EVENT_TYPES.FOUL) {
-      setSimulationState(prev => ({
-        ...prev,
-        accumulatedFouls: {
-          ...prev.accumulatedFouls,
-          [event.team]: prev.accumulatedFouls[event.team] + 1
-        }
-      }));
-    }
-
+    // Actualizar momentum basado en el evento
     const newMomentum = updateMomentum(simulationState.momentum, event, currentPossession);
+
+    // Actualizar presión
     const newPressure = updatePressure(simulationState.pressure, event, currentPossession);
 
+    // Actualizar todos los estados
     setSimulationState(prev => ({
       ...prev,
       possession: event.team,
@@ -529,51 +442,54 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       lastAction: event.action
     }));
 
-    setPlayerPositions(calculatePlayerPositions(event.zone, event.team, currentTime, selectedFormation));
-    setMatchEvents(prev => [event, ...prev.slice(0, 24)]);
-    setMatchStats(prev => updateMatchStats(prev, event, currentTime));
-  }, [character, selectedBot, simulationState, generateMatchEvent, calculatePlayerPositions, calculatePlayerRating, selectedFormation]);
+    // Actualizar posiciones de jugadores
+    setPlayerPositions(calculatePlayerPositions(event.zone, event.team, currentTime));
 
-  // 📊 ACTUALIZADOR DE MOMENTUM FÚTSAL
+    // Actualizar eventos del partido
+    setMatchEvents(prev => [event, ...prev.slice(0, 24)]); // Mantener últimos 25 eventos
+
+    // Actualizar estadísticas
+    setMatchStats(prev => updateMatchStats(prev, event, currentTime));
+  }, [character, selectedBot, simulationState, generateMatchEvent, calculatePlayerPositions, calculatePlayerRating]);
+
+  // 📊 ACTUALIZADOR DE MOMENTUM MEJORADO
   const updateMomentum = (currentMomentum, event, possession) => {
     let change = 0;
     
     switch(event.intensity) {
       case MATCH_CONFIG.INTENSITY.VERY_HIGH:
         if (event.action === MATCH_CONFIG.EVENT_TYPES.GOAL) {
-          change = possession === 'user' ? 25 : -25;
-        } else if (event.action === MATCH_CONFIG.EVENT_TYPES.DOUBLE_PENALTY) {
-          change = possession === 'user' ? 15 : -15;
+          change = possession === 'user' ? 20 : -20;
         }
         break;
       case MATCH_CONFIG.INTENSITY.HIGH:
-        change = possession === 'user' ? 10 : -10;
+        change = possession === 'user' ? 8 : -8;
         break;
       case MATCH_CONFIG.INTENSITY.MEDIUM:
-        change = possession === 'user' ? 4 : -4;
+        change = possession === 'user' ? 3 : -3;
         break;
       default:
         change = possession === 'user' ? 1 : -1;
     }
 
+    // Efectos especiales por tipo de acción
     if (event.action === MATCH_CONFIG.EVENT_TYPES.TACKLE) {
-      change = possession === 'user' ? -6 : 6;
+      change = possession === 'user' ? -5 : 5; // El que pierde la posesión pierde momentum
     } else if (event.sub_type === 'saved') {
-      change = possession === 'user' ? -10 : 6;
-    } else if (event.action === MATCH_CONFIG.EVENT_TYPES.PIVOT) {
-      change = possession === 'user' ? 8 : -8;
+      change = possession === 'user' ? -8 : 5; // El portero gana momentum al salvar
     }
 
+    // Añadir aleatoriedad controlada
     change += (Math.random() - 0.5) * 4;
     
     return Math.max(0, Math.min(100, currentMomentum + change));
   };
 
-  // 🎯 ACTUALIZADOR DE PRESIÓN FÚTSAL
+  // 🎯 ACTUALIZADOR DE PRESIÓN MEJORADO
   const updatePressure = (currentPressure, event, possession) => {
-    const pressureChange = event.intensity === MATCH_CONFIG.INTENSITY.VERY_HIGH ? 20 :
-                          event.intensity === MATCH_CONFIG.INTENSITY.HIGH ? 12 :
-                          event.intensity === MATCH_CONFIG.INTENSITY.MEDIUM ? 6 : 2;
+    const pressureChange = event.intensity === MATCH_CONFIG.INTENSITY.VERY_HIGH ? 15 :
+                          event.intensity === MATCH_CONFIG.INTENSITY.HIGH ? 10 :
+                          event.intensity === MATCH_CONFIG.INTENSITY.MEDIUM ? 5 : 2;
     
     return {
       user: Math.max(0, Math.min(100, 
@@ -585,22 +501,24 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     };
   };
 
-  // 📈 ACTUALIZADOR DE ESTADÍSTICAS FÚTSAL
+  // 📈 ACTUALIZADOR DE ESTADÍSTICAS AVANZADO
   const updateMatchStats = (prevStats, event, currentTime) => {
     if (!prevStats) return prevStats;
 
     const newStats = JSON.parse(JSON.stringify(prevStats));
     
+    // Actualizar estadística principal del evento
     if (event.stat_type) {
-      newStats[event.team][event.stat_type] = (newStats[event.team][event.stat_type] || 0) + 1;
+      newStats[event.team][event.stat_type]++;
     }
 
+    // Estadísticas específicas por sub-tipo
     if (event.sub_type === 'saved') {
       newStats[event.team === 'user' ? 'bot' : 'user'].saves = 
         (newStats[event.team === 'user' ? 'bot' : 'user'].saves || 0) + 1;
     }
 
-    // Posesión (más dinámica en futsal)
+    // Calcular posesión en tiempo real
     const totalMinutes = currentTime;
     const userPossessionMinutes = (prevStats.user.possession / 100) * (totalMinutes - 1) + 
       (event.team === 'user' ? 1 : 0);
@@ -608,13 +526,14 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     newStats.user.possession = Math.round((userPossessionMinutes / totalMinutes) * 100);
     newStats.bot.possession = 100 - newStats.user.possession;
 
-    // Estadísticas específicas de futsal
+    // Calcular precisión de tiros
     if (event.stat_type === 'shots') {
       const totalShots = newStats[event.team].shots;
       const goals = newStats[event.team].goals || 0;
       newStats[event.team].shotAccuracy = totalShots > 0 ? Math.round((goals / totalShots) * 100) : 0;
     }
 
+    // Calcular precisión de pases
     if (event.stat_type === 'passes') {
       newStats[event.team].completed_passes = (newStats[event.team].completed_passes || 0) + 1;
       const totalPasses = newStats[event.team].passes;
@@ -622,14 +541,10 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       newStats[event.team].passAccuracy = totalPasses > 0 ? Math.round((completed / totalPasses) * 100) : 100;
     }
 
-    // Faltas acumuladas
-    newStats.user.accumulatedFouls = simulationState.accumulatedFouls.user;
-    newStats.bot.accumulatedFouls = simulationState.accumulatedFouls.bot;
-
     return newStats;
   };
 
-  // 🛑 DETENER SIMULACIÓN
+  // 🛑 DETENER SIMULACIÓN MEJORADO
   const stopSimulation = useCallback((finalize = false) => {
     if (simulationIntervalRef.current) {
       clearInterval(simulationIntervalRef.current);
@@ -639,6 +554,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     if (finalize) {
       setSimulationState(prev => ({ ...prev, isActive: false }));
       
+      // Enviar estadísticas finales
       if (onMatchFinish && matchStats) {
         setTimeout(() => {
           onMatchFinish({
@@ -649,42 +565,34 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
               finalScore: {
                 user: matchStats.user.goals || 0,
                 bot: matchStats.bot.goals || 0
-              },
-              formation: selectedFormation
+              }
             }
           });
         }, 500);
       }
     }
-  }, [matchStats, simulationState, onMatchFinish, selectedFormation]);
+  }, [matchStats, simulationState, onMatchFinish]);
 
-  // 🎮 SISTEMA DE VISUALIZACIÓN FÚTSAL
+  // 🎮 SISTEMA DE VISUALIZACIÓN MEJORADO
   const getBallPosition = useCallback(() => {
     const { ballZone, isActive, matchTime } = simulationState;
     if (!isActive) return { x: 50, y: 50 };
 
+    // Movimiento más natural con variación temporal
     const timeVariation = Math.sin(matchTime * 0.2) * 3;
     const randomVariation = Math.random() * 8 - 4;
 
     const zonePositions = {
       [MATCH_CONFIG.ZONES.USER_DEFENSE]: { 
-        x: 20 + Math.random() * 10 + timeVariation, 
+        x: 15 + Math.random() * 10 + timeVariation, 
         y: 35 + Math.random() * 30 + randomVariation 
       },
-      [MATCH_CONFIG.ZONES.LEFT_WING]: { 
-        x: 35 + Math.random() * 10 + timeVariation, 
-        y: 20 + Math.random() * 20 + randomVariation 
-      },
       [MATCH_CONFIG.ZONES.CENTER]: { 
-        x: 50 + Math.random() * 10 + timeVariation, 
+        x: 45 + Math.random() * 10 + timeVariation, 
         y: 40 + Math.random() * 20 + randomVariation 
       },
-      [MATCH_CONFIG.ZONES.RIGHT_WING]: { 
-        x: 65 + Math.random() * 10 + timeVariation, 
-        y: 20 + Math.random() * 20 + randomVariation 
-      },
       [MATCH_CONFIG.ZONES.BOT_DEFENSE]: { 
-        x: 80 + Math.random() * 10 + timeVariation, 
+        x: 75 + Math.random() * 10 + timeVariation, 
         y: 35 + Math.random() * 30 + randomVariation 
       }
     };
@@ -692,26 +600,25 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     return zonePositions[ballZone] || { x: 50, y: 50 };
   }, [simulationState]);
 
-  // ⚡ EFECTO DE INICIO DE SIMULACIÓN
+  // ⚡ EFECTO DE SIMULACIÓN SUPER PRO
   useEffect(() => {
     if (simulating && selectedBot && character && !simulationState.isActive) {
-      console.log("🚀 INICIANDO SIMULACIÓN FÚTSAL");
+      console.log("🚀 INICIANDO SIMULACIÓN PROFESIONAL");
       
+      // Reiniciar estados
       setMatchEvents([]);
       setMatchStats({
         user: { 
           shots: 0, goals: 0, passes: 0, tackles: 0, fouls: 0, 
           possession: 50, shotAccuracy: 0, passAccuracy: 100, 
           completed_passes: 0, saves: 0, name: character.nickname,
-          pivots: 0, wall_passes: 0, power_plays: 0, penalties: 0,
-          accumulatedFouls: 0
+          crosses: 0, corners: 0
         },
         bot: { 
           shots: 0, goals: 0, passes: 0, tackles: 0, fouls: 0, 
           possession: 50, shotAccuracy: 0, passAccuracy: 100, 
           completed_passes: 0, saves: 0, name: selectedBot.name,
-          pivots: 0, wall_passes: 0, power_plays: 0, penalties: 0,
-          accumulatedFouls: 0
+          crosses: 0, corners: 0
         }
       });
       
@@ -723,24 +630,22 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
         ballZone: MATCH_CONFIG.ZONES.CENTER,
         momentum: 50,
         pressure: { user: 50, bot: 50 },
-        lastAction: null,
-        accumulatedFouls: { user: 0, bot: 0 },
-        formaciones: {
-          user: selectedFormation,
-          bot: '2-2'
-        }
+        lastAction: null
       }));
 
+      // Configurar intervalo de simulación
       simulationIntervalRef.current = setInterval(() => {
         setSimulationState(prev => {
           const newTime = prev.matchTime + 1;
           
+          // Finalizar partido a los 90 minutos
           if (newTime >= MATCH_CONFIG.DURATION) {
-            console.log("🏁 FINALIZANDO PARTIDO FÚTSAL");
+            console.log("🏁 FINALIZANDO PARTIDO PROFESIONAL");
             stopSimulation(true);
             return { ...prev, isActive: false };
           }
           
+          // Simular minuto actual
           simulateMinute(newTime);
           return { ...prev, matchTime: newTime };
         });
@@ -753,7 +658,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
         clearInterval(simulationIntervalRef.current);
       }
     };
-  }, [simulating, selectedBot, character, simulationState.speed, selectedFormation]);
+  }, [simulating, selectedBot, character, simulationState.speed]);
 
   // ⚡ EFECTO PARA CAMBIOS DE VELOCIDAD
   useEffect(() => {
@@ -776,7 +681,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
     }
   }, [simulationState.speed]);
 
-  // 🎨 FUNCIONES DE UI PARA FÚTSAL
+  // 🎨 FUNCIONES DE UI MEJORADAS
   const getActionIcon = (action) => {
     const icons = {
       [MATCH_CONFIG.EVENT_TYPES.GOAL]: '🥅',
@@ -785,70 +690,76 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
       [MATCH_CONFIG.EVENT_TYPES.TACKLE]: '🛑',
       [MATCH_CONFIG.EVENT_TYPES.FOUL]: '⚠️',
       [MATCH_CONFIG.EVENT_TYPES.CORNER]: '↶',
-      [MATCH_CONFIG.EVENT_TYPES.PIVOT]: '🔄',
-      [MATCH_CONFIG.EVENT_TYPES.WALL_PASS]: '🧱',
-      [MATCH_CONFIG.EVENT_TYPES.POWER_PLAY]: '🎯',
-      [MATCH_CONFIG.EVENT_TYPES.DOUBLE_PENALTY]: '🎯',
+      [MATCH_CONFIG.EVENT_TYPES.OFFSIDE]: '🚩',
+      [MATCH_CONFIG.EVENT_TYPES.CROSS]: '⤴️',
       [MATCH_CONFIG.EVENT_TYPES.SAVE]: '✋'
     };
     return icons[action] || '●';
   };
 
-  const getDifficultyColor = useCallback((difficulty) => { 
-    const colors = {
-      easy: '#4cc9f0', 
-      medium: '#4361ee', 
-      hard: '#7209b7',
-      expert: '#f72585',
-      legendary: '#ff9e00'
-    };
-    return colors[difficulty] || '#00bbf9';
-  }, []);
+  const getDifficultyColor = useCallback((difficulty) => ({ 
+    easy: '#4cc9f0', 
+    medium: '#4361ee', 
+    hard: '#7209b7',
+    expert: '#f72585',
+    legendary: '#ff9e00'
+  }[difficulty] || '#00bbf9'), []);
 
-  const getDifficultyText = useCallback((difficulty) => {
-    const texts = {
-      easy: 'FÁCIL', 
-      medium: 'MEDIO', 
-      hard: 'DIFÍCIL',
-      expert: 'ÉLITE',
-      legendary: 'LEYENDA'
-    };
-    return texts[difficulty] || difficulty?.toUpperCase() || 'NORMAL';
-  }, []);
+  const getDifficultyText = useCallback((difficulty) => ({ 
+    easy: 'FÁCIL', 
+    medium: 'MEDIO', 
+    hard: 'DIFÍCIL',
+    expert: 'ÉLITE',
+    legendary: 'LEYENDA'
+  }[difficulty] || difficulty.toUpperCase()), []);
 
   const getBotAvatar = useCallback((botLevel) => { 
-    const level = botLevel || 1;
-    if (level <= 2) return "🥅"; 
-    if (level <= 4) return "⚽"; 
-    if (level <= 6) return "👟"; 
-    if (level <= 8) return "🔥"; 
-    if (level <= 10) return "🏆";
+    if (botLevel <= 2) return "🥅"; 
+    if (botLevel <= 4) return "⚽"; 
+    if (botLevel <= 6) return "👟"; 
+    if (botLevel <= 8) return "🔥"; 
+    if (botLevel <= 10) return "🏆";
     return "👑"; 
   }, []);
 
+  const getResultType = useCallback((match, characterId) => { 
+    if (match.winner_id === characterId) return 'win'; 
+    if (match.player1_score === match.player2_score) return 'draw'; 
+    return 'lose'; 
+  }, []);
+
   const ballPosition = getBallPosition();
-  const currentPlayerPositions = playerPositions.user ? playerPositions : calculatePlayerPositions(
-    MATCH_CONFIG.ZONES.CENTER, 
-    'neutral', 
-    0, 
-    selectedFormation
-  );
+  const currentPlayerPositions = playerPositions.user ? playerPositions : {
+    user: { x: 25, y: 30 },
+    bot: { x: 75, y: 60 }
+  };
 
-  // ✅ CORRECCIÓN: Verificación segura para el array de bots
-  const safeBots = Array.isArray(bots) ? bots : [];
+  useEffect(() => {
+  const interval = setInterval(() => {
+    const header = document.querySelector(".app-header.professional");
+    const target = document.querySelector(".section-header");
 
-  return (
-    <div className="training-dashboard super-pro futsal-version">
-      {/* HEADER SUPERIOR FÚTSAL */}
+    if (header && target && !target.contains(header)) {
+      target.appendChild(header);
+      clearInterval(interval); // Detiene el intervalo cuando ya lo movió
+    }
+  }, 300);
+
+  return () => clearInterval(interval);
+}, []);
+
+return (
+    <div className="training-dashboard super-pro">
+      {/* HEADER SUPERIOR PROFESIONAL CON DATOS DEL PARTIDO */}
       <div className="app-header professional">
         <div className="header-content">
           <div className="header-section">
-            <h2>🥅 SIMULADOR FÚTSAL PRO</h2>
+            <h2>⚽ SIMULADOR TÁCTICO PRO</h2>
             <div className="match-info-header">
               {simulating && selectedBot ? (
-                <span className="opponent-info">vs {selectedBot.name} | {MATCH_CONFIG.FORMATIONS[selectedFormation]}</span>
+                <span className="opponent-info">vs {selectedBot.name}</span>
               ) : (
-                <span className="opponent-info">Selecciona formación y oponente</span>
+                <span className="opponent-info">Selecciona un oponente</span>
               )}
             </div>
           </div>
@@ -858,17 +769,12 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
               <div className="score-display-header">
                 {matchStats ? `${matchStats.user.goals || 0} - ${matchStats.bot.goals || 0}` : '0 - 0'}
               </div>
-              <div className="formation-selector">
-                <label>Formación:</label>
-                <select 
-                  value={selectedFormation} 
-                  onChange={(e) => setSelectedFormation(e.target.value)}
-                  disabled={simulationState.isActive}
-                >
-                  {Object.entries(MATCH_CONFIG.FORMATIONS).map(([key, value]) => (
-                    <option key={key} value={key}>{value}</option>
-                  ))}
-                </select>
+              <div className="time-display">
+                <span className="match-time-header">{simulationState.matchTime}'</span>
+                <span className="phase-header">
+                  {simulationState.matchTime <= 45 ? '1º TIEMPO' : 
+                   simulationState.matchTime < 90 ? '2º TIEMPO' : 'FINAL'}
+                </span>
               </div>
             </div>
           </div>
@@ -879,19 +785,18 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                 speed={simulationState.speed} 
                 setSpeed={(s) => setSimulationState(prev => ({ ...prev, speed: s }))}
                 momentum={simulationState.momentum}
-                matchTime={simulationState.matchTime}
               />
             </div>
           </div>
         </div>
       </div>
 
-      {/* LAYOUT PRINCIPAL FÚTSAL */}
+      {/* LAYOUT PRINCIPAL MODIFICADO */}
       <div className="main-layout improved">
-        {/* PANEL IZQUIERDO - ESTADÍSTICAS FÚTSAL */}
+        {/* PANEL IZQUIERDO - ESTADÍSTICAS */}
         <div className="left-panel stats-panel">
           <div className="panel-header">
-            <h3>📊 ESTADÍSTICAS FÚTSAL</h3>
+            <h3>📊 ESTADÍSTICAS EN VIVO</h3>
           </div>
           <div className="panel-content stats-content">
             {matchStats ? (
@@ -900,19 +805,19 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                   <h4>⚽ ATAQUE</h4>
                   <div className="stat-row">
                     <span>Disparos:</span>
-                    <span>{matchStats.user.shots || 0} - {matchStats.bot.shots || 0}</span>
+                    <span>{matchStats.user.shots} - {matchStats.bot.shots}</span>
                   </div>
                   <div className="stat-row">
                     <span>Goles:</span>
-                    <span>{matchStats.user.goals || 0} - {matchStats.bot.goals || 0}</span>
+                    <span>{matchStats.user.goals} - {matchStats.bot.goals}</span>
                   </div>
                   <div className="stat-row">
                     <span>Precisión:</span>
-                    <span>{matchStats.user.shotAccuracy || 0}% - {matchStats.bot.shotAccuracy || 0}%</span>
+                    <span>{matchStats.user.shotAccuracy}% - {matchStats.bot.shotAccuracy}%</span>
                   </div>
                   <div className="stat-row">
-                    <span>Pivotes:</span>
-                    <span>{matchStats.user.pivots || 0} - {matchStats.bot.pivots || 0}</span>
+                    <span>Centros:</span>
+                    <span>{matchStats.user.crosses} - {matchStats.bot.crosses}</span>
                   </div>
                 </div>
                 
@@ -920,19 +825,19 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                   <h4>🛡️ DEFENSA</h4>
                   <div className="stat-row">
                     <span>Entradas:</span>
-                    <span>{matchStats.user.tackles || 0} - {matchStats.bot.tackles || 0}</span>
+                    <span>{matchStats.user.tackles} - {matchStats.bot.tackles}</span>
                   </div>
                   <div className="stat-row">
                     <span>Faltas:</span>
-                    <span>{matchStats.user.fouls || 0} - {matchStats.bot.fouls || 0}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>Faltas Acum:</span>
-                    <span>{matchStats.user.accumulatedFouls || 0} - {matchStats.bot.accumulatedFouls || 0}</span>
+                    <span>{matchStats.user.fouls} - {matchStats.bot.fouls}</span>
                   </div>
                   <div className="stat-row">
                     <span>Paradas:</span>
-                    <span>{matchStats.user.saves || 0} - {matchStats.bot.saves || 0}</span>
+                    <span>{matchStats.user.saves} - {matchStats.bot.saves}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span>Esquinas:</span>
+                    <span>{matchStats.user.corners} - {matchStats.bot.corners}</span>
                   </div>
                 </div>
                 
@@ -943,32 +848,29 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                     <div className="possession-bar-mini">
                       <div 
                         className="possession-fill user" 
-                        style={{ width: `${matchStats.user.possession || 50}%` }}
+                        style={{ width: `${matchStats.user.possession}%` }}
                       >
-                        {matchStats.user.possession || 50}%
+                        {matchStats.user.possession}%
                       </div>
                       <div 
                         className="possession-fill bot" 
-                        style={{ width: `${matchStats.bot.possession || 50}%` }}
+                        style={{ width: `${matchStats.bot.possession}%` }}
                       >
-                        {matchStats.bot.possession || 50}%
+                        {matchStats.bot.possession}%
                       </div>
                     </div>
                   </div>
                   <div className="stat-row">
                     <span>Pases:</span>
-                    <span>{matchStats.user.passes || 0} - {matchStats.bot.passes || 0}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span>Paredes:</span>
-                    <span>{matchStats.user.wall_passes || 0} - {matchStats.bot.wall_passes || 0}</span>
+                    <span>{matchStats.user.passes} - {matchStats.bot.passes}</span>
                   </div>
                   <div className="stat-row">
                     <span>Precisión pases:</span>
-                    <span>{matchStats.user.passAccuracy || 0}% - {matchStats.bot.passAccuracy || 0}%</span>
+                    <span>{matchStats.user.passAccuracy}% - {matchStats.bot.passAccuracy}%</span>
                   </div>
                 </div>
 
+                {/* MOMENTUM Y PRESIÓN */}
                 <div className="stats-category">
                   <h4>📈 MOMENTUM</h4>
                   <div className="momentum-display">
@@ -986,7 +888,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                         <span className="pressure-value">{simulationState.pressure.user}%</span>
                       </div>
                       <div className="pressure-item">
-                        <span>{selectedBot?.name || 'RIVAL'}:</span>
+                        <span>{selectedBot?.name}:</span>
                         <span className="pressure-value">{simulationState.pressure.bot}%</span>
                       </div>
                     </div>
@@ -996,72 +898,56 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
             ) : (
               <div className="no-stats">
                 <p>Las estadísticas aparecerán aquí cuando inicies un partido</p>
-                <div className="formation-info">
-                  <h4>Formación Seleccionada: {MATCH_CONFIG.FORMATIONS[selectedFormation]}</h4>
-                  <p>Sistema táctico optimizado para fútbol sala</p>
+                <div className="stats-placeholder">
+                  <div className="placeholder-item"></div>
+                  <div className="placeholder-item"></div>
+                  <div className="placeholder-item"></div>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* PANEL CENTRAL - CANCHA FÚTSAL */}
+        {/* PANEL CENTRAL - CANCHA */}
         <div className="center-panel">
-          <div className="soccer-field improved futsal-field">
+          <div className="soccer-field improved">
             <div className="field-grass">
-              {/* Líneas de futsal */}
               <div className="center-circle"></div>
               <div className="center-spot"></div>
-              <div className="penalty-area left futsal-penalty"></div>
-              <div className="penalty-area right futsal-penalty"></div>
-              <div className="goal left futsal-goal"></div>
-              <div className="goal right futsal-goal"></div>
+              <div className="penalty-area left"></div>
+              <div className="penalty-area right"></div>
+              <div className="small-area left"></div>
+              <div className="small-area right"></div>
+              <div className="goal left"></div>
+              <div className="goal right"></div>
               <div className="penalty-spot left"></div>
               <div className="penalty-spot right"></div>
               
-              {/* Segundo punto de penalti */}
-              <div className="second-penalty left"></div>
-              <div className="second-penalty right"></div>
-              
               {simulating && selectedBot && simulationState.isActive && (
                 <>
-                  {/* Jugadores usuario */}
-                  {currentPlayerPositions.user.map((pos, index) => (
-                    <div 
-                      key={`user-${index}`}
-                      className={`player player-user improved ${index === 0 ? 'goalkeeper' : 'field-player'}`}
-                      style={{ 
-                        left: `${pos.x}%`, 
-                        top: `${pos.y}%`
-                      }}
-                    >
-                      <div className="player-icon">
-                        {index === 0 ? '🧤' : '👤'}
-                      </div>
-                      <div className="player-name">
-                        {index === 0 ? 'POR' : character?.nickname?.substring(0, 3) || 'JUG'}
-                      </div>
-                    </div>
-                  ))}
+                  {/* Jugador Usuario */}
+                  <div 
+                    className="player player-user improved" 
+                    style={{ 
+                      left: `${currentPlayerPositions.user.x}%`, 
+                      top: `${currentPlayerPositions.user.y}%`
+                    }}
+                  >
+                    <div className="player-icon">👤</div>
+                    <div className="player-name">{character?.nickname || "JUGADOR"}</div>
+                  </div>
                   
-                  {/* Jugadores bot */}
-                  {currentPlayerPositions.bot.map((pos, index) => (
-                    <div 
-                      key={`bot-${index}`}
-                      className={`player player-bot improved ${index === 0 ? 'goalkeeper' : 'field-player'}`}
-                      style={{ 
-                        left: `${pos.x}%`, 
-                        top: `${pos.y}%`
-                      }}
-                    >
-                      <div className="player-icon">
-                        {index === 0 ? '🧤' : getBotAvatar(selectedBot.level)}
-                      </div>
-                      <div className="player-name">
-                        {index === 0 ? 'POR' : selectedBot?.name?.substring(0, 3) || 'RIV'}
-                      </div>
-                    </div>
-                  ))}
+                  {/* Jugador Bot */}
+                  <div 
+                    className="player player-bot improved" 
+                    style={{ 
+                      left: `${currentPlayerPositions.bot.x}%`, 
+                      top: `${currentPlayerPositions.bot.y}%`
+                    }}
+                  >
+                    <div className="player-icon">{getBotAvatar(selectedBot.level)}</div>
+                    <div className="player-name">{selectedBot?.name || "RIVAL"}</div>
+                  </div>
                   
                   {/* Balón */}
                   <div 
@@ -1074,33 +960,25 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                     ⚽
                   </div>
 
-                  {/* Indicador de posesión */}
+                  {/* Indicador de Posesión */}
                   <div className="possession-indicator-field">
                     <div className={`possession-arrow ${simulationState.possession}`}></div>
                     <span className="possession-text">
                       {simulationState.possession === 'user' ? '▶️' : '◀️'} 
-                      {simulationState.possession === 'user' ? character?.nickname : selectedBot?.name}
+                      {simulationState.possession === 'user' ? character.nickname : selectedBot.name}
                     </span>
-                  </div>
-
-                  {/* Indicador de faltas acumuladas */}
-                  <div className="fouls-indicator">
-                    <div className="fouls-user">
-                      {simulationState.accumulatedFouls.user} faltas
-                    </div>
-                    <div className="fouls-bot">
-                      {simulationState.accumulatedFouls.bot} faltas
-                    </div>
                   </div>
                 </>
               )}
               
               {!simulating && (
                 <div className="field-message improved">
-                  <h3>🥅 SIMULADOR FÚTSAL PRO</h3>
-                  <p>Selecciona formación y oponente para iniciar</p>
-                  <div className="formation-preview">
-                    <strong>Formación: {MATCH_CONFIG.FORMATIONS[selectedFormation]}</strong>
+                  <h3>⚽ SIMULADOR TÁCTICO PRO</h3>
+                  <p>Selecciona un oponente para iniciar la simulación</p>
+                  <div className="feature-list">
+                    <span>🎯 Sistema de Momentum</span>
+                    <span>🏃 Posicionamiento Dinámico</span>
+                    <span>📊 Estadísticas Avanzadas</span>
                   </div>
                 </div>
               )}
@@ -1108,10 +986,10 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
           </div>
         </div>
 
-        {/* PANEL DERECHO - EVENTOS FÚTSAL */}
+        {/* PANEL DERECHO - EVENTOS/COMENTARIOS */}
         <div className="right-panel events-panel">
           <div className="panel-header">
-            <h3>📝 EVENTOS FÚTSAL</h3>
+            <h3>📝 EVENTOS DEL PARTIDO</h3>
           </div>
           <div className="panel-content events-content">
             {matchEvents.length === 0 ? (
@@ -1119,16 +997,13 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                 <p>Esperando el inicio del partido...</p>
                 <div className="match-info-side">
                   <div className="info-item">
-                    <strong>Formación:</strong> {MATCH_CONFIG.FORMATIONS[selectedFormation]}
+                    <strong>Formación:</strong> {simulationState.formaciones.user}
                   </div>
                   <div className="info-item">
-                    <strong>Duración:</strong> 2×20 min
+                    <strong>Condiciones:</strong> Óptimas
                   </div>
                   <div className="info-item">
-                    <strong>Reglas:</strong> Futsal FIFA
-                  </div>
-                  <div className="info-item">
-                    <strong>Doble Penalti:</strong> A partir de 5 faltas
+                    <strong>Árbitro:</strong> Sistema VAR
                   </div>
                 </div>
               </div>
@@ -1143,7 +1018,7 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
                       <span className="event-time">{event.time}</span>
                       <span className="event-action-icon">{getActionIcon(event.action)}</span>
                       <span className="event-team">
-                        {event.team === 'user' ? character?.nickname : selectedBot?.name}
+                        {event.team === 'user' ? character.nickname : selectedBot.name}
                       </span>
                     </div>
                     <div className="event-text">{event.text}</div>
@@ -1158,108 +1033,218 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
         </div>
       </div>
 
-      {/* PANEL INFERIOR - BOTS Y OPCIONES */}
+      {/* PANEL INFERIOR (BOTS, HISTORIAL, RESULTADOS) - SE MANTIENE IGUAL */}
       <div className="bottom-panel professional">
         <div className="panel-tabs professional">
           <button className={`tab-button professional ${activePanel === "bots" ? "active" : ""}`} onClick={() => setActivePanel("bots")}>
             🤖 ELEGIR OPONENTE
           </button>
+          <button className={`tab-button professional ${activePanel === "history" ? "active" : ""}`} onClick={() => setActivePanel("history")}>
+            📊 HISTORIAL
+          </button>
+          <button className={`tab-button ${activePanel === "results" ? "active" : ""}`} onClick={() => setActivePanel("results")}>
+            📈 RESULTADOS
+          </button>
         </div>
         
         <div className="panel-content professional">
-          {activePanel === "bots" ? (
-            <div className="bots-grid professional">
-              {safeBots.length > 0 ? (
-                safeBots.map(bot => (
-                  <div key={bot.id} className="bot-card professional">
-                    <div className="bot-header professional">
-                      <div 
-                        className="bot-avatar professional" 
-                        style={{ 
-                          background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                          boxShadow: `0 0 20px ${getDifficultyColor(bot.difficulty)}50`
-                        }}
-                      >
-                        {getBotAvatar(bot.level)}
-                        <div className="bot-level">Lvl {bot.level || 1}</div>
-                      </div>
-                      <div className="bot-info professional">
-                        <h4>{bot.name || 'Bot Futsal'}</h4>
-                        <div className="bot-stats">
-                          <div className="stat-bar">
-                            <span>Tiro: {bot.tiro || 0}</span>
-                            <div className="bar">
-                              <div 
-                                className="fill" 
-                                style={{ width: `${bot.tiro || 0}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                          <div className="stat-bar">
-                            <span>Velocidad: {bot.velocidad || 0}</span>
-                            <div className="bar">
-                              <div 
-                                className="fill" 
-                                style={{ width: `${bot.velocidad || 0}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                          <div className="stat-bar">
-                            <span>Pivote: {bot.pivote || 0}</span>
-                            <div className="bar">
-                              <div 
-                                className="fill" 
-                                style={{ width: `${bot.pivote || 0}%` }}
-                              ></div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="bot-meta professional">
-                          <span className="level-badge professional">Nivel {bot.level || 1}</span>
-                          <span 
-                            className="difficulty-badge professional" 
-                            style={{ 
-                              color: getDifficultyColor(bot.difficulty),
-                              borderColor: getDifficultyColor(bot.difficulty)
-                            }}
-                          >
-                            {getDifficultyText(bot.difficulty)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <button 
-                      className={`play-btn professional ${bot.difficulty}`} 
-                      onClick={() => onStartMatch(bot)} 
-                      disabled={loading || simulating}
-                      style={{ 
-                        background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
-                        boxShadow: `0 4px 15px ${getDifficultyColor(bot.difficulty)}40`
-                      }}
-                    >
-                      {loading && selectedBot?.id === bot.id ? (
-                        <span className="loading-spinner">🔄</span>
-                      ) : (
-                        "⚔️ JUGAR"
-                      )}
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <div className="no-bots-message">
-                  <div className="empty-state">
-                    <div className="empty-icon">🤖</div>
-                    <h4>No hay oponentes disponibles</h4>
-                    <p>Intenta recargar la página</p>
+  {activePanel === "bots" ? (
+  <div className="bots-grid professional">
+    {bots && Array.isArray(bots) && bots.length > 0 ? (
+      bots.map(bot => (
+        <div key={bot.id} className="bot-card professional">
+          <div className="bot-header professional">
+            <div 
+              className="bot-avatar professional" 
+              style={{ 
+                background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
+                boxShadow: `0 0 20px ${getDifficultyColor(bot.difficulty)}50`
+              }}
+            >
+              {getBotAvatar(bot.level)}
+              <div className="bot-level">Lvl {bot.level}</div>
+            </div>
+            <div className="bot-info professional">
+              <h4>{bot.name || 'Bot'}</h4> {/* ✅ Valor por defecto */}
+              <div className="bot-stats">
+                <div className="stat-bar">
+                  <span>Tiro: {bot.tiro || 0}</span> {/* ✅ Valor por defecto */}
+                  <div className="bar">
+                    <div 
+                      className="fill" 
+                      style={{ width: `${bot.tiro || 0}%` }}
+                    ></div>
                   </div>
                 </div>
-              )}
+                <div className="stat-bar">
+                  <span>Velocidad: {bot.velocidad || 0}</span> {/* ✅ Valor por defecto */}
+                  <div className="bar">
+                    <div 
+                      className="fill" 
+                      style={{ width: `${bot.velocidad || 0}%` }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div className="bot-meta professional">
+                <span className="level-badge professional">Nivel {bot.level || 1}</span> {/* ✅ Valor por defecto */}
+                <span 
+                  className="difficulty-badge professional" 
+                  style={{ 
+                    color: getDifficultyColor(bot.difficulty),
+                    borderColor: getDifficultyColor(bot.difficulty)
+                  }}
+                >
+                  {getDifficultyText(bot.difficulty)}
+                </span>
+              </div>
             </div>
-          ) : null}
+          </div>
+          <button 
+            className={`play-btn professional ${bot.difficulty}`} 
+            onClick={() => onStartMatch(bot)} 
+            disabled={loading || simulating}
+            style={{ 
+              background: `linear-gradient(135deg, ${getDifficultyColor(bot.difficulty)}, #7b2cbf)`,
+              boxShadow: `0 4px 15px ${getDifficultyColor(bot.difficulty)}40`
+            }}
+          >
+            {loading && selectedBot?.id === bot.id ? (
+              <span className="loading-spinner">🔄</span>
+            ) : (
+              "⚔️ JUGAR"
+            )}
+            <div className="btn-glow"></div>
+          </button>
+        </div>
+      ))
+    ) : (
+      <div className="no-bots-message">
+        <div className="empty-state">
+          <div className="empty-icon">🤖</div>
+          <h4>No hay oponentes disponibles</h4>
+          <p>Intenta recargar la página o verifica tu conexión</p>
+          <button 
+            className="retry-btn"
+            onClick={() => window.location.reload()}
+          >
+            🔄 Recargar
+          </button>
         </div>
       </div>
+    )}
+  </div>
+) : activePanel === "history" ? (
+    <div className="history-section professional">
+      <h3>📊 HISTORIAL DE PARTIDOS</h3>
+      {!matchHistory || matchHistory.length === 0 ? (
+        <div className="no-history professional">
+          <p>No hay partidas registradas.</p>
+          <div className="empty-state">
+            <div>⚽</div>
+            <p>Juega tu primer partido para comenzar tu historial</p>
+          </div>
+        </div>
+      ) : (
+        <div className="history-list professional">
+          {matchHistory.map((match) => (
+            <div key={match.id} className="history-item professional">
+              <div className="match-result professional">
+                <span className={`result-badge professional ${getResultType(match, character?.id)}`}>
+                  {getResultType(match, character?.id) === 'win' ? 'V' : 
+                   getResultType(match, character?.id) === 'draw' ? 'E' : 'D'}
+                </span>
+                <span className="score professional">{match.player1_score} - {match.player2_score}</span>
+                <span className="opponent-name">vs {match.opponent_name || 'RIVAL'}</span>
+              </div>
+              <div className="match-info professional">
+                <span className="match-date">
+                  {new Date(match.finished_at).toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                  })}
+                </span>
+                <span className="match-rewards">+{match.rewards_exp} EXP</span>
+                <span className="match-duration">{match.duration || 90}'</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
+  ) : (
+    <div className="results-section">
+      <h3>ÚLTIMO RESULTADO</h3>
+      {matchResult ? (
+        <div className="match-result-panel">
+          <div className="result-header">
+            <div className="result-score-large">
+              {matchResult.simulation.player1Score} - {matchResult.simulation.player2Score}
+            </div>
+            <div className={`result-type ${
+              matchResult.simulation.winnerId === character.id ? 'win' : 
+              matchResult.simulation.player1Score === matchResult.simulation.player2Score ? 'draw' : 'lose'
+            }`}>
+              {matchResult.simulation.winnerId === character.id ? 'VICTORIA' : 
+               matchResult.simulation.player1Score === matchResult.simulation.player2Score ? 'EMPATE' : 'DERROTA'}
+            </div>
+          </div>
+          
+          <p className="result-opponent">vs {matchResult.botName}</p>
+          
+          <div className="performance-grid">
+            <div className="performance-stat-panel">
+              <div className="stat-label-panel">Disparos</div>
+              <div className="stat-value-panel">{finalStats?.user?.shots || 0}</div>
+            </div>
+            <div className="performance-stat-panel">
+              <div className="stat-label-panel">Goles</div>
+              <div className="stat-value-panel">{finalStats?.user?.goals || 0}</div>
+            </div>
+            <div className="performance-stat-panel">
+              <div className="stat-label-panel">Pases</div>
+              <div className="stat-value-panel">{finalStats?.user?.passes || 0}</div>
+            </div>
+            <div className="performance-stat-panel">
+              <div className="stat-label-panel">Entradas</div>
+              <div className="stat-value-panel">{finalStats?.user?.tackles || 0}</div>
+            </div>
+          </div>
+          
+          <div className="rewards-panel">
+            <h4>🏆 RECOMPENSAS</h4>
+            <div className="reward-item-panel">
+              <span>Experiencia:</span>
+              <span className="reward-amount-panel">+{matchResult.rewards.exp} EXP</span>
+            </div>
+            <div className="reward-item-panel">
+              <span>Lupicoins:</span>
+              <span className="reward-amount-panel">+{matchResult.rewards.coins} 🪙</span>
+            </div>
+            
+            {matchResult.leveledUp && (
+              <div className="level-up-badge">
+                🎉 ¡Subiste al nivel {matchResult.newLevel}!
+              </div>
+            )}
+          </div>
+          
+          <button className="close-result-btn" onClick={onCloseResult}>
+            CERRAR RESULTADO
+          </button>
+        </div>
+      ) : (
+        <div className="no-history">
+          <p>No hay resultados recientes</p>
+          <p>Juega un partido para ver tus estadísticas aquí</p>
+        </div>
+      )}
+    </div>
+  )}
+</div>    
+          </div>
+      </div>
   );
 };
-
 export default TrainingDashboard;
