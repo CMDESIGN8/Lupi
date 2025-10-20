@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/TrainingDashboard.css";
-import FutsalField from "./FutsalField";
 
 // 🎮 CONSTANTES DE CONFIGURACIÓN PROFESIONAL
 const MATCH_CONFIG = {
@@ -8,7 +7,6 @@ const MATCH_CONFIG = {
   EVENT_TYPES: {
     PASS: 'pass',
     TACKLE: 'tackle', 
-    
     SHOT: 'shot',
     GOAL: 'goal',
     FOUL: 'foul',
@@ -820,13 +818,71 @@ const TrainingDashboard = ({ character, bots = [], matchHistory, loading, simula
 
         {/* PANEL CENTRAL - CANCHA */}
         <div className="center-panel">
-          <FutsalField 
-  players={[
-    { id: 'u1', team: 'user', x: playerPositions.user.x * 8, y: playerPositions.user.y * 4 },
-    { id: 'b1', team: 'bot', x: playerPositions.bot.x * 8, y: playerPositions.bot.y * 4 }
-  ]}
-  ball={{ x: ballPosition.x * 8, y: ballPosition.y * 4 }}
-/>
+          <div className="soccer-field improved">
+            <div className="field-grass">
+              <div className="center-circle"></div>
+              <div className="center-spot"></div>
+              <div className="penalty-area left"></div>
+              <div className="penalty-area right"></div>
+              <div className="small-area left"></div>
+              <div className="small-area right"></div>
+              <div className="goal left"></div>
+              <div className="goal right"></div>
+              <div className="penalty-spot left"></div>
+              <div className="penalty-spot right"></div>
+              
+              {simulating && selectedBot && simulationState.isActive && (
+                <>
+                  <div 
+                    className="player player-user improved" 
+                    style={{ 
+                      left: `${currentPlayerPositions.user.x}%`, 
+                      top: `${currentPlayerPositions.user.y}%`
+                    }}
+                  >
+                    <div className="player-icon">👤</div>
+                    <div className="player-name">{character?.nickname || "JUGADOR"}</div>
+                  </div>
+                  
+                  <div 
+                    className="player player-bot improved" 
+                    style={{ 
+                      left: `${currentPlayerPositions.bot.x}%`, 
+                      top: `${currentPlayerPositions.bot.y}%`
+                    }}
+                  >
+                    <div className="player-icon">{getBotAvatar(selectedBot.level)}</div>
+                    <div className="player-name">{selectedBot?.name || "RIVAL"}</div>
+                  </div>
+                  
+                  <div 
+                    className="soccer-ball improved" 
+                    style={{ 
+                      left: `${ballPosition.x}%`, 
+                      top: `${ballPosition.y}%`
+                    }}
+                  >
+                    ⚽
+                  </div>
+
+                  <div className="possession-indicator-field">
+                    <div className={`possession-arrow ${simulationState.possession}`}></div>
+                    <span className="possession-text">
+                      {simulationState.possession === 'user' ? '▶️' : '◀️'} 
+                      {simulationState.possession === 'user' ? character?.nickname : selectedBot?.name}
+                    </span>
+                  </div>
+                </>
+              )}
+              
+              {!simulating && (
+                <div className="field-message improved">
+                  <h3>⚽ SIMULADOR TÁCTICO PRO</h3>
+                  <p>Selecciona un oponente para iniciar la simulación</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* PANEL DERECHO - EVENTOS COMPLETOS */}
