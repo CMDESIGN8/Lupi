@@ -106,10 +106,15 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
           </div>
         )}
 
-        {/* BOTÓN PARA CERRAR MANUALMENTE */}
+        {/* BOTÓN PARA CERRAR MANUALMENTE - ÚNICA FORMA DE CERRAR */}
         <button className="close-result-btn" onClick={onClose}>
           CONTINUAR
         </button>
+        
+        {/* Mensaje indicativo para el usuario */}
+        <p className="close-hint">
+          Haz clic en CONTINUAR para volver al entrenamiento
+        </p>
       </div>
     </div>
   );
