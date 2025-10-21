@@ -56,22 +56,29 @@ const TrainingDashboard = ({ character }) => {
 
   // Finalizar una partida: Llama a la API para guardar el resultado y obtener recompensas
   const handleFinishMatch = useCallback(async (finalState) => {
-    try {
-      const finalScore = {
-        player1Score: finalState.matchStats.user.goals,
-        player2Score: finalState.matchStats.bot.goals,
-      };
+  try {
+    const finalScore = {
+      player1Score: finalState.matchStats.user.goals,
+      player2Score: finalState.matchStats.bot.goals,
+    };
 
-      const result = await api.finishMatch(finalState.matchId, finalScore);
-      console.log("✅ Partida finalizada, resultado:", result);
-      
-      // Disparamos la acción para mostrar el modal de resultados
-      dispatch({ type: 'SHOW_RESULTS', payload: result });
+    console.log("🏁 Finalizando partida con:", {
+      matchId: finalState.matchId,
+      finalScore,
+      matchStats: finalState.matchStats
+    });
 
-    } catch (error) {
-      console.error("Error al finalizar la partida:", error);
-    }
-  }, []);
+    const result = await api.finishMatch(finalState.matchId, finalScore);
+    console.log("✅ Partida finalizada, resultado:", result);
+    
+    dispatch({ type: 'SHOW_RESULTS', payload: result });
+
+  } catch (error) {
+    console.error("❌ Error al finalizar la partida:", error);
+    // Muestra el error al usuario
+    alert(`Error al finalizar partida: ${error.message}`);
+  }
+}, []);
 
   // useEffect principal que controla el motor de la simulación
   useEffect(() => {
