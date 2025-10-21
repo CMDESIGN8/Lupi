@@ -1,3 +1,4 @@
+import './globals.css';
 /* styles/BotMatchmaking.css - ESTILOS BASE AISLADOS */
 .bot-matchmaking-container {
   min-height: 100vh;
