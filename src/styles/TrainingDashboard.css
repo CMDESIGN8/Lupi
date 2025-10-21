@@ -1,4 +1,5 @@
-/* ===== COMPONENTE PRINCIPAL ===== */
+@import './globales.css';/* ===== COMPONENTE PRINCIPAL ===== */
+
 .training-dashboard {
   min-height: 100vh;
   padding: 1rem;
