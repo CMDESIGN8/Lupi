@@ -1,312 +1,182 @@
-@import './globales.css';
+/* SoccerField.css */
+.soccer-field.futsal-field {
+  width: 100%;
+  max-width: 800px;
+  aspect-ratio: 2/1;
+  background: linear-gradient(135deg, #2e7d32, #1b5e20);
+  border: 3px solid #fff;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
 
-/* ===== CANCHA DE FÚTSAL AZUL ===== */
-.soccer-field {
+.field-grass {
   width: 100%;
   height: 100%;
   position: relative;
   background: 
-    linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%),
-    repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.05) 15px, rgba(255,255,255,0.05) 30px);
-  border-radius: 15px;
-  border: 3px solid #e2e8f0;
-  overflow: hidden;
-  box-shadow: 
-    inset 0 0 50px rgba(0, 0, 0, 0.4),
-    var(--shadow-md);
+    /* Líneas del campo */
+    linear-gradient(to right, #fff 1px, transparent 1px) 50% 50% / 100% 5px,
+    linear-gradient(to bottom, #fff 1px, transparent 1px) 50% 50% / 5px 100%,
+    /* Patrón de césped */
+    radial-gradient(circle at 20% 30%, rgba(76, 175, 80, 0.3) 2px, transparent 2px),
+    radial-gradient(circle at 80% 70%, rgba(76, 175, 80, 0.3) 2px, transparent 2px);
+  background-color: #4caf50;
 }
 
-.field-grass {
-  position: relative;
-  width: 100%; 
-  height: 100%;
-  background: 
-    linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 51%),
-    radial-gradient(circle at 50% 50%, transparent 70px, rgba(255,255,255,0.3) 70px, rgba(255,255,255,0.3) 72px, transparent 72px);
-}
-
-/* Elementos del campo en azul más claro */
-.center-circle, 
-.center-spot, 
-.penalty-area, 
-.small-area, 
-.goal, 
-.penalty-spot,
-.second-penalty {
+/* Líneas del campo de fútsal */
+.center-circle {
   position: absolute;
-  border: 3px solid rgba(255,255,255,0.7);
-}
-
-.center-circle { 
-  top: 50%; left: 50%; transform: translate(-50%, -50%); 
-  width: 140px; height: 140px; 
-  border-radius: 50%; 
-}
-
-.center-spot { 
-  top: 50%; left: 50%; transform: translate(-50%, -50%); 
-  width: 12px; height: 12px; 
-  background: rgba(255,255,255,0.8); 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20%;
+  height: 60%;
+  border: 2px solid #fff;
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255,255,255,0.5);
-  border: none;
 }
 
-.penalty-area { 
-  top: 18%; height: 64%; width: 20%; 
-}
-
-.penalty-area.left { 
-  left: 0; border-right: none; 
-  border-top-right-radius: 20px; border-bottom-right-radius: 20px; 
-}
-
-.penalty-area.right { 
-  right: 0; border-left: none; 
-  border-top-left-radius: 20px; border-bottom-left-radius: 20px; 
-}
-
-.penalty-area.futsal-penalty {
-  top: 25%; height: 50%; width: 15%;
-  border-radius: 0 8px 8px 0;
-}
-
-.penalty-area.futsal-penalty.right {
-  border-radius: 8px 0 0 8px;
-}
-
-.small-area { 
-  top: 32%; height: 36%; width: 10%; 
-}
-
-.small-area.left { 
-  left: 0; border-right: none; 
-  border-top-right-radius: 12px; border-bottom-right-radius: 12px; 
-}
-
-.small-area.right { 
-  right: 0; border-left: none; 
-  border-top-left-radius: 12px; border-bottom-left-radius: 12px; 
-}
-
-.goal { 
-  top: 38%; height: 24%; width: 2.5%; 
-  background: rgba(255,255,255,0.2);
-}
-
-.goal.left { left: -1.2%; }
-.goal.right { right: -1.2%; }
-
-.goal.futsal-goal {
-  top: 42%; height: 16%; width: 1.5%;
-}
-
-.penalty-spot { 
-  top: 50%; transform: translateY(-50%); 
-  width: 10px; height: 10px; 
-  background: rgba(255,255,255,0.8); 
+.center-spot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: #fff;
   border-radius: 50%;
-  box-shadow: 0 0 8px rgba(255,255,255,0.4);
-  border: none;
 }
 
-.penalty-spot.left { left: 11%; }
-.penalty-spot.right { right: 11%; }
-
-.second-penalty {
-  top: 50%; transform: translateY(-50%);
-  width: 6px; height: 6px;
-  background: rgba(255,255,255,0.8);
-  border-radius: 50%;
-  border: none;
+.futsal-penalty {
+  width: 12% !important;
+  height: 40% !important;
+  border-radius: 10px;
 }
 
-.second-penalty.left { left: 8%; }
-.second-penalty.right { right: 8%; }
+.futsal-goal {
+  position: absolute;
+  top: 30%;
+  width: 2%;
+  height: 40%;
+  background: #8B4513;
+  border: 2px solid #fff;
+}
 
-/* ===== JUGADORES Y BALÓN ===== */
+.futsal-goal.left {
+  left: 0;
+}
+
+.futsal-goal.right {
+  right: 0;
+}
+
+/* Jugadores */
 .player {
   position: absolute;
-  text-align: center;
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
   z-index: 10;
-  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.6));
-  transform: translate(-50%, -50%);
 }
 
-.player-icon { 
-  font-size: 2.5rem; 
-  animation: playerPulse 3s infinite;
+.player.user {
+  background: rgba(33, 150, 243, 0.9);
+  border-color: #1976d2;
 }
 
-.player.goalkeeper .player-icon {
-  font-size: 2.2rem;
-}
-
-.player.field-player .player-icon {
-  font-size: 2rem;
-}
-
-.player-name { 
-  margin-top: 0.3rem; 
-  font-weight: 700; 
-  font-size: 0.85rem; 
-  background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(30,41,59,0.9));
-  padding: 0.3rem 0.8rem; 
-  border-radius: 12px; 
-  border: 1px solid rgba(255,255,255,0.2);
-  backdrop-filter: blur(5px);
-  color: #FFFFFF !important;
-  white-space: nowrap;
+.player.bot {
+  background: rgba(244, 67, 54, 0.9);
+  border-color: #d32f2f;
 }
 
 .player.has-ball {
-  transform: translate(-50%, -50%) scale(1.2);
-  filter: drop-shadow(0 0 10px yellow);
-  z-index: 10;
-}
-
-.player.portero { z-index: 5; }
-.player.defensor { z-index: 4; }
-.player.goleador { z-index: 6; }
-
-.player-role {
-  font-size: 0.7rem;
-  margin-top: 0.2rem;
-  opacity: 0.8;
-  text-transform: capitalize;
-}
-  
-.soccer-ball {
-  position: absolute;
-  font-size: 2.2rem;
-  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.7));
+  border: 3px solid #FFD700;
+  box-shadow: 0 0 15px #FFD700;
+  transform: translate(-50%, -50%) scale(1.1);
   z-index: 20;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: ballFloat 4s ease-in-out infinite;
-  transform: translate(-50%, -50%);
 }
 
-/* ===== MENSAJES Y ESTADOS ===== */
-.field-message {
+.player.GK {
+  background: rgba(255, 193, 7, 0.9) !important;
+  border-color: #FFA000 !important;
+}
+
+.ball-indicator {
   position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 5;
-  background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9));
-  padding: 3rem 4rem;
-  border-radius: 20px;
-  border: 2px solid rgba(76, 201, 240, 0.3);
-  backdrop-filter: blur(15px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  top: -5px;
+  right: -5px;
+  font-size: 12px;
+  animation: bounce 0.6s infinite alternate;
 }
 
-.field-message h3 { 
-  margin: 0 0 1.5rem 0; 
-  color: var(--accent-blue); 
-  font-family: 'Orbitron', monospace;
-  font-size: 1.8rem;
-  text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-5px); }
 }
 
-.field-message p { 
-  margin: 0; 
-  color: #e2e8f0; 
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
-
-/* Indicadores de falta */
-.fouls-indicator {
+/* Información del juego */
+.game-info {
   position: absolute;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  gap: 2rem;
-  background: rgba(0,0,0,0.7);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  z-index: 25;
-}
-
-.fouls-user {
-  color: var(--accent-blue);
-}
-
-.fouls-bot {
-  color: #f87171;
-}
-
-/* Posesión en campo */
-.possession-indicator-field {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(0,0,0,0.7);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: bold;
-  z-index: 25;
-}
-
-.possession-arrow {
-  width: 0;
-  height: 0;
-  border-style: solid;
-}
-
-.possession-arrow.user {
-  border-width: 5px 0 5px 8px;
-  border-color: transparent transparent transparent var(--accent-blue);
-}
-
-.possession-arrow.bot {
-  border-width: 5px 8px 5px 0;
-  border-color: transparent var(--accent-red) transparent transparent;
-}
-
-/* Indicadores de Estado */
-.tactic-indicator {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.7);
-  padding: 0.5rem 1rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  text-align: center;
+  z-index: 5;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .player-icon {
-    font-size: 2rem;
-  }
-  
-  .soccer-ball {
-    font-size: 1.8rem;
-  }
-  
-  .field-message {
-    padding: 2rem;
-  }
-  
-  .field-message h3 {
-    font-size: 1.4rem;
-  }
-  
-  .fouls-indicator {
-    font-size: 0.7rem;
-    gap: 1rem;
-  }
+.formation-info {
+  font-size: 12px;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
+.field-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  border-radius: 15px;
+  backdrop-filter: blur(5px);
+}
+
+.formation-options {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: center;
+}
+
+.formation-option {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Efectos de movimiento */
+@keyframes movePlayer {
+  0% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+  100% { transform: translate(-50%, -50%); }
+}
+
+.player.has-ball {
+  animation: movePlayer 1s ease-in-out infinite;
 }
