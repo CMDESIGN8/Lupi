@@ -1719,3 +1719,112 @@
 .player.has-ball {
   animation: playerPulse 1s ease-in-out infinite;
 }
+
+/* ===== ESTILOS PARA EL MODAL DE RESULTADOS ===== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: var(--gradient-primary);
+  padding: 2rem 3rem;
+  border-radius: 20px;
+  border: 2px solid var(--accent-blue);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  animation: resultSlideIn 0.5s ease-out;
+}
+
+.modal-content.victory {
+  border-color: var(--accent-green);
+}
+.modal-content.defeat {
+  border-color: var(--accent-red);
+}
+
+.modal-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--accent-yellow);
+}
+
+.modal-score {
+  font-size: 4rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-rewards h3 {
+  font-size: 1.2rem;
+  color: var(--accent-blue);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.reward-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.reward-value.exp { color: var(--accent-green); }
+.reward-value.coins { color: var(--accent-yellow); }
+
+.level-up-alert {
+  margin-top: 1.5rem;
+  padding: 0.8rem;
+  background: var(--gradient-accent);
+  border-radius: 10px;
+  font-weight: bold;
+  animation: highlightPulse 2s infinite;
+}
+
+.modal-close-btn {
+  margin-top: 2rem;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+  background: var(--accent-purple);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-close-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
+}
+
+.loading-bots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 1.2rem;
+    color: var(--accent-blue);
+}
+
+@keyframes resultSlideIn {
+  from { opacity: 0; transform: translateY(50px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
