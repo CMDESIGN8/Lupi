@@ -1,5 +1,6 @@
 // EventsFeed.jsx
 import React from 'react';
+import "../../styles/EventsFeed.css";
 
 export const EventsFeed = ({ state, character }) => {
   const { matchEvents, selectedBot } = state;
@@ -34,4 +35,5 @@ export const EventsFeed = ({ state, character }) => {
       )}
     </div>
   );
+
 };
