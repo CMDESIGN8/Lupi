@@ -1,5 +1,6 @@
 // SoccerField.jsx
 import React from 'react';
+import "../../styles/SoccerField.css";
 
 export const SoccerField = ({ state }) => {
   const { simulating, possession } = state;
@@ -31,3 +32,4 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
