@@ -64,6 +64,23 @@
   text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
 }
 
+.match-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.score-display-header {
+  font-size: 2rem;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
   .main-layout { 
@@ -114,9 +131,21 @@
   .app-header.professional h2 {
     font-size: 1.2rem;
   }
+  
+  .score-display-header {
+    font-size: 1.6rem;
+  }
+  
+  .header-content {
+    gap: 0.5rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .header-section {
+    width: 100%;
+  }
+  
   .main-layout {
     grid-template-rows: auto 300px auto;
   }
