@@ -1,6 +1,6 @@
 // SimulationControls.jsx
 import React from 'react';
-
+import '../../styles/SimulationControls.css'; // Reutilizamos los estilos
 export const SimulationControls = ({ state, dispatch }) => {
   const { speed, matchTime } = state;
 
@@ -21,4 +21,5 @@ export const SimulationControls = ({ state, dispatch }) => {
       </div>
     </div>
   );
+
 };
