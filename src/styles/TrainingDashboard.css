@@ -1643,3 +1643,79 @@
 .soccer-ball {
   transition: all 0.4s ease-in-out;
 }
+
+/* styles/TrainingDashboard.css - MEJORAS ADICIONALES */
+
+/* Formación Controls */
+.formation-controls {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.formation-controls label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.formation-controls select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--accent-blue);
+  border-radius: 8px;
+  color: white;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+/* Jugadores Múltiples */
+.player {
+  position: absolute;
+  text-align: center;
+  transition: all 0.5s ease;
+  transform: translate(-50%, -50%);
+}
+
+.player-role {
+  font-size: 0.7rem;
+  margin-top: 0.2rem;
+  opacity: 0.8;
+  text-transform: capitalize;
+}
+
+.player.has-ball {
+  transform: translate(-50%, -50%) scale(1.2);
+  filter: drop-shadow(0 0 10px yellow);
+  z-index: 10;
+}
+
+.player.portero { z-index: 5; }
+.player.defensor { z-index: 4; }
+.player.goleador { z-index: 6; }
+
+/* Indicadores de Estado */
+.tactic-indicator {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Animaciones Mejoradas */
+@keyframes playerPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+.player {
+  animation: playerPulse 3s ease-in-out infinite;
+}
+
+.player.has-ball {
+  animation: playerPulse 1s ease-in-out infinite;
+}
