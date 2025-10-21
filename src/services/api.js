@@ -3,7 +3,7 @@ const API_URL = "https://lupiback.onrender.com"; // URL del backend desplegado
 export const getBots = async () => {
   try {
     console.log('🔍 Fetching bots from:', `${API_URL}/bots`);
-    const response = await fetch(`${API_URL}/bots`);
+    const response = await fetch(`${API_URL}/bots`); // ✅ Correcto
     
     console.log('📊 Response status:', response.status);
     
@@ -26,7 +26,7 @@ export const getBots = async () => {
 };
 
 export const startMatch = async (characterId, botId) => {
-  const response = await fetch(`${API_URL}/match`, {
+  const response = await fetch(`${API_URL}/bots/match`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ characterId, botId }),
@@ -36,10 +36,10 @@ export const startMatch = async (characterId, botId) => {
 };
 
 export const finishMatch = async (matchId, finalScore) => {
-  const response = await fetch(`${API_URL}/${matchId}/finish`, {
+   const response = await fetch(`${API_URL}/bots/${matchId}/finish`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(finalScore), // { player1Score, player2Score }
+    body: JSON.stringify(finalScore),
   });
   if (!response.ok) throw new Error("Error al finalizar la partida");
   return await response.json();
