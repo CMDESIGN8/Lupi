@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import "../styles/TrainingDashboard.css";
-import { simulationReducer, initialState } from './simulationReducer';
-import { MATCH_CONFIG } from './futsalConfig';
+import { simulationReducer, initialState } from './TrainingDashboard/simulationReducer';
+import { MATCH_CONFIG } from './TrainingDashboard/futsalConfig';
 
-import { SimulationControls } from './SimulationControls';
-import { TacticalControls } from './TacticalControls';
-import { SoccerField } from './SoccerField';
-import { StatsPanel } from './StatsPanel';
-import { EventsFeed } from './EventsFeed';
-import { BotSelector } from './BotSelector';
+import { SimulationControls } from './TrainingDashboard/SimulationControls';
+import { TacticalControls } from './TrainingDashboard/TacticalControls';
+import { SoccerField } from './TrainingDashboard/SoccerField';
+import { StatsPanel } from './TrainingDashboard/StatsPanel';
+import { EventsFeed } from './TrainingDashboard/EventsFeed';
+import { BotSelector } from './TrainingDashboard/BotSelector';
 
 const TrainingDashboard = ({ character, bots = [] }) => {
   const [state, dispatch] = useReducer(simulationReducer, initialState);
