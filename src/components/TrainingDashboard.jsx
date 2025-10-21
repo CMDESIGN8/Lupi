@@ -113,7 +113,7 @@ const TrainingDashboard = ({ character }) => {
       )}
 
       <div className="app-header professional">
-        <h2>🥅 SIMULADOR FÚTSAL PRO v2.0</h2>
+        <h2>🥅 Arena de Fútsal/h2>
         <div className="score-display-header">
           {state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}
         </div>
