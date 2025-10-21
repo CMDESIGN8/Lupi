@@ -1,6 +1,6 @@
 // BotSelector.jsx
 import React from 'react';
-import "../../styles/Botselector.css";
+import "../../styles/BotSelector.css";
 export const BotSelector = ({ bots, onStartMatch, simulating }) => {
   // Función para obtener avatar (puedes moverla a un utils si quieres)
   const getBotAvatar = (level) => {
@@ -38,3 +38,4 @@ export const BotSelector = ({ bots, onStartMatch, simulating }) => {
   );
 
 };
+
