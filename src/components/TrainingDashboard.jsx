@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useReducer } from "react";
 import "../styles/TrainingDashboard.css";
 import { simulationReducer, initialState } from './TrainingDashboard/simulationReducer';
 import { MATCH_CONFIG } from './TrainingDashboard/futsalConfig';
