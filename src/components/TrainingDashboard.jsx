@@ -10,7 +10,7 @@ import { SoccerField } from './TrainingDashboard/SoccerField';
 import { StatsPanel } from './TrainingDashboard/StatsPanel';
 import { EventsFeed } from './TrainingDashboard/EventsFeed';
 import { BotSelector } from './TrainingDashboard/BotSelector';
-import { MatchResultModal } from './TrainingDashboard/MatchResultModal'; // ¡Nuevo componente!
+import { MatchResultModal } from './TrainingDashboard/MatchResultModal';
 
 const TrainingDashboard = ({ character }) => {
   const [state, dispatch] = useReducer(simulationReducer, initialState);
@@ -36,7 +36,6 @@ const TrainingDashboard = ({ character }) => {
   const handleStartMatch = async (bot) => {
     if (!character || !character.id) {
         console.error("Error: El personaje no tiene un ID válido.");
-        // Opcional: mostrar un mensaje al usuario
         return;
     }
     try {
@@ -56,36 +55,34 @@ const TrainingDashboard = ({ character }) => {
 
   // Finalizar una partida: Llama a la API para guardar el resultado y obtener recompensas
   const handleFinishMatch = useCallback(async (finalState) => {
-  try {
-    const finalScore = {
-      player1Score: finalState.matchStats.user.goals,
-      player2Score: finalState.matchStats.bot.goals,
-    };
+    try {
+      const finalScore = {
+        player1Score: finalState.matchStats.user.goals,
+        player2Score: finalState.matchStats.bot.goals,
+      };
 
-    console.log("🏁 Finalizando partida con:", {
-      matchId: finalState.matchId,
-      finalScore,
-      matchStats: finalState.matchStats
-    });
+      console.log("🏁 Finalizando partida con:", {
+        matchId: finalState.matchId,
+        finalScore,
+        matchStats: finalState.matchStats
+      });
 
-    const result = await api.finishMatch(finalState.matchId, finalScore);
-    console.log("✅ Partida finalizada, resultado:", result);
-    
-    dispatch({ type: 'SHOW_RESULTS', payload: result });
+      const result = await api.finishMatch(finalState.matchId, finalScore);
+      console.log("✅ Partida finalizada, resultado:", result);
+      
+      dispatch({ type: 'SHOW_RESULTS', payload: result });
 
-  } catch (error) {
-    console.error("❌ Error al finalizar la partida:", error);
-    // Muestra el error al usuario
-    alert(`Error al finalizar partida: ${error.message}`);
-  }
-}, []);
+    } catch (error) {
+      console.error("❌ Error al finalizar la partida:", error);
+      alert(`Error al finalizar partida: ${error.message}`);
+    }
+  }, []);
 
   // useEffect principal que controla el motor de la simulación
   useEffect(() => {
     let interval = null;
     if (state.simulating) {
       interval = setInterval(() => {
-        // Usamos una función de callback con dispatch para obtener el estado más reciente
         dispatch({ type: 'TICK_MINUTE' });
       }, state.speed);
 
@@ -95,7 +92,6 @@ const TrainingDashboard = ({ character }) => {
         handleFinishMatch(state);
       }
     }
-    // Limpieza al desmontar o cambiar dependencias
     return () => clearInterval(interval);
   }, [state.simulating, state.speed, state.matchTime, state, handleFinishMatch]);
   
@@ -103,41 +99,40 @@ const TrainingDashboard = ({ character }) => {
     dispatch({ type: 'CLOSE_RESULTS' });
   };
 
-  // ESTA ES LA SECCIÓN CORREGIDA: El return ahora está dentro de la función.
   return (
     <div className="training-dashboard futsal-version">
       
-      {/* ¡NUEVO! Modal para mostrar resultados al finalizar */}
+      {/* Modal para mostrar resultados al finalizar */}
       {state.matchResult && (
         <MatchResultModal result={state.matchResult} onClose={closeResultModal} />
       )}
 
       <div className="app-header professional">
-        <h2>🥅 Arena de Fútsal </h2>
+        <h2>🥅 Arena de Fútsal</h2> {/* CORREGIDO: Etiqueta h2 cerrada */}
         <div className="score-display-header">
           {state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}
         </div>
       </div>
       
       <div className="main-layout improved">
-          {/* Panel izquierdo - Ahora eventos */}
-  <div className="left-panel">
-    <EventsFeed state={state} character={character} />
-  </div>
+        {/* Panel izquierdo - Ahora eventos */}
+        <div className="left-panel">
+          <EventsFeed state={state} character={character} />
+        </div>
 
-  {/* Panel central - Cancha (se mantiene igual) */}
-  <div className="center-panel">
-    <SoccerField state={state} />
-  </div>
+        {/* Panel central - Cancha (se mantiene igual) */}
+        <div className="center-panel">
+          <SoccerField state={state} />
+        </div>
 
-  {/* Panel derecho - Ahora controles y estadísticas */}
-  <div className="right-panel">
-    <SimulationControls state={state} dispatch={dispatch} />
-    <TacticalControls state={state} dispatch={dispatch} />
-    <hr className="divider" />
-    <StatsPanel state={state} />
-  </div>
-</div>
+        {/* Panel derecho - Ahora controles y estadísticas */}
+        <div className="right-panel">
+          <SimulationControls state={state} dispatch={dispatch} />
+          <TacticalControls state={state} dispatch={dispatch} />
+          <hr className="divider" />
+          <StatsPanel state={state} />
+        </div>
+      </div> {/* CORREGIDO: Este div cierra main-layout */}
 
       <div className="bottom-panel professional">
         {isLoading ? (
