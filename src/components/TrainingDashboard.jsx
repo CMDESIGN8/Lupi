@@ -120,21 +120,24 @@ const TrainingDashboard = ({ character }) => {
       </div>
       
       <div className="main-layout improved">
-        <div className="left-panel">
-          <SimulationControls state={state} dispatch={dispatch} />
-          <TacticalControls state={state} dispatch={dispatch} />
-          <hr className="divider" />
-          <StatsPanel state={state} />
-        </div>
+  {/* Panel izquierdo - Ahora eventos */}
+  <div className="left-panel">
+    <EventsFeed state={state} character={character} />
+  </div>
 
-        <div className="center-panel">
-          <SoccerField state={state} />
-        </div>
+  {/* Panel central - Cancha (se mantiene igual) */}
+  <div className="center-panel">
+    <SoccerField state={state} />
+  </div>
 
-        <div className="right-panel">
-          <EventsFeed state={state} character={character} />
-        </div>
-      </div>
+  {/* Panel derecho - Ahora controles y estadísticas */}
+  <div className="right-panel">
+    <SimulationControls state={state} dispatch={dispatch} />
+    <TacticalControls state={state} dispatch={dispatch} />
+    <hr className="divider" />
+    <StatsPanel state={state} />
+  </div>
+</div>
 
       <div className="bottom-panel professional">
         {isLoading ? (
