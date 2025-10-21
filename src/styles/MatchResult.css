@@ -272,3 +272,20 @@
     font-size: 1rem;
   }
 }
+
+/* Mensaje indicativo para cerrar */
+.close-hint {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Prevenir que se cierre haciendo clic fuera */
+.match-result-overlay {
+  pointer-events: auto;
+}
+
+.match-result-card {
+  pointer-events: auto;
+}
