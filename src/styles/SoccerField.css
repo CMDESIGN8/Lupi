@@ -439,3 +439,64 @@
   0%, 100% { transform: translate(-50%, -50%) scale(1); }
   50% { transform: translate(-50%, -50%) scale(1.05); }
 }
+
+.pre-match-content {
+    text-align: center;
+    color: #fff;
+    background: linear-gradient(145deg, rgba(0, 20, 0, 0.9) 0%, rgba(0, 0, 0, 0.95) 100%);
+    padding: 50px 40px;
+    border-radius: 12px;
+    border: 2px solid #4caf50;
+    box-shadow: 
+        0 0 20px rgba(76, 175, 80, 0.4),
+        0 10px 25px rgba(0, 0, 0, 0.8),
+        inset 0 0 15px rgba(76, 175, 80, 0.1);
+    position: relative;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+}
+
+.pre-match-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #4caf50, transparent);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Para el texto dentro del contenedor */
+.pre-match-content h3 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.pre-match-content p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+/* Efecto de aparición suave */
+.pre-match-content {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
