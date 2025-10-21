@@ -113,14 +113,14 @@ const TrainingDashboard = ({ character }) => {
       )}
 
       <div className="app-header professional">
-        <h2>🥅 Arena de Fútsal/h2>
+        <h2>🥅 Arena de Fútsal </h2>
         <div className="score-display-header">
           {state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}
         </div>
       </div>
       
       <div className="main-layout improved">
-  {/* Panel izquierdo - Ahora eventos */}
+          {/* Panel izquierdo - Ahora eventos */}
   <div className="left-panel">
     <EventsFeed state={state} character={character} />
   </div>
