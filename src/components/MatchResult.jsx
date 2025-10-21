@@ -1,23 +1,23 @@
 import React from "react";
 import "../styles/MatchResult.css";
 
-const MatchResult = ({ result, character, onClose, finalStats }) => {
+const MatchResult = ({ result, character, onClose }) => {
   // Verificar si tenemos datos válidos para mostrar
-  if (!result || !result.simulation) {
+  if (!result) {
     console.log("No hay resultado válido para mostrar:", result);
     return null;
   }
 
-  // Usar finalStats si están disponibles, sino usar las de result
-  const stats = finalStats?.user || result.simulation?.userStats;
-
+  // ✅ USAR DATOS DEL BACKEND DIRECTAMENTE
   const getResultType = () => {
-    if (!result.simulation) return 'draw';
+    if (!result.simulation && !result.match) return 'draw';
     
-    // Verificar diferentes formas en que puede venir el winnerId
-    const winnerId = result.simulation.winnerId || result.simulation.winner_id;
-    const player1Score = result.simulation.player1Score || result.simulation.player1_score || 0;
-    const player2Score = result.simulation.player2Score || result.simulation.player2_score || 0;
+    // Preferir datos de simulation, luego de match
+    const winnerId = result.simulation?.winnerId || result.match?.winner_id;
+    const player1Score = result.simulation?.player1Score || result.match?.player1_score || 0;
+    const player2Score = result.simulation?.player2Score || result.match?.player2_score || 0;
+    
+    console.log("🔍 Determinando resultado:", { winnerId, player1Score, player2Score, characterId: character?.id });
     
     if (winnerId === character?.id) return 'win';
     if (player1Score === player2Score) return 'draw';
@@ -26,14 +26,22 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
 
   const resultType = getResultType();
   
-  // Obtener scores de manera segura
-  const player1Score = result.simulation.player1Score || result.simulation.player1_score || 0;
-  const player2Score = result.simulation.player2Score || result.simulation.player2_score || 0;
+  // ✅ Obtener scores de manera segura desde backend
+  const player1Score = result.simulation?.player1Score || result.match?.player1_score || 0;
+  const player2Score = result.simulation?.player2Score || result.match?.player2_score || 0;
 
-  // Obtener recompensas de manera segura
-  const rewards = result.rewards || { exp: 50, coins: 30 };
+  // ✅ Obtener recompensas del backend
+  const rewards = result.rewards || { exp: 0, coins: 0 };
   const leveledUp = result.leveledUp || false;
-  const newLevel = result.newLevel || (character?.level || 1) + 1;
+  const newLevel = result.newLevel || (character?.level || 1);
+
+  console.log("🎯 Mostrando resultado final:", {
+    resultType,
+    score: `${player1Score}-${player2Score}`,
+    rewards,
+    leveledUp,
+    newLevel
+  });
 
   return (
     <div className="match-result-overlay">
@@ -52,7 +60,7 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
         
         <p className="result-opponent">vs {result.botName || 'RIVAL'}</p>
 
-        {/* SECCIÓN DE RECOMPENSAS - SIEMPRE VISIBLE */}
+        {/* SECCIÓN DE RECOMPENSAS */}
         <div className="rewards-display">
           <h4>🏆 RECOMPENSAS GANADAS</h4>
           <div className="reward-item">
@@ -71,47 +79,18 @@ const MatchResult = ({ result, character, onClose, finalStats }) => {
           )}
         </div>
 
-        {/* ESTADÍSTICAS OPCIONALES - SOLO SI HAY DATOS */}
-        {stats && (
-          <div className="performance-stats">
-            <h4>📈 ESTADÍSTICAS DEL PARTIDO</h4>
-            <div className="stats-grid">
-              <div className="performance-stat">
-                <span className="stat-label">Disparos</span>
-                <span className="stat-value">{stats.shots || 0}</span>
-              </div>
-              <div className="performance-stat">
-                <span className="stat-label">Goles</span>
-                <span className="stat-value">{stats.goals || 0}</span>
-              </div>
-              <div className="performance-stat">
-                <span className="stat-label">Pases</span>
-                <span className="stat-value">{stats.passes || 0}</span>
-              </div>
-              <div className="performance-stat">
-                <span className="stat-label">Entradas</span>
-                <span className="stat-value">{stats.tackles || 0}</span>
-              </div>
-              <div className="performance-stat">
-                <span className="stat-label">Posesión</span>
-                <span className="stat-value">{stats.possession || 50}%</span>
-              </div>
-              {stats.passAccuracy && (
-                <div className="performance-stat">
-                  <span className="stat-label">Precisión pases</span>
-                  <span className="stat-value">{stats.passAccuracy}%</span>
-                </div>
-              )}
-            </div>
+        {/* MENSAJE DEL BACKEND */}
+        {result.message && (
+          <div className="backend-message">
+            <p>{result.message}</p>
           </div>
         )}
 
-        {/* BOTÓN PARA CERRAR MANUALMENTE - ÚNICA FORMA DE CERRAR */}
+        {/* BOTÓN PARA CERRAR MANUALMENTE */}
         <button className="close-result-btn" onClick={onClose}>
           CONTINUAR
         </button>
         
-        {/* Mensaje indicativo para el usuario */}
         <p className="close-hint">
           Haz clic en CONTINUAR para volver al entrenamiento
         </p>
