@@ -444,7 +444,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 30px; /* Espacio entre las tarjetas y el badge */
+  gap: 100px; /* Espacio entre las tarjetas y el badge */
 }
 
 .vs-badge {
@@ -461,6 +461,8 @@
   justify-content: center;
   box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
   flex-shrink: 0;
+      margin-bottom: 5%;
+    margin-left: 1%;
 }
 
 .pre-match-arena {
