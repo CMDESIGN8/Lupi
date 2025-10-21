@@ -1,4 +1,4 @@
-import './globals.css';
+@import './globales.css';
 /* ===== BOTS Y OPCIONES MEJORADOS ===== */
 .bots-grid { 
   display: grid; 
