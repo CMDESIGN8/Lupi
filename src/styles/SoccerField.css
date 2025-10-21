@@ -1,1 +1,81 @@
 
+/* Efecto de gol */
+.goal-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.goal-explosion {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, #ffeb3b 0%, transparent 70%);
+  border-radius: 50%;
+  animation: goalExplosion 0.8s ease-out;
+}
+
+@keyframes goalExplosion {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.goal-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffeb3b;
+  text-shadow: 0 0 20px #ff9800;
+  animation: goalText 2s ease-in-out;
+}
+
+@keyframes goalText {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Efecto de parada */
+.save-effect {
+  position: absolute;
+  z-index: 90;
+  pointer-events: none;
+}
+
+.save-sparkle {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, #ffffff 0%, transparent 70%);
+  border-radius: 50%;
+  animation: saveSparkle 0.5s ease-out;
+}
+
+@keyframes saveSparkle {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Mejoras en animaciones */
+.soccer-ball.shooting {
+  animation: ballShot 0.5s ease-out;
+}
+
+@keyframes ballShot {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.2); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+.player.with-ball {
+  animation: playerPulse 1s ease-in-out infinite;
+}
+
+@keyframes playerPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+}
