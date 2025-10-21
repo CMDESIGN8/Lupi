@@ -1,10 +1,10 @@
 const API_URL = "https://lupiback.onrender.com"; // URL del backend desplegado
 
 export const getBots = async () => {
-  const response = await fetch(API_URL);
+  const response = await fetch(`${API_URL}/bots`); // ← Agrega /bots
   if (!response.ok) throw new Error("Error al cargar los bots");
   const data = await response.json();
-  return data.bots;
+  return data.bots || data; // Por si la respuesta viene directa o en propiedad bots
 };
 
 export const startMatch = async (characterId, botId) => {
