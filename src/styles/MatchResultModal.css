@@ -105,4 +105,37 @@
   }
   
   .modal-title {
-    font-size: 1.5rem
+    font-size: 1.5rem;
+  }
+  
+  .modal-score {
+    font-size: 3rem;
+    gap: 1rem;
+  }
+  
+  .result-score-large {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 1rem 1.5rem;
+  }
+  
+  .modal-title {
+    font-size: 1.3rem;
+  }
+  
+  .modal-score {
+    font-size: 2.5rem;
+  }
+  
+  .modal-rewards h3 {
+    font-size: 1.1rem;
+  }
+  
+  .reward-item {
+    font-size: 1rem;
+  }
+}
