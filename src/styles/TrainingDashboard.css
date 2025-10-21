@@ -1,49 +1,12 @@
-/* styles/TrainingDashboard.css - VERSIÓN GAMER MMORPG ÉPICA */
-
-/* ===== VARIABLES Y CONFIGURACIÓN GLOBAL MMORPG ===== */
-:root {
-  /* Colores épicos MMORPG */
-  --epic-purple: #8b5cf6;
-  --epic-blue: #3b82f6;
-  --epic-cyan: #06d6a0;
-  --epic-gold: #fbbf24;
-  --epic-red: #ef4444;
-  --epic-dark: #0f0f1f;
-  --epic-darker: #050510;
-  --epic-card-bg: rgba(15, 15, 31, 0.95);
-  
-  /* Gradientes épicos */
-  --gradient-epic-bg: linear-gradient(135deg, #050510 0%, #1a1a2e 50%, #16213e 100%);
-  --gradient-epic-card: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
-  --gradient-epic-gold: linear-gradient(135deg, #fbbf24, #d97706, #f59e0b);
-  --gradient-epic-purple: linear-gradient(135deg, #8b5cf6, #7c3aed, #6d28d9);
-  --gradient-epic-blue: linear-gradient(135deg, #3b82f6, #2563eb, #1d4ed8);
-  --gradient-epic-cyan: linear-gradient(135deg, #06d6a0, #059669, #047857);
-  
-  /* Efectos MMORPG */
-  --shadow-epic: 0 10px 40px rgba(139, 92, 246, 0.3);
-  --shadow-gold: 0 10px 40px rgba(251, 191, 36, 0.4);
-  --glow-purple: 0 0 30px rgba(139, 92, 246, 0.6);
-  --glow-gold: 0 0 30px rgba(251, 191, 36, 0.6);
-  --border-epic: 2px solid transparent;
-  --border-gold: 2px solid var(--epic-gold);
-}
-
-/* ===== ESTILOS BASE MMORPG ===== */
+/* ===== COMPONENTE PRINCIPAL ===== */
 .training-dashboard {
   min-height: 100vh;
-  background: 
-    var(--gradient-epic-bg),
-    radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
-  color: #e2e8f0;
   padding: 1rem;
-  font-family: 'Cinzel', 'Rajdhani', serif;
   position: relative;
   overflow-x: hidden;
 }
 
-/* Efecto de partículas épico */
+/* Efecto de partículas en el fondo */
 .training-dashboard::before {
   content: '';
   position: fixed;
@@ -52,634 +15,114 @@
   width: 100%;
   height: 100%;
   background: 
-    radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(251, 191, 36, 0.05) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, rgba(76, 201, 240, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(67, 97, 238, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(114, 9, 183, 0.05) 0%, transparent 50%);
   pointer-events: none;
   z-index: -1;
 }
 
-/* ===== LAYOUT PRINCIPAL CON ESTILO MMORPG ===== */
-.training-dashboard .main-layout {
-  display: grid;
-  grid-template-columns: 300px 1fr 300px;
-  gap: 2rem;
-  height: 70vh;
-  margin-bottom: 2rem;
-  position: relative;
-}
-
-/* ===== PANELES CON BORDES ÉPICOS ===== */
-.training-dashboard .left-panel,
-.training-dashboard .right-panel,
-.training-dashboard .bottom-panel,
-.training-dashboard .center-panel {
-  background: linear-gradient(145deg, rgba(15, 15, 31, 0.95), rgba(26, 26, 46, 0.98));
-  border-radius: 20px;
-  border: var(--border-epic);
-  box-shadow: 
-    var(--shadow-epic),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(15px);
-  position: relative;
-  overflow: hidden;
-  border-image: linear-gradient(135deg, var(--epic-purple), var(--epic-blue)) 1;
-}
-
-/* Efecto de borde brillante */
-.training-dashboard .left-panel::before,
-.training-dashboard .right-panel::before,
-.training-dashboard .bottom-panel::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(135deg, var(--epic-purple), var(--epic-blue), var(--epic-cyan));
-  border-radius: 22px;
-  z-index: -1;
-  opacity: 0.7;
-}
-
-/* ===== CANCHA DE FÚTSAL ÉPICA ===== */
-.training-dashboard .soccer-field {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background: 
-    linear-gradient(135deg, #1e3a8a 0%, #3730a3 50%, #312e81 100%),
-    repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(251, 191, 36, 0.1) 15px, rgba(251, 191, 36, 0.1) 30px);
-  border-radius: 20px;
-  border: 3px solid var(--epic-gold);
-  overflow: hidden;
-  box-shadow: 
-    inset 0 0 60px rgba(0, 0, 0, 0.6),
-    var(--shadow-gold),
-    0 0 40px rgba(251, 191, 36, 0.3);
-}
-
-.training-dashboard .field-grass {
-  position: relative;
-  width: 100%; 
-  height: 100%;
-  background: 
-    linear-gradient(90deg, transparent 49%, rgba(251, 191, 36, 0.3) 49%, rgba(251, 191, 36, 0.3) 51%, transparent 51%),
-    radial-gradient(circle at 50% 50%, transparent 70px, rgba(251, 191, 36, 0.2) 70px, rgba(251, 191, 36, 0.2) 72px, transparent 72px);
-}
-
-/* ===== HEADER ÉPICO MMORPG ===== */
+/* ===== HEADER PROFESIONAL ===== */
 .app-header.professional {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(15, 15, 31, 0.95), rgba(26, 26, 46, 0.98));
-  border-bottom: 3px solid transparent;
-  border-image: var(--gradient-epic-gold) 1;
-  padding: 1.5rem 3rem;
-  margin: 0 auto 2rem auto;
-  border-radius: 0 0 25px 25px;
-  box-shadow: var(--shadow-gold);
-  backdrop-filter: blur(15px);
+  background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .95));
+  border-bottom: 3px solid var(--accent-blue);
+  padding: 1rem 2rem;
+  margin: 0 auto 1.5rem auto;
+  border-radius: 0 0 15px 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  backdrop-filter: blur(10px);
   width: fit-content;
   max-width: 90%;
   text-align: center;
-  position: relative;
-  overflow: hidden;
 }
 
-.app-header.professional::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--gradient-epic-gold);
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.header-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
 }
 
 .app-header.professional h2 {
   margin: 0;
-  color: var(--epic-gold);
-  font-family: 'Cinzel', 'Orbitron', serif;
-  font-size: 2rem;
-  text-shadow: 
-    0 0 20px rgba(251, 191, 36, 0.8),
-    2px 2px 4px rgba(0, 0, 0, 0.8);
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  color: var(--accent-blue);
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
 }
 
-.score-display-header {
-  font-size: 2.5rem;
-  font-weight: bold;
-  font-family: 'Cinzel', 'Orbitron', serif;
-  background: var(--gradient-epic-gold);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
-}
-
-/* ===== BOTS CARDS ÉPICAS ===== */
-.training-dashboard .bot-card {
-  background: linear-gradient(145deg, rgba(15, 15, 31, 0.95), rgba(26, 26, 46, 0.98));
-  border-radius: 25px;
-  padding: 2rem;
-  border: 2px solid transparent;
-  border-image: linear-gradient(135deg, var(--epic-purple), var(--epic-blue)) 1;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(15px);
-  position: relative;
-  overflow: hidden;
-  box-shadow: var(--shadow-epic);
-}
-
-.training-dashboard .bot-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent);
-  transition: left 0.6s ease;
-}
-
-.training-dashboard .bot-card:hover::before {
-  left: 100%;
-}
-
-.training-dashboard .bot-card:hover {
-  transform: translateY(-12px) scale(1.03);
-  box-shadow: 
-    0 30px 60px rgba(139, 92, 246, 0.4),
-    0 0 40px rgba(59, 130, 246, 0.3);
-  border-image: var(--gradient-epic-gold) 1;
-}
-
-/* Avatar épico con marco dorado */
-.training-dashboard .bot-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  border: 3px solid transparent;
-  border-image: var(--gradient-epic-gold) 1;
-  box-shadow: var(--shadow-gold);
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-}
-
-/* Nivel con estilo MMORPG */
-.training-dashboard .bot-level {
-  position: absolute;
-  bottom: -8px;
-  right: -8px;
-  background: var(--gradient-epic-gold);
-  color: var(--epic-darker);
-  font-size: 0.8rem;
-  font-weight: 900;
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
-  border: 2px solid var(--epic-darker);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  font-family: 'Cinzel', serif;
-}
-
-/* ===== BOTONES ÉPICOS ===== */
-.training-dashboard .play-btn {
-  width: 100%;
-  padding: 1.5rem;
-  border: none;
-  border-radius: 15px;
-  color: var(--epic-darker);
-  font-weight: 900;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Cinzel', 'Rajdhani', serif;
-  font-size: 1.2rem;
-  position: relative;
-  overflow: hidden;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  margin-top: 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  background: var(--gradient-epic-gold);
-}
-
-.training-dashboard .play-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  transition: left 0.6s ease;
-}
-
-.training-dashboard .play-btn:hover::before {
-  left: 100%;
-}
-
-.training-dashboard .play-btn:hover {
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 
-    0 20px 40px rgba(251, 191, 36, 0.6),
-    0 0 30px rgba(251, 191, 36, 0.4);
-  filter: brightness(1.2);
-}
-
-/* Colores de dificultad épicos */
-.training-dashboard .play-btn.easy {
-  background: var(--gradient-epic-cyan);
-}
-
-.training-dashboard .play-btn.medium {
-  background: var(--gradient-epic-blue);
-}
-
-.training-dashboard .play-btn.hard {
-  background: var(--gradient-epic-purple);
-}
-
-.training-dashboard .play-btn.expert {
-  background: linear-gradient(135deg, #dc2626, #b91c1c, #991b1b);
-  animation: expertGlow 2s ease-in-out infinite;
-}
-
-.training-dashboard .play-btn.legendary {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b, #d97706, #b45309);
-  animation: legendaryGlow 1.5s ease-in-out infinite;
-}
-
-/* ===== CONTROLES TÁCTICOS ÉPICOS ===== */
-.tactic-btn {
-  flex: 1;
-  padding: 1rem;
-  font-size: 1rem;
-  font-weight: 800;
-  border: 2px solid transparent;
-  border-image: linear-gradient(135deg, #475569, #64748b) 1;
-  background: linear-gradient(145deg, rgba(15, 15, 31, 0.8), rgba(26, 26, 46, 0.9));
-  color: #94a3b8;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  font-family: 'Cinzel', serif;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.tactic-btn:hover:not(:disabled) {
-  transform: translateY(-3px);
-  border-image: var(--gradient-epic-gold) 1;
-  color: var(--epic-gold);
-  box-shadow: var(--shadow-gold);
-}
-
-.tactic-btn.active {
-  color: white;
-  border-image: var(--gradient-epic-purple) 1;
-  background: linear-gradient(145deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.3));
-  box-shadow: var(--glow-purple);
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-}
-
-/* ===== ESTADÍSTICAS CON ESTILO MMORPG ===== */
-.training-dashboard .stats-category h4 {
-  margin: 0 0 1.5rem 0;
-  color: var(--epic-gold);
-  font-size: 1.3rem;
-  border-bottom: 2px solid transparent;
-  border-image: var(--gradient-epic-gold) 1;
-  padding-bottom: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  font-family: 'Cinzel', serif;
-  text-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
-}
-
-.training-dashboard .stat-bar .fill {
-  height: 100%;
-  border-radius: 8px;
-  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
-}
-
-/* Colores de barras épicas */
-.training-dashboard .stat-bar:nth-child(1) .fill {
-  background: var(--gradient-epic-red);
-}
-
-.training-dashboard .stat-bar:nth-child(2) .fill {
-  background: var(--gradient-epic-blue);
-}
-
-.training-dashboard .stat-bar:nth-child(3) .fill {
-  background: var(--gradient-epic-cyan);
-}
-
-.training-dashboard .stat-bar:nth-child(4) .fill {
-  background: var(--gradient-epic-purple);
-}
-
-/* ===== JUGADORES CON ESTILO ÉPICO ===== */
-.training-dashboard .player-icon {
-  font-size: 3rem;
-  animation: epicPulse 3s infinite;
-  filter: drop-shadow(3px 3px 8px rgba(0, 0, 0, 0.8));
-}
-
-.training-dashboard .player.has-ball {
-  transform: translate(-50%, -50%) scale(1.3);
-  filter: 
-    drop-shadow(0 0 15px var(--epic-gold))
-    drop-shadow(0 0 25px rgba(251, 191, 36, 0.6));
-  z-index: 20;
-}
-
-.training-dashboard .player-name {
-  margin-top: 0.5rem;
-  font-weight: 800;
-  font-size: 0.9rem;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(26, 26, 46, 0.95));
-  padding: 0.4rem 1rem;
-  border-radius: 15px;
-  border: 1px solid transparent;
-  border-image: var(--gradient-epic-gold) 1;
-  backdrop-filter: blur(10px);
-  color: #FFFFFF !important;
-  white-space: nowrap;
-  font-family: 'Cinzel', serif;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-/* ===== SISTEMA DE COMENTARIOS ÉPICO ===== */
-.training-dashboard .commentary-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem;
-  background: linear-gradient(135deg, rgba(15, 15, 31, 0.95), rgba(26, 26, 46, 0.98));
-  border-bottom: 2px solid transparent;
-  border-image: var(--gradient-epic-purple) 1;
-  position: relative;
-}
-
-.training-dashboard .commentary-header h3 {
-  margin: 0;
-  color: var(--epic-gold);
-  font-size: 1.4rem;
-  font-family: 'Cinzel', 'Orbitron', serif;
-  text-shadow: 0 2px 12px rgba(251, 191, 36, 0.5);
-  letter-spacing: 1px;
-}
-
-.training-dashboard .commentary-event {
-  background: linear-gradient(135deg, rgba(15, 15, 31, 0.8), rgba(26, 26, 46, 0.9));
-  border-radius: 15px;
-  padding: 1.2rem;
-  border-left: 6px solid;
-  border-image: var(--gradient-epic-blue) 1;
-  animation: epicCommentSlide 0.6s ease;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.training-dashboard .commentary-event.very-high {
-  border-image: var(--gradient-epic-gold) 1;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(26, 26, 46, 0.95));
-  animation: epicHighlightPulse 2s infinite;
-}
-
-/* ===== ANIMACIONES ÉPICAS NUEVAS ===== */
-@keyframes epicPulse {
-  0%, 100% { 
-    transform: translate(-50%, -50%) scale(1);
-    filter: drop-shadow(3px 3px 8px rgba(0, 0, 0, 0.8));
-  }
-  50% { 
-    transform: translate(-50%, -50%) scale(1.1);
-    filter: drop-shadow(0 0 15px rgba(139, 92, 246, 0.6));
-  }
-}
-
-@keyframes epicCommentSlide {
-  from { 
-    opacity: 0; 
-    transform: translateX(40px) scale(0.9);
-  }
-  to { 
-    opacity: 1; 
-    transform: translateX(0) scale(1);
-  }
-}
-
-@keyframes epicHighlightPulse {
-  0%, 100% { 
-    box-shadow: 0 0 0 rgba(251, 191, 36, 0);
-    transform: scale(1);
-  }
-  50% { 
-    box-shadow: 0 0 30px rgba(251, 191, 36, 0.6);
-    transform: scale(1.02);
-  }
-}
-
-@keyframes expertGlow {
-  0%, 100% { 
-    box-shadow: 0 10px 30px rgba(220, 38, 38, 0.4);
-  }
-  50% { 
-    box-shadow: 
-      0 15px 40px rgba(220, 38, 38, 0.6),
-      0 0 30px rgba(220, 38, 38, 0.4);
-  }
-}
-
-@keyframes legendaryGlow {
-  0%, 100% { 
-    box-shadow: 
-      0 10px 30px rgba(251, 191, 36, 0.5),
-      0 0 20px rgba(251, 191, 36, 0.3);
-  }
-  50% { 
-    box-shadow: 
-      0 20px 50px rgba(251, 191, 36, 0.8),
-      0 0 40px rgba(251, 191, 36, 0.6),
-      0 0 60px rgba(251, 191, 36, 0.4);
-  }
-}
-
-/* ===== MODAL DE RESULTADOS ÉPICO ===== */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(5, 5, 16, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-}
-
-.modal-content {
-  background: linear-gradient(145deg, rgba(15, 15, 31, 0.98), rgba(26, 26, 46, 0.95));
-  padding: 3rem 4rem;
-  border-radius: 30px;
-  border: 3px solid transparent;
-  border-image: var(--gradient-epic-gold) 1;
-  box-shadow: 
-    var(--shadow-gold),
-    inset 0 0 60px rgba(251, 191, 36, 0.1);
-  text-align: center;
-  width: 90%;
-  max-width: 600px;
-  animation: epicModalAppear 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes epicModalAppear {
-  from { 
-    opacity: 0; 
-    transform: translateY(60px) scale(0.8) rotateX(-10deg);
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1) rotateX(0);
-  }
-}
-
-.modal-title {
-  font-family: 'Cinzel', 'Orbitron', serif;
-  font-size: 2.5rem;
-  margin-bottom: 2rem;
-  background: var(--gradient-epic-gold);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 0 30px rgba(251, 191, 36, 0.8);
-  letter-spacing: 3px;
-}
-
-/* ===== SCROLLBAR ÉPICO ===== */
-.training-dashboard .panel-content::-webkit-scrollbar {
-  width: 12px;
-}
-
-.training-dashboard .panel-content::-webkit-scrollbar-track {
-  background: linear-gradient(180deg, rgba(15, 15, 31, 0.8), rgba(26, 26, 46, 0.8));
-  border-radius: 6px;
-  border: 1px solid rgba(139, 92, 246, 0.3);
-}
-
-.training-dashboard .panel-content::-webkit-scrollbar-thumb {
-  background: var(--gradient-epic-purple);
-  border-radius: 6px;
-  border: 2px solid rgba(15, 15, 31, 0.8);
-}
-
-.training-dashboard .panel-content::-webkit-scrollbar-thumb:hover {
-  background: var(--gradient-epic-gold);
-  box-shadow: var(--glow-gold);
-}
-
-/* ===== RESPONSIVE MEJORADO ===== */
+/* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 1200px) {
-  .training-dashboard .main-layout { 
-    grid-template-columns: 280px 1fr 280px; 
-    gap: 1.5rem;
+  .main-layout { 
+    grid-template-columns: 250px 1fr 250px; 
   }
 }
 
 @media (max-width: 1024px) {
-  .training-dashboard .main-layout { 
+  .main-layout { 
     grid-template-columns: 1fr; 
-    grid-template-rows: auto 500px auto;
-    height: auto;
+    height: auto; 
+    grid-template-rows: auto 400px auto;
   }
   
-  .app-header.professional h2 {
-    font-size: 1.8rem;
+  .left-panel { 
+    height: 400px; 
   }
   
-  .score-display-header {
-    font-size: 2.2rem;
+  .right-panel { 
+    height: 400px; 
+  }
+  
+  .center-panel {
+    order: -1;
+    height: 50vh;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    gap: 1rem;
   }
 }
 
 @media (max-width: 768px) {
-  .training-dashboard {
-    padding: 0.5rem;
+  .training-dashboard { 
+    padding: 0.5rem; 
+  }
+  
+  .main-layout {
+    gap: 1rem;
   }
   
   .app-header.professional {
-    padding: 1rem 2rem;
+    padding: 0.8rem 1rem;
     max-width: 95%;
   }
   
   .app-header.professional h2 {
-    font-size: 1.4rem;
-    letter-spacing: 1px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-layout {
+    grid-template-rows: auto 300px auto;
   }
   
-  .modal-content {
-    padding: 2rem;
-    margin: 1rem;
-  }
-  
-  .modal-title {
-    font-size: 2rem;
+  .left-panel,
+  .right-panel {
+    height: 300px;
   }
 }
-
-/* ===== EFECTOS DE TEXTO ÉPICOS ===== */
-.epic-text-glow {
-  text-shadow: 
-    0 0 10px currentColor,
-    0 0 20px currentColor,
-    0 0 30px currentColor;
-}
-
-.epic-text-gradient {
-  background: var(--gradient-epic-gold);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ===== MEJORAS PARA ESTADOS DE BOT ===== */
-.training-dashboard .bot-card.legendary {
-  border-image: var(--gradient-epic-gold) 1;
-  animation: legendaryCardGlow 2s ease-in-out infinite;
-}
-
-@keyframes legendaryCardGlow {
-  0%, 100% { 
-    box-shadow: 
-      0 10px 40px rgba(251, 191, 36, 0.4),
-      0 0 20px rgba(251, 191, 36, 0.3);
-  }
-  50% { 
-    box-shadow: 
-      0 20px 60px rgba(251, 191, 36, 0.7),
-      0 0 40px rgba(251, 191, 36, 0.5),
-      0 0 60px rgba(251, 191, 36, 0.3);
-  }
-}
-
-/* Asegurar que las fuentes estén disponibles */
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
