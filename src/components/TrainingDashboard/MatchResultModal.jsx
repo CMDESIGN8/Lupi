@@ -1,5 +1,5 @@
 import React from 'react';
-import '../../styles/TrainingDashboard.css'; // Reutilizamos los estilos
+import '../../styles/MatchResultModal.css'; // Reutilizamos los estilos
 
 export const MatchResultModal = ({ result, onClose }) => {
   const { matchResult, rewards, message } = result;
