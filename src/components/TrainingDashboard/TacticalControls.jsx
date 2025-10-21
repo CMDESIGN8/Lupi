@@ -1,5 +1,6 @@
 // TacticalControls.jsx - VERSIÓN MEJORADA
 import React from 'react';
+import '../../styles/TacticalControls.css'; // Reutilizamos los estilos
 import { MATCH_CONFIG } from './futsalConfig';
 
 export const TacticalControls = ({ state, dispatch }) => {
@@ -53,3 +54,4 @@ export const TacticalControls = ({ state, dispatch }) => {
     </div>
   );
 };
+
