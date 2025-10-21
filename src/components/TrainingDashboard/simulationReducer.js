@@ -1,5 +1,115 @@
-// simulationReducer.js - VERSIÓN MEJORADA
+// simulationReducer.js - VERSIÓN CORREGIDA
 import { MATCH_CONFIG } from './futsalConfig';
+
+// 🎯 FUNCIONES AUXILIARES QUE FALTABAN
+const getSpecialAbility = (role) => {
+  const abilities = {
+    goleador: 'power_shot',
+    defensor: 'defensive_wall', 
+    portero: 'super_save',
+    ala: 'speed_boost'
+  };
+  return abilities[role] || 'basic_skill';
+};
+
+const getDefaultPosition = (role) => {
+  const positions = {
+    portero: { x: 20, y: 50 },
+    defensor: { x: 40, y: 50 },
+    goleador: { x: 70, y: 50 },
+    ala: { x: 50, y: 30 }
+  };
+  return positions[role] || positions.defensor;
+};
+
+const selectDefensiveRole = (attackerRole) => {
+  const defensiveMap = {
+    goleador: 'defensor',
+    defensor: 'goleador', 
+    portero: 'defensor',
+    ala: 'defensor'
+  };
+  return defensiveMap[attackerRole] || 'defensor';
+};
+
+const updateMatchStats = (currentStats, event) => {
+  const newStats = JSON.parse(JSON.stringify(currentStats));
+  
+  switch (event.type) {
+    case MATCH_CONFIG.EVENT_TYPES.GOAL:
+      newStats[event.team].goals++;
+      newStats[event.team].shots++;
+      break;
+    case MATCH_CONFIG.EVENT_TYPES.SAVE:
+      newStats[event.team === 'user' ? 'bot' : 'user'].saves++;
+      newStats[event.team === 'user' ? 'bot' : 'user'].shots++;
+      break;
+    case MATCH_CONFIG.EVENT_TYPES.TACKLE:
+      newStats[event.team].tackles++;
+      break;
+    case MATCH_CONFIG.EVENT_TYPES.FOUL:
+      newStats[event.team].fouls++;
+      break;
+    case MATCH_CONFIG.EVENT_TYPES.PASS:
+      // Los pases no incrementan estadísticas principales
+      break;
+  }
+  
+  return newStats;
+};
+
+const updatePlayerPositions = (currentPositions, event, ballZone, possession) => {
+  // Por ahora, devolvemos las posiciones sin cambios
+  // Puedes implementar lógica de movimiento más adelante
+  return currentPositions;
+};
+
+const updateBallZone = (currentZone, event, possession) => {
+  const zoneTransitions = {
+    [MATCH_CONFIG.ZONES.USER_DEFENSE]: {
+      user: [MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.CENTER],
+      bot: [MATCH_CONFIG.ZONES.USER_DEFENSE, MATCH_CONFIG.ZONES.CENTER]
+    },
+    [MATCH_CONFIG.ZONES.CENTER]: {
+      user: [MATCH_CONFIG.ZONES.BOT_DEFENSE, MATCH_CONFIG.ZONES.CENTER],
+      bot: [MATCH_CONFIG.ZONES.USER_DEFENSE, MATCH_CONFIG.ZONES.CENTER]
+    },
+    [MATCH_CONFIG.ZONES.BOT_DEFENSE]: {
+      user: [MATCH_CONFIG.ZONES.BOT_DEFENSE, MATCH_CONFIG.ZONES.CENTER],
+      bot: [MATCH_CONFIG.ZONES.CENTER, MATCH_CONFIG.ZONES.CENTER]
+    }
+  };
+  
+  const transitions = zoneTransitions[currentZone]?.[possession] || [MATCH_CONFIG.ZONES.CENTER];
+  return transitions[Math.floor(Math.random() * transitions.length)];
+};
+
+const updateGameDynamics = (currentMomentum, currentPressure, event) => {
+  let momentumChange = 0;
+  let pressureChange = { user: 0, bot: 0 };
+  
+  switch (event.type) {
+    case MATCH_CONFIG.EVENT_TYPES.GOAL:
+      momentumChange = event.team === 'user' ? 20 : -20;
+      pressureChange.user = event.team === 'user' ? 15 : -10;
+      pressureChange.bot = event.team === 'user' ? -15 : 10;
+      break;
+    case MATCH_CONFIG.EVENT_TYPES.SAVE:
+      momentumChange = event.team === 'user' ? -10 : 10;
+      break;
+    case MATCH_CONFIG.EVENT_TYPES.TACKLE:
+      momentumChange = event.team === 'user' ? 5 : -5;
+      break;
+  }
+  
+  return {
+    newMomentum: Math.max(0, Math.min(100, currentMomentum + momentumChange)),
+    newPressure: {
+      user: Math.max(0, Math.min(100, currentPressure.user + pressureChange.user)),
+      bot: Math.max(0, Math.min(100, currentPressure.bot + pressureChange.bot))
+    }
+  };
+};
 
 // 🎯 SISTEMA DE JUGADORES MEJORADO
 const createPlayer = (baseStats, role) => ({
@@ -10,25 +120,31 @@ const createPlayer = (baseStats, role) => ({
   specialAbility: getSpecialAbility(role)
 });
 
-const getDefaultPosition = (role) => {
-  const positions = {
-    goleador: { x: 70, y: 50 },
-    defensor: { x: 40, y: 50 },
-    portero: { x: 20, y: 50 },
-    ala: { x: 50, y: 30 }
-  };
-  return positions[role] || positions.defensor;
-};
-
 // 🎲 SISTEMA DE PROBABILIDADES MÁS ROBUSTO
 const calculateActionProbabilities = (state, attackerRole, defenderRole) => {
   const { tactic, possession, ballZone } = state;
   
   // Probabilidades base según roles
   const baseProbs = {
-    goleador: { [MATCH_CONFIG.EVENT_TYPES.SHOT]: 0.4, [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.5, [MATCH_CONFIG.EVENT_TYPES.FOUL]: 0.1 },
-    defensor: { [MATCH_CONFIG.EVENT_TYPES.TACKLE]: 0.4, [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.5, [MATCH_CONFIG.EVENT_TYPES.FOUL]: 0.1 },
-    portero: { [MATCH_CONFIG.EVENT_TYPES.SAVE]: 0.7, [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.3 }
+    goleador: { 
+      [MATCH_CONFIG.EVENT_TYPES.SHOT]: 0.4, 
+      [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.5, 
+      [MATCH_CONFIG.EVENT_TYPES.FOUL]: 0.1 
+    },
+    defensor: { 
+      [MATCH_CONFIG.EVENT_TYPES.TACKLE]: 0.4, 
+      [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.5, 
+      [MATCH_CONFIG.EVENT_TYPES.FOUL]: 0.1 
+    },
+    portero: { 
+      [MATCH_CONFIG.EVENT_TYPES.SAVE]: 0.7, 
+      [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.3 
+    },
+    ala: {
+      [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.6,
+      [MATCH_CONFIG.EVENT_TYPES.SHOT]: 0.3,
+      [MATCH_CONFIG.EVENT_TYPES.TACKLE]: 0.1
+    }
   };
 
   let probs = { ...baseProbs[attackerRole] };
@@ -60,26 +176,6 @@ const calculateActionProbabilities = (state, attackerRole, defenderRole) => {
   });
 
   return probs;
-};
-
-// 🎪 GENERADOR DE EVENTOS MEJORADO
-const generateMatchEvent = (state) => {
-  const { possession, character, selectedBot, tactic, matchTime, ballZone } = state;
-  
-  const attacker = possession === 'user' ? character : selectedBot;
-  const defender = possession === 'user' ? selectedBot : character;
-  
-  // Selección inteligente de roles
-  const attackerRole = selectRoleForAction(ballZone, tactic, possession);
-  const defenderRole = selectDefensiveRole(attackerRole);
-  
-  const attackerRating = calculatePlayerRating(attacker, attackerRole);
-  const defenderRating = calculatePlayerRating(defender, defenderRole);
-
-  const probabilities = calculateActionProbabilities(state, attackerRole, defenderRole);
-  const selectedAction = selectActionFromProbabilities(probabilities);
-  
-  return createEventFromAction(selectedAction, attacker, defender, attackerRole, matchTime, possession);
 };
 
 // 🎯 SELECCIÓN INTELIGENTE DE ROLES
@@ -130,6 +226,16 @@ const createEventFromAction = (action, attacker, defender, attackerRole, matchTi
       `¡Gran entrada de ${defender.name}! Recupera el balón.`,
       `${defender.name} intercepta limpiamente.`,
       `Recuperación brillante de ${defender.name}.`
+    ],
+    [MATCH_CONFIG.EVENT_TYPES.PASS]: [
+      `${attacker.name} realiza un pase preciso.`,
+      `Buena circulación de ${attacker.name}.`,
+      `${attacker.name} avanza con el balón.`
+    ],
+    [MATCH_CONFIG.EVENT_TYPES.FOUL]: [
+      `Falta de ${defender.name} sobre ${attacker.name}.`,
+      `Infracción cometida por ${defender.name}.`,
+      `${defender.name} comete una falta.`
     ]
   };
 
@@ -146,25 +252,112 @@ const createEventFromAction = (action, attacker, defender, attackerRole, matchTi
 const calculatePlayerPositions = (formation, ballZone, possession) => {
   const formationTemplates = {
     '3-1': {
-      user: [
-        createPlayer({}, 'portero'),
-        createPlayer({}, 'defensor'),
-        createPlayer({}, 'defensor'), 
-        createPlayer({}, 'defensor'),
-        createPlayer({}, 'goleador')
-      ],
-      bot: [
-        createPlayer({}, 'portero'),
-        createPlayer({}, 'defensor'),
-        createPlayer({}, 'defensor'),
-        createPlayer({}, 'defensor'),
-        createPlayer({}, 'goleador')
-      ]
+      user: {
+        portero: createPlayer({}, 'portero'),
+        defensor1: createPlayer({}, 'defensor'),
+        defensor2: createPlayer({}, 'defensor'), 
+        defensor3: createPlayer({}, 'defensor'),
+        goleador: createPlayer({}, 'goleador')
+      },
+      bot: {
+        portero: createPlayer({}, 'portero'),
+        defensor1: createPlayer({}, 'defensor'),
+        defensor2: createPlayer({}, 'defensor'),
+        defensor3: createPlayer({}, 'defensor'),
+        goleador: createPlayer({}, 'goleador')
+      }
     }
   };
 
   return formationTemplates[formation] || formationTemplates['3-1'];
 };
+
+// 🎪 GENERADOR DE EVENTOS MEJORADO
+const generateMatchEvent = (state) => {
+  const { possession, character, selectedBot, tactic, matchTime, ballZone } = state;
+  
+  const attacker = possession === 'user' ? character : selectedBot;
+  const defender = possession === 'user' ? selectedBot : character;
+  
+  // Selección inteligente de roles
+  const attackerRole = selectRoleForAction(ballZone, tactic, possession);
+  const defenderRole = selectDefensiveRole(attackerRole);
+  
+  const attackerRating = calculatePlayerRating(attacker, attackerRole);
+  const defenderRating = calculatePlayerRating(defender, defenderRole);
+
+  const probabilities = calculateActionProbabilities(state, attackerRole, defenderRole);
+  const selectedAction = selectActionFromProbabilities(probabilities);
+  
+  return createEventFromAction(selectedAction, attacker, defender, attackerRole, matchTime, possession);
+};
+
+// 🎯 CÁLCULO DE HABILIDADES
+const calculatePlayerRating = (player, role) => {
+  if (!player) return 50;
+  const weights = {
+    goleador: { tiro: 0.4, potencia: 0.3, defensa: 0.1, velocidad: 0.2 },
+    defensor: { tiro: 0.1, potencia: 0.2, defensa: 0.5, velocidad: 0.2 },
+    portero: { tiro: 0.05, potencia: 0.1, defensa: 0.6, velocidad: 0.25 },
+    ala: { tiro: 0.3, potencia: 0.2, defensa: 0.2, velocidad: 0.3 },
+    balanced: { tiro: 0.25, potencia: 0.25, defensa: 0.25, velocidad: 0.25 }
+  };
+  const w = weights[role] || weights.balanced;
+  return (
+    (player.tiro || 50) * w.tiro +
+    (player.potencia || 50) * w.potencia +
+    (player.defensa || 50) * w.defensa +
+    (player.velocidad || 50) * w.velocidad
+  );
+};
+
+// 🛠️ FUNCIONES AUXILIARES
+function weightedRandomSelection(weights) {
+  const total = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
+  let random = Math.random() * total;
+  
+  for (const [item, weight] of Object.entries(weights)) {
+    random -= weight;
+    if (random <= 0) return item;
+  }
+  
+  return Object.keys(weights)[0];
+}
+
+function selectActionFromProbabilities(probabilities) {
+  const total = Object.values(probabilities).reduce((sum, prob) => sum + prob, 0);
+  let random = Math.random() * total;
+  
+  for (const [action, prob] of Object.entries(probabilities)) {
+    random -= prob;
+    if (random <= 0) return action;
+  }
+  
+  return MATCH_CONFIG.EVENT_TYPES.PASS;
+}
+
+function getIntensityForAction(action) {
+  const intensities = {
+    [MATCH_CONFIG.EVENT_TYPES.GOAL]: MATCH_CONFIG.INTENSITY.VERY_HIGH,
+    [MATCH_CONFIG.EVENT_TYPES.SHOT]: MATCH_CONFIG.INTENSITY.HIGH,
+    [MATCH_CONFIG.EVENT_TYPES.SAVE]: MATCH_CONFIG.INTENSITY.HIGH,
+    [MATCH_CONFIG.EVENT_TYPES.TACKLE]: MATCH_CONFIG.INTENSITY.MEDIUM,
+    [MATCH_CONFIG.EVENT_TYPES.FOUL]: MATCH_CONFIG.INTENSITY.MEDIUM,
+    [MATCH_CONFIG.EVENT_TYPES.PASS]: MATCH_CONFIG.INTENSITY.LOW
+  };
+  
+  return intensities[action] || MATCH_CONFIG.INTENSITY.LOW;
+}
+
+function createPlayerTeam(baseStats) {
+  return {
+    portero: createPlayer(baseStats, 'portero'),
+    defensor1: createPlayer(baseStats, 'defensor'),
+    defensor2: createPlayer(baseStats, 'defensor'),
+    defensor3: createPlayer(baseStats, 'defensor'),
+    goleador: createPlayer(baseStats, 'goleador')
+  };
+}
 
 export const initialState = {
   simulating: false,
@@ -269,52 +462,4 @@ export function simulationReducer(state, action) {
     default:
       return state;
   }
-}
-
-// 🛠️ FUNCIONES AUXILIARES
-function weightedRandomSelection(weights) {
-  const total = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
-  let random = Math.random() * total;
-  
-  for (const [item, weight] of Object.entries(weights)) {
-    random -= weight;
-    if (random <= 0) return item;
-  }
-  
-  return Object.keys(weights)[0];
-}
-
-function selectActionFromProbabilities(probabilities) {
-  const total = Object.values(probabilities).reduce((sum, prob) => sum + prob, 0);
-  let random = Math.random() * total;
-  
-  for (const [action, prob] of Object.entries(probabilities)) {
-    random -= prob;
-    if (random <= 0) return action;
-  }
-  
-  return MATCH_CONFIG.EVENT_TYPES.PASS;
-}
-
-function getIntensityForAction(action) {
-  const intensities = {
-    [MATCH_CONFIG.EVENT_TYPES.GOAL]: MATCH_CONFIG.INTENSITY.VERY_HIGH,
-    [MATCH_CONFIG.EVENT_TYPES.SHOT]: MATCH_CONFIG.INTENSITY.HIGH,
-    [MATCH_CONFIG.EVENT_TYPES.SAVE]: MATCH_CONFIG.INTENSITY.HIGH,
-    [MATCH_CONFIG.EVENT_TYPES.TACKLE]: MATCH_CONFIG.INTENSITY.MEDIUM,
-    [MATCH_CONFIG.EVENT_TYPES.FOUL]: MATCH_CONFIG.INTENSITY.MEDIUM,
-    [MATCH_CONFIG.EVENT_TYPES.PASS]: MATCH_CONFIG.INTENSITY.LOW
-  };
-  
-  return intensities[action] || MATCH_CONFIG.INTENSITY.LOW;
-}
-
-function createPlayerTeam(baseStats) {
-  return {
-    portero: createPlayer(baseStats, 'portero'),
-    defensor1: createPlayer(baseStats, 'defensor'),
-    defensor2: createPlayer(baseStats, 'defensor'),
-    defensor3: createPlayer(baseStats, 'defensor'),
-    goleador: createPlayer(baseStats, 'goleador')
-  };
 }
