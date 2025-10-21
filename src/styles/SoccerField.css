@@ -1,4 +1,146 @@
+/* Agregar al SoccerField.css */
 
+/* Efectos de animación mejorados */
+.pass-trail {
+  position: absolute;
+  height: 3px;
+  background: linear-gradient(90deg, #4caf50, transparent);
+  transform-origin: 0 50%;
+  z-index: 15;
+  animation: passTrail 0.8s ease-out;
+}
+
+@keyframes passTrail {
+  0% { width: 0; opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
+
+.shot-trail {
+  position: absolute;
+  height: 4px;
+  background: linear-gradient(90deg, #ff9800, #ffeb3b, transparent);
+  transform-origin: 0 50%;
+  z-index: 15;
+  animation: shotTrail 0.6s ease-out;
+}
+
+@keyframes shotTrail {
+  0% { width: 0; opacity: 1; }
+  100% { width: 120%; opacity: 0; }
+}
+
+/* Efecto de gol */
+.goal-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.goal-explosion {
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, #ffeb3b 0%, transparent 70%);
+  border-radius: 50%;
+  animation: goalExplosion 0.8s ease-out;
+}
+
+@keyframes goalExplosion {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+.goal-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffeb3b;
+  text-shadow: 0 0 20px #ff9800;
+  animation: goalText 2s ease-in-out;
+}
+
+@keyframes goalText {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+/* Efecto de atajada */
+.save-effect {
+  position: absolute;
+  z-index: 90;
+  pointer-events: none;
+}
+
+.save-sparkle {
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, #ffffff 0%, transparent 70%);
+  border-radius: 50%;
+  animation: saveSparkle 0.5s ease-out;
+}
+
+@keyframes saveSparkle {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* Mejoras en las animaciones del balón */
+.soccer-ball.passing {
+  animation: ballPass 0.8s ease-out;
+}
+
+.soccer-ball.shooting {
+  animation: ballShoot 0.6s ease-out;
+}
+
+@keyframes ballPass {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -52%) scale(0.9); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes ballShoot {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -55%) scale(0.8); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Estados de los jugadores */
+.player.moving {
+  animation: playerMove 0.5s ease-in-out;
+}
+
+@keyframes playerMove {
+  0% { transform: translate(-50%, -50%); }
+  50% { transform: translate(-50%, -52%); }
+  100% { transform: translate(-50%, -50%); }
+}
+
+/* Mejoras en el HUD */
+.match-hud {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(15px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.action-indicator {
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
 /* Efecto de gol */
 .goal-effect {
   position: absolute;
