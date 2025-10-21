@@ -523,6 +523,13 @@
   flex-shrink: 0;
 }
 
+.tactical-breakdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px; /* Espacio entre las tarjetas y el badge */
+}
+
 @keyframes pulse {
   0% { opacity: 1; }
   50% { opacity: 0.3; }
