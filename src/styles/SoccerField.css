@@ -561,3 +561,83 @@
   transform: translateY(-2px);
   transition: all 0.3s ease;
 }
+
+.pre-match-arena {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 2px solid #00ffff;
+  border-radius: 15px;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+  padding: 20px;
+}
+
+.game-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: white;
+  text-shadow: 0 0 10px #00ffff;
+}
+
+.title-accent {
+  color: #ff0080;
+  text-shadow: 0 0 10px #ff0080;
+}
+
+.status-text {
+  color: #00ff88;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.status-pulse {
+  width: 8px;
+  height: 8px;
+  background: #00ff88;
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+  margin-right: 10px;
+}
+
+.formation-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-formation {
+  border-left: 4px solid #00ffff;
+}
+
+.rival-formation {
+  border-left: 4px solid #ff0080;
+}
+
+.formation-badge {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.formation-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+}
+
+.vs-badge {
+  background: linear-gradient(45deg, #ff0080, #00ffff);
+  padding: 10px 15px;
+  border-radius: 50%;
+  font-weight: 900;
+  color: white;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
