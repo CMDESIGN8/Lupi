@@ -1,0 +1,169 @@
+/* ===== CANCHA DE FÚTSAL ===== */
+.futsal-field {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: 
+    linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%),
+    repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.05) 15px, rgba(255,255,255,0.05) 30px);
+  border-radius: 15px;
+  border: 3px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 0 50px rgba(0, 0, 0, 0.4),
+    var(--shadow-md);
+}
+
+.field-grass {
+  position: relative;
+  width: 100%; 
+  height: 100%;
+  background: 
+    linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 51%),
+    radial-gradient(circle at 50% 50%, transparent 70px, rgba(255,255,255,0.3) 70px, rgba(255,255,255,0.3) 72px, transparent 72px);
+}
+
+/* Elementos del campo */
+.center-circle, .center-spot, .penalty-area, .small-area, .goal, .penalty-spot, .second-penalty {
+  position: absolute;
+  border: 3px solid rgba(255,255,255,0.7);
+}
+
+.center-circle { 
+  top: 50%; left: 50%; transform: translate(-50%, -50%); 
+  width: 140px; height: 140px; 
+  border-radius: 50%; 
+}
+
+.center-spot { 
+  top: 50%; left: 50%; transform: translate(-50%, -50%); 
+  width: 12px; height: 12px; 
+  background: rgba(255,255,255,0.8); 
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  border: none;
+}
+
+.penalty-area { 
+  top: 18%; height: 64%; width: 20%; 
+}
+
+.penalty-area.left { 
+  left: 0; border-right: none; 
+  border-top-right-radius: 20px; border-bottom-right-radius: 20px; 
+}
+
+.penalty-area.right { 
+  right: 0; border-left: none; 
+  border-top-left-radius: 20px; border-bottom-left-radius: 20px; 
+}
+
+/* ===== JUGADORES Y BALÓN ===== */
+.player {
+  position: absolute;
+  text-align: center;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.6));
+  transform: translate(-50%, -50%);
+}
+
+.player-icon { 
+  font-size: 2.5rem; 
+  animation: playerPulse 3s infinite;
+}
+
+.player.goalkeeper .player-icon {
+  font-size: 2.2rem;
+}
+
+.player.field-player .player-icon {
+  font-size: 2rem;
+}
+
+.player-name { 
+  margin-top: 0.3rem; 
+  font-weight: 700; 
+  font-size: 0.85rem; 
+  background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(30,41,59,0.9));
+  padding: 0.3rem 0.8rem; 
+  border-radius: 12px; 
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(5px);
+  color: #FFFFFF !important;
+  white-space: nowrap;
+}
+
+.soccer-ball {
+  position: absolute;
+  font-size: 2.2rem;
+  filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.7));
+  z-index: 20;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: ballFloat 4s ease-in-out infinite;
+  transform: translate(-50%, -50%);
+}
+
+/* ===== MENSAJES Y ESTADOS ===== */
+.field-message {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  background: linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9));
+  padding: 3rem 4rem;
+  border-radius: 20px;
+  border: 2px solid rgba(76, 201, 240, 0.3);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.field-message h3 { 
+  margin: 0 0 1.5rem 0; 
+  color: var(--accent-blue); 
+  font-family: 'Orbitron', monospace;
+  font-size: 1.8rem;
+  text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
+}
+
+/* Indicadores de falta */
+.fouls-indicator {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2rem;
+  background: rgba(0,0,0,0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  z-index: 25;
+}
+
+.fouls-user {
+  color: var(--accent-blue);
+}
+
+.fouls-bot {
+  color: #f87171;
+}
+
+/* Posesión en campo */
+.possession-indicator-field {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.7);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  z-index: 25;
+}
