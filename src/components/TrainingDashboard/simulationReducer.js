@@ -135,7 +135,7 @@ export function simulationReducer(state, action) {
         return { ...state, simulating: false };
       }
       
-      const newTime = state.matchTime + 1;
+      const newTime = state.matchTime + 0.5;
       const event = generateMatchEvent(state);
       
       const newStats = JSON.parse(JSON.stringify(state.matchStats));
@@ -158,7 +158,9 @@ export function simulationReducer(state, action) {
         matchStats: newStats
       };
     }
-
+  case 'CHANGE_FORMATION':
+  return { ...state, formation: action.payload };
+      
     case 'CHANGE_SPEED':
       return { ...state, speed: action.payload };
 
@@ -190,5 +192,6 @@ export function simulationReducer(state, action) {
       return state;
   }
 }
+
 
 
