@@ -110,6 +110,8 @@ export const initialState = {
   matchStats: null,
   character: null,
   selectedBot: null,
+  matchId: null, // Guardará el ID de la partida de la DB
+  matchResult: null, // Para mostrar el modal de resultados
 };
 
 export function simulationReducer(state, action) {
@@ -119,11 +121,12 @@ export function simulationReducer(state, action) {
       return {
         ...initialState,
         simulating: true,
-        character,
+        character: { ...action.payload.character, name: action.payload.character.nickname },
         selectedBot: action.payload.selectedBot,
+        matchId: action.payload.matchId, // Guardamos el ID
         matchStats: {
-          user: { goals: 0, shots: 0, tackles: 0, saves: 0, fouls: 0, possession: 50 },
-          bot: { goals: 0, shots: 0, tackles: 0, saves: 0, fouls: 0, possession: 50 },
+          user: { goals: 0, shots: 0, tackles: 0, saves: 0, fouls: 0 },
+          bot: { goals: 0, shots: 0, tackles: 0, saves: 0, fouls: 0 },
         },
       };
 
@@ -165,7 +168,27 @@ export function simulationReducer(state, action) {
     case 'END_MATCH':
       return { ...state, simulating: false };
       
+    // ¡NUEVOS CASOS PARA EL MODAL DE RESULTADOS!
+    case 'SHOW_RESULTS':
+      return {
+        ...state,
+        simulating: false,
+        matchResult: action.payload,
+      };
+      
+    case 'CLOSE_RESULTS':
+      return {
+        ...state,
+        matchResult: null,
+        // Opcional: resetear el estado del partido por completo
+        matchTime: 0,
+        matchEvents: [],
+        matchStats: null,
+      };
+      
     default:
       return state;
   }
 }
+
+
