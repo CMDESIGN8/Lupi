@@ -440,98 +440,242 @@
   50% { transform: translate(-50%, -50%) scale(1.05); }
 }
 
-.pre-match-arena {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border: 2px solid #00ffff;
-  border-radius: 15px;
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-  padding: 20px;
+.pre-match-content {
+  text-align: center;
+  color: #ffffff;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(0, 40, 80, 0.9) 0%, rgba(0, 10, 30, 0.95) 50%),
+    linear-gradient(135deg, #001122 0%, #003366 100%);
+  padding: 60px 50px;
+  border-radius: 25px;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Rajdhani', 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  backdrop-filter: blur(15px);
+  box-shadow:
+    0 0 60px rgba(0, 150, 255, 0.4),
+    inset 0 0 100px rgba(0, 200, 255, 0.1),
+    0 20px 60px rgba(0, 0, 0, 0.8);
 }
 
-.game-title {
-  font-size: 2.5rem;
+/* Borde animado con efecto neón */
+.pre-match-content::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  background: linear-gradient(45deg, 
+    #00ffff, #0080ff, #00ffff, #0080ff, 
+    #00ffff, #0080ff, #00ffff);
+  background-size: 400% 400%;
+  border-radius: 28px;
+  z-index: -1;
+  animation: border-flow 3s ease infinite;
+  filter: blur(8px);
+  opacity: 0.8;
+}
+
+/* Patrón de circuitos en el fondo */
+.pre-match-content::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(0, 255, 255, 0.1) 2px, transparent 2px),
+    radial-gradient(circle at 80% 20%, rgba(0, 128, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, transparent 98%, rgba(0, 255, 255, 0.05) 100%),
+    linear-gradient(0deg, transparent 98%, rgba(0, 128, 255, 0.05) 100%);
+  background-size: 50px 50px, 30px 30px, 20px 20px, 20px 20px;
+  animation: circuit-move 20s linear infinite;
+  pointer-events: none;
+}
+
+.pre-match-content h3 {
+  margin: 0 0 30px 0;
+  font-size: 42px;
   font-weight: 900;
-  text-transform: uppercase;
+  color: #00ffff;
+  text-shadow:
+    0 0 20px rgba(0, 255, 255, 0.8),
+    0 0 40px rgba(0, 255, 255, 0.6),
+    0 0 60px rgba(0, 255, 255, 0.4),
+    0 0 80px rgba(0, 255, 255, 0.2);
+  position: relative;
+  z-index: 2;
   letter-spacing: 3px;
-  color: white;
-  text-shadow: 0 0 10px #00ffff;
+  background: linear-gradient(90deg, #00ffff, #0080ff, #00ffff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 100%;
+  animation: text-shine 2s linear infinite;
 }
 
-.title-accent {
-  color: #ff0080;
-  text-shadow: 0 0 10px #ff0080;
-}
-
-.status-text {
-  color: #00ff88;
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-.status-pulse {
-  width: 8px;
-  height: 8px;
-  background: #00ff88;
-  border-radius: 50%;
-  animation: pulse 1.5s infinite;
-  margin-right: 10px;
-}
-
-.formation-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
-  padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.user-formation {
-  border-left: 4px solid #00ffff;
-}
-
-.rival-formation {
-  border-left: 4px solid #ff0080;
-}
-
-.formation-badge {
-  font-size: 0.8rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.formation-value {
-  font-size: 1.8rem;
+/* Contador de tiempo estilo HUD */
+.pre-match-timer {
+  font-size: 28px;
   font-weight: 700;
-  color: white;
+  color: #00ffff;
+  margin: 25px 0;
+  padding: 15px 30px;
+  background: rgba(0, 40, 80, 0.6);
+  border: 2px solid rgba(0, 255, 255, 0.4);
+  border-radius: 12px;
+  text-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+  box-shadow: 
+    inset 0 0 20px rgba(0, 255, 255, 0.2),
+    0 0 30px rgba(0, 255, 255, 0.3);
+  position: relative;
+  z-index: 2;
+  font-family: 'Orbitron', monospace;
 }
 
-.vs-badge {
-  background: linear-gradient(45deg, #ff0080, #00ffff);
-  padding: 15px;
-  border-radius: 50%;
+/* Stats con diseño de interfaz de juego */
+.pre-match-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 25px;
+  margin: 40px 0;
+  position: relative;
+  z-index: 2;
+}
+
+.stat-item {
+  background: linear-gradient(135deg, 
+    rgba(0, 40, 80, 0.8) 0%, 
+    rgba(0, 20, 40, 0.9) 100%);
+  padding: 20px;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 200, 255, 0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.stat-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s ease;
+}
+
+.stat-item:hover::before {
+  left: 100%;
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0, 255, 255, 0.6);
+  box-shadow: 0 10px 25px rgba(0, 255, 255, 0.3);
+}
+
+.stat-value {
+  font-size: 32px;
   font-weight: 900;
-  color: #fff;
-  font-size: 1.2rem;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 15px rgba(255, 0, 128, 0.5);
-  margin: 0 20px;
-  flex-shrink: 0;
+  color: #00ffff;
+  text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+  font-family: 'Orbitron', monospace;
 }
 
-.tactical-breakdown {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 30px; /* Espacio entre las tarjetas y el badge */
+.stat-label {
+  font-size: 14px;
+  color: #88ffff;
+  opacity: 0.8;
+  margin-top: 8px;
 }
 
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
+/* Barra de progreso estilo gamer */
+.match-loading-bar {
+  height: 8px;
+  background: rgba(0, 40, 80, 0.6);
+  border-radius: 4px;
+  margin: 30px 0;
+  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    #00ffff 0%, 
+    #0080ff 50%, 
+    #00ffff 100%);
+  background-size: 200% 100%;
+  animation: loading-animation 2s linear infinite;
+  border-radius: 4px;
+}
+
+/* Animaciones */
+@keyframes border-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes text-shine {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes circuit-move {
+  0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 50px 50px, 30px 30px, 20px 20px, 20px 20px; }
+}
+
+@keyframes loading-animation {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Efectos de partículas */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: #00ffff;
+  border-radius: 50%;
+  animation: particle-float 6s infinite linear;
+}
+
+@keyframes particle-float {
+  0% { transform: translateY(100%) translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100%) translateX(20px); opacity: 0; }
+}
+
+/* Efecto hover épico */
+.pre-match-content:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    0 0 80px rgba(0, 150, 255, 0.6),
+    inset 0 0 120px rgba(0, 200, 255, 0.15),
+    0 25px 80px rgba(0, 0, 0, 0.9);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
