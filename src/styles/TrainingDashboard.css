@@ -467,11 +467,6 @@
     gap: 1rem;
   }
   
-  .training-dashboard .bots-grid { 
-    grid-template-columns: 1fr; 
-    gap: 1.5rem;
-    padding: 1rem;
-  }
   
   .app-header.professional {
     padding: 1rem 2rem;
@@ -487,15 +482,6 @@
 @media (max-width: 480px) {
   .training-dashboard {
     padding: 0.5rem;
-  }
-  
-  .training-dashboard .bot-card {
-    padding: 1.5rem;
-  }
-  
-  .training-dashboard .play-btn {
-    padding: 1.2rem;
-    font-size: 1.1rem;
   }
   
   .app-header.professional h2 {
