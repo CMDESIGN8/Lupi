@@ -1,4 +1,5 @@
-/* ===== ESTILOS PARA EL MODAL DE RESULTADOS ===== */
+@import './globales.css';/* ===== ESTILOS PARA EL MODAL DE RESULTADOS ===== */
+
 .modal-overlay {
   position: fixed;
   top: 0;
