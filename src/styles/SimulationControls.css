@@ -1,4 +1,5 @@
-/* ===== CONTROLES DE SIMULACIÓN ===== */
+@import './globales.css';/* ===== CONTROLES DE SIMULACIÓN ===== */
+
 .simulation-controls { 
   display: flex; 
   gap: 0.5rem; 
