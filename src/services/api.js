@@ -1,10 +1,28 @@
 const API_URL = "https://lupiback.onrender.com"; // URL del backend desplegado
 
 export const getBots = async () => {
-  const response = await fetch(`${API_URL}/bots`); // ← Agrega /bots
-  if (!response.ok) throw new Error("Error al cargar los bots");
-  const data = await response.json();
-  return data.bots || data; // Por si la respuesta viene directa o en propiedad bots
+  try {
+    console.log('🔍 Fetching bots from:', `${API_URL}/bots`);
+    const response = await fetch(`${API_URL}/bots`);
+    
+    console.log('📊 Response status:', response.status);
+    
+    // Ver el contenido real de la respuesta
+    const text = await response.text();
+    console.log('📄 Raw response:', text.substring(0, 500));
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${text}`);
+    }
+    
+    const data = JSON.parse(text);
+    console.log('✅ Parsed data:', data);
+    return data.bots || data;
+    
+  } catch (error) {
+    console.error('❌ Error in getBots:', error);
+    throw error;
+  }
 };
 
 export const startMatch = async (characterId, botId) => {
