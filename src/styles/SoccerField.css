@@ -508,10 +508,19 @@
 
 .vs-badge {
   background: linear-gradient(45deg, #ff0080, #00ffff);
-  padding: 10px 15px;
+  padding: 15px;
   border-radius: 50%;
   font-weight: 900;
-  color: white;
+  color: #fff;
+  font-size: 1.2rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(255, 0, 128, 0.5);
+  margin: 0 20px;
+  flex-shrink: 0;
 }
 
 @keyframes pulse {
