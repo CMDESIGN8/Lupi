@@ -262,12 +262,6 @@ body {
   margin-top: 1rem;
 }
 
-.stats-grid span {
-  padding: 0.5rem;
-  background: #f8f9fa;
-  border-radius: 3px;
-}
-
 .loading {
   display: flex;
   justify-content: center;
