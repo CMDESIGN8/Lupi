@@ -1,436 +1,362 @@
 /* SoccerField.css */
-.cyberpunk-futsal {
+.soccer-field.futsal-realistic {
   width: 100%;
   height: 100%;
   min-height: 600px;
-  background: #0a0a0a;
+  background: #1a237e;
   position: relative;
   overflow: hidden;
-  border: 3px solid #00ff88;
-  box-shadow: 
-    0 0 30px #00ff88,
-    inset 0 0 30px rgba(0, 255, 136, 0.1);
+  border-radius: 5px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.cyberpunk-field {
+.field-surface {
   width: 100%;
   height: 100%;
   position: relative;
   background: 
-    linear-gradient(45deg, #0a0a0a 25%, transparent 25%),
-    linear-gradient(-45deg, #0a0a0a 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #0a0a0a 75%),
-    linear-gradient(-45deg, transparent 75%, #0a0a0a 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    /* Césped azul */
+    linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  background-blend-mode: overlay;
 }
 
-/* Grid cyberpunk */
-.cyber-grid {
+/* Líneas del campo */
+.field-line {
   position: absolute;
+  background: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+.touch-line {
+  left: 0;
   width: 100%;
+  height: 2px;
+}
+
+.touch-line.top {
+  top: 0;
+}
+
+.touch-line.bottom {
+  bottom: 0;
+}
+
+.goal-line {
+  top: 0;
+  width: 2px;
   height: 100%;
-  background: 
-    linear-gradient(90deg, transparent 99%, rgba(0, 255, 136, 0.1) 99%),
-    linear-gradient(0deg, transparent 99%, rgba(0, 255, 136, 0.1) 99%);
-  background-size: 50px 50px;
-  animation: gridMove 20s linear infinite;
 }
 
-@keyframes gridMove {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
+.goal-line.left {
+  left: 0;
 }
 
-/* Líneas del campo cyberpunk */
-.cyber-center-circle {
+.goal-line.right {
+  right: 0;
+}
+
+.halfway-line {
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 100%;
+  background: #ffffff;
+}
+
+/* Círculo central */
+.center-circle {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 25%;
-  height: 70%;
-  border: 2px solid #00ff88;
+  height: 60%;
+  border: 2px solid #ffffff;
   border-radius: 50%;
-  box-shadow: 0 0 20px #00ff88;
-  opacity: 0.6;
 }
 
-.cyber-center-spot {
+.center-spot {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
-  background: #ff0088;
+  width: 10px;
+  height: 10px;
+  background: #ffffff;
   border-radius: 50%;
-  box-shadow: 0 0 15px #ff0088;
-  animation: pulse 2s infinite;
 }
 
-.cyber-penalty {
+/* Áreas de penal */
+.penalty-area {
   position: absolute;
-  width: 15%;
-  height: 45%;
-  border: 2px solid #00ccff;
-  box-shadow: 0 0 15px #00ccff;
-  opacity: 0.7;
+  width: 12%;
+  height: 40%;
+  border: 2px solid #ffffff;
+  top: 30%;
 }
 
-.cyber-penalty.left {
+.penalty-area.left {
   left: 0;
   border-right: none;
 }
 
-.cyber-penalty.right {
+.penalty-area.right {
   right: 0;
   border-left: none;
 }
 
-.cyber-goal {
+.penalty-spot {
   position: absolute;
-  top: 27.5%;
-  width: 3%;
-  height: 45%;
-  background: linear-gradient(45deg, #ff0088, #cc00ff);
-  border: 1px solid #ff0088;
-  box-shadow: 0 0 20px #ff0088;
+  width: 8px;
+  height: 8px;
+  background: #ffffff;
+  border-radius: 50%;
 }
 
-.cyber-goal.left {
+.penalty-area.left .penalty-spot {
+  right: 15%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.penalty-area.right .penalty-spot {
+  left: 15%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.penalty-arc {
+  position: absolute;
+  width: 8%;
+  height: 20%;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  top: 40%;
+}
+
+.penalty-area.left .penalty-arc {
+  right: -4%;
+  border-left: none;
+}
+
+.penalty-area.right .penalty-arc {
+  left: -4%;
+  border-right: none;
+}
+
+/* Punto de doble penal (6ta falta) */
+.second-penalty-spot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: #ffeb3b;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+}
+
+/* Arcos */
+.goal {
+  position: absolute;
+  top: 40%;
+  width: 2%;
+  height: 20%;
+  background: transparent;
+  border: 2px solid #ffffff;
+}
+
+.goal.left {
   left: 0;
+  border-right: none;
 }
 
-.cyber-goal.right {
+.goal.right {
   right: 0;
+  border-left: none;
 }
 
-/* Jugadores cyberpunk */
-.cyber-player {
+/* Jugadores */
+.player {
   position: absolute;
   width: 50px;
   height: 50px;
   border-radius: 50%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  z-index: 20;
-  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  font-family: Arial, sans-serif;
   transform: translate(-50%, -50%);
+  transition: all 0.8s ease-in-out;
+  z-index: 20;
 }
 
-.player-holo {
+.player.user {
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  border: 2px solid #1b5e20;
+  color: white;
+}
+
+.player.bot {
+  background: linear-gradient(135deg, #f44336, #c62828);
+  border: 2px solid #b71c1c;
+  color: white;
+}
+
+.player.GK {
+  background: linear-gradient(135deg, #ff9800, #ef6c00) !important;
+  border-color: #e65100 !important;
+}
+
+.player.with-ball {
+  border: 3px solid #ffeb3b;
+  box-shadow: 0 0 15px #ffeb3b;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.player-number {
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.player-position {
+  font-size: 8px;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+
+/* Balón */
+.soccer-ball {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 25px;
+  height: 25px;
+  background: white;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, var(--player-glow), transparent, var(--player-glow));
-  opacity: 0.6;
-  animation: rotate 3s linear infinite;
-}
-
-.player-core {
-  position: absolute;
-  width: 70%;
-  height: 70%;
-  border-radius: 50%;
-  background: var(--player-glow);
-  filter: blur(8px);
-  opacity: 0.8;
-}
-
-.player-emoji {
-  position: relative;
-  z-index: 2;
-  filter: drop-shadow(0 0 5px #000);
-}
-
-.player-pulse {
-  position: absolute;
-  width: 120%;
-  height: 120%;
-  border-radius: 50%;
-  border: 2px solid var(--player-glow);
-  opacity: 0;
-  animation: pulse 2s infinite;
-}
-
-.cyber-player.attacking {
-  animation: attackGlow 1.5s ease-in-out infinite;
-}
-
-.cyber-player.defending {
-  animation: defendPulse 2s ease-in-out infinite;
-}
-
-@keyframes attackGlow {
-  0%, 100% { 
-    filter: drop-shadow(0 0 10px var(--player-glow)); 
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% { 
-    filter: drop-shadow(0 0 25px var(--player-glow)); 
-    transform: translate(-50%, -50%) scale(1.1);
-  }
-}
-
-@keyframes defendPulse {
-  0%, 100% { 
-    filter: drop-shadow(0 0 5px var(--player-glow)); 
-  }
-  50% { 
-    filter: drop-shadow(0 0 15px var(--player-glow)); 
-  }
-}
-
-/* Balón cyberpunk */
-.cyber-ball {
-  position: absolute;
-  width: 30px;
-  height: 30px;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  z-index: 30;
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  transform: translate(-50%, -50%);
 }
 
-.ball-core {
+.ball-pattern {
+  width: 80%;
+  height: 80%;
+  background: 
+    radial-gradient(circle at 30% 30%, #000 2px, transparent 2px),
+    radial-gradient(circle at 70% 70%, #000 2px, transparent 2px);
+  border-radius: 50%;
+}
+
+.soccer-ball::before {
+  content: '';
   position: absolute;
   width: 100%;
   height: 100%;
+  border: 1px solid #000;
   border-radius: 50%;
-  background: #ff0088;
-  filter: blur(6px);
-  opacity: 0.8;
+  opacity: 0.3;
 }
 
-.ball-aura {
-  position: absolute;
-  width: 150%;
-  height: 150%;
-  border-radius: 50%;
-  border: 2px solid #00ff88;
-  animation: auraPulse 1.5s ease-in-out infinite;
-}
-
-.cyber-ball.glitching {
-  animation: ballGlitch 0.3s infinite, ballFloat 2s ease-in-out infinite;
-}
-
-@keyframes ballGlitch {
-  0%, 100% { transform: translate(-50%, -50%); }
-  50% { transform: translate(-51%, -49%); }
-}
-
-@keyframes ballFloat {
-  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-  50% { transform: translate(-50%, -52%) rotate(180deg); }
-}
-
-@keyframes auraPulse {
-  0%, 100% { 
-    opacity: 0.5;
-    transform: scale(1);
-  }
-  50% { 
-    opacity: 0.8;
-    transform: scale(1.1);
-  }
-}
-
-/* Trail del balón */
-.ball-trail {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--trail-color);
-  filter: blur(2px);
-  transform: translate(-50%, -50%);
-  z-index: 25;
-}
-
-/* Partículas */
-.cyber-particle {
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  background: var(--particle-color);
-  border-radius: 50%;
-  filter: blur(1px);
-  animation: particleFloat 3s ease-in-out infinite;
-}
-
-@keyframes particleFloat {
-  0%, 100% { 
-    opacity: 0;
-    transform: translateY(0);
-  }
-  50% { 
-    opacity: 1;
-    transform: translateY(-20px);
-  }
-}
-
-/* HUD Cyberpunk */
-.cyber-hud {
+/* Indicador de posesión */
+.possession-indicator {
   position: absolute;
   top: 15px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  gap: 30px;
   background: rgba(0, 0, 0, 0.8);
-  border: 1px solid #00ff88;
+  color: white;
   padding: 10px 20px;
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-  z-index: 40;
-}
-
-.hud-section {
+  border-radius: 20px;
+  font-family: Arial, sans-serif;
   text-align: center;
+  z-index: 40;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.hud-label {
-  font-size: 10px;
-  color: #00ff88;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 4px;
-  font-family: 'Courier New', monospace;
-}
-
-.hud-value {
+.possession-team {
   font-size: 14px;
-  color: #fff;
   font-weight: bold;
-  text-shadow: 0 0 10px currentColor;
-  font-family: 'Courier New', monospace;
+  margin-bottom: 2px;
 }
 
-.hud-value.user { color: #00ff88; }
-.hud-value.bot { color: #ff0088; }
-
-/* Efectos de escaneo */
-.scan-line {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #00ff88, transparent);
-  animation: scan 3s linear infinite;
-  z-index: 35;
+.possession-team.user {
+  color: #4caf50;
 }
 
-.radar-pulse {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  border: 1px solid #00ff88;
-  animation: radar 4s linear infinite;
-  z-index: 5;
+.possession-team.bot {
+  color: #f44336;
 }
 
-@keyframes scan {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(100%); }
-}
-
-@keyframes radar {
-  0% {
-    width: 0;
-    height: 0;
-    opacity: 1;
-  }
-  100% {
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-  }
+.formation-display {
+  font-size: 11px;
+  opacity: 0.8;
 }
 
 /* Mensaje inicial */
-.cyber-message {
+.field-message {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  color: #00ff88;
-  z-index: 40;
+  color: white;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 30px;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.message-glitch {
-  font-size: 2.5em;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  animation: glitch 2s infinite;
-  text-shadow: 
-    0 0 10px #00ff88,
-    0 0 20px #00ff88,
-    0 0 30px #00ff88;
+.field-message h3 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  color: #ffeb3b;
 }
 
-.message-sub {
-  font-size: 1em;
-  margin-top: 10px;
-  opacity: 0.8;
-  font-family: 'Courier New', monospace;
+.field-message p {
+  margin: 0;
+  opacity: 0.9;
 }
 
-.terminal-prompt {
-  font-size: 1.5em;
-  margin-top: 15px;
-  animation: blink 1s infinite;
+/* Efectos de movimiento para jugadores */
+@keyframes playerMove {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+  25% { transform: translate(-50%, -51%) rotate(1deg); }
+  75% { transform: translate(-50%, -49%) rotate(-1deg); }
 }
 
-/* Animaciones generales */
-@keyframes glitch {
-  0%, 100% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-@keyframes rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+.player:not(.GK) {
+  animation: playerMove 3s ease-in-out infinite;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .cyber-hud {
-    flex-direction: column;
-    gap: 10px;
-    top: 10px;
-  }
-  
-  .cyber-player {
+  .player {
     width: 40px;
     height: 40px;
-    font-size: 16px;
+  }
+  
+  .player-number {
+    font-size: 12px;
+  }
+  
+  .player-position {
+    font-size: 7px;
+  }
+  
+  .soccer-ball {
+    width: 20px;
+    height: 20px;
   }
 }
