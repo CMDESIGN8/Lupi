@@ -334,18 +334,56 @@ export const SoccerField = ({ state }) => {
             </div>
           </>
         ) : (
-          <div className="pre-match">
-            <div className="pre-match-content">
-              <h3>FÚTSAL SIMULATOR PRO</h3>
-              <p>Campo listo para el partido</p>
-              <div className="formation-preview">
-                <div className="formation-user">Tu formación: {userFormation}</div>
-                <div className="formation-bot">Rival: {botFormation}</div>
-              </div>
-            </div>
+          <div className="pre-match-arena">
+  <div className="pre-match-overlay">
+    <div className="match-header">
+      <div className="title-container">
+        <h1 className="game-title">FÚTSAL<span className="title-accent">ARENA</span></h1>
+        <div className="match-status">
+          <div className="status-pulse"></div>
+          <span className="status-text">PREPARACIÓN DE BATALLA</span>
+        </div>
+      </div>
+    </div>
+    
+    <div className="arena-display">
+      <div className="stadium-preview">
+        <div className="field-glow"></div>
+        <p className="arena-ready">ARENA SINCRONIZADA</p>
+      </div>
+      
+      <div className="tactical-breakdown">
+        <div className="formation-card user-formation">
+          <div className="formation-badge">TU ESTRATEGIA</div>
+          <div className="formation-display">
+            <span className="formation-value">{userFormation}</span>
+            <div className="formation-type">OFENSIVA</div>
           </div>
+        </div>
+        
+        <div className="vs-badge">
+          <span>VS</span>
+        </div>
+        
+        <div className="formation-card rival-formation">
+          <div className="formation-badge">RIVAL DETECTADO</div>
+          <div className="formation-display">
+            <span className="formation-value">{botFormation}</span>
+            <div className="formation-type">CONTRAATAQUE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div className="match-countdown">
+      <div className="countdown-text">INICIANDO EN...</div>
+      <div className="countdown-timer">3</div>
+    </div>
+  </div>
+</div>
         )}
       </div>
     </div>
   );
 };
+
