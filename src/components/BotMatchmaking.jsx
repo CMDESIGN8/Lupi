@@ -20,7 +20,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
     }
   }, [character]);
 
-  // ✅ ELIMINAMOS EL TIMER AUTOMÁTICO - SOLO SE CIERRA MANUALMENTE
+  // ✅ CONTROL MANUAL DEL RESULTADO - SOLO SE CIERRA CON BOTÓN
   useEffect(() => {
     if (matchResult) {
       console.log("🔄 MatchResult actualizado, mostrando resultado...", matchResult);
@@ -219,7 +219,7 @@ const BotMatchmaking = ({ character, onMatchUpdate }) => {
         />
       )}
       
-      {/* MOSTRAR MatchResult CUANDO HAY RESULTADO - PERMANECE HASTA CERRAR MANUALMENTE */}
+      {/* ✅ MOSTRAR MatchResult CUANDO HAY RESULTADO - PERMANECE HASTA CERRAR MANUALMENTE */}
       {showResult && matchResult && (
         <MatchResult
           result={matchResult}
