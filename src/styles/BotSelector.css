@@ -1,311 +1,146 @@
-/* BotSelector.css - VERSIÓN PREMIUM */
-.panel-content.premium {
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-  min-height: 100vh;
+/* BotSelector.css */
+.bot-card.professional {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  border-radius: 15px;
   padding: 20px;
+  margin: 10px;
+  color: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.bots-header {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.bots-header h2 {
-  color: #fff;
-  font-size: 2.5em;
-  margin-bottom: 10px;
-  text-shadow: 0 0 20px rgba(255,255,255,0.3);
-}
-
-.bots-header p {
-  color: #8892b0;
-  font-size: 1.1em;
-}
-
-.bots-grid.premium {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 25px;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* Tarjetas de bot con diferentes dificultades */
-.bot-card.premium {
-  background: linear-gradient(145deg, #1e1e2e 0%, #2d2d44 100%);
-  border-radius: 20px;
-  padding: 25px;
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  transition: all 0.3s ease;
-}
-
-.bot-card.premium::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #4CAF50, #FF9800, #F44336, #9C27B0);
-}
-
-.bot-card.premium.easy::before { background: #4CAF50; }
-.bot-card.premium.medium::before { background: #FF9800; }
-.bot-card.premium.hard::before { background: #F44336; }
-.bot-card.premium.expert::before { background: #9C27B0; }
-
-.bot-card.premium:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-}
-
-.card-glow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  background: radial-gradient(ellipse at top, rgba(255,255,255,0.1) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.bot-card.premium:hover .card-glow {
-  opacity: 1;
-}
-
-/* Header de la tarjeta */
-.bot-header.premium {
+.bot-header.professional {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
-.avatar-section {
-  position: relative;
+.bot-avatar.professional {
+  font-size: 2.5em;
   margin-right: 15px;
 }
 
-.bot-avatar.premium {
-  font-size: 3em;
-  filter: drop-shadow(0 0 10px currentColor);
+.bot-info.professional h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.2em;
 }
 
-.level-badge {
-  position: absolute;
-  bottom: -5px;
-  right: -5px;
-  background: #ffd700;
-  color: #000;
-  font-size: 0.7em;
+.bot-level {
+  color: #4FC3F7;
   font-weight: bold;
-  padding: 2px 8px;
-  border-radius: 10px;
 }
-
-.bot-info.premium h4 {
-  margin: 0 0 8px 0;
-  font-size: 1.3em;
-  color: #fff;
-}
-
-.difficulty-tag {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 15px;
-  font-size: 0.8em;
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.difficulty-tag.easy { background: #4CAF50; color: white; }
-.difficulty-tag.medium { background: #FF9800; color: white; }
-.difficulty-tag.hard { background: #F44336; color: white; }
-.difficulty-tag.expert { background: #9C27B0; color: white; }
 
 .win-probability {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: 0.9em;
+  color: #FFD54F;
+  margin-top: 5px;
 }
 
-.probability-value {
-  font-size: 1.1em;
-  font-weight: bold;
-  color: #4FC3F7;
-}
-
-.probability-label {
-  font-size: 0.8em;
-  color: #8892b0;
-}
-
-/* Análisis rápido */
-.quick-analysis {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px;
+.bot-section {
   margin: 15px 0;
-  padding: 15px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 12px;
-}
-
-.analysis-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.risk-level {
-  font-weight: bold;
-  padding: 3px 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 8px;
-  font-size: 0.8em;
 }
 
-.risk-level.alto { background: #f44336; color: white; }
-.risk-level.medio { background: #ff9800; color: white; }
-.risk-level.bajo { background: #4caf50; color: white; }
-
-.multiplier {
-  color: #ffd700;
-  font-weight: bold;
+.bot-section h5 {
+  margin: 0 0 10px 0;
+  color: #4FC3F7;
+  font-size: 1em;
 }
 
-/* Recompensas preview */
-.rewards-preview {
+.rewards-list {
   display: flex;
-  gap: 10px;
-  margin: 15px 0;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .reward-item {
-  background: rgba(255,255,255,0.1);
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-size: 0.85em;
+  background: rgba(76, 175, 80, 0.3);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
 }
 
-.reward-item.premium {
-  background: linear-gradient(45deg, #FFD700, #FF6B00);
-  color: #000;
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.skill-tag {
+  background: rgba(156, 39, 176, 0.3);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+}
+
+.stats-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-item label {
+  width: 70px;
+  font-size: 0.8em;
+  color: #BDBDBD;
+}
+
+.stat-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4FC3F7, #29B6F6);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.stat-item span {
+  width: 30px;
+  text-align: right;
+  font-size: 0.8em;
   font-weight: bold;
 }
 
-/* Botones de acción */
-.bot-actions {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.info-btn, .play-btn.premium {
+.play-btn.professional {
+  width: 100%;
   padding: 12px;
+  background: linear-gradient(45deg, #FF4081, #F50057);
+  color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
+  margin-top: 10px;
   transition: all 0.3s ease;
 }
 
-.info-btn {
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-.info-btn:hover {
-  background: rgba(255,255,255,0.2);
-}
-
-.play-btn.premium {
-  color: white;
-  background: linear-gradient(45deg, #4CAF50, #45a049);
-}
-
-.play-btn.premium.medium { background: linear-gradient(45deg, #FF9800, #F57C00); }
-.play-btn.premium.hard { background: linear-gradient(45deg, #F44336, #D32F2F); }
-.play-btn.premium.expert { background: linear-gradient(45deg, #9C27B0, #7B1FA2); }
-
-.play-btn.premium:hover:not(:disabled) {
+.play-btn.professional:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 5px 15px rgba(255, 64, 129, 0.4);
 }
 
-.play-btn.premium:disabled {
-  opacity: 0.6;
+.play-btn.professional:disabled {
+  background: #666;
   cursor: not-allowed;
   transform: none;
 }
 
-/* Modal de detalles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+.bots-grid.professional {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
   padding: 20px;
-}
-
-.bot-details-modal {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border-radius: 20px;
-  max-width: 800px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid rgba(255,255,255,0.1);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 25px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-.modal-header h3 {
-  color: #fff;
-  margin: 0;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.5em;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.modal-content {
-  padding: 25px;
-}
-
-/* Estilos específicos del modal... */
-/* (Los estilos restantes siguen la misma línea premium) */
-
-/* Responsive */
-@media (max-width: 768px) {
-  .bots-grid.premium {
-    grid-template-columns: 1fr;
-  }
-  
-  .bot-details-modal {
-    margin: 10px;
-  }
 }
