@@ -36,13 +36,32 @@ export const startMatch = async (characterId, botId) => {
 };
 
 export const finishMatch = async (matchId, finalScore) => {
-   const response = await fetch(`${API_URL}/bots/${matchId}/finish`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(finalScore),
-  });
-  if (!response.ok) throw new Error("Error al finalizar la partida");
-  return await response.json();
+  try {
+    console.log("📤 Enviando finish match:", { matchId, finalScore });
+    
+    const response = await fetch(`${API_URL}/bots/${matchId}/finish`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(finalScore),
+    });
+    
+    console.log("📥 Respuesta recibida:", response.status);
+    
+    if (!response.ok) {
+      // Intentar obtener más detalles del error
+      const errorText = await response.text();
+      console.error("❌ Error response:", errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+    
+    const result = await response.json();
+    console.log("✅ Finish match exitoso:", result);
+    return result;
+    
+  } catch (error) {
+    console.error("❌ Error en finishMatch:", error);
+    throw error;
+  }
 };
 
 export async function getProfile(userId) {
