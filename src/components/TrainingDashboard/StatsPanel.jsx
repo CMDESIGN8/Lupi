@@ -1,5 +1,6 @@
 // StatsPanel.jsx
 import React from 'react';
+import '../../styles/StatsPanel.css'; // Reutilizamos los estilos
 
 export const StatsPanel = ({ state }) => {
   const { matchStats } = state;
@@ -39,4 +40,5 @@ export const StatsPanel = ({ state }) => {
       </div>
     </div>
   );
+
 };
