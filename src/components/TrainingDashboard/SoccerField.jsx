@@ -339,10 +339,6 @@ export const SoccerField = ({ state }) => {
     <div className="match-header">
       <div className="title-container">
         <h1 className="game-title">FÚTSAL<span className="title-accent">ARENA</span></h1>
-        <div className="match-status">
-          <div className="status-pulse"></div>
-          <span className="status-text">PREPARACIÓN DE BATALLA</span>
-        </div>
       </div>
     </div>
     
@@ -374,11 +370,6 @@ export const SoccerField = ({ state }) => {
         </div>
       </div>
     </div>
-    
-    <div className="match-countdown">
-      <div className="countdown-text">INICIANDO EN...</div>
-      <div className="countdown-timer">3</div>
-    </div>
   </div>
 </div>
         )}
@@ -386,6 +377,7 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
 
 
 
