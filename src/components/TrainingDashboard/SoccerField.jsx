@@ -1,37 +1,8 @@
-// SoccerField.jsx - VERSIÓN MEJORADA
+// SoccerField.jsx
 import React from 'react';
 
 export const SoccerField = ({ state }) => {
-  const { simulating, possession, playerPositions } = state;
-
-  const renderPlayers = (team, isUser) => {
-    if (!playerPositions[team]) return null;
-    
-    return Object.entries(playerPositions[team]).map(([playerId, player], index) => (
-      <div 
-        key={playerId}
-        className={`player ${team} ${player.role} ${possession === team ? 'has-ball' : ''}`}
-        style={{ 
-          left: `${player.position.x}%`, 
-          top: `${player.position.y}%`,
-          animationDelay: `${index * 0.1}s`
-        }}
-      >
-        {getPlayerIcon(player.role, isUser)}
-        <div className="player-role">{player.role}</div>
-      </div>
-    ));
-  };
-
-  const getPlayerIcon = (role, isUser) => {
-    const icons = {
-      portero: '🧤',
-      defensor: isUser ? '🛡️' : '🔵',
-      goleador: isUser ? '⚽' : '🔴',
-      ala: isUser ? '💨' : '🟢'
-    };
-    return icons[role] || (isUser ? '👤' : '🤖');
-  };
+  const { simulating, possession } = state;
 
   return (
     <div className="soccer-field improved futsal-field">
@@ -43,32 +14,18 @@ export const SoccerField = ({ state }) => {
         
         {simulating ? (
           <>
-            {renderPlayers('user', true)}
-            {renderPlayers('bot', false)}
-            
-            <div 
-              className="soccer-ball" 
-              style={{ 
-                top: '50%', 
-                left: possession === 'user' ? '35%' : '65%' 
-              }}
-            >
-              ⚽
-            </div>
-            
+            <div className={`player user ${possession === 'user' ? 'has-ball' : ''}`} style={{ top: '50%', left: '30%' }}>👤</div>
+            <div className={`player bot ${possession === 'bot' ? 'has-ball' : ''}`} style={{ top: '50%', left: '70%' }}>🤖</div>
+            <div className="soccer-ball" style={{ top: '50%', left: possession === 'user' ? '35%' : '65%' }}>⚽</div>
             <div className="possession-indicator-field">
-              Posesión: {possession === 'user' ? state.character.name : state.selectedBot.name}
-            </div>
-
-            <div className="tactic-indicator">
-              Táctica: {state.tactic} | Zona: {state.ballZone}
+                Posesión: {possession === 'user' ? state.character.name : state.selectedBot.name}
             </div>
           </>
         ) : (
-          <div className="field-message improved">
-            <h3>SIMULADOR FÚTSAL PRO v2.0</h3>
-            <p>Elige un oponente y formación para comenzar</p>
-          </div>
+           <div className="field-message improved">
+              <h3>SIMULADOR FÚTSAL PRO</h3>
+              <p>Elige un oponente para comenzar</p>
+            </div>
         )}
       </div>
     </div>
