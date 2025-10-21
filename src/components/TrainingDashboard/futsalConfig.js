@@ -25,14 +25,14 @@ export const MATCH_CONFIG = {
     HIGH: 'high',
     VERY_HIGH: 'very-high'
   },
-  FORMATIONS: {
-    '3-1': '3-1 (Clásica)',
-    '2-2': '2-2 (Cuadrado)',
-    '4-0': '4-0 (Rombo)',
-  },
   TACTICS: {
+    OFFENSIVE: 'offensive',
     DEFENSIVE: 'defensive',
-    BALANCED: 'balanced',
-    OFFENSIVE: 'offensive'
+    BALANCED: 'balanced'
+  },
+  FORMATIONS: {
+    '2-1-1': '2-1-1 (Clásica)',
+    '3-1': '3-1 (Defensiva)',
+    '1-2-1': '1-2-1 (Ofensiva)'
   }
 };
