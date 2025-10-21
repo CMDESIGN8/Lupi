@@ -24,7 +24,7 @@ export const SoccerField = ({ state }) => {
           </>
         ) : (
            <div className="field-message improved">
-              <h3>SIMULADOR FÚTSAL PRO</h3>
+              <h3>SIMULADOR FÚTSAL</h3>
               <p>Elige un oponente para comenzar</p>
             </div>
         )}
@@ -32,4 +32,5 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
 
