@@ -25,21 +25,30 @@ export const Dashboard = ({ user }) => {
     if (user) fetchData(user.id);
   }, [user]);
 
-  const fetchData = async (userId) => {
-    setLoading(true);
-    try {
-      const charData = await getCharacter(userId);
-      if (charData?.id) {
-        setCharacter(charData);
-        const walletData = await getWallet(charData.id);
-        setWallet(walletData);
-      }
-    } catch (error) {
-      console.error("❌ Error cargando datos:", error);
-    } finally {
-      setLoading(false);
+ const fetchData = async (userId) => {
+  setLoading(true);
+  try {
+    const response = await getCharacter(userId);
+    const charData = response?.data; // 👈 Accede a la propiedad correcta
+
+    console.log("🧩 Personaje recibido:", charData);
+
+    if (charData?.id) {
+      setCharacter(charData);
+
+      const walletResponse = await getWallet(charData.id);
+      const walletData = walletResponse?.data || walletResponse;
+      setWallet(walletData);
+    } else {
+      console.warn("⚠️ No se encontró personaje para el usuario.");
     }
-  };
+  } catch (error) {
+    console.error("❌ Error cargando datos:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const increaseStat = async (statKey) => {
     if (!character || character.available_skill_points <= 0) return;
