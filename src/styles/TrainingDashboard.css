@@ -1558,3 +1558,88 @@
 .training-dashboard .probability-fill {
   animation: probabilityPulse 2s ease-in-out infinite;
 }
+
+/* ... (TODO TU CSS ORIGINAL VA AQUÍ) ... */
+
+/* ===== NUEVOS ESTILOS PARA V2.0 ===== */
+
+/* Separador en panel izquierdo */
+.divider {
+  border: none;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+  margin: 1rem 0;
+}
+
+/* Controles Tácticos */
+.tactical-controls {
+  padding: 1rem;
+  text-align: center;
+}
+
+.tactical-controls h4 {
+  margin: 0 0 1rem 0;
+  color: var(--accent-blue);
+  font-family: 'Orbitron', monospace;
+  font-size: 1.1rem;
+}
+
+.tactic-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.tactic-btn {
+  flex: 1;
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 2px solid #475569;
+  background: rgba(30, 41, 59, 0.8);
+  color: #cbd5e1;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tactic-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+}
+
+.tactic-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tactic-btn.active {
+  color: white;
+  box-shadow: 0 0 15px rgba(255,255,255,0.3);
+}
+
+.tactic-btn.defensive.active {
+  background: var(--futsal-blue);
+  border-color: var(--accent-blue);
+}
+
+.tactic-btn.balanced.active {
+  background: var(--accent-purple);
+  border-color: #a78bfa;
+}
+
+.tactic-btn.offensive.active {
+  background: var(--accent-red);
+  border-color: #f87171;
+}
+
+/* Indicador de Posesión en Cancha */
+.player.has-ball {
+  transform: scale(1.2);
+  filter: drop-shadow(0 0 10px yellow);
+}
+
+.soccer-ball {
+  transition: all 0.4s ease-in-out;
+}
