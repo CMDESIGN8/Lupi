@@ -464,11 +464,12 @@
 }
 
 .pre-match-arena {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border: 2px solid #00ffff;
-  border-radius: 15px;
-  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
-  padding: 20px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e82 10%);
+    border: 2px solid #00ffff;
+    border-radius: 15px;
+    box-shadow: 0 0 30px #00ffff4d;
+    padding: 20px;
+    margin-top: 11%;
 }
 
 .game-title {
