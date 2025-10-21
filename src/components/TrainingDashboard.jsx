@@ -2,7 +2,7 @@ import React, { useState, useEffect, useReducer, useCallback } from "react";
 import "../styles/TrainingDashboard.css";
 import { simulationReducer, initialState } from './TrainingDashboard/simulationReducer';
 import { MATCH_CONFIG } from './TrainingDashboard/futsalConfig';
-import * as api from "../services/api"
+import { api } from '../services/api';
 
 import { SimulationControls } from './TrainingDashboard/SimulationControls';
 import { TacticalControls } from './TrainingDashboard/TacticalControls';
