@@ -113,7 +113,6 @@
 }
 
 .training-dashboard .field-grass {
-    position: relative;
     width: 100%;
     height: 100%;
     /* background: linear-gradient(90deg, transparent 49%, rgba(255, 255, 255, .4) 49%, rgba(255, 255, 255, .4) 51%, transparent 51%), radial-gradient(circle at 50% 50%, transparent 70px, rgba(255, 255, 255, .3) 70px, rgba(255, 255, 255, .3) 72px, transparent 72px); */
