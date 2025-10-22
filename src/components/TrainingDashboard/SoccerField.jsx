@@ -329,7 +329,7 @@ export const SoccerField = ({ state }) => {
                 {gameState.action === 'passing' && '⚽ PASE →'}
                 {gameState.action === 'shooting' && '🎯 TIRO A PUERTA!'}
                 {gameState.action === 'dribbling' && '🌀 REGATE'}
-                {gameState.action === 'moving' && '⇄ CIRCULACIÓN'}
+                {gameState.action === 'moving' && '🏃🏼‍♂️ CIRCULACIÓN'}
               </div>
             </div>
           </>
@@ -377,6 +377,7 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
 
 
 
