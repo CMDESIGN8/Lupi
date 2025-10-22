@@ -109,67 +109,68 @@ const TrainingDashboard = ({ character }) => {
       )}
 
      <div className="app-header professional">
-  <div className="header-content">
-    {/* Título Principal */}
-    <div className="header-title">
-      <h1>🥅 FÚTSAL ARENA</h1>
-      <div className="version-badge">v8</div>
-    </div>
-    
-    <div className="header-main">
-      {/* Sección Izquierda: Equipo Local */}
-      <div className="team-section home-team">
-        <div className="team-header">
-          <div className="team-logo">
-            <div className="logo-placeholder">🏆</div>
+  <div className="header-container">
+    <div className="header-content">
+      {/* Título Principal */}
+      <div className="header-title">
+        <h1>🥅 FÚTSAL ARENA</h1>
+      </div>
+      
+      <div className="header-main">
+        {/* Sección Izquierda: Equipo Local */}
+        <div className="team-section home-team">
+          <div className="team-header">
+            <div className="team-logo">
+              <div className="logo-placeholder">🏆</div>
+            </div>
+            <div className="team-details">
+              <div className="team-name">{state.character?.name || 'TU EQUIPO'}</div>
+              <div className="team-fouls">
+                <span className="fouls-label">FALTAS:</span>
+                <span className="fouls-count">{state.fouls?.user || 0}</span>
+                {state.fouls?.user >= 5 && <span className="fouls-warning">⚠️</span>}
+              </div>
+            </div>
           </div>
-          <div className="team-details">
-            <div className="team-name">{state.character?.name || 'TU EQUIPO'}</div>
-            <div className="team-fouls">
-              <span className="fouls-label">FALTAS:</span>
-              <span className="fouls-count">{state.fouls?.user || 0}</span>
-              {state.fouls?.user >= 5 && <span className="fouls-warning">⚠️</span>}
+        </div>
+
+        {/* Sección Central: Marcador y Controles */}
+        <div className="center-section">
+          <div className="score-display">
+            <span className="score-main">
+              {state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}
+            </span>
+          </div>
+          <div className="match-time-display">
+            <div className="time">{state.matchTime || 0}'</div>
+            <div className="phase">
+              {state.matchTime <= 20 ? '1º TIEMPO' : state.matchTime < 40 ? '2º TIEMPO' : 'FINAL'}
+            </div>
+          </div>
+        </div>
+
+        {/* Sección Derecha: Equipo Visitante */}
+        <div className="team-section away-team">
+          <div className="team-header">
+            <div className="team-details">
+              <div className="team-name">{state.selectedBot?.name || 'RIVAL'}</div>
+              <div className="team-fouls">
+                <span className="fouls-label">FALTAS:</span>
+                <span className="fouls-count">{state.fouls?.bot || 0}</span>
+                {state.fouls?.bot >= 5 && <span className="fouls-warning">⚠️</span>}
+              </div>
+            </div>
+            <div className="team-logo">
+              <div className="logo-placeholder">⚽</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Sección Central: Marcador y Controles */}
-      <div className="center-section">
-        <div className="score-display">
-          <span className="score-main">
-            {state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}
-          </span>
-        </div>
-        <div className="match-time-display">
-          <div className="time">{state.matchTime || 0}'</div>
-          <div className="phase">
-            {state.matchTime <= 20 ? '1º TIEMPO' : state.matchTime < 40 ? '2º TIEMPO' : 'FINAL'}
-          </div>
-        </div>
+      {/* Controles de Simulación */}
+      <div className="simulation-controls-header">
+        <SimulationControls state={state} dispatch={dispatch} />
       </div>
-
-      {/* Sección Derecha: Equipo Visitante */}
-      <div className="team-section away-team">
-        <div className="team-header">
-          <div className="team-details">
-            <div className="team-name">{state.selectedBot?.name || 'RIVAL'}</div>
-            <div className="team-fouls">
-              <span className="fouls-label">FALTAS:</span>
-              <span className="fouls-count">{state.fouls?.bot || 0}</span>
-              {state.fouls?.bot >= 5 && <span className="fouls-warning">⚠️</span>}
-            </div>
-          </div>
-          <div className="team-logo">
-            <div className="logo-placeholder">⚽</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {/* Controles de Simulación */}
-    <div className="simulation-controls-header">
-      <SimulationControls state={state} dispatch={dispatch} />
     </div>
   </div>
 </div>
