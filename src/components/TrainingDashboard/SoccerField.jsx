@@ -386,31 +386,6 @@ export const SoccerField = ({ state }) => {
               </div>
             )}
 
-            {/* HUD del partido */}
-            <div className="match-hud">
-              <div className="possession-display">
-                <span className={`team ${possession}`}>
-                  {possession === 'user' ? (state.character?.name || 'TU EQUIPO') : (state.selectedBot?.name || 'RIVAL')}
-                </span>
-                <span className="possession-text"> tiene la posesión</span>
-              </div>
-              
-              {/* CONTADOR DE FALTAS */}
-              <div className="fouls-display">
-                <div className="fouls-counter">
-                  <span className="fouls-label">Faltas:</span>
-                  <span className="fouls-user">{fouls?.user || 0}</span>
-                  <span className="fouls-separator">-</span>
-                  <span className="fouls-bot">{fouls?.bot || 0}</span>
-                </div>
-                {(fouls?.user >= 5 || fouls?.bot >= 5) && (
-                  <div className="double-penalty-warning">
-                    ⚠️ Próxima falta será doble penalti
-                  </div>
-                )}
-              </div>
-            </div>
-
             {/* Indicador de Acción Mejorado */}
             <div className="action-overlay">
               <div className={`action-indicator ${gameState.action}`}>
@@ -476,3 +451,4 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
