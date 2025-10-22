@@ -118,20 +118,34 @@ const TrainingDashboard = ({ character }) => {
     <div className="header-main">
       {/* Resultado con Imágenes/Escudos */}
       <div className="match-result-display">
+        {/* Equipo Local */}
         <div className="team-display home-team">
-          <div className="team-logo">
-            <div className="logo-placeholder">🛡️</div>
+          <div className="team-logo-section">
+            <div className="team-logo">
+              <div className="logo-placeholder">🏆</div>
+            </div>
+            {/* Contador de Faltas del Equipo Local */}
+            <div className="fouls-counter-team">
+              <div className="fouls-label">Faltas</div>
+              <div className="fouls-count">{state.fouls?.user || 0}</div>
+              {state.fouls?.user >= 5 && (
+                <div className="fouls-warning">⚠️</div>
+              )}
+            </div>
           </div>
           <div className="team-info">
             <span className="team-name">{state.character?.name || 'Tu Equipo'}</span>
           </div>
         </div>
         
+        {/* Centro con Marcador y Tiempo */}
         <div className="score-divider">
           <span className="vs-text">VS</span>
-          <span className="score-main">{state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}</span>
+          <span className="score-main">
+            {state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}
+          </span>
           
-          {/* Tiempo del Partido debajo del resultado */}
+          {/* Tiempo del Partido */}
           <div className="match-time-display">
             <div className="time">{state.matchTime || 0}'</div>
             <div className="phase">
@@ -140,12 +154,23 @@ const TrainingDashboard = ({ character }) => {
           </div>
         </div>
         
+        {/* Equipo Visitante */}
         <div className="team-display away-team">
           <div className="team-info">
             <span className="team-name">{state.selectedBot?.name || 'Rival'}</span>
           </div>
-          <div className="team-logo">
-            <div className="logo-placeholder">🛡️</div>
+          <div className="team-logo-section">
+            <div className="team-logo">
+              <div className="logo-placeholder">⚽</div>
+            </div>
+            {/* Contador de Faltas del Equipo Visitante */}
+            <div className="fouls-counter-team">
+              <div className="fouls-label">Faltas</div>
+              <div className="fouls-count">{state.fouls?.bot || 0}</div>
+              {state.fouls?.bot >= 5 && (
+                <div className="fouls-warning">⚠️</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
