@@ -1,4 +1,4 @@
-/* Controles Tácticos - Versión Pantalla Completa */
+/* TacticalControls.css - VERSIÓN MEJORADA */
 .tactical-controls {
   padding: 1.5rem 2rem;
   text-align: center;
@@ -22,38 +22,72 @@
   text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
 }
 
-/* Contenedor principal de tácticas */
 .tactics-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* Formación actual */
-.formation-display {
+/* Control de Formación */
+.formation-controls {
   background: rgba(30, 41, 59, 0.6);
-  padding: 1rem;
+  padding: 1.2rem;
   border-radius: 12px;
   border: 1px solid rgba(56, 189, 248, 0.2);
 }
 
+.formation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
 .formation-label {
   color: #94a3b8;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+  font-weight: 600;
 }
 
 .formation-value {
   color: var(--accent-yellow);
   font-family: 'Orbitron', monospace;
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   font-weight: bold;
   text-shadow: 0 0 8px rgba(234, 179, 8, 0.4);
 }
 
-/* Botones de táctica mejorados */
+.formation-selector {
+  display: flex;
+  justify-content: center;
+}
+
+.formation-dropdown {
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 2px solid #475569;
+  border-radius: 8px;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.formation-dropdown:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+}
+
+.formation-dropdown:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Botones de Táctica */
 .tactic-buttons {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -61,18 +95,22 @@
 }
 
 .tactic-btn {
-  padding: 1.2rem 0.5rem;
-  font-size: 1rem;
-  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.2rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
   border: 2px solid;
   background: rgba(30, 41, 59, 0.9);
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   position: relative;
   overflow: hidden;
+  min-height: 100px;
 }
 
 .tactic-btn::before {
@@ -90,18 +128,41 @@
   left: 100%;
 }
 
-.tactic-btn:hover:not(:disabled) {
+.tactic-btn:hover:not(.disabled) {
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.tactic-btn:disabled {
+.tactic-btn.disabled {
   opacity: 0.4;
   cursor: not-allowed;
   transform: none !important;
 }
 
-/* Estados activos de los botones */
+.tactic-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.tactic-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.tactic-name {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.tactic-short-desc {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  line-height: 1.2;
+}
+
+/* Estados activos */
 .tactic-btn.active {
   color: white;
   box-shadow: 0 0 20px rgba(255,255,255,0.4);
@@ -143,7 +204,6 @@
 
 /* Descripción de táctica */
 .tactic-description {
-  margin-top: 1rem;
   padding: 1rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
@@ -156,11 +216,15 @@
   line-height: 1.4;
   margin: 0;
   font-style: italic;
+  text-align: center;
 }
 
-/* Estado de espera */
+/* Estados del partido */
+.match-status {
+  margin-top: 0.5rem;
+}
+
 .waiting-indicator {
-  margin-top: 1.5rem;
   padding: 1rem;
   background: rgba(234, 179, 8, 0.1);
   border: 1px solid rgba(234, 179, 8, 0.3);
@@ -176,15 +240,42 @@
   text-shadow: 0 0 5px rgba(234, 179, 8, 0.3);
 }
 
-/* Responsive para móviles */
+.active-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 10px;
+}
+
+.active-pulse {
+  width: 12px;
+  height: 12px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.active-text {
+  color: #22c55e;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .tactical-controls {
     padding: 1rem;
     margin: 0.5rem;
-  }
-  
-  .tactical-controls h4 {
-    font-size: 1.1rem;
   }
   
   .tactic-buttons {
@@ -192,12 +283,21 @@
     gap: 0.8rem;
   }
   
+  .formation-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
   .tactic-btn {
+    min-height: 80px;
     padding: 1rem 0.5rem;
+  }
+  
+  .tactic-name {
     font-size: 0.9rem;
   }
   
-  .formation-value {
-    font-size: 1.2rem;
+  .tactic-short-desc {
+    font-size: 0.7rem;
   }
 }
