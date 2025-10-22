@@ -525,10 +525,6 @@ export const SoccerField = ({ state }) => {
         {/* Indicador de Zona del Campo */}
         {simulating && (
           <div className="field-zone-indicator">
-            <div className={`zone-display ${currentZone}`}>
-              ZONA: {currentZone === 'defensive' ? 'DEFENSIVA' : 
-                     currentZone === 'midfield' ? 'MEDIO CAMPO' : 'DE ATAQUE'}
-            </div>
           </div>
         )}
 
@@ -648,12 +644,10 @@ export const SoccerField = ({ state }) => {
             {/* Contador de Faltas */}
             <div className="fouls-counter">
               <div className="fouls-user">
-                <span className="fouls-label">Faltas {character?.name || 'TÚ'}:</span>
-                <span className="fouls-count">{fouls?.user || 0}</span>
+              
               </div>
               <div className="fouls-bot">
-                <span className="fouls-label">Faltas {selectedBot?.name || 'RIVAL'}:</span>
-                <span className="fouls-count">{fouls?.bot || 0}</span>
+               
               </div>
             </div>
           </>
@@ -708,3 +702,4 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
