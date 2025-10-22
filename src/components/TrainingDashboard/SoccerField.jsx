@@ -192,6 +192,15 @@ export const SoccerField = ({ state }) => {
     const { players, ball, action } = currentState;
 
     // PRIMERO: Verificar si hay gol
+   // Simular acción del juego - VERSIÓN CORREGIDA
+  const simulateGameAction = (currentState) => {
+    // Si hay un efecto de gol activo (desde el estado), no hacer nada.
+    // Esto detiene el bucle principal en useEffect.
+    if (goalEffect) return currentState; 
+
+    const { players, ball, action } = currentState;
+
+    // PRIMERO: Verificar si hay gol
     const goalScored = checkForGoal(ball.x, ball.y);
     if (goalScored && !goalProcessed.current) {
       handleGoal(goalScored);
@@ -204,14 +213,7 @@ export const SoccerField = ({ state }) => {
     let newBall = { ...ball };
     let newAction = action;
     let newTargetPlayer = null;
-
-    // PRIMERO: Verificar si hay gol (antes de cualquier movimiento)
-    const goalScored = checkForGoal(ball.x, ball.y);
-    if (goalScored && !goalProcessed.current) {
-      handleGoal(goalScored);
-      return currentState; // Congelar el estado
-    }
-
+    
     // Si el balón está con un jugador
     if (ball.withPlayer) {
       const playerWithBall = players.find(p => p.id === ball.withPlayer);
@@ -485,4 +487,5 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
 
