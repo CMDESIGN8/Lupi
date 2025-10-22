@@ -16,6 +16,7 @@ const TrainingDashboard = ({ character }) => {
   const [state, dispatch] = useReducer(simulationReducer, initialState);
   const [bots, setBots] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { speed, matchTime } = state;
 
   // Cargar los bots desde el backend al montar el componente
   useEffect(() => {
@@ -137,12 +138,17 @@ const TrainingDashboard = ({ character }) => {
             <span className="team-score">{state.matchStats?.bot.goals || 0}</span>
             <span className="team-name">{state.selectedBot?.name || 'Rival'}</span>
           </div>
+          <div className="match-time-display">
+        <div className="time">{matchTime}'</div>
+        <div className="phase">
+          {matchTime <= 20 ? '1º TIEMPO' : matchTime < 40 ? '2º TIEMPO' : 'FINAL'}
+        </div>
+      </div>
           <div className="team-logo">
             <div className="logo-placeholder">⚽</div>
           </div>
         </div>
       </div>
-
       {/* Controles de Simulación */}
       <SimulationControls state={state} dispatch={dispatch} />
     </div>
