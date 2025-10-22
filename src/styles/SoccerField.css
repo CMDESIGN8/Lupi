@@ -270,7 +270,6 @@
 .training-dashboard .free-kick-line {
   position: absolute;
   top: 0;
-  height: 100%;
   width: 2px;
   background: rgba(255,255,255,0.4);
 }
