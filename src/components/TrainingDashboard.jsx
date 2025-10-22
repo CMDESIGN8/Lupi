@@ -120,11 +120,10 @@ const TrainingDashboard = ({ character }) => {
       <div className="match-result-display">
         <div className="team-display home-team">
           <div className="team-logo">
-            <div className="logo-placeholder">🏆</div>
+            <div className="logo-placeholder">🛡️</div>
           </div>
           <div className="team-info">
             <span className="team-name">{state.character?.name || 'Tu Equipo'}</span>
-            <span className="team-score">{state.matchStats?.user.goals || 0}</span>
           </div>
         </div>
         
@@ -143,11 +142,10 @@ const TrainingDashboard = ({ character }) => {
         
         <div className="team-display away-team">
           <div className="team-info">
-            <span className="team-score">{state.matchStats?.bot.goals || 0}</span>
             <span className="team-name">{state.selectedBot?.name || 'Rival'}</span>
           </div>
           <div className="team-logo">
-            <div className="logo-placeholder">⚽</div>
+            <div className="logo-placeholder">🛡️</div>
           </div>
         </div>
       </div>
