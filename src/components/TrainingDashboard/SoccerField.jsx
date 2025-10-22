@@ -1,4 +1,4 @@
-// SoccerField.jsx - VERSIÓN CON POSICIÓN DE BALÓN SINCRONIZADA
+// SoccerField.jsx - VERSIÓN CORREGIDA PARA SAQUE DE CENTRO DESPUÉS DEL GOL
 import React, { useState, useEffect, useRef } from 'react';
 import "../../styles/SoccerField.css";
 
@@ -10,7 +10,9 @@ export const SoccerField = ({ state }) => {
     botFormation = '2-1-1', 
     matchEvents = [], 
     fouls,
-    score 
+    matchStats,
+    character,
+    selectedBot
   } = state;
   
   const [gameState, setGameState] = useState({
@@ -20,137 +22,322 @@ export const SoccerField = ({ state }) => {
     targetPlayer: null
   });
   
-  // Estados para efectos
+  // Estados para efectos mejorados
   const [goalEffect, setGoalEffect] = useState(null);
+  const [doublePenaltyEffect, setDoublePenaltyEffect] = useState(false);
   const [lastGoalTeam, setLastGoalTeam] = useState(null);
+  const [currentZone, setCurrentZone] = useState('midfield');
+  
   const lastProcessedEvent = useRef(null);
   const lastScore = useRef({ user: 0, bot: 0 });
+  const gameIntervalRef = useRef(null);
+  const isResettingAfterGoal = useRef(false);
 
-  // Configuración inicial de jugadores
+  // Configuración inicial de jugadores MEJORADA con formaciones
   const initializePlayers = () => {
-    const userPlayers = [
-      { id: 'user-gk', team: 'user', position: 'GK', x: 8, y: 50, number: '1', name: 'PORTERO', hasBall: false },
-      { id: 'user-df1', team: 'user', position: 'DF', x: 25, y: 30, number: '2', name: 'DEFENSA', hasBall: false },
-      { id: 'user-df2', team: 'user', position: 'DF', x: 25, y: 70, number: '3', name: 'DEFENSA', hasBall: false },
-      { id: 'user-mf', team: 'user', position: 'MF', x: 45, y: 50, number: '4', name: 'MEDIO', hasBall: false },
-      { id: 'user-fw', team: 'user', position: 'FW', x: 65, y: 50, number: '5', name: 'DELANTERO', hasBall: possession === 'user' }
-    ];
+    const getFormationPositions = (formation, isUser) => {
+      const formations = {
+        '2-1-1': [
+          { position: 'GK', x: isUser ? 8 : 92, y: 50 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 30 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 70 },
+          { position: 'MF', x: isUser ? 45 : 55, y: 50 },
+          { position: 'FW', x: isUser ? 65 : 35, y: 50 }
+        ],
+        '3-1': [
+          { position: 'GK', x: isUser ? 8 : 92, y: 50 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 20 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 50 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 80 },
+          { position: 'FW', x: isUser ? 65 : 35, y: 50 }
+        ],
+        '1-2-1': [
+          { position: 'GK', x: isUser ? 8 : 92, y: 50 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 50 },
+          { position: 'MF', x: isUser ? 45 : 55, y: 30 },
+          { position: 'MF', x: isUser ? 45 : 55, y: 70 },
+          { position: 'FW', x: isUser ? 65 : 35, y: 50 }
+        ],
+        '2-2': [
+          { position: 'GK', x: isUser ? 8 : 92, y: 50 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 30 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 70 },
+          { position: 'MF', x: isUser ? 45 : 55, y: 30 },
+          { position: 'MF', x: isUser ? 45 : 55, y: 70 }
+        ],
+        '1-3': [
+          { position: 'GK', x: isUser ? 8 : 92, y: 50 },
+          { position: 'DF', x: isUser ? 25 : 75, y: 50 },
+          { position: 'MF', x: isUser ? 45 : 55, y: 25 },
+          { position: 'MF', x: isUser ? 45 : 55, y: 50 },
+          { position: 'MF', x: isUser ? 45 : 55, y: 75 }
+        ]
+      };
 
-    const botPlayers = [
-      { id: 'bot-gk', team: 'bot', position: 'GK', x: 92, y: 50, number: '1', name: 'PORTERO', hasBall: false },
-      { id: 'bot-df1', team: 'bot', position: 'DF', x: 75, y: 30, number: '2', name: 'DEFENSA', hasBall: false },
-      { id: 'bot-df2', team: 'bot', position: 'DF', x: 75, y: 70, number: '3', name: 'DEFENSA', hasBall: false },
-      { id: 'bot-mf', team: 'bot', position: 'MF', x: 55, y: 50, number: '4', name: 'MEDIO', hasBall: false },
-      { id: 'bot-fw', team: 'bot', position: 'FW', x: 35, y: 50, number: '5', name: 'DELANTERO', hasBall: possession === 'bot' }
-    ];
+      return formations[formation] || formations['2-1-1'];
+    };
+
+    const userPositions = getFormationPositions(userFormation, true);
+    const botPositions = getFormationPositions(botFormation, false);
+
+    const userPlayers = userPositions.map((pos, index) => ({
+      id: `user-${pos.position.toLowerCase()}${index}`,
+      team: 'user',
+      position: pos.position,
+      x: pos.x,
+      y: pos.y,
+      number: (index + 1).toString(),
+      name: pos.position,
+      hasBall: false // Inicialmente sin balón
+    }));
+
+    const botPlayers = botPositions.map((pos, index) => ({
+      id: `bot-${pos.position.toLowerCase()}${index}`,
+      team: 'bot',
+      position: pos.position,
+      x: pos.x,
+      y: pos.y,
+      number: (index + 1).toString(),
+      name: pos.position,
+      hasBall: false // Inicialmente sin balón
+    }));
 
     return [...userPlayers, ...botPlayers];
   };
 
-  // Sincronizar con eventos del backend - VERSIÓN MEJORADA
+  // Función para configurar el saque de centro después de un gol
+  const setupKickoffAfterGoal = (scoringTeam) => {
+    const players = initializePlayers();
+    
+    // El equipo que recibió el gol saca del centro
+    const kickoffTeam = scoringTeam === 'user' ? 'bot' : 'user';
+    
+    // Encontrar el delantero del equipo que saca
+    const kickoffPlayer = players.find(player => 
+      player.team === kickoffTeam && player.position === 'FW'
+    );
+
+    if (kickoffPlayer) {
+      // Posicionar el balón en el centro con el delantero que saca
+      const newState = {
+        players: players.map(player => ({
+          ...player,
+          hasBall: player.id === kickoffPlayer.id
+        })),
+        ball: { 
+          x: 50, 
+          y: 50, 
+          withPlayer: kickoffPlayer.id 
+        },
+        action: 'moving',
+        targetPlayer: null
+      };
+      
+      setGameState(newState);
+      updateBallStyle(newState.ball);
+      console.log(`🔄 Saque de centro: ${kickoffTeam} inicia con la posesión`);
+    }
+  };
+
+  // Función para actualizar las propiedades CSS del balón
+  const updateBallStyle = (ball) => {
+    const ballElement = document.querySelector('.soccer-ball');
+    if (ballElement) {
+      ballElement.style.setProperty('--ball-x', `${ball.x}%`);
+      ballElement.style.setProperty('--ball-y', `${ball.y}%`);
+    }
+  };
+
+  // Sincronizar con eventos del backend
   useEffect(() => {
     if (!simulating || !matchEvents || matchEvents.length === 0) return;
 
     const latestEvent = matchEvents[0];
     
-    // Evitar procesar el mismo evento múltiples veces
     if (lastProcessedEvent.current === latestEvent.id) return;
     
     lastProcessedEvent.current = latestEvent.id;
 
-    // Manejar evento de GOL - CON POSICIÓN CORRECTA DEL BALÓN
-    if (latestEvent.type === 'goal') {
-      const scoringTeam = latestEvent.team;
-      console.log(`⚽ GOL REAL de ${scoringTeam} - Posicionando balón en portería correcta`);
+    // Actualizar zona del campo basado en el evento
+    if (latestEvent.fieldZone) {
+      setCurrentZone(latestEvent.fieldZone);
+    }
+
+    // Manejar DOBLE PENALTI
+    if (latestEvent.type === 'double_penalty') {
+      console.log(`🎯 DOBLE PENALTI detectado`);
       
-      // POSICIONAR EL BALÓN EN LA PORTERÍA CORRESPONDIENTE
-      let goalBallPosition;
-      if (scoringTeam === 'user') {
-        // Gol de USER = balón en portería DERECHA (bot)
-        goalBallPosition = { x: 98, y: 45 + Math.random() * 10 };
-      } else {
-        // Gol de BOT = balón en portería IZQUIERDA (user)  
-        goalBallPosition = { x: 2, y: 45 + Math.random() * 10 };
-      }
+      setDoublePenaltyEffect(true);
+      const newState = {
+        ...gameState,
+        action: 'double_penalty',
+        ball: { x: 50, y: 38, withPlayer: null }
+      };
+      setGameState(newState);
+      updateBallStyle(newState.ball);
 
-      // Actualizar estado visual inmediatamente
-      setGameState(prev => ({
-        ...prev,
-        ball: { ...prev.ball, ...goalBallPosition, withPlayer: null },
-        action: 'shooting'
-      }));
-
-      // Pequeño delay para que se vea el balón en la portería antes del efecto
       setTimeout(() => {
-        setGoalEffect('active');
-        setLastGoalTeam(scoringTeam);
-      }, 100);
+        if (latestEvent.isGoal) {
+          setGoalEffect('active');
+          setLastGoalTeam(latestEvent.team);
+        }
+        setDoublePenaltyEffect(false);
+      }, 1500);
 
-      // Resetear después del efecto
       setTimeout(() => {
         setGoalEffect(null);
-        // Saque de centro del equipo que recibió el gol
-        setGameState(prev => ({
-          ...prev,
-          players: initializePlayers(),
-          ball: { x: 50, y: 50, withPlayer: scoringTeam === 'user' ? 'bot-fw' : 'user-fw' },
-          action: 'moving'
-        }));
+        setupKickoffAfterGoal(latestEvent.team);
+      }, 3000);
+    }
+
+    // Manejar evento de GOL - CORREGIDO
+    else if (latestEvent.type === 'goal') {
+      const scoringTeam = latestEvent.team;
+      console.log(`⚽ GOL de ${scoringTeam}`);
+      
+      let goalBallPosition;
+      if (scoringTeam === 'user') {
+        goalBallPosition = { x: 95, y: 45 + Math.random() * 10 };
+      } else {
+        goalBallPosition = { x: 5, y: 45 + Math.random() * 10 };
+      }
+
+      // Mostrar efecto de gol inmediatamente
+      setGoalEffect('active');
+      setLastGoalTeam(scoringTeam);
+      
+      // Posicionar balón en la portería
+      const newState = {
+        ...gameState,
+        ball: { ...goalBallPosition, withPlayer: null },
+        action: 'shooting'
+      };
+      setGameState(newState);
+      updateBallStyle(newState.ball);
+
+      // Después del efecto de gol, configurar saque de centro
+      setTimeout(() => {
+        setGoalEffect(null);
+        isResettingAfterGoal.current = true;
+        
+        // Pequeña pausa antes del saque
+        setTimeout(() => {
+          setupKickoffAfterGoal(scoringTeam);
+          isResettingAfterGoal.current = false;
+        }, 500);
+        
       }, 2500);
     }
 
     // Manejar otros eventos
-    if (latestEvent.type === 'foul' || latestEvent.type === 'double_penalty') {
+    else if (latestEvent.type === 'foul') {
+      const newState = {
+        ...gameState,
+        action: 'foul',
+        ball: { 
+          x: latestEvent.team === 'user' ? 35 : 65, 
+          y: 30 + Math.random() * 40, 
+          withPlayer: null 
+        }
+      };
+      setGameState(newState);
+      updateBallStyle(newState.ball);
+
+      setTimeout(() => {
+        setGameState(prev => ({
+          ...prev,
+          action: 'moving'
+        }));
+      }, 1000);
+    }
+    else if (latestEvent.type === 'dribble') {
       setGameState(prev => ({
         ...prev,
-        action: latestEvent.type === 'double_penalty' ? 'double_penalty' : 'moving'
+        action: 'dribbling'
       }));
+
+      setTimeout(() => {
+        setGameState(prev => ({
+          ...prev,
+          action: 'moving'
+        }));
+      }, 800);
+    }
+    else if (latestEvent.type === 'tackle') {
+      setGameState(prev => ({
+        ...prev,
+        action: 'tackle'
+      }));
+
+      setTimeout(() => {
+        setGameState(prev => ({
+          ...prev,
+          action: 'moving'
+        }));
+      }, 800);
     }
 
-  }, [matchEvents, simulating]);
+  }, [matchEvents, simulating, userFormation, botFormation, possession]);
 
-  // También verificar cambios en el marcador - VERSIÓN MEJORADA
+  // Verificar cambios en el marcador - CORREGIDO
   useEffect(() => {
-    if (score && simulating) {
-      // Detectar si hubo un gol comparando con el marcador anterior
-      if (score.user > lastScore.current.user) {
-        console.log("📈 Gol de USER detectado por cambio de marcador - Posicionando balón");
+    if (matchStats && simulating && !isResettingAfterGoal.current) {
+      const currentUserGoals = matchStats.user?.goals || 0;
+      const currentBotGoals = matchStats.bot?.goals || 0;
+      
+      if (currentUserGoals > lastScore.current.user) {
+        console.log("📈 Gol de USER detectado por cambio de marcador");
+        setGoalEffect('active');
+        setLastGoalTeam('user');
         
-        // Posicionar balón en portería de BOT (gol de user)
-        setGameState(prev => ({
-          ...prev,
-          ball: { ...prev.ball, x: 98, y: 45 + Math.random() * 10, withPlayer: null },
+        // Posicionar balón en portería rival
+        const goalState = {
+          ...gameState,
+          ball: { x: 95, y: 45 + Math.random() * 10, withPlayer: null },
           action: 'shooting'
-        }));
-
+        };
+        setGameState(goalState);
+        updateBallStyle(goalState.ball);
+        
         setTimeout(() => {
-          setGoalEffect('active');
-          setLastGoalTeam('user');
-        }, 100);
-
-        setTimeout(() => setGoalEffect(null), 2500);
+          setGoalEffect(null);
+          isResettingAfterGoal.current = true;
+          setTimeout(() => {
+            setupKickoffAfterGoal('user');
+            isResettingAfterGoal.current = false;
+          }, 500);
+        }, 2500);
         
-      } else if (score.bot > lastScore.current.bot) {
-        console.log("📈 Gol de BOT detectado por cambio de marcador - Posicionando balón");
+      } else if (currentBotGoals > lastScore.current.bot) {
+        console.log("📈 Gol de BOT detectado por cambio de marcador");
+        setGoalEffect('active');
+        setLastGoalTeam('bot');
         
-        // Posicionar balón en portería de USER (gol de bot)
-        setGameState(prev => ({
-          ...prev,
-          ball: { ...prev.ball, x: 2, y: 45 + Math.random() * 10, withPlayer: null },
+        // Posicionar balón en portería rival
+        const goalState = {
+          ...gameState,
+          ball: { x: 5, y: 45 + Math.random() * 10, withPlayer: null },
           action: 'shooting'
-        }));
-
+        };
+        setGameState(goalState);
+        updateBallStyle(goalState.ball);
+        
         setTimeout(() => {
-          setGoalEffect('active');
-          setLastGoalTeam('bot');
-        }, 100);
-
-        setTimeout(() => setGoalEffect(null), 2500);
+          setGoalEffect(null);
+          isResettingAfterGoal.current = true;
+          setTimeout(() => {
+            setupKickoffAfterGoal('bot');
+            isResettingAfterGoal.current = false;
+          }, 500);
+        }, 2500);
       }
       
-      lastScore.current = { ...score };
+      lastScore.current = { 
+        user: currentUserGoals, 
+        bot: currentBotGoals 
+      };
     }
-  }, [score, simulating]);
+  }, [matchStats, simulating]);
 
   // Encontrar jugador más cercano al balón
   const findClosestPlayer = (ballX, ballY, players) => {
@@ -159,8 +346,10 @@ export const SoccerField = ({ state }) => {
 
     players.forEach(player => {
       const distance = Math.sqrt(Math.pow(player.x - ballX, 2) + Math.pow(player.y - ballY, 2));
-      if (distance < minDistance) {
-        minDistance = distance;
+      const adjustedDistance = player.team === possession ? distance * 0.8 : distance;
+      
+      if (adjustedDistance < minDistance) {
+        minDistance = adjustedDistance;
         closestPlayer = player;
       }
     });
@@ -174,19 +363,19 @@ export const SoccerField = ({ state }) => {
       p.team === currentPlayer.team && p.id !== currentPlayer.id
     );
 
+    if (teammates.length === 0) return null;
+
     const sortedTeammates = teammates.sort((a, b) => {
-      if (currentPlayer.team === 'user') {
-        return b.x - a.x;
-      } else {
-        return a.x - b.x;
-      }
+      const aScore = (currentPlayer.team === 'user' ? a.x : 100 - a.x) + (50 - Math.abs(a.y - 50));
+      const bScore = (currentPlayer.team === 'user' ? b.x : 100 - b.x) + (50 - Math.abs(b.y - 50));
+      return bScore - aScore;
     });
 
     return sortedTeammates[0];
   };
 
   // Mover jugadores de forma inteligente
-  const updatePlayerPositions = (players, ball, possession) => {
+  const updatePlayerPositions = (players, ball, possession, zone) => {
     return players.map(player => {
       let targetX = player.x;
       let targetY = player.y;
@@ -198,16 +387,31 @@ export const SoccerField = ({ state }) => {
             targetY = 50;
             break;
           case 'DF':
-            targetX = player.team === 'user' ? 25 : 75;
-            targetY = player.y;
-            if (Math.random() > 0.7) targetY = 30 + Math.random() * 40;
+            if (zone === 'defensive') {
+              targetX = player.team === 'user' ? 20 : 80;
+            } else if (zone === 'attacking') {
+              targetX = player.team === 'user' ? 40 : 60;
+            } else {
+              targetX = player.team === 'user' ? 30 : 70;
+            }
+            targetY = player.y + (Math.random() - 0.5) * 20;
             break;
           case 'MF':
-            targetX = player.team === 'user' ? 45 : 55;
+            if (zone === 'defensive') {
+              targetX = player.team === 'user' ? 35 : 65;
+            } else if (zone === 'attacking') {
+              targetX = player.team === 'user' ? 60 : 40;
+            } else {
+              targetX = player.team === 'user' ? 45 : 55;
+            }
             targetY = 20 + Math.random() * 60;
             break;
           case 'FW':
-            targetX = player.team === 'user' ? 65 : 35;
+            if (zone === 'attacking') {
+              targetX = player.team === 'user' ? 75 : 25;
+            } else {
+              targetX = player.team === 'user' ? 65 : 35;
+            }
             targetY = 30 + Math.random() * 40;
             break;
         }
@@ -215,24 +419,33 @@ export const SoccerField = ({ state }) => {
         switch (player.position) {
           case 'GK':
             targetX = player.team === 'user' ? 8 : 92;
-            targetY = 50;
+            targetY = ball.y;
             break;
           case 'DF':
-            targetX = player.team === 'user' ? 30 : 70;
-            targetY = ball.y;
+            targetX = player.team === 'user' ? 
+              Math.max(20, ball.x - 15) : 
+              Math.min(80, ball.x + 15);
+            targetY = ball.y + (Math.random() - 0.5) * 10;
             break;
           case 'MF':
-            targetX = player.team === 'user' ? 40 : 60;
-            targetY = ball.y;
+            targetX = player.team === 'user' ? 
+              Math.max(30, ball.x - 10) : 
+              Math.min(70, ball.x + 10);
+            targetY = ball.y + (Math.random() - 0.5) * 15;
             break;
           case 'FW':
-            targetX = player.team === 'user' ? 55 : 45;
+            targetX = player.team === 'user' ? 
+              Math.max(40, ball.x - 5) : 
+              Math.min(60, ball.x + 5);
             targetY = ball.y;
             break;
         }
       }
 
-      const speed = 0.8;
+      targetX = Math.max(5, Math.min(95, targetX));
+      targetY = Math.max(10, Math.min(90, targetY));
+
+      const speed = 0.6 + Math.random() * 0.4;
       const newX = player.x + (targetX - player.x) * speed;
       const newY = player.y + (targetY - player.y) * speed;
 
@@ -245,80 +458,111 @@ export const SoccerField = ({ state }) => {
     });
   };
 
-  // Simulación visual solamente (sin lógica de gol)
+  // Simulación visual MEJORADA con verificación de estado
   const simulateVisualAction = (currentState) => {
-    if (goalEffect) return currentState; // Pausar durante efecto de gol
+    if (goalEffect || doublePenaltyEffect || isResettingAfterGoal.current) {
+      return currentState;
+    }
 
     const { players, ball, action } = currentState;
     
+    // Verificar que el estado sea válido
+    if (!players || players.length === 0) {
+      console.log('⚠️ No hay jugadores, reiniciando...');
+      const initialState = {
+        players: initializePlayers(),
+        ball: { x: 50, y: 50, withPlayer: possession === 'user' ? 'user-fw0' : 'bot-fw0' },
+        action: 'moving',
+        targetPlayer: null
+      };
+      return initialState;
+    }
+
     let newBall = { ...ball };
     let newAction = action;
     let newTargetPlayer = null;
 
-    // Solo simulación visual - EVITAR que el balón entre en porterías
+    // Si el balón está con un jugador
     if (ball.withPlayer) {
       const playerWithBall = players.find(p => p.id === ball.withPlayer);
       
       if (playerWithBall) {
         const actionRoll = Math.random();
         
-        if (actionRoll < 0.6) {
+        if (actionRoll < 0.5) {
           // Pasar
           newAction = 'passing';
           const teammate = findTeammateForPass(playerWithBall, players);
-          if (teammate) {
+          if (teammate && Math.random() < 0.8) {
             newTargetPlayer = teammate.id;
             newBall.x = teammate.x;
             newBall.y = teammate.y;
             newBall.withPlayer = null;
-          }
-        } else if (actionRoll < 0.85) {
-          // Driblar - CON LÍMITES PARA EVITAR PORTERÍAS
-          newAction = 'dribbling';
-          if (playerWithBall.team === 'user') {
-            newBall.x = Math.min(88, playerWithBall.x + 6); // No llegar a portería
           } else {
-            newBall.x = Math.max(12, playerWithBall.x - 6); // No llegar a portería
+            newBall.x = playerWithBall.x + (Math.random() - 0.5) * 30;
+            newBall.y = playerWithBall.y + (Math.random() - 0.5) * 20;
+            newBall.withPlayer = null;
           }
-          newBall.y = Math.max(15, Math.min(85, playerWithBall.y + (Math.random() - 0.5) * 12));
+        } else if (actionRoll < 0.8) {
+          // Driblar
+          newAction = 'dribbling';
+          const dribbleDistance = 8 + Math.random() * 12;
+          if (playerWithBall.team === 'user') {
+            newBall.x = Math.min(90, playerWithBall.x + dribbleDistance);
+          } else {
+            newBall.x = Math.max(10, playerWithBall.x - dribbleDistance);
+          }
+          newBall.y = Math.max(15, Math.min(85, playerWithBall.y + (Math.random() - 0.5) * 15));
           newBall.withPlayer = null;
         } else {
-          // Tirar - PERO DETENERSE ANTES DE LA PORTERÍA
+          // Tirar
           newAction = 'shooting';
           const isUser = playerWithBall.team === 'user';
-          // Detener el tiro antes de la línea de gol (85% o 15%)
-          const shotX = isUser ? 85 + Math.random() * 8 : 7 + Math.random() * 8;
-          const shotY = 40 + Math.random() * 20;
+          const shotX = isUser ? 85 + Math.random() * 10 : 5 + Math.random() * 10;
+          const shotY = 35 + Math.random() * 30;
           
           newBall.x = shotX;
           newBall.y = shotY;
           newBall.withPlayer = null;
         }
+      } else {
+        // Jugador con balón no encontrado, liberar balón
+        newBall.withPlayer = null;
+        newAction = 'moving';
       }
     } else {
-      // Balón suelto - EVITAR que entre en porterías
+      // Balón suelto
       newAction = 'moving';
       const closestPlayer = findClosestPlayer(ball.x, ball.y, players);
+      
       if (closestPlayer) {
         const distance = Math.sqrt(
           Math.pow(closestPlayer.x - ball.x, 2) + 
           Math.pow(closestPlayer.y - ball.y, 2)
         );
         
-        if (distance < 8) {
+        if (distance < 12) {
           newBall.withPlayer = closestPlayer.id;
           newBall.x = closestPlayer.x;
           newBall.y = closestPlayer.y;
         } else {
-          const speed = 0.6;
+          const speed = 0.8;
           newBall.x = ball.x + (closestPlayer.x - ball.x) * speed;
           newBall.y = ball.y + (closestPlayer.y - ball.y) * speed;
+          newBall.x += (Math.random() - 0.5) * 4;
+          newBall.y += (Math.random() - 0.5) * 3;
         }
+      } else {
+        newBall.x += (Math.random() - 0.5) * 8;
+        newBall.y += (Math.random() - 0.5) * 6;
       }
     }
 
+    newBall.x = Math.max(2, Math.min(98, newBall.x));
+    newBall.y = Math.max(5, Math.min(95, newBall.y));
+
     return {
-      players: updatePlayerPositions(players, newBall, possession),
+      players: updatePlayerPositions(players, newBall, possession, currentZone),
       ball: newBall,
       action: newAction,
       targetPlayer: newTargetPlayer
@@ -327,28 +571,53 @@ export const SoccerField = ({ state }) => {
 
   // Efecto principal de simulación visual
   useEffect(() => {
-    if (simulating && !goalEffect) {
-      const gameInterval = setInterval(() => {
-        setGameState(prev => {
-          if (prev.players.length === 0) {
-            return {
-              players: initializePlayers(),
-              ball: { x: 50, y: 50, withPlayer: possession === 'user' ? 'user-fw' : 'bot-fw' },
-              action: 'moving',
-              targetPlayer: null
-            };
-          }
-          return simulateVisualAction(prev);
-        });
-      }, 400);
+    if (simulating && !goalEffect && !doublePenaltyEffect && !isResettingAfterGoal.current) {
+      if (gameIntervalRef.current) {
+        clearInterval(gameIntervalRef.current);
+      }
 
-      return () => clearInterval(gameInterval);
+      // Verificar e inicializar estado si es necesario
+      if (gameState.players.length === 0) {
+        const initialState = {
+          players: initializePlayers(),
+          ball: { x: 50, y: 50, withPlayer: possession === 'user' ? 'user-fw0' : 'bot-fw0' },
+          action: 'moving',
+          targetPlayer: null
+        };
+        setGameState(initialState);
+        updateBallStyle(initialState.ball);
+      }
+
+      gameIntervalRef.current = setInterval(() => {
+        setGameState(prev => {
+          const newState = simulateVisualAction(prev);
+          updateBallStyle(newState.ball);
+          return newState;
+        });
+      }, 350);
+
+      return () => {
+        if (gameIntervalRef.current) {
+          clearInterval(gameIntervalRef.current);
+          gameIntervalRef.current = null;
+        }
+      };
     }
-  }, [simulating, possession, goalEffect]);
+  }, [simulating, possession, goalEffect, doublePenaltyEffect, userFormation, botFormation, currentZone]);
+
+  // Actualizar CSS cuando cambia el estado del balón
+  useEffect(() => {
+    updateBallStyle(gameState.ball);
+  }, [gameState.ball]);
 
   // Reiniciar cuando para la simulación
   useEffect(() => {
     if (!simulating) {
+      if (gameIntervalRef.current) {
+        clearInterval(gameIntervalRef.current);
+        gameIntervalRef.current = null;
+      }
+      
       setGameState({
         players: [],
         ball: { x: 50, y: 50, withPlayer: null },
@@ -356,8 +625,11 @@ export const SoccerField = ({ state }) => {
         targetPlayer: null
       });
       setGoalEffect(null);
+      setDoublePenaltyEffect(false);
+      setCurrentZone('midfield');
       lastProcessedEvent.current = null;
       lastScore.current = { user: 0, bot: 0 };
+      isResettingAfterGoal.current = false;
     }
   }, [simulating]);
 
@@ -380,7 +652,37 @@ export const SoccerField = ({ state }) => {
         <div className="futsal-goal left"></div>
         <div className="futsal-goal right"></div>
 
-        {/* EFECTO DE GOL - Solo cuando el backend lo indique */}
+        {/* Indicador de Zona del Campo */}
+        {simulating && (
+          <div className="field-zone-indicator">
+            <div className={`zone-display ${currentZone}`}>
+              ZONA: {currentZone === 'defensive' ? 'DEFENSIVA' : 
+                     currentZone === 'midfield' ? 'MEDIO CAMPO' : 'DE ATAQUE'}
+            </div>
+          </div>
+        )}
+
+        {/* EFECTO DE DOBLE PENALTI */}
+        {doublePenaltyEffect && (
+          <div className="double-penalty-effect">
+            <div className="penalty-explosion">
+              <div className="penalty-ring"></div>
+              <div className="penalty-core"></div>
+              <div className="penalty-text">DOBLE PENALTI!</div>
+              {[...Array(8)].map((_, i) => (
+                <div 
+                  key={i}
+                  className="penalty-spark"
+                  style={{
+                    '--spark-angle': (i * 45) + 'deg'
+                  }}
+                ></div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* EFECTO DE GOL */}
         {goalEffect && (
           <div className="goal-celebration">
             <div className="goal-explosion">
@@ -389,8 +691,8 @@ export const SoccerField = ({ state }) => {
               <div className="goal-text">¡GOL!</div>
               <div className="goal-team">
                 {lastGoalTeam === 'user' 
-                  ? (state.character?.name || 'TU EQUIPO') 
-                  : (state.selectedBot?.name || 'RIVAL')}
+                  ? (character?.name || 'TU EQUIPO') 
+                  : (selectedBot?.name || 'RIVAL')}
               </div>
               {[...Array(12)].map((_, i) => (
                 <div 
@@ -412,7 +714,7 @@ export const SoccerField = ({ state }) => {
             {gameState.players.map((player) => (
               <div 
                 key={player.id}
-                className={`player ${player.team} ${player.position} ${player.hasBall ? 'with-ball' : ''} ${gameState.action}`}
+                className={`player ${player.team} ${player.position} ${player.hasBall ? 'with-ball' : ''}`}
                 style={{ 
                   left: `${player.x}%`,
                   top: `${player.y}%`
@@ -421,6 +723,7 @@ export const SoccerField = ({ state }) => {
                 <div className="player-number">{player.number}</div>
                 <div className="player-glow"></div>
                 {player.hasBall && <div className="ball-holder"></div>}
+                <div className="player-position-badge">{player.position}</div>
               </div>
             ))}
 
@@ -457,6 +760,8 @@ export const SoccerField = ({ state }) => {
                   {gameState.action === 'dribbling' && '🌀'}
                   {gameState.action === 'moving' && '🏃'}
                   {gameState.action === 'double_penalty' && '💥'}
+                  {gameState.action === 'foul' && '⚠️'}
+                  {gameState.action === 'tackle' && '🛡️'}
                 </div>
                 <div className="action-text">
                   {gameState.action === 'passing' && 'PASE →'}
@@ -464,6 +769,8 @@ export const SoccerField = ({ state }) => {
                   {gameState.action === 'dribbling' && 'REGATE'}
                   {gameState.action === 'moving' && 'CIRCULACIÓN'}
                   {gameState.action === 'double_penalty' && 'DOBLE PENALTI!'}
+                  {gameState.action === 'foul' && 'FALTA COMETIDA'}
+                  {gameState.action === 'tackle' && 'INTERCEPCIÓN!'}
                 </div>
               </div>
             </div>
@@ -480,7 +787,8 @@ export const SoccerField = ({ state }) => {
               <div className="arena-display">
                 <div className="stadium-preview">
                   <div className="field-glow"></div>
-                  <p className="arena-ready">ARENA SINCRONIZADA</p>
+                  <p className="arena-ready">ARENA MEJORADA</p>
+                  <p className="arena-features">Sistema de zonas • Fatiga dinámica • Doble penalti</p>
                 </div>
                 
                 <div className="tactical-breakdown">
@@ -488,7 +796,10 @@ export const SoccerField = ({ state }) => {
                     <div className="formation-badge">TU ESTRATEGIA</div>
                     <div className="formation-display">
                       <span className="formation-value">{userFormation}</span>
-                      <div className="formation-type">OFENSIVA</div>
+                      <div className="formation-type">
+                        {userFormation === '3-1' ? 'DEFENSIVA' : 
+                         userFormation === '1-3' ? 'OFENSIVA' : 'BALANCEADA'}
+                      </div>
                     </div>
                   </div>
                   
@@ -497,10 +808,13 @@ export const SoccerField = ({ state }) => {
                   </div>
                   
                   <div className="formation-card rival-formation">
-                    <div className="formation-badge">RIVAL DETECTADO</div>
+                    <div className="formation-badge">RIVAL</div>
                     <div className="formation-display">
                       <span className="formation-value">{botFormation}</span>
-                      <div className="formation-type">CONTRAATAQUE</div>
+                      <div className="formation-type">
+                        {botFormation === '3-1' ? 'DEFENSIVA' : 
+                         botFormation === '1-3' ? 'OFENSIVA' : 'BALANCEADA'}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -512,3 +826,4 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
