@@ -34,7 +34,6 @@
 /* ===== ESTILOS BASE ===== */
 .training-dashboard {
   min-height: 100vh;
-  background: var(--gradient-bg);
   color: white;
   padding: 1rem;
   font-family: 'Rajdhani', sans-serif;
