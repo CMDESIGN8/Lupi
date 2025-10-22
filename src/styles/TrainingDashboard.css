@@ -1064,7 +1064,7 @@
   text-shadow: 0 2px 15px rgba(76, 201, 240, 0.6);
   background: linear-gradient(135deg, #38bdf8, #60a5fa);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--accent-blue);
   background-clip: text;
 }
 
