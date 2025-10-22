@@ -113,7 +113,7 @@ const TrainingDashboard = ({ character }) => {
     <div className="header-content">
       {/* Título Principal */}
       <div className="header-title">
-        <h1>🥅 FÚTSAL ARENA</h1>
+        <h1>CONTROL DEL PARTIDO</h1>
         <SimulationControls state={state} dispatch={dispatch} />
       </div>
       
