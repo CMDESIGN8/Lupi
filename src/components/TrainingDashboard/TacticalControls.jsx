@@ -8,50 +8,61 @@ export const TacticalControls = ({ state, dispatch }) => {
 
   return (
     <div className="tactical-controls">
-      <h4>CONTROL TÁCTICO</h4>
-      
-      <div className="formation-controls">
-        <label>Formación:</label>
-        <select 
-          value={formation} 
-          onChange={(e) => dispatch({ type: 'CHANGE_FORMATION', payload: e.target.value })}
-          disabled={simulating}
-        >
-          {Object.entries(MATCH_CONFIG.FORMATIONS).map(([key, value]) => (
-            <option key={key} value={key}>{value}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="tactic-buttons">
-        <button 
-          onClick={() => dispatch({ type: 'CHANGE_TACTIC', payload: MATCH_CONFIG.TACTICS.DEFENSIVE })}
-          className={`tactic-btn defensive ${tactic === 'defensive' ? 'active' : ''}`}
-          disabled={!simulating}
-        >
-          🛡️ Defensiva
-          <span>+ Entradas, - Disparos</span>
-        </button>
-        
-        <button 
-          onClick={() => dispatch({ type: 'CHANGE_TACTIC', payload: MATCH_CONFIG.TACTICS.BALANCED })}
-          className={`tactic-btn balanced ${tactic === 'balanced' ? 'active' : ''}`}
-          disabled={!simulating}
-        >
-          ⚖️ Equilibrada
-          <span>Balance ofensivo/defensivo</span>
-        </button>
-        
-        <button 
-          onClick={() => dispatch({ type: 'CHANGE_TACTIC', payload: MATCH_CONFIG.TACTICS.OFFENSIVE })}
-          className={`tactic-btn offensive ${tactic === 'offensive' ? 'active' : ''}`}
-          disabled={!simulating}
-        >
-          ⚔️ Ofensiva
-          <span>+ Disparos, - Defensa</span>
-        </button>
-      </div>
+  <h4>CONTROL TÁCTICO</h4>
+  
+  <div className="tactics-container">
+    {/* Display de formación */}
+    <div className="formation-display">
+      <div className="formation-label">Formación:</div>
+      <div className="formation-value">{state.userFormation || '2-1-1'} (Clásica)</div>
     </div>
+
+    {/* Botones de táctica */}
+    <div className="tactic-buttons">
+      <button 
+        className={`tactic-btn defensive ${state.tactic === 'defensive' ? 'active' : ''}`}
+        onClick={() => handleTacticChange('defensive')}
+        disabled={state.simulating}
+      >
+        Defensivo
+      </button>
+      
+      <button 
+        className={`tactic-btn balanced ${state.tactic === 'balanced' ? 'active' : ''}`}
+        onClick={() => handleTacticChange('balanced')}
+        disabled={state.simulating}
+      >
+        Equilibrado
+      </button>
+      
+      <button 
+        className={`tactic-btn offensive ${state.tactic === 'offensive' ? 'active' : ''}`}
+        onClick={() => handleTacticChange('offensive')}
+        disabled={state.simulating}
+      >
+        Ofensivo
+      </button>
+    </div>
+
+    {/* Descripción de táctica actual */}
+    <div className="tactic-description">
+      <p className="tactic-description-text">
+        {state.tactic === 'defensive' && 'Estructura sólida, prioriza la seguridad defensiva y contraataques organizados'}
+        {state.tactic === 'balanced' && 'Balance ofensivo/defensivo, juego versátil y adaptativo al desarrollo del partido'}
+        {state.tactic === 'offensive' && 'Presión constante, ataque organizado y creación continua de oportunidades de gol'}
+      </p>
+    </div>
+
+    {/* Indicador de estado */}
+    {!state.simulating && (
+      <div className="waiting-indicator">
+        <p className="waiting-text">Esperando inicio del partido...</p>
+      </div>
+    )}
+  </div>
+</div>
+
   );
 };
+
 
