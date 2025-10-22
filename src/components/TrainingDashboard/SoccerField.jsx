@@ -1,4 +1,4 @@
-// SoccerField.jsx - VERSIÓN CORREGIDA CON BALÓN QUE SE MUEVE
+// SoccerField.jsx - VERSIÓN CORREGIDA CON MOVIMIENTO CONSTANTE DEL BALÓN
 import React, { useState, useEffect, useRef } from 'react';
 import "../../styles/SoccerField.css";
 
@@ -30,6 +30,7 @@ export const SoccerField = ({ state }) => {
   
   const lastProcessedEvent = useRef(null);
   const lastScore = useRef({ user: 0, bot: 0 });
+  const gameIntervalRef = useRef(null);
 
   // Configuración inicial de jugadores MEJORADA con formaciones
   const initializePlayers = () => {
@@ -104,37 +105,20 @@ export const SoccerField = ({ state }) => {
   };
 
   // Función para actualizar las propiedades CSS del balón
-  const updateBallStyle = (ball, action) => {
+  const updateBallStyle = (ball) => {
     const ballElement = document.querySelector('.soccer-ball');
     if (ballElement) {
-      // Actualizar posición mediante CSS variables
       ballElement.style.setProperty('--ball-x', `${ball.x}%`);
       ballElement.style.setProperty('--ball-y', `${ball.y}%`);
-      
-      // Actualizar distancia del pase si hay objetivo
-      if (action === 'passing' && gameState.targetPlayer) {
-        const targetPlayer = gameState.players.find(p => p.id === gameState.targetPlayer);
-        if (targetPlayer) {
-          const distance = Math.sqrt(
-            Math.pow(ball.x - targetPlayer.x, 2) + 
-            Math.pow(ball.y - targetPlayer.y, 2)
-          );
-          const passLine = document.querySelector('.pass-line');
-          if (passLine) {
-            passLine.style.setProperty('--pass-distance', `${distance}px`);
-          }
-        }
-      }
     }
   };
 
-  // Sincronizar con eventos del backend - VERSIÓN MEJORADA PARA NUEVO REDUCER
+  // Sincronizar con eventos del backend
   useEffect(() => {
     if (!simulating || !matchEvents || matchEvents.length === 0) return;
 
     const latestEvent = matchEvents[0];
     
-    // Evitar procesar el mismo evento múltiples veces
     if (lastProcessedEvent.current === latestEvent.id) return;
     
     lastProcessedEvent.current = latestEvent.id;
@@ -146,17 +130,17 @@ export const SoccerField = ({ state }) => {
 
     // Manejar DOBLE PENALTI
     if (latestEvent.type === 'double_penalty') {
-      console.log(`🎯 DOBLE PENALTI detectado - Equipo: ${latestEvent.team}`);
+      console.log(`🎯 DOBLE PENALTI detectado`);
       
       setDoublePenaltyEffect(true);
       const newState = {
+        ...gameState,
         action: 'double_penalty',
         ball: { x: 50, y: 38, withPlayer: null }
       };
-      setGameState(prev => ({ ...prev, ...newState }));
-      updateBallStyle(newState.ball, newState.action);
+      setGameState(newState);
+      updateBallStyle(newState.ball);
 
-      // Efecto visual del doble penalti
       setTimeout(() => {
         if (latestEvent.isGoal) {
           setGoalEffect('active');
@@ -167,7 +151,6 @@ export const SoccerField = ({ state }) => {
 
       setTimeout(() => {
         setGoalEffect(null);
-        // Saque de centro después del doble penalti
         const resetState = {
           players: initializePlayers(),
           ball: { x: 50, y: 50, withPlayer: latestEvent.team === 'user' ? 'bot-fw0' : 'user-fw0' },
@@ -175,14 +158,14 @@ export const SoccerField = ({ state }) => {
           targetPlayer: null
         };
         setGameState(resetState);
-        updateBallStyle(resetState.ball, resetState.action);
+        updateBallStyle(resetState.ball);
       }, 3000);
     }
 
     // Manejar evento de GOL
     else if (latestEvent.type === 'goal') {
       const scoringTeam = latestEvent.team;
-      console.log(`⚽ GOL de ${scoringTeam} - Posicionando balón`);
+      console.log(`⚽ GOL de ${scoringTeam}`);
       
       let goalBallPosition;
       if (scoringTeam === 'user') {
@@ -192,11 +175,12 @@ export const SoccerField = ({ state }) => {
       }
 
       const newState = {
-        ball: { ...gameState.ball, ...goalBallPosition, withPlayer: null },
+        ...gameState,
+        ball: { ...goalBallPosition, withPlayer: null },
         action: 'shooting'
       };
-      setGameState(prev => ({ ...prev, ...newState }));
-      updateBallStyle(newState.ball, newState.action);
+      setGameState(newState);
+      updateBallStyle(newState.ball);
 
       setTimeout(() => {
         setGoalEffect('active');
@@ -205,7 +189,6 @@ export const SoccerField = ({ state }) => {
 
       setTimeout(() => {
         setGoalEffect(null);
-        // Saque de centro
         const resetState = {
           players: initializePlayers(),
           ball: { x: 50, y: 50, withPlayer: scoringTeam === 'user' ? 'bot-fw0' : 'user-fw0' },
@@ -213,13 +196,14 @@ export const SoccerField = ({ state }) => {
           targetPlayer: null
         };
         setGameState(resetState);
-        updateBallStyle(resetState.ball, resetState.action);
+        updateBallStyle(resetState.ball);
       }, 2500);
     }
 
-    // Manejar FALTA
+    // Manejar otros eventos
     else if (latestEvent.type === 'foul') {
       const newState = {
+        ...gameState,
         action: 'foul',
         ball: { 
           x: latestEvent.team === 'user' ? 35 : 65, 
@@ -227,8 +211,8 @@ export const SoccerField = ({ state }) => {
           withPlayer: null 
         }
       };
-      setGameState(prev => ({ ...prev, ...newState }));
-      updateBallStyle(newState.ball, newState.action);
+      setGameState(newState);
+      updateBallStyle(newState.ball);
 
       setTimeout(() => {
         setGameState(prev => ({
@@ -237,8 +221,6 @@ export const SoccerField = ({ state }) => {
         }));
       }, 1000);
     }
-
-    // Manejar REGATE exitoso
     else if (latestEvent.type === 'dribble') {
       setGameState(prev => ({
         ...prev,
@@ -252,8 +234,6 @@ export const SoccerField = ({ state }) => {
         }));
       }, 800);
     }
-
-    // Manejar TACKLE/INTERCEPCIÓN
     else if (latestEvent.type === 'tackle') {
       setGameState(prev => ({
         ...prev,
@@ -295,15 +275,18 @@ export const SoccerField = ({ state }) => {
     }
   }, [matchStats, simulating]);
 
-  // Encontrar jugador más cercano al balón
+  // Encontrar jugador más cercano al balón - MEJORADO
   const findClosestPlayer = (ballX, ballY, players) => {
     let closestPlayer = null;
     let minDistance = Infinity;
 
     players.forEach(player => {
+      // Priorizar jugadores del equipo con posesión
       const distance = Math.sqrt(Math.pow(player.x - ballX, 2) + Math.pow(player.y - ballY, 2));
-      if (distance < minDistance) {
-        minDistance = distance;
+      const adjustedDistance = player.team === possession ? distance * 0.8 : distance;
+      
+      if (adjustedDistance < minDistance) {
+        minDistance = adjustedDistance;
         closestPlayer = player;
       }
     });
@@ -311,40 +294,38 @@ export const SoccerField = ({ state }) => {
     return closestPlayer;
   };
 
-  // Encontrar compañero para pasar
+  // Encontrar compañero para pasar - MEJORADO
   const findTeammateForPass = (currentPlayer, players) => {
     const teammates = players.filter(p => 
       p.team === currentPlayer.team && p.id !== currentPlayer.id
     );
 
-    // Priorizar jugadores en mejor posición (más adelantados para ataque)
+    if (teammates.length === 0) return null;
+
+    // Priorizar jugadores en mejor posición ofensiva
     const sortedTeammates = teammates.sort((a, b) => {
-      if (currentPlayer.team === 'user') {
-        return b.x - a.x; // Para user, más cerca de portería rival
-      } else {
-        return a.x - b.x; // Para bot, más cerca de portería user
-      }
+      const aScore = (currentPlayer.team === 'user' ? a.x : 100 - a.x) + (50 - Math.abs(a.y - 50));
+      const bScore = (currentPlayer.team === 'user' ? b.x : 100 - b.x) + (50 - Math.abs(b.y - 50));
+      return bScore - aScore;
     });
 
     return sortedTeammates[0];
   };
 
-  // Mover jugadores de forma inteligente BASADO EN ZONA Y FORMACIÓN
+  // Mover jugadores de forma inteligente - MEJORADO
   const updatePlayerPositions = (players, ball, possession, zone) => {
     return players.map(player => {
       let targetX = player.x;
       let targetY = player.y;
 
-      // Comportamiento diferente según la zona del campo
       if (player.team === possession) {
-        // EQUIPO ATACANTE
+        // EQUIPO ATACANTE - comportamiento más agresivo
         switch (player.position) {
           case 'GK':
             targetX = player.team === 'user' ? 8 : 92;
             targetY = 50;
             break;
           case 'DF':
-            // Defensas se adaptan a la zona
             if (zone === 'defensive') {
               targetX = player.team === 'user' ? 20 : 80;
             } else if (zone === 'attacking') {
@@ -352,11 +333,9 @@ export const SoccerField = ({ state }) => {
             } else {
               targetX = player.team === 'user' ? 30 : 70;
             }
-            targetY = player.y;
-            if (Math.random() > 0.7) targetY = 25 + Math.random() * 50;
+            targetY = player.y + (Math.random() - 0.5) * 20;
             break;
           case 'MF':
-            // Medios se mueven según zona
             if (zone === 'defensive') {
               targetX = player.team === 'user' ? 35 : 65;
             } else if (zone === 'attacking') {
@@ -367,7 +346,6 @@ export const SoccerField = ({ state }) => {
             targetY = 20 + Math.random() * 60;
             break;
           case 'FW':
-            // Delanteros más agresivos en zona de ataque
             if (zone === 'attacking') {
               targetX = player.team === 'user' ? 75 : 25;
             } else {
@@ -377,35 +355,38 @@ export const SoccerField = ({ state }) => {
             break;
         }
       } else {
-        // EQUIPO DEFENSOR
+        // EQUIPO DEFENSOR - comportamiento más reactivo
         switch (player.position) {
           case 'GK':
             targetX = player.team === 'user' ? 8 : 92;
-            targetY = 50;
+            targetY = ball.y;
             break;
           case 'DF':
             targetX = player.team === 'user' ? 
-              (zone === 'defensive' ? 25 : 35) : 
-              (zone === 'defensive' ? 75 : 65);
-            targetY = ball.y;
+              Math.max(20, ball.x - 15) : 
+              Math.min(80, ball.x + 15);
+            targetY = ball.y + (Math.random() - 0.5) * 10;
             break;
           case 'MF':
             targetX = player.team === 'user' ? 
-              (zone === 'defensive' ? 40 : 50) : 
-              (zone === 'defensive' ? 60 : 50);
-            targetY = ball.y;
+              Math.max(30, ball.x - 10) : 
+              Math.min(70, ball.x + 10);
+            targetY = ball.y + (Math.random() - 0.5) * 15;
             break;
           case 'FW':
-            // Delanteros presionando en recuperación
             targetX = player.team === 'user' ? 
-              (zone === 'defensive' ? 55 : 65) : 
-              (zone === 'defensive' ? 45 : 35);
+              Math.max(40, ball.x - 5) : 
+              Math.min(60, ball.x + 5);
             targetY = ball.y;
             break;
         }
       }
 
-      const speed = 0.8;
+      // Limitar posiciones dentro del campo
+      targetX = Math.max(5, Math.min(95, targetX));
+      targetY = Math.max(10, Math.min(90, targetY));
+
+      const speed = 0.6 + Math.random() * 0.4; // Velocidad variable
       const newX = player.x + (targetX - player.x) * speed;
       const newY = player.y + (targetY - player.y) * speed;
 
@@ -418,7 +399,7 @@ export const SoccerField = ({ state }) => {
     });
   };
 
-  // Simulación visual mejorada
+  // Simulación visual MEJORADA - movimiento más consistente
   const simulateVisualAction = (currentState) => {
     if (goalEffect || doublePenaltyEffect) return currentState;
 
@@ -428,38 +409,45 @@ export const SoccerField = ({ state }) => {
     let newAction = action;
     let newTargetPlayer = null;
 
+    // Si el balón está con un jugador
     if (ball.withPlayer) {
       const playerWithBall = players.find(p => p.id === ball.withPlayer);
       
       if (playerWithBall) {
         const actionRoll = Math.random();
         
-        if (actionRoll < 0.6) {
-          // Pasar
+        if (actionRoll < 0.5) {
+          // Pasar (50% de probabilidad)
           newAction = 'passing';
           const teammate = findTeammateForPass(playerWithBall, players);
-          if (teammate) {
+          if (teammate && Math.random() < 0.8) { // 80% de éxito en pase
             newTargetPlayer = teammate.id;
             newBall.x = teammate.x;
             newBall.y = teammate.y;
             newBall.withPlayer = null;
-          }
-        } else if (actionRoll < 0.85) {
-          // Driblar
-          newAction = 'dribbling';
-          if (playerWithBall.team === 'user') {
-            newBall.x = Math.min(85, playerWithBall.x + 5);
           } else {
-            newBall.x = Math.max(15, playerWithBall.x - 5);
+            // Pase fallido, balón se va a posición aleatoria
+            newBall.x = playerWithBall.x + (Math.random() - 0.5) * 30;
+            newBall.y = playerWithBall.y + (Math.random() - 0.5) * 20;
+            newBall.withPlayer = null;
           }
-          newBall.y = Math.max(15, Math.min(85, playerWithBall.y + (Math.random() - 0.5) * 10));
+        } else if (actionRoll < 0.8) {
+          // Driblar (30% de probabilidad)
+          newAction = 'dribbling';
+          const dribbleDistance = 8 + Math.random() * 12;
+          if (playerWithBall.team === 'user') {
+            newBall.x = Math.min(90, playerWithBall.x + dribbleDistance);
+          } else {
+            newBall.x = Math.max(10, playerWithBall.x - dribbleDistance);
+          }
+          newBall.y = Math.max(15, Math.min(85, playerWithBall.y + (Math.random() - 0.5) * 15));
           newBall.withPlayer = null;
         } else {
-          // Tirar
+          // Tirar (20% de probabilidad)
           newAction = 'shooting';
           const isUser = playerWithBall.team === 'user';
-          const shotX = isUser ? 88 + Math.random() * 6 : 6 + Math.random() * 6;
-          const shotY = 40 + Math.random() * 20;
+          const shotX = isUser ? 85 + Math.random() * 10 : 5 + Math.random() * 10;
+          const shotY = 35 + Math.random() * 30;
           
           newBall.x = shotX;
           newBall.y = shotY;
@@ -467,26 +455,40 @@ export const SoccerField = ({ state }) => {
         }
       }
     } else {
-      // Balón suelto
+      // Balón suelto - MOVIMIENTO MÁS ACTIVO
       newAction = 'moving';
       const closestPlayer = findClosestPlayer(ball.x, ball.y, players);
+      
       if (closestPlayer) {
         const distance = Math.sqrt(
           Math.pow(closestPlayer.x - ball.x, 2) + 
           Math.pow(closestPlayer.y - ball.y, 2)
         );
         
-        if (distance < 8) {
+        if (distance < 12) { // Radio mayor para atrapar el balón
           newBall.withPlayer = closestPlayer.id;
           newBall.x = closestPlayer.x;
           newBall.y = closestPlayer.y;
         } else {
-          const speed = 0.6;
+          // Movimiento más activo hacia el jugador más cercano
+          const speed = 0.8;
           newBall.x = ball.x + (closestPlayer.x - ball.x) * speed;
           newBall.y = ball.y + (closestPlayer.y - ball.y) * speed;
+          
+          // Añadir movimiento aleatorio para evitar que se quede quieto
+          newBall.x += (Math.random() - 0.5) * 4;
+          newBall.y += (Math.random() - 0.5) * 3;
         }
+      } else {
+        // Movimiento aleatorio si no hay jugadores cercanos
+        newBall.x += (Math.random() - 0.5) * 8;
+        newBall.y += (Math.random() - 0.5) * 6;
       }
     }
+
+    // Asegurar que el balón no se salga del campo
+    newBall.x = Math.max(2, Math.min(98, newBall.x));
+    newBall.y = Math.max(5, Math.min(95, newBall.y));
 
     return {
       players: updatePlayerPositions(players, newBall, possession, currentZone),
@@ -496,40 +498,57 @@ export const SoccerField = ({ state }) => {
     };
   };
 
-  // Efecto principal de simulación visual
+  // Efecto principal de simulación visual - MEJORADO
   useEffect(() => {
     if (simulating && !goalEffect && !doublePenaltyEffect) {
-      const gameInterval = setInterval(() => {
+      // Limpiar intervalo anterior si existe
+      if (gameIntervalRef.current) {
+        clearInterval(gameIntervalRef.current);
+      }
+
+      // Inicializar estado si es necesario
+      if (gameState.players.length === 0) {
+        const initialState = {
+          players: initializePlayers(),
+          ball: { x: 50, y: 50, withPlayer: possession === 'user' ? 'user-fw0' : 'bot-fw0' },
+          action: 'moving',
+          targetPlayer: null
+        };
+        setGameState(initialState);
+        updateBallStyle(initialState.ball);
+      }
+
+      // Iniciar nuevo intervalo
+      gameIntervalRef.current = setInterval(() => {
         setGameState(prev => {
-          if (prev.players.length === 0) {
-            const newState = {
-              players: initializePlayers(),
-              ball: { x: 50, y: 50, withPlayer: possession === 'user' ? 'user-fw0' : 'bot-fw0' },
-              action: 'moving',
-              targetPlayer: null
-            };
-            updateBallStyle(newState.ball, newState.action);
-            return newState;
-          }
-          
           const newState = simulateVisualAction(prev);
-          updateBallStyle(newState.ball, newState.action);
+          updateBallStyle(newState.ball);
           return newState;
         });
-      }, 400);
+      }, 350); // Intervalo ligeramente más rápido
 
-      return () => clearInterval(gameInterval);
+      return () => {
+        if (gameIntervalRef.current) {
+          clearInterval(gameIntervalRef.current);
+          gameIntervalRef.current = null;
+        }
+      };
     }
   }, [simulating, possession, goalEffect, doublePenaltyEffect, userFormation, botFormation, currentZone]);
 
   // Actualizar CSS cuando cambia el estado del balón
   useEffect(() => {
-    updateBallStyle(gameState.ball, gameState.action);
-  }, [gameState.ball, gameState.action]);
+    updateBallStyle(gameState.ball);
+  }, [gameState.ball]);
 
   // Reiniciar cuando para la simulación
   useEffect(() => {
     if (!simulating) {
+      if (gameIntervalRef.current) {
+        clearInterval(gameIntervalRef.current);
+        gameIntervalRef.current = null;
+      }
+      
       setGameState({
         players: [],
         ball: { x: 50, y: 50, withPlayer: null },
