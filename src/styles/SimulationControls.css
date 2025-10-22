@@ -1,1 +1,60 @@
+/* ===== CONTROLES DE SIMULACIÓN ===== */
+.training-dashboard .simulation-controls { 
+  display: flex; 
+  gap: 0.5rem; 
+  align-items: center;
+  padding: 1rem;
+}
 
+.training-dashboard .simulation-controls.professional {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.training-dashboard .speed-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.training-dashboard .simulation-controls button {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--accent-blue);
+  color: white;
+  font-size: 1.1rem;
+  border-radius: 10px;
+  width: 40px; 
+  height: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.training-dashboard .simulation-controls button:hover { 
+  background: rgba(76, 201, 240, 0.3); 
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
+}
+
+.training-dashboard .simulation-controls button.active { 
+  background: var(--gradient-accent);
+  color: var(--primary-dark); 
+  transform: scale(1.1);
+  box-shadow: var(--shadow-glow);
+}
+
+.training-dashboard .match-time {
+  background: var(--gradient-danger);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: 'Orbitron', monospace;
+  min-width: 100px;
+  text-align: center;
+  border: 2px solid rgba(255,255,255,0.3);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+  animation: timePulse 2s infinite;
+}
