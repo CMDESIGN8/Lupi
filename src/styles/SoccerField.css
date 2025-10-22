@@ -1,5 +1,36 @@
 /* SoccerField.css - VERSIÓN ADAPTADA PARA NUEVO REDUCER */
 
+:root {
+  /* Colores principales */
+  --primary-dark: #0f172a;
+  --primary-medium: #1e293b;
+  --primary-light: #334155;
+  --accent-blue: #4cc9f0;
+  --accent-purple: #4361ee;
+  --accent-red: #dc2626;
+  --accent-green: #16a34a;
+  --accent-yellow: #fbbf24;
+  
+  /* Colores futsal */
+  --futsal-blue: #1e40af;
+  --futsal-light-blue: #3b82f6;
+  --futsal-dark-blue: #1e3a8a;
+  
+  /* Gradientes */
+  --gradient-bg: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --gradient-primary: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-medium) 50%, var(--primary-light) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  --gradient-danger: linear-gradient(135deg, var(--accent-red), #b91c1c);
+  --gradient-futsal: linear-gradient(135deg, var(--futsal-blue) 0%, var(--futsal-light-blue) 100%);
+  
+  /* Efectos */
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.2);
+  --shadow-glow: 0 0 20px rgba(76, 201, 240, 0.4);
+  --border-glow: 2px solid var(--accent-blue);
+}
+
+
 /* ===== EFECTOS DE GOL MEJORADOS ===== */
 .goal-celebration {
   position: absolute;
