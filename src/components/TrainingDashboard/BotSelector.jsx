@@ -51,15 +51,19 @@ export const BotSelector = ({ bots, onStartMatch, simulating, playerLevel = 3 })
     return baseStats;
   };
 
-  // Sistema de recompensas realista
-  const getBotRewards = (level) => {
-    return {
-      xp: level * 100,
-      coins: level * 50,
-      items: level >= 5 ? ['Caja Élite'] : level >= 3 ? ['Caja Avanzada'] : ['Caja Básica'],
-      tokens: level >= 7 ? Math.floor(level * 1.5) : 0
-    };
+  // Sistema de recompensas realista (ACTUALIZADO)
+const getBotRewards = (level) => {
+  // Valores reducidos para coincidir con el backend
+  const baseXP = level * 25; // Reducido de 100
+  const baseCoins = level * 15; // Reducido de 50
+  
+  return {
+    xp: baseXP,
+    coins: baseCoins,
+    items: level >= 7 ? ['Caja Élite'] : level >= 4 ? ['Caja Avanzada'] : ['Caja Básica'],
+    tokens: level >= 8 ? Math.floor(level * 0.5) : 0 // Reducido
   };
+};
 
   // Habilidades progresivas
   const getBotSkills = (level) => {
@@ -247,3 +251,4 @@ export const BotSelector = ({ bots, onStartMatch, simulating, playerLevel = 3 })
     </div>
   );
 };
+
