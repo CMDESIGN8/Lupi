@@ -1,254 +1,9 @@
-// simulationReducer.js - VERSIÓN MEJORADA COMPLETA
+// simulationReducer.js - VERSIÓN MEJORADA Y MÁS REALISTA
 import { MATCH_CONFIG } from './futsalConfig';
 
-// --- SISTEMA DE MOMENTUM Y CONFIANZA ---
-const calculateMomentum = (events, team, currentMomentum) => {
-  const recentEvents = events.slice(0, 8);
-  let momentumChange = 0;
-  
-  recentEvents.forEach(event => {
-    if (event.type === 'goal' && event.team === team) momentumChange += 0.3;
-    if (event.type === 'save' && event.team === team) momentumChange += 0.15;
-    if (event.type === 'tackle' && event.team === team) momentumChange += 0.1;
-    if (event.type === 'foul' && event.team !== team) momentumChange += 0.1;
-    if (event.type === 'goal' && event.team !== team) momentumChange -= 0.2;
-  });
-  
-  return Math.max(-1, Math.min(1, currentMomentum + momentumChange));
-};
+// --- LÓGICA PRINCIPAL MEJORADA ---
 
-const applyMomentumEffects = (probs, momentum, team) => {
-  const momentumBonus = momentum[team] * 0.15;
-  return {
-    ...probs,
-    shot: probs.shot * (1 + momentumBonus),
-    dribble: probs.dribble * (1 + momentumBonus * 0.8),
-    pass: probs.pass * (1 - momentumBonus * 0.5)
-  };
-};
-
-// --- SISTEMA DE LESIONES Y TARJETAS ---
-const checkForInjury = (foulEvent, state) => {
-  if (foulEvent.intensity === 'high' && Math.random() < 0.08) {
-    const injuredTeam = foulEvent.team === 'user' ? 'bot' : 'user';
-    const positions = ['DF', 'MF', 'FW'];
-    const injuredPosition = positions[Math.floor(Math.random() * positions.length)];
-    
-    return {
-      team: injuredTeam,
-      position: injuredPosition,
-      duration: Math.floor(Math.random() * 3) + 1
-    };
-  }
-  return null;
-};
-
-const checkForCards = (foulEvent, state) => {
-  const foulTeam = foulEvent.team;
-  const foulCount = state.fouls[foulTeam] || 0;
-  
-  if (foulCount % 3 === 0) {
-    return {
-      team: foulTeam,
-      type: state.cards[foulTeam]?.yellow >= 1 ? 'red' : 'yellow'
-    };
-  }
-  return null;
-};
-
-// --- SISTEMA DE ESTRATEGIAS ESPECÍFICAS ---
-const formationStrategies = {
-  '2-1-1': {
-    strength: 'balanced',
-    weakness: 'flanks',
-    specialMove: 'quick_counter'
-  },
-  '3-1': {
-    strength: 'defense',
-    weakness: 'attack',
-    specialMove: 'long_ball'
-  },
-  '1-2-1': {
-    strength: 'midfield',
-    weakness: 'defense', 
-    specialMove: 'possession_game'
-  },
-  '2-2': {
-    strength: 'pressing',
-    weakness: 'counter_attack',
-    specialMove: 'high_press'
-  },
-  '1-3': {
-    strength: 'attack',
-    weakness: 'defense',
-    specialMove: 'all_out_attack'
-  }
-};
-
-const executeSpecialMove = (formation, team, state) => {
-  const strategy = formationStrategies[formation];
-  const chance = 0.1;
-  
-  if (Math.random() < chance) {
-    switch (strategy.specialMove) {
-      case 'quick_counter':
-        return { 
-          type: 'COUNTER_ATTACK', 
-          bonus: { shot: 0.2, dribble: 0.15 },
-          duration: 1 
-        };
-      case 'high_press':
-        return {
-          type: 'HIGH_PRESS',
-          bonus: { tackle: 0.25, foul: 0.1 },
-          duration: 2
-        };
-      case 'all_out_attack':
-        return {
-          type: 'ALL_OUT_ATTACK', 
-          bonus: { shot: 0.3, dribble: 0.2 },
-          penalty: { tackle: -0.2 },
-          duration: 1
-        };
-    }
-  }
-  return null;
-};
-
-// --- SISTEMA DE CONDICIÓN FÍSICA INDIVIDUAL ---
-const calculateStaminaDrain = (position, actionType) => {
-  const baseDrain = {
-    'GK': { shot: 2, save: 8, pass: 1, tackle: 3, dribble: 4 },
-    'DF': { shot: 3, save: 1, pass: 2, tackle: 6, dribble: 5 },
-    'MF': { shot: 4, save: 1, pass: 3, tackle: 5, dribble: 6 },
-    'FW': { shot: 5, save: 1, pass: 2, tackle: 4, dribble: 7 }
-  };
-  
-  return baseDrain[position]?.[actionType] || 2;
-};
-
-const applyStaminaEffects = (rating, stamina) => {
-  if (stamina > 70) return rating;
-  if (stamina > 40) return rating * 0.9;
-  if (stamina > 20) return rating * 0.75;
-  return rating * 0.6;
-};
-
-// --- EVENTOS ESPECIALES Y RAROS ---
-const generateSpecialEvent = (state) => {
-  const specialChance = 0.015;
-  
-  if (Math.random() < specialChance) {
-    const events = [
-      {
-        type: 'WOODWORK',
-        text: '¡QUÉ PALO! El balón golpea el poste y sale.',
-        effect: { momentum: -0.3 }
-      },
-      {
-        type: 'SPECTACULAR_SAVE',
-        text: '¡PARADA ANTOLÓGICA! El portero hace un milagro.',
-        effect: { momentum: 0.4 }
-      },
-      {
-        type: 'MISSED_PENALTY',
-        text: '¡PENALTI FALLADO! Oportunidad desperdiciada.',
-        effect: { momentum: -0.5, confidence: -10 }
-      }
-    ];
-    
-    return events[Math.floor(Math.random() * events.length)];
-  }
-  return null;
-};
-
-// --- SISTEMA DE ACOMODACIÓN AL RIVAL ---
-const adaptiveAI = (state) => {
-  const { matchEvents, userFormation, tactic } = state;
-  
-  const userAttacks = matchEvents.filter(e => 
-    e.team === 'user' && (e.type === 'shot' || e.type === 'dribble')
-  ).length;
-  
-  const userPasses = matchEvents.filter(e => 
-    e.team === 'user' && e.type === 'pass'
-  ).length;
-  
-  if (userAttacks > userPasses * 1.5) {
-    return {
-      ...state,
-      botTactic: MATCH_CONFIG.TACTICS.DEFENSIVE,
-      botFormation: userFormation === '1-3' ? '3-1' : '2-1-1'
-    };
-  } else if (userPasses > userAttacks * 1.2) {
-    return {
-      ...state,
-      botTactic: MATCH_CONFIG.TACTICS.COUNTER_ATTACK,
-      botFormation: '2-2'
-    };
-  }
-  
-  return state;
-};
-
-// --- FACTORES EXTERNOS REALISTAS ---
-const calculateMatchPressure = (state) => {
-  const timePressure = state.matchTime / MATCH_CONFIG.DURATION;
-  const scorePressure = Math.abs(
-    (state.matchStats?.user?.goals || 0) - (state.matchStats?.bot?.goals || 0)
-  ) === 1 ? 0.3 : 0;
-  
-  return Math.min(1, timePressure + scorePressure);
-};
-
-// --- HABILIDADES ESPECIALES ---
-const specialAbilities = {
-  'playmaker': {
-    name: 'Pase Descisivo',
-    trigger: 'pass',
-    effect: (rating) => rating * 1.3,
-    cooldown: 3
-  },
-  'finisher': {
-    name: 'Definición Mortal', 
-    trigger: 'shot',
-    effect: (rating) => rating * 1.4,
-    cooldown: 4
-  }
-};
-
-const assignSpecialAbility = (player) => {
-  if (player.tiro > 70 && player.potencia > 65) return 'finisher';
-  if (player.defensa > 75) return 'wall';
-  if (player.velocidad > 70 && player.tiro > 60) return 'playmaker';
-  return null;
-};
-
-// --- ANÁLISIS TÁCTICO EN TIEMPO REAL ---
-const generateTacticalInsights = (state) => {
-  const insights = [];
-  const { matchStats } = state;
-  
-  const userShotEffectiveness = (matchStats.user.goals / matchStats.user.shots) * 100 || 0;
-  const totalActions = matchStats.user.passes + matchStats.bot.passes;
-  const userPossession = (matchStats.user.passes / totalActions) * 100 || 50;
-  
-  if (userShotEffectiveness > 40) {
-    insights.push("Tu equipo tiene una efectividad de tiro excelente");
-  } else if (userShotEffectiveness < 15) {
-    insights.push("Necesitas mejorar la efectividad de tus tiros");
-  }
-  
-  if (userPossession > 60) {
-    insights.push("Dominas la posesión del balón");
-  } else if (userPossession < 40) {
-    insights.push("El rival controla el juego");
-  }
-  
-  return insights;
-};
-
-// --- LÓGICA PRINCIPAL MEJORADA (existente pero mejorada) ---
+// 1. CÁLCULO DE HABILIDADES MÁS DETALLADO
 const calculatePlayerRating = (player, position, context = 'general') => {
   if (!player) return 50;
   
@@ -285,26 +40,31 @@ const calculatePlayerRating = (player, position, context = 'general') => {
   ));
 };
 
+// 2. SISTEMA DE FATIGA Y MOMENTO
 const calculateFatigueModifier = (matchTime, playerRating) => {
-  const fatigueRate = 0.15;
+  const fatigueRate = 0.15; // 15% de reducción al final del partido
   const timeFactor = matchTime / MATCH_CONFIG.DURATION;
   const fatigueEffect = 1 - (fatigueRate * timeFactor);
+  
+  // Jugadores con mejor condición física se fatigan menos
   const staminaBonus = (playerRating - 50) / 100 * 0.1;
   
   return Math.max(0.7, Math.min(1.2, fatigueEffect + staminaBonus));
 };
 
+// 3. OBTENER JUGADOR ACTIVO MEJORADO (con contexto)
 const getActivePlayer = (team, formation, playerType, matchTime) => {
   const formations = {
     '2-1-1': ['GK', 'DF', 'DF', 'MF', 'FW'],
     '3-1': ['GK', 'DF', 'DF', 'DF', 'FW'],
     '1-2-1': ['GK', 'DF', 'MF', 'MF', 'FW'],
-    '2-2': ['GK', 'DF', 'DF', 'MF', 'MF'],
-    '1-3': ['GK', 'DF', 'MF', 'MF', 'MF']
+    '2-2': ['GK', 'DF', 'DF', 'MF', 'MF'], // Nueva formación
+    '1-3': ['GK', 'DF', 'MF', 'MF', 'MF']  // Nueva formación ofensiva
   };
 
   const positions = formations[formation] || formations['2-1-1'];
   
+  // Probabilidades contextuales según tipo de acción
   const positionWeights = {
     'attacking': { 'GK': 0.02, 'DF': 0.18, 'MF': 0.4, 'FW': 0.4 },
     'defending': { 'GK': 0.1, 'DF': 0.5, 'MF': 0.3, 'FW': 0.1 },
@@ -313,6 +73,7 @@ const getActivePlayer = (team, formation, playerType, matchTime) => {
 
   const weights = positionWeights[playerType] || positionWeights.general;
   
+  // Ajustar por fatiga (los delanteros se fatigan más)
   const fatigueFactors = { 'GK': 0.9, 'DF': 0.95, 'MF': 1.0, 'FW': 1.05 };
   let adjustedWeights = { ...weights };
   
@@ -321,11 +82,13 @@ const getActivePlayer = (team, formation, playerType, matchTime) => {
     adjustedWeights[pos] *= fatigue * (fatigueFactors[pos] || 1);
   });
 
+  // Normalizar pesos
   const totalWeight = Object.values(adjustedWeights).reduce((sum, w) => sum + w, 0);
   Object.keys(adjustedWeights).forEach(pos => {
     adjustedWeights[pos] /= totalWeight;
   });
 
+  // Seleccionar jugador
   let random = Math.random();
   let cumulative = 0;
   let selectedPosition = 'MF';
@@ -349,6 +112,7 @@ const getActivePlayer = (team, formation, playerType, matchTime) => {
   };
 };
 
+// 4. SISTEMA DE ZONAS DEL CAMPO
 const getFieldZone = (attackerPosition, actionType) => {
   const zones = {
     'GK': 'defensive',
@@ -360,6 +124,7 @@ const getFieldZone = (attackerPosition, actionType) => {
   return zones[attackerPosition] || 'midfield';
 };
 
+// 5. SIMULAR DOBLE PENALTI MEJORADO
 const simulateDoublePenalty = (attackerTeam, defenderTeam, matchTime) => {
   const attacker = getActivePlayer(attackerTeam, '2-1-1', 'attacking', matchTime);
   const defender = getActivePlayer(defenderTeam, '2-1-1', 'defending', matchTime);
@@ -367,7 +132,10 @@ const simulateDoublePenalty = (attackerTeam, defenderTeam, matchTime) => {
   const shotPower = calculatePlayerRating(attackerTeam, 'FW', 'shot') * attacker.fatigue;
   const savePower = calculatePlayerRating(defenderTeam, 'GK', 'save') * defender.fatigue;
   
+  // En doble penalti, el portero tiene menos ventaja
   const baseChance = (shotPower / (shotPower + savePower * 1.0));
+  
+  // Factor de presión (últimos minutos)
   const pressureFactor = matchTime > 35 ? 1.1 : 1.0;
   const goalChance = Math.min(0.85, baseChance * pressureFactor);
   
@@ -377,13 +145,15 @@ const simulateDoublePenalty = (attackerTeam, defenderTeam, matchTime) => {
     `coloca el balón en la escuadra`,
     `dispara potente al ángulo`,
     `ejecuta un tiro colocado`,
-    `lanza un rocket imparable`
+    `lanza un rocket imparable`,
+    `define con precisión`
   ];
   
   const saveDescriptions = [
     `se estrella contra el poste`,
     `es despejado por el portero`,
-    `sale por poco desviado`
+    `sale por poco desviado`,
+    `es atajado milagrosamente`
   ];
   
   const description = isGoal 
@@ -399,30 +169,16 @@ const simulateDoublePenalty = (attackerTeam, defenderTeam, matchTime) => {
   };
 };
 
-// --- GENERADOR DE EVENTOS CON TODAS LAS MEJORAS ---
+// 6. GENERADOR DE EVENTOS MÁS REALISTA
 const generateMatchEvent = (state) => {
-  const { possession, character, selectedBot, tactic, userFormation, botFormation, fouls, matchTime, momentum } = state;
+  const { possession, character, selectedBot, tactic, userFormation, botFormation, fouls, matchTime } = state;
   
-  // Verificar evento especial
-  const specialEvent = generateSpecialEvent(state);
-  if (specialEvent) {
-    return {
-      id: Date.now() + Math.random(),
-      time: `${state.matchTime}'`,
-      type: specialEvent.type,
-      team: possession,
-      text: specialEvent.text,
-      intensity: 'very-high',
-      isSpecial: true
-    };
-  }
-
   const attackerTeam = possession === 'user' ? character : selectedBot;
   const defenderTeam = possession === 'user' ? selectedBot : character;
   const attackerFormation = possession === 'user' ? userFormation : botFormation;
   const defenderFormation = possession === 'user' ? botFormation : userFormation;
 
-  // Verificar doble penalti
+  // Verificar doble penalti por acumulación de faltas
   const currentTeamFouls = fouls[possession] || 0;
   if (currentTeamFouls >= MATCH_CONFIG.FOULS.DOUBLE_PENALTY_FOUL) {
     const penaltyResult = simulateDoublePenalty(attackerTeam, defenderTeam, matchTime);
@@ -439,13 +195,13 @@ const generateMatchEvent = (state) => {
     };
   }
 
-  // Obtener jugadores con todas las mejoras
+  // Obtener jugadores con contexto
   const attacker = getActivePlayer(attackerTeam, attackerFormation, 'attacking', matchTime);
   const defender = getActivePlayer(defenderTeam, defenderFormation, 'defending', matchTime);
   
   const fieldZone = getFieldZone(attacker.position, 'general');
 
-  // Probabilidades base con todas las mejoras aplicadas
+  // --- Probabilidades base por ZONA DEL CAMPO ---
   let probs = {
     [MATCH_CONFIG.EVENT_TYPES.PASS]: 0.45,
     [MATCH_CONFIG.EVENT_TYPES.SHOT]: 0.2,
@@ -454,10 +210,7 @@ const generateMatchEvent = (state) => {
     [MATCH_CONFIG.EVENT_TYPES.DRIBBLE]: 0.12,
   };
 
-  // Aplicar todas las mejoras
-  probs = applyMomentumEffects(probs, momentum, possession);
-  
-  // Ajustes por zona
+  // Ajustes por ZONA
   if (fieldZone === 'defensive') {
     probs.shot -= 0.15;
     probs.pass += 0.1;
@@ -468,25 +221,71 @@ const generateMatchEvent = (state) => {
     probs.dribble += 0.05;
   }
 
-  // Verificar movimiento especial
-  const specialMove = executeSpecialMove(attackerFormation, possession, state);
-  if (specialMove) {
-    Object.keys(specialMove.bonus || {}).forEach(action => {
-      probs[action] = (probs[action] || 0) + specialMove.bonus[action];
-    });
-    Object.keys(specialMove.penalty || {}).forEach(action => {
-      probs[action] = (probs[action] || 0) + specialMove.penalty[action];
-    });
+  // Ajustes por POSICIÓN del atacante
+  if (attacker.position === 'FW') {
+    probs.shot += 0.1;
+    probs.dribble += 0.05;
+    probs.pass -= 0.15;
+  } else if (attacker.position === 'DF') {
+    probs.shot -= 0.1;
+    probs.pass += 0.1;
+    probs.tackle += 0.05;
+  } else if (attacker.position === 'GK') {
+    probs.shot = 0.01; // Casi nunca tira un portero
+    probs.pass = 0.8;  // Muchos pases
   }
 
-  // Resto de la lógica de probabilidades...
-  // [Mantener el resto de tu lógica existente pero mejorada]
+  // --- Ajuste por TÁCTICAS MEJORADO ---
+  if (possession === 'user') {
+    if (tactic === MATCH_CONFIG.TACTICS.OFFENSIVE) {
+      probs.shot += 0.1;
+      probs.dribble += 0.07;
+      probs.pass -= 0.17;
+    } else if (tactic === MATCH_CONFIG.TACTICS.DEFENSIVE) {
+      probs.shot -= 0.08;
+      probs.pass += 0.1;
+      probs.tackle += 0.05;
+    } else if (tactic === MATCH_CONFIG.TACTICS.COUNTER_ATTACK) {
+      probs.dribble += 0.08;
+      probs.pass += 0.05;
+      probs.shot -= 0.03;
+    }
+  }
+
+  // IA del bot más inteligente
+  if (possession === 'bot') {
+    const botTactic = state.botTactic || MATCH_CONFIG.TACTICS.BALANCED;
+    const scoreDiff = (state.matchStats?.bot?.goals || 0) - (state.matchStats?.user?.goals || 0);
+    
+    if (botTactic === MATCH_CONFIG.TACTICS.OFFENSIVE) {
+      probs.shot += 0.08;
+      probs.dribble += 0.06;
+      probs.pass -= 0.14;
+    } else if (botTactic === MATCH_CONFIG.TACTICS.DEFENSIVE && scoreDiff > 0) {
+      // Si va ganando, se defiende más
+      probs.shot -= 0.1;
+      probs.pass += 0.12;
+      probs.tackle += 0.05;
+    } else if (botTactic === MATCH_CONFIG.TACTICS.COUNTER_ATTACK && scoreDiff < 0) {
+      // Si va perdiendo, contraataca
+      probs.dribble += 0.1;
+      probs.shot += 0.05;
+    }
+  }
+
+  // --- AJUSTES POR FATIGA (minutos finales) ---
+  if (matchTime > 35) {
+    const fatigueFactor = 1 - ((matchTime - 35) / 5) * 0.3; // Reducción progresiva
+    probs.dribble *= fatigueFactor;
+    probs.shot *= fatigueFactor;
+    probs.pass /= fatigueFactor; // Más pases por cansancio
+  }
 
   // Normalizar probabilidades
   const total = Object.values(probs).reduce((sum, prob) => sum + prob, 0);
   Object.keys(probs).forEach(key => probs[key] /= total);
 
-  // Selección de acción
+  // --- Selección de acción ---
   const random = Math.random();
   let cumulative = 0;
   let action = MATCH_CONFIG.EVENT_TYPES.PASS;
@@ -499,15 +298,24 @@ const generateMatchEvent = (state) => {
     }
   }
 
-  // [Resto de la lógica de eventos...]
-  // Mantener tu lógica existente pero aplicando las mejoras
-
+  // --- CALCULO DE ÉXITO MÁS REALISTA ---
   const contextRatings = {
     [MATCH_CONFIG.EVENT_TYPES.SHOT]: {
       attacker: calculatePlayerRating(attackerTeam, 'FW', 'shot') * attacker.fatigue,
       defender: calculatePlayerRating(defenderTeam, 'GK', 'save') * defender.fatigue
     },
-    // ... resto de contextos
+    [MATCH_CONFIG.EVENT_TYPES.DRIBBLE]: {
+      attacker: calculatePlayerRating(attackerTeam, attacker.position, 'dribble') * attacker.fatigue,
+      defender: calculatePlayerRating(defenderTeam, defender.position, 'tackle') * defender.fatigue
+    },
+    [MATCH_CONFIG.EVENT_TYPES.PASS]: {
+      attacker: calculatePlayerRating(attackerTeam, attacker.position, 'pass') * attacker.fatigue,
+      defender: calculatePlayerRating(defenderTeam, defender.position, 'tackle') * defender.fatigue
+    },
+    [MATCH_CONFIG.EVENT_TYPES.TACKLE]: {
+      attacker: calculatePlayerRating(attackerTeam, attacker.position, 'tackle') * attacker.fatigue,
+      defender: calculatePlayerRating(defenderTeam, defender.position, 'dribble') * defender.fatigue
+    }
   };
 
   const ratings = contextRatings[action] || contextRatings.pass;
@@ -522,19 +330,128 @@ const generateMatchEvent = (state) => {
     fieldZone: fieldZone
   };
 
-  // [Mantener el resto de tu lógica de eventos...]
-  // Solo agregar las nuevas funcionalidades
+  // --- RESULTADOS DETALLADOS POR ACCIÓN ---
 
+  // TIRO A PUERTA
+  if (action === MATCH_CONFIG.EVENT_TYPES.SHOT) {
+    const shotQuality = ratings.attacker / 100;
+    const saveQuality = ratings.defender / 100;
+    
+    const goalChance = (shotQuality / (shotQuality + saveQuality * 1.2));
+    
+    if (Math.random() < goalChance) {
+      const goalTexts = [
+        `¡GOOOL de ${attackerTeam.name}! ${attacker.position} define con clase.`,
+        `¡GOOOLAZO de ${attackerTeam.name}! ${attacker.position} no perdona.`,
+        `¡GOOOL de ${attackerTeam.name}! ${attacker.position} anota con precisión.`,
+        `¡GOOOL de ${attackerTeam.name}! ${attacker.position} fusila al ángulo.`
+      ];
+      
+      return { 
+        ...event, 
+        type: MATCH_CONFIG.EVENT_TYPES.GOAL, 
+        team: possession, 
+        text: goalTexts[Math.floor(Math.random() * goalTexts.length)], 
+        intensity: 'very-high' 
+      };
+    }
+    
+    const saveTexts = [
+      `¡PARADÓN! El portero de ${defenderTeam.name} detiene a ${attackerTeam.name}.`,
+      `¡INCREÍBLE ATAJADA! ${defenderTeam.name} salva su portería.`,
+      `¡SE VA POR POCO! El tiro de ${attackerTeam.name} rozó el poste.`,
+      `¡DESPEJADO! ${defenderTeam.name} evita el gol.`
+    ];
+    
+    return { 
+      ...event, 
+      type: MATCH_CONFIG.EVENT_TYPES.SAVE, 
+      team: possession === 'user' ? 'bot' : 'user', 
+      text: saveTexts[Math.floor(Math.random() * saveTexts.length)], 
+      intensity: 'high' 
+    };
+  }
+  
+  // REGATE
+  if (action === MATCH_CONFIG.EVENT_TYPES.DRIBBLE) {
+    if (success) {
+      const dribbleTexts = [
+        `¡REGATE IMPRESIONANTE! ${attackerTeam.name} supera la marca.`,
+        `¡HABILIDAD PURA! ${attackerTeam.name} deja atrás al defensor.`,
+        `¡ELASTICO PERFECTO! ${attackerTeam.name} avanza con clase.`
+      ];
+      
+      return { 
+        ...event, 
+        type: MATCH_CONFIG.EVENT_TYPES.DRIBBLE, 
+        team: possession, 
+        text: dribbleTexts[Math.floor(Math.random() * dribbleTexts.length)], 
+        intensity: 'medium' 
+      };
+    }
+    
+    return { 
+      ...event, 
+      type: MATCH_CONFIG.EVENT_TYPES.TACKLE, 
+      team: possession === 'user' ? 'bot' : 'user', 
+      text: `¡INTERCEPTADO! ${defenderTeam.name} corta el regate.`, 
+      intensity: 'medium' 
+    };
+  }
+
+  // FALTA
+  if (action === MATCH_CONFIG.EVENT_TYPES.FOUL) {
+    const foulTexts = [
+      `Falta dura de ${defenderTeam.name}.`,
+      `Tarjeta amarilla para ${defenderTeam.name}.`,
+      `Falta táctica de ${defenderTeam.name}.`
+    ];
+    
+    return { 
+      ...event, 
+      type: MATCH_CONFIG.EVENT_TYPES.FOUL, 
+      team: possession === 'user' ? 'bot' : 'user', 
+      text: foulTexts[Math.floor(Math.random() * foulTexts.length)], 
+      intensity: 'medium',
+      isFoul: true
+    };
+  }
+
+  // TACKLE O INTERCEPCIÓN
+  if (action === MATCH_CONFIG.EVENT_TYPES.TACKLE || (action === MATCH_CONFIG.EVENT_TYPES.PASS && !success)) {
+    const tackleTexts = [
+      `¡ROBO PERFECTO! ${defenderTeam.name} recupera el balón.`,
+      `¡INTERCEPCIÓN CLAVE! ${defenderTeam.name} corta el ataque.`,
+      `¡RECUPERACIÓN! ${defenderTeam.name} gana la posesión.`
+    ];
+    
+    return { 
+      ...event, 
+      type: MATCH_CONFIG.EVENT_TYPES.TACKLE, 
+      team: possession === 'user' ? 'bot' : 'user', 
+      text: tackleTexts[Math.floor(Math.random() * tackleTexts.length)], 
+      intensity: 'medium' 
+    };
+  }
+
+  // PASE EXITOSO
+  const passTexts = [
+    `${attackerTeam.name} combina con inteligencia.`,
+    `Pase milimétrico de ${attackerTeam.name}.`,
+    `${attackerTeam.name} avanza con el balón controlado.`,
+    `Buena circulación de ${attackerTeam.name}.`
+  ];
+  
   return { 
     ...event, 
     type: MATCH_CONFIG.EVENT_TYPES.PASS, 
     team: possession, 
-    text: `${attackerTeam.name} avanza con el balón.`, 
+    text: passTexts[Math.floor(Math.random() * passTexts.length)], 
     intensity: 'low' 
   };
 };
 
-// --- ESTADO INICIAL ACTUALIZADO ---
+// 7. REDUCER ACTUALIZADO (se mantiene igual que tu versión)
 export const initialState = {
   simulating: false,
   matchTime: 0,
@@ -551,21 +468,9 @@ export const initialState = {
   matchId: null,
   matchResult: null,
   fouls: { user: 0, bot: 0 },
-  pendingDoublePenalty: null,
-  // NUEVOS ESTADOS
-  momentum: { user: 0, bot: 0 },
-  confidence: { user: 50, bot: 50 },
-  injuries: { user: [], bot: [] },
-  cards: { user: { yellow: 0, red: 0 }, bot: { yellow: 0, red: 0 } },
-  playerStamina: {
-    user: { GK: 100, DF1: 100, DF2: 100, MF: 100, FW: 100 },
-    bot: { GK: 100, DF1: 100, DF2: 100, MF: 100, FW: 100 }
-  },
-  tacticalInsights: [],
-  specialMoves: { user: null, bot: null }
+  pendingDoublePenalty: null
 };
 
-// --- REDUCER ACTUALIZADO ---
 export function simulationReducer(state, action) {
   switch (action.type) {
     case 'START_MATCH':
@@ -579,16 +484,8 @@ export function simulationReducer(state, action) {
         botFormation: action.payload.botFormation || '2-1-1',
         matchId: action.payload.matchId,
         matchStats: {
-          user: { 
-            goals: 0, shots: 0, tackles: 0, saves: 0, fouls: 0, passes: 0, dribbles: 0,
-            possessionTime: 0, shotAccuracy: 0, passAccuracy: 0,
-            attackZones: { defensive: 0, midfield: 0, attacking: 0 }
-          },
-          bot: { 
-            goals: 0, shots: 0, tackles: 0, saves: 0, fouls: 0, passes: 0, dribbles: 0,
-            possessionTime: 0, shotAccuracy: 0, passAccuracy: 0,
-            attackZones: { defensive: 0, midfield: 0, attacking: 0 }
-          },
+          user: { goals: 0, shots: 0, tackles: 0, saves: 0, fouls: 0, passes: 0, dribbles: 0 },
+          bot: { goals: 0, shots: 0, tackles: 0, saves: 0, fouls: 0, passes: 0, dribbles: 0 },
         },
       };
 
@@ -597,38 +494,11 @@ export function simulationReducer(state, action) {
         return { ...state, simulating: false };
       }
       
-      // Aplicar IA adaptativa
-      const adaptedState = adaptiveAI(state);
-      
       const newTime = state.matchTime + 0.5;
-      const event = generateMatchEvent(adaptedState);
+      const event = generateMatchEvent(state);
       
-      const newStats = JSON.parse(JSON.stringify(adaptedState.matchStats));
-      const newFouls = { ...adaptedState.fouls };
-      const newMomentum = { ...adaptedState.momentum };
-      const newCards = { ...adaptedState.cards };
-      const newInjuries = { ...adaptedState.injuries };
-      
-      // Actualizar momentum
-      newMomentum.user = calculateMomentum(adaptedState.matchEvents, 'user', newMomentum.user);
-      newMomentum.bot = calculateMomentum(adaptedState.matchEvents, 'bot', newMomentum.bot);
-      
-      // Verificar lesiones y tarjetas en faltas
-      if (event.type === 'foul') {
-        const injury = checkForInjury(event, adaptedState);
-        if (injury) {
-          newInjuries[injury.team].push(injury);
-        }
-        
-        const card = checkForCards(event, adaptedState);
-        if (card) {
-          if (card.type === 'yellow') {
-            newCards[card.team].yellow += 1;
-          } else {
-            newCards[card.team].red += 1;
-          }
-        }
-      }
+      const newStats = JSON.parse(JSON.stringify(state.matchStats));
+      const newFouls = { ...state.fouls };
       
       // Actualizar estadísticas
       if (event.type === 'goal') {
@@ -657,26 +527,17 @@ export function simulationReducer(state, action) {
         newFouls[event.team] = 0;
       }
       
-      // Generar insights tácticos
-      const tacticalInsights = generateTacticalInsights({
-        ...adaptedState,
-        matchStats: newStats
-      });
-      
       return {
-        ...adaptedState,
+        ...state,
         matchTime: newTime,
-        possession: event.isDoublePenalty ? adaptedState.possession : event.team,
-        matchEvents: [event, ...adaptedState.matchEvents.slice(0, 24)],
+        possession: event.isDoublePenalty ? state.possession : event.team,
+        matchEvents: [event, ...state.matchEvents.slice(0, 24)],
         matchStats: newStats,
-        fouls: newFouls,
-        momentum: newMomentum,
-        cards: newCards,
-        injuries: newInjuries,
-        tacticalInsights: tacticalInsights.slice(0, 3) // Máximo 3 insights
+        fouls: newFouls
       };
     }
 
+    // ... resto del reducer se mantiene igual
     case 'CHANGE_FORMATION':
       return { ...state, userFormation: action.payload };
       
@@ -700,9 +561,13 @@ export function simulationReducer(state, action) {
       
     case 'CLOSE_RESULTS':
       return {
-        ...initialState,
-        character: state.character,
-        selectedBot: state.selectedBot
+        ...state,
+        matchResult: null,
+        matchTime: 0,
+        matchEvents: [],
+        matchStats: null,
+        fouls: { user: 0, bot: 0 },
+        pendingDoublePenalty: null
       };
       
     default:
