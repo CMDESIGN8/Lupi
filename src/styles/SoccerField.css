@@ -1,4 +1,6 @@
-/* ===== EFECTOS DE GOL MEJORADOS ===== */
+
+
+//* ===== EFECTOS DE GOL MEJORADOS ===== */
 .goal-celebration {
   position: absolute;
   top: 50%;
@@ -154,33 +156,6 @@
         calc(-50% + var(--sparkle-y) * 200px)
       ) 
       scale(0);
-    opacity: 0;
-  }
-}
-
-/* Efecto de confeti adicional */
-.confetti {
-  position: absolute;
-  width: 10px;
-  height: 20px;
-  background: #ff0000;
-  animation: confettiFall 3s ease-in forwards;
-}
-
-.confetti:nth-child(odd) {
-  background: #00ff00;
-}
-.confetti:nth-child(even) {
-  background: #0000ff;
-}
-
-@keyframes confettiFall {
-  0% {
-    transform: translateY(-100px) rotate(0deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(500px) rotate(360deg);
     opacity: 0;
   }
 }
