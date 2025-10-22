@@ -356,7 +356,7 @@ export const SoccerField = ({ state }) => {
     <div className="action-glow"></div>
   </div>
 </div>
-          </>
+          </div>
         ) : (
          <div className="pre-match-arena">
   <div className="pre-match-overlay">
@@ -401,6 +401,7 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
 
 
 
