@@ -4,7 +4,6 @@
   flex-direction: column;
   gap: 1rem;
   align-items: center;
-  background: rgba(255, 255, 255, 0.01);
   min-width: 200px;
 }
 
