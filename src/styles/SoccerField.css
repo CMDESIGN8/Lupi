@@ -1,28 +1,5 @@
 
 /* SoccerField.css */
-/* ===== CANCHA DE FÚTSAL CORREGIDA CON ÁREAS REDONDEADAS ===== */
-.training-dashboard .soccer-field {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background: 
-    linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%),
-    repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.05) 15px, rgba(255,255,255,0.05) 30px);
-  border-radius: 15px;
-  border: 3px solid #e2e8f0;
-  overflow: hidden;
-  box-shadow: 
-    inset 0 0 50px rgba(0, 0, 0, 0.4),
-    var(--shadow-md);
-}
-
-.training-dashboard .field-grass {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    /* background: linear-gradient(90deg, transparent 49%, rgba(255, 255, 255, .4) 49%, rgba(255, 255, 255, .4) 51%, transparent 51%), radial-gradient(circle at 50% 50%, transparent 70px, rgba(255, 255, 255, .3) 70px, rgba(255, 255, 255, .3) 72px, transparent 72px); */
-    bottom: 40px;
-}
 
 /* ÁREAS DE FÚTSAL REDONDEADAS */
 .training-dashboard .futsal-area {
