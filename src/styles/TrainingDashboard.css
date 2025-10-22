@@ -732,63 +732,212 @@
   filter: none !important;
 }
 
-/* ===== HEADER PROFESIONAL ===== */
+/* ===== HEADER PROFESIONAL MEJORADO ===== */
 .app-header.professional {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .95));
   border-bottom: 3px solid var(--accent-blue);
-  padding: 1rem 2rem;
-  margin: 0 auto 1.5rem auto;
-  border-radius: 0 0 15px 15px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  backdrop-filter: blur(10px);
-  max-width: 90%;
-  text-align: center;
+  padding: 1.5rem 2rem;
+  margin: 0 auto 2rem auto;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  backdrop-filter: blur(15px);
+  max-width: 95%;
 }
 
 .header-content {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-  width: 100%;
-}
-
-.header-section {
-  display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  flex: 1;
+  gap: 1.5rem;
 }
 
-.app-header.professional h2 {
+/* Título Central */
+.header-title {
+  text-align: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.header-title h1 {
   margin: 0;
   color: var(--accent-blue);
   font-family: 'Orbitron', monospace;
-  font-size: 1.5rem;
-  text-shadow: 0 2px 10px rgba(76, 201, 240, 0.5);
-}
-
-.match-status {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.score-display-header {
   font-size: 2rem;
-  font-weight: bold;
-  font-family: 'Orbitron', monospace;
-  background: var(--gradient-accent);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 0 2px 15px rgba(76, 201, 240, 0.6);
+  background: linear-gradient(135deg, #38bdf8, #60a5fa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* Contenido Principal del Header */
+.header-main {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 3rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Display del Resultado */
+.match-result-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem 2rem;
+  border-radius: 20px;
+  border: 2px solid rgba(56, 189, 248, 0.2);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+/* Equipos */
+.team-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 140px;
+}
+
+.team-display.home-team {
+  text-align: left;
+}
+
+.team-display.away-team {
+  text-align: right;
+  flex-direction: row-reverse;
+}
+
+.team-logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid rgba(255,255,255,0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.logo-placeholder {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.team-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.team-name {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.team-score {
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  font-family: 'Orbitron', monospace;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Divider del Score */
+.score-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1.5rem;
+}
+
+.vs-text {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.score-main {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--accent-yellow);
+  font-family: 'Orbitron', monospace;
+  text-shadow: 0 2px 10px rgba(234, 179, 8, 0.4);
+  background: linear-gradient(135deg, #eab308, #f59e0b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .header-main {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .match-result-display {
+    order: 1;
+  }
+  
+  .training-dashboard .simulation-controls {
+    order: 2;
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header.professional {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .header-title h1 {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+  }
+  
+  .match-result-display {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .team-logo {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .team-score {
+    font-size: 1.5rem;
+  }
+  
+  .score-main {
+    font-size: 2rem;
+  }
+  
+  .score-divider {
+    padding: 0 1rem;
+  }
+  
+  .training-dashboard .simulation-controls button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+}
+
 
 /* ===== COMPONENTES ESPECÍFICOS FÚTSAL ===== */
 .formation-selector {
