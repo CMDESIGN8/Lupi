@@ -183,6 +183,10 @@ const TrainingDashboard = ({ character }) => {
 
         {/* Panel central - Cancha (se mantiene igual) */}
         <div className="center-panel">
+          {/* Controles de Simulación */}
+      <div className="simulation-controls-header">
+        <SimulationControls state={state} dispatch={dispatch} />
+      </div>
           <SoccerField state={state} />
         </div>
 
