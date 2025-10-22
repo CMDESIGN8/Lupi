@@ -196,19 +196,153 @@
   animation: holderPulse 0.5s ease-in-out infinite;
 }
 
-/* Balón realista */
-.soccer-ball {
+/* ===== BALÓN DE FÚTSAL REALISTA ===== */
+.training-dashboard .soccer-ball {
   position: absolute;
-  width: 22px;
-  height: 22px;
-  background: white;
+  width: 26px;
+  height: 26px;
+  background: 
+    radial-gradient(circle at 30% 30%, #ffffff 0%, #f8fafc 100%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   z-index: 30;
-  transition: all 0.2s ease-out;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 
-    0 4px 12px rgba(0, 0, 0, 0.4),
-    inset 0 0 8px rgba(0, 0, 0, 0.2);
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #e2e8f0;
+  animation: ballFloat 3s ease-in-out infinite;
+}
+
+/* Diseño del balón - patrones característicos */
+.training-dashboard .soccer-ball::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  transform: translate(-50%, -50%);
+  background: 
+    /* Líneas negras del balón */
+    linear-gradient(45deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%),
+    linear-gradient(-45deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%),
+    linear-gradient(0deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%),
+    linear-gradient(90deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%);
+  border-radius: 50%;
+  opacity: 0.9;
+}
+
+/* Efecto de brillo/reflejo */
+.training-dashboard .soccer-ball::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 20%;
+  width: 12px;
+  height: 6px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+  border-radius: 50%;
+  transform: rotate(-30deg);
+  filter: blur(1px);
+}
+
+/* Estados del balón */
+.training-dashboard .soccer-ball.moving {
+  animation: ballSpin 0.8s linear infinite, ballFloat 3s ease-in-out infinite;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.6),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.training-dashboard .soccer-ball.kicked {
+  animation: ballKick 0.5s ease-out, ballSpin 0.6s linear infinite;
+}
+
+.training-dashboard .soccer-ball.rolling {
+  animation: ballRoll 1.2s ease-in-out infinite, ballSpin 1s linear infinite;
+}
+
+/* Animaciones mejoradas */
+@keyframes ballSpin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes ballFloat {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+  50% { transform: translate(-50%, -50%) translateY(-3px); }
+}
+
+@keyframes ballKick {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  25% { transform: translate(-50%, -50%) scale(0.9); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes ballRoll {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg) translateX(0px); }
+  25% { transform: translate(-50%, -50%) rotate(90deg) translateX(2px); }
+  75% { transform: translate(-50%, -50%) rotate(270deg) translateX(-2px); }
+}
+
+/* Efecto de sombra debajo del balón */
+.training-dashboard .ball-shadow {
+  position: absolute;
+  width: 18px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 25;
+  filter: blur(3px);
+  animation: shadowPulse 3s ease-in-out infinite;
+}
+
+@keyframes shadowPulse {
+  0%, 100% { 
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% { 
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+}
+
+/* Balón en diferentes estados del juego */
+.training-dashboard .soccer-ball.in-goal {
+  animation: goalCelebration 2s ease-out;
+  box-shadow: 
+    0 0 30px rgba(76, 201, 240, 0.8),
+    0 0 60px rgba(76, 201, 240, 0.4);
+}
+
+@keyframes goalCelebration {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  25% { transform: translate(-50%, -50%) scale(1.3); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+  75% { transform: translate(-50%, -50%) scale(1.2); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Versión alternativa del balón (diseño moderno) */
+.training-dashboard .soccer-ball.modern {
+  background: 
+    radial-gradient(circle at 35% 35%, #ffffff 0%, #f1f5f9 100%);
+}
+
+.training-dashboard .soccer-ball.modern::before {
+  background: 
+    /* Diseño hexagonal moderno */
+    radial-gradient(circle at 50% 50%, transparent 30%, #1a1a1a 30%, #1a1a1a 35%, transparent 35%),
+    repeating-conic-gradient(
+      from 0deg,
+      #1a1a1a 0deg 10deg,
+      transparent 10deg 20deg
+    );
+  opacity: 0.8;
 }
 
 .soccer-ball.free {
