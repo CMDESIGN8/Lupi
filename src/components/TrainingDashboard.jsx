@@ -107,13 +107,47 @@ const TrainingDashboard = ({ character }) => {
         <MatchResultModal result={state.matchResult} onClose={closeResultModal} />
       )}
 
-      <div className="app-header professional">
-        <h2>🥅 Arena de Fútsal</h2> {/* CORREGIDO: Etiqueta h2 cerrada */}
-        <div className="score-display-header">
-          {state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}
+     <div className="app-header professional">
+  <div className="header-content">
+    {/* Título Central */}
+    <div className="header-title">
+      <h1>🥅 FÚTSAL ARENA</h1>
+    </div>
+    
+    <div className="header-main">
+      {/* Resultado con Imágenes/Escudos */}
+      <div className="match-result-display">
+        <div className="team-display home-team">
+          <div className="team-logo">
+            <div className="logo-placeholder">🏆</div>
+          </div>
+          <div className="team-info">
+            <span className="team-name">{state.character?.name || 'Tu Equipo'}</span>
+            <span className="team-score">{state.matchStats?.user.goals || 0}</span>
+          </div>
         </div>
-        <SimulationControls state={state} dispatch={dispatch} />
+        
+        <div className="score-divider">
+          <span className="vs-text">VS</span>
+          <span className="score-main">{state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}</span>
+        </div>
+        
+        <div className="team-display away-team">
+          <div className="team-info">
+            <span className="team-score">{state.matchStats?.bot.goals || 0}</span>
+            <span className="team-name">{state.selectedBot?.name || 'Rival'}</span>
+          </div>
+          <div className="team-logo">
+            <div className="logo-placeholder">⚽</div>
+          </div>
+        </div>
       </div>
+
+      {/* Controles de Simulación */}
+      <SimulationControls state={state} dispatch={dispatch} />
+    </div>
+  </div>
+</div>
       
       <div className="main-layout improved">
         {/* Panel izquierdo - Ahora eventos */}
