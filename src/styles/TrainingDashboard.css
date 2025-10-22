@@ -1029,22 +1029,34 @@
 }
 
 
-/* ===== HEADER REORGANIZADO ===== */
+/* ===== HEADER CENTRADO ===== */
 .app-header.professional {
   background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .95));
   border-bottom: 3px solid var(--accent-blue);
-  padding: 1.5rem 2rem;
+  padding: 1.5rem 0; /* Cambiado: padding vertical solo */
   margin: 0 auto 2rem auto;
   border-radius: 0 0 20px 20px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.4);
   backdrop-filter: blur(15px);
-  max-width: 95%;
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centra horizontalmente */
+}
+
+.header-container {
+  width: 100%;
+  max-width: 1200px; /* Ancho máximo para pantallas grandes */
+  display: flex;
+  justify-content: center;
 }
 
 .header-content {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  width: 100%;
+  max-width: 1100px; /* Un poco menos que el container */
+  padding: 0 2rem; /* Padding interno en lugar del header */
 }
 
 /* Título Principal con Versión */
@@ -1053,6 +1065,7 @@
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(56, 189, 248, 0.3);
   position: relative;
+  width: 100%;
 }
 
 .header-title h1 {
@@ -1066,22 +1079,10 @@
   text-shadow: 0 2px 15px rgba(76, 201, 240, 0.6);
   background: linear-gradient(135deg, #38bdf8, #60a5fa);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--accent-blue);
   background-clip: text;
 }
 
-.version-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: var(--accent-purple);
-  color: white;
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  font-family: 'Orbitron', monospace;
-}
 
 /* Contenido Principal del Header */
 .header-main {
@@ -1089,7 +1090,8 @@
   grid-template-columns: 1fr auto 1fr;
   gap: 2rem;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* Centra el grid */
+  width: 100%;
 }
 
 /* Secciones de Equipos */
@@ -1251,6 +1253,7 @@
   justify-content: center;
   padding-top: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
 }
 
 /* Animaciones */
@@ -1266,10 +1269,18 @@
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+  .header-content {
+    max-width: 1000px;
+    padding: 0 1.5rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .header-main {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+    justify-items: center;
   }
   
   .center-section {
@@ -1278,12 +1289,18 @@
   
   .team-section {
     justify-content: center !important;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .header-content {
+    padding: 0 1rem;
   }
 }
 
 @media (max-width: 768px) {
   .app-header.professional {
-    padding: 1rem;
+    padding: 1rem 0;
     margin-bottom: 1rem;
   }
   
@@ -1294,6 +1311,7 @@
   .team-section {
     padding: 0.8rem 1rem;
     gap: 1rem;
+    max-width: 350px;
   }
   
   .team-logo {
@@ -1345,74 +1363,21 @@
   .score-main {
     font-size: 2rem;
   }
+  
+  .header-content {
+    padding: 0 0.5rem;
+  }
 }
 
-/* ===== COMPONENTES ESPECÍFICOS FÚTSAL ===== */
-.formation-selector {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.formation-selector label {
-  font-size: 0.8rem;
-  color: #94a3b8;
-}
-
-.formation-selector select {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid var(--accent-blue);
-  border-radius: 6px;
-  color: white;
-  padding: 0.3rem 0.5rem;
-  font-size: 0.8rem;
-}
-
-.training-dashboard .fouls-indicator {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 2rem;
-  background: rgba(0,0,0,0.7);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  z-index: 25;
-}
-
-.training-dashboard .fouls-user {
-  color: var(--accent-blue);
-}
-
-.training-dashboard .fouls-bot {
-  color: #f87171;
-}
-
-.match-time-display {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: var(--gradient-danger);
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 15px;
-  border: 2px solid rgba(255,255,255,0.3);
-  min-width: 80px;
-}
-
-.match-time-display .time {
-  font-size: 1.1rem;
-  font-weight: bold;
-  font-family: 'Orbitron', monospace;
-}
-
-.match-time-display .phase {
-  font-size: 0.7rem;
-  opacity: 0.9;
+/* Para pantallas muy grandes */
+@media (min-width: 1600px) {
+  .header-container {
+    max-width: 1400px;
+  }
+  
+  .header-content {
+    max-width: 1300px;
+  }
 }
 
 /* ===== NUEVOS COMPONENTES ===== */
