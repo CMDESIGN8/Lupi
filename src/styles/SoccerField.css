@@ -1,3 +1,5 @@
+/* SoccerField.css - VERSIÓN ADAPTADA PARA NUEVO REDUCER */
+
 /* ===== EFECTOS DE GOL MEJORADOS ===== */
 .goal-celebration {
   position: absolute;
@@ -157,26 +159,141 @@
     opacity: 0;
   }
 }
-/* SoccerField.css */
 
-.double-penalty-warning {
-  background: #FF9800;
-  color: white;
-  padding: 4px 10px;
-  border-radius: 10px;
-  font-size: 0.8em;
-  margin-top: 5px;
-  animation: pulse 1.5s infinite;
+/* ===== INDICADOR DE ZONA DEL CAMPO ===== */
+.field-zone-indicator {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 }
 
-@keyframes pulse {
-  0% { opacity: 0.7; }
-  50% { opacity: 1; }
-  100% { opacity: 0.7; }
+.zone-display {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border: 2px solid;
+}
+
+.zone-display.defensive {
+  border-color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.2);
+}
+
+.zone-display.midfield {
+  border-color: #4ecdc4;
+  background: rgba(78, 205, 196, 0.2);
+}
+
+.zone-display.attacking {
+  border-color: #45b7d1;
+  background: rgba(69, 183, 209, 0.2);
+}
+
+/* ===== EFECTO DE DOBLE PENALTI ===== */
+.double-penalty-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.penalty-explosion {
+  position: relative;
+  animation: penaltyPulse 1.5s ease-out;
+}
+
+.penalty-ring {
+  width: 120px;
+  height: 120px;
+  border: 4px solid #ffd700;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: ringExpand 1s ease-out;
+}
+
+.penalty-core {
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, #ffd700, #ff6b00);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: corePulse 0.5s ease-in-out infinite;
+}
+
+.penalty-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+  text-align: center;
+}
+
+.penalty-spark {
+  position: absolute;
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to top, #ffd700, transparent);
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  animation: sparkFly 1s ease-out forwards;
+}
+
+@keyframes penaltyPulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes ringExpand {
+  0% { width: 0; height: 0; opacity: 1; }
+  100% { width: 120px; height: 120px; opacity: 0; }
+}
+
+@keyframes corePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes sparkFly {
+  0% { transform: rotate(var(--spark-angle)) translate(0, 0); opacity: 1; }
+  100% { transform: rotate(var(--spark-angle)) translate(0, -100px); opacity: 0; }
+}
+
+/* ===== ELEMENTOS DEL CAMPO DE FÚTSAL ===== */
+.field-grass {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2d5a27 0%, #1e3f1e 100%);
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 /* ÁREAS DE FÚTSAL REDONDEADAS */
-.training-dashboard .futsal-area {
+.futsal-area {
   position: absolute;
   border: 3px solid rgba(255,255,255,0.7);
   top: 50%;
@@ -185,20 +302,20 @@
   height: 60%;
 }
 
-.training-dashboard .futsal-area.left {
+.futsal-area.left {
   left: 0;
   border-right: none;
   border-radius: 0 60px 60px 0;
 }
 
-.training-dashboard .futsal-area.right {
+.futsal-area.right {
   right: 0;
   border-left: none;
   border-radius: 60px 0 0 60px;
 }
 
 /* Puntos de penalti de futsal */
-.training-dashboard .futsal-penalty-spot {
+.futsal-penalty-spot {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -210,24 +327,24 @@
   border: none;
 }
 
-.training-dashboard .futsal-penalty-spot.first {
+.futsal-penalty-spot.first {
   left: 8%;
 }
 
-.training-dashboard .futsal-penalty-spot.second {
+.futsal-penalty-spot.second {
   left: 12%;
 }
 
-.training-dashboard .futsal-penalty-spot.third {
+.futsal-penalty-spot.third {
   right: 8%;
 }
 
-.training-dashboard .futsal-penalty-spot.fourth {
+.futsal-penalty-spot.fourth {
   right: 12%;
 }
 
 /* Puntos de doble penalti (6 metros) */
-.training-dashboard .double-penalty-spot {
+.double-penalty-spot {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -238,16 +355,16 @@
   border: none;
 }
 
-.training-dashboard .double-penalty-spot.left {
+.double-penalty-spot.left {
   left: 5%;
 }
 
-.training-dashboard .double-penalty-spot.right {
+.double-penalty-spot.right {
   right: 5%;
 }
 
 /* Porterías de futsal */
-.training-dashboard .futsal-goal {
+.futsal-goal {
   position: absolute;
   top: 42%;
   height: 16%;
@@ -256,54 +373,58 @@
   border: 2px solid rgba(255,255,255,0.8);
 }
 
-.training-dashboard .futsal-goal.left {
+.futsal-goal.left {
   left: -0.8%;
   border-radius: 0 4px 4px 0;
 }
 
-.training-dashboard .futsal-goal.right {
+.futsal-goal.right {
   right: -0.8%;
   border-radius: 4px 0 0 4px;
 }
 
 /* Línea de 10 metros (tiro libre) */
-.training-dashboard .free-kick-line {
+.free-kick-line {
   position: absolute;
   top: 0;
   width: 2px;
   background: rgba(255,255,255,0.4);
 }
 
-.training-dashboard .free-kick-line.left {
+.free-kick-line.left {
   left: 20%;
 }
 
-.training-dashboard .free-kick-line.right {
+.free-kick-line.right {
   right: 20%;
 }
 
-/* Elementos existentes que se mantienen */
-.training-dashboard .center-circle, 
-.training-dashboard .center-spot { 
+/* Elementos del centro */
+.center-circle { 
   position: absolute;
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  width: 140px; 
+  height: 140px; 
   border: 3px solid rgba(255,255,255,0.7);
-}
-
-.training-dashboard .center-circle { 
-  top: 50%; left: 50%; transform: translate(-50%, -50%); 
-  width: 140px; height: 140px; 
   border-radius: 50%; 
 }
 
-.training-dashboard .center-spot { 
-  top: 50%; left: 50%; transform: translate(-50%, -50%); 
-  width: 12px; height: 12px; 
+.center-spot { 
+  position: absolute;
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  width: 12px; 
+  height: 12px; 
   background: rgba(255,255,255,0.8); 
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(255,255,255,0.5);
   border: none;
 }
-/* Jugadores mejorados */
+
+/* ===== JUGADORES MEJORADOS ===== */
 .player {
   position: absolute;
   width: 45px;
@@ -369,8 +490,21 @@
   animation: holderPulse 0.5s ease-in-out infinite;
 }
 
+/* Badge de posición del jugador */
+.player-position-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 8px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
 /* ===== BALÓN DE FÚTSAL REALISTA ===== */
-.training-dashboard .soccer-ball {
+.soccer-ball {
   position: absolute;
   width: 26px;
   height: 26px;
@@ -388,7 +522,7 @@
 }
 
 /* Diseño del balón - patrones característicos */
-.training-dashboard .soccer-ball::before {
+.soccer-ball::before {
   content: '';
   position: absolute;
   top: 50%;
@@ -407,7 +541,7 @@
 }
 
 /* Efecto de brillo/reflejo */
-.training-dashboard .soccer-ball::after {
+.soccer-ball::after {
   content: '';
   position: absolute;
   top: 15%;
@@ -421,113 +555,27 @@
 }
 
 /* Estados del balón */
-.training-dashboard .soccer-ball.moving {
+.soccer-ball.moving {
   animation: ballSpin 0.8s linear infinite, ballFloat 3s ease-in-out infinite;
   box-shadow: 
     0 8px 25px rgba(0, 0, 0, 0.6),
     inset 0 -4px 8px rgba(0, 0, 0, 0.4);
 }
 
-.training-dashboard .soccer-ball.kicked {
-  animation: ballKick 0.5s ease-out, ballSpin 0.6s linear infinite;
+.soccer-ball.passing {
+  animation: ballPass 0.8s ease-out;
 }
 
-.training-dashboard .soccer-ball.rolling {
-  animation: ballRoll 1.2s ease-in-out infinite, ballSpin 1s linear infinite;
+.soccer-ball.shooting {
+  animation: ballShoot 0.6s ease-out;
 }
 
-/* Animaciones mejoradas */
-@keyframes ballSpin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
-}
-
-@keyframes ballFloat {
-  0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
-  50% { transform: translate(-50%, -50%) translateY(-3px); }
-}
-
-@keyframes ballKick {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  25% { transform: translate(-50%, -50%) scale(0.9); }
-  50% { transform: translate(-50%, -50%) scale(1.1); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-@keyframes ballRoll {
-  0%, 100% { transform: translate(-50%, -50%) rotate(0deg) translateX(0px); }
-  25% { transform: translate(-50%, -50%) rotate(90deg) translateX(2px); }
-  75% { transform: translate(-50%, -50%) rotate(270deg) translateX(-2px); }
-}
-
-/* Efecto de sombra debajo del balón */
-.training-dashboard .ball-shadow {
-  position: absolute;
-  width: 18px;
-  height: 8px;
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 25;
-  filter: blur(3px);
-  animation: shadowPulse 3s ease-in-out infinite;
-}
-
-@keyframes shadowPulse {
-  0%, 100% { 
-    opacity: 0.6;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% { 
-    opacity: 0.3;
-    transform: translate(-50%, -50%) scale(0.8);
-  }
-}
-
-/* Balón en diferentes estados del juego */
-.training-dashboard .soccer-ball.in-goal {
-  animation: goalCelebration 2s ease-out;
-  box-shadow: 
-    0 0 30px rgba(76, 201, 240, 0.8),
-    0 0 60px rgba(76, 201, 240, 0.4);
-}
-
-@keyframes goalCelebration {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  25% { transform: translate(-50%, -50%) scale(1.3); }
-  50% { transform: translate(-50%, -50%) scale(1.1); }
-  75% { transform: translate(-50%, -50%) scale(1.2); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-/* Versión alternativa del balón (diseño moderno) */
-.training-dashboard .soccer-ball.modern {
-  background: 
-    radial-gradient(circle at 35% 35%, #ffffff 0%, #f1f5f9 100%);
-}
-
-.training-dashboard .soccer-ball.modern::before {
-  background: 
-    /* Diseño hexagonal moderno */
-    radial-gradient(circle at 50% 50%, transparent 30%, #1a1a1a 30%, #1a1a1a 35%, transparent 35%),
-    repeating-conic-gradient(
-      from 0deg,
-      #1a1a1a 0deg 10deg,
-      transparent 10deg 20deg
-    );
-  opacity: 0.8;
+.soccer-ball.dribbling {
+  animation: ballDribble 0.5s ease-in-out infinite;
 }
 
 .soccer-ball.free {
   animation: ballBounce 0.6s ease-in-out infinite;
-}
-
-.soccer-ball.passing {
-  animation: passFlight 0.4s ease-out;
-}
-
-.soccer-ball.shooting {
-  animation: shootFlight 0.3s ease-out;
 }
 
 .ball-seams {
@@ -541,7 +589,7 @@
   border-radius: 50%;
 }
 
-/* Línea de pase */
+/* ===== LÍNEA DE PASE ===== */
 .pass-line {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -565,304 +613,38 @@
   border-radius: 50%;
   animation: targetPulse 0.4s ease-in-out;
 }
-.possession-display {
-  font-size: 14px;
-  margin-bottom: 4px;
-}
 
-.team.user {
-  color: #4caf50;
-  font-weight: bold;
-}
-
-.team.bot {
-  color: #f44336;
-  font-weight: bold;
-}
-
-/* Animaciones */
-@keyframes ballPulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.1); }
-}
-
-@keyframes ballBounce {
-  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-  50% { transform: translate(-50%, -48%) scale(0.9) rotate(180deg); }
-}
-
-@keyframes passFlight {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  100% { transform: translate(-50%, -50%) scale(1.2); }
-}
-
-@keyframes shootFlight {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  100% { transform: translate(-50%, -50%) scale(1.3); }
-}
-
-@keyframes holderPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.2); }
-}
-
-@keyframes passLine {
-  0% { width: 0; opacity: 1; }
-  100% { width: 100px; opacity: 0; }
-}
-
-@keyframes targetPulse {
-  0% { transform: scale(0); opacity: 1; }
-  100% { transform: scale(1); opacity: 0; }
-}
-
-
-.formation-preview {
-  margin-top: 20px;
-  font-size: 14px;
-}
-
-.formation-user {
-  color: #4caf50;
-  margin-bottom: 5px;
-}
-
-.formation-bot {
-  color: #f44336;
-}
-/* Efectos de animación mejorados */
-.pass-trail {
+/* ===== CONTADOR DE FALTAS ===== */
+.fouls-counter {
   position: absolute;
-  height: 3px;
-  background: linear-gradient(90deg, #4caf50, transparent);
-  transform-origin: 0 50%;
-  z-index: 15;
-  animation: passTrail 0.8s ease-out;
-}
-
-@keyframes passTrail {
-  0% { width: 0; opacity: 1; }
-  100% { width: 100%; opacity: 0; }
-}
-
-.shot-trail {
-  position: absolute;
-  height: 4px;
-  background: linear-gradient(90deg, #ff9800, #ffeb3b, transparent);
-  transform-origin: 0 50%;
-  z-index: 15;
-  animation: shotTrail 0.6s ease-out;
-}
-
-@keyframes shotTrail {
-  0% { width: 0; opacity: 1; }
-  100% { width: 120%; opacity: 0; }
-}
-
-/* Efecto de gol */
-.goal-effect {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 100;
-  pointer-events: none;
-}
-
-.goal-explosion {
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, #ffeb3b 0%, transparent 70%);
-  border-radius: 50%;
-  animation: goalExplosion 0.8s ease-out;
-}
-
-@keyframes goalExplosion {
-  0% { transform: scale(0); opacity: 1; }
-  100% { transform: scale(2); opacity: 0; }
-}
-
-.goal-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 48px;
-  font-weight: bold;
-  color: #ffeb3b;
-  text-shadow: 0 0 20px #ff9800;
-  animation: goalText 2s ease-in-out;
-}
-
-@keyframes goalText {
-  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-}
-
-/* Efecto de atajada */
-.save-effect {
-  position: absolute;
-  z-index: 90;
-  pointer-events: none;
-}
-
-.save-sparkle {
-  width: 100px;
-  height: 100px;
-  background: radial-gradient(circle, #ffffff 0%, transparent 70%);
-  border-radius: 50%;
-  animation: saveSparkle 0.5s ease-out;
-}
-
-@keyframes saveSparkle {
-  0% { transform: scale(0); opacity: 1; }
-  100% { transform: scale(1.5); opacity: 0; }
-}
-
-/* Mejoras en las animaciones del balón */
-.soccer-ball.passing {
-  animation: ballPass 0.8s ease-out;
-}
-
-.soccer-ball.shooting {
-  animation: ballShoot 0.6s ease-out;
-}
-
-@keyframes ballPass {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -52%) scale(0.9); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-@keyframes ballShoot {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -55%) scale(0.8); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-/* Estados de los jugadores */
-.player.moving {
-  animation: playerMove 0.5s ease-in-out;
-}
-
-@keyframes playerMove {
-  0% { transform: translate(-50%, -50%); }
-  50% { transform: translate(-50%, -52%); }
-  100% { transform: translate(-50%, -50%); }
-}
-
-/* ===== HUD MEJORADO ===== */
-.match-hud {
-  position: absolute;
-  bottom: 20px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.95), 
-    rgba(30, 41, 59, 0.98)
-  );
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 2px solid rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  box-shadow: 
-    0 12px 40px rgba(0, 0, 0, 0.8),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-  padding: 1.2rem 2rem;
-  z-index: 90;
-  min-width: 300px;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  animation: hudEntrance 0.6s ease-out;
-}
-
-@keyframes hudEntrance {
-  from {
-    opacity: 0;
-    transform: translate(-50%, 20px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-.possession-display {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.8rem 1.2rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.team {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.team.user {
-  color: #60a5fa;
-  text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
-}
-
-.team.bot {
-  color: #f87171;
-  text-shadow: 0 0 10px rgba(248, 113, 113, 0.5);
-}
-
-.possession-text {
-  color: #cbd5e1;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.fouls-display {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.fouls-counter {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 0.6rem 1.2rem;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.fouls-label {
-  color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  gap: 20px;
+  z-index: 10;
 }
 
 .fouls-user, .fouls-bot {
-  font-family: 'Orbitron', monospace;
-  font-weight: 700;
-  font-size: 1.1rem;
-  min-width: 20px;
-  text-align: center;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.fouls-user {
-  color: #60a5fa;
+.fouls-label {
+  font-size: 10px;
+  opacity: 0.8;
 }
 
-.fouls-bot {
-  color: #f87171;
+.fouls-count {
+  font-weight: bold;
+  font-size: 16px;
+  color: #ff6b6b;
 }
 
 .fouls-separator {
@@ -953,13 +735,9 @@
   letter-spacing: 3px;
 }
 
-/* Estados por tipo de acción - Mejorados */
+/* Estados por tipo de acción */
 .action-indicator.passing {
   border-color: #60a5fa;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.98), 
-    rgba(30, 41, 59, 0.95)
-  );
   box-shadow: 
     0 15px 40px rgba(0, 0, 0, 0.5),
     0 0 30px rgba(96, 165, 250, 0.4),
@@ -973,10 +751,6 @@
 
 .action-indicator.shooting {
   border-color: #f87171;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.98), 
-    rgba(30, 41, 59, 0.95)
-  );
   box-shadow: 
     0 15px 40px rgba(0, 0, 0, 0.5),
     0 0 30px rgba(248, 113, 113, 0.5),
@@ -992,10 +766,6 @@
 
 .action-indicator.dribbling {
   border-color: #a78bfa;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.98), 
-    rgba(30, 41, 59, 0.95)
-  );
   box-shadow: 
     0 15px 40px rgba(0, 0, 0, 0.5),
     0 0 30px rgba(167, 139, 250, 0.4),
@@ -1009,10 +779,6 @@
 
 .action-indicator.moving {
   border-color: #34d399;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.98), 
-    rgba(30, 41, 59, 0.95)
-  );
   box-shadow: 
     0 15px 40px rgba(0, 0, 0, 0.5),
     0 0 30px rgba(52, 211, 153, 0.4),
@@ -1026,10 +792,6 @@
 
 .action-indicator.double_penalty {
   border-color: #fbbf24;
-  background: linear-gradient(135deg, 
-    rgba(15, 23, 42, 0.98), 
-    rgba(30, 41, 59, 0.95)
-  );
   box-shadow: 
     0 15px 40px rgba(0, 0, 0, 0.5),
     0 0 40px rgba(251, 191, 36, 0.6),
@@ -1044,7 +806,193 @@
   font-size: 1.1rem;
 }
 
-/* ===== ANIMACIONES MEJORADAS ===== */
+.action-indicator.foul {
+  border-color: #f59e0b;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(245, 158, 11, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.action-indicator.foul .action-text {
+  color: #fed7aa;
+  text-shadow: 0 0 10px rgba(254, 215, 170, 0.6);
+}
+
+.action-indicator.tackle {
+  border-color: #10b981;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(16, 185, 129, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.action-indicator.tackle .action-text {
+  color: #a7f3d0;
+  text-shadow: 0 0 10px rgba(167, 243, 208, 0.6);
+}
+
+/* ===== PANTALLA PRE-PARTIDO ===== */
+.pre-match-arena {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e82 10%);
+  border: 2px solid #00ffff;
+  border-radius: 15px;
+  box-shadow: 0 0 30px #00ffff4d;
+  padding: 20px;
+  top: 7px;
+  position: relative;
+}
+
+.pre-match-overlay {
+  text-align: center;
+}
+
+.game-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: white;
+  text-shadow: 0 0 10px #00ffff;
+}
+
+.title-accent {
+  color: #ff0080;
+  text-shadow: 0 0 10px #ff0080;
+}
+
+.arena-ready {
+  color: #00ff88;
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: 1.2rem;
+}
+
+.arena-features {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 5px;
+  color: #cbd5e1;
+}
+
+.tactical-breakdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 100px;
+  margin-top: 20px;
+}
+
+.vs-badge {
+  background: linear-gradient(45deg, #ff0080, #00ffff);
+  padding: 20px;
+  border-radius: 50%;
+  font-weight: 900;
+  color: #fff;
+  font-size: 1.5rem;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+  flex-shrink: 0;
+  margin-bottom: 5%;
+  margin-left: 1%;
+}
+
+.formation-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  min-width: 120px;
+}
+
+.user-formation {
+  border-left: 4px solid #00ffff;
+}
+
+.rival-formation {
+  border-left: 4px solid #ff0080;
+}
+
+.formation-badge {
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.formation-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  display: block;
+}
+
+.formation-type {
+  font-size: 10px;
+  opacity: 0.8;
+  margin-top: 2px;
+  color: #cbd5e1;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes ballPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.1); }
+}
+
+@keyframes ballBounce {
+  0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  50% { transform: translate(-50%, -48%) scale(0.9) rotate(180deg); }
+}
+
+@keyframes ballPass {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -52%) scale(0.9); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes ballShoot {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -55%) scale(0.8); }
+  100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes ballDribble {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -48%) scale(0.95); }
+}
+
+@keyframes ballSpin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes ballFloat {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+  50% { transform: translate(-50%, -50%) translateY(-3px); }
+}
+
+@keyframes holderPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+@keyframes passLine {
+  0% { width: 0; opacity: 1; }
+  100% { width: 100px; opacity: 0; }
+}
+
+@keyframes targetPulse {
+  0% { transform: scale(0); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+
 @keyframes actionSlideDown {
   from {
     opacity: 0;
@@ -1086,21 +1034,6 @@
   }
 }
 
-@keyframes penaltyPulse {
-  0%, 100% { 
-    transform: translate(-50%, 0) scale(1);
-    box-shadow: 
-      0 15px 40px rgba(0, 0, 0, 0.5),
-      0 0 40px rgba(251, 191, 36, 0.6);
-  }
-  50% { 
-    transform: translate(-50%, 0) scale(1.08);
-    box-shadow: 
-      0 15px 40px rgba(0, 0, 0, 0.5),
-      0 0 60px rgba(251, 191, 36, 0.8);
-  }
-}
-
 @keyframes warningPulse {
   0%, 100% { 
     opacity: 1;
@@ -1112,202 +1045,13 @@
   }
 }
 
-/* ===== EFECTOS DE GOL PREMIUM ===== */
-.goal-effect {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 200;
-  pointer-events: none;
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
 }
 
-.goal-explosion {
-  position: relative;
-  width: 300px;
-  height: 300px;
-}
-
-.goal-ring {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 4px solid #fbbf24;
-  border-radius: 50%;
-  animation: goalRing 1.2s ease-out forwards;
-}
-
-.goal-core {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100px;
-  height: 100px;
-  background: radial-gradient(circle, #fef3c7 0%, #fbbf24 50%, transparent 70%);
-  border-radius: 50%;
-  animation: goalCore 1s ease-out forwards;
-  filter: blur(2px);
-}
-
-.goal-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-family: 'Orbitron', monospace;
-  font-size: 4rem;
-  font-weight: 900;
-  color: #fef3c7;
-  text-shadow: 
-    0 0 20px #fbbf24,
-    0 0 40px #f59e0b,
-    0 0 60px #d97706;
-  animation: goalText 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  text-transform: uppercase;
-  letter-spacing: 8px;
-}
-
-.goal-sparkle {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: #fef3c7;
-  border-radius: 50%;
-  animation: goalSparkle 1.5s ease-out forwards;
-}
-
-@keyframes goalRing {
-  0% { 
-    width: 0; 
-    height: 0; 
-    opacity: 1; 
-  }
-  100% { 
-    width: 400px; 
-    height: 400px; 
-    opacity: 0; 
-  }
-}
-
-@keyframes goalCore {
-  0% { 
-    transform: translate(-50%, -50%) scale(0); 
-    opacity: 1; 
-  }
-  50% { 
-    transform: translate(-50%, -50%) scale(1.5); 
-    opacity: 0.8; 
-  }
-  100% { 
-    transform: translate(-50%, -50%) scale(2); 
-    opacity: 0; 
-  }
-}
-
-@keyframes goalText {
-  0% { 
-    transform: translate(-50%, -50%) scale(0) rotate(-20deg); 
-    opacity: 0; 
-  }
-  50% { 
-    transform: translate(-50%, -50%) scale(1.3) rotate(5deg); 
-    opacity: 1; 
-  }
-  100% { 
-    transform: translate(-50%, -50%) scale(1) rotate(0deg); 
-    opacity: 1; 
-  }
-}
-
-@keyframes goalSparkle {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(
-      calc(var(--sparkle-x) * 200px),
-      calc(var(--sparkle-y) * 200px)
-    ) scale(0);
-    opacity: 0;
-  }
-}
-
-/* ===== EFECTO DE ENTRADA/SALIDA ===== */
-.action-indicator.entering {
-  animation: actionSlideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
-             actionFloat 4s ease-in-out infinite;
-}
-
-.action-indicator.exiting {
-  animation: actionSlideUp 0.5s ease-in forwards;
-}
-
-@keyframes actionSlideUp {
-  from {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translate(-50%, -40px) scale(0.9);
-  }
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-  .match-hud {
-    bottom: 10px;
-    padding: 1rem 1.5rem;
-    min-width: 280px;
-    gap: 0.8rem;
-  }
-  
-  .action-indicator {
-    padding: 0.8rem 1.5rem;
-    gap: 0.8rem;
-  }
-  
-  .action-text {
-    font-size: 0.9rem;
-    letter-spacing: 2px;
-  }
-  
-  .action-icon {
-    font-size: 1.4rem;
-  }
-  
-  .goal-text {
-    font-size: 3rem;
-    letter-spacing: 6px;
-  }
-}
-
-@media (max-width: 480px) {
-  .match-hud {
-    min-width: 250px;
-    padding: 0.8rem 1.2rem;
-  }
-  
-  .possession-display {
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-  }
-  
-  .action-indicator {
-    padding: 0.7rem 1.2rem;
-  }
-  
-  .action-text {
-    font-size: 0.8rem;
-    letter-spacing: 1px;
-  }
-}
-
-/* Efecto de parada */
+/* ===== EFECTO DE PARADA/PORTERÍA ===== */
 .save-effect {
   position: absolute;
   z-index: 90;
@@ -1327,120 +1071,62 @@
   100% { transform: scale(1.5); opacity: 0; }
 }
 
-/* Mejoras en animaciones */
-.soccer-ball.shooting {
-  animation: ballShot 0.5s ease-out;
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .action-indicator {
+    padding: 0.8rem 1.5rem;
+    gap: 0.8rem;
+  }
+  
+  .action-text {
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+  }
+  
+  .action-icon {
+    font-size: 1.4rem;
+  }
+  
+  .goal-text {
+    font-size: 3rem;
+    letter-spacing: 6px;
+  }
+  
+  .tactical-breakdown {
+    gap: 50px;
+  }
+  
+  .formation-card {
+    min-width: 100px;
+    padding: 10px;
+  }
+  
+  .formation-value {
+    font-size: 1.5rem;
+  }
 }
 
-@keyframes ballShot {
-  0% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.2); }
-  100% { transform: translate(-50%, -50%) scale(1); }
-}
-
-.player.with-ball {
-  animation: playerPulse 1s ease-in-out infinite;
-}
-
-@keyframes playerPulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -50%) scale(1.05); }
-}
-
-.tactical-breakdown {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 100px; /* Espacio entre las tarjetas y el badge */
-}
-
-.vs-badge {
-  background: linear-gradient(45deg, #ff0080, #00ffff);
-  padding: 20px;
-  border-radius: 50%;
-  font-weight: 900;
-  color: #fff;
-  font-size: 1.5rem;
-  width: 70px;
-  height: 70px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-  flex-shrink: 0;
-      margin-bottom: 5%;
-    margin-left: 1%;
-}
-
-.pre-match-arena {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e82 10%);
-    border: 2px solid #00ffff;
-    border-radius: 15px;
-    box-shadow: 0 0 30px #00ffff4d;
-    padding: 20px;
-    top: 7px;
-    position: relative;
-}
-
-.game-title {
-  font-size: 2.5rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  color: white;
-  text-shadow: 0 0 10px #00ffff;
-}
-
-.title-accent {
-  color: #ff0080;
-  text-shadow: 0 0 10px #ff0080;
-}
-
-.status-text {
-  color: #00ff88;
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
-.status-pulse {
-  width: 8px;
-  height: 8px;
-  background: #00ff88;
-  border-radius: 50%;
-  animation: pulse 1.5s infinite;
-  margin-right: 10px;
-}
-
-.formation-card {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
-  padding: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.user-formation {
-  border-left: 4px solid #00ffff;
-}
-
-.rival-formation {
-  border-left: 4px solid #ff0080;
-}
-
-.formation-badge {
-  font-size: 0.8rem;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.formation-value {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: white;
-}
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
+@media (max-width: 480px) {
+  .action-indicator {
+    padding: 0.7rem 1.2rem;
+  }
+  
+  .action-text {
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+  }
+  
+  .tactical-breakdown {
+    gap: 30px;
+    flex-direction: column;
+  }
+  
+  .vs-badge {
+    margin: 10px 0;
+  }
+  
+  .fouls-counter {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
