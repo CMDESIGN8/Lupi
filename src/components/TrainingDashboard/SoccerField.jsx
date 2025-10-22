@@ -1,9 +1,9 @@
-// SoccerField.jsx - VERSIÓN CORREGIDA
+// SoccerField.jsx
 import React, { useState, useEffect } from 'react';
 import "../../styles/SoccerField.css";
 
 export const SoccerField = ({ state }) => {
-  const { simulating, possession, userFormation = '2-1-1', botFormation = '2-1-1', matchEvents, fouls } = state;
+  const { simulating, possession, userFormation = '2-1-1', botFormation = '2-1-1', matchEvents } = state;
   const [gameState, setGameState] = useState({
     players: [],
     ball: { x: 50, y: 50, withPlayer: null },
@@ -245,32 +245,32 @@ export const SoccerField = ({ state }) => {
 
   return (
     <div className="soccer-field">
-      <div className="field-grass">
-        {/* Áreas de futsal redondeadas */}
-        <div className="futsal-area left"></div>
-        <div className="futsal-area right"></div>
-        
-        {/* Puntos de penalti */}
-        <div className="futsal-penalty-spot first"></div>
-        <div className="futsal-penalty-spot second"></div>
-        <div className="futsal-penalty-spot third"></div>
-        <div className="futsal-penalty-spot fourth"></div>
-        
-        {/* Puntos de doble penalti */}
-        <div className="double-penalty-spot left"></div>
-        <div className="double-penalty-spot right"></div>
-        
-        {/* Líneas de tiro libre */}
-        <div className="free-kick-line left"></div>
-        <div className="free-kick-line right"></div>
-        
-        {/* Elementos centrales */}
-        <div className="center-circle"></div>
-        <div className="center-spot"></div>
-        
-        {/* Porterías */}
-        <div className="futsal-goal left"></div>
-        <div className="futsal-goal right"></div>
+  <div className="field-grass">
+    {/* Áreas de futsal redondeadas */}
+    <div className="futsal-area left"></div>
+    <div className="futsal-area right"></div>
+    
+    {/* Puntos de penalti */}
+    <div className="futsal-penalty-spot first"></div>
+    <div className="futsal-penalty-spot second"></div>
+    <div className="futsal-penalty-spot third"></div>
+    <div className="futsal-penalty-spot fourth"></div>
+    
+    {/* Puntos de doble penalti */}
+    <div className="double-penalty-spot left"></div>
+    <div className="double-penalty-spot right"></div>
+    
+    {/* Líneas de tiro libre */}
+    <div className="free-kick-line left"></div>
+    <div className="free-kick-line right"></div>
+    
+    {/* Elementos centrales */}
+    <div className="center-circle"></div>
+    <div className="center-spot"></div>
+    
+    {/* Porterías */}
+    <div className="futsal-goal left"></div>
+    <div className="futsal-goal right"></div>
 
         {simulating ? (
           <>
@@ -322,85 +322,61 @@ export const SoccerField = ({ state }) => {
                 </span>
                 <span className="possession-text"> tiene la posesión</span>
               </div>
-              
-              {/* CONTADOR DE FALTAS */}
-              <div className="fouls-display">
-                <div className="fouls-counter">
-                  <span className="fouls-label">Faltas:</span>
-                  <span className="fouls-user">{fouls?.user || 0}</span>
-                  <span className="fouls-separator">-</span>
-                  <span className="fouls-bot">{fouls?.bot || 0}</span>
-                </div>
-                {(fouls?.user >= 5 || fouls?.bot >= 5) && (
-                  <div className="double-penalty-warning">
-                    ⚠️ Próxima falta será doble penalti
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Indicador de Acción Mejorado */}
-            <div className="action-overlay">
-              <div className={`action-indicator ${gameState.action}`}>
-                <div className="action-icon">
-                  {gameState.action === 'passing' && '⚽'}
-                  {gameState.action === 'shooting' && '🎯'}
-                  {gameState.action === 'dribbling' && '🌀'}
-                  {gameState.action === 'moving' && '🏃'}
-                  {matchEvents[0]?.type === 'double_penalty' && '💥'}
-                </div>
-                <div className="action-text">
-                  {gameState.action === 'passing' && 'PASE →'}
-                  {gameState.action === 'shooting' && 'TIRO A PUERTA!'}
-                  {gameState.action === 'dribbling' && 'REGATE'}
-                  {gameState.action === 'moving' && 'CIRCULACIÓN'}
-                  {matchEvents[0]?.type === 'double_penalty' && 'DOBLE PENALTI!'}
-                </div>
-                <div className="action-glow"></div>
+              <div className="action-indicator">
+                {gameState.action === 'passing' && '⚽ PASE →'}
+                {gameState.action === 'shooting' && '🎯 TIRO A PUERTA!'}
+                {gameState.action === 'dribbling' && '🌀 REGATE'}
+                {gameState.action === 'moving' && '🏃🏼‍♂️ CIRCULACIÓN'}
               </div>
             </div>
           </>
         ) : (
-          <div className="pre-match-arena">
-            <div className="pre-match-overlay">
-              <div className="match-header">
-                <div className="title-container">
-                  <h1 className="game-title">FÚTSAL<span className="title-accent">ARENA</span></h1>
-                </div>
-              </div>
-              
-              <div className="arena-display">
-                <div className="stadium-preview">
-                  <div className="field-glow"></div>
-                  <p className="arena-ready">ARENA SINCRONIZADA</p>
-                </div>
-                
-                <div className="tactical-breakdown">
-                  <div className="formation-card user-formation">
-                    <div className="formation-badge">TU ESTRATEGIA</div>
-                    <div className="formation-display">
-                      <span className="formation-value">{userFormation}</span>
-                      <div className="formation-type">OFENSIVA</div>
-                    </div>
-                  </div>
-                  
-                  <div className="vs-badge">
-                    <span>VS</span>
-                  </div>
-                  
-                  <div className="formation-card rival-formation">
-                    <div className="formation-badge">RIVAL DETECTADO</div>
-                    <div className="formation-display">
-                      <span className="formation-value">{botFormation}</span>
-                      <div className="formation-type">CONTRAATAQUE</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+         <div className="pre-match-arena">
+  <div className="pre-match-overlay">
+    <div className="match-header">
+      <div className="title-container">
+        <h1 className="game-title">FÚTSAL<span className="title-accent">ARENA</span></h1>
+      </div>
+    </div>
+    
+    <div className="arena-display">
+      <div className="stadium-preview">
+        <div className="field-glow"></div>
+        <p className="arena-ready">ARENA SINCRONIZADA</p>
+      </div>
+      
+      <div className="tactical-breakdown">
+        <div className="formation-card user-formation">
+          <div className="formation-badge">TU ESTRATEGIA</div>
+          <div className="formation-display">
+            <span className="formation-value">{userFormation}</span>
+            <div className="formation-type">OFENSIVA</div>
           </div>
+        </div>
+        
+        <div className="vs-badge">
+          <span>VS</span>
+        </div>
+        
+        <div className="formation-card rival-formation">
+          <div className="formation-badge">RIVAL DETECTADO</div>
+          <div className="formation-display">
+            <span className="formation-value">{botFormation}</span>
+            <div className="formation-type">CONTRAATAQUE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
         )}
       </div>
     </div>
   );
 };
+
+
+
+
+
+
