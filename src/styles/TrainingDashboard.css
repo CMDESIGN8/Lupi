@@ -1159,12 +1159,13 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .fouls-label {
   color: #94a3b8;
   font-weight: 600;
+  font-size: 1rem;
 }
 
 .fouls-count {
