@@ -337,13 +337,23 @@ export const SoccerField = ({ state }) => {
     )}
   </div>
   
-  <div className="action-indicator">
-    {gameState.action === 'passing' && '⚽ PASE →'}
-    {gameState.action === 'shooting' && '🎯 TIRO A PUERTA!'}
-    {gameState.action === 'dribbling' && '🌀 REGATE'}
-    {gameState.action === 'moving' && '🏃🏼‍♂️ CIRCULACIÓN'}
-    {/* Agregar indicador para doble penalti */}
-    {matchEvents[0]?.type === 'double_penalty' && '🎯 DOBLE PENALTI!'}
+ <div className="action-overlay">
+  <div className={`action-indicator ${gameState.action}`}>
+    <div className="action-icon">
+      {gameState.action === 'passing' && '⚽'}
+      {gameState.action === 'shooting' && '🎯'}
+      {gameState.action === 'dribbling' && '🌀'}
+      {gameState.action === 'moving' && '🏃'}
+      {matchEvents[0]?.type === 'double_penalty' && '💥'}
+    </div>
+    <div className="action-text">
+      {gameState.action === 'passing' && 'PASE →'}
+      {gameState.action === 'shooting' && 'TIRO A PUERTA!'}
+      {gameState.action === 'dribbling' && 'REGATE'}
+      {gameState.action === 'moving' && 'CIRCULACIÓN'}
+      {matchEvents[0]?.type === 'double_penalty' && 'DOBLE PENALTI!'}
+    </div>
+    <div className="action-glow"></div>
   </div>
 </div>
           </>
@@ -391,6 +401,7 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
 
 
 
