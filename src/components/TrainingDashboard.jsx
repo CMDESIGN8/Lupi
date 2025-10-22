@@ -167,11 +167,6 @@ const TrainingDashboard = ({ character }) => {
           </div>
         </div>
       </div>
-
-      {/* Controles de Simulación */}
-      <div className="simulation-controls-header">
-        <SimulationControls state={state} dispatch={dispatch} />
-      </div>
     </div>
   </div>
 </div>
