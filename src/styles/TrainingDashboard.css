@@ -69,7 +69,6 @@
 
 /* ===== PANELES GENERALES ===== */
 .training-dashboard .left-panel,
-.training-dashboard .right-panel,
 .training-dashboard .bottom-panel,
 .training-dashboard .center-panel {
   background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.95));
