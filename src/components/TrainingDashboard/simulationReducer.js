@@ -61,14 +61,49 @@ const getActivePlayer = (team, formation, playerType) => {
   };
 };
 
-// 3. GENERADOR DE EVENTOS MEJORADO
+// 3. SIMULAR DOBLE PENALTI (desde línea de 10m)
+const simulateDoublePenalty = (attackerTeam, defenderTeam) => {
+  const shotPower = calculatePlayerRating(attackerTeam, 'FW');
+  const savePower = calculatePlayerRating(defenderTeam, 'GK');
+  
+  // En doble penalti, el portero tiene menos ventaja (solo 1.0 en lugar de 1.2)
+  const goalChance = (shotPower / (shotPower + savePower * 1.0));
+  
+  const isGoal = Math.random() < goalChance;
+  
+  return {
+    isGoal,
+    text: isGoal 
+      ? `¡GOOOL DE DOBLE PENALTI! ${attackerTeam.name} anota desde la línea de 10m.`
+      : `¡PARADA INCREÍBLE! El portero de ${defenderTeam.name} detiene el doble penalti.`
+  };
+};
+
+// 4. GENERADOR DE EVENTOS MEJORADO
 const generateMatchEvent = (state) => {
-  const { possession, character, selectedBot, tactic, userFormation, botFormation } = state;
+  const { possession, character, selectedBot, tactic, userFormation, botFormation, fouls } = state;
   
   const attackerTeam = possession === 'user' ? character : selectedBot;
   const defenderTeam = possession === 'user' ? selectedBot : character;
   const attackerFormation = possession === 'user' ? userFormation : botFormation;
   const defenderFormation = possession === 'user' ? botFormation : userFormation;
+
+  // Verificar si hay doble penalti pendiente por acumulación de faltas
+  const currentTeamFouls = fouls[possession] || 0;
+  if (currentTeamFouls >= MATCH_CONFIG.FOULS.DOUBLE_PENALTY_FOUL) {
+    const penaltyResult = simulateDoublePenalty(attackerTeam, defenderTeam);
+    
+    return {
+      id: Date.now() + Math.random(),
+      time: `${state.matchTime}'`,
+      type: MATCH_CONFIG.EVENT_TYPES.DOUBLE_PENALTY,
+      team: possession,
+      text: penaltyResult.text,
+      intensity: 'very-high',
+      isGoal: penaltyResult.isGoal,
+      isDoublePenalty: true
+    };
+  }
 
   // Obtener jugadores activos para esta acción
   const attacker = getActivePlayer(attackerTeam, attackerFormation, 'attacker');
@@ -188,23 +223,25 @@ const generateMatchEvent = (state) => {
     };
   }
 
-  // TACKLE O FALTA
-  if (action === MATCH_CONFIG.EVENT_TYPES.TACKLE || (action === MATCH_CONFIG.EVENT_TYPES.PASS && !success)) {
-    return { 
-      ...event, 
-      type: MATCH_CONFIG.EVENT_TYPES.TACKLE, 
-      team: possession === 'user' ? 'bot' : 'user', 
-      text: `¡${defenderTeam.name} (${defender.position}) roba el balón!`, 
-      intensity: 'medium' 
-    };
-  }
-  
+  // FALTA
   if (action === MATCH_CONFIG.EVENT_TYPES.FOUL) {
     return { 
       ...event, 
       type: MATCH_CONFIG.EVENT_TYPES.FOUL, 
       team: possession === 'user' ? 'bot' : 'user', 
       text: `Falta de ${defenderTeam.name} (${defender.position}).`, 
+      intensity: 'medium',
+      isFoul: true
+    };
+  }
+
+  // TACKLE O FALTA EN PASE
+  if (action === MATCH_CONFIG.EVENT_TYPES.TACKLE || (action === MATCH_CONFIG.EVENT_TYPES.PASS && !success)) {
+    return { 
+      ...event, 
+      type: MATCH_CONFIG.EVENT_TYPES.TACKLE, 
+      team: possession === 'user' ? 'bot' : 'user', 
+      text: `¡${defenderTeam.name} (${defender.position}) roba el balón!`, 
       intensity: 'medium' 
     };
   }
@@ -235,6 +272,8 @@ export const initialState = {
   selectedBot: null,
   matchId: null,
   matchResult: null,
+  fouls: { user: 0, bot: 0 }, // Contador de faltas por equipo
+  pendingDoublePenalty: null // Doble penalti pendiente
 };
 
 export function simulationReducer(state, action) {
@@ -264,6 +303,7 @@ export function simulationReducer(state, action) {
       const event = generateMatchEvent(state);
       
       const newStats = JSON.parse(JSON.stringify(state.matchStats));
+      const newFouls = { ...state.fouls };
       
       // Actualizar estadísticas según evento
       if (event.type === 'goal') {
@@ -276,18 +316,31 @@ export function simulationReducer(state, action) {
         newStats[event.team].tackles++;
       } else if (event.type === 'foul') {
         newStats[event.team].fouls++;
+        // Incrementar contador de faltas del equipo que cometió la falta
+        newFouls[event.team] = (newFouls[event.team] || 0) + 1;
       } else if (event.type === 'pass') {
         newStats[event.team].passes++;
       } else if (event.type === 'dribble') {
         newStats[event.team].dribbles++;
+      } else if (event.type === 'double_penalty') {
+        if (event.isGoal) {
+          newStats[event.team].goals++;
+          newStats[event.team].shots++;
+        } else {
+          newStats[event.team === 'user' ? 'bot' : 'user'].saves++;
+          newStats[event.team].shots++;
+        }
+        // Reiniciar contador de faltas después del doble penalti
+        newFouls[event.team] = 0;
       }
       
       return {
         ...state,
         matchTime: newTime,
-        possession: event.team,
+        possession: event.isDoublePenalty ? state.possession : event.team, // En doble penalti no cambia posesión
         matchEvents: [event, ...state.matchEvents.slice(0, 24)],
-        matchStats: newStats
+        matchStats: newStats,
+        fouls: newFouls
       };
     }
 
@@ -317,7 +370,7 @@ export function simulationReducer(state, action) {
 
     case 'END_MATCH':
       return { ...state, simulating: false };
-      
+
     case 'SHOW_RESULTS':
       return {
         ...state,
@@ -332,6 +385,8 @@ export function simulationReducer(state, action) {
         matchTime: 0,
         matchEvents: [],
         matchStats: null,
+        fouls: { user: 0, bot: 0 },
+        pendingDoublePenalty: null
       };
       
     default:
