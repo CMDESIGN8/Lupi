@@ -322,13 +322,30 @@ export const SoccerField = ({ state }) => {
                 </span>
                 <span className="possession-text"> tiene la posesión</span>
               </div>
-              <div className="action-indicator">
-                {gameState.action === 'passing' && '⚽ PASE →'}
-                {gameState.action === 'shooting' && '🎯 TIRO A PUERTA!'}
-                {gameState.action === 'dribbling' && '🌀 REGATE'}
-                {gameState.action === 'moving' && '🏃🏼‍♂️ CIRCULACIÓN'}
-              </div>
-            </div>
+               {/* CONTADOR DE FALTAS */}
+  <div className="fouls-display">
+    <div className="fouls-counter">
+      <span className="fouls-label">Faltas:</span>
+      <span className="fouls-user">{state.fouls?.user || 0}</span>
+      <span className="fouls-separator">-</span>
+      <span className="fouls-bot">{state.fouls?.bot || 0}</span>
+    </div>
+    {(state.fouls?.user >= 5 || state.fouls?.bot >= 5) && (
+      <div className="double-penalty-warning">
+        ⚠️ Próxima falta será doble penalti
+      </div>
+    )}
+  </div>
+  
+  <div className="action-indicator">
+    {gameState.action === 'passing' && '⚽ PASE →'}
+    {gameState.action === 'shooting' && '🎯 TIRO A PUERTA!'}
+    {gameState.action === 'dribbling' && '🌀 REGATE'}
+    {gameState.action === 'moving' && '🏃🏼‍♂️ CIRCULACIÓN'}
+    {/* Agregar indicador para doble penalti */}
+    {matchEvents[0]?.type === 'double_penalty' && '🎯 DOBLE PENALTI!'}
+  </div>
+</div>
           </>
         ) : (
          <div className="pre-match-arena">
@@ -374,6 +391,7 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
 
 
 
