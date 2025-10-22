@@ -244,36 +244,33 @@ export const SoccerField = ({ state }) => {
   }, [simulating]);
 
   return (
-    <div className="soccer-field futsal-professional">
-      <div className="field-surface">
-        {/* Líneas del campo de fútsal profesional */}
-        <div className="field-line touch-line top"></div>
-        <div className="field-line touch-line bottom"></div>
-        <div className="field-line goal-line left"></div>
-        <div className="field-line goal-line right"></div>
-        <div className="field-line halfway-line"></div>
-        
-        <div className="center-circle"></div>
-        <div className="center-mark"></div>
-        
-        {/* Áreas de penal */}
-        <div className="penalty-area left">
-          <div className="penalty-mark"></div>
-          <div className="penalty-arc"></div>
-        </div>
-        <div className="penalty-area right">
-          <div className="penalty-mark"></div>
-          <div className="penalty-arc"></div>
-        </div>
-
-        {/* Punto de doble penal */}
-        <div className="second-penalty-mark"></div>
-        
-        {/* Arcos */}
-        <div className="goal-frame left"></div>
-        <div className="goal-frame right"></div>
-        <div className="goal-net left"></div>
-        <div className="goal-net right"></div>
+    <div className="soccer-field">
+  <div className="field-grass">
+    {/* Áreas de futsal redondeadas */}
+    <div className="futsal-area left"></div>
+    <div className="futsal-area right"></div>
+    
+    {/* Puntos de penalti */}
+    <div className="futsal-penalty-spot first"></div>
+    <div className="futsal-penalty-spot second"></div>
+    <div className="futsal-penalty-spot third"></div>
+    <div className="futsal-penalty-spot fourth"></div>
+    
+    {/* Puntos de doble penalti */}
+    <div className="double-penalty-spot left"></div>
+    <div className="double-penalty-spot right"></div>
+    
+    {/* Líneas de tiro libre */}
+    <div className="free-kick-line left"></div>
+    <div className="free-kick-line right"></div>
+    
+    {/* Elementos centrales */}
+    <div className="center-circle"></div>
+    <div className="center-spot"></div>
+    
+    {/* Porterías */}
+    <div className="futsal-goal left"></div>
+    <div className="futsal-goal right"></div>
 
         {simulating ? (
           <>
@@ -377,6 +374,7 @@ export const SoccerField = ({ state }) => {
     </div>
   );
 };
+
 
 
 
