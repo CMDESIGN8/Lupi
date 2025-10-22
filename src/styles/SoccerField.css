@@ -1,6 +1,161 @@
 
 /* SoccerField.css */
+/* ===== CANCHA DE FÚTSAL CORREGIDA CON ÁREAS REDONDEADAS ===== */
+.training-dashboard .soccer-field {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: 
+    linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%),
+    repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255,255,255,0.05) 15px, rgba(255,255,255,0.05) 30px);
+  border-radius: 15px;
+  border: 3px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 
+    inset 0 0 50px rgba(0, 0, 0, 0.4),
+    var(--shadow-md);
+}
 
+.training-dashboard .field-grass {
+  position: relative;
+  width: 100%; 
+  height: 100%;
+  background: 
+    /* Línea de medio campo */
+    linear-gradient(90deg, transparent 49%, rgba(255,255,255,0.4) 49%, rgba(255,255,255,0.4) 51%, transparent 51%),
+    /* Círculo central */
+    radial-gradient(circle at 50% 50%, transparent 70px, rgba(255,255,255,0.3) 70px, rgba(255,255,255,0.3) 72px, transparent 72px);
+}
+
+/* ÁREAS DE FÚTSAL REDONDEADAS */
+.training-dashboard .futsal-area {
+  position: absolute;
+  border: 3px solid rgba(255,255,255,0.7);
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12%;
+  height: 60%;
+}
+
+.training-dashboard .futsal-area.left {
+  left: 0;
+  border-right: none;
+  border-radius: 0 60px 60px 0;
+}
+
+.training-dashboard .futsal-area.right {
+  right: 0;
+  border-left: none;
+  border-radius: 60px 0 0 60px;
+}
+
+/* Puntos de penalti de futsal */
+.training-dashboard .futsal-penalty-spot {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255,255,255,0.6);
+  border: none;
+}
+
+.training-dashboard .futsal-penalty-spot.first {
+  left: 8%;
+}
+
+.training-dashboard .futsal-penalty-spot.second {
+  left: 12%;
+}
+
+.training-dashboard .futsal-penalty-spot.third {
+  right: 8%;
+}
+
+.training-dashboard .futsal-penalty-spot.fourth {
+  right: 12%;
+}
+
+/* Puntos de doble penalti (6 metros) */
+.training-dashboard .double-penalty-spot {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 50%;
+  border: none;
+}
+
+.training-dashboard .double-penalty-spot.left {
+  left: 5%;
+}
+
+.training-dashboard .double-penalty-spot.right {
+  right: 5%;
+}
+
+/* Porterías de futsal */
+.training-dashboard .futsal-goal {
+  position: absolute;
+  top: 42%;
+  height: 16%;
+  width: 1.5%;
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.8);
+}
+
+.training-dashboard .futsal-goal.left {
+  left: -0.8%;
+  border-radius: 0 4px 4px 0;
+}
+
+.training-dashboard .futsal-goal.right {
+  right: -0.8%;
+  border-radius: 4px 0 0 4px;
+}
+
+/* Línea de 10 metros (tiro libre) */
+.training-dashboard .free-kick-line {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 2px;
+  background: rgba(255,255,255,0.4);
+}
+
+.training-dashboard .free-kick-line.left {
+  left: 20%;
+}
+
+.training-dashboard .free-kick-line.right {
+  right: 20%;
+}
+
+/* Elementos existentes que se mantienen */
+.training-dashboard .center-circle, 
+.training-dashboard .center-spot { 
+  position: absolute;
+  border: 3px solid rgba(255,255,255,0.7);
+}
+
+.training-dashboard .center-circle { 
+  top: 50%; left: 50%; transform: translate(-50%, -50%); 
+  width: 140px; height: 140px; 
+  border-radius: 50%; 
+}
+
+.training-dashboard .center-spot { 
+  top: 50%; left: 50%; transform: translate(-50%, -50%); 
+  width: 12px; height: 12px; 
+  background: rgba(255,255,255,0.8); 
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  border: none;
+}
 /* Jugadores mejorados */
 .player {
   position: absolute;
