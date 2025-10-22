@@ -67,31 +67,328 @@
   position: relative;
 }
 
-/* ===== PANELES GENERALES ===== */
-.training-dashboard .left-panel,
-.training-dashboard .bottom-panel,
-.training-dashboard .center-panel {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.95));
-  border-radius: 20px;
-  border: var(--border-glow);
-  box-shadow: var(--shadow-lg), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  position: relative;
-  overflow: hidden;
+/* ===== VARIABLES PARA CONSISTENCIA ===== */
+.training-dashboard {
+  --panel-bg: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(30, 41, 59, 0.97));
+  --panel-border: 2px solid rgba(56, 189, 248, 0.25);
+  --panel-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --panel-glow: 0 0 20px rgba(56, 189, 248, 0.15);
+  --panel-radius: 20px;
+  --inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
+/* ===== PANEL IZQUIERDO (Controles Tácticos) ===== */
 .training-dashboard .left-panel {
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
+  border: var(--panel-border);
+  box-shadow: var(--panel-shadow), var(--panel-glow), var(--inner-glow);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.training-dashboard .left-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(56, 189, 248, 0.4), 
+    transparent
+  );
+}
+
+.training-dashboard .left-panel-content {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
   overflow-y: auto;
 }
 
+/* Scrollbar personalizado para left-panel */
+.training-dashboard .left-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.training-dashboard .left-panel::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 3px;
+}
+
+.training-dashboard .left-panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #38bdf8, #60a5fa);
+  border-radius: 3px;
+}
+
+.training-dashboard .left-panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #60a5fa, #93c5fd);
+}
+
+/* ===== PANEL DERECHO (Eventos del Partido) ===== */
 .training-dashboard .right-panel {
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
+  border: var(--panel-border);
+  box-shadow: var(--panel-shadow), var(--panel-glow), var(--inner-glow);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.training-dashboard .right-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(234, 179, 8, 0.4), 
+    transparent
+  );
+}
+
+.training-dashboard .right-panel-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.training-dashboard .right-panel-content {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+/* Scrollbar personalizado para right-panel */
+.training-dashboard .right-panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.training-dashboard .right-panel-content::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 3px;
+}
+
+.training-dashboard .right-panel-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #eab308, #f59e0b);
+  border-radius: 3px;
+}
+
+.training-dashboard .right-panel-content::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+}
+
+/* ===== PANEL CENTRAL (Campo de Juego) ===== */
+.training-dashboard .center-panel {
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
+  border: var(--panel-border);
+  box-shadow: var(--panel-shadow), var(--panel-glow), var(--inner-glow);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
   height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.training-dashboard .center-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(56, 189, 248, 0.05) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.training-dashboard .center-panel-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+/* ===== PANEL INFERIOR (Estadísticas) ===== */
+.training-dashboard .bottom-panel {
+  background: var(--panel-bg);
+  border-radius: var(--panel-radius);
+  border: var(--panel-border);
+  box-shadow: var(--panel-shadow), var(--panel-glow), var(--inner-glow);
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  margin-top: 1.5rem;
+}
+
+.training-dashboard .bottom-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(34, 197, 94, 0.4), 
+    transparent
+  );
+}
+
+.training-dashboard .bottom-panel-content {
+  padding: 1.5rem;
+}
+
+/* ===== TÍTULOS DE PANEL ===== */
+.panel-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 0 0 1rem 0;
+  text-shadow: 0 2px 8px rgba(56, 189, 248, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.panel-title::before {
+  content: '';
+  width: 4px;
+  height: 16px;
+  background: linear-gradient(135deg, #38bdf8, #60a5fa);
+  border-radius: 2px;
+}
+
+.right-panel .panel-title {
+  color: var(--accent-yellow);
+  text-shadow: 0 2px 8px rgba(234, 179, 8, 0.3);
+}
+
+.right-panel .panel-title::before {
+  background: linear-gradient(135deg, #eab308, #f59e0b);
+}
+
+.bottom-panel .panel-title {
+  color: #22c55e;
+  text-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+}
+
+.bottom-panel .panel-title::before {
+  background: linear-gradient(135deg, #22c55e, #4ade80);
+}
+
+/* ===== ESTADOS DE HOVER Y FOCUS ===== */
+.training-dashboard .left-panel:hover,
+.training-dashboard .right-panel:hover,
+.training-dashboard .center-panel:hover,
+.training-dashboard .bottom-panel:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: var(--panel-shadow), 0 0 25px rgba(56, 189, 248, 0.2), var(--inner-glow);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .training-dashboard .left-panel,
+  .training-dashboard .right-panel,
+  .training-dashboard .center-panel,
+  .training-dashboard .bottom-panel {
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+  }
+  
+  .training-dashboard .left-panel-content,
+  .training-dashboard .right-panel-content,
+  .training-dashboard .bottom-panel-content {
+    padding: 1.25rem;
+  }
+  
+  .panel-title {
+    font-size: 1rem;
+    letter-spacing: 1px;
+  }
+}
+
+@media (max-width: 768px) {
+  .training-dashboard .left-panel,
+  .training-dashboard .right-panel,
+  .training-dashboard .center-panel,
+  .training-dashboard .bottom-panel {
+    border-radius: 14px;
+    margin-bottom: 1rem;
+  }
+  
+  .training-dashboard .left-panel-content,
+  .training-dashboard .right-panel-content,
+  .training-dashboard .bottom-panel-content {
+    padding: 1rem;
+  }
+  
+  .panel-title {
+    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+  }
+}
+
+/* ===== ANIMACIONES SUTILES ===== */
+@keyframes panelEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.training-dashboard .left-panel,
+.training-dashboard .right-panel,
+.training-dashboard .center-panel,
+.training-dashboard .bottom-panel {
+  animation: panelEntrance 0.6s ease-out;
+}
+
+.training-dashboard .left-panel {
+  animation-delay: 0.1s;
 }
 
 .training-dashboard .center-panel {
-  height: 100%;
+  animation-delay: 0.2s;
+}
+
+.training-dashboard .right-panel {
+  animation-delay: 0.3s;
+}
+
+.training-dashboard .bottom-panel {
+  animation-delay: 0.4s;
 }
 
 /* ===== CANCHA DE FÚTSAL AZUL ===== */
