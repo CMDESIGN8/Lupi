@@ -323,6 +323,15 @@
   overflow: hidden;
 }
 
+.soccer-field {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%), repeating-linear-gradient(45deg, transparent, transparent 15px, rgba(255, 255, 255, .05) 15px, rgba(255, 255, 255, .05) 30px);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
 /* ÁREAS DE FÚTSAL REDONDEADAS */
 .futsal-area {
   position: absolute;
