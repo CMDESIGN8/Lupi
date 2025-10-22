@@ -41,10 +41,10 @@
 }
 
 .field-grass {
-  position: relative;
+   position: relative;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #2d5a27 0%, #1e3f1e 100%);
+  background: linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%);
   border-radius: 10px;
   overflow: hidden;
 }
