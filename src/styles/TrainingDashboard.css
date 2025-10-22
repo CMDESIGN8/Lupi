@@ -733,7 +733,6 @@
 }
 
 /* ===== HEADER PROFESIONAL MEJORADO ===== */
-/* ===== HEADER PROFESIONAL MEJORADO ===== */
 .app-header.professional {
   background: linear-gradient(135deg, rgba(15, 23, 42, .95), rgba(30, 41, 59, .95));
   border-bottom: 3px solid var(--accent-blue);
@@ -769,7 +768,7 @@
   text-shadow: 0 2px 15px rgba(76, 201, 240, 0.6);
   background: linear-gradient(135deg, #38bdf8, #60a5fa);
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: var(--accent-blue); ;
   background-clip: text;
 }
 
@@ -925,78 +924,6 @@
     transform: scale(1); 
     box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4);
   }
-}
-
-/* ===== CONTROLES DE SIMULACIÓN MEJORADOS ===== */
-.training-dashboard .simulation-controls { 
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 1.5rem;
-  border-radius: 15px;
-  border: 2px solid rgba(56, 189, 248, 0.2);
-  min-width: 200px;
-}
-
-.training-dashboard .controls-main {
-  display: flex;
-  gap: 0.8rem;
-  align-items: center;
-}
-
-.training-dashboard .speed-controls {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-}
-
-.training-dashboard .simulation-controls button {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-  border: 2px solid var(--accent-blue);
-  color: white;
-  font-size: 1.3rem;
-  border-radius: 12px;
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.training-dashboard .simulation-controls button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.training-dashboard .simulation-controls button:hover::before {
-  left: 100%;
-}
-
-.training-dashboard .simulation-controls button:hover { 
-  background: rgba(76, 201, 240, 0.3); 
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(76, 201, 240, 0.4);
-  border-color: #60a5fa;
-}
-
-.training-dashboard .simulation-controls button.active { 
-  background: linear-gradient(135deg, #38bdf8, #60a5fa);
-  color: white;
-  transform: scale(1.1);
-  box-shadow: 0 0 25px rgba(56, 189, 248, 0.6);
-  border-color: #93c5fd;
 }
 
 /* Responsive */
