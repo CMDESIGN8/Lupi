@@ -112,6 +112,7 @@ const TrainingDashboard = ({ character }) => {
         <div className="score-display-header">
           {state.matchStats ? `${state.matchStats.user.goals} - ${state.matchStats.bot.goals}` : '0 - 0'}
         </div>
+        <SimulationControls state={state} dispatch={dispatch} />
       </div>
       
       <div className="main-layout improved">
@@ -127,7 +128,6 @@ const TrainingDashboard = ({ character }) => {
 
         {/* Panel derecho - Ahora controles y estadísticas */}
         <div className="right-panel">
-          <SimulationControls state={state} dispatch={dispatch} />
           <TacticalControls state={state} dispatch={dispatch} />
           <hr className="divider" />
           <StatsPanel state={state} />
