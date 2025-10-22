@@ -1,5 +1,4 @@
 // futsalConfig.js
-
 export const MATCH_CONFIG = {
   DURATION: 40, // 2 tiempos de 20 min
   EVENT_TYPES: {
@@ -34,5 +33,9 @@ export const MATCH_CONFIG = {
     '2-1-1': '2-1-1 (Clásica)',
     '3-1': '3-1 (Defensiva)',
     '1-2-1': '1-2-1 (Ofensiva)'
+  },
+  FOULS: {
+    MAX_FOULS: 5, // Hasta 5 faltas acumulativas
+    DOUBLE_PENALTY_FOUL: 6 // A la 6ta falta, doble penalti
   }
 };
