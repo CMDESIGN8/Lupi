@@ -439,14 +439,14 @@
 }
 
 .fouls-label {
-  font-size: 10px;
+  font-size: 1rem;
   opacity: 0.8;
 }
 
 .fouls-count {
   font-weight: bold;
   font-size: 16px;
-  color: #ff6b6b;
+  color: #fff;
 }
 
 .fouls-separator {
