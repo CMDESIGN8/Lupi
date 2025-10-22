@@ -6,7 +6,6 @@ export const SimulationControls = ({ state, dispatch }) => {
 
   return (
     <div className="simulation-controls professional">
-      <h4>CONTROL DE PARTIDO</h4>
       <div className="speed-controls">
         <button onClick={() => dispatch({ type: 'CHANGE_SPEED', payload: 1200 })} className={speed === 1200 ? 'active' : ''}>🐢</button>
         <button onClick={() => dispatch({ type: 'CHANGE_SPEED', payload: 800 })} className={speed === 800 ? 'active' : ''}>▶️</button>
@@ -17,4 +16,5 @@ export const SimulationControls = ({ state, dispatch }) => {
   );
 
 };
+
 
