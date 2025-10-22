@@ -114,6 +114,7 @@ const TrainingDashboard = ({ character }) => {
       {/* Título Principal */}
       <div className="header-title">
         <h1>🥅 FÚTSAL ARENA</h1>
+        <SimulationControls state={state} dispatch={dispatch} />
       </div>
       
       <div className="header-main">
