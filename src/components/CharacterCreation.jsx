@@ -21,7 +21,7 @@ const CharacterAvatar = ({ nickname }) => (
   <div className="character-avatar-center">
     <div className="avatar-display-center">
       <img 
-        src="../assets/avatar.png" 
+        src="https://i.ibb.co/zVd0skVf/avatar-placeholder.png" 
         alt="Avatar del personaje"
         className="avatar-image-main"
         onError={(e) => {
