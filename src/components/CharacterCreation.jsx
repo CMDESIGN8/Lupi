@@ -98,7 +98,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
       // URL del backend en Render
       const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://lupiback.onrender.com';
       
-      const response = await fetch(`${API_BASE_URL}/api/characters`, {
+      const response = await fetch(`${API_BASE_URL}/characters`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
