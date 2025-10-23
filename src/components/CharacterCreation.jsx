@@ -95,8 +95,9 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
 
       console.log('📤 Enviando datos a la API:', characterPayload);
 
-      // Usar el endpoint de Express
-      const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+      // URL del backend en Render
+      const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://lupiback.onrender.com';
+      
       const response = await fetch(`${API_BASE_URL}/api/characters`, {
         method: 'POST',
         headers: {
@@ -134,7 +135,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
       } else if (error.message.includes('profiles') || error.message.includes('foreign key')) {
         alert('❌ Error de perfil de usuario. Por favor contacta al soporte.');
       } else if (error.message.includes('Network Error') || error.message.includes('Failed to fetch')) {
-        alert('❌ Error de conexión. Verifica que el servidor esté funcionando.');
+        alert('❌ Error de conexión. Verifica que el servidor esté funcionando en Render.');
       } else {
         alert(`❌ Error al crear personaje: ${error.message}`);
       }
