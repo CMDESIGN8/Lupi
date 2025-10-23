@@ -233,6 +233,7 @@
   padding: 8px 15px;
   border-radius: 6px;
   border: 1px solid #4a5568;
+  background: transparent;
 }
 
 .points-label {
