@@ -1,6 +1,6 @@
 // apps/client/src/components/CharacterCreation.jsx
 import React, { useState } from 'react';
-import './CharacterCreation.css';
+import '../styles/CharacterCreation.css';
 
 const BASE_SKILLS = {
   pase: { name: '📨 Pase', value: 50 },
