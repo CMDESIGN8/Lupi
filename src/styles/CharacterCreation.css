@@ -1,499 +1,355 @@
 /* src/styles/CharacterCreation.css */
+
+/* --- FONDO Y GENERAL --- */
 .character-creation-rom {
   min-height: 100vh;
-  background: 
-    linear-gradient(135deg, #1a1f2e 0%, #2d3748 50%, #1a202c 100%),
-    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+  /* USAMOS LA IMAGEN PROPORCIONADA COMO FONDO */
+  /* Idealmente, aquí usarías una imagen de fondo de fantasía limpia */
+  background: url('image_717c4b.png'); /* Asegúrate que la ruta a tu imagen sea correcta */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* Para que el fondo no se mueva con el scroll */
+  
   padding: 20px;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  color: #e2e8f0;
+  font-family: 'Georgia', 'Times New Roman', serif; /* Fuente más "fantasía" */
+  color: #f0e6d2; /* Color de texto general (beige/hueso) */
 }
 
+/* --- CONTENEDOR PRINCIPAL --- */
 .creation-container {
-  max-width: 1400px;
+  max-width: 100%; /* Ocupar todo */
   margin: 0 auto;
-  background: rgba(26, 32, 44, 0.8);
-  border-radius: 8px;
-  border: 1px solid #2d3748;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  background: none; /* Sin fondo de contenedor, solo los paneles */
+  border: none;
+  box-shadow: none;
 }
 
+/* --- HEADER (LO OCULTAMOS PARA PARECERSE A LA IMAGEN) --- */
 .creation-header {
-  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-  padding: 25px 30px;
-  border-bottom: 1px solid #4a5568;
-  text-align: center;
+  display: none; 
 }
 
-.creation-header h1 {
-  font-size: 2.2rem;
-  font-weight: 300;
-  margin: 0 0 8px 0;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-.creation-header p {
-  margin: 0;
-  color: #cbd5e0;
-  font-size: 1.1rem;
-  font-weight: 300;
-}
-
+/* --- LAYOUT DE 3 COLUMNAS --- */
 .creation-content-new {
   display: grid;
-  grid-template-columns: 350px 1fr 350px;
+  grid-template-columns: 320px 1fr 320px; /* Paneles un poco más estrechos */
+  /* INVERTIMOS LOS PANELES IZQUIERDO Y DERECHO USANDO GRID AREAS */
+  /* Tu panel de "Info" (Left) ahora irá a la derecha */
+  /* Tu panel de "Skills" (Right) ahora irá a la izquierda */
+  grid-template-areas: "right center left"; 
   min-height: 700px;
+  gap: 20px; /* Añadimos un espacio entre paneles */
 }
 
-/* Panel Izquierdo - Información */
-.left-panel-new {
-  background: rgba(45, 55, 72, 0.6);
-  border-right: 1px solid #4a5568;
-  padding: 30px;
+/* Asignamos las áreas */
+.left-panel-new { 
+  grid-area: left; 
+  /* ¡Este es ahora el panel de la DERECHA (Info) */
+}
+.center-panel-new { 
+  grid-area: center; 
+}
+.right-panel-new { 
+  grid-area: right; 
+  /* ¡Este es ahora el panel de la IZQUIERDA (Skills) */
+}
+
+
+/* --- ESTILO DE PANELES (IZQUIERDO Y DERECHO) --- */
+.left-panel-new,
+.right-panel-new {
+  background: rgba(10, 5, 5, 0.8); /* Fondo oscuro semi-transparente */
+  border: 2px solid #a07c3c; /* Borde dorado/bronce */
+  border-radius: 8px;
+  padding: 25px;
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(200, 155, 60, 0.2) inset; /* Sombra oscura + brillo dorado interno */
 }
+
+/* --- PANEL DERECHO (INFO DEL PERSONAJE) --- */
+/* (Originalmente .left-panel-new) */
 
 .info-section h3,
-.tips-section h3 {
-  font-size: 1.2rem;
+.tips-section h3,
+.section-header-new h2 /* Aplicamos a ambos headers */ {
+  font-size: 1.3rem;
   font-weight: 600;
-  margin: 0 0 20px 0;
-  color: #e2e8f0;
+  margin: 0 0 15px 0;
+  color: #c89b3c; /* Título en dorado */
   padding-bottom: 10px;
-  border-bottom: 1px solid #4a5568;
+  border-bottom: 1px solid #a07c3c; /* Línea dorada */
+  font-family: 'Georgia', serif;
+  text-align: left; /* Alinear a la izquierda */
+  text-transform: uppercase; /* Como en la imagen */
+  letter-spacing: 1px;
 }
-
-.input-group-new {
-  margin-bottom: 0;
+.section-header-new h2 {
+  text-align: center; /* El de skills sí estaba centrado */
 }
 
 .input-group-new label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #cbd5e0;
+  color: #f0e6d2; /* Texto beige */
   font-size: 0.95rem;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .name-input-new {
-  width: 100%;
-  padding: 14px 16px;
-  background: #2d3748;
-  border: 1px solid #4a5568;
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5); /* Fondo oscuro para input */
+  border: 1px solid #a07c3c;
+  border-radius: 4px;
   color: #fff;
   font-size: 1rem;
-  transition: all 0.2s ease;
+  font-family: 'Georgia', serif;
 }
 
 .name-input-new:focus {
-  outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  border-color: #f0e6d2; /* Borde beige al hacer foco */
+  box-shadow: 0 0 0 3px rgba(200, 155, 60, 0.3); /* Sombra dorada */
 }
 
 .name-input-new::placeholder {
-  color: #718096;
+  color: #a0a0a0;
 }
 
 .input-group-new small {
-  display: block;
-  margin-top: 8px;
-  color: #718096;
-  font-size: 0.85rem;
+  color: #b0a090; /* Color de ayuda más tenue */
 }
 
 .points-card-new {
-  background: rgba(26, 32, 44, 0.9);
-  border: 1px solid #4a5568;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-}
-
-.points-header-new {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  background: rgba(30, 20, 15, 0.7); /* Fondo de tarjeta más sutil */
+  border: 1px solid #a07c3c;
+  border-radius: 6px;
+  padding: 15px;
 }
 
 .points-title-new {
-  font-size: 1rem;
+  color: #f0e6d2;
   font-weight: 600;
-  color: #cbd5e0;
+  text-transform: uppercase;
 }
 
 .points-value-new {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #48bb78;
+  color: #c89b3c; /* Puntos en dorado, no verde */
+  font-size: 1.8rem;
 }
 
 .points-subtitle {
-  font-size: 0.9rem;
-  color: #718096;
+  color: #b0a090;
 }
 
 .tips-section {
   flex: 1;
 }
 
-.tips-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
 .tip-item {
-  background: rgba(26, 32, 44, 0.8);
-  border: 1px solid #4a5568;
-  border-radius: 6px;
-  padding: 15px;
-  transition: all 0.2s ease;
+  background: rgba(30, 20, 15, 0.7);
+  border: 1px solid #a07c3c;
+  padding: 12px;
+  border-radius: 4px;
 }
 
 .tip-item:hover {
-  border-color: #4299e1;
-  transform: translateY(-1px);
+  border-color: #f0e6d2;
 }
 
 .tip-item strong {
-  display: block;
-  color: #4299e1;
-  font-size: 0.95rem;
-  margin-bottom: 5px;
+  color: #c89b3c; /* Título del consejo en dorado */
 }
 
 .tip-item p {
-  margin: 0;
-  color: #cbd5e0;
-  font-size: 0.85rem;
-  line-height: 1.4;
+  color: #f0e6d2;
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 .create-btn-new {
-  width: 100%;
-  padding: 16px;
-  background: linear-gradient(135deg, #48bb78, #38a169);
+  padding: 14px;
+  /* Gradiente de botón dorado/marrón */
+  background: linear-gradient(135deg, #c89b3c, #8b4513);
   color: white;
-  border: none;
+  border: 1px solid #f0e6d2;
   border-radius: 6px;
   font-size: 1.1rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  text-transform: uppercase; /* Como "CONFIRMAR" */
+  letter-spacing: 1px;
 }
 
 .create-btn-new:hover:not(:disabled) {
-  background: linear-gradient(135deg, #38a169, #2f855a);
+  background: linear-gradient(135deg, #e0a84c, #a05e1a);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+  box-shadow: 0 6px 20px rgba(200, 155, 60, 0.4);
 }
 
 .create-btn-new:disabled {
-  background: #4a5568;
+  background: #5a4a3a; /* Marrón desaturado para deshabilitado */
+  border-color: #7a6a5a;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
 }
 
 .warning-message-new {
-  background: rgba(197, 48, 48, 0.1);
+  background: rgba(197, 48, 48, 0.2);
   color: #fc8181;
-  padding: 14px;
-  border-radius: 6px;
-  text-align: center;
-  border: 1px solid rgba(197, 48, 48, 0.3);
-  font-weight: 500;
-  font-size: 0.9rem;
+  border: 1px solid rgba(197, 48, 48, 0.5);
+  font-weight: 600;
 }
 
-/* Panel Central - Avatar */
+/* --- PANEL CENTRAL (AVATAR) --- */
 .center-panel-new {
-  background: rgba(26, 32, 44, 0.9);
+  background: transparent; /* Sin fondo */
   padding: 40px 30px;
-  display: flex;
-  align-items: center;
+  border: none; /* Sin bordes */
+  align-items: center; /* Centrado vertical */
   justify-content: center;
-  border-right: 1px solid #4a5568;
 }
 
 .character-avatar-center {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar-display-center {
-  text-align: center;
-  max-width: 400px;
+  /* La imagen del usuario ya tiene un personaje. 
+     Solo estilizamos el nombre de abajo. */
 }
 
 .avatar-image-main {
-  width: 300px;
-  height: 300px;
-  border-radius: 12px;
-  border: 3px solid #4299e1;
-  box-shadow: 0 8px 30px rgba(66, 153, 225, 0.3);
-  margin-bottom: 25px;
-  object-fit: cover;
+  border: none; /* Quitamos el borde azul */
+  box-shadow: none; /* Quitamos la sombra azul */
+  /* Añadimos un ligero 'drop-shadow' para separarlo del fondo */
+  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
 }
 
-.avatar-fallback {
-  display: none;
-}
-
-.avatar-placeholder {
-  width: 300px;
-  height: 300px;
-  background: linear-gradient(135deg, #4a5568 0%, #718096 100%);
-  border-radius: 12px;
-  border: 3px solid #718096;
-  margin: 0 auto 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.avatar-silhouette {
-  width: 200px;
-  height: 200px;
-  background: #2d3748;
-  border-radius: 50%;
-  position: relative;
-}
-
-.avatar-silhouette::before {
-  content: '';
-  position: absolute;
-  top: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 80px;
-  background: #4a5568;
-  border-radius: 50%;
-}
-
-.avatar-silhouette::after {
-  content: '';
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 60px;
-  background: #4a5568;
-  border-radius: 10px;
-}
+.avatar-fallback { display: none; }
+.avatar-placeholder { display: none; }
 
 .avatar-info-center {
-  text-align: center;
+  /* Fondo sutil para legibilidad del texto */
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-top: -20px; /* Superponerlo un poco a la imagen */
+  position: relative;
+  z-index: 10;
+  border: 1px solid rgba(160, 124, 60, 0.5);
 }
 
 .avatar-name-main {
-  font-size: 2rem;
-  font-weight: 600;
   color: #fff;
-  margin: 0 0 10px 0;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.avatar-details {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 20px;
+  text-shadow: 2px 2px 4px #000;
 }
 
 .avatar-class-main {
-  color: #4299e1;
-  font-size: 1.2rem;
-  font-weight: 500;
+  color: #c89b3c; /* Dorado */
+  font-size: 1.1rem;
 }
 
 .avatar-level-main {
-  background: #48bb78;
+  background: #a07c3c; /* Fondo dorado/bronce */
   color: white;
-  padding: 6px 16px;
+  padding: 4px 12px;
   border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 600;
 }
 
-/* Panel Derecho - Skills */
-.right-panel-new {
-  background: rgba(45, 55, 72, 0.6);
-  padding: 30px;
-}
-
-.skills-section-new {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.section-header-new {
-  margin-bottom: 25px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #4a5568;
-}
-
-.section-header-new h2 {
-  font-size: 1.4rem;
-  font-weight: 400;
-  margin: 0;
-  color: #e2e8f0;
-  text-align: center;
-}
+/* --- PANEL IZQUIERDO (HABILIDADES) --- */
+/* (Originalmente .right-panel-new) */
 
 .skills-grid-new {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  flex: 1;
-  padding-right: 10px;
+  gap: 8px; /* Menos espacio entre filas */
+  padding-right: 5px;
 }
 
+/* Scrollbar estilo fantasía */
 .skills-grid-new::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
-
 .skills-grid-new::-webkit-scrollbar-track {
-  background: #2d3748;
-  border-radius: 3px;
+  background: #3a2a1a;
+  border-radius: 4px;
 }
-
 .skills-grid-new::-webkit-scrollbar-thumb {
-  background: #4a5568;
-  border-radius: 3px;
+  background: #a07c3c;
+  border-radius: 4px;
+  border: 1px solid #f0e6d2;
 }
-
 .skills-grid-new::-webkit-scrollbar-thumb:hover {
-  background: #718096;
+  background: #c89b3c;
 }
 
 .skill-row-new {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 15px;
-  align-items: center;
-  padding: 15px;
-  background: rgba(45, 55, 72, 0.8);
-  border: 1px solid #4a5568;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
+  padding: 10px 15px;
+  background: rgba(30, 20, 15, 0.7);
+  border: 1px solid #a07c3c;
+  border-radius: 6px;
 }
 
 .skill-row-new:hover {
-  background: rgba(66, 153, 225, 0.1);
-  border-color: #4299e1;
+  background: rgba(200, 155, 60, 0.15);
+  border-color: #c89b3c;
 }
 
 .skill-row-new.selected {
-  background: rgba(66, 153, 225, 0.15);
-  border-color: #4299e1;
-  box-shadow: 0 0 0 2px #4299e1;
-}
-
-.skill-info-new {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.skill-icon-new {
-  font-size: 1.3rem;
+  background: rgba(200, 155, 60, 0.25);
+  border-color: #f0e6d2;
+  box-shadow: 0 0 0 2px #f0e6d2;
 }
 
 .skill-name-new {
-  font-weight: 500;
-  color: #e2e8f0;
-  font-size: 1rem;
-}
-
-.skill-controls-new {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  color: #f0e6d2;
+  font-size: 0.95rem;
 }
 
 .control-btn-new {
-  width: 36px;
-  height: 36px;
-  border: 1px solid #4a5568;
-  background: #2d3748;
-  color: #cbd5e0;
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.2s ease;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #a07c3c;
+  background: #3a2a1a;
+  color: #f0e6d2;
+  border-radius: 4px;
 }
 
 .control-btn-new:hover:not(:disabled) {
-  background: #4a5568;
-  border-color: #718096;
+  background: #a07c3c;
+  border-color: #f0e6d2;
   color: #fff;
 }
 
+/* Mantenemos los colores de + y - porque son funcionales */
 .control-btn-new.plus:hover:not(:disabled) {
-  background: #48bb78;
+  background: #38a169; /* Verde (OK para "subir") */
   border-color: #48bb78;
+  color: white;
 }
-
 .control-btn-new.minus:hover:not(:disabled) {
-  background: #e53e3e;
-  border-color: #e53e3e;
+  background: #e53e3e; /* Rojo (OK para "bajar") */
+  border-color: #fc8181;
+  color: white;
 }
 
 .control-btn-new:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .skill-value-display-new {
-  min-width: 45px;
-  text-align: center;
+  min-width: 40px;
 }
 
 .value-new {
-  font-weight: 700;
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .skill-bar-new {
-  grid-column: 1 / -1;
-  height: 6px;
-  background: #2d3748;
-  border-radius: 3px;
-  overflow: hidden;
-  margin-top: 10px;
+  height: 4px;
+  background: #3a2a1a;
+  margin-top: 8px;
+  border-radius: 2px;
 }
 
 .skill-progress-new {
-  height: 100%;
-  background: linear-gradient(90deg, #4299e1, #48bb78);
-  border-radius: 3px;
-  transition: width 0.3s ease;
+  /* Gradiente dorado para la barra de progreso */
+  background: linear-gradient(90deg, #a07c3c, #f0e6d2);
+  border-radius: 2px;
 }
 
 .spinner {
@@ -510,60 +366,49 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive */
+/* --- RESPONSIVE --- */
 @media (max-width: 1200px) {
   .creation-content-new {
     grid-template-columns: 300px 1fr 300px;
-  }
-  
-  .avatar-image-main {
-    width: 250px;
-    height: 250px;
+    grid-template-areas: "right center left"; /* Mantener el swap */
   }
 }
 
 @media (max-width: 1024px) {
   .creation-content-new {
     grid-template-columns: 1fr;
+    /* Reordenamos para móvil, manteniendo la lógica */
     grid-template-areas: 
       "center"
-      "left"
-      "right";
+      "right" /* Skills (Originalmente .right-panel-new) */
+      "left"; /* Info (Originalmente .left-panel-new) */
   }
-  
-  .left-panel-new { grid-area: left; }
-  .center-panel-new { grid-area: center; }
-  .right-panel-new { grid-area: right; }
   
   .center-panel-new {
     min-height: 400px;
+    padding: 20px;
   }
-  
+
   .avatar-image-main {
     width: 200px;
     height: 200px;
   }
+
+  .avatar-info-center {
+    margin-top: -10px; /* Ajuste para avatar más pequeño */
+  }
 }
 
 @media (max-width: 768px) {
-  .creation-container {
-    margin: 10px;
+  .character-creation-rom {
+    padding: 10px;
   }
-  
-  .creation-header {
-    padding: 20px;
-  }
-  
-  .creation-header h1 {
-    font-size: 1.8rem;
-  }
-  
+
   .left-panel-new,
-  .center-panel-new,
   .right-panel-new {
-    padding: 20px;
+    padding: 15px;
   }
-  
+
   .avatar-details {
     flex-direction: column;
     gap: 10px;
