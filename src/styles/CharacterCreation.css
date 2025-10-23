@@ -11,21 +11,23 @@
   --blue-dark: #001122;
 }
 
+/* Fondo estilo estadio */
 .stadium-bg {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: radial-gradient(circle at top, var(--blue-dark), var(--dark));
-  background-image: url('/assets/stadium-fog.png'); /* si quieres, efecto de humo o gradas */
+  background-image: url('/assets/stadium-fog.png'); /* opcional: humo o gradas */
   background-size: cover;
   background-repeat: no-repeat;
   font-family: 'Rajdhani', sans-serif;
   color: #fff;
 }
 
+/* Card principal */
 .creation-card {
-  background: rgba(10,10,26,0.85);
+  background: linear-gradient(135deg, rgb(10, 26, 47), rgb(5, 19, 34));
   border: 2px solid var(--primary);
   border-radius: 25px;
   padding: 40px;
@@ -35,16 +37,24 @@
   text-align: center;
 }
 
+/* Título */
 h2 {
   font-family: 'Orbitron', sans-serif;
   color: var(--accent);
   text-shadow: 0 0 10px var(--accent);
 }
 
+/* Avatar central */
 .avatar-section {
   display: flex;
   justify-content: center;
   margin-bottom: 30px;
+}
+
+.avatar-glow {
+  border-radius: 50%;
+  display: inline-block;
+  transition: box-shadow 0.5s ease;
 }
 
 .avatar-img {
@@ -55,15 +65,13 @@ h2 {
   box-shadow: 0 0 40px var(--accent), 0 0 80px var(--cyan);
 }
 
-.avatar-glow {
-  animation: pulse-glow 2s infinite alternate;
-}
-
+/* Animación de pulso opcional */
 @keyframes pulse-glow {
   0% { box-shadow: 0 0 30px var(--accent), 0 0 60px var(--cyan);}
   100% { box-shadow: 0 0 50px var(--accent), 0 0 100px var(--cyan);}
 }
 
+/* Formulario */
 .form-group input {
   width: 100%;
   padding: 14px;
@@ -81,13 +89,15 @@ h2 {
   text-shadow: 0 0 8px var(--accent);
 }
 
+/* Grid de skills */
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,1fr);
   gap: 20px;
   margin: 25px 0;
 }
 
+/* Panel HUD de cada skill */
 .skill-item.hud-panel {
   background: rgba(0,0,20,0.6);
   border: 1px solid var(--cyan);
@@ -102,6 +112,22 @@ h2 {
   box-shadow: 0 0 25px var(--accent);
 }
 
+/* Skill bar animada */
+.skill-bar {
+  background: rgba(255,255,255,0.1);
+  height: 8px;
+  border-radius: 6px;
+  margin: 6px 0;
+}
+
+.skill-fill {
+  background: var(--accent);
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+/* Controles de skill */
 .skill-controls {
   display: flex;
   justify-content: space-around;
@@ -129,6 +155,7 @@ h2 {
   font-size: 1.2em;
 }
 
+/* Botón crear personaje */
 .create-button {
   width: 100%;
   padding: 16px;
@@ -147,4 +174,15 @@ h2 {
 .create-button:hover {
   transform: scale(1.05);
   box-shadow: 0 0 30px var(--accent), 0 0 60px var(--cyan);
+}
+
+/* Responsividad */
+@media screen and (max-width: 768px) {
+  .skills-grid { grid-template-columns: repeat(2,1fr); }
+  .avatar-img { width: 180px; height: 180px; }
+}
+
+@media screen and (max-width: 480px) {
+  .skills-grid { grid-template-columns: 1fr; }
+  .avatar-img { width: 150px; height: 150px; }
 }
