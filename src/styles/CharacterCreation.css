@@ -209,29 +209,44 @@
 }
 
 .character-avatar-center {
-  /* La imagen del usuario ya tiene un personaje. 
-     Solo estilizamos el nombre de abajo. */
+  /* Estilos para el contenedor del avatar */
 }
+
+/* APLICAMOS FLEXBOX PARA REORDENAR */
+.avatar-display-center {
+  text-align: center;
+  max-width: 400px;
+  display: flex; /* Activamos Flexbox */
+  flex-direction: column; /* Apilamos los elementos verticalmente */
+  align-items: center; /* Centramos horizontalmente */
+}
+
 
 .avatar-image-main {
-  border: none; /* Quitamos el borde azul */
-  box-shadow: none; /* Quitamos la sombra azul */
-  /* Añadimos un ligero 'drop-shadow' para separarlo del fondo */
+  border: none;
+  box-shadow: none;
   filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+  order: 2; /* ENVIAMOS LA IMAGEN AL SEGUNDO LUGAR */
+  margin-bottom: 0; /* Reseteamos el margen inferior */
 }
 
-.avatar-fallback { display: none; }
+.avatar-fallback { 
+  display: none; 
+  order: 2; /* APLICAMOS EL MISMO ORDEN AL FALLBACK */
+}
 .avatar-placeholder { display: none; }
 
 .avatar-info-center {
-  /* Fondo sutil para legibilidad del texto */
   background: rgba(0, 0, 0, 0.4);
   border-radius: 8px;
   padding: 10px 15px;
-  margin-top: -20px; /* Superponerlo un poco a la imagen */
   position: relative;
   z-index: 10;
   border: 1px solid rgba(160, 124, 60, 0.5);
+  order: 1; /* TRAEMOS LA INFO AL PRIMER LUGAR */
+  margin-top: 0; /* Reseteamos el margen superior */
+  margin-bottom: -20px; /* CAMBIAMOS A MARGIN-BOTTOM para que se solape con la imagen de abajo */
+  width: 90%; /* Aseguramos que tenga un ancho coherente */
 }
 
 .avatar-name-main {
