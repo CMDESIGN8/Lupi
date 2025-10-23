@@ -52,88 +52,92 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
     setAvailablePoints(prev => prev - difference);
   };
 
-  // ✅ Aseguramos que la función sea async correctamente
   const handleCreateCharacter = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      // Preparar datos
-      const skillsData = {};
-      Object.keys(characterData.skills).forEach(key => {
-        skillsData[key] = characterData.skills[key].value;
-      });
+  try {
+    // Preparar datos
+    const skillsData = {};
+    Object.keys(characterData.skills).forEach(key => {
+      skillsData[key] = characterData.skills[key].value;
+    });
 
-      // Crear personaje
-      const { data: character, error } = await supabase
-        .from('characters')
-        .insert([
-          {
-            user_id: user.id,
-            nickname: characterData.nickname,
-            available_skill_points: 0,
-            ...skillsData
-          }
-        ])
-        .select()
-        .single();
-
-      if (error) {
-        if (error.code === '23505') {
-          throw new Error('Este nombre de personaje ya está en uso. Por favor elige otro.');
+    // Crear personaje
+    const { data: character, error } = await supabase
+      .from('characters')
+      .insert([
+        {
+          user_id: user.id,
+          nickname: characterData.nickname,
+          available_skill_points: 0,
+          ...skillsData
         }
-        throw error;
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === '23505') { // Violación de unique constraint
+        throw new Error('Este nombre de personaje ya está en uso. Por favor elige otro.');
       }
-
-      // ✅ Crear wallet (mismo bloque async)
-      const walletAddress = `${characterData.nickname.toLowerCase().replace(/\s+/g, '')}.lupi`;
-      const { error: walletError } = await supabase
-        .from('wallets')
-        .insert([
-          {
-            character_id: character.id,
-            address: walletAddress,
-            lupicoins: 100.00
-          }
-        ]);
-
-      if (walletError) throw walletError;
-
-      console.log('✅ Personaje creado exitosamente:', character);
-      alert(`¡Personaje creado exitosamente!\nWallet: ${walletAddress}`);
-      onCharacterCreated(character);
-
-    } catch (error) {
-      console.error('❌ Error creando personaje:', error);
-      alert(`Error: ${error.message}`);
-    } finally {
-      setLoading(false);
+      throw error;
     }
-  }; // 👈 esta llave debe cerrar justo después del bloque try/catch
+
+    // Crear wallet
+    const walletAddress = `${characterData.nickname.toLowerCase().replace(/\s+/g, '')}.lupi`;
+    const { error: walletError } = await supabase
+      .from('wallets')
+      .insert([
+        {
+          character_id: character.id,
+          address: walletAddress,
+          lupicoins: 100.00
+        }
+      ]);
+
+    if (walletError) throw walletError;
+
+    console.log('✅ Personaje creado exitosamente:', character);
+    alert(`¡Personaje creado exitosamente!\nWallet: ${walletAddress}`);
+    onCharacterCreated(character);
+
+  } catch (error) {
+    console.error('❌ Error creando personaje:', error);
+    alert(`Error: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="character-creation">
       <div className="creation-card">
         <h2>Crear tu Personaje Deportivo</h2>
+        
         <form onSubmit={handleCreateCharacter}>
+          {/* Nombre del Personaje */}
           <div className="form-group">
             <label>Nombre del Personaje (Nickname)</label>
             <input
               type="text"
               value={characterData.nickname}
-              onChange={(e) =>
-                setCharacterData({ ...characterData, nickname: e.target.value })
-              }
+              onChange={(e) => setCharacterData({
+                ...characterData, 
+                nickname: e.target.value
+              })}
               placeholder="Ej: Messi10"
               required
             />
             <small>Este será tu nombre en el juego</small>
           </div>
 
+          {/* Puntos Disponibles */}
           <div className="points-display">
             <h3>Puntos de Skill Disponibles: {availablePoints}</h3>
           </div>
 
+          {/* Skills */}
           <div className="skills-grid">
             <h3>Distribuye tus 10 puntos adicionales:</h3>
             {Object.entries(characterData.skills).map(([key, skill]) => (
@@ -143,7 +147,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
                   <button
                     type="button"
                     onClick={() => updateSkill(key, skill.value - 1)}
-                    disabled={skill.value <= 50}
+                    disabled={skill.value <= 50 || availablePoints >= 10}
                   >
                     -
                   </button>
@@ -160,8 +164,8 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
             ))}
           </div>
 
-          <button
-            type="submit"
+          <button 
+            type="submit" 
             disabled={loading || availablePoints > 0 || !characterData.nickname}
             className="create-button"
           >
