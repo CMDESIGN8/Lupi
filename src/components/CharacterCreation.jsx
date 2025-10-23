@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import '../styles/CharacterCreation.css';
 import { supabase } from '../lib/supabaseClient';
-import avatarPlaceholder from '../assets/avatar-placeholder.png'; // Imagen ejemplo
+import avatarPlaceholder from '../assets/avatar-placeholder.png';
 
 const BASE_SKILLS = {
   pase: { name: '📨 Pase', value: 50 },
@@ -70,12 +70,14 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
   };
 
   return (
-    <div className="character-creation">
-      <div className="creation-card">
+    <div className="character-creation stadium-bg">
+      <div className="creation-card mmorpg-card">
         <h2>🎮 Crear tu Personaje Deportivo</h2>
 
         <div className="avatar-section">
-          <img src={avatarPlaceholder} alt="Avatar" className="avatar-img" />
+          <div className="avatar-glow">
+            <img src={avatarPlaceholder} alt="Avatar" className="avatar-img" />
+          </div>
         </div>
 
         <form onSubmit={handleCreateCharacter}>
@@ -96,7 +98,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
 
           <div className="skills-grid">
             {Object.entries(characterData.skills).map(([key, skill]) => (
-              <div key={key} className="skill-item">
+              <div key={key} className="skill-item hud-panel">
                 <label>{skill.name}</label>
                 <div className="skill-controls">
                   <button type="button" onClick={() => updateSkill(key, skill.value - 1)}>-</button>
