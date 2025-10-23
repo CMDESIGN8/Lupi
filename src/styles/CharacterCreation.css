@@ -422,50 +422,100 @@
 }
 
 /* --- RESPONSIVE --- */
+
 @media (max-width: 1200px) {
+  .creation-container {
+    max-width: 95%; /* Usamos más de la pantalla */
+  }
+
   .creation-content-new {
-    grid-template-columns: 300px 1fr 300px;
+    /* Mantenemos el layout pero con paneles laterales más pequeños */
+    grid-template-columns: 300px auto 300px; 
     grid-template-areas: "right center left"; /* Mantener el swap */
+    gap: 20px;
+    justify-content: center;
   }
 }
 
 @media (max-width: 1024px) {
   .creation-content-new {
-    grid-template-columns: 1fr;
+    /* CAMBIO A 1 SOLA COLUMNA (STACKED) */
+    grid-template-columns: minmax(0, 1fr); /* Columna única que ocupa el 100% */
     /* Reordenamos para móvil, manteniendo la lógica */
     grid-template-areas: 
       "center"
-      "right" /* Skills (Originalmente .right-panel-new) */
-      "left"; /* Info (Originalmente .left-panel-new) */
+      "right" /* Skills (Panel original "right") */
+      "left"; /* Info (Panel original "left") */
+    gap: 30px; /* Mantenemos un buen espacio vertical */
   }
   
   .center-panel-new {
-    min-height: 400px;
-    padding: 20px;
+    min-height: auto; /* Dejamos que el contenido defina la altura */
+    padding: 20px 10px;
+  }
+
+  /* Hacemos que los paneles ocupen un ancho máximo más razonable */
+  .left-panel-new,
+  .right-panel-new {
+    width: 90%;
+    max-width: 500px;
+    margin: 0 auto; /* Centramos los paneles */
   }
 
   .avatar-image-main {
     width: 200px;
     height: 200px;
+    /* La 'order: 2' de la regla principal sigue aplicando */
   }
 
   .avatar-info-center {
-    margin-top: -10px; /* Ajuste para avatar más pequeño */
+    /* La 'order: 1' de la regla principal sigue aplicando */
+    /* Ajustamos el solapamiento para la imagen más pequeña */
+    margin-bottom: -15px; 
+    width: 90%;
+    max-width: 320px; /* Evitamos que sea muy ancho en tablets */
   }
 }
 
 @media (max-width: 768px) {
   .character-creation-rom {
-    padding: 10px;
+    padding: 10px 0; /* Menos padding general */
   }
 
+  /* Hacemos que los paneles ocupen todo el ancho */
   .left-panel-new,
   .right-panel-new {
-    padding: 15px;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    border-radius: 0; /* Sin bordes redondeados en móvil */
+    border-left: none;
+    border-right: none;
+  }
+
+  /* Ajustamos el panel central también */
+  .center-panel-new {
+    padding: 20px 0;
+  }
+  
+  .creation-content-new {
+    gap: 15px; /* Reducimos el espacio entre paneles */
   }
 
   .avatar-details {
+    /* Esto apila "Deportista" y "Nivel 1" */
     flex-direction: column;
     gap: 10px;
+  }
+
+  .skill-controls-new {
+    gap: 10px; /* Menos espacio entre botones en móvil */
+  }
+
+  /* Botones de skill un poco más pequeños */
+  .control-btn-new {
+    width: 38px;
+    height: 38px;
+    font-size: 1.3rem;
   }
 }
