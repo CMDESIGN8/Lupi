@@ -4,65 +4,33 @@ import '../styles/CharacterCreation.css';
 import { supabase } from '../lib/supabaseClient';
 
 const BASE_SKILLS = {
-  pase: { name: 'Pase', value: 50, icon: '↗️', color: '#00B894' },
-  potencia: { name: 'Potencia', value: 50, icon: '💥', color: '#E84393' },
-  velocidad: { name: 'Velocidad', value: 50, icon: '⚡', color: '#FDCB6E' },
-  liderazgo: { name: 'Liderazgo', value: 50, icon: '👑', color: '#FF7675' },
-  tiro: { name: 'Tiro', value: 50, icon: '🎯', color: '#6C5CE7' },
-  regate: { name: 'Regate', value: 50, icon: '🌀', color: '#00CEC9' },
-  tecnica: { name: 'Técnica', value: 50, icon: '🔧', color: '#A29BFE' },
-  estrategia: { name: 'Estrategia', value: 50, icon: '🧠', color: '#FD79A8' },
-  inteligencia: { name: 'Inteligencia', value: 50, icon: '📊', color: '#74B9FF' },
-  defensa: { name: 'Defensa', value: 50, icon: '🛡️', color: '#636E72' },
-  resistencia: { name: 'Resistencia', value: 50, icon: '🏃', color: '#00B894' }
+  pase: { name: 'Pase', value: 50, icon: '↗️' },
+  potencia: { name: 'Potencia', value: 50, icon: '💥' },
+  velocidad: { name: 'Velocidad', value: 50, icon: '⚡' },
+  liderazgo: { name: 'Liderazgo', value: 50, icon: '👑' },
+  tiro: { name: 'Tiro', value: 50, icon: '🎯' },
+  regate: { name: 'Regate', value: 50, icon: '🌀' },
+  tecnica: { name: 'Técnica', value: 50, icon: '🔧' },
+  estrategia: { name: 'Estrategia', value: 50, icon: '🧠' },
+  inteligencia: { name: 'Inteligencia', value: 50, icon: '📊' },
+  defensa: { name: 'Defensa', value: 50, icon: '🛡️' },
+  resistencia: { name: 'Resistencia', value: 50, icon: '🏃' }
 };
 
-const AvatarPreview = ({ nickname, stats }) => (
-  <div className="avatar-preview">
-    <div className="avatar-container">
-      <div className="avatar-circle">
-        <div className="avatar-face">
-          <div className="avatar-eyes">
-            <div className="eye"></div>
-            <div className="eye"></div>
-          </div>
-          <div className="avatar-mouth"></div>
+const CharacterAvatar = ({ nickname, className = '' }) => (
+  <div className={`character-avatar ${className}`}>
+    <div className="avatar-display">
+      <div className="avatar-image">
+        <div className="avatar-base">
+          <div className="avatar-head"></div>
+          <div className="avatar-body"></div>
         </div>
-        <div className="avatar-hair"></div>
+        <div className="avatar-glow"></div>
       </div>
-      <div className="avatar-jersey">
-        <div className="jersey-number">
-          {nickname ? nickname.slice(0, 2).toUpperCase() : '10'}
-        </div>
-      </div>
-    </div>
-    
-    <div className="character-info">
-      <h3 className="character-name">{nickname || 'Nuevo Jugador'}</h3>
-      <div className="character-level">Nivel 1</div>
-    </div>
-
-    <div className="stats-overview">
-      <div className="stat-card">
-        <div className="stat-icon">⚔️</div>
-        <div className="stat-info">
-          <div className="stat-value">{stats.ataque}</div>
-          <div className="stat-label">Ataque</div>
-        </div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-icon">🛡️</div>
-        <div className="stat-info">
-          <div className="stat-value">{stats.defensa}</div>
-          <div className="stat-label">Defensa</div>
-        </div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-icon">🌟</div>
-        <div className="stat-info">
-          <div className="stat-value">{stats.tecnica}</div>
-          <div className="stat-label">Técnica</div>
-        </div>
+      <div className="avatar-info">
+        <h3 className="avatar-name">{nickname || 'Nuevo Jugador'}</h3>
+        <div className="avatar-class">Deportista Profesional</div>
+        <div className="avatar-level">Nivel 1</div>
       </div>
     </div>
   </div>
@@ -75,7 +43,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
   });
   const [availablePoints, setAvailablePoints] = useState(10);
   const [loading, setLoading] = useState(false);
-  const [activeSkill, setActiveSkill] = useState(null);
+  const [selectedSkill, setSelectedSkill] = useState(null);
 
   const updateSkill = (skillKey, newValue) => {
     const currentValue = characterData.skills[skillKey].value;
@@ -110,7 +78,6 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
     setLoading(true);
 
     try {
-      // Tu código existente para crear el personaje...
       const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
@@ -176,115 +143,177 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
   const stats = calculateStats();
 
   return (
-    <div className="character-creation-modern">
+    <div className="character-creation-rom">
       <div className="creation-container">
         <div className="creation-header">
-          <h1>CREAR PERSONAJE DEPORTIVO</h1>
-          <p>Construye al próximo campeón del deporte mundial</p>
+          <h1>CREAR PERSONAJE</h1>
+          <p>Construye a tu leyenda del deporte</p>
         </div>
 
-        <div className="creation-layout">
-          {/* Panel Izquierdo - Skills */}
-          <div className="skills-panel">
-            <div className="points-card">
-              <div className="points-header">
-                <span className="points-title">Puntos Disponibles</span>
-                <span className="points-count">{availablePoints}</span>
-              </div>
-              <div className="points-subtitle">
-                Distribuye {availablePoints} puntos adicionales entre tus habilidades
-              </div>
-            </div>
-
-            <div className="skills-grid">
-              {Object.entries(characterData.skills).map(([key, skill]) => (
-                <div 
-                  key={key}
-                  className={`skill-card ${activeSkill === key ? 'active' : ''}`}
-                  onMouseEnter={() => setActiveSkill(key)}
-                  onMouseLeave={() => setActiveSkill(null)}
-                >
-                  <div className="skill-header">
-                    <span className="skill-icon">{skill.icon}</span>
-                    <span className="skill-name">{skill.name}</span>
-                    <span className="skill-value">{skill.value}</span>
-                  </div>
-                  
-                  <div className="skill-bar">
+        <div className="creation-content">
+          {/* Panel Izquierdo - Avatar y Stats */}
+          <div className="left-panel">
+            <CharacterAvatar nickname={characterData.nickname} />
+            
+            <div className="stats-panel">
+              <h3>Estadísticas del Personaje</h3>
+              <div className="stats-grid">
+                <div className="stat-item">
+                  <span className="stat-name">Ataque</span>
+                  <div className="stat-bar">
                     <div 
-                      className="skill-progress"
-                      style={{
-                        width: `${((skill.value - 50) / 50) * 100}%`,
-                        backgroundColor: skill.color
-                      }}
+                      className="stat-fill" 
+                      style={{width: `${stats.ataque}%`}}
                     ></div>
                   </div>
-
-                  <div className="skill-controls">
-                    <button
-                      type="button"
-                      onClick={() => updateSkill(key, skill.value - 5)}
-                      disabled={skill.value <= 50 || availablePoints >= 10}
-                      className="control-btn minus"
-                    >
-                      -5
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateSkill(key, skill.value - 1)}
-                      disabled={skill.value <= 50 || availablePoints >= 10}
-                      className="control-btn minus"
-                    >
-                      -
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateSkill(key, skill.value + 1)}
-                      disabled={availablePoints <= 0}
-                      className="control-btn plus"
-                    >
-                      +
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => updateSkill(key, skill.value + 5)}
-                      disabled={availablePoints < 5}
-                      className="control-btn plus"
-                    >
-                      +5
-                    </button>
-                  </div>
+                  <span className="stat-value">{stats.ataque}</span>
                 </div>
-              ))}
+                <div className="stat-item">
+                  <span className="stat-name">Defensa</span>
+                  <div className="stat-bar">
+                    <div 
+                      className="stat-fill" 
+                      style={{width: `${stats.defensa}%`}}
+                    ></div>
+                  </div>
+                  <span className="stat-value">{stats.defensa}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-name">Técnica</span>
+                  <div className="stat-bar">
+                    <div 
+                      className="stat-fill" 
+                      style={{width: `${stats.tecnica}%`}}
+                    ></div>
+                  </div>
+                  <span className="stat-value">{stats.tecnica}</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-name">Mental</span>
+                  <div className="stat-bar">
+                    <div 
+                      className="stat-fill" 
+                      style={{width: `${stats.mental}%`}}
+                    ></div>
+                  </div>
+                  <span className="stat-value">{stats.mental}</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Panel Central - Avatar */}
-          <div className="avatar-panel">
-            <AvatarPreview nickname={characterData.nickname} stats={stats} />
-            
-            <form onSubmit={handleCreateCharacter} className="creation-form">
-              <div className="name-input-group">
-                <input
-                  type="text"
-                  value={characterData.nickname}
-                  onChange={(e) => setCharacterData({
-                    ...characterData, 
-                    nickname: e.target.value
-                  })}
-                  placeholder="Ingresa el nombre de tu personaje"
-                  className="name-input"
-                  required
-                  minLength={3}
-                  maxLength={20}
-                />
-                <small>3-20 caracteres. Este será tu nombre en el juego.</small>
+          {/* Panel Central - Skills */}
+          <div className="center-panel">
+            <div className="skills-section">
+              <div className="section-header">
+                <h2>Habilidades Deportivas</h2>
+                <div className="points-display">
+                  <span className="points-label">Puntos disponibles:</span>
+                  <span className="points-value">{availablePoints}</span>
+                </div>
+              </div>
+
+              <div className="skills-grid">
+                {Object.entries(characterData.skills).map(([key, skill]) => (
+                  <div 
+                    key={key} 
+                    className={`skill-row ${selectedSkill === key ? 'selected' : ''}`}
+                    onClick={() => setSelectedSkill(key)}
+                  >
+                    <div className="skill-info">
+                      <span className="skill-icon">{skill.icon}</span>
+                      <span className="skill-name">{skill.name}</span>
+                    </div>
+                    
+                    <div className="skill-controls">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateSkill(key, skill.value - 1);
+                        }}
+                        disabled={skill.value <= 50 || availablePoints >= 10}
+                        className="control-btn minus"
+                      >
+                        -
+                      </button>
+                      
+                      <div className="skill-value-display">
+                        <span className="value">{skill.value}</span>
+                      </div>
+                      
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateSkill(key, skill.value + 1);
+                        }}
+                        disabled={availablePoints <= 0}
+                        className="control-btn plus"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <div className="skill-bar">
+                      <div 
+                        className="skill-progress"
+                        style={{width: `${((skill.value - 50) / 50) * 100}%`}}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Panel Derecho - Formulario */}
+          <div className="right-panel">
+            <div className="creation-form">
+              <div className="form-section">
+                <h3>Información del Personaje</h3>
+                <div className="input-group">
+                  <label>Nombre del Personaje</label>
+                  <input
+                    type="text"
+                    value={characterData.nickname}
+                    onChange={(e) => setCharacterData({
+                      ...characterData, 
+                      nickname: e.target.value
+                    })}
+                    placeholder="Ingresa el nombre de tu personaje"
+                    className="name-input"
+                    required
+                    minLength={3}
+                    maxLength={20}
+                  />
+                  <small>3-20 caracteres. Este será tu nombre en el juego.</small>
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h3>Resumen</h3>
+                <div className="summary-card">
+                  <div className="summary-item">
+                    <span>Puntos utilizados:</span>
+                    <span>{10 - availablePoints}/10</span>
+                  </div>
+                  <div className="summary-item">
+                    <span>Habilidades asignadas:</span>
+                    <span>{Object.values(characterData.skills).filter(s => s.value > 50).length}</span>
+                  </div>
+                  <div className="summary-item">
+                    <span>Estadística más alta:</span>
+                    <span>{Math.max(...Object.values(stats))}</span>
+                  </div>
+                </div>
               </div>
 
               <button 
                 type="submit" 
+                onClick={handleCreateCharacter}
                 disabled={loading || availablePoints > 0 || !characterData.nickname || characterData.nickname.length < 3}
-                className="create-character-btn"
+                className="create-btn"
               >
                 {loading ? (
                   <>
@@ -292,7 +321,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
                     Creando Personaje...
                   </>
                 ) : (
-                  '🎮 Crear Personaje'
+                  'Crear Personaje'
                 )}
               </button>
 
@@ -301,81 +330,6 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
                   ⚠️ Aún tienes {availablePoints} punto(s) por asignar
                 </div>
               )}
-            </form>
-          </div>
-
-          {/* Panel Derecho - Stats */}
-          <div className="stats-panel">
-            <div className="stats-card">
-              <h3>Estadísticas Generales</h3>
-              <div className="stats-list">
-                <div className="stat-item">
-                  <div className="stat-bar-container">
-                    <div className="stat-label">
-                      <span>Ataque</span>
-                      <span>{stats.ataque}</span>
-                    </div>
-                    <div className="stat-bar">
-                      <div 
-                        className="stat-fill attack" 
-                        style={{width: `${stats.ataque}%`}}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-bar-container">
-                    <div className="stat-label">
-                      <span>Defensa</span>
-                      <span>{stats.defensa}</span>
-                    </div>
-                    <div className="stat-bar">
-                      <div 
-                        className="stat-fill defense" 
-                        style={{width: `${stats.defensa}%`}}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-bar-container">
-                    <div className="stat-label">
-                      <span>Técnica</span>
-                      <span>{stats.tecnica}</span>
-                    </div>
-                    <div className="stat-bar">
-                      <div 
-                        className="stat-fill technique" 
-                        style={{width: `${stats.tecnica}%`}}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-bar-container">
-                    <div className="stat-label">
-                      <span>Mental</span>
-                      <span>{stats.mental}</span>
-                    </div>
-                    <div className="stat-bar">
-                      <div 
-                        className="stat-fill mental" 
-                        style={{width: `${stats.mental}%`}}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="tips-card">
-              <h4>💡 Consejos</h4>
-              <ul>
-                <li>Equilibra tus habilidades según tu estilo de juego</li>
-                <li>La resistencia afecta tu duración en partidos largos</li>
-                <li>El liderazgo mejora el rendimiento del equipo</li>
-                <li>Distribuye todos los puntos antes de crear</li>
-              </ul>
             </div>
           </div>
         </div>
