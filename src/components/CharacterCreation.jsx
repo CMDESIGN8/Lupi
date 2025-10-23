@@ -57,32 +57,37 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
   setLoading(true);
 
   try {
-    // Preparar datos
     const skillsData = {};
     Object.keys(characterData.skills).forEach(key => {
       skillsData[key] = characterData.skills[key].value;
     });
 
-    // Crear personaje
-    const { data: character, error } = await supabase
-      .from('characters')
-      .insert([
-        {
-          user_id: user.id,
-          nickname: characterData.nickname,
-          available_skill_points: 0,
-          ...skillsData
-        }
-      ])
-      .select()
-      .single();
+    // 🚀 LLAMAR AL BACKEND (NO A SUPABASE)
+    const response = await fetch("https://lupiback.onrender.com/characters", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: user.id,
+        name: characterData.nickname,
+        position: "delantero", // o el rol que quieras
+        ...skillsData,
+      }),
+    });
 
-    if (error) {
-      if (error.code === '23505') { // Violación de unique constraint
-        throw new Error('Este nombre de personaje ya está en uso. Por favor elige otro.');
-      }
-      throw error;
-    }
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Error creando personaje");
+
+    console.log("✅ Personaje creado exitosamente:", data.character);
+    alert(`¡Personaje creado exitosamente!`);
+    onCharacterCreated(data.character);
+
+  } catch (error) {
+    console.error("❌ Error creando personaje:", error);
+    alert(`Error: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
     // Crear wallet
     const walletAddress = `${characterData.nickname.toLowerCase().replace(/\s+/g, '')}.lupi`;
