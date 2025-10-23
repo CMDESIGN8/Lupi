@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import '../styles/CharacterCreation.css';
 import { supabase } from '../lib/supabaseClient';
-import avatarPlaceholder from '../assets/avatar-placeholder.png'; // Puedes reemplazar con tu imagen
+import avatarPlaceholder from '../assets/avatar-placeholder.png'; // Imagen ejemplo
 
 const BASE_SKILLS = {
   pase: { name: '📨 Pase', value: 50 },
@@ -29,16 +29,11 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
   const updateSkill = (skillKey, newValue) => {
     const currentValue = characterData.skills[skillKey].value;
     const difference = newValue - currentValue;
-
-    if (difference > availablePoints) return;
-    if (newValue < 50) return;
+    if (difference > availablePoints || newValue < 50) return;
 
     setCharacterData(prev => ({
       ...prev,
-      skills: {
-        ...prev.skills,
-        [skillKey]: { ...prev.skills[skillKey], value: newValue }
-      }
+      skills: { ...prev.skills, [skillKey]: { ...prev.skills[skillKey], value: newValue } }
     }));
     setAvailablePoints(prev => prev - difference);
   };
@@ -47,24 +42,22 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error: profileError } = await supabase.from('profiles').upsert({
+      await supabase.from('profiles').upsert({
         id: user.id,
         username: user.email?.split('@')[0] || `user_${user.id.slice(0,8)}`,
         email: user.email
       }, { onConflict: 'id' });
-      if (profileError) throw profileError;
 
       const skillsData = Object.fromEntries(
         Object.entries(characterData.skills).map(([k,v]) => [k, v.value])
       );
 
-      const { data: character, error: characterError } = await supabase.from('characters').insert([{
+      const { data: character } = await supabase.from('characters').insert([{
         user_id: user.id,
         nickname: characterData.nickname,
         available_skill_points: availablePoints,
         ...skillsData
       }]).select().single();
-      if (characterError) throw characterError;
 
       const walletAddress = `${characterData.nickname.toLowerCase().replace(/\s+/g, '')}.lupi`;
       await supabase.from('wallets').insert([{ character_id: character.id, address: walletAddress, lupicoins: 100 }]);
@@ -78,7 +71,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
 
   return (
     <div className="character-creation">
-      <div className="creation-card mmorpg-card">
+      <div className="creation-card">
         <h2>🎮 Crear tu Personaje Deportivo</h2>
 
         <div className="avatar-section">
