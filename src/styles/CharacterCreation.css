@@ -255,7 +255,7 @@
 /* (Originalmente .right-panel-new) */
 
 .skills-grid-new {
-  gap: 15px; /* Más espacio entre cada "caja" de skill */
+  gap: 15px; /* Espacio entre cada "caja" de skill */
   padding-right: 5px;
 }
 
@@ -277,25 +277,22 @@
 }
 
 .skill-row-new {
-  /* CAMBIO A FLEXBOX VERTICAL */
+  /* Mantenemos Flexbox VERTICAL para la caja entera */
   display: flex;
   flex-direction: column;
   gap: 12px; /* Espacio entre Info, Controles y Barra */
   
-  padding: 15px; /* Aumentamos padding para más aire */
+  padding: 15px; 
   background: rgba(30, 20, 15, 0.7);
   border: 1px solid #a07c3c;
   border-radius: 6px;
-  /* Eliminamos cursor: pointer y transiciones, ya no es "seleccionable" */
 }
 
 .skill-row-new:hover {
-  /* Estilo hover más sutil */
   border-color: #c89b3c;
   background: rgba(30, 20, 15, 0.9);
 }
 
-/* Eliminamos el estado "selected" que ya no aplica a este layout */
 .skill-row-new.selected {
   background: rgba(30, 20, 15, 0.7);
   border-color: #a07c3c;
@@ -312,22 +309,25 @@
 
 .skill-name-new {
   color: #f0e6d2;
-  font-size: 1.1rem; /* Un poco más grande */
+  font-size: 1.1rem; 
   font-weight: 600;
 }
 
 .skill-controls-new {
-  /* CAMBIO A FLEXBOX VERTICAL */
+  /* CAMBIO A FLEXBOX HORIZONTAL */
   display: flex;
-  flex-direction: column;
-  align-items: center; /* Centramos botones y número */
-  gap: 8px; /* Espacio entre -, 50, + */
+  flex-direction: row; /* Para poner [-] [50] [+] en la misma línea */
+  align-items: center; /* Alinear verticalmente los botones y el número */
+  justify-content: center; /* Centrar el grupo horizontalmente */
+  gap: 15px; /* Espacio entre los botones y el número */
 }
 
 .control-btn-new {
-  width: 80%; /* Hacemos los botones más anchos, como en la imagen */
-  max-width: 150px; /* Pero no *demasiado* anchos */
-  height: 30px;
+  /* CAMBIO A BOTONES CUADRADOS */
+  width: 40px;  /* Ancho fijo */
+  height: 40px; /* Alto fijo */
+  max-width: none; /* Quitamos el max-width anterior */
+  
   border: 1px solid #a07c3c;
   background: #3a2a1a;
   color: #f0e6d2;
@@ -336,7 +336,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  font-size: 1.1rem;
+  font-size: 1.5rem; /* Hacemos el '+' y '-' más grandes */
   transition: all 0.2s ease;
   cursor: pointer;
 }
@@ -348,12 +348,12 @@
 }
 
 .control-btn-new.plus:hover:not(:disabled) {
-  background: #38a169;
+  background: #38a169; 
   border-color: #48bb78;
   color: white;
 }
 .control-btn-new.minus:hover:not(:disabled) {
-  background: #e53e3e;
+  background: #e53e3e; 
   border-color: #fc8181;
   color: white;
 }
@@ -374,16 +374,15 @@
 
 .value-new {
   color: #fff;
-  font-size: 1.5rem; /* Número más grande, como en la imagen */
+  font-size: 1.5rem; /* Mantenemos el número grande */
   font-weight: 700;
 }
 
 .skill-bar-new {
-  /* ELIMINAMOS 'grid-column' */
-  width: 100%; /* Aseguramos que ocupe todo el ancho */
-  height: 6px; /* Barra un poco más gruesa */
+  width: 100%; /* La barra ocupa todo el ancho de la caja */
+  height: 6px; 
   background: #3a2a1a;
-  margin-top: 5px; /* Espacio extra arriba de la barra */
+  margin-top: 5px; /* Pequeño espacio sobre la barra */
   border-radius: 3px;
   overflow: hidden;
 }
