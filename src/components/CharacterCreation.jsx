@@ -14,7 +14,7 @@ const BASE_SKILLS = {
   estrategia: { name: 'Estrategia', value: 50, icon: '🧠' },
   inteligencia: { name: 'Inteligencia', value: 50, icon: '📊' },
   defensa: { name: 'Defensa', value: 50, icon: '🛡️' },
-  resistencia: { name: 'Resistencia', value: 50, icon: '🏃' }
+  resistencia_base: { name: 'Resistencia', value: 50, icon: '🏃' }
 };
 
 const CharacterAvatar = ({ nickname }) => (
