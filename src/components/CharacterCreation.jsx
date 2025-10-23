@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import '../styles/CharacterCreation.css';
 import { supabase } from '../lib/supabaseClient';
-import avatarPlaceholder from '../assets/avatar-placeholder.png'; // Puedes reemplazar con tu imagen
+import avatarPlaceholder from '../../assets/avatar-placeholder.png'; // Puedes reemplazar con tu imagen
 
 const BASE_SKILLS = {
   pase: { name: '📨 Pase', value: 50 },
