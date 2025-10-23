@@ -1,6 +1,6 @@
 // apps/client/src/components/CharacterCreation.jsx
 import React, { useState } from 'react';
-import '../styles/CharacterCreation.css';
+import './CharacterCreation.css';
 
 const BASE_SKILLS = {
   pase: { name: '📨 Pase', value: 50 },
@@ -81,7 +81,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
     try {
       console.log('🎮 Iniciando creación de personaje para usuario:', user.id);
 
-      // Preparar datos para la API
+      // Preparar datos para la API - CORREGIDO: usar nickname en lugar de name
       const skillsData = {};
       Object.keys(characterData.skills).forEach(key => {
         skillsData[key] = characterData.skills[key].value;
@@ -89,14 +89,14 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
 
       const characterPayload = {
         user_id: user.id,
-        name: characterData.nickname,
+        nickname: characterData.nickname, // ← CORREGIDO: cambiar 'name' por 'nickname'
         position: 'delantero',
         ...skillsData
       };
 
       console.log('📤 Enviando datos a la API:', characterPayload);
 
-      // URL del backend en Render - usa /characters directamente
+      // URL del backend en Render
       const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://lupiback.onrender.com';
       
       const response = await fetch(`${API_BASE_URL}/characters`, {
@@ -118,7 +118,9 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || result.details || 'Error desconocido al crear personaje');
+        // Mostrar el error específico de Supabase si está disponible
+        const errorMessage = result.error?.message || result.error || result.details || 'Error desconocido al crear personaje';
+        throw new Error(errorMessage);
       }
 
       console.log('✅ Personaje creado exitosamente:', result);
@@ -143,6 +145,8 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
         alert('❌ Este nombre de personaje ya está en uso. Por favor elige otro.');
       } else if (error.message.includes('profiles') || error.message.includes('foreign key')) {
         alert('❌ Error de perfil de usuario. Por favor contacta al soporte.');
+      } else if (error.message.includes('nickname') || error.message.includes('not-null constraint')) {
+        alert('❌ Error: El campo nickname es requerido. Por favor verifica los datos.');
       } else if (error.message.includes('Network Error') || error.message.includes('Failed to fetch')) {
         alert('❌ Error de conexión. Verifica que el servidor esté funcionando.');
       } else {
