@@ -1,49 +1,79 @@
-/* CharacterCreation.css */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap');
+
+:root {
+  --primary: #4361ee;
+  --secondary: #00bbf9;
+  --accent: #00ff88;
+  --violet: #00ff88;
+  --cyan: #4cc9f0;
+  --dark: #0a0a1a;
+  --darker: #000000;
+  --blue-dark: #001122;
+}
+
 .character-creation {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 40px;
-  background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+  align-items: center;
   min-height: 100vh;
+  background: linear-gradient(135deg, var(--dark), var(--blue-dark));
+  font-family: 'Rajdhani', sans-serif;
   color: #fff;
-  font-family: 'Orbitron', sans-serif;
 }
 
 .creation-card {
-  background: #1b1b1b;
+  background: var(--dark);
+  border: 2px solid var(--primary);
   border-radius: 20px;
-  padding: 30px;
-  width: 600px;
-  box-shadow: 0 0 30px rgba(0,255,200,0.4);
+  padding: 40px;
+  width: 650px;
+  max-width: 90%;
+  box-shadow: 0 0 40px var(--primary);
+  text-align: center;
 }
 
 .avatar-section {
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .avatar-img {
-  width: 150px;
-  height: 150px;
+  width: 180px;
+  height: 180px;
   border-radius: 50%;
-  border: 4px solid #00ffc2;
+  border: 4px solid var(--accent);
+  box-shadow: 0 0 20px var(--accent);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid var(--secondary);
+  background: var(--blue-dark);
+  color: #fff;
+  font-size: 1em;
+  margin-top: 5px;
+}
+
+.points-display h3 {
+  margin: 10px 0;
+  color: var(--accent);
 }
 
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 15px;
-  margin: 20px 0;
+  margin: 25px 0;
 }
 
 .skill-item {
-  background: #222;
-  border-radius: 10px;
+  background: var(--blue-dark);
+  border-radius: 12px;
   padding: 10px;
-  text-align: center;
-  box-shadow: 0 0 10px rgba(0,255,200,0.2);
+  box-shadow: 0 0 15px var(--cyan);
 }
 
 .skill-controls {
@@ -54,14 +84,13 @@
 }
 
 .skill-controls button {
-  background: linear-gradient(45deg, #00ffc2, #00a8ff);
+  background: var(--secondary);
   border: none;
   padding: 5px 12px;
   border-radius: 6px;
   cursor: pointer;
-  color: #000;
   font-weight: bold;
-  transition: transform 0.2s;
+  transition: all 0.2s;
 }
 
 .skill-controls button:hover {
@@ -75,38 +104,28 @@
 
 .create-button {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(45deg, #ff005e, #ff9500);
+  padding: 14px;
+  background: var(--primary);
   border: none;
-  border-radius: 12px;
+  border-radius: 15px;
   font-size: 1.2em;
   font-weight: bold;
   margin-top: 20px;
   cursor: pointer;
   color: #fff;
-  transition: all 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .create-button:hover {
   transform: scale(1.05);
+  box-shadow: 0 0 20px var(--accent);
 }
 
-.points-display {
-  text-align: center;
-  margin: 15px 0;
-  font-size: 1.1em;
+h2 {
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 20px;
 }
 
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  border: 2px solid #00ffc2;
-  background: #111;
-  color: #fff;
-  font-size: 1em;
-}
-
-h2, h3 {
-  text-align: center;
+h3 {
+  font-family: 'Rajdhani', sans-serif;
 }
