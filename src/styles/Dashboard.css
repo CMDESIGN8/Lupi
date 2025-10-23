@@ -638,10 +638,6 @@ body {
     flex-direction: column;
   }
   
-  .skills-grid {
-    max-height: 400px;
-  }
-  
   .levelup-stats {
     flex-direction: column;
     gap: 20px;
