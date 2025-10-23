@@ -1,5 +1,5 @@
 // src/components/CharacterCreation.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/CharacterCreation.css';
 import { supabase } from '../lib/supabaseClient';
 import avatarPlaceholder from '../assets/avatar-placeholder.png';
@@ -19,12 +19,16 @@ const BASE_SKILLS = {
 };
 
 export const CharacterCreation = ({ user, onCharacterCreated }) => {
-  const [characterData, setCharacterData] = useState({
-    nickname: '',
-    skills: { ...BASE_SKILLS }
-  });
+  const [characterData, setCharacterData] = useState({ nickname: '', skills: { ...BASE_SKILLS } });
   const [availablePoints, setAvailablePoints] = useState(10);
   const [loading, setLoading] = useState(false);
+  const [totalSkillPoints, setTotalSkillPoints] = useState(0);
+
+  useEffect(() => {
+    // Calcular puntos totales para animar el halo del avatar
+    const total = Object.values(characterData.skills).reduce((sum, s) => sum + s.value, 0);
+    setTotalSkillPoints(total);
+  }, [characterData.skills]);
 
   const updateSkill = (skillKey, newValue) => {
     const currentValue = characterData.skills[skillKey].value;
@@ -75,7 +79,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
         <h2>🎮 Crear tu Personaje Deportivo</h2>
 
         <div className="avatar-section">
-          <div className="avatar-glow">
+          <div className="avatar-glow" style={{ boxShadow: `0 0 ${20 + (totalSkillPoints-550)/2}px var(--accent), 0 0 ${50 + (totalSkillPoints-550)}px var(--cyan)` }}>
             <img src={avatarPlaceholder} alt="Avatar" className="avatar-img" />
           </div>
         </div>
@@ -100,6 +104,9 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
             {Object.entries(characterData.skills).map(([key, skill]) => (
               <div key={key} className="skill-item hud-panel">
                 <label>{skill.name}</label>
+                <div className="skill-bar">
+                  <div className="skill-fill" style={{ width: `${(skill.value-50)*10}%` }}></div>
+                </div>
                 <div className="skill-controls">
                   <button type="button" onClick={() => updateSkill(key, skill.value - 1)}>-</button>
                   <span className="skill-value">{skill.value}</span>
