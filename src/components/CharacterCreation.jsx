@@ -1,4 +1,4 @@
-// apps/client/src/components/CharacterCreation.jsx
+// src/components/CharacterCreation.jsx
 import React, { useState } from 'react';
 import '../styles/CharacterCreation.css';
 import { supabase } from '../lib/supabaseClient';
@@ -54,62 +54,89 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
   };
 
   const handleCreateCharacter = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    // Preparar datos
-    const skillsData = {};
-    Object.keys(characterData.skills).forEach(key => {
-      skillsData[key] = characterData.skills[key].value;
-    });
+    try {
+      // ✅ PRIMERO: Asegurar que el perfil existe
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          username: user.email?.split('@')[0] || `user_${user.id.slice(0,8)}`,
+          email: user.email
+        }, {
+          onConflict: 'id'
+        });
 
-    // Crear personaje
-    const { data: character, error } = await supabase
-      .from('characters')
-      .insert([
-        {
-          user_id: user.id,
-          nickname: characterData.nickname,
-          available_skill_points: 0,
-          ...skillsData
-        }
-      ])
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') { // Violación de unique constraint
-        throw new Error('Este nombre de personaje ya está en uso. Por favor elige otro.');
+      if (profileError) {
+        console.error('❌ Error creando perfil:', profileError);
+        throw new Error('Error al crear perfil de usuario');
       }
-      throw error;
-    }
 
-    // Crear wallet
-    const walletAddress = `${characterData.nickname.toLowerCase().replace(/\s+/g, '')}.lupi`;
-    const { error: walletError } = await supabase
-      .from('wallets')
-      .insert([
-        {
-          character_id: character.id,
-          address: walletAddress,
-          lupicoins: 100.00
+      console.log('✅ Perfil verificado/creado');
+
+      // ✅ SEGUNDO: Preparar datos del personaje
+      const skillsData = {};
+      Object.keys(characterData.skills).forEach(key => {
+        skillsData[key] = characterData.skills[key].value;
+      });
+
+      // ✅ TERCERO: Crear personaje
+      const { data: character, error: characterError } = await supabase
+        .from('characters')
+        .insert([
+          {
+            user_id: user.id,
+            nickname: characterData.nickname,
+            available_skill_points: availablePoints, // Guardar puntos restantes
+            ...skillsData
+          }
+        ])
+        .select()
+        .single();
+
+      if (characterError) {
+        if (characterError.code === '23505') {
+          throw new Error('Este nombre de personaje ya está en uso. Por favor elige otro.');
         }
-      ]);
+        if (characterError.code === '23503') {
+          throw new Error('Error de permisos. Contacta al administrador.');
+        }
+        throw characterError;
+      }
 
-    if (walletError) throw walletError;
+      console.log('✅ Personaje creado:', character);
 
-    console.log('✅ Personaje creado exitosamente:', character);
-    alert(`¡Personaje creado exitosamente!\nWallet: ${walletAddress}`);
-    onCharacterCreated(character);
+      // ✅ CUARTO: Crear wallet
+      const walletAddress = `${characterData.nickname.toLowerCase().replace(/\s+/g, '')}.lupi`;
+      const { error: walletError } = await supabase
+        .from('wallets')
+        .insert([
+          {
+            character_id: character.id,
+            address: walletAddress,
+            lupicoins: 100.00
+          }
+        ]);
 
-  } catch (error) {
-    console.error('❌ Error creando personaje:', error);
-    alert(`Error: ${error.message}`);
-  } finally {
-    setLoading(false);
-  }
-};
+      if (walletError) {
+        console.error('❌ Error creando wallet:', walletError);
+        // No lanzar error aquí, el personaje ya fue creado
+      }
+
+      console.log('✅ Wallet creada:', walletAddress);
+      
+      alert(`¡Personaje creado exitosamente!\nWallet: ${walletAddress}\nRecibiste 100 LupiCoins de bienvenida!`);
+      onCharacterCreated(character);
+
+    } catch (error) {
+      console.error('❌ Error completo creando personaje:', error);
+      alert(`Error: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="character-creation">
@@ -129,18 +156,21 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
               })}
               placeholder="Ej: Messi10"
               required
+              minLength={3}
+              maxLength={20}
             />
-            <small>Este será tu nombre en el juego</small>
+            <small>Este será tu nombre en el juego (3-20 caracteres)</small>
           </div>
 
           {/* Puntos Disponibles */}
           <div className="points-display">
             <h3>Puntos de Skill Disponibles: {availablePoints}</h3>
+            <small>Base: 50 puntos en cada skill + {availablePoints} puntos extra para distribuir</small>
           </div>
 
           {/* Skills */}
           <div className="skills-grid">
-            <h3>Distribuye tus 10 puntos adicionales:</h3>
+            <h3>Distribuye tus {availablePoints} puntos adicionales:</h3>
             {Object.entries(characterData.skills).map(([key, skill]) => (
               <div key={key} className="skill-item">
                 <label>{skill.name}</label>
@@ -167,7 +197,7 @@ export const CharacterCreation = ({ user, onCharacterCreated }) => {
 
           <button 
             type="submit" 
-            disabled={loading || availablePoints > 0 || !characterData.nickname}
+            disabled={loading || availablePoints > 0 || !characterData.nickname || characterData.nickname.length < 3}
             className="create-button"
           >
             {loading ? 'Creando...' : 'Crear Personaje'}
