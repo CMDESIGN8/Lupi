@@ -17,7 +17,7 @@
 
 /* --- CONTENEDOR PRINCIPAL --- */
 .creation-container {
-  max-width: 100%; /* Ocupar todo */
+  max-width: 1400px; /* ¡CAMBIO! Límite de ancho para centrar todo */
   margin: 0 auto;
   background: none; /* Sin fondo de contenedor, solo los paneles */
   border: none;
@@ -32,13 +32,11 @@
 /* --- LAYOUT DE 3 COLUMNAS --- */
 .creation-content-new {
   display: grid;
-  grid-template-columns: 320px 1fr 320px; /* Paneles un poco más estrechos */
-  /* INVERTIMOS LOS PANELES IZQUIERDO Y DERECHO USANDO GRID AREAS */
-  /* Tu panel de "Info" (Left) ahora irá a la derecha */
-  /* Tu panel de "Skills" (Right) ahora irá a la izquierda */
+  grid-template-columns: 320px auto 320px; /* Columna central a 'auto' */
+  justify-content: center; /* Centra las 3 columnas como un grupo */
   grid-template-areas: "right center left"; 
   min-height: 700px;
-  gap: 20px; /* Añadimos un espacio entre paneles */
+  gap: 30px; /* Aumentamos el espacio para que "respire" */
 }
 
 /* Asignamos las áreas */
