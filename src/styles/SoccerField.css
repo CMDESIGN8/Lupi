@@ -30,33 +30,41 @@
   --border-glow: 2px solid var(--accent-blue);
 }
 
-/* ===== ELEMENTOS DEL CAMPO DE FÚTSAL ===== */
+/* ===== CAMPO DE FÚTSAL MEJORADO ===== */
 .soccer-field {
   position: relative;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%);
   border-radius: 10px;
   overflow: hidden;
+  background: 
+    /* Textura sutil de piso de fútsal (SVG embebido) */
+    url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='none'/%3E%3Cpath d='M0,50 L100,50' stroke='%23ffffff' stroke-opacity='0.05' stroke-width='1'/%3E%3Cpath d='M50,0 L50,100' stroke='%23ffffff' stroke-opacity='0.03' stroke-width='1'/%3E%3C/svg%3E"),
+    linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%);
 }
 
-.field-grass {
-   position: relative;
+/* Iluminación ambiental */
+.soccer-field::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--futsal-dark-blue) 0%, var(--futsal-blue) 50%, var(--futsal-light-blue) 100%);
-  border-radius: 10px;
-  overflow: hidden;
+  background: radial-gradient(circle at 25% 15%, rgba(255, 255, 255, 0.1), transparent 60%);
+  pointer-events: none;
+  z-index: 1;
 }
 
-/* ÁREAS DE FÚTSAL REDONDEADAS */
+/* ===== ELEMENTOS DEL CAMPO ===== */
 .futsal-area {
   position: absolute;
-  border: 3px solid rgba(255,255,255,0.7);
+  border: 3px solid rgba(255, 255, 255, 0.7);
   top: 50%;
   transform: translateY(-50%);
   width: 12%;
   height: 60%;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
 }
 
 .futsal-area.left {
@@ -71,133 +79,100 @@
   border-radius: 60px 0 0 60px;
 }
 
-/* Puntos de penalti de futsal */
-.futsal-penalty-spot {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
-  background: rgba(255,255,255,0.9);
-  border-radius: 50%;
-  box-shadow: 0 0 6px rgba(255,255,255,0.6);
-  border: none;
-}
-
-.futsal-penalty-spot.first {
-  left: 8%;
-}
-
-.futsal-penalty-spot.second {
-  left: 12%;
-}
-
-.futsal-penalty-spot.third {
-  right: 8%;
-}
-
-.futsal-penalty-spot.fourth {
-  right: 12%;
-}
-
-/* Puntos de doble penalti (6 metros) */
+.futsal-penalty-spot,
 .double-penalty-spot {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 6px;
-  height: 6px;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
   border: none;
 }
 
-.double-penalty-spot.left {
-  left: 5%;
+.futsal-penalty-spot {
+  width: 8px;
+  height: 8px;
 }
 
-.double-penalty-spot.right {
-  right: 5%;
+.double-penalty-spot {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.8);
 }
 
-/* Porterías de futsal */
+.futsal-penalty-spot.first { left: 8%; }
+.futsal-penalty-spot.second { left: 12%; }
+.futsal-penalty-spot.third { right: 8%; }
+.futsal-penalty-spot.fourth { right: 12%; }
+.double-penalty-spot.left { left: 5%; }
+.double-penalty-spot.right { right: 5%; }
+
 .futsal-goal {
   position: absolute;
   top: 42%;
   height: 16%;
   width: 1.5%;
-  background: rgba(255,255,255,0.2);
-  border: 2px solid rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.4));
 }
 
-.futsal-goal.left {
-  left: -0.8%;
-  border-radius: 0 4px 4px 0;
-}
+.futsal-goal.left { left: -0.8%; border-radius: 0 4px 4px 0; }
+.futsal-goal.right { right: -0.8%; border-radius: 4px 0 0 4px; }
 
-.futsal-goal.right {
-  right: -0.8%;
-  border-radius: 4px 0 0 4px;
-}
-
-/* Línea de 10 metros (tiro libre) */
 .free-kick-line {
   position: absolute;
   top: 0;
+  bottom: 0;
   width: 2px;
-  background: rgba(255,255,255,0.4);
+  background: rgba(255, 255, 255, 0.4);
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));
 }
+.free-kick-line.left { left: 20%; }
+.free-kick-line.right { right: 20%; }
 
-.free-kick-line.left {
-  left: 20%;
-}
-
-.free-kick-line.right {
-  right: 20%;
-}
-
-/* Elementos del centro */
-.center-circle { 
+.center-circle {
   position: absolute;
-  top: 50%; 
-  left: 50%; 
-  transform: translate(-50%, -50%); 
-  width: 140px; 
-  height: 140px; 
-  border: 3px solid rgba(255,255,255,0.7);
-  border-radius: 50%; 
-}
-
-.center-spot { 
-  position: absolute;
-  top: 50%; 
-  left: 50%; 
-  transform: translate(-50%, -50%); 
-  width: 12px; 
-  height: 12px; 
-  background: rgba(255,255,255,0.8); 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  border: 3px solid rgba(255, 255, 255, 0.7);
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255,255,255,0.5);
-  border: none;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
 }
 
-/* ===== BALÓN DE FÚTSAL - VERSIÓN CORREGIDA ===== */
+.center-spot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* ===== BALÓN REALISTA CON ROTACIÓN ===== */
 .soccer-ball {
   position: absolute;
   width: 26px;
   height: 26px;
-  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f8fafc 100%);
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f0f4f8 100%);
   border-radius: 50%;
   transform: translate(-50%, -50%);
   z-index: 30;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 
-    0 6px 20px rgba(0, 0, 0, 0.5),
-    inset 0 -4px 8px rgba(0, 0, 0, 0.3);
+    0 6px 16px rgba(0, 0, 0, 0.5),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2);
   border: 1px solid #e2e8f0;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
 
-/* Diseño del balón - patrones característicos */
 .soccer-ball::before {
   content: '';
   position: absolute;
@@ -208,14 +183,11 @@
   transform: translate(-50%, -50%);
   background: 
     linear-gradient(45deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%),
-    linear-gradient(-45deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%),
-    linear-gradient(0deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%),
-    linear-gradient(90deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%);
+    linear-gradient(-45deg, transparent 45%, #1a1a1a 45%, #1a1a1a 55%, transparent 55%);
   border-radius: 50%;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
-/* Efecto de brillo/reflejo */
 .soccer-ball::after {
   content: '';
   position: absolute;
@@ -223,72 +195,44 @@
   left: 20%;
   width: 12px;
   height: 6px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+  background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.2));
   border-radius: 50%;
   transform: rotate(-30deg);
   filter: blur(1px);
 }
 
-/* Estados del balón - CORREGIDOS */
+/* Animaciones del balón con rotación */
 .soccer-ball.moving {
-  animation: ballFloat 2s ease-in-out infinite;
+  animation: ballFloat 2s ease-in-out infinite, ballRotate 1.2s linear infinite;
 }
 
 .soccer-ball.passing {
-  animation: ballPass 0.8s ease-out;
+  animation: ballPass 0.8s ease-out, ballRotate 0.8s linear;
 }
 
 .soccer-ball.shooting {
-  animation: ballShoot 0.6s ease-out;
+  animation: ballShoot 0.6s ease-out, ballRotate 0.6s linear;
 }
 
 .soccer-ball.dribbling {
-  animation: ballDribble 0.5s ease-in-out infinite;
+  animation: ballDribble 0.5s ease-in-out infinite, ballRotate 0.5s linear infinite;
 }
 
-.soccer-ball.free {
-  animation: ballBounce 0.8s ease-in-out infinite;
-}
-
-.soccer-ball.with-player {
-  animation: ballWithPlayer 1s ease-in-out infinite;
-}
-
-/* Balón en doble penalti */
+.soccer-ball.free,
+.soccer-ball.with-player,
 .soccer-ball.double_penalty {
-  animation: ballDoublePenalty 1s ease-in-out infinite;
+  animation: ballBounce 0.8s ease-in-out infinite, ballRotate 1s linear infinite;
 }
 
-/* Efecto cuando el balón está con jugador */
-.ball-holder {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 15px;
-  height: 15px;
-  background: #ffeb3b;
-  border-radius: 50%;
-  animation: holderPulse 0.5s ease-in-out infinite;
-  box-shadow: 0 0 10px rgba(255, 235, 59, 0.8);
+@keyframes ballRotate {
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-.ball-seams {
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 30% 30%, #000 1px, transparent 1px),
-    radial-gradient(circle at 70% 70%, #000 1px, transparent 1px),
-    linear-gradient(45deg, transparent 48%, #000 48%, #000 52%, transparent 52%),
-    linear-gradient(-45deg, transparent 48%, #000 48%, #000 52%, transparent 52%);
-  border-radius: 50%;
-}
-
-/* ===== JUGADORES MEJORADOS ===== */
+/* ===== JUGADORES CON FORMA HUMANOIDE ===== */
 .player {
   position: absolute;
   width: 45px;
   height: 45px;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -296,6 +240,18 @@
   transform: translate(-50%, -50%);
   transition: all 0.3s ease-out;
   z-index: 20;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+  /* Forma de jugador estilizado */
+  clip-path: polygon(
+    50% 0%,      /* cabeza */
+    70% 20%,     /* hombro derecho */
+    100% 40%,    /* cadera derecha */
+    90% 70%,     /* rodilla derecha */
+    50% 100%,    /* pie */
+    10% 70%,     /* rodilla izquierda */
+    0% 40%,      /* cadera izquierda */
+    30% 20%      /* hombro izquierdo */
+  );
 }
 
 .player.user {
@@ -322,23 +278,17 @@
     inset 0 0 10px rgba(255, 235, 59, 0.3);
   animation: playerWithBall 1s ease-in-out infinite;
   z-index: 25;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.5));
 }
 
 .player-number {
   font-size: 14px;
   font-weight: bold;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  z-index: 2;
+  position: relative;
 }
 
-.player-glow {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at center, transparent 30%, rgba(255, 255, 255, 0.2) 100%);
-}
-
-/* Badge de posición del jugador */
 .player-position-badge {
   position: absolute;
   top: -8px;
@@ -349,9 +299,10 @@
   padding: 2px 4px;
   border-radius: 4px;
   font-weight: bold;
+  z-index: 3;
 }
 
-/* ===== LÍNEA DE PASE MEJORADA ===== */
+/* ===== LÍNEA DE PASE ===== */
 .pass-line {
   position: absolute;
   transform: translate(-50%, -50%);
@@ -381,7 +332,7 @@
   box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
 }
 
-/* ===== INDICADOR DE ZONA DEL CAMPO ===== */
+/* ===== INDICADOR DE ZONA ===== */
 .field-zone-indicator {
   position: absolute;
   top: 10px;
@@ -395,25 +346,9 @@
   color: white;
   padding: 5px 15px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: bold;
-  text-transform: uppercase;
-  border: 2px solid;
-}
-
-.zone-display.defensive {
-  border-color: #ff6b6b;
-  background: rgba(255, 107, 107, 0.2);
-}
-
-.zone-display.midfield {
-  border-color: #4ecdc4;
-  background: rgba(78, 205, 196, 0.2);
-}
-
-.zone-display.attacking {
-  border-color: #45b7d1;
-  background: rgba(69, 183, 209, 0.2);
+  backdrop-filter: blur(4px);
 }
 
 /* ===== CONTADOR DE FALTAS ===== */
