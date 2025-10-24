@@ -688,9 +688,6 @@ body {
 .fifa-chart-section {
   margin: 25px 0;
   padding: 20px;
-  background: rgba(20, 25, 60, 0.6);
-  border-radius: 15px;
-  border: 1px solid var(--primary);
 }
 
 .fifa-chart-section h3 {
