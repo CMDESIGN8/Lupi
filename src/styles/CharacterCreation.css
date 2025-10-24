@@ -5,7 +5,7 @@
   min-height: 100vh;
   /* USAMOS LA IMAGEN PROPORCIONADA COMO FONDO */
   /* Idealmente, aquí usarías una imagen de fondo de fantasía limpia */
-  background: url('image_717c4b.png'); /* Asegúrate que la ruta a tu imagen sea correcta */
+  background: url('../assets/fondo.png'); /* Asegúrate que la ruta a tu imagen sea correcta */
   background-size: cover;
   background-position: center;
   background-attachment: fixed; /* Para que el fondo no se mueva con el scroll */
