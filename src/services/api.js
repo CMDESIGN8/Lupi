@@ -1,4 +1,4 @@
-const API_URL = "https://lupiback.onrender.com"; // URL del backend desplegado
+const API_URL = "https://lupiback-dd62.onrender.com"; // URL del backend desplegado
 
 export const getBots = async () => {
   try {
