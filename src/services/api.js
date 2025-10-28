@@ -116,3 +116,58 @@ export async function trainCharacter(characterId) {
 
   return res.json();
 }
+
+// CLUBES API FUNCTIONS
+export const getClubs = async (page = 1, limit = 20, search = '') => {
+  const response = await fetch(`${API_URL}/clubs?page=${page}&limit=${limit}&search=${search}`);
+  if (!response.ok) throw new Error("Error al cargar clubes");
+  return await response.json();
+};
+
+export const getClubDetails = async (clubId) => {
+  const response = await fetch(`${API_URL}/clubs/${clubId}`);
+  if (!response.ok) throw new Error("Error al cargar detalles del club");
+  return await response.json();
+};
+
+export const getClubMembers = async (clubId) => {
+  const response = await fetch(`${API_URL}/clubs/${clubId}/members`);
+  if (!response.ok) throw new Error("Error al cargar miembros del club");
+  return await response.json();
+};
+
+export const createClub = async (clubData) => {
+  const response = await fetch(`${API_URL}/clubs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(clubData),
+  });
+  if (!response.ok) throw new Error("Error al crear club");
+  return await response.json();
+};
+
+export const joinClub = async (clubId, characterId) => {
+  const response = await fetch(`${API_URL}/clubs/${clubId}/join`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ character_id: characterId }),
+  });
+  if (!response.ok) throw new Error("Error al unirse al club");
+  return await response.json();
+};
+
+export const leaveClub = async (clubId, characterId) => {
+  const response = await fetch(`${API_URL}/clubs/${clubId}/leave`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ character_id: characterId }),
+  });
+  if (!response.ok) throw new Error("Error al abandonar el club");
+  return await response.json();
+};
+
+export const getClubRanking = async (clubId) => {
+  const response = await fetch(`${API_URL}/clubs/${clubId}/ranking`);
+  if (!response.ok) throw new Error("Error al cargar ranking del club");
+  return await response.json();
+};
