@@ -1,5 +1,236 @@
 /* SuperDashboard.css - Diseño Gamer Épico */
+/* Agregar estas reglas al SuperDashboard.css existente */
 
+/* Grid Principal Mejorado */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 20px;
+  min-height: 60vh;
+}
+
+.left-column,
+.center-column,
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Radar Mejorado */
+.enhanced-radar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.radar-svg {
+  filter: drop-shadow(0 0 10px rgba(0, 255, 136, 0.3));
+}
+
+.radar-label {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-shadow: 0 0 5px #000;
+}
+
+.radar-value {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-shadow: 0 0 5px #000;
+}
+
+/* Perfil Central Mejorado */
+.profile-card {
+  height: fit-content;
+}
+
+.profile-content {
+  flex-direction: column;
+  text-align: center;
+  gap: 20px;
+}
+
+.stats-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0, 255, 136, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.stat-name {
+  font-weight: bold;
+  color: #00ff88;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+/* Misiones */
+.missions-card {
+  height: fit-content;
+}
+
+.missions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.mission-item {
+  display: flex;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(0, 255, 136, 0.05);
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  transition: all 0.3s ease;
+}
+
+.mission-item:hover {
+  background: rgba(0, 255, 136, 0.1);
+  transform: translateX(5px);
+}
+
+.mission-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.mission-info {
+  flex: 1;
+}
+
+.mission-info h4 {
+  margin: 0 0 5px 0;
+  color: #00ff88;
+  font-size: 0.9rem;
+}
+
+.mission-info p {
+  margin: 0 0 10px 0;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.mission-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mission-progress .progress-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(0, 255, 136, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.mission-progress .progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff88, #00cc66);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.mission-progress span {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #00ff88;
+  min-width: 30px;
+}
+
+/* Todas las Habilidades */
+.all-skills-container {
+  padding: 20px;
+}
+
+.skills-category {
+  margin-bottom: 30px;
+}
+
+.category-title {
+  color: #00ff88;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 15px;
+}
+
+.no-points {
+  text-align: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+/* Acciones NO FIJAS */
+.epic-actions-container {
+  padding: 20px;
+}
+
+.epic-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .left-column,
+  .center-column,
+  .right-column {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .epic-actions {
+    flex-wrap: wrap;
+  }
+  
+  .action-btn {
+    min-width: 70px;
+    padding: 10px 15px;
+  }
+}
 .super-dashboard {
   min-height: 100vh;
   background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
