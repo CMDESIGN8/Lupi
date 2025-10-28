@@ -137,13 +137,32 @@ export const getClubMembers = async (clubId) => {
 };
 
 export const createClub = async (clubData) => {
-  const response = await fetch(`${API_URL}/clubs`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(clubData),
-  });
-  if (!response.ok) throw new Error("Error al crear club");
-  return await response.json();
+  try {
+    console.log('🎯 Enviando datos para crear club:', clubData);
+    
+    const response = await fetch(`${API_URL}/clubs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(clubData),
+    });
+
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      // Obtener el mensaje de error detallado
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Club creado exitosamente:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en createClub:', error);
+    throw error;
+  }
 };
 
 export const joinClub = async (clubId, characterId) => {
