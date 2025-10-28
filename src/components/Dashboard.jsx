@@ -4,7 +4,7 @@ import BotMatchmaking from "../components/BotMatchmaking";
 import { ClubList } from "../components/clubs/ClubList";
 import { ClubCreation } from "../components/clubs/ClubCreation";
 import { MyClub } from "../components/clubs/MyClub";
-import "../styles/SuperDashboard.css";
+import "../styles/Dashboard.css";
 
 export const Dashboard = ({ user, character: initialCharacter }) => {
   const [character, setCharacter] = useState(initialCharacter);
