@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
-import BotMatchmaking from "../components/BotMatchmaking";
-import { ClubList } from "../components/clubs/ClubList";
-import { ClubCreation } from "../components/clubs/ClubCreation";
-import { MyClub } from "../components/clubs/MyClub";
+import BotMatchmaking from "./BotMatchmaking";
+import { ClubList } from "./clubs/ClubList";
+import { ClubCreation } from "./clubs/ClubCreation";
+import { MyClub } from "./clubs/MyClub";
 import "../styles/Dashboard.css";
 
 export const Dashboard = ({ user, character: initialCharacter }) => {
@@ -77,15 +77,22 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
     }
   };
 
-  // Pantalla de carga
+  // Pantalla de carga épica
   if (loading) return (
     <div className="epic-loading">
       <div className="loading-orb"></div>
       <div className="loading-text">
-        <h2>INICIALIZANDO SISTEMA</h2>
+        <h2>INICIALIZANDO SISTEMA LUPI</h2>
         <p>Cargando datos del gladiador...</p>
       </div>
       <div className="scan-line"></div>
+      <div className="loading-particles">
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+        <div className="particle"></div>
+      </div>
     </div>
   );
 
@@ -125,449 +132,309 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
     );
   }
 
-  // ========== DASHBOARD PRINCIPAL ==========
+  // ========== DASHBOARD PRINCIPAL ÉPICO ==========
   return (
     <div className="super-dashboard">
-      {/* Fondo con efectos */}
+      {/* Fondo con efectos épicos */}
       <div className="dashboard-bg">
-        <div className="particles"></div>
-        <div className="grid-lines"></div>
+        <div className="nebula-effect"></div>
+        <div className="floating-particles">
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+        </div>
+        <div className="grid-overlay"></div>
       </div>
 
-      {/* Header Épico */}
+      {/* Header Épico Mejorado */}
       <header className="epic-header">
         <div className="header-left">
-          <div className="logo">
+          <div className="logo-glow">
             <span className="logo-icon">⚡</span>
             <span className="logo-text">LUPI-CORE</span>
+            <div className="logo-pulse"></div>
           </div>
-          <div className="player-tag">
-            <span className="tag">{character.nickname || "GLADIADOR"}</span>
-            <span className="level-badge">NV. {character.level || 1}</span>
+          <div className="player-identity">
+            <div className="player-badge">
+              <span className="player-name">{character.nickname || "GLADIADOR"}</span>
+              <span className="player-level">NV. {character.level || 1}</span>
+            </div>
+            {character.club_id && (
+              <div className="club-indicator">
+                <span className="club-badge">🏆 CLUB ACTIVO</span>
+              </div>
+            )}
           </div>
         </div>
         
         <div className="header-center">
-          <div className="mission-status">
-            <span className="status-pulse"></span>
-            SISTEMA ACTIVO
+          <div className="system-status">
+            <div className="status-indicator">
+              <div className="pulse-dot"></div>
+              <span className="status-text">SISTEMA OPERATIVO</span>
+            </div>
+            <div className="connection-bars">
+              <div className="bar"></div>
+              <div className="bar"></div>
+              <div className="bar"></div>
+              <div className="bar"></div>
+              <div className="bar"></div>
+            </div>
           </div>
         </div>
 
         <div className="header-right">
-          <div className="resource-display">
-            <div className="resource">
-              <span className="resource-icon">⚡</span>
-              <span className="resource-value">{character.available_skill_points || 0}</span>
-              <span className="resource-label">PUNTOS HABILIDAD</span>
+          <div className="resources-panel">
+            <div className="resource-card">
+              <div className="resource-icon">⚡</div>
+              <div className="resource-info">
+                <div className="resource-value">{character.available_skill_points || 0}</div>
+                <div className="resource-label">PUNTOS HABILIDAD</div>
+              </div>
             </div>
-            <div className="resource">
-              <span className="resource-icon">💰</span>
-              <span className="resource-value">{wallet?.lupicoins || 0}</span>
-              <span className="resource-label">LUPICOINS</span>
+            <div className="resource-card">
+              <div className="resource-icon">💰</div>
+              <div className="resource-info">
+                <div className="resource-value">{wallet?.lupicoins || 0}</div>
+                <div className="resource-label">LUPICOINS</div>
+              </div>
+            </div>
+            <div className="resource-card">
+              <div className="resource-icon">⭐</div>
+              <div className="resource-info">
+                <div className="resource-value">{character.experience || 0}</div>
+                <div className="resource-label">EXPERIENCIA</div>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Navegación Principal */}
-      <nav className="epic-nav">
-        <button 
-          className={`nav-btn ${activeTab === "stats" ? "active" : ""}`}
-          onClick={() => setActiveTab("stats")}
-        >
-          📊 PANEL PRINCIPAL
-        </button>
-        <button 
-          className={`nav-btn ${activeTab === "skills" ? "active" : ""}`}
-          onClick={() => setActiveTab("skills")}
-        >
-          🎯 TODAS LAS HABILIDADES
-        </button>
-        <button 
-          className={`nav-btn ${activeTab === "training" ? "active" : ""}`}
-          onClick={() => setActiveTab("training")}
-        >
-          🏋️ ENTRENAMIENTO
-        </button>
+      {/* Navegación Principal Mejorada */}
+      <nav className="epic-navigation">
+        <div className="nav-container">
+          <button 
+            className={`nav-item ${activeTab === "stats" ? "active" : ""}`}
+            onClick={() => setActiveTab("stats")}
+          >
+            <span className="nav-icon">📊</span>
+            <span className="nav-text">PANEL PRINCIPAL</span>
+            <div className="nav-glow"></div>
+          </button>
+          <button 
+            className={`nav-item ${activeTab === "skills" ? "active" : ""}`}
+            onClick={() => setActiveTab("skills")}
+          >
+            <span className="nav-icon">🎯</span>
+            <span className="nav-text">HABILIDADES</span>
+            <div className="nav-glow"></div>
+          </button>
+          <button 
+            className={`nav-item ${activeTab === "training" ? "active" : ""}`}
+            onClick={() => setActiveTab("training")}
+          >
+            <span className="nav-icon">🏋️</span>
+            <span className="nav-text">ENTRENAMIENTO</span>
+            <div className="nav-glow"></div>
+          </button>
+        </div>
       </nav>
 
       {/* Contenido Principal */}
-      <div className="dashboard-content">
+      <main className="dashboard-main">
         
         {/* Pestaña de Panel Principal */}
         {activeTab === "stats" && (
-          <div className="main-layout-70-30">
-            
-            {/* Panel Principal (70%) */}
-            <div className="main-panel">
+          <div className="main-dashboard">
+            <div className="dashboard-grid">
+              
+              {/* Panel del Héroe (70%) */}
               <div className="hero-panel">
-                <div className="epic-card hero-card">
+                
+                {/* Tarjeta de Perfil Épica */}
+                <div className="epic-profile-card">
+                  <div className="card-glow"></div>
                   <div className="card-header">
-                    <h3>PANEL DEL GLADIADOR</h3>
-                    <div className="card-badge">NV. {character.level}</div>
+                    <h3 className="card-title">PERFIL DEL GLADIADOR</h3>
+                    <div className="card-badges">
+                      <span className="badge level-badge">NV. {character.level}</span>
+                      <span className="badge class-badge">DELANTERO</span>
+                    </div>
                   </div>
                   
-                  <div className="hero-content">
-                    
-                    {/* Sección Superior: Radar y Avatar */}
-                    <div className="hero-top-section">
-                      
-                      {/* Radar de Atributos */}
-                      <div className="radar-section">
-                        <div className="section-title">RADAR DE ATRIBUTOS</div>
-                        <div className="radar-container">
-                          <EnhancedRadarChart character={character} />
+                  <div className="profile-content">
+                    {/* Avatar y Info Básica */}
+                    <div className="avatar-section">
+                      <div className="avatar-container">
+                        <div className="avatar-glow">
+                          <div className="avatar-core">
+                            <div className="avatar-icon">⚽</div>
+                          </div>
+                          <div className="avatar-rings">
+                            <div className="ring"></div>
+                            <div className="ring"></div>
+                            <div className="ring"></div>
+                          </div>
+                        </div>
+                        <div className="avatar-stats">
+                          <div className="stat-mini">
+                            <span className="mini-label">ENERGÍA</span>
+                            <span className="mini-value">{character.energia || 100}</span>
+                          </div>
+                          <div className="stat-mini">
+                            <span className="mini-label">SALUD</span>
+                            <span className="mini-value">{character.salud || 100}</span>
+                          </div>
                         </div>
                       </div>
                       
-                      {/* Avatar e Información Básica */}
-                      <div className="avatar-section">
-                        <div className="character-avatar-large">
-                          <div className="avatar-glowing">
-                            <div className="avatar-core">⚽</div>
-                            <div className="avatar-ring"></div>
-                          </div>
-                          <div className="avatar-level">NV. {character.level}</div>
-                        </div>
+                      <div className="player-info">
+                        <h1 className="player-name-glow">{character.nickname}</h1>
+                        <div className="player-title">DELANTERO ÉLITE</div>
                         
-                        <div className="basic-info">
-                          <h2 className="character-name">{character.nickname}</h2>
-                          <div className="character-class">DELANTERO ÉLITE</div>
-                          
-                          <div className="quick-stats">
-                            <div className="quick-stat">
-                              <span className="stat-icon">⭐</span>
-                              <span className="stat-label">EXP</span>
-                              <span className="stat-value">{character.experience || 0}</span>
+                        {/* Barra de Experiencia Mejorada */}
+                        <div className="exp-section">
+                          <div className="exp-header">
+                            <span className="exp-label">EXPERIENCIA</span>
+                            <span className="exp-numbers">
+                              {character.experience || 0} / {character.experience_to_next_level || 100}
+                            </span>
+                          </div>
+                          <div className="exp-bar-container">
+                            <div className="exp-bar">
+                              <div 
+                                className="exp-fill" 
+                                style={{ 
+                                  width: `${Math.min((character.experience || 0) / (character.experience_to_next_level || 100) * 100, 100)}%` 
+                                }}
+                              >
+                                <div className="exp-shine"></div>
+                              </div>
                             </div>
-                            <div className="quick-stat">
-                              <span className="stat-icon">⚡</span>
-                              <span className="stat-label">ENERGÍA</span>
-                              <span className="stat-value">{character.energia || 100}</span>
-                            </div>
-                            <div className="quick-stat">
-                              <span className="stat-icon">💰</span>
-                              <span className="stat-label">LUPICOINS</span>
-                              <span className="stat-value">{wallet?.lupicoins || 0}</span>
+                            <div className="exp-next">
+                              Próximo nivel: <span>{character.experience_to_next_level - (character.experience || 0)} EXP</span>
                             </div>
                           </div>
                         </div>
                       </div>
-                      
                     </div>
 
-                    {/* Sección Inferior: Barras de Estadísticas */}
-                    <div className="hero-bottom-section">
-                      <div className="section-title">ESTADÍSTICAS COMPLETAS</div>
-                      
+                    {/* Radar de Atributos */}
+                    <div className="radar-section">
+                      <div className="section-header">
+                        <h4>RADAR DE ATRIBUTOS</h4>
+                        <div className="section-actions">
+                          <button className="btn-small">📊 DETALLES</button>
+                        </div>
+                      </div>
+                      <div className="radar-container">
+                        <EnhancedRadarChart character={character} />
+                      </div>
+                    </div>
+
+                    {/* Estadísticas en Barras */}
+                    <div className="stats-section">
+                      <div className="section-header">
+                        <h4>ESTADÍSTICAS DETALLADAS</h4>
+                      </div>
                       <div className="stats-grid">
-                        <div className="stat-category">
-                          <h4>🏃 ATRIBUTOS FÍSICOS</h4>
-                          <div className="stats-bars">
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Velocidad</span>
-                                <span className="label-value">{character.velocidad || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.velocidad || 0}%`}}
-                                  data-value={character.velocidad || 0}
-                                ></div>
-                              </div>
-                            </div>
-                            
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Potencia</span>
-                                <span className="label-value">{character.potencia || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.potencia || 0}%`}}
-                                  data-value={character.potencia || 0}
-                                ></div>
-                              </div>
-                            </div>
-                            
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Resistencia</span>
-                                <span className="label-value">{character.resistencia_base || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.resistencia_base || 0}%`}}
-                                  data-value={character.resistencia_base || 0}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="stat-category">
-                          <h4>⚽ HABILIDADES TÉCNICAS</h4>
-                          <div className="stats-bars">
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Pase</span>
-                                <span className="label-value">{character.pase || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.pase || 0}%`}}
-                                  data-value={character.pase || 0}
-                                ></div>
-                              </div>
-                            </div>
-                            
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Tiro</span>
-                                <span className="label-value">{character.tiro || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.tiro || 0}%`}}
-                                  data-value={character.tiro || 0}
-                                ></div>
-                              </div>
-                            </div>
-                            
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Regate</span>
-                                <span className="label-value">{character.regate || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.regate || 0}%`}}
-                                  data-value={character.regate || 0}
-                                ></div>
-                              </div>
-                            </div>
-                            
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Técnica</span>
-                                <span className="label-value">{character.tecnica || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.tecnica || 0}%`}}
-                                  data-value={character.tecnica || 0}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="stat-category">
-                          <h4>🛡️ ATRIBUTOS DEFENSIVOS</h4>
-                          <div className="stats-bars">
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Defensa</span>
-                                <span className="label-value">{character.defensa || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.defensa || 0}%`}}
-                                  data-value={character.defensa || 0}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="stat-category">
-                          <h4>🧠 ATRIBUTOS MENTALES</h4>
-                          <div className="stats-bars">
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Liderazgo</span>
-                                <span className="label-value">{character.liderazgo || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.liderazgo || 0}%`}}
-                                  data-value={character.liderazgo || 0}
-                                ></div>
-                              </div>
-                            </div>
-                            
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Estrategia</span>
-                                <span className="label-value">{character.estrategia || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.estrategia || 0}%`}}
-                                  data-value={character.estrategia || 0}
-                                ></div>
-                              </div>
-                            </div>
-                            
-                            <div className="stat-bar">
-                              <div className="bar-label">
-                                <span className="label-text">Inteligencia</span>
-                                <span className="label-value">{character.inteligencia || 0}</span>
-                              </div>
-                              <div className="bar-container">
-                                <div 
-                                  className="bar-fill" 
-                                  style={{width: `${character.inteligencia || 0}%`}}
-                                  data-value={character.inteligencia || 0}
-                                ></div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Panel de Misiones (30%) */}
-            <div className="missions-panel">
-              <div className="epic-card missions-card">
-                <div className="card-header">
-                  <h3>MISIONES ACTIVAS</h3>
-                  <div className="missions-count">4</div>
-                </div>
-                <div className="missions-list">
-                  <div className="mission-item">
-                    <div className="mission-icon">🎯</div>
-                    <div className="mission-info">
-                      <h4>Entrenamiento Diario</h4>
-                      <p>Completa 3 sesiones de entrenamiento</p>
-                      <div className="mission-progress">
-                        <div className="progress-bar">
-                          <div className="progress-fill" style={{width: '66%'}}></div>
-                        </div>
-                        <span>2/3</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mission-item">
-                    <div className="mission-icon">⚔️</div>
-                    <div className="mission-info">
-                      <h4>Victoria en Arena</h4>
-                      <p>Gana 1 partida contra bots</p>
-                      <div className="mission-progress">
-                        <div className="progress-bar">
-                          <div className="progress-fill" style={{width: '0%'}}></div>
-                        </div>
-                        <span>0/1</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mission-item">
-                    <div className="mission-icon">🏆</div>
-                    <div className="mission-info">
-                      <h4>Unirse a un Clan</h4>
-                      <p>Forma parte de una comunidad</p>
-                      <div className="mission-progress">
-                        <div className="progress-bar">
-                          <div className="progress-fill" style={{width: character.club_id ? '100%' : '0%'}}></div>
-                        </div>
-                        <span>{character.club_id ? '1/1' : '0/1'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mission-item">
-                    <div className="mission-icon">⭐</div>
-                    <div className="mission-info">
-                      <h4>Mejora de Habilidades</h4>
-                      <p>Gasta 5 puntos de habilidad</p>
-                      <div className="mission-progress">
-                        <div className="progress-bar">
-                          <div className="progress-fill" style={{width: '20%'}}></div>
-                        </div>
-                        <span>1/5</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mission-item">
-                    <div className="mission-icon">💰</div>
-                    <div className="mission-info">
-                      <h4>Recolector de Monedas</h4>
-                      <p>Consigue 500 Lupicoins</p>
-                      <div className="mission-progress">
-                        <div className="progress-bar">
-                          <div className="progress-fill" style={{width: `${Math.min(((wallet?.lupicoins || 0) / 500) * 100, 100)}%`}}></div>
-                        </div>
-                        <span>{wallet?.lupicoins || 0}/500</span>
+                        <StatCategory 
+                          title="🏃 ATRIBUTOS FÍSICOS" 
+                          stats={[
+                            { label: "Velocidad", value: character.velocidad || 0 },
+                            { label: "Potencia", value: character.potencia || 0 },
+                            { label: "Resistencia", value: character.resistencia_base || 0 }
+                          ]}
+                        />
+                        <StatCategory 
+                          title="⚽ HABILIDADES TÉCNICAS" 
+                          stats={[
+                            { label: "Pase", value: character.pase || 0 },
+                            { label: "Tiro", value: character.tiro || 0 },
+                            { label: "Regate", value: character.regate || 0 },
+                            { label: "Técnica", value: character.tecnica || 0 }
+                          ]}
+                        />
+                        <StatCategory 
+                          title="🛡️ ATRIBUTOS DEFENSIVOS" 
+                          stats={[
+                            { label: "Defensa", value: character.defensa || 0 }
+                          ]}
+                        />
+                        <StatCategory 
+                          title="🧠 ATRIBUTOS MENTALES" 
+                          stats={[
+                            { label: "Liderazgo", value: character.liderazgo || 0 },
+                            { label: "Estrategia", value: character.estrategia || 0 },
+                            { label: "Inteligencia", value: character.inteligencia || 0 }
+                          ]}
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
+              {/* Panel de Misiones (30%) */}
+              <div className="missions-panel">
+                <div className="missions-card">
+                  <div className="card-glow"></div>
+                  <div className="card-header">
+                    <h3 className="card-title">MISIONES ACTIVAS</h3>
+                    <div className="missions-count">5</div>
+                  </div>
+                  
+                  <div className="missions-content">
+                    <MissionList character={character} wallet={wallet} />
+                  </div>
+                </div>
+              </div>
+
+            </div>
           </div>
         )}
 
-        {/* Pestaña de Todas las Habilidades */}
+        {/* Pestaña de Habilidades */}
         {activeTab === "skills" && (
-          <div className="tab-content skills-tab">
-            <AllSkillsGrid 
-              character={character} 
-              onSkillUpgrade={increaseStat}
-              addingSkill={addingSkill}
-            />
-          </div>
+          <SkillsTab 
+            character={character} 
+            onSkillUpgrade={increaseStat}
+            addingSkill={addingSkill}
+          />
         )}
 
         {/* Pestaña de Entrenamiento */}
         {activeTab === "training" && (
-          <div className="tab-content training-tab">
-            <TrainingSection 
-              character={character}
-              onTrain={handleTrain}
-              training={training}
-            />
-          </div>
+          <TrainingTab 
+            character={character}
+            onTrain={handleTrain}
+            training={training}
+          />
         )}
 
-      </div>
+      </main>
 
-      {/* Barra de Acciones (NO FIJA) */}
-      <div className="epic-actions-container">
-        <div className="epic-actions">
+      {/* Barra de Acciones Inferior Mejorada */}
+      <footer className="action-bar">
+        <div className="action-container">
           <button 
-            className="action-btn primary"
+            className="action-btn primary-glow"
             onClick={() => setCurrentSection("bot-match")}
           >
             <span className="btn-icon">⚔️</span>
             <span className="btn-text">ARENA</span>
+            <div className="btn-glow"></div>
           </button>
           
           <button 
-            className="action-btn secondary"
+            className="action-btn secondary-glow"
             onClick={() => setCurrentSection("clubs")}
           >
             <span className="btn-icon">🏆</span>
             <span className="btn-text">CLANES</span>
+            <div className="btn-glow"></div>
           </button>
           
           <button className="action-btn">
@@ -579,209 +446,198 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
             <span className="btn-icon">🔄</span>
             <span className="btn-text">ACTUALIZAR</span>
           </button>
-        </div>
-      </div>
 
-      {/* Efectos de Nivel Up */}
-      {showLevelUp && <LevelUpAnimation />}
+          <button className="action-btn stats">
+            <span className="btn-icon">📈</span>
+            <span className="btn-text">ESTADÍSTICAS</span>
+          </button>
+        </div>
+      </footer>
+
+      {/* Efectos de Nivel Up Mejorados */}
+      {showLevelUp && <LevelUpAnimation level={character.level} />}
     </div>
   );
 };
 
-// Radar de Atributos Mejorado
+// Componente de Radar Mejorado
 const EnhancedRadarChart = ({ character }) => {
-  const mainAttributes = [
+  const attributes = [
     { key: "pase", label: "PASE", value: character.pase || 0, color: "#00ff88" },
-    { key: "tiro", label: "TIRO", value: character.tiro || 0, color: "#ff4444" },
-    { key: "regate", label: "REGATE", value: character.regate || 0, color: "#8844ff" },
-    { key: "velocidad", label: "VELOCIDAD", value: character.velocidad || 0, color: "#ffaa00" },
-    { key: "defensa", label: "DEFENSA", value: character.defensa || 0, color: "#00aaff" },
-    { key: "potencia", label: "FÍSICO", value: character.potencia || 0, color: "#ff44aa" },
+    { key: "tiro", label: "TIRO", value: character.tiro || 0, color: "#ff6b6b" },
+    { key: "regate", label: "REGATE", value: character.regate || 0, color: "#4ecdc4" },
+    { key: "velocidad", label: "VELOC", value: character.velocidad || 0, color: "#45b7d1" },
+    { key: "defensa", label: "DEF", value: character.defensa || 0, color: "#96ceb4" },
+    { key: "potencia", label: "FÍSICO", value: character.potencia || 0, color: "#feca57" }
   ];
 
-  const maxValue = 100;
-  const center = 150;
-  const radius = 120;
-
   return (
-    <div className="enhanced-radar">
-      <svg width="300" height="300" viewBox="0 0 300 300" className="radar-svg">
-        {/* Círculos de referencia */}
-        <circle cx={center} cy={center} r={radius * 0.25} fill="none" stroke="rgba(0, 255, 136, 0.2)" strokeWidth="1"/>
-        <circle cx={center} cy={center} r={radius * 0.5} fill="none" stroke="rgba(0, 255, 136, 0.2)" strokeWidth="1"/>
-        <circle cx={center} cy={center} r={radius * 0.75} fill="none" stroke="rgba(0, 255, 136, 0.2)" strokeWidth="1"/>
-        <circle cx={center} cy={center} r={radius} fill="none" stroke="rgba(0, 255, 136, 0.3)" strokeWidth="2"/>
-
-        {/* Líneas de ejes */}
-        {mainAttributes.map((attr, index) => {
-          const angle = (index * 2 * Math.PI) / mainAttributes.length - Math.PI / 2;
-          const x = center + radius * Math.cos(angle);
-          const y = center + radius * Math.sin(angle);
-          return (
-            <line 
-              key={`axis-${index}`}
-              x1={center} 
-              y1={center} 
-              x2={x} 
-              y2={y} 
-              stroke="rgba(0, 255, 136, 0.3)" 
-              strokeWidth="1"
-            />
-          );
-        })}
-
-        {/* Polígono de atributos */}
-        <polygon
-          points={mainAttributes.map((attr, index) => {
-            const angle = (index * 2 * Math.PI) / mainAttributes.length - Math.PI / 2;
-            const valueRadius = (attr.value / maxValue) * radius;
-            const x = center + valueRadius * Math.cos(angle);
-            const y = center + valueRadius * Math.sin(angle);
-            return `${x},${y}`;
-          }).join(' ')}
-          fill="rgba(0, 255, 136, 0.3)"
-          stroke="#00ff88"
-          strokeWidth="2"
-        />
-
-        {/* Puntos y etiquetas */}
-        {mainAttributes.map((attr, index) => {
-          const angle = (index * 2 * Math.PI) / mainAttributes.length - Math.PI / 2;
-          const valueRadius = (attr.value / maxValue) * radius;
-          const x = center + valueRadius * Math.cos(angle);
-          const y = center + valueRadius * Math.sin(angle);
-          const labelRadius = radius + 20;
-          const labelX = center + labelRadius * Math.cos(angle);
-          const labelY = center + labelRadius * Math.sin(angle);
-
-          return (
-            <g key={attr.key}>
-              {/* Punto */}
-              <circle cx={x} cy={y} r="4" fill={attr.color} stroke="#000" strokeWidth="1"/>
-              
-              {/* Línea al punto */}
+    <div className="radar-chart-enhanced">
+      <div className="radar-visual">
+        <svg viewBox="0 0 200 200" className="radar-svg">
+          {/* Círculos de referencia */}
+          <circle cx="100" cy="100" r="40" fill="none" stroke="rgba(0, 255, 136, 0.1)" strokeWidth="1"/>
+          <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(0, 255, 136, 0.1)" strokeWidth="1"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(0, 255, 136, 0.2)" strokeWidth="1"/>
+          
+          {/* Ejes */}
+          {attributes.map((_, i) => {
+            const angle = (i * 360) / attributes.length;
+            const rad = (angle * Math.PI) / 180;
+            const x = 100 + 80 * Math.cos(rad);
+            const y = 100 + 80 * Math.sin(rad);
+            return (
               <line 
-                x1={center} 
-                y1={center} 
-                x2={x} 
-                y2={y} 
-                stroke={attr.color} 
-                strokeWidth="1" 
-                opacity="0.5"
+                key={i}
+                x1="100" y1="100" 
+                x2={x} y2={y} 
+                stroke="rgba(0, 255, 136, 0.3)" 
+                strokeWidth="1"
               />
-              
-              {/* Etiqueta */}
-              <text 
-                x={labelX} 
-                y={labelY} 
-                textAnchor="middle" 
-                dominantBaseline="middle"
-                className="radar-label"
-                fill={attr.color}
-                fontSize="10"
-                fontWeight="bold"
-              >
-                {attr.label}
-              </text>
-              
-              {/* Valor */}
-              <text 
-                x={x} 
-                y={y - 10} 
-                textAnchor="middle" 
-                dominantBaseline="middle"
-                className="radar-value"
-                fill="#ffffff"
-                fontSize="9"
-                fontWeight="bold"
-              >
-                {attr.value}
-              </text>
-            </g>
-          );
-        })}
-      </svg>
+            );
+          })}
+          
+          {/* Polígono */}
+          <polygon
+            points={attributes.map(attr => {
+              const angle = (attributes.indexOf(attr) * 360) / attributes.length;
+              const rad = (angle * Math.PI) / 180;
+              const value = (attr.value / 100) * 80;
+              const x = 100 + value * Math.cos(rad);
+              const y = 100 + value * Math.sin(rad);
+              return `${x},${y}`;
+            }).join(' ')}
+            fill="rgba(0, 255, 136, 0.3)"
+            stroke="#00ff88"
+            strokeWidth="2"
+          />
+          
+          {/* Puntos y etiquetas */}
+          {attributes.map((attr, i) => {
+            const angle = (i * 360) / attributes.length;
+            const rad = (angle * Math.PI) / 180;
+            const value = (attr.value / 100) * 80;
+            const x = 100 + value * Math.cos(rad);
+            const y = 100 + value * Math.sin(rad);
+            const labelX = 100 + 95 * Math.cos(rad);
+            const labelY = 100 + 95 * Math.sin(rad);
+
+            return (
+              <g key={attr.key}>
+                <circle cx={x} cy={y} r="4" fill={attr.color} stroke="#000" strokeWidth="1"/>
+                <text 
+                  x={labelX} 
+                  y={labelY} 
+                  textAnchor="middle" 
+                  dominantBaseline="middle"
+                  className="radar-label"
+                  fill={attr.color}
+                  fontSize="8"
+                  fontWeight="bold"
+                >
+                  {attr.label}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      </div>
     </div>
   );
 };
 
-// Componente de Todas las Habilidades
-const AllSkillsGrid = ({ character, onSkillUpgrade, addingSkill }) => {
-  const allSkills = [
-    { key: "pase", label: "Pase Preciso", icon: "📨", desc: "Precisión en pases", category: "Técnica" },
-    { key: "tiro", label: "Disparo Letal", icon: "🎯", desc: "Fuerza y precisión de tiro", category: "Ataque" },
-    { key: "regate", label: "Regate Ágil", icon: "🌀", desc: "Habilidad para driblar", category: "Técnica" },
-    { key: "velocidad", label: "Velocidad Explosiva", icon: "💨", desc: "Rapidez en el campo", category: "Físico" },
-    { key: "defensa", label: "Muro Defensivo", icon: "🛡️", desc: "Habilidad defensiva", category: "Defensa" },
-    { key: "potencia", label: "Fuerza Bruta", icon: "💪", desc: "Potencia física", category: "Físico" },
-    { key: "liderazgo", label: "Liderazgo", icon: "👑", desc: "Capacidad de liderazgo", category: "Mental" },
-    { key: "tecnica", label: "Técnica", icon: "🔧", desc: "Habilidad técnica", category: "Técnica" },
-    { key: "estrategia", label: "Estrategia", icon: "🧠", desc: "Inteligencia táctica", category: "Mental" },
-    { key: "inteligencia", label: "Inteligencia", icon: "📈", desc: "Visión de juego", category: "Mental" },
-    { key: "resistencia_base", label: "Resistencia", icon: "🏃", desc: "Resistencia física", category: "Físico" },
+// Componente de Categoría de Estadísticas
+const StatCategory = ({ title, stats }) => {
+  return (
+    <div className="stat-category">
+      <h5 className="category-title">{title}</h5>
+      <div className="stats-list">
+        {stats.map((stat, index) => (
+          <div key={index} className="stat-item">
+            <div className="stat-info">
+              <span className="stat-name">{stat.label}</span>
+              <span className="stat-value">{stat.value}</span>
+            </div>
+            <div className="stat-bar">
+              <div 
+                className="stat-fill" 
+                style={{ width: `${stat.value}%` }}
+                data-value={stat.value}
+              >
+                <div className="stat-glow"></div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Componente de Lista de Misiones
+const MissionList = ({ character, wallet }) => {
+  const missions = [
+    {
+      icon: "🎯",
+      title: "Entrenamiento Diario",
+      description: "Completa 3 sesiones de entrenamiento",
+      progress: 2,
+      total: 3,
+      type: "daily"
+    },
+    {
+      icon: "⚔️",
+      title: "Victoria en Arena",
+      description: "Gana 1 partida contra bots",
+      progress: 0,
+      total: 1,
+      type: "combat"
+    },
+    {
+      icon: "🏆",
+      title: "Unirse a un Clan",
+      description: "Forma parte de una comunidad",
+      progress: character.club_id ? 1 : 0,
+      total: 1,
+      type: "social"
+    },
+    {
+      icon: "⭐",
+      title: "Mejora de Habilidades",
+      description: "Gasta 5 puntos de habilidad",
+      progress: 1,
+      total: 5,
+      type: "progress"
+    },
+    {
+      icon: "💰",
+      title: "Recolector de Monedas",
+      description: "Consigue 500 Lupicoins",
+      progress: wallet?.lupicoins || 0,
+      total: 500,
+      type: "economy"
+    }
   ];
 
-  // Agrupar habilidades por categoría
-  const skillsByCategory = allSkills.reduce((acc, skill) => {
-    if (!acc[skill.category]) acc[skill.category] = [];
-    acc[skill.category].push(skill);
-    return acc;
-  }, {});
-
   return (
-    <div className="all-skills-container">
-      <div className="skills-header">
-        <h3>SISTEMA COMPLETO DE HABILIDADES</h3>
-        <div className="skill-points-display">
-          <span className="points-count">{character.available_skill_points || 0}</span>
-          <span className="points-label">PUNTOS DISPONIBLES</span>
-        </div>
-      </div>
-      
-      {Object.entries(skillsByCategory).map(([category, skills]) => (
-        <div key={category} className="skills-category">
-          <h4 className="category-title">{category}</h4>
-          <div className="skills-grid">
-            {skills.map(skill => {
-              const currentValue = character[skill.key] || 0;
-              const canUpgrade = character.available_skill_points > 0 && currentValue < 100;
-              
-              return (
-                <div key={skill.key} className="skill-card epic">
-                  <div className="skill-header">
-                    <div className="skill-icon">{skill.icon}</div>
-                    <div className="skill-info">
-                      <h4>{skill.label}</h4>
-                      <p>{skill.desc}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="skill-progress">
-                    <div className="progress-container">
-                      <div 
-                        className="progress-fill" 
-                        style={{ width: `${currentValue}%` }}
-                      ></div>
-                    </div>
-                    <span className="skill-value">{currentValue}/100</span>
-                  </div>
-
-                  {canUpgrade ? (
-                    <button
-                      className="upgrade-btn epic"
-                      onClick={() => onSkillUpgrade(skill.key)}
-                      disabled={addingSkill}
-                    >
-                      {addingSkill ? "⚡..." : "⚡ MEJORAR"}
-                    </button>
-                  ) : currentValue >= 100 ? (
-                    <div className="max-level">NIVEL MÁXIMO</div>
-                  ) : (
-                    <div className="no-points">SIN PUNTOS</div>
-                  )}
-                </div>
-              );
-            })}
+    <div className="missions-list">
+      {missions.map((mission, index) => (
+        <div key={index} className={`mission-item ${mission.type}`}>
+          <div className="mission-icon">{mission.icon}</div>
+          <div className="mission-content">
+            <h4>{mission.title}</h4>
+            <p>{mission.description}</p>
+            <div className="mission-progress">
+              <div className="progress-bar">
+                <div 
+                  className="progress-fill" 
+                  style={{ width: `${(mission.progress / mission.total) * 100}%` }}
+                ></div>
+              </div>
+              <span className="progress-text">
+                {mission.progress}/{mission.total}
+              </span>
+            </div>
           </div>
         </div>
       ))}
@@ -789,19 +645,105 @@ const AllSkillsGrid = ({ character, onSkillUpgrade, addingSkill }) => {
   );
 };
 
-// Componente de Entrenamiento
-const TrainingSection = ({ character, onTrain, training }) => {
+// Componente de Pestaña de Habilidades
+const SkillsTab = ({ character, onSkillUpgrade, addingSkill }) => {
+  const skillCategories = {
+    "TÉCNICA": [
+      { key: "pase", label: "Pase Preciso", icon: "📨", desc: "Precisión en pases" },
+      { key: "tiro", label: "Disparo Letal", icon: "🎯", desc: "Fuerza y precisión" },
+      { key: "regate", label: "Regate Ágil", icon: "🌀", desc: "Habilidad para driblar" },
+      { key: "tecnica", label: "Técnica", icon: "🔧", desc: "Habilidad técnica" }
+    ],
+    "FÍSICO": [
+      { key: "velocidad", label: "Velocidad", icon: "💨", desc: "Rapidez en el campo" },
+      { key: "potencia", label: "Potencia", icon: "💪", desc: "Fuerza física" },
+      { key: "resistencia_base", label: "Resistencia", icon: "🏃", desc: "Resistencia física" }
+    ],
+    "DEFENSA": [
+      { key: "defensa", label: "Defensa", icon: "🛡️", desc: "Habilidad defensiva" }
+    ],
+    "MENTAL": [
+      { key: "liderazgo", label: "Liderazgo", icon: "👑", desc: "Capacidad de mando" },
+      { key: "estrategia", label: "Estrategia", icon: "🧠", desc: "Inteligencia táctica" },
+      { key: "inteligencia", label: "Inteligencia", icon: "📈", desc: "Visión de juego" }
+    ]
+  };
+
   return (
-    <div className="training-container">
-      <div className="training-card epic-card">
-        <div className="card-header">
-          <h3>CÁMARA DE ENTRENAMIENTO</h3>
+    <div className="skills-tab">
+      <div className="skills-header">
+        <h2>SISTEMA DE HABILIDADES</h2>
+        <div className="skills-points">
+          <span className="points-amount">{character.available_skill_points || 0}</span>
+          <span className="points-label">PUNTOS DISPONIBLES</span>
         </div>
-        
+      </div>
+
+      <div className="skills-categories">
+        {Object.entries(skillCategories).map(([category, skills]) => (
+          <div key={category} className="skill-category">
+            <h3 className="category-header">{category}</h3>
+            <div className="skills-grid">
+              {skills.map(skill => {
+                const value = character[skill.key] || 0;
+                const canUpgrade = character.available_skill_points > 0 && value < 100;
+
+                return (
+                  <div key={skill.key} className="skill-card">
+                    <div className="skill-header">
+                      <div className="skill-icon">{skill.icon}</div>
+                      <div className="skill-info">
+                        <h4>{skill.label}</h4>
+                        <p>{skill.desc}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="skill-progress">
+                      <div className="progress-container">
+                        <div 
+                          className="progress-fill" 
+                          style={{ width: `${value}%` }}
+                        ></div>
+                      </div>
+                      <span className="skill-value">{value}/100</span>
+                    </div>
+
+                    {canUpgrade ? (
+                      <button
+                        className="upgrade-btn"
+                        onClick={() => onSkillUpgrade(skill.key)}
+                        disabled={addingSkill}
+                      >
+                        {addingSkill ? "⚡..." : "⚡ MEJORAR"}
+                      </button>
+                    ) : value >= 100 ? (
+                      <div className="max-level">NIVEL MÁXIMO</div>
+                    ) : (
+                      <div className="no-points">SIN PUNTOS</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Componente de Pestaña de Entrenamiento
+const TrainingTab = ({ character, onTrain, training }) => {
+  return (
+    <div className="training-tab">
+      <div className="training-card">
+        <div className="card-glow"></div>
         <div className="training-content">
           <div className="training-visual">
             <div className="training-orb">
-              <div className="orb-core"></div>
+              <div className="orb-core">
+                <div className="orb-icon">⚽</div>
+              </div>
               <div className="orb-rings">
                 <div className="ring"></div>
                 <div className="ring"></div>
@@ -811,28 +753,34 @@ const TrainingSection = ({ character, onTrain, training }) => {
           </div>
           
           <div className="training-info">
-            <h4>ENTRENAMIENTO INTENSIVO</h4>
-            <p>Mejora tus habilidades básicas mediante entrenamiento riguroso</p>
+            <h2>CÁMARA DE ENTRENAMIENTO</h2>
+            <p>Mejora tus habilidades básicas mediante entrenamiento riguroso y disciplinado</p>
             
             <div className="training-rewards">
-              <div className="reward-item">
+              <div className="reward">
                 <span className="reward-icon">⭐</span>
-                <span className="reward-text">+100 EXP</span>
+                <div className="reward-info">
+                  <span className="reward-amount">+100</span>
+                  <span className="reward-type">EXPERIENCIA</span>
+                </div>
               </div>
-              <div className="reward-item">
+              <div className="reward">
                 <span className="reward-icon">💰</span>
-                <span className="reward-text">+150 LUPICOINS</span>
+                <div className="reward-info">
+                  <span className="reward-amount">+150</span>
+                  <span className="reward-type">LUPICOINS</span>
+                </div>
               </div>
             </div>
             
             <button 
-              className="train-btn epic"
+              className="train-btn"
               onClick={onTrain}
               disabled={training}
             >
               {training ? (
                 <>
-                  <span className="training-spinner"></span>
+                  <div className="training-spinner"></div>
                   ENTRENANDO...
                 </>
               ) : (
@@ -846,15 +794,24 @@ const TrainingSection = ({ character, onTrain, training }) => {
   );
 };
 
-// Animación de Level Up
-const LevelUpAnimation = () => {
+// Animación de Level Up Mejorada
+const LevelUpAnimation = ({ level }) => {
   return (
     <div className="level-up-overlay">
-      <div className="level-up-content">
-        <div className="level-up-text">¡NIVEL ALCANZADO!</div>
-        <div className="level-up-effects">
-          <div className="explosion"></div>
-          <div className="particles"></div>
+      <div className="level-up-container">
+        <div className="level-up-content">
+          <div className="level-text">¡NIVEL ALCANZADO!</div>
+          <div className="level-number">{level}</div>
+          <div className="level-effects">
+            <div className="explosion"></div>
+            <div className="particles">
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+              <div className="particle"></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
