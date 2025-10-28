@@ -193,93 +193,251 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
       </nav>
 
       {/* Contenido Principal */}
-      <main className="dashboard-main">
-        
-       // En la pestaña de Panel Principal, reemplaza el main-grid con esto:
-{activeTab === "stats" && (
-  <div className="tab-content stats-tab">
-    <div className="main-layout-70-30">
-      
-      {/* Panel Principal (70%) */}
       <div className="main-panel">
-        <div className="panel-content">
+  <div className="hero-panel">
+    
+    {/* Panel del Héroe - Radar y Perfil */}
+    <div className="epic-card hero-card">
+      <div className="card-header">
+        <h3>PANEL DEL GLADIADOR</h3>
+        <div className="card-badge">NV. {character.level}</div>
+      </div>
+      
+      <div className="hero-content">
+        
+        {/* Sección Superior: Radar y Avatar */}
+        <div className="hero-top-section">
           
-          {/* Perfil del Jugador */}
-          <div className="epic-card profile-card">
-            <div className="card-header">
-              <h3>PERFIL DEL GLADIADOR</h3>
-              <div className="card-badge">ACTIVO</div>
-            </div>
-            <div className="profile-content">
-              <div className="character-avatar">
-                <div className="avatar-glowing">
-                  <div className="avatar-core">⚽</div>
-                  <div className="avatar-ring"></div>
-                </div>
-                <div className="avatar-level">NV. {character.level}</div>
-              </div>
-              
-              <div className="profile-info">
-                <h2 className="character-name">{character.nickname}</h2>
-                <div className="character-class">DELANTERO ÉLITE</div>
-                
-                {/* Estadísticas del Personaje */}
-                <div className="stats-summary">
-                  <div className="stat-row">
-                    <span className="stat-name">Experiencia</span>
-                    <span className="stat-value">
-                      {character.experience || 0} / {character.experience_to_next_level || 100}
-                    </span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-name">Energía</span>
-                    <span className="stat-value">{character.energia || 100}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-name">Salud</span>
-                    <span className="stat-value">{character.salud || 100}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-name">Hambre</span>
-                    <span className="stat-value">{character.hambre || 100}</span>
-                  </div>
-                  <div className="stat-row">
-                    <span className="stat-name">Sed</span>
-                    <span className="stat-value">{character.sed || 100}</span>
-                  </div>
-                </div>
-
-                <div className="exp-display">
-                  <div className="exp-bar-container">
-                    <div className="exp-bar">
-                      <div 
-                        className="exp-fill" 
-                        style={{ 
-                          width: `${Math.min((character.experience || 0) / (character.experience_to_next_level || 100) * 100, 100)}%` 
-                        }}
-                      ></div>
-                    </div>
-                    <div className="exp-numbers">
-                      PRÓXIMO NIVEL: {character.experience_to_next_level - (character.experience || 0)} EXP
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* Radar de Atributos */}
-          <div className="epic-card radar-card">
-            <div className="card-header">
-              <h3>RADAR DE ATRIBUTOS</h3>
-            </div>
+          <div className="radar-section">
+            <div className="section-title">RADAR DE ATRIBUTOS</div>
             <div className="radar-container">
               <EnhancedRadarChart character={character} />
             </div>
           </div>
-
+          
+          {/* Avatar e Información Básica */}
+          <div className="avatar-section">
+            <div className="character-avatar-large">
+              <div className="avatar-glowing">
+                <div className="avatar-core">⚽</div>
+                <div className="avatar-ring"></div>
+              </div>
+              <div className="avatar-level">NV. {character.level}</div>
+            </div>
+            
+            <div className="basic-info">
+              <h2 className="character-name">{character.nickname}</h2>
+              <div className="character-class">DELANTERO ÉLITE</div>
+              
+              <div className="quick-stats">
+                <div className="quick-stat">
+                  <span className="stat-icon">⭐</span>
+                  <span className="stat-label">EXP</span>
+                  <span className="stat-value">{character.experience || 0}</span>
+                </div>
+                <div className="quick-stat">
+                  <span className="stat-icon">⚡</span>
+                  <span className="stat-label">ENERGÍA</span>
+                  <span className="stat-value">{character.energia || 100}</span>
+                </div>
+                <div className="quick-stat">
+                  <span className="stat-icon">💰</span>
+                  <span className="stat-label">LUPICOINS</span>
+                  <span className="stat-value">{wallet?.lupicoins || 0}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
         </div>
+
+        {/* Sección Inferior: Barras de Estadísticas */}
+        <div className="hero-bottom-section">
+          <div className="section-title">ESTADÍSTICAS COMPLETAS</div>
+          
+          <div className="stats-grid">
+            <div className="stat-category">
+              <h4>🏃 ATRIBUTOS FÍSICOS</h4>
+              <div className="stats-bars">
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Velocidad</span>
+                    <span className="label-value">{character.velocidad || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.velocidad || 0}%`}}
+                      data-value={character.velocidad || 0}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Potencia</span>
+                    <span className="label-value">{character.potencia || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.potencia || 0}%`}}
+                      data-value={character.potencia || 0}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Resistencia</span>
+                    <span className="label-value">{character.resistencia_base || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.resistencia_base || 0}%`}}
+                      data-value={character.resistencia_base || 0}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="stat-category">
+              <h4>⚽ HABILIDADES TÉCNICAS</h4>
+              <div className="stats-bars">
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Pase</span>
+                    <span className="label-value">{character.pase || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.pase || 0}%`}}
+                      data-value={character.pase || 0}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Tiro</span>
+                    <span className="label-value">{character.tiro || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.tiro || 0}%`}}
+                      data-value={character.tiro || 0}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Regate</span>
+                    <span className="label-value">{character.regate || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.regate || 0}%`}}
+                      data-value={character.regate || 0}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Técnica</span>
+                    <span className="label-value">{character.tecnica || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.tecnica || 0}%`}}
+                      data-value={character.tecnica || 0}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="stat-category">
+              <h4>🛡️ ATRIBUTOS DEFENSIVOS</h4>
+              <div className="stats-bars">
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Defensa</span>
+                    <span className="label-value">{character.defensa || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.defensa || 0}%`}}
+                      data-value={character.defensa || 0}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="stat-category">
+              <h4>🧠 ATRIBUTOS MENTALES</h4>
+              <div className="stats-bars">
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Liderazgo</span>
+                    <span className="label-value">{character.liderazgo || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.liderazgo || 0}%`}}
+                      data-value={character.liderazgo || 0}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Estrategia</span>
+                    <span className="label-value">{character.estrategia || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.estrategia || 0}%`}}
+                      data-value={character.estrategia || 0}
+                    ></div>
+                  </div>
+                </div>
+                
+                <div className="stat-bar">
+                  <div className="bar-label">
+                    <span className="label-text">Inteligencia</span>
+                    <span className="label-value">{character.inteligencia || 0}</span>
+                  </div>
+                  <div className="bar-container">
+                    <div 
+                      className="bar-fill" 
+                      style={{width: `${character.inteligencia || 0}%`}}
+                      data-value={character.inteligencia || 0}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
+    </div>
+
+  </div>
+</div>
 
       {/* Panel de Misiones (30%) */}
       <div className="missions-panel">
