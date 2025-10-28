@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
 import BotMatchmaking from "../components/BotMatchmaking";
 import "../styles/Dashboard.css";
+import { ClubList } from "../components/clubs/ClubList";
+import { ClubCreation } from "../components/clubs/ClubCreation";
+import { MyClub } from "../components/clubs/MyClub";
 
 export const Dashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
@@ -11,6 +14,9 @@ export const Dashboard = ({ user }) => {
   const [addingSkill, setAddingSkill] = useState(false);
   const [training, setTraining] = useState(false);
   const [currentSection, setCurrentSection] = useState("dashboard"); // <-- ESTADO AÑADIDO
+  const [currentSection, setCurrentSection] = useState("dashboard");
+const [refreshTrigger, setRefreshTrigger] = useState(0);
+
 
   useEffect(() => {
     const header = document.querySelector(".app-header.professional");
@@ -107,6 +113,42 @@ setWallet(walletData); } } catch (error) {
       </div>
     );
   }
+
+  // En el render, después de la sección de bots, agregar:
+if (currentSection === "clubs") {
+  return (
+    <div className="dashboard">
+      <div className="section-header">
+        <button 
+          onClick={() => setCurrentSection("dashboard")}
+          className="btn-back"
+        >
+          ← VOLVER AL DASHBOARD
+        </button>
+        <h2>🏆 SISTEMA DE CLUBES</h2>
+      </div>
+
+      {character.club_id ? (
+        <MyClub 
+          character={character} 
+          onClubUpdate={handleClubUpdate}
+        />
+      ) : (
+        <div className="clubs-section">
+          <ClubCreation 
+            user={user}
+            character={character}
+            onClubCreated={handleClubUpdate}
+          />
+          <ClubList 
+            character={character}
+            onClubUpdate={handleClubUpdate}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
   // ========== DASHBOARD PRINCIPAL ==========
   const expActual = character.experience || 0;
@@ -243,6 +285,11 @@ setWallet(walletData); } } catch (error) {
       </div>
     );
   };
+
+  const handleClubUpdate = () => {
+  setRefreshTrigger(prev => prev + 1);
+  fetchData(user.id); // Recargar datos del personaje
+};
 
   // Todas las stats para la lista
   const allStats = [
@@ -465,6 +512,12 @@ setWallet(walletData); } } catch (error) {
         <button className="market-btn">
           🛒 MERCADO
         </button>
+        <button 
+  className="clubs-btn"
+  onClick={() => setCurrentSection("clubs")}
+>
+  🏆 CLUBES
+</button>
       </div>
 
       {/* Popup de Level Up */}
