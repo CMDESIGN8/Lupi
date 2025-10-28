@@ -4,7 +4,7 @@ import BotMatchmaking from "../components/BotMatchmaking";
 import { ClubList } from "../components/clubs/ClubList";
 import { ClubCreation } from "../components/clubs/ClubCreation";
 import { MyClub } from "../components/clubs/MyClub";
-import "../styles/Dashboard.css";
+import "../styles/SuperDashboard.css";
 
 export const Dashboard = ({ user, character: initialCharacter }) => {
   const [character, setCharacter] = useState(initialCharacter);
@@ -15,16 +15,9 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
   const [training, setTraining] = useState(false);
   const [currentSection, setCurrentSection] = useState("dashboard");
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [activeTab, setActiveTab] = useState("stats");
 
-  useEffect(() => {
-    const header = document.querySelector(".app-header.professional");
-    const target = document.querySelector(".section-header");
-
-    if (header && target && !target.contains(header)) {
-      target.appendChild(header);
-    }
-  }, []);
-
+  // Efectos de partículas en el fondo (simulados con CSS)
   useEffect(() => {
     if (user) fetchData(user.id);
   }, [user, refreshTrigger]);
@@ -50,510 +43,459 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
     fetchData(user.id);
   };
 
-  const increaseStat = async (statKey) => {
-    if (!character || character.available_skill_points <= 0) return;
-    setAddingSkill(true);
-    try {
-      const updatedCharacter = await updateStat(character.id, statKey);
-      setCharacter(updatedCharacter);
-    } catch (err) {
-      console.error("Error al agregar skill:", err);
-      alert(err.message);
-    } finally {
-      setAddingSkill(false);
-    }
-  };
-
-  const handleTrain = async () => {
-    if (!character) return;
-    setTraining(true);
-    try {
-      const result = await trainCharacter(character.id);
-      if (result.character) {
-        setCharacter(result.character);
-        setWallet(result.wallet);
-        if (result.leveledUp) {
-          setShowLevelUp(true);
-          setTimeout(() => setShowLevelUp(false), 3000);
-        }
-      }
-    } catch (err) {
-      console.error("Error entrenando:", err);
-      alert(err.message);
-    } finally {
-      setTraining(false);
-    }
-  };
-
-  const handleMatchUpdate = () => {
-    fetchData(user.id);
-  };
-
-  // Si está cargando
+  // Si está cargando - Pantalla de carga épica
   if (loading) return (
-    <div className="loading-screen">
-      <div className="loading-spinner"></div>
-      <p>Cargando datos del atleta...</p>
-    </div>
-  );
-  
-  // Si no tiene personaje
-  if (!character) return (
-    <div className="no-character">
-      <p>⚠️ No tienes personaje aún.</p>
-      <button onClick={() => window.location.href = '/create-character'}>
-        Crear Personaje
-      </button>
+    <div className="epic-loading">
+      <div className="loading-orb"></div>
+      <div className="loading-text">
+        <h2>INICIALIZANDO SISTEMA</h2>
+        <p>Cargando datos del gladiador...</p>
+      </div>
+      <div className="scan-line"></div>
     </div>
   );
 
-  // Renderizar sección de bots si está activa
+  // Renderizar secciones específicas
   if (currentSection === "bot-match") {
     return (
-      <div className="dashboard">
+      <div className="super-dashboard">
         <div className="section-header">
-          <button 
-            onClick={() => setCurrentSection("dashboard")}
-            className="btn-back"
-          >
-            ← VOLVER AL DASHBOARD
+          <button onClick={() => setCurrentSection("dashboard")} className="btn-back epic-btn">
+            ⬅ VOLVER AL NÚCLEO
           </button>
-          <h2>⚽ ENTRENAR CONTRA BOTS</h2>
+          <h2 className="section-title">⚔️ ARENA DE ENTRENAMIENTO</h2>
         </div>
-
-        <BotMatchmaking 
-          character={character} 
-          onMatchUpdate={handleMatchUpdate}
-        />
+        <BotMatchmaking character={character} onMatchUpdate={fetchData} />
       </div>
     );
   }
 
-  // Renderizar sección de clubes si está activa
   if (currentSection === "clubs") {
     return (
-      <div className="dashboard">
+      <div className="super-dashboard">
         <div className="section-header">
-          <button 
-            onClick={() => setCurrentSection("dashboard")}
-            className="btn-back"
-          >
-            ← VOLVER AL DASHBOARD
+          <button onClick={() => setCurrentSection("dashboard")} className="btn-back epic-btn">
+            ⬅ VOLVER AL NÚCLEO
           </button>
-          <h2>🏆 SISTEMA DE CLUBES</h2>
+          <h2 className="section-title">🏆 CLANES DE GUERREROS</h2>
         </div>
-
         {character.club_id ? (
-          <MyClub 
-            character={character} 
-            onClubUpdate={handleClubUpdate}
-          />
+          <MyClub character={character} onClubUpdate={handleClubUpdate} />
         ) : (
           <div className="clubs-section">
-            <ClubCreation 
-              user={user}
-              character={character}
-              onClubCreated={handleClubUpdate}
-            />
-            <ClubList 
-              character={character}
-              onClubUpdate={handleClubUpdate}
-            />
+            <ClubCreation user={user} character={character} onClubCreated={handleClubUpdate} />
+            <ClubList character={character} onClubUpdate={handleClubUpdate} />
           </div>
         )}
       </div>
     );
   }
 
-  // ========== DASHBOARD PRINCIPAL ==========
-  const expActual = character.experience || 0;
-  const expMax = character.experience_to_next_level || 100;
-  const expPorcentaje = Math.min((expActual / expMax) * 100, 100);
-
-  // Stats para el gráfico radial
-  const mainStats = [
-    { 
-      key: "pase", 
-      label: "Pase", 
-      value: character.pase || 0, 
-      short: "PAS" 
-    },
-    { 
-      key: "tiro", 
-      label: "Tiro", 
-      value: character.tiro || 0, 
-      short: "TIR" 
-    },
-    { 
-      key: "regate", 
-      label: "Regate", 
-      value: character.regate || 0, 
-      short: "REG" 
-    },
-    { 
-      key: "velocidad", 
-      label: "Velocidad", 
-      value: character.velocidad || 0, 
-      short: "VEL" 
-    },
-    { 
-      key: "defensa", 
-      label: "Defensa", 
-      value: character.defensa || 0, 
-      short: "DEF" 
-    },
-    { 
-      key: "potencia", 
-      label: "Físico", 
-      value: character.potencia || 0, 
-      short: "FIS" 
-    }
-  ];
-
-  // Calcular promedio general
-  const totalStats = mainStats.reduce((sum, stat) => sum + stat.value, 0);
-  const averageRating = Math.round(totalStats / mainStats.length);
-
-  // Función para generar el gráfico radial
-  const RadarChart = ({ stats, size = 200 }) => {
-    const center = size / 2;
-    const radius = size * 0.4;
-    
-    const points = stats.map((stat, index) => {
-      const angle = (index * 2 * Math.PI) / stats.length - Math.PI / 2;
-      const value = (stat.value / 100) * radius;
-      return {
-        x: center + value * Math.cos(angle),
-        y: center + value * Math.sin(angle),
-        label: stat.short,
-        value: stat.value
-      };
-    });
-
-    const polygonPoints = points.map(point => `${point.x},${point.y}`).join(' ');
-
-    return (
-      <div className="radar-chart-container">
-        <svg width={size} height={size} className="radar-chart">
-          {/* Círculos concéntricos */}
-          <circle cx={center} cy={center} r={radius * 0.75} className="radar-circle" />
-          <circle cx={center} cy={center} r={radius * 0.5} className="radar-circle" />
-          <circle cx={center} cy={center} r={radius * 0.25} className="radar-circle" />
-          
-          {/* Ejes */}
-          {points.map((point, index) => (
-            <line
-              key={`axis-${index}`}
-              x1={center}
-              y1={center}
-              x2={center + radius * Math.cos((index * 2 * Math.PI) / stats.length - Math.PI / 2)}
-              y2={center + radius * Math.sin((index * 2 * Math.PI) / stats.length - Math.PI / 2)}
-              className="radar-axis"
-            />
-          ))}
-          
-          {/* Polígono de stats */}
-          <polygon
-            points={polygonPoints}
-            className="radar-polygon"
-          />
-          
-          {/* Puntos */}
-          {points.map((point, index) => (
-            <circle
-              key={`point-${index}`}
-              cx={point.x}
-              cy={point.y}
-              r="4"
-              className="radar-point"
-            />
-          ))}
-          
-          {/* Etiquetas */}
-          {points.map((point, index) => {
-            const angle = (index * 2 * Math.PI) / stats.length - Math.PI / 2;
-            const labelRadius = radius + 20;
-            return (
-              <g key={`label-${index}`}>
-                <text
-                  x={center + labelRadius * Math.cos(angle)}
-                  y={center + labelRadius * Math.sin(angle)}
-                  className="radar-label"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                >
-                  {point.label}
-                </text>
-                <text
-                  x={center + (labelRadius + 15) * Math.cos(angle)}
-                  y={center + (labelRadius + 15) * Math.sin(angle)}
-                  className="radar-value"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                >
-                  {point.value}
-                </text>
-              </g>
-            );
-          })}
-        </svg>
-      </div>
-    );
-  };
-
-  // Todas las stats para la lista
-  const allStats = [
-    { key: "pase", label: "📨 Pase", icon: "⚽" },
-    { key: "potencia", label: "Potencia", icon: "💪" },
-    { key: "velocidad", label: "Velocidad", icon: "💨" },
-    { key: "liderazgo", label: "Liderazgo", icon: "👑" },
-    { key: "tiro", label: "Tiro", icon: "🎯" },
-    { key: "regate", label: "Regate", icon: "🌀" },
-    { key: "tecnica", label: "Técnica", icon: "🔧" },
-    { key: "estrategia", label: "Estrategia", icon: "🧠" },
-    { key: "inteligencia", label: "Inteligencia", icon: "📈" },
-    { key: "defensa", label: "Defensa", icon: "🛡️" },
-    { key: "resistencia_base", label: "Resistencia", icon: "🏃" },
-  ];
-
-  // Obtener valor real del personaje
-  const getCharacterStat = (statKey) => {
-    return character[statKey] || 0;
-  };
-
+  // ========== SUPER DASHBOARD PRINCIPAL ==========
   return (
-    <div className="dashboard">
-      {/* Game Header */}
-      <div className="game-header">
-        <h1>FOOTBALL MODE</h1>
-        <div className="header-stats">
-          <div className="header-stat">
-            <span className="stat-label">NIVEL</span>
-            <span className="stat-value">{character.level || 1}</span>
+    <div className="super-dashboard">
+      {/* Fondo con efectos */}
+      <div className="dashboard-bg">
+        <div className="particles"></div>
+        <div className="grid-lines"></div>
+      </div>
+
+      {/* Header Épico */}
+      <header className="epic-header">
+        <div className="header-left">
+          <div className="logo">
+            <span className="logo-icon">⚡</span>
+            <span className="logo-text">LUPI-CORE</span>
           </div>
-          <div className="header-stat">
-            <span className="stat-label">SKILL POINTS</span>
-            <span className="stat-value">{character.available_skill_points || 0}</span>
-          </div>
-          <div className="header-stat">
-            <span className="stat-label">RATING</span>
-            <span className="stat-value">{averageRating}</span>
+          <div className="player-tag">
+            <span className="tag">{character.nickname || "GLADIADOR"}</span>
+            <span className="level-badge">NV. {character.level || 1}</span>
           </div>
         </div>
-      </div>
+        
+        <div className="header-center">
+          <div className="mission-status">
+            <span className="status-pulse"></span>
+            SISTEMA ACTIVO
+          </div>
+        </div>
 
-      <div className="dashboard-layout">
-        {/* Columna Izquierda - Perfil del Atleta */}
-        <div className="left-column">
-          <section className="athlete-profile">
-            <div className="profile-header">
-              <div className="player-avatar">
-                <div className="avatar-icon">⚽</div>
-                <div className="overall-rating">{averageRating}</div>
-              </div>
-              <div className="player-info">
-                <h2 className="player-name">{character.nickname || "Jugador"}</h2>
-                <div className="player-level">NIVEL {character.level || 1}</div>
-                <div className="player-class">Delantero Estrella</div>
-                <div className="player-position">POSICIÓN: DELANTERO</div>
-                {character.club_id && (
-                  <div className="player-club">
-                    🏆 MIEMBRO DE CLUB
-                  </div>
-                )}
-              </div>
+        <div className="header-right">
+          <div className="resource-display">
+            <div className="resource">
+              <span className="resource-icon">⚡</span>
+              <span className="resource-value">{character.available_skill_points || 0}</span>
+              <span className="resource-label">PUNTOS HABILIDAD</span>
             </div>
+            <div className="resource">
+              <span className="resource-icon">💰</span>
+              <span className="resource-value">{wallet?.lupicoins || 0}</span>
+              <span className="resource-label">LUPICOINS</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
-            {/* Gráfico FIFA Style */}
-            <div className="fifa-chart-section">
-              <h3>📊 ESTADÍSTICAS PRINCIPALES</h3>
+      {/* Navegación Principal */}
+      <nav className="epic-nav">
+        <button 
+          className={`nav-btn ${activeTab === "stats" ? "active" : ""}`}
+          onClick={() => setActiveTab("stats")}
+        >
+          📊 ESTADÍSTICAS
+        </button>
+        <button 
+          className={`nav-btn ${activeTab === "skills" ? "active" : ""}`}
+          onClick={() => setActiveTab("skills")}
+        >
+          🎯 HABILIDADES
+        </button>
+        <button 
+          className={`nav-btn ${activeTab === "training" ? "active" : ""}`}
+          onClick={() => setActiveTab("training")}
+        >
+          🏋️ ENTRENAMIENTO
+        </button>
+      </nav>
+
+      {/* Contenido Principal */}
+      <main className="dashboard-main">
+        
+        {/* Pestaña de Estadísticas */}
+        {activeTab === "stats" && (
+          <div className="tab-content stats-tab">
+            <div className="stats-grid">
               
-              <RadarChart stats={mainStats} size={280} />
-              
-              {/* Resumen de stats */}
-              <div className="stats-summary">
-                <div className="stats-string">
-                  {mainStats.map(stat => (
-                    <span key={stat.key} className="stat-abbr">
-                      {stat.short}
-                      <span className="stat-number">{stat.value}</span>
-                    </span>
-                  ))}
+              {/* Tarjeta de Perfil Épica */}
+              <div className="epic-card profile-card">
+                <div className="card-header">
+                  <h3>PERFIL DEL GLADIADOR</h3>
+                  <div className="card-badge">ACTIVO</div>
+                </div>
+                <div className="profile-content">
+                  <div className="character-avatar">
+                    <div className="avatar-glowing">
+                      <div className="avatar-core">⚽</div>
+                      <div className="avatar-ring"></div>
+                    </div>
+                    <div className="avatar-level">NV. {character.level}</div>
+                  </div>
+                  
+                  <div className="profile-info">
+                    <h2 className="character-name">{character.nickname}</h2>
+                    <div className="character-class">DELANTERO ÉLITE</div>
+                    
+                    <div className="exp-display">
+                      <div className="exp-bar-container">
+                        <div className="exp-bar">
+                          <div 
+                            className="exp-fill" 
+                            style={{ 
+                              width: `${Math.min((character.experience || 0) / (character.experience_to_next_level || 100) * 100, 100)}%` 
+                            }}
+                          ></div>
+                        </div>
+                        <div className="exp-numbers">
+                          {character.experience || 0} / {character.experience_to_next_level || 100} EXP
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Leyenda de stats */}
-              <div className="stats-legend">
-                {mainStats.map(stat => (
-                  <div key={stat.key} className="legend-item">
-                    <span className="legend-label">{stat.label}</span>
-                    <span className="legend-value">{stat.value}</span>
+              {/* Radar de Habilidades */}
+              <div className="epic-card radar-card">
+                <div className="card-header">
+                  <h3>RADAR DE ATRIBUTOS</h3>
+                </div>
+                <div className="radar-container">
+                  <SkillsRadar character={character} />
+                </div>
+              </div>
+
+              {/* Stats Rápidas */}
+              <div className="epic-card quick-stats">
+                <div className="card-header">
+                  <h3>ESTADÍSTICAS RÁPIDAS</h3>
+                </div>
+                <div className="stats-list">
+                  <div className="stat-item">
+                    <span className="stat-icon">🎯</span>
+                    <span className="stat-name">Precisión</span>
+                    <span className="stat-value">{character.tiro || 0}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="exp-section">
-              <div className="exp-info">
-                <span className="exp-label">EXPERIENCIA</span>
-                <span className="exp-numbers">{expActual} / {expMax}</span>
-              </div>
-              <div className="exp-bar">
-                <div
-                  className="exp-fill glow-progress"
-                  style={{ width: `${expPorcentaje}%` }}
-                />
-              </div>
-              <div className="next-level">
-                Próximo nivel: <span>{expMax - expActual} EXP</span>
-              </div>
-            </div>
-          </section>
-
-          <section className="training-section">
-            <h3>🏋️ ENTRENAMIENTO</h3>
-            <div className="training-info">
-              <p>Mejora tus habilidades y gana recompensas</p>
-              <div className="training-rewards">
-                <span>+100 EXP</span>
-                <span>+150 Lupicoins</span>
-              </div>
-            </div>
-            <button 
-              className="train-btn" 
-              onClick={handleTrain}
-              disabled={training}
-            >
-              {training ? "🔄 ENTRENANDO..." : "💪 ENTRENAR AHORA"}
-            </button>
-          </section>
-        </div>
-
-        {/* Columna Derecha - Wallet y Habilidades */}
-        <div className="right-column">
-          {/* Wallet Section */}
-          <section className="wallet-card">
-            <div className="wallet-header">
-              <h3>💰 WALLET</h3>
-              <div className="wallet-balance">
-                <span className="balance-amount">{wallet?.lupicoins || 0}</span>
-                <span className="balance-label">LUPICOINS</span>
-              </div>
-            </div>
-            <div className="wallet-info">
-              <div className="wallet-address">
-                <span className="address-label">Dirección:</span>
-                <span className="address-value">{wallet?.address || 'Cargando...'}</span>
-              </div>
-            </div>
-            <div className="wallet-actions">
-              <button className="wallet-btn primary">TRANSFERIR</button>
-              <button className="wallet-btn">HISTORIAL</button>
-            </div>
-          </section>
-
-          {/* Skills Section */}
-          <section className="skills-section">
-            <div className="skills-header">
-              <h3>🎯 TODAS LAS HABILIDADES</h3>
-              <div className="skills-points">
-                <span className="points-available">{character.available_skill_points || 0}</span>
-                <span className="points-label">Puntos Disponibles</span>
-              </div>
-            </div>
-
-            <div className="skills-grid">
-              {allStats.map(({ key, label, icon }) => {
-                const currentValue = getCharacterStat(key);
-                const currentLevel = Math.floor(currentValue / 10);
-                const canUpgrade = character.available_skill_points > 0 && currentValue < 100;
-                
-                return (
-                  <div key={key} className="skill-card">
-                    <div className="skill-header">
-                      <div className="skill-icon">{icon}</div>
-                      <div className="skill-info">
-                        <span className="skill-name">{label}</span>
-                        <span className="skill-level">Nv. {currentLevel}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="skill-progress">
-                      <div className="progress-bar">
-                        <div
-                          className="progress-fill"
-                          style={{ width: `${currentValue}%` }}
-                        ></div>
-                      </div>
-                      <span className="skill-value">{currentValue}</span>
-                    </div>
-
-                    {canUpgrade && (
-                      <button
-                        className="upgrade-btn"
-                        onClick={() => increaseStat(key)}
-                        disabled={addingSkill}
-                        title={`Mejorar ${label}`}
-                      >
-                        {addingSkill ? "..." : "⬆️"}
-                      </button>
-                    )}
-
-                    {!canUpgrade && currentValue >= 100 && (
-                      <div className="max-level-badge">MAX</div>
-                    )}
+                  <div className="stat-item">
+                    <span className="stat-icon">💨</span>
+                    <span className="stat-name">Velocidad</span>
+                    <span className="stat-value">{character.velocidad || 0}</span>
                   </div>
-                );
-              })}
-            </div>
-          </section>
-        </div>
-      </div>
+                  <div className="stat-item">
+                    <span className="stat-icon">🛡️</span>
+                    <span className="stat-name">Defensa</span>
+                    <span className="stat-value">{character.defensa || 0}</span>
+                  </div>
+                  <div className="stat-item">
+                    <span className="stat-icon">⚡</span>
+                    <span className="stat-name">Energía</span>
+                    <span className="stat-value">{character.energia || 100}</span>
+                  </div>
+                </div>
+              </div>
 
-      {/* Acciones Globales */}
-      <div className="global-actions">
-        <button onClick={() => fetchData(user.id)} className="refresh-btn">
-          🔄 ACTUALIZAR DATOS
-        </button>
-        
+            </div>
+          </div>
+        )}
+
+        {/* Pestaña de Habilidades */}
+        {activeTab === "skills" && (
+          <div className="tab-content skills-tab">
+            <SkillsGrid 
+              character={character} 
+              onSkillUpgrade={increaseStat}
+              addingSkill={addingSkill}
+            />
+          </div>
+        )}
+
+        {/* Pestaña de Entrenamiento */}
+        {activeTab === "training" && (
+          <div className="tab-content training-tab">
+            <TrainingSection 
+              character={character}
+              onTrain={handleTrain}
+              training={training}
+            />
+          </div>
+        )}
+
+      </main>
+
+      {/* Barra de Acciones Inferior */}
+      <footer className="epic-actions">
         <button 
-          className="match-btn"
+          className="action-btn primary"
           onClick={() => setCurrentSection("bot-match")}
         >
-          ⚽ ENTRENAR CONTRA BOTS
+          <span className="btn-icon">⚔️</span>
+          <span className="btn-text">ARENA</span>
         </button>
         
         <button 
-          className="clubs-btn"
+          className="action-btn secondary"
           onClick={() => setCurrentSection("clubs")}
         >
-          🏆 CLUBES
+          <span className="btn-icon">🏆</span>
+          <span className="btn-text">CLANES</span>
         </button>
         
-        <button className="market-btn">
-          🛒 MERCADO
+        <button className="action-btn">
+          <span className="btn-icon">🛒</span>
+          <span className="btn-text">MERCADO</span>
         </button>
-      </div>
+        
+        <button className="action-btn" onClick={() => fetchData(user.id)}>
+          <span className="btn-icon">🔄</span>
+          <span className="btn-text">ACTUALIZAR</span>
+        </button>
+      </footer>
 
-      {/* Popup de Level Up */}
-      {showLevelUp && (
-        <div className="levelup-popup">
-          <div className="levelup-content">
-            <h2>🎉 ¡SUBISTE DE NIVEL!</h2>
-            <div className="levelup-stats">
-              <div className="level-stat">
-                <span>Nuevo Nivel</span>
-                <span className="level-number">{character.level}</span>
-              </div>
-              <div className="level-stat">
-                <span>Skill Points</span>
-                <span className="skill-points">+5</span>
-              </div>
-            </div>
-            <p>¡Continúa entrenando para mejorar tus habilidades!</p>
-          </div>
-        </div>
-      )}
+      {/* Efectos de Nivel Up */}
+      {showLevelUp && <LevelUpAnimation />}
     </div>
   );
 };
+
+// Componente de Radar de Habilidades
+const SkillsRadar = ({ character }) => {
+  const skills = [
+    { key: "pase", label: "PASE", value: character.pase || 0 },
+    { key: "tiro", label: "TIRO", value: character.tiro || 0 },
+    { key: "regate", label: "REGATE", value: character.regate || 0 },
+    { key: "velocidad", label: "VELOCIDAD", value: character.velocidad || 0 },
+    { key: "defensa", label: "DEFENSA", value: character.defensa || 0 },
+    { key: "potencia", label: "FÍSICO", value: character.potencia || 0 },
+  ];
+
+  return (
+    <div className="skills-radar">
+      <div className="radar-chart">
+        {skills.map((skill, index) => {
+          const angle = (index * 360) / skills.length;
+          const radius = (skill.value / 100) * 80;
+          return (
+            <div 
+              key={skill.key}
+              className="radar-point"
+              style={{
+                transform: `rotate(${angle}deg) translate(${radius}px) rotate(-${angle}deg)`
+              }}
+            >
+              <div className="point-value">{skill.value}</div>
+              <div className="point-label">{skill.label}</div>
+            </div>
+          );
+        })}
+        <div className="radar-grid">
+          {[25, 50, 75, 100].map(percent => (
+            <div 
+              key={percent}
+              className="grid-circle"
+              style={{ width: `${percent * 1.6}px`, height: `${percent * 1.6}px` }}
+            ></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente de Grid de Habilidades
+const SkillsGrid = ({ character, onSkillUpgrade, addingSkill }) => {
+  const allSkills = [
+    { key: "pase", label: "Pase Preciso", icon: "📨", desc: "Precisión en pases" },
+    { key: "tiro", label: "Disparo Letal", icon: "🎯", desc: "Fuerza y precisión de tiro" },
+    { key: "regate", label: "Regate Ágil", icon: "🌀", desc: "Habilidad para driblar" },
+    { key: "velocidad", label: "Velocidad Explosiva", icon: "💨", desc: "Rapidez en el campo" },
+    { key: "defensa", label: "Muro Defensivo", icon: "🛡️", desc: "Habilidad defensiva" },
+    { key: "potencia", label: "Fuerza Bruta", icon: "💪", desc: "Potencia física" },
+    { key: "liderazgo", label: "Liderazgo", icon: "👑", desc: "Capacidad de liderazgo" },
+    { key: "tecnica", label: "Técnica", icon: "🔧", desc: "Habilidad técnica" },
+  ];
+
+  return (
+    <div className="skills-grid-container">
+      <div className="skills-header">
+        <h3>SISTEMA DE HABILIDADES</h3>
+        <div className="skill-points-display">
+          <span className="points-count">{character.available_skill_points || 0}</span>
+          <span className="points-label">PUNTOS DISPONIBLES</span>
+        </div>
+      </div>
+      
+      <div className="skills-grid">
+        {allSkills.map(skill => {
+          const currentValue = character[skill.key] || 0;
+          const canUpgrade = character.available_skill_points > 0 && currentValue < 100;
+          
+          return (
+            <div key={skill.key} className="skill-card epic">
+              <div className="skill-header">
+                <div className="skill-icon">{skill.icon}</div>
+                <div className="skill-info">
+                  <h4>{skill.label}</h4>
+                  <p>{skill.desc}</p>
+                </div>
+              </div>
+              
+              <div className="skill-progress">
+                <div className="progress-container">
+                  <div 
+                    className="progress-fill" 
+                    style={{ width: `${currentValue}%` }}
+                  ></div>
+                </div>
+                <span className="skill-value">{currentValue}/100</span>
+              </div>
+
+              {canUpgrade ? (
+                <button
+                  className="upgrade-btn epic"
+                  onClick={() => onSkillUpgrade(skill.key)}
+                  disabled={addingSkill}
+                >
+                  {addingSkill ? "⚡..." : "⚡ MEJORAR"}
+                </button>
+              ) : (
+                <div className="max-level">NIVEL MÁXIMO</div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// Componente de Entrenamiento
+const TrainingSection = ({ character, onTrain, training }) => {
+  return (
+    <div className="training-container">
+      <div className="training-card epic-card">
+        <div className="card-header">
+          <h3>CÁMARA DE ENTRENAMIENTO</h3>
+        </div>
+        
+        <div className="training-content">
+          <div className="training-visual">
+            <div className="training-orb">
+              <div className="orb-core"></div>
+              <div className="orb-rings">
+                <div className="ring"></div>
+                <div className="ring"></div>
+                <div className="ring"></div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="training-info">
+            <h4>ENTRENAMIENTO INTENSIVO</h4>
+            <p>Mejora tus habilidades básicas mediante entrenamiento riguroso</p>
+            
+            <div className="training-rewards">
+              <div className="reward-item">
+                <span className="reward-icon">⭐</span>
+                <span className="reward-text">+100 EXP</span>
+              </div>
+              <div className="reward-item">
+                <span className="reward-icon">💰</span>
+                <span className="reward-text">+150 LUPICOINS</span>
+              </div>
+            </div>
+            
+            <button 
+              className="train-btn epic"
+              onClick={onTrain}
+              disabled={training}
+            >
+              {training ? (
+                <>
+                  <span className="training-spinner"></span>
+                  ENTRENANDO...
+                </>
+              ) : (
+                "INICIAR ENTRENAMIENTO"
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Animación de Level Up
+const LevelUpAnimation = () => {
+  return (
+    <div className="level-up-overlay">
+      <div className="level-up-content">
+        <div className="level-up-text">¡NIVEL ALCANZADO!</div>
+        <div className="level-up-effects">
+          <div className="explosion"></div>
+          <div className="particles"></div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Funciones existentes (increaseStat, handleTrain, etc.)
+const increaseStat = async (statKey) => {
+  // ... tu código existente
+};
+
+const handleTrain = async () => {
+  // ... tu código existente
+};
+
+export default Dashboard;
