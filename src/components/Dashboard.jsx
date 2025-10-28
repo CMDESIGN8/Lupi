@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { getCharacter, getWallet, updateStat, trainCharacter } from "../services/api";
 import BotMatchmaking from "../components/BotMatchmaking";
-import "../styles/Dashboard.css";
 import { ClubList } from "../components/clubs/ClubList";
 import { ClubCreation } from "../components/clubs/ClubCreation";
 import { MyClub } from "../components/clubs/MyClub";
+import "../styles/Dashboard.css";
 
-export const Dashboard = ({ user }) => {
-  const [character, setCharacter] = useState(null);
+export const Dashboard = ({ user, character: initialCharacter }) => {
+  const [character, setCharacter] = useState(initialCharacter);
   const [wallet, setWallet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [addingSkill, setAddingSkill] = useState(false);
   const [training, setTraining] = useState(false);
-  const [currentSection, setCurrentSection] = useState("dashboard"); // <-- ESTADO AÑADIDO
-const [refreshTrigger, setRefreshTrigger] = useState(0);
-
+  const [currentSection, setCurrentSection] = useState("dashboard");
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const header = document.querySelector(".app-header.professional");
@@ -28,17 +27,28 @@ const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     if (user) fetchData(user.id);
-  }, [user]);
+  }, [user, refreshTrigger]);
 
- const fetchData = async (userId) => { 
-   setLoading(true);
-   try { const charData = await getCharacter(userId); 
-        if (charData?.id) { setCharacter(charData); 
-                           
-const walletData = await getWallet(charData.id); 
-setWallet(walletData); } } catch (error) { 
-     console.error("❌ Error cargando datos:", error); } 
-   finally { setLoading(false); } };
+  const fetchData = async (userId) => { 
+    setLoading(true);
+    try { 
+      const charData = await getCharacter(userId); 
+      if (charData?.id) { 
+        setCharacter(charData); 
+        const walletData = await getWallet(charData.id); 
+        setWallet(walletData); 
+      } 
+    } catch (error) { 
+      console.error("❌ Error cargando datos:", error); 
+    } finally { 
+      setLoading(false); 
+    }
+  };
+
+  const handleClubUpdate = () => {
+    setRefreshTrigger(prev => prev + 1);
+    fetchData(user.id);
+  };
 
   const increaseStat = async (statKey) => {
     if (!character || character.available_skill_points <= 0) return;
@@ -76,7 +86,7 @@ setWallet(walletData); } } catch (error) {
   };
 
   const handleMatchUpdate = () => {
-    fetchData(user.id); // Recargar datos después de partida
+    fetchData(user.id);
   };
 
   // Si está cargando
@@ -101,9 +111,15 @@ setWallet(walletData); } } catch (error) {
   if (currentSection === "bot-match") {
     return (
       <div className="dashboard">
-        {/* Header con botón para volver */}
         <div className="section-header">
-          </div>
+          <button 
+            onClick={() => setCurrentSection("dashboard")}
+            className="btn-back"
+          >
+            ← VOLVER AL DASHBOARD
+          </button>
+          <h2>⚽ ENTRENAR CONTRA BOTS</h2>
+        </div>
 
         <BotMatchmaking 
           character={character} 
@@ -113,41 +129,41 @@ setWallet(walletData); } } catch (error) {
     );
   }
 
-  // En el render, después de la sección de bots, agregar:
-if (currentSection === "clubs") {
-  return (
-    <div className="dashboard">
-      <div className="section-header">
-        <button 
-          onClick={() => setCurrentSection("dashboard")}
-          className="btn-back"
-        >
-          ← VOLVER AL DASHBOARD
-        </button>
-        <h2>🏆 SISTEMA DE CLUBES</h2>
-      </div>
+  // Renderizar sección de clubes si está activa
+  if (currentSection === "clubs") {
+    return (
+      <div className="dashboard">
+        <div className="section-header">
+          <button 
+            onClick={() => setCurrentSection("dashboard")}
+            className="btn-back"
+          >
+            ← VOLVER AL DASHBOARD
+          </button>
+          <h2>🏆 SISTEMA DE CLUBES</h2>
+        </div>
 
-      {character.club_id ? (
-        <MyClub 
-          character={character} 
-          onClubUpdate={handleClubUpdate}
-        />
-      ) : (
-        <div className="clubs-section">
-          <ClubCreation 
-            user={user}
-            character={character}
-            onClubCreated={handleClubUpdate}
-          />
-          <ClubList 
-            character={character}
+        {character.club_id ? (
+          <MyClub 
+            character={character} 
             onClubUpdate={handleClubUpdate}
           />
-        </div>
-      )}
-    </div>
-  );
-}
+        ) : (
+          <div className="clubs-section">
+            <ClubCreation 
+              user={user}
+              character={character}
+              onClubCreated={handleClubUpdate}
+            />
+            <ClubList 
+              character={character}
+              onClubUpdate={handleClubUpdate}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // ========== DASHBOARD PRINCIPAL ==========
   const expActual = character.experience || 0;
@@ -285,11 +301,6 @@ if (currentSection === "clubs") {
     );
   };
 
-  const handleClubUpdate = () => {
-  setRefreshTrigger(prev => prev + 1);
-  fetchData(user.id); // Recargar datos del personaje
-};
-
   // Todas las stats para la lista
   const allStats = [
     { key: "pase", label: "📨 Pase", icon: "⚽" },
@@ -345,6 +356,11 @@ if (currentSection === "clubs") {
                 <div className="player-level">NIVEL {character.level || 1}</div>
                 <div className="player-class">Delantero Estrella</div>
                 <div className="player-position">POSICIÓN: DELANTERO</div>
+                {character.club_id && (
+                  <div className="player-club">
+                    🏆 MIEMBRO DE CLUB
+                  </div>
+                )}
               </div>
             </div>
 
@@ -494,29 +510,29 @@ if (currentSection === "clubs") {
         </div>
       </div>
 
-      {/* Acciones Globales - CON EL BOTÓN CORREGIDO */}
+      {/* Acciones Globales */}
       <div className="global-actions">
         <button onClick={() => fetchData(user.id)} className="refresh-btn">
           🔄 ACTUALIZAR DATOS
         </button>
         
-        {/* BOTÓN QUE LLEVA A LA SECCIÓN DE BOTS */}
         <button 
           className="match-btn"
-          onClick={() => setCurrentSection("bot-match")} // <-- ESTA ES LA FUNCIÓN
+          onClick={() => setCurrentSection("bot-match")}
         >
           ⚽ ENTRENAR CONTRA BOTS
+        </button>
+        
+        <button 
+          className="clubs-btn"
+          onClick={() => setCurrentSection("clubs")}
+        >
+          🏆 CLUBES
         </button>
         
         <button className="market-btn">
           🛒 MERCADO
         </button>
-        <button 
-  className="clubs-btn"
-  onClick={() => setCurrentSection("clubs")}
->
-  🏆 CLUBES
-</button>
       </div>
 
       {/* Popup de Level Up */}
