@@ -14,7 +14,6 @@ export const Dashboard = ({ user }) => {
   const [addingSkill, setAddingSkill] = useState(false);
   const [training, setTraining] = useState(false);
   const [currentSection, setCurrentSection] = useState("dashboard"); // <-- ESTADO AÑADIDO
-  const [currentSection, setCurrentSection] = useState("dashboard");
 const [refreshTrigger, setRefreshTrigger] = useState(0);
 
 
