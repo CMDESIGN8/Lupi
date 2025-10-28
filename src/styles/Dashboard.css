@@ -50,120 +50,80 @@
   gap: 20px;
 }
 
+/* Reemplaza las clases stats-summary y stat-row con esto: */
+
 .stats-summary {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 25px 0;
+  gap: 15px;
+  margin: 20px 0;
   width: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  border: 2px solid rgba(0, 255, 136, 0.4);
-  border-radius: 15px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
 }
 
-.stats-summary::before {
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 20px;
+  background: linear-gradient(90deg, rgba(0, 255, 136, 0.1) 0%, rgba(0, 255, 136, 0.05) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.stat-row::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: 
-    linear-gradient(90deg, transparent 95%, rgba(0, 255, 136, 0.1) 95%),
-    linear-gradient(0deg, transparent 95%, rgba(0, 255, 136, 0.1) 95%);
-  background-size: 30px 30px;
-  animation: gridMove 10s infinite linear;
-  pointer-events: none;
+  height: 2px;
+  background: linear-gradient(90deg, #00ff88, transparent);
+  animation: statGlow 2s infinite;
 }
 
-.stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  background: rgba(0, 255, 136, 0.05);
-  border-radius: 10px;
-  border: 1px solid rgba(0, 255, 136, 0.2);
-  position: relative;
-  transition: all 0.3s ease;
-  width: 100%;
-}
-
-.stat-row::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 70%;
-  background: #00ff88;
-  border-radius: 0 4px 4px 0;
-  transition: all 0.3s ease;
-}
-
-.stat-row:hover::after {
-  height: 90%;
-  background: linear-gradient(180deg, #00ff88, #00cc66);
+@keyframes statGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 .stat-row:hover {
-  background: rgba(0, 255, 136, 0.1);
-  transform: translateX(8px);
+  transform: translateX(5px);
+  border-color: #00ff88;
+  box-shadow: 0 5px 20px rgba(0, 255, 136, 0.2);
 }
 
 .stat-name {
   font-weight: bold;
   color: #00ff88;
   font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  min-width: 120px;
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
 
 .stat-value {
-  font-weight: 900;
+  font-weight: bold;
   color: #ffffff;
-  font-size: 1.2rem;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 8px 16px;
+  font-size: 1.1rem;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 255, 136, 0.4);
-  min-width: 100px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  min-width: 80px;
   text-align: center;
-  position: relative;
-  overflow: hidden;
 }
 
-.stat-value::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.3), transparent);
-  transition: left 0.5s ease;
+/* Para la experiencia, hacemos una barra de progreso especial */
+.stat-row.exp-row {
+  background: linear-gradient(90deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%);
+  border: 2px solid rgba(0, 255, 136, 0.4);
 }
 
-.stat-row:hover .stat-value::before {
-  left: 100%;
-}
-
-/* Barra de experiencia especial */
-.stat-row.exp-stat {
-  background: linear-gradient(90deg, rgba(0, 255, 136, 0.15), rgba(0, 255, 136, 0.05));
-  border: 2px solid rgba(0, 255, 136, 0.5);
-}
-
-.stat-row.exp-stat .stat-value {
+.stat-row.exp-row .stat-value {
   background: linear-gradient(45deg, #00ff88, #00cc66);
   color: #000;
-  border: none;
   font-weight: 900;
 }
 
