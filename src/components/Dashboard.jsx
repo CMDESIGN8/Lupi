@@ -195,149 +195,176 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
       {/* Contenido Principal */}
       <main className="dashboard-main">
         
-        {/* Pestaña de Panel Principal */}
-        {activeTab === "stats" && (
-          <div className="tab-content stats-tab">
-            <div className="main-grid">
+       // En la pestaña de Panel Principal, reemplaza el main-grid con esto:
+{activeTab === "stats" && (
+  <div className="tab-content stats-tab">
+    <div className="main-layout-70-30">
+      
+      {/* Panel Principal (70%) */}
+      <div className="main-panel">
+        <div className="panel-content">
+          
+          {/* Perfil del Jugador */}
+          <div className="epic-card profile-card">
+            <div className="card-header">
+              <h3>PERFIL DEL GLADIADOR</h3>
+              <div className="card-badge">ACTIVO</div>
+            </div>
+            <div className="profile-content">
+              <div className="character-avatar">
+                <div className="avatar-glowing">
+                  <div className="avatar-core">⚽</div>
+                  <div className="avatar-ring"></div>
+                </div>
+                <div className="avatar-level">NV. {character.level}</div>
+              </div>
               
-              {/* Columna Izquierda - Radar de Atributos */}
-              <div className="left-column">
-                <div className="epic-card radar-card">
-                  <div className="card-header">
-                    <h3>RADAR DE ATRIBUTOS</h3>
+              <div className="profile-info">
+                <h2 className="character-name">{character.nickname}</h2>
+                <div className="character-class">DELANTERO ÉLITE</div>
+                
+                {/* Estadísticas del Personaje */}
+                <div className="stats-summary">
+                  <div className="stat-row">
+                    <span className="stat-name">Experiencia</span>
+                    <span className="stat-value">
+                      {character.experience || 0} / {character.experience_to_next_level || 100}
+                    </span>
                   </div>
-                  <div className="radar-container">
-                    <EnhancedRadarChart character={character} />
+                  <div className="stat-row">
+                    <span className="stat-name">Energía</span>
+                    <span className="stat-value">{character.energia || 100}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span className="stat-name">Salud</span>
+                    <span className="stat-value">{character.salud || 100}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span className="stat-name">Hambre</span>
+                    <span className="stat-value">{character.hambre || 100}</span>
+                  </div>
+                  <div className="stat-row">
+                    <span className="stat-name">Sed</span>
+                    <span className="stat-value">{character.sed || 100}</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Columna Central - Avatar del Personaje */}
-              <div className="center-column">
-                <div className="epic-card profile-card">
-                  <div className="card-header">
-                    <h3>PERFIL DEL GLADIADOR</h3>
-                    <div className="card-badge">ACTIVO</div>
-                  </div>
-                  <div className="profile-content">
-                    <div className="character-avatar">
-                      <div className="avatar-glowing">
-                        <div className="avatar-core">⚽</div>
-                        <div className="avatar-ring"></div>
-                      </div>
-                      <div className="avatar-level">NV. {character.level}</div>
+                <div className="exp-display">
+                  <div className="exp-bar-container">
+                    <div className="exp-bar">
+                      <div 
+                        className="exp-fill" 
+                        style={{ 
+                          width: `${Math.min((character.experience || 0) / (character.experience_to_next_level || 100) * 100, 100)}%` 
+                        }}
+                      ></div>
                     </div>
-                    
-                    <div className="profile-info">
-                      <h2 className="character-name">{character.nickname}</h2>
-                      <div className="character-class">DELANTERO ÉLITE</div>
-                      
-                      <div className="stats-summary">
-                        <div className="stat-row">
-                          <span className="stat-name">Experiencia</span>
-                          <span className="stat-value">
-                            {character.experience || 0} / {character.experience_to_next_level || 100}
-                          </span>
-                        </div>
-                        <div className="stat-row">
-                          <span className="stat-name">Energía</span>
-                          <span className="stat-value">{character.energia || 100}</span>
-                        </div>
-                        <div className="stat-row">
-                          <span className="stat-name">Salud</span>
-                          <span className="stat-value">{character.salud || 100}</span>
-                        </div>
-                      </div>
-
-                      <div className="exp-display">
-                        <div className="exp-bar-container">
-                          <div className="exp-bar">
-                            <div 
-                              className="exp-fill" 
-                              style={{ 
-                                width: `${Math.min((character.experience || 0) / (character.experience_to_next_level || 100) * 100, 100)}%` 
-                              }}
-                            ></div>
-                          </div>
-                          <div className="exp-numbers">
-                            PRÓXIMO NIVEL: {character.experience_to_next_level - (character.experience || 0)} EXP
-                          </div>
-                        </div>
-                      </div>
+                    <div className="exp-numbers">
+                      PRÓXIMO NIVEL: {character.experience_to_next_level - (character.experience || 0)} EXP
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* Columna Derecha - Misiones Activas */}
-              <div className="right-column">
-                <div className="epic-card missions-card">
-                  <div className="card-header">
-                    <h3>MISIONES ACTIVAS</h3>
-                  </div>
-                  <div className="missions-list">
-                    <div className="mission-item">
-                      <div className="mission-icon">🎯</div>
-                      <div className="mission-info">
-                        <h4>Entrenamiento Diario</h4>
-                        <p>Completa 3 sesiones de entrenamiento</p>
-                        <div className="mission-progress">
-                          <div className="progress-bar">
-                            <div className="progress-fill" style={{width: '66%'}}></div>
-                          </div>
-                          <span>2/3</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mission-item">
-                      <div className="mission-icon">⚔️</div>
-                      <div className="mission-info">
-                        <h4>Victoria en Arena</h4>
-                        <p>Gana 1 partida contra bots</p>
-                        <div className="mission-progress">
-                          <div className="progress-bar">
-                            <div className="progress-fill" style={{width: '0%'}}></div>
-                          </div>
-                          <span>0/1</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mission-item">
-                      <div className="mission-icon">🏆</div>
-                      <div className="mission-info">
-                        <h4>Unirse a un Clan</h4>
-                        <p>Forma parte de una comunidad</p>
-                        <div className="mission-progress">
-                          <div className="progress-bar">
-                            <div className="progress-fill" style={{width: character.club_id ? '100%' : '0%'}}></div>
-                          </div>
-                          <span>{character.club_id ? '1/1' : '0/1'}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mission-item">
-                      <div className="mission-icon">⭐</div>
-                      <div className="mission-info">
-                        <h4>Mejora de Habilidades</h4>
-                        <p>Gasta 5 puntos de habilidad</p>
-                        <div className="mission-progress">
-                          <div className="progress-bar">
-                            <div className="progress-fill" style={{width: '20%'}}></div>
-                          </div>
-                          <span>1/5</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
-        )}
+
+          {/* Radar de Atributos */}
+          <div className="epic-card radar-card">
+            <div className="card-header">
+              <h3>RADAR DE ATRIBUTOS</h3>
+            </div>
+            <div className="radar-container">
+              <EnhancedRadarChart character={character} />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Panel de Misiones (30%) */}
+      <div className="missions-panel">
+        <div className="epic-card missions-card">
+          <div className="card-header">
+            <h3>MISIONES ACTIVAS</h3>
+            <div className="missions-count">4</div>
+          </div>
+          <div className="missions-list">
+            <div className="mission-item">
+              <div className="mission-icon">🎯</div>
+              <div className="mission-info">
+                <h4>Entrenamiento Diario</h4>
+                <p>Completa 3 sesiones de entrenamiento</p>
+                <div className="mission-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{width: '66%'}}></div>
+                  </div>
+                  <span>2/3</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mission-item">
+              <div className="mission-icon">⚔️</div>
+              <div className="mission-info">
+                <h4>Victoria en Arena</h4>
+                <p>Gana 1 partida contra bots</p>
+                <div className="mission-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{width: '0%'}}></div>
+                  </div>
+                  <span>0/1</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mission-item">
+              <div className="mission-icon">🏆</div>
+              <div className="mission-info">
+                <h4>Unirse a un Clan</h4>
+                <p>Forma parte de una comunidad</p>
+                <div className="mission-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{width: character.club_id ? '100%' : '0%'}}></div>
+                  </div>
+                  <span>{character.club_id ? '1/1' : '0/1'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mission-item">
+              <div className="mission-icon">⭐</div>
+              <div className="mission-info">
+                <h4>Mejora de Habilidades</h4>
+                <p>Gasta 5 puntos de habilidad</p>
+                <div className="mission-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{width: '20%'}}></div>
+                  </div>
+                  <span>1/5</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mission-item">
+              <div className="mission-icon">💰</div>
+              <div className="mission-info">
+                <h4>Recolector de Monedas</h4>
+                <p>Consigue 500 Lupicoins</p>
+                <div className="mission-progress">
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{width: `${Math.min(((wallet?.lupicoins || 0) / 500) * 100, 100)}%`}}></div>
+                  </div>
+                  <span>{wallet?.lupicoins || 0}/500</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+)}
 
         {/* Pestaña de Todas las Habilidades */}
         {activeTab === "skills" && (
