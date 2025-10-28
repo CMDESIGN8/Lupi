@@ -257,7 +257,7 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
                 <div className="epic-profile-card">
                   <div className="card-glow"></div>
                   <div className="card-header">
-                    <h3 className="card-title">PERFIL DEL GLADIADOR</h3>
+                    <h3 className="card-title">PERFIL DEL DEPORTISTA</h3>
                     <div className="card-badges">
                       <span className="badge level-badge">NV. {character.level}</span>
                       <span className="badge class-badge">DELANTERO</span>
@@ -334,45 +334,7 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
                       </div>
                     </div>
 
-                    {/* Estadísticas en Barras */}
-                    <div className="stats-section">
-                      <div className="section-header">
-                        <h4>ESTADÍSTICAS DETALLADAS</h4>
-                      </div>
-                      <div className="stats-grid">
-                        <StatCategory 
-                          title="🏃 ATRIBUTOS FÍSICOS" 
-                          stats={[
-                            { label: "Velocidad", value: character.velocidad || 0 },
-                            { label: "Potencia", value: character.potencia || 0 },
-                            { label: "Resistencia", value: character.resistencia_base || 0 }
-                          ]}
-                        />
-                        <StatCategory 
-                          title="⚽ HABILIDADES TÉCNICAS" 
-                          stats={[
-                            { label: "Pase", value: character.pase || 0 },
-                            { label: "Tiro", value: character.tiro || 0 },
-                            { label: "Regate", value: character.regate || 0 },
-                            { label: "Técnica", value: character.tecnica || 0 }
-                          ]}
-                        />
-                        <StatCategory 
-                          title="🛡️ ATRIBUTOS DEFENSIVOS" 
-                          stats={[
-                            { label: "Defensa", value: character.defensa || 0 }
-                          ]}
-                        />
-                        <StatCategory 
-                          title="🧠 ATRIBUTOS MENTALES" 
-                          stats={[
-                            { label: "Liderazgo", value: character.liderazgo || 0 },
-                            { label: "Estrategia", value: character.estrategia || 0 },
-                            { label: "Inteligencia", value: character.inteligencia || 0 }
-                          ]}
-                        />
-                      </div>
-                    </div>
+              
                   </div>
                 </div>
               </div>
