@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getClubDetails, getClubMembers, leaveClub } from '../../services/api';
+import { ClubEvents } from './ClubEvents'; // ← NUEVO IMPORT
+import { MemberManagement } from '../cmdesign/MemberManagement'; // ← Verificar que esta línea esté presente
+
 import '../../styles/MyClub.css';
 
 export const MyClub = ({ character, onClubUpdate }) => {
@@ -135,6 +138,12 @@ export const MyClub = ({ character, onClubUpdate }) => {
           📊 RESUMEN
         </button>
         <button
+      className={`tab-button ${activeTab === 'events' ? 'active' : ''}`}
+      onClick={() => setActiveTab('events')}
+    >
+      📅 EVENTOS
+    </button>
+        <button
           className={`tab-button ${activeTab === 'members' ? 'active' : ''}`}
           onClick={() => setActiveTab('members')}
         >
@@ -152,8 +161,18 @@ export const MyClub = ({ character, onClubUpdate }) => {
         >
           💬 CHAT
         </button>
+        {isAdmin && (
+  <button
+    className={`tab-button ${activeTab === 'management' ? 'active' : ''}`}
+    onClick={() => setActiveTab('management')}
+  >
+    👑 ADMINISTRAR
+  </button>
+)}
+        
       </div>
 
+      
       {/* Contenido de las pestañas */}
       <div className="club-content">
         {activeTab === 'overview' && (
@@ -163,6 +182,27 @@ export const MyClub = ({ character, onClubUpdate }) => {
             {/* Aquí irá el feed de actividades */}
           </div>
         )}
+
+        {activeTab === 'management' && isAdmin && (
+  <div className="tab-content">
+    <MemberManagement 
+      club={club}
+      character={character}
+      members={members}
+      onMembersUpdate={fetchClubData}
+    />
+  </div>
+)}
+
+        {/* ← NUEVA PESTAÑA EVENTOS */}
+    {activeTab === 'events' && (
+      <div className="tab-content">
+        <ClubEvents 
+          club={club} 
+          character={character} 
+        />
+      </div>
+    )}
 
         {activeTab === 'members' && (
           <div className="tab-content">

@@ -273,6 +273,8 @@
   backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
+  gap: 5px;
+  flex-wrap: wrap;
 }
 
 .club-tabs::before {
@@ -307,6 +309,7 @@
   font-size: 0.9rem;
   position: relative;
   overflow: hidden;
+  min-width: 120px;
 }
 
 .tab-button::before {

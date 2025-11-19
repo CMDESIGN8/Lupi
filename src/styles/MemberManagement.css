@@ -1,0 +1,124 @@
+/* src/styles/MemberManagement.css */
+.member-management {
+  padding: 20px;
+}
+
+.management-description {
+  color: #6c757d;
+  margin-bottom: 20px;
+}
+
+.members-management-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.management-member-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.member-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.member-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.member-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.member-level {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.member-role {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.badge-admin {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-moderator {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.badge-member {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.member-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-promote {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-demote {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-promote:hover:not(:disabled),
+.btn-demote:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-promote:disabled,
+.btn-demote:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.no-members-management {
+  text-align: center;
+  padding: 40px;
+  color: #6c757d;
+  background: #f8f9fa;
+  border-radius: 8px;
+}

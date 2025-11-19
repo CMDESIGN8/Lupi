@@ -352,3 +352,39 @@ body {
   color: var(--lupi-text-secondary);
 }
 
+
+/* Botones de navegación */
+.nav-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  margin-right: 10px;
+  transition: background 0.3s ease;
+}
+
+.nav-button:hover {
+  background: #5a67d8;
+}
+
+/* Placeholder para gestión de clubes */
+.management-placeholder {
+  background: #f8f9fa;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px dashed #dee2e6;
+}
+
+.management-placeholder ul {
+  text-align: left;
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+.management-placeholder li {
+  margin-bottom: 0.5rem;
+}

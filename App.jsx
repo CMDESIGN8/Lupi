@@ -3,16 +3,17 @@ import React, { useState, useEffect } from 'react';
 import { Auth } from './src/components/Auth';
 import { CharacterCreation } from './src/components/CharacterCreation';
 import { Dashboard } from './src/components/Dashboard';
+import { CMDashboard } from './src/components/cmdesign/CMDashboard'; // ← NUEVO IMPORT
 import { supabase } from './src/lib/supabaseClient';
 import './App.css';
 import { LoadingSpinner } from './src/components/LoadingSpinner';
-
 
 function App() {
   const [user, setUser] = useState(null);
   const [character, setCharacter] = useState(null);
   const [loading, setLoading] = useState(true);
   const [checkingCharacter, setCheckingCharacter] = useState(false);
+  const [currentView, setCurrentView] = useState('cmdesign'); // ← NUEVO ESTADO: 'cmdesign' | 'lupiapp'
 
   useEffect(() => {
     console.log('🔧 App mounted - checking session');
@@ -72,6 +73,7 @@ function App() {
     await supabase.auth.signOut();
     setUser(null);
     setCharacter(null);
+    setCurrentView('cmdesign'); // ← Resetear a vista principal al logout
   };
 
   const fetchCharacter = async (userId) => {
@@ -106,17 +108,40 @@ function App() {
     }
   };
 
- if (loading) {
-  return <LoadingSpinner message="Cargando LupiApp..." />;
-}
+  // ← NUEVA FUNCIÓN: Navegar a LupiApp
+  const handleNavigateToLupiApp = () => {
+    console.log('🎮 Navegando a LupiApp...');
+    setCurrentView('lupiapp');
+  };
+
+  // ← NUEVA FUNCIÓN: Navegar a CM DESIGN Suite
+  const handleNavigateToCMDesign = () => {
+    console.log('🏢 Navegando a CM DESIGN Suite...');
+    setCurrentView('cmdesign');
+  };
+
+  if (loading) {
+    return <LoadingSpinner message="Cargando LupiApp..." />;
+  }
 
   return (
     <div className="App">
       <header className="app-header">
-        <h1>🐺 LupiApp - MMORPG Deportivo</h1>
+        <h1>
+          {currentView === 'cmdesign' ? '🏢 CM DESIGN Suite' : '🐺 LupiApp - MMORPG Deportivo'}
+        </h1>
         {user && (
           <div className="user-info">
             <span>Hola, {user.email}</span>
+            {/* ← NUEVO BOTÓN DE NAVEGACIÓN */}
+            {currentView === 'lupiapp' && (
+              <button 
+                onClick={handleNavigateToCMDesign}
+                className="nav-button"
+              >
+                🏢 Ir a CM DESIGN
+              </button>
+            )}
             <button onClick={handleLogout}>Cerrar Sesión</button>
           </div>
         )}
@@ -134,8 +159,21 @@ function App() {
           />
         )}
 
+        {/* ← NUEVA LÓGICA DE VISTAS */}
         {user && !checkingCharacter && character && (
-          <Dashboard user={user} character={character} />
+          <>
+            {currentView === 'cmdesign' && (
+              <CMDashboard 
+                user={user} 
+                character={character}
+                onNavigateToLupiApp={handleNavigateToLupiApp}
+              />
+            )}
+            
+            {currentView === 'lupiapp' && (
+              <Dashboard user={user} character={character} />
+            )}
+          </>
         )}
       </main>
     </div>

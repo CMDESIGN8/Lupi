@@ -1,4 +1,4 @@
-const API_URL = "https://lupiback-dd62.onrender.com"; // URL del backend desplegado
+const API_URL = "http://localhost:5000"
 
 export const getBots = async () => {
   try {
@@ -189,4 +189,232 @@ export const getClubRanking = async (clubId) => {
   const response = await fetch(`${API_URL}/clubs/${clubId}/ranking`);
   if (!response.ok) throw new Error("Error al cargar ranking del club");
   return await response.json();
+};
+
+// ===============================
+// CLUB EVENTS API FUNCTIONS
+// ===============================
+
+export const createClubEvent = async (clubId, eventData) => {
+  try {
+    console.log('🎯 Enviando datos para crear evento:', { clubId, eventData });
+    
+    const response = await fetch(`${API_URL}/clubs/${clubId}/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(eventData),
+    });
+
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Evento creado exitosamente:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en createClubEvent:', error);
+    throw error;
+  }
+};
+
+export const getClubEvents = async (clubId) => {
+  try {
+    console.log('🔍 Obteniendo eventos del club (BASE DE DATOS):', clubId);
+    
+    const response = await fetch(`${API_URL}/clubs/${clubId}/events`);
+    
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Eventos obtenidos de la base de datos:', result.events?.length || 0);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en getClubEvents:', error);
+    // Fallback a datos vacíos si hay error
+    return { success: true, events: [] };
+  }
+};
+
+export const joinClubEvent = async (clubId, eventId, characterId) => {
+  try {
+    console.log('🎯 Uniéndose a evento (BASE DE DATOS):', { clubId, eventId, characterId });
+    
+    const response = await fetch(`${API_URL}/clubs/${clubId}/events/${eventId}/join`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ character_id: characterId }),
+    });
+
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Unido a evento en base de datos:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en joinClubEvent:', error);
+    throw error;
+  }
+};
+
+export const deleteClubEvent = async (clubId, eventId, characterId) => {
+  try {
+    console.log('🗑️ Eliminando evento (BASE DE DATOS):', { clubId, eventId, characterId });
+    
+    const response = await fetch(`${API_URL}/clubs/${clubId}/events/${eventId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ character_id: characterId }),
+    });
+
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Evento eliminado de base de datos:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en deleteClubEvent:', error);
+    throw error;
+  }
+};
+// AGREGAR ESTO AL FINAL DE LAS FUNCIONES DE EVENTOS en services/api.js
+
+export const updateClubEvent = async (clubId, eventId, updates) => {
+  try {
+    console.log('🎯 Actualizando evento (BASE DE DATOS):', { clubId, eventId, updates });
+    
+    const response = await fetch(`${API_URL}/clubs/${clubId}/events/${eventId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Evento actualizado en base de datos:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en updateClubEvent:', error);
+    throw error;
+  }
+};
+
+export const getClubEvent = async (clubId, eventId) => {
+  try {
+    console.log('🔍 Obteniendo evento específico (BASE DE DATOS):', { clubId, eventId });
+    
+    const response = await fetch(`${API_URL}/clubs/${clubId}/events/${eventId}`);
+    
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Evento obtenido de la base de datos:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en getClubEvent:', error);
+    throw error;
+  }
+};
+
+export const promoteToAdmin = async (clubId, characterId, targetCharacterId) => {
+  try {
+    console.log('👑 Promoviendo a administrador:', { clubId, characterId, targetCharacterId });
+    
+    const response = await fetch(`${API_URL}/clubs/${clubId}/promote-to-admin`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        character_id: characterId, 
+        target_character_id: targetCharacterId 
+      }),
+    });
+
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Miembro promovido a admin:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en promoteToAdmin:', error);
+    throw error;
+  }
+};
+
+export const demoteToMember = async (clubId, characterId, targetCharacterId) => {
+  try {
+    console.log('👥 Degradando a miembro:', { clubId, characterId, targetCharacterId });
+    
+    const response = await fetch(`${API_URL}/clubs/${clubId}/demote-to-member`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        character_id: characterId, 
+        target_character_id: targetCharacterId 
+      }),
+    });
+
+    console.log('📊 Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('✅ Admin degradado a miembro:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('❌ Error en demoteToMember:', error);
+    throw error;
+  }
 };
