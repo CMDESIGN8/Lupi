@@ -3,6 +3,7 @@ import { getCharacter, getWallet, updateStat, trainCharacter } from "../services
 import BotMatchmaking from "./BotMatchmaking";
 import { ClubList } from "./clubs/ClubList";
 import { ClubCreation } from "./clubs/ClubCreation";
+import MissionList from './MissionList'; // Ajusta la ruta si es necesario
 import { MyClub } from "./clubs/MyClub";
 import "../styles/Dashboard.css";
 
@@ -83,7 +84,7 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
       <div className="loading-orb"></div>
       <div className="loading-text">
         <h2>INICIALIZANDO SISTEMA LUPI</h2>
-        <p>Cargando datos del gladiador...</p>
+        <p>Cargando datos del Heroe...</p>
       </div>
       <div className="scan-line"></div>
       <div className="loading-particles">
@@ -116,9 +117,9 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
       <div className="super-dashboard">
         <div className="section-header">
           <button onClick={() => setCurrentSection("dashboard")} className="btn-back epic-btn">
-            ⬅ VOLVER AL NÚCLEO
+            ⬅ VOLVER
           </button>
-          <h2 className="section-title">🏆 CLANES DE GUERREROS</h2>
+          <h2 className="section-title">🏆 CLUB</h2>
         </div>
         {character.club_id ? (
           <MyClub character={character} onClubUpdate={handleClubUpdate} />
@@ -153,13 +154,17 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
         <div className="header-left">
           <div className="logo-glow">
             <span className="logo-icon">⚡</span>
-            <span className="logo-text">LUPI-CORE</span>
+            <span className="logo-text">LupiApp</span>
             <div className="logo-pulse"></div>
           </div>
           <div className="player-identity">
             <div className="player-badge">
               <span className="player-name">{character.nickname || "GLADIADOR"}</span>
               <span className="player-level">NV. {character.level || 1}</span>
+              <span className="player-wallet">
+    {/* Muestra el nickname del personaje, o 'Usuario' si no existe */}
+    Direccion de Billetera <br></br>{character.nickname || 'Usuario'}.Lupi
+</span>
             </div>
             {character.club_id && (
               <div className="club-indicator">
@@ -168,23 +173,7 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
             )}
           </div>
         </div>
-        
-        <div className="header-center">
-          <div className="system-status">
-            <div className="status-indicator">
-              <div className="pulse-dot"></div>
-              <span className="status-text">SISTEMA OPERATIVO</span>
-            </div>
-            <div className="connection-bars">
-              <div className="bar"></div>
-              <div className="bar"></div>
-              <div className="bar"></div>
-              <div className="bar"></div>
-              <div className="bar"></div>
-            </div>
-          </div>
-        </div>
-
+      
         <div className="header-right">
           <div className="resources-panel">
             <div className="resource-card">
@@ -270,8 +259,8 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
                       <div className="avatar-container">
                         <div className="avatar-glow">
                           <div className="avatar-core">
-                            <div className="avatar-icon">⚽</div>
-                          </div>
+  <img src="./src/assets/avatar.png" alt="Avatar del Personaje" className="character-avatar-image" />
+</div>
                           <div className="avatar-rings">
                             <div className="ring"></div>
                             <div className="ring"></div>
@@ -395,7 +384,7 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
             onClick={() => setCurrentSection("clubs")}
           >
             <span className="btn-icon">🏆</span>
-            <span className="btn-text">CLANES</span>
+            <span className="btn-text">CLUB</span>
             <div className="btn-glow"></div>
           </button>
           
@@ -537,75 +526,7 @@ const StatCategory = ({ title, stats }) => {
 };
 
 // Componente de Lista de Misiones
-const MissionList = ({ character, wallet }) => {
-  const missions = [
-    {
-      icon: "🎯",
-      title: "Entrenamiento Diario",
-      description: "Completa 3 sesiones de entrenamiento",
-      progress: 2,
-      total: 3,
-      type: "daily"
-    },
-    {
-      icon: "⚔️",
-      title: "Victoria en Arena",
-      description: "Gana 1 partida contra bots",
-      progress: 0,
-      total: 1,
-      type: "combat"
-    },
-    {
-      icon: "🏆",
-      title: "Unirse a un Clan",
-      description: "Forma parte de una comunidad",
-      progress: character.club_id ? 1 : 0,
-      total: 1,
-      type: "social"
-    },
-    {
-      icon: "⭐",
-      title: "Mejora de Habilidades",
-      description: "Gasta 5 puntos de habilidad",
-      progress: 1,
-      total: 5,
-      type: "progress"
-    },
-    {
-      icon: "💰",
-      title: "Recolector de Monedas",
-      description: "Consigue 500 Lupicoins",
-      progress: wallet?.lupicoins || 0,
-      total: 500,
-      type: "economy"
-    }
-  ];
 
-  return (
-    <div className="missions-list">
-      {missions.map((mission, index) => (
-        <div key={index} className={`mission-item ${mission.type}`}>
-          <div className="mission-icon">{mission.icon}</div>
-          <div className="mission-content">
-            <h4>{mission.title}</h4>
-            <p>{mission.description}</p>
-            <div className="mission-progress">
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill" 
-                  style={{ width: `${(mission.progress / mission.total) * 100}%` }}
-                ></div>
-              </div>
-              <span className="progress-text">
-                {mission.progress}/{mission.total}
-              </span>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
 
 // Componente de Pestaña de Habilidades
 const SkillsTab = ({ character, onSkillUpgrade, addingSkill }) => {

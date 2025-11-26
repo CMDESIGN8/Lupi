@@ -1,0 +1,123 @@
+/* src/styles/GameWorld.css */
+.game-world-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #0a0a0a;
+}
+
+#game-container {
+  width: 100%;
+  height: 100%;
+}
+
+.minigame-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.minigame-container {
+  width: 95%;
+  height: 95%;
+  background: #1a1a2e;
+  border-radius: 20px;
+  border: 3px solid #00ff88;
+  box-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.close-minigame {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 10;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-minigame:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.6);
+}
+
+.minigame-content {
+  width: 100%;
+  height: 100%;
+}
+
+.game-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.game-menu {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  padding: 40px;
+  border-radius: 20px;
+  border: 3px solid #00ff88;
+  min-width: 400px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+.game-menu h2 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 32px;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.game-menu button {
+  width: 100%;
+  padding: 15px;
+  margin: 10px 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.game-menu button:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: #00ff88;
+  transform: translateX(10px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

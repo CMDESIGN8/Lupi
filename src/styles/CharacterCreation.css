@@ -1,521 +1,575 @@
-/* src/styles/CharacterCreation.css */
+/* src/styles/CharacterCreation.css - VERSIÓN CORREGIDA PARA SCROLL EN MÓVIL */
 
-/* --- FONDO Y GENERAL --- */
-.character-creation-rom {
-  min-height: 100vh;
-  /* USAMOS LA IMAGEN PROPORCIONADA COMO FONDO */
-  /* Idealmente, aquí usarías una imagen de fondo de fantasía limpia */
-  background: url('../assets/fondo.png'); /* Asegúrate que la ruta a tu imagen sea correcta */
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed; /* Para que el fondo no se mueva con el scroll */
+/* =========================================
+   1. VARIABLES & CONFIGURACIÓN BASE
+   ========================================= */
+:root {
+  --neon-cyan: #00f3ff;
+  --neon-blue: #0095ff;
+  --neon-purple: #bc13fe;
+  --neon-pink: #ff00ff;
+  --neon-green: #00ff9d;
+  --neon-gold: #ffd700;
   
-  padding: 20px;
-  font-family: 'Georgia', 'Times New Roman', serif; /* Fuente más "fantasía" */
-  color: #f0e6d2; /* Color de texto general (beige/hueso) */
+  --bg-dark: #050a14;
+  --bg-panel: rgba(10, 15, 30, 0.65);
+  --glass-border: rgba(0, 243, 255, 0.15);
+  
+  --font-main: 'Rajdhani', 'Orbitron', sans-serif;
+  --font-display: 'Orbitron', sans-serif;
+  
+  --shadow-glow: 0 0 10px rgba(0, 243, 255, 0.5);
+  --shadow-glow-strong: 0 0 20px rgba(0, 243, 255, 0.8);
+  
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
 }
 
-/* --- CONTENEDOR PRINCIPAL --- */
-.creation-container {
-  max-width: 1400px; /* ¡CAMBIO! Límite de ancho para centrar todo */
+* {
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-cyan) rgba(0,0,0,0.3);
+}
+
+body {
+  margin: 0;
+  overflow: auto; 
+  background-color: var(--bg-dark);
+  font-family: var(--font-main);
+  color: #fff;
+}
+
+/* --- BASE STYLE - PANTALLA COMPLETA --- */
+.character-creation-dashboard {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.05) 0%, rgba(0,0,0,0) 70%),
+    linear-gradient(180deg, rgba(5, 10, 20, 0.8), rgba(5, 10, 20, 0.95)),
+    url('/src/assets/fondo.png') center/cover no-repeat;
+  z-index: 1;
+  overflow-y: auto; /* El scroll principal ocurre aquí (CRÍTICO) */
+}
+
+.dashboard-container {
+  width: 100%;
+  max-width: 1600px;
+  /* En lugar de 100vh, permitimos que crezca en móvil */
+  min-height: 100vh; 
   margin: 0 auto;
-  background: none; /* Sin fondo de contenedor, solo los paneles */
+  padding: 20px;
+  display: flex;
+  align-items: flex-start; /* Alineación arriba */
+}
+
+/* --- LAYOUT PRINCIPAL (MOBILE-FIRST) --- */
+/* Por defecto, apilamos en una columna para móvil */
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  width: 100%;
+  min-height: calc(100vh - 40px);
+  padding-bottom: 20px; /* Asegura espacio para ver el botón al final */
+}
+
+/* === PANELES LATERALES (COMPORTAMIENTO EN MÓVIL) === */
+.info-panel,
+.skills-panel {
+  /* En móvil, no son 'sticky', sino bloques normales */
+  position: relative;
+  width: 100%;
+  max-height: none;
+  overflow-y: visible; /* El scroll lo maneja el padre */
+
+  /* Estilos Glassmorphism */
+  background: var(--bg-panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: var(--spacing-lg);
+  box-shadow: 
+    0 10px 30px rgba(0,0,0,0.5),
+    inset 0 0 20px rgba(0, 243, 255, 0.05);
+  transition: var(--transition-smooth);
+}
+
+.info-panel:hover,
+.skills-panel:hover {
+  border-color: rgba(0, 243, 255, 0.3);
+  box-shadow: 
+    0 15px 40px rgba(0,0,0,0.6),
+    inset 0 0 30px rgba(0, 243, 255, 0.08),
+    0 0 15px rgba(0, 243, 255, 0.1);
+}
+
+/* --- PANEL CENTRAL (AVATAR) EN MÓVIL --- */
+.avatar-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Alinea arriba para evitar mucho espacio */
+  padding: 0;
+  min-height: 50vh; /* Altura mínima para el avatar */
+}
+
+.character-avatar {
+  max-height: 40vh; /* Ajuste para móvil */
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 25px rgba(0, 243, 255, 0.3));
+  animation: float 6s ease-in-out;
+  z-index: 1;
+}
+
+
+/* =========================================
+   2. MEDIA QUERY (TABLET / DESKTOP)
+   ========================================= */
+
+@media (min-width: 1025px) {
+  /* Restablecemos el diseño a 3 columnas fijo */
+  .dashboard-content {
+    display: grid;
+    grid-template-columns: 350px 1fr 380px; 
+    gap: var(--spacing-lg);
+    height: calc(100vh - 40px); /* Altura fija en desktop */
+    min-height: auto;
+    padding-bottom: 0;
+  }
+  
+  .dashboard-container {
+    align-items: center; /* Centrado vertical en desktop */
+  }
+
+  /* === PANELES LATERALES (COMPORTAMIENTO EN DESKTOP) === */
+  .info-panel,
+  .skills-panel {
+    /* Hacemos los paneles STICKY y les damos scroll interno */
+    position: sticky;
+    top: 20px;
+    height: 100%;
+    max-height: calc(100vh - 40px); /* Ocupa la altura disponible */
+    overflow-y: auto; /* El scroll es interno */
+  }
+  
+  /* --- PANEL CENTRAL (AVATAR) EN DESKTOP --- */
+  .avatar-panel {
+    justify-content: center; /* Centra el avatar verticalmente */
+    min-height: 100%;
+  }
+
+  .character-avatar {
+      max-height: 55vh; /* Avatar más grande en desktop */
+  }
+}
+
+/* =========================================
+   3. ESTILOS DE COMPONENTES
+   ========================================= */
+
+/* (Mantener el resto de los estilos de componentes aquí) */
+
+/* Títulos de Sección */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--neon-cyan);
+  margin-top: 0;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+  padding-bottom: 10px;
+}
+
+.panel-section {
+  margin-bottom: 30px;
+}
+
+/* Inputs */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-label {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.name-input {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  color: white;
+  padding: 14px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  transition: var(--transition-fast);
+  width: 100%;
+}
+
+.name-input:focus {
+  outline: none;
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+  background: rgba(0, 243, 255, 0.05);
+}
+
+.input-hint {
+  font-size: 0.75rem;
+  color: rgba(0, 243, 255, 0.6);
+}
+
+/* Tarjetas de Consejos */
+.tips-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tip-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--neon-blue);
+  padding: 12px 16px;
+  border-radius: 0 12px 12px 0;
+  transition: var(--transition-fast);
+}
+
+.tip-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateX(5px);
+}
+
+.tip-title {
+  color: var(--neon-blue);
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.tip-description {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #ccc;
+}
+
+/* Animación de flotación */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+/* Placa de Nombre debajo del Avatar */
+.avatar-info {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--neon-cyan);
+  padding: 12px 24px;
+  border-radius: 50px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-glow);
+  margin-bottom: 20px;
+  min-width: 200px;
+  z-index: 2; /* Asegura que esté sobre el avatar si es necesario */
+}
+
+.avatar-name {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: white;
+  text-transform: uppercase;
+  text-shadow: 0 0 10px var(--neon-cyan);
+  margin-bottom: 4px;
+}
+
+.avatar-details {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.8rem;
+}
+
+.avatar-class { color: var(--neon-cyan); }
+.avatar-level { 
+  color: var(--neon-gold); 
+  font-weight: bold;
+}
+
+/* Botones de Acción */
+.avatar-actions {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.create-btn {
+  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
   border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #000;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+  position: relative;
+  overflow: hidden;
+}
+
+.create-btn:hover:not(:disabled) {
+  transform: scale(1.02) translateY(-2px);
+  box-shadow: 0 0 35px rgba(0, 243, 255, 0.7);
+  letter-spacing: 2px;
+}
+
+.create-btn:disabled {
+  background: #333;
+  color: #666;
+  cursor: not-allowed;
   box-shadow: none;
 }
 
-/* --- HEADER (LO OCULTAMOS PARA PARECERSE A LA IMAGEN) --- */
-.creation-header {
-  display: none; 
+/* Spinner de carga */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(0,0,0,0.3);
+  border-top: 3px solid #000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 10px;
 }
 
-/* --- LAYOUT DE 3 COLUMNAS --- */
-.creation-content-new {
-  display: grid;
-  grid-template-columns: 320px auto 320px; /* Columna central a 'auto' */
-  justify-content: center; /* Centra las 3 columnas como un grupo */
-  grid-template-areas: "right center left"; 
-  min-height: 700px;
-  gap: 30px; /* Aumentamos el espacio para que "respire" */
-}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* Asignamos las áreas */
-.left-panel-new { 
-  grid-area: left; 
-  /* ¡Este es ahora el panel de la DERECHA (Info) */
-}
-.center-panel-new { 
-  grid-area: center; 
-}
-.right-panel-new { 
-  grid-area: right; 
-  /* ¡Este es ahora el panel de la IZQUIERDA (Skills) */
-}
-
-
-/* --- ESTILO DE PANELES (IZQUIERDO Y DERECHO) --- */
-.left-panel-new,
-.right-panel-new {
-  background: rgba(10, 5, 5, 0.8); /* Fondo oscuro semi-transparente */
-  border: 2px solid #a07c3c; /* Borde dorado/bronce */
+.warning-message {
+  background: rgba(255, 50, 50, 0.15);
+  border: 1px solid rgba(255, 50, 50, 0.5);
+  color: #ff6b6b;
+  padding: 10px;
   border-radius: 8px;
-  padding: 25px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(200, 155, 60, 0.2) inset; /* Sombra oscura + brillo dorado interno */
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  animation: pulse-red 2s infinite;
 }
 
-/* --- PANEL DERECHO (INFO DEL PERSONAJE) --- */
-/* (Originalmente .left-panel-new) */
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(255, 50, 50, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0); }
+}
 
-.info-section h3,
-.tips-section h3,
-.section-header-new h2 /* Aplicamos a ambos headers */ {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin: 0 0 15px 0;
-  color: #c89b3c; /* Título en dorado */
-  padding-bottom: 10px;
-  border-bottom: 1px solid #a07c3c; /* Línea dorada */
-  font-family: 'Georgia', serif;
-  text-align: left; /* Alinear a la izquierda */
-  text-transform: uppercase; /* Como en la imagen */
+/* Header de Puntos */
+.points-card {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent);
+  border-left: 4px solid var(--neon-gold);
+  padding: 15px;
+  margin-bottom: 25px;
+  border-radius: 0 12px 12px 0;
+}
+
+.points-title {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--neon-gold);
+  text-transform: uppercase;
   letter-spacing: 1px;
 }
-.section-header-new h2 {
-  text-align: center; /* El de skills sí estaba centrado */
-}
 
-.input-group-new label {
-  color: #f0e6d2; /* Texto beige */
-  font-size: 0.95rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.name-input-new {
-  background: rgba(0, 0, 0, 0.5); /* Fondo oscuro para input */
-  border: 1px solid #a07c3c;
-  border-radius: 4px;
+.points-value {
+  font-size: 2.2rem;
+  font-family: var(--font-display);
   color: #fff;
-  font-size: 1rem;
-  font-family: 'Georgia', serif;
-}
-
-.name-input-new:focus {
-  border-color: #f0e6d2; /* Borde beige al hacer foco */
-  box-shadow: 0 0 0 3px rgba(200, 155, 60, 0.3); /* Sombra dorada */
-}
-
-.name-input-new::placeholder {
-  color: #a0a0a0;
-}
-
-.input-group-new small {
-  color: #b0a090; /* Color de ayuda más tenue */
-}
-
-.points-card-new {
-  background: rgba(30, 20, 15, 0.7); /* Fondo de tarjeta más sutil */
-  border: 1px solid #a07c3c;
-  border-radius: 6px;
-  padding: 15px;
-}
-
-.points-title-new {
-  color: #f0e6d2;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.points-value-new {
-  color: #c89b3c; /* Puntos en dorado, no verde */
-  font-size: 1.8rem;
+  text-shadow: 0 0 15px var(--neon-gold);
+  line-height: 1.1;
+  display: block;
+  margin: 5px 0;
 }
 
 .points-subtitle {
-  color: #b0a090;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  font-style: italic;
 }
 
-.tips-section {
-  flex: 1;
-}
-
-.tip-item {
-  background: rgba(30, 20, 15, 0.7);
-  border: 1px solid #a07c3c;
-  padding: 12px;
-  border-radius: 4px;
-}
-
-.tip-item:hover {
-  border-color: #f0e6d2;
-}
-
-.tip-item strong {
-  color: #c89b3c; /* Título del consejo en dorado */
-}
-
-.tip-item p {
-  color: #f0e6d2;
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-
-.create-btn-new {
-  padding: 14px;
-  /* Gradiente de botón dorado/marrón */
-  background: linear-gradient(135deg, #c89b3c, #8b4513);
-  color: white;
-  border: 1px solid #f0e6d2;
-  border-radius: 6px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-transform: uppercase; /* Como "CONFIRMAR" */
-  letter-spacing: 1px;
-}
-
-.create-btn-new:hover:not(:disabled) {
-  background: linear-gradient(135deg, #e0a84c, #a05e1a);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(200, 155, 60, 0.4);
-}
-
-.create-btn-new:disabled {
-  background: #5a4a3a; /* Marrón desaturado para deshabilitado */
-  border-color: #7a6a5a;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.warning-message-new {
-  background: rgba(197, 48, 48, 0.2);
-  color: #fc8181;
-  border: 1px solid rgba(197, 48, 48, 0.5);
-  font-weight: 600;
-}
-
-/* --- PANEL CENTRAL (AVATAR) --- */
-.center-panel-new {
-  background: transparent; /* Sin fondo */
-  padding: 40px 30px;
-  border: none; /* Sin bordes */
-  align-items: center; /* Centrado vertical */
-  justify-content: center;
-}
-
-.character-avatar-center {
-  /* Estilos para el contenedor del avatar */
-}
-
-/* APLICAMOS FLEXBOX PARA REORDENAR */
-.avatar-display-center {
-  text-align: center;
-  max-width: 400px;
-  display: flex; /* Activamos Flexbox */
-  flex-direction: column; /* Apilamos los elementos verticalmente */
-  align-items: center; /* Centramos horizontalmente */
-}
-
-
-.avatar-image-main {
-  border: none;
-  box-shadow: none;
-  filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
-  order: 2; /* ENVIAMOS LA IMAGEN AL SEGUNDO LUGAR */
-  margin-bottom: 0; /* Reseteamos el margen inferior */
-}
-
-.avatar-fallback { 
-  display: none; 
-  order: 2; /* APLICAMOS EL MISMO ORDEN AL FALLBACK */
-}
-.avatar-placeholder { display: none; }
-
-.avatar-info-center {
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 8px;
-  padding: 10px 15px;
-  position: relative;
-  z-index: 10;
-  border: 1px solid rgba(160, 124, 60, 0.5);
-  order: 1; /* TRAEMOS LA INFO AL PRIMER LUGAR */
-  margin-top: 0; /* Reseteamos el margen superior */
-  margin-bottom: -20px; /* CAMBIAMOS A MARGIN-BOTTOM para que se solape con la imagen de abajo */
-  width: 90%; /* Aseguramos que tenga un ancho coherente */
-}
-
-.avatar-name-main {
-  color: #fff;
-  text-shadow: 2px 2px 4px #000;
-}
-
-.avatar-class-main {
-  color: #c89b3c; /* Dorado */
-  font-size: 1.1rem;
-}
-
-.avatar-level-main {
-  background: #a07c3c; /* Fondo dorado/bronce */
-  color: white;
-  padding: 4px 12px;
-  border-radius: 20px;
-}
-
-/* --- PANEL IZQUIERDO (HABILIDADES) --- */
-/* (Originalmente .right-panel-new) */
-
-.skills-grid-new {
-  gap: 15px; /* Espacio entre cada "caja" de skill */
-  padding-right: 5px;
-}
-
-/* Scrollbar estilo fantasía */
-.skills-grid-new::-webkit-scrollbar {
-  width: 8px;
-}
-.skills-grid-new::-webkit-scrollbar-track {
-  background: #3a2a1a;
-  border-radius: 4px;
-}
-.skills-grid-new::-webkit-scrollbar-thumb {
-  background: #a07c3c;
-  border-radius: 4px;
-  border: 1px solid #f0e6d2;
-}
-.skills-grid-new::-webkit-scrollbar-thumb:hover {
-  background: #c89b3c;
-}
-
-.skill-row-new {
-  /* Mantenemos Flexbox VERTICAL para la caja entera */
-  display: flex;
-  flex-direction: column;
-  gap: 12px; /* Espacio entre Info, Controles y Barra */
-  
-  padding: 15px; 
-  background: rgba(30, 20, 15, 0.7);
-  border: 1px solid #a07c3c;
-  border-radius: 6px;
-}
-
-.skill-row-new:hover {
-  border-color: #c89b3c;
-  background: rgba(30, 20, 15, 0.9);
-}
-
-.skill-row-new.selected {
-  background: rgba(30, 20, 15, 0.7);
-  border-color: #a07c3c;
-  box-shadow: none;
-}
-
-.skill-info-new {
-  display: flex;
-  align-items: center;
+/* Grid de Tarjetas */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100%, 1fr)); 
   gap: 12px;
-  /* Centramos el nombre de la habilidad */
-  justify-content: center; 
 }
 
-.skill-name-new {
-  color: #f0e6d2;
-  font-size: 1.1rem; 
-  font-weight: 600;
+/* Tarjeta Individual */
+.skill-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(0, 243, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.skill-controls-new {
-  /* CAMBIO A FLEXBOX HORIZONTAL */
+.skill-card:hover, .skill-card.selected {
+  background: rgba(0, 243, 255, 0.08);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.skill-card.selected {
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);
+}
+
+.skill-header {
   display: flex;
-  flex-direction: row; /* Para poner [-] [50] [+] en la misma línea */
-  align-items: center; /* Alinear verticalmente los botones y el número */
-  justify-content: center; /* Centrar el grupo horizontalmente */
-  gap: 15px; /* Espacio entre los botones y el número */
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.control-btn-new {
-  /* CAMBIO A BOTONES CUADRADOS */
-  width: 40px;  /* Ancho fijo */
-  height: 40px; /* Alto fijo */
-  max-width: none; /* Quitamos el max-width anterior */
-  
-  border: 1px solid #a07c3c;
-  background: #3a2a1a;
-  color: #f0e6d2;
-  border-radius: 4px;
+.skill-icon {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+}
+
+.skill-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+/* Controles (+/-) y Valor */
+.skill-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.control-btn {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  background: transparent;
+  color: var(--neon-cyan);
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 1.5rem; /* Hacemos el '+' y '-' más grandes */
-  transition: all 0.2s ease;
-  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
 }
 
-.control-btn-new:hover:not(:disabled) {
-  background: #a07c3c;
-  border-color: #f0e6d2;
+.control-btn:hover:not(:disabled) {
+  background: var(--neon-cyan) !important;
   color: #fff;
+  box-shadow: 0 0 10px var(--neon-cyan);
 }
 
-.control-btn-new.plus:hover:not(:disabled) {
-  background: #38a169; 
-  border-color: #48bb78;
-  color: white;
-}
-.control-btn-new.minus:hover:not(:disabled) {
-  background: #e53e3e; 
-  border-color: #fc8181;
-  color: white;
-}
-
-.control-btn-new:disabled {
-  opacity: 0.5;
+.control-btn:disabled {
+  opacity: 0.3;
   cursor: not-allowed;
-  background: #3a2a1a;
-  border-color: #a07c3c;
-  color: #f0e6d2;
+  border-color: transparent;
 }
 
-
-.skill-value-display-new {
-  min-width: 40px;
+.skill-value {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  min-width: 30px;
   text-align: center;
 }
 
-.value-new {
-  color: #fff;
-  font-size: 1.5rem; /* Mantenemos el número grande */
-  font-weight: 700;
-}
-
-.skill-bar-new {
-  width: 100%; /* La barra ocupa todo el ancho de la caja */
-  height: 6px; 
-  background: #3a2a1a;
-  margin-top: 5px; /* Pequeño espacio sobre la barra */
+/* Barra de Progreso */
+.skill-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
   border-radius: 3px;
   overflow: hidden;
 }
 
-.skill-progress-new {
+.skill-progress {
   height: 100%;
-  background: linear-gradient(90deg, #a07c3c, #f0e6d2);
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan));
   border-radius: 3px;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease-out;
+  box-shadow: 0 0 10px var(--neon-cyan);
 }
 
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid transparent;
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+/* Scrollbars Personalizados (Mantener al final) */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
 }
 
-/* --- RESPONSIVE --- */
-
-@media (max-width: 1200px) {
-  .creation-container {
-    max-width: 95%; /* Usamos más de la pantalla */
-  }
-
-  .creation-content-new {
-    /* Mantenemos el layout pero con paneles laterales más pequeños */
-    grid-template-columns: 300px auto 300px; 
-    grid-template-areas: "right center left"; /* Mantener el swap */
-    gap: 20px;
-    justify-content: center;
-  }
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 243, 255, 0.3);
+  border-radius: 10px;
 }
 
-@media (max-width: 1024px) {
-  .creation-content-new {
-    /* CAMBIO A 1 SOLA COLUMNA (STACKED) */
-    grid-template-columns: minmax(0, 1fr); /* Columna única que ocupa el 100% */
-    /* Reordenamos para móvil, manteniendo la lógica */
-    grid-template-areas: 
-      "center"
-      "right" /* Skills (Panel original "right") */
-      "left"; /* Info (Panel original "left") */
-    gap: 30px; /* Mantenemos un buen espacio vertical */
-  }
-  
-  .center-panel-new {
-    min-height: auto; /* Dejamos que el contenido defina la altura */
-    padding: 20px 10px;
-  }
-
-  /* Hacemos que los paneles ocupen un ancho máximo más razonable */
-  .left-panel-new,
-  .right-panel-new {
-    width: 90%;
-    max-width: 500px;
-    margin: 0 auto; /* Centramos los paneles */
-  }
-
-  .avatar-image-main {
-    width: 200px;
-    height: 200px;
-    /* La 'order: 2' de la regla principal sigue aplicando */
-  }
-
-  .avatar-info-center {
-    /* La 'order: 1' de la regla principal sigue aplicando */
-    /* Ajustamos el solapamiento para la imagen más pequeña */
-    margin-bottom: -15px; 
-    width: 90%;
-    max-width: 320px; /* Evitamos que sea muy ancho en tablets */
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
 }
 
+/* Móviles */
 @media (max-width: 768px) {
-  .character-creation-rom {
-    padding: 10px 0; /* Menos padding general */
+  .dashboard-container {
+    padding: 10px;
   }
 
-  /* Hacemos que los paneles ocupen todo el ancho */
-  .left-panel-new,
-  .right-panel-new {
-    width: 100%;
-    max-width: 100%;
-    padding: 20px;
-    border-radius: 0; /* Sin bordes redondeados en móvil */
-    border-left: none;
-    border-right: none;
+  .character-avatar {
+    max-height: 35vh;
   }
+}
 
-  /* Ajustamos el panel central también */
-  .center-panel-new {
-    padding: 20px 0;
-  }
-  
-  .creation-content-new {
-    gap: 15px; /* Reducimos el espacio entre paneles */
-  }
+/* Pantallas muy grandes */
+@media (min-width: 1400px) {
+    .dashboard-content {
+        grid-template-columns: 400px 1fr 400px;
+        max-width: 1500px;
+    }
+}
 
-  .avatar-details {
-    /* Esto apila "Deportista" y "Nivel 1" */
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .skill-controls-new {
-    gap: 10px; /* Menos espacio entre botones en móvil */
-  }
-
-  /* Botones de skill un poco más pequeños */
-  .control-btn-new {
-    width: 38px;
-    height: 38px;
-    font-size: 1.3rem;
-  }
+.skill-controls button {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #dddddd00 !important;
+    border-radius: 3px;
+    cursor: pointer;
+    background: transparent !important;
 }

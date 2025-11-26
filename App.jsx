@@ -8,6 +8,7 @@ import { supabase } from './src/lib/supabaseClient';
 import './App.css';
 import { LoadingSpinner } from './src/components/LoadingSpinner';
 
+
 function App() {
   const [user, setUser] = useState(null);
   const [character, setCharacter] = useState(null);

@@ -1,0 +1,200 @@
+.missions-list {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.missions-card {
+    background: rgba(5, 15, 30, 0.7);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(0, 255, 136, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.mission-item {
+    background: rgba(5, 15, 30, 0.7);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-left: 4px solid #4a90e2;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.mission-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mission-item.completed {
+    border-left-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+/* Colores por tipo de misión */
+.mission-item.daily { border-left-color: #FF9800; }
+.mission-item.weekly { border-left-color: #9C27B0; }
+.mission-item.achievement { border-left-color: #FF5722; }
+.mission-item.tutorial { border-left-color: #00BCD4; }
+.mission-item.combat { border-left-color: #F44336; }
+.mission-item.social { border-left-color: #3F51B5; }
+.mission-item.economy { border-left-color: #FFD700; }
+.mission-item.progress { border-left-color: #4CAF50; }
+
+.mission-icon {
+    font-size: 2rem;
+    margin-right: 16px;
+    float: left;
+}
+
+.mission-content {
+    overflow: hidden;
+}
+
+.mission-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.mission-header h4 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.mission-rewards {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.reward-xp, .reward-coins, .reward-item {
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.mission-content p {
+    margin: 8px 0;
+    color: #ccc;
+    font-size: 0.9rem;
+}
+
+.mission-progress {
+    margin-top: 12px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4a90e2, #357abd);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.mission-item.completed .progress-fill {
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+}
+
+.progress-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+.claim-button {
+    background: linear-gradient(135deg, #FFD700, #FFA000);
+    color: #000;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.claim-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+}
+
+.missions-loading, .no-missions {
+    text-align: center;
+    padding: 40px;
+    color: #ccc;
+    font-style: italic;
+}
+
+/* Efectos de brillo para misiones completadas */
+.mission-item.completed {
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+/* Panel de misiones en dashboard */
+.missions-panel {
+    flex: 0 0 30%;
+}
+
+
+
+.missions-card .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.missions-count {
+    background: rgba(0, 255, 136, 0.2);
+    color: #00ff88;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.missions-loading {
+    text-align: center;
+    padding: 40px;
+    color: #ccc;
+}
+
+.loading-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(0, 255, 136, 0.3);
+    border-top: 3px solid #00ff88;
+    border-radius: 50%;
+    animation: spin 1s linear;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

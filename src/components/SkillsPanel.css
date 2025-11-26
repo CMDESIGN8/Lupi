@@ -1,0 +1,365 @@
+/* Variables específicas para el panel aislado */
+:root {
+  --isolated-neon-cyan: #00f3ff;
+  --isolated-neon-blue: #008cff;
+  --isolated-neon-purple: #8a2be2;
+  --isolated-darker-bg: #0a0a1a;
+  --isolated-spacing-xs: 8px;
+  --isolated-spacing-sm: 12px;
+  --isolated-spacing-md: 16px;
+  --isolated-spacing-lg: 20px;
+  --isolated-text-glow: 0 0 10px rgba(0, 243, 255, 0.7);
+  --isolated-neon-glow: 0 0 20px rgba(0, 243, 255, 0.4);
+}
+
+/* Contenedor principal - Pantalla completa */
+.skills-panel-isolated {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Overlay de fondo */
+.skills-panel-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+/* Panel contenedor */
+.skills-panel-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 90vh;
+  max-height: 700px;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2a 50%, #0a0a1a 100%);
+  border: 2px solid rgba(0, 243, 255, 0.3);
+  border-radius: 16px;
+  padding: var(--isolated-spacing-lg);
+  box-shadow: 
+    0 0 40px rgba(0, 243, 255, 0.3),
+    inset 0 0 20px rgba(0, 243, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: var(--isolated-spacing-md);
+  overflow: hidden;
+  z-index: 1001;
+}
+
+/* Header del panel */
+.skills-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--isolated-spacing-md);
+  border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+}
+
+.skills-panel-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.5rem;
+  text-shadow: var(--isolated-text-glow);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.close-button {
+  background: rgba(255, 0, 0, 0.2);
+  border: 1px solid rgba(255, 0, 0, 0.4);
+  color: #ff4444;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-button:hover {
+  background: rgba(255, 0, 0, 0.4);
+  border-color: #ff4444;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+  transform: scale(1.1);
+}
+
+/* Puntos disponibles */
+.points-card-isolated {
+  background: linear-gradient(135deg, 
+    rgba(0, 243, 255, 0.15), 
+    rgba(255, 0, 255, 0.1));
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  border-radius: 12px;
+  padding: var(--isolated-spacing-lg);
+  text-align: center;
+  box-shadow: var(--isolated-neon-glow);
+}
+
+.points-header-isolated {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--isolated-spacing-xs);
+}
+
+.points-title-isolated {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: var(--isolated-text-glow);
+}
+
+.points-value-isolated {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--isolated-neon-cyan);
+  text-shadow: var(--isolated-neon-glow);
+  font-family: 'Orbitron', sans-serif;
+}
+
+.points-subtitle-isolated {
+  font-size: 0.9rem;
+  color: rgba(0, 243, 255, 0.8);
+  text-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+}
+
+/* Grid de habilidades */
+.skills-grid-isolated {
+  display: flex;
+  flex-direction: column;
+  gap: var(--isolated-spacing-sm);
+  flex: 1;
+  overflow-y: auto;
+  padding-right: var(--isolated-spacing-xs);
+}
+
+/* Skill Card */
+.skill-card-isolated {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 8px 12px;
+  background: linear-gradient(135deg, 
+    rgba(0, 243, 255, 0.05) 0%, 
+    rgba(138, 43, 226, 0.05) 100%);
+  border: 1px solid rgba(0, 243, 255, 0.15);
+  padding: 12px 14px;
+  border-radius: 8px;
+  min-height: 60px;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+  position: relative;
+  cursor: pointer;
+}
+
+.skill-card-isolated:hover {
+  border-color: var(--isolated-neon-cyan);
+  box-shadow: 0 0 12px rgba(0, 243, 255, 0.25);
+  transform: translateX(3px);
+}
+
+.skill-card-isolated.selected {
+  border-color: var(--isolated-neon-cyan);
+  background: linear-gradient(135deg, 
+    rgba(0, 243, 255, 0.12) 0%, 
+    rgba(0, 149, 255, 0.08) 100%);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+}
+
+/* Header del skill */
+.skill-header-isolated {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.95rem;
+  grid-column: 1 / 4;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.skill-icon-isolated {
+  font-size: 1.2rem;
+  filter: drop-shadow(0 0 4px rgba(0, 243, 255, 0.7));
+  min-width: 24px;
+  flex-shrink: 0;
+}
+
+.skill-name-isolated {
+  font-weight: 600;
+  color: white;
+  font-size: 0.95rem;
+  text-shadow: var(--isolated-text-glow);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Controles */
+.skill-controls-isolated {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  grid-column: 4 / 6;
+  grid-row: 1;
+  justify-self: end;
+  flex-shrink: 0;
+}
+
+.control-btn-isolated {
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(0, 243, 255, 0.4);
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--isolated-neon-cyan);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-shadow: var(--isolated-text-glow);
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.control-btn-isolated:hover:not(:disabled) {
+  background: var(--isolated-neon-cyan);
+  border-color: var(--isolated-neon-cyan);
+  color: var(--isolated-darker-bg);
+  box-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+  text-shadow: none;
+  transform: scale(1.1);
+}
+
+.control-btn-isolated:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.skill-value-isolated {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--isolated-neon-cyan);
+  min-width: 40px;
+  text-align: center;
+  text-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+  font-family: 'Orbitron', sans-serif;
+  flex-shrink: 0;
+}
+
+/* Barra de progreso */
+.skill-bar-isolated {
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 243, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  grid-column: 1 / 6;
+  grid-row: 2;
+  margin-top: 8px;
+}
+
+.skill-progress-isolated {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  background: linear-gradient(90deg, 
+    var(--isolated-neon-cyan) 0%, 
+    var(--isolated-neon-blue) 50%, 
+    var(--isolated-neon-purple) 100%);
+  box-shadow: 0 0 6px rgba(0, 243, 255, 0.6);
+  position: relative;
+}
+
+.skill-progress-isolated::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Scrollbar personalizado */
+.skills-grid-isolated::-webkit-scrollbar {
+  width: 6px;
+}
+
+.skills-grid-isolated::-webkit-scrollbar-track {
+  background: rgba(0, 243, 255, 0.1);
+  border-radius: 3px;
+  margin: 10px 0;
+}
+
+.skills-grid-isolated::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--isolated-neon-cyan), var(--isolated-neon-blue));
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+}
+
+.skills-grid-isolated::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--isolated-neon-blue), var(--isolated-neon-purple));
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .skills-panel-isolated {
+    padding: 10px;
+  }
+  
+  .skills-panel-container {
+    height: 95vh;
+    max-height: none;
+  }
+  
+  .skill-card-isolated {
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto auto auto;
+    gap: 6px;
+  }
+  
+  .skill-header-isolated {
+    grid-column: 1 / 4;
+    grid-row: 1;
+  }
+  
+  .skill-controls-isolated {
+    grid-column: 1 / 4;
+    grid-row: 2;
+    justify-self: center;
+  }
+  
+  .skill-bar-isolated {
+    grid-column: 1 / 4;
+    grid-row: 3;
+  }
+}
