@@ -1,0 +1,91 @@
+/* src/styles/LupicoinsDisplay.css */
+.lupicoins-display-compact {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid #ffd700;
+  border-radius: 20px;
+  padding: 8px 12px;
+  color: white;
+  font-weight: bold;
+  backdrop-filter: blur(10px);
+  margin: 5px;
+}
+
+.lupicoins-icon {
+  font-size: 1.2em;
+  margin-right: 8px;
+}
+
+.lupicoins-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.lupicoins-label {
+  font-size: 0.7em;
+  opacity: 0.8;
+}
+
+.lupicoins-value {
+  font-size: 1em;
+  color: #ffd700;
+}
+
+.lupicoins-display-full {
+  background: rgba(0, 0, 0, 0.9);
+  border: 3px solid #ffd700;
+  border-radius: 15px;
+  padding: 15px;
+  color: white;
+  text-align: center;
+  backdrop-filter: blur(10px);
+}
+
+.lupicoins-header h3 {
+  margin: 0 0 10px 0;
+  color: #ffd700;
+}
+
+.lupicoins-amount-large {
+  font-size: 2em;
+  font-weight: bold;
+  color: #ffd700;
+  margin: 10px 0;
+}
+
+.lupicoins-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.lupicoins-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lupicoins-btn.add {
+  background: #4CAF50;
+  color: white;
+}
+
+.lupicoins-btn.subtract {
+  background: #f44336;
+  color: white;
+}
+
+.lupicoins-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+.lupicoins-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}

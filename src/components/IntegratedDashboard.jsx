@@ -1,13 +1,15 @@
 // src/components/IntegratedDashboard.jsx
 import React, { useState, useEffect } from "react";
 import { GameWorld } from "./GameWorld";
-import TrainingDashboard from "./TrainingDashboard";
-import BotMatchmaking from "./BotMatchmaking";
-import { ClubList } from "./clubs/ClubList";
-import { ClubCreation } from "./clubs/ClubCreation";
-import { MyClub } from "./clubs/MyClub";
-import { getCharacter, getWallet, getBots } from "../services/api";
-import "../styles/IntegratedDashboard.css";
+import TrainingDashboard from "./TrainingDashboard"; // Asumo que esto existe
+import BotMatchmaking from "./BotMatchmaking"; // Asumo que esto existe
+import { ClubList } from "./clubs/ClubList"; // Asumo que esto existe
+import { ClubCreation } from "./clubs/ClubCreation"; // Asumo que esto existe
+import { MyClub } from "./clubs/MyClub"; // Asumo que esto existe
+// Asegúrate de que tus funciones getCharacter, getWallet, getBots existan en esta ruta
+import { getCharacter, getWallet, getBots } from "../services/api"; 
+import "../styles/IntegratedDashboard.css"; // Asumo que esto existe
+import { gameService } from '../services/gameService';
 
 export const IntegratedDashboard = ({ user }) => {
   const [character, setCharacter] = useState(null);
@@ -16,6 +18,7 @@ export const IntegratedDashboard = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [currentView, setCurrentView] = useState("game"); // 'game', 'dashboard', 'clubs', 'bot-match', 'futsal'
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
+  const [clubData, setClubData] = useState(null);
 
   useEffect(() => {
     if (user) fetchData(user.id);
@@ -31,6 +34,17 @@ export const IntegratedDashboard = ({ user }) => {
         setWallet(walletData);
         const botsData = await getBots();
         setBots(botsData);
+        
+        // NUEVO: Obtener datos del club si el character tiene club_id
+        if (charData.club_id) {
+          try {
+            const clubData = await gameService.getClubDetails(charData.club_id);
+            setClubData(clubData);
+          } catch (error) {
+            console.log('⚠️ No se pudieron cargar los datos del club:', error);
+            setClubData(null);
+          }
+        }
       }
     } catch (error) {
       console.error("Error cargando datos:", error);
@@ -45,7 +59,8 @@ export const IntegratedDashboard = ({ user }) => {
   };
 
   const handleClubUpdate = () => {
-    fetchData(user.id);
+    // Refresca los datos, incluyendo el club actualizado
+    fetchData(user.id); 
   };
 
   if (loading) {
@@ -77,6 +92,8 @@ export const IntegratedDashboard = ({ user }) => {
           <GameWorld 
             character={character}
             user={user}
+            wallet={wallet}
+            club={clubData}
             onNavigate={handleNavigate}
           />
           

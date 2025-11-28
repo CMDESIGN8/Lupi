@@ -1,7 +1,8 @@
 // src/components/game/scenes/BattleScene.js
 import Phaser from 'phaser';
 
-export default class BattleScene extends Phaser.Scene {
+// CAMBIO: Quitamos 'default' para permitir la importación con { BattleScene }
+export class BattleScene extends Phaser.Scene {
   constructor() {
     super({ key: 'BattleScene' });
     

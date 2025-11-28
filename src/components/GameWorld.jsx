@@ -1,12 +1,13 @@
-// src/components/GameWorld.jsx
 import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { MainScene } from './game/scenes/MainScene';
-import BattleScene from './game/scenes/BattleScene';
+import { BattleScene } from './game/scenes/BattleScene'; 
 import { UIOverlay } from './game/ui/UIOverlay';
+import { gameService } from '../services/gameService'; 
 import '../styles/GameWorld.css';
 
-export const GameWorld = ({ character, user, onNavigate }) => {
+// CORRECCIÓN CLAVE: Recibir la prop 'club'
+export const GameWorld = ({ character, wallet, user, club, onNavigate }) => { 
   const gameRef = useRef(null);
   const phaserGameRef = useRef(null);
   const [gameState, setGameState] = useState({
@@ -24,19 +25,19 @@ export const GameWorld = ({ character, user, onNavigate }) => {
     const config = {
       type: Phaser.AUTO,
       parent: 'game-container',
-      width: 1280,
-      height: 720,
+      width: window.innerWidth,
+      height: window.innerHeight,
       backgroundColor: '#1a1a2e',
       physics: {
         default: 'arcade',
         arcade: {
           gravity: { y: 0 },
-          debug: false
+          debug: false 
         }
       },
-      scene: [MainScene, BattleScene],
+      scene: [MainScene, BattleScene], 
       scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH
       }
     };
@@ -44,11 +45,28 @@ export const GameWorld = ({ character, user, onNavigate }) => {
     const game = new Phaser.Game(config);
     phaserGameRef.current = game;
 
-    // Pasar datos del personaje a Phaser
+    // --- INYECCIÓN DE DATOS Y SERVICIOS ---
+    
+    // 1. Datos estáticos iniciales
     game.registry.set('character', character);
     game.registry.set('user', user);
+    game.registry.set('wallet', wallet);
+    game.registry.set('clubData', club); 
+
+    // 2. Inyectar funciones de servicio para que las Escenas puedan llamar a la BD
+    game.registry.set('services', {
+      saveProgress: (characterId, x, y, loc) => gameService.saveProgress(characterId, x, y, loc),
+      getItems: () => gameService.getUserItems(user.id),
+      getClubDetails: (clubId) => gameService.getClubDetails(clubId), 
+      getRanking: () => gameService.getTopPlayers(),
+      getWallet: (characterId) => gameService.getWallet(characterId),
+      updateLupicoins: (characterId, amount) => gameService.updateLupicoins(characterId, amount),
+      addLupicoins: (characterId, amount, reason) => gameService.addLupicoins(characterId, amount, reason)
+    });
     
-    // Escuchar eventos del juego
+    // --------------------------------------
+
+    // Escuchar eventos del juego (Phaser -> React)
     game.events.on('location-entered', (location) => {
       setGameState(prev => ({
         ...prev,
@@ -63,15 +81,32 @@ export const GameWorld = ({ character, user, onNavigate }) => {
 
     game.events.on('open-minigame', (minigameType) => {
       setShowMinigame(minigameType);
+      if (game.scene.isActive('MainScene')) {
+        game.scene.pause('MainScene');
+      }
+    });
+
+    game.events.on('navigate', (destination) => {
+      onNavigate(destination);
     });
 
     return () => {
       if (phaserGameRef.current) {
+        // Guardar posición al desmontar componente
+        const mainScene = phaserGameRef.current.scene.getScene('MainScene');
+        if (mainScene && mainScene.player) {
+           gameService.saveProgress(
+             character.id, 
+             mainScene.player.x, 
+             mainScene.player.y, 
+             mainScene.currentLocation
+           );
+        }
         phaserGameRef.current.destroy(true);
         phaserGameRef.current = null;
       }
     };
-  }, [character, user]);
+  }, [character, user, club, onNavigate]); // Añadir 'club' a las dependencias si lo usas en el effect
 
   const getLocationActions = (location) => {
     const actions = {
@@ -111,7 +146,6 @@ export const GameWorld = ({ character, user, onNavigate }) => {
 
   const closeMinigame = () => {
     setShowMinigame(null);
-    // Reanudar el juego de fondo
     if (phaserGameRef.current) {
       phaserGameRef.current.scene.resume('MainScene');
     }
@@ -119,10 +153,8 @@ export const GameWorld = ({ character, user, onNavigate }) => {
 
   return (
     <div className="game-world-container">
-      {/* Canvas de Phaser */}
       <div id="game-container" ref={gameRef} />
-
-      {/* UI Overlay sobre el canvas */}
+      
       <UIOverlay
         character={character}
         gameState={gameState}
@@ -130,22 +162,21 @@ export const GameWorld = ({ character, user, onNavigate }) => {
         onAction={handleAction}
       />
 
-      {/* Minijuego Futsal en Modal */}
       {showMinigame === 'futsal' && (
         <div className="minigame-modal">
           <div className="minigame-container">
             <button className="close-minigame" onClick={closeMinigame}>
               ✕ Volver al Mundo
             </button>
-            {/* Aquí se renderiza tu TrainingDashboard */}
             <div className="minigame-content">
-              {/* Importarás y renderizarás TrainingDashboard aquí */}
+               <h2 style={{color: 'white', textAlign: 'center', marginTop: '20px'}}>
+                 Minijuego de Futsal Cargando...
+               </h2>
             </div>
           </div>
         </div>
       )}
 
-      {/* Menú de Pausa / Opciones */}
       {gameState.showMenu && (
         <div className="game-menu-overlay">
           <div className="game-menu">

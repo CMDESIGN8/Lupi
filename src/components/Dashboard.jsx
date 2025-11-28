@@ -5,7 +5,9 @@ import { ClubList } from "./clubs/ClubList";
 import { ClubCreation } from "./clubs/ClubCreation";
 import MissionList from './MissionList'; // Ajusta la ruta si es necesario
 import { MyClub } from "./clubs/MyClub";
-import "../styles/Dashboard.css";
+import { IntegratedDashboard } from "./IntegratedDashboard";
+import "../styles/Dashboard.css"; 
+
 
 export const Dashboard = ({ user, character: initialCharacter }) => {
   const [character, setCharacter] = useState(initialCharacter);
@@ -129,6 +131,27 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
             <ClubList character={character} onClubUpdate={handleClubUpdate} />
           </div>
         )}
+      </div>
+    );
+  }
+
+  // NUEVA SECCIÓN: Integrated Dashboard
+  if (currentSection === "integrateddashboard") {
+    return (
+      <div className="super-dashboard">
+        <div className="section-header">
+          <button onClick={() => setCurrentSection("dashboard")} className="btn-back epic-btn">
+            ⬅ VOLVER AL NÚCLEO
+          </button>
+          <h2 className="section-title">🚀 DASHBOARD INTEGRADO</h2>
+        </div>
+        <IntegratedDashboard 
+          user={user}
+          character={character}
+          wallet={wallet}
+          onDataUpdate={fetchData}
+          // Removemos apiClient ya que no está definido
+        />
       </div>
     );
   }
@@ -281,7 +304,7 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
                       
                       <div className="player-info">
                         <h1 className="player-name-glow">{character.nickname}</h1>
-                        <div className="player-title">DELANTERO ÉLITE</div>
+                        <div className="player-title">DELANTERO ÉLITE EN {character.club_name}</div>
                         
                         {/* Barra de Experiencia Mejorada */}
                         <div className="exp-section">
@@ -379,6 +402,18 @@ export const Dashboard = ({ user, character: initialCharacter }) => {
             <div className="btn-glow"></div>
           </button>
           
+          <button 
+            className="action-btn primary-glow"
+            onClick={() => {
+              console.log("Botón presionado - cambiando a integrateddashboard");
+              setCurrentSection("integrateddashboard");
+            }}
+          >
+            <span className="btn-icon">🎮</span>
+            <span className="btn-text">JUEGO</span>
+            <div className="btn-glow"></div>
+          </button>
+
           <button 
             className="action-btn secondary-glow"
             onClick={() => setCurrentSection("clubs")}

@@ -1,6 +1,8 @@
 /* src/styles/GameWorld.css */
 .game-world-container {
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -8,8 +10,17 @@
 }
 
 #game-container {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+}
+
+#game-container canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .minigame-modal {

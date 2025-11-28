@@ -226,15 +226,7 @@ const getBotRewards = (level) => {
         <h1>Selecciona tu Oponente</h1>
         <p>Enfrenta bots con diferentes niveles de habilidad y gana recompensas</p>
       </div>
-
-      <div className="bots-grid">
-        {bots.map(bot => (
-          <BotCard key={bot.id} bot={bot} />
-        ))}
-      </div>
-
-      {/* Leyenda de dificultad */}
-      <div className="difficulty-legend">
+    <div className="difficulty-legend">
         <div className="legend-item">
           <div className="color-indicator beginner"></div>
           <span>Principiante</span>
@@ -248,6 +240,14 @@ const getBotRewards = (level) => {
           <span>Élite</span>
         </div>
       </div>
+
+      <div className="bots-grid">
+        {bots.map(bot => (
+          <BotCard key={bot.id} bot={bot} />
+        ))}
+      </div>
+
+      {/* Leyenda de dificultad */}
     </div>
   );
 };

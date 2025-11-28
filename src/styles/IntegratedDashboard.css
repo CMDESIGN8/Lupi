@@ -235,29 +235,6 @@
   font-size: 16px;
 }
 
-.mission-preview {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.mission-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  font-size: 13px;
-}
-
-.mission-progress {
-  color: #00ff88;
-  font-weight: bold;
-}
-
 /* Panel Actions */
 .panel-actions {
   display: flex;
@@ -450,3 +427,4 @@
 .section-view::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 255, 136, 0.8);
 }
+
