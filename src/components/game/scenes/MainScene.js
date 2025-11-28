@@ -214,13 +214,26 @@ export class MainScene extends Phaser.Scene {
     try {
       // Usar la clave del spritesheet generado ('player_spritesheet')
       this.player = this.physics.add.sprite(safeX, safeY, 'player_spritesheet');
+      
+      // NUEVO: Reducir el tamaño visual del sprite (puedes ajustar este valor)
+      this.player.setScale(0.25); // Ejemplo: 256 * 0.25 = 64px de alto/ancho visual.
+
       this.player.setCollideWorldBounds(true);
       this.player.setDepth(100);
       
-      // Ajustar tamaño y offset para el frame de 64x64
-      this.player.body.setSize(30, 30);
-      this.player.body.setOffset(17, 30); // Centrado X: (64-30)/2 = 17, Y ajustado al pie.
+      // NUEVO: Ajustar tamaño y offset para el frame escalado.
+      // Si el sprite escalado tiene 64px de alto, un cuerpo de 30x30 es un buen punto de partida.
+      const bodyWidth = 256;
+      const bodyHeight = 256;
+      const spriteScale = 0.25; // Debe coincidir con el setScale de arriba
       
+  
+      
+      this.player.body.setSize(256, 256); // Tamaño del cuerpo físico en el sprite original
+      
+     
+      this.player.body.setOffset(68, 100);
+
       // Iniciar la animación idle
       this.player.play('player_idle');
 
@@ -234,10 +247,10 @@ export class MainScene extends Phaser.Scene {
     }
 
     // TEXTO DEL NICKNAME
-    this.playerNameText = this.add.text(0, 35, character?.nickname || 'Jugador', {
+    this.playerNameText = this.add.text(0, 85, character?.nickname || 'Jugador', {
       fontSize: '17px',
       fontFamily: 'Arial',
-      color: '#ffffff',
+      color: '#ffffffff',
       stroke: '#000000',
       strokeThickness: 3,
       fontWeight: 'bold',
@@ -258,7 +271,7 @@ export class MainScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(101);
     
     // BARRA DE ESTAMINA
-    this.energyBarBg = this.add.rectangle(0, 75, 50, 6, 0x333333).setDepth(101);
+    this.energyBarBg = this.add.rectangle(0, 95, 50, 6, 0x333333).setDepth(101);
     this.energyBarBg.setOrigin(0, 0.5);
     
     this.energyBar = this.add.rectangle(0, 75, 50, 6, 0x00ff88).setDepth(102);
@@ -865,88 +878,85 @@ export class MainScene extends Phaser.Scene {
 
   // 4. REFECTORIZACIÓN DE update (Movimiento y Animación)
   update() {
-  if (!this.player || !this.player.body) return;
-  
-  // Restablecer velocidad en cada ciclo
-  this.player.body.setVelocity(0);
-  
-  // Detectar si está corriendo (SHIFT presionado)
-  const isRunning = this.keys.shift.isDown;
-  const speed = isRunning ? 300 : 200; // Correr es más rápido
-  
-  let moving = false;
-  let direction = this.player.getData('lastDirection') || 'down'; // Usar última dirección como punto de partida
-  
-  // Movimiento Horizontal
-  if (this.cursors.left.isDown || this.keys.a.isDown) {
-    this.player.body.setVelocityX(-speed);
-    direction = 'left';
-    moving = true;
-  } else if (this.cursors.right.isDown || this.keys.d.isDown) {
-    this.player.body.setVelocityX(speed);
-    direction = 'right';
-    moving = true;
-  }
-  
-  // Movimiento Vertical
-  if (this.cursors.up.isDown || this.keys.w.isDown) {
-    this.player.body.setVelocityY(-speed);
-    direction = 'up';
-    moving = true;
-  } else if (this.cursors.down.isDown || this.keys.s.isDown) {
-    this.player.body.setVelocityY(speed);
-    direction = 'down';
-    moving = true;
-  }
-  
-  // Normalizar velocidad diagonal
-  if (this.player.body.velocity.x !== 0 && this.player.body.velocity.y !== 0) {
-    this.player.body.velocity.normalize().scale(speed);
-  }
-  
-  // ==================== SISTEMA DE ANIMACIONES (Adaptado a LPC) ====================
-  
-  // ¡IMPORTANTE! LPC tiene sprites separados para 'left' y 'right', no necesitamos voltear.
-  this.player.setFlipX(false); 
-  
-  if (moving) {
-    // Decidir entre caminar o correr
-    const moveType = isRunning ? 'run' : 'walk';
-    
-    // La clave se construye dinámicamente: player_walk_down, player_run_up, etc.
-    const animKey = `player_${moveType}_${direction}`;
-    
-    // Reproducir animación si es diferente
-    if (this.player.anims.currentAnim?.key !== animKey) {
-      this.player.play(animKey, true);
-    }
-    
-    // Guardar última dirección
-    this.player.setData('lastDirection', direction);
-    
-  } else {
-    // IDLE - usar la última dirección conocida
-    const lastDir = this.player.getData('lastDirection') || 'down';
-    
-    // Construir la clave de Idle usando la dirección guardada.
-    // Usamos 'down' como fallback para 'idle' genérico.
-    let animKey = `player_idle_${lastDir}`;
-    
-    // En el caso de que 'lastDir' sea indefinido o 'down', usa 'player_idle_down'
-    if (lastDir === 'down' && this.player.anims.currentAnim?.key === 'player_idle') {
-      // Caso especial para corregir si el fallback genérico 'player_idle' (que creaste) estaba activo
-      animKey = 'player_idle_down';
-    }
+ if (!this.player || !this.player.body) return;
+ 
+ // Restablecer velocidad en cada ciclo
+ this.player.body.setVelocity(0);
+ 
+ // Detectar si está corriendo (SHIFT presionado)
+ const isRunning = this.keys.shift.isDown;
+ const speed = isRunning ? 300 : 200; // Correr es más rápido
+ 
+ let moving = false;
+// Resetear la velocidad horizontal y vertical antes de calcular el nuevo movimiento
+    this.player.body.setVelocity(0);
+ let direction = this.player.getData('lastDirection') || 'down'; // Usar última dirección como punto de partida
+ 
+ // Movimiento Horizontal
+ if (this.cursors.left.isDown || this.keys.a.isDown) {
+  this.player.body.setVelocityX(-speed);
+  direction = 'left';
+  moving = true;
+  this.player.setFlipX(false);
+ } else if (this.cursors.right.isDown || this.keys.d.isDown) {
+  this.player.body.setVelocityX(speed);
+  direction = 'right';
+  moving = true;
+  this.player.setFlipX(false);
+ }
+ 
+ // Movimiento Vertical
+ if (this.cursors.up.isDown || this.keys.w.isDown) {
+  this.player.body.setVelocityY(-speed);
+  direction = 'up';
+  moving = true;
+ } else if (this.cursors.down.isDown || this.keys.s.isDown) {
+  this.player.body.setVelocityY(speed);
+  direction = 'down';
+  moving = true;
+ }
+ 
+ // Normalizar velocidad diagonal
+ if (this.player.body.velocity.x !== 0 && this.player.body.velocity.y !== 0) {
+  this.player.body.velocity.normalize().scale(speed);
+ }
+ 
+ // ==================== SISTEMA DE ANIMACIONES (Adaptado a LPC) ====================
+ 
+ // ¡IMPORTANTE! LPC tiene sprites separados para 'left' y 'right', no necesitamos voltear.
+ 
+ if (moving) {
+  // Decidir entre caminar o correr
+  const moveType = isRunning ? 'run' : 'walk';
+  
+  // La clave se construye dinámicamente: player_walk_down, player_run_up, etc.
+  const animKey = `player_${moveType}_${direction}`;
 
-    if (this.player.anims.currentAnim?.key !== animKey) {
-      this.player.play(animKey, true);
-    }
-  }
-  
-  // Actualizar UI y sistemas
-  this.updatePlayerUI();
-  this.checkInteractionZones();
-  this.checkNearbyNPCs();
+  // Reproducir animación si es diferente
+  if (this.player.anims.currentAnim?.key !== animKey) {
+   this.player.play(animKey, true);
+  }
+  
+  // Guardar última dirección
+  this.player.setData('lastDirection', direction);
+  
+ } else {
+
+  const lastDir = this.player.getData('lastDirection') || 'down';
+  let animKey = `player_idle_${lastDir}`;
+  if (lastDir === 'down' && this.player.anims.currentAnim?.key === 'player_idle') {
+   animKey = 'player_idle_down';
+  }
+
+  if (this.player.anims.currentAnim?.key !== animKey) {
+   this.player.play(animKey, true);
+  }
+ }
+ 
+ // Actualizar UI y sistemas
+ this.updatePlayerUI();
+ this.checkInteractionZones();
+ this.checkNearbyNPCs();
 }
 
 // NUEVO: Método para manejar ataques
@@ -978,7 +988,6 @@ handleAttack() {
       break;
   }
   
-  this.player.setFlipX(flipX);
   this.player.play(attackAnim);
   
   // Crear efecto visual del ataque
@@ -1064,10 +1073,10 @@ showHurtEffect() {
   updatePlayerUI() {
     const character = this.player.getData('character');
     
-    this.playerNameText.setPosition(this.player.x, this.player.y + 35);
+    this.playerNameText.setPosition(this.player.x, this.player.y + 45);
     
     if (this.playerClubText) {
-      this.playerClubText.setPosition(this.player.x, this.player.y + 55);
+      this.playerClubText.setPosition(this.player.x, this.player.y + 60);
     }
     
     const energyPercent = (character?.energia || 100) / 100;
