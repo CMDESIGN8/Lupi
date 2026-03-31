@@ -1,6 +1,15 @@
 import { supabase } from './supabaseClient';
 import { POINTS_PER_TICKET } from './constants';
 
+// Add missing RegisterData type
+export interface RegisterData {
+  email: string;
+  username: string;
+  club: string;
+  password: string;
+  referralCode?: string;
+}
+
 // Types
 export interface AppUser {
   id: string;
@@ -42,103 +51,111 @@ export interface Notification {
   created_at: string;
 }
 
+// Add type for ticket parameter
+interface TicketFromDB {
+  id: string;
+  ticket_number: string;
+  user_id: string;
+  club: string;
+  status: 'pendiente' | 'participando' | 'ganador' | 'invalido';
+  created_at: string;
+}
+
 export const api = {
-  
-  // En src/lib/api.ts, actualiza la función register
-register: async ({ email, username, club, password, referralCode }: RegisterData): Promise<AppUser> => {
-  console.log('🔵 Iniciando registro con datos:', { email, username, club, referralCode });
-  
-  // 1. Verificar si el username existe
-  const { data: existingUsername } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('username', username)
-    .maybeSingle();
-
-  if (existingUsername) {
-    throw new Error('El nombre de usuario ya existe.');
-  }
-
-  // 2. Crear usuario en auth
-  console.log('🟡 Creando usuario en auth...');
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { 
-        username, 
-        club
-      }
-    }
-  });
-
-  if (authError) {
-    console.error('🔴 Error en auth:', authError);
-    throw new Error(authError.message);
-  }
-  
-  if (!authData.user) {
-    throw new Error('Error creating user');
-  }
-  
-  console.log('🟢 Usuario creado en auth:', authData.user.id);
-
-  // 3. Esperar a que el trigger cree el perfil
-  console.log('🟡 Esperando creación de perfil...');
-  await new Promise(resolve => setTimeout(resolve, 2000));
-
-  // 4. Obtener el perfil creado
-  const { data: profileData, error: profileError } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', authData.user.id)
-    .single();
-
-  if (profileError) {
-    console.error('🔴 Error obteniendo perfil:', profileError);
-    throw new Error('Error al crear el perfil');
-  }
-  
-  console.log('🟢 Perfil creado:', profileData);
-
-  // 5. Procesar referido si existe
-  if (referralCode && referralCode.trim() !== '') {
-    console.log('🟡 Procesando referido con código:', referralCode.toUpperCase());
+  register: async ({ email, username, club, password, referralCode }: RegisterData): Promise<AppUser> => {
+    console.log('🔵 Iniciando registro con datos:', { email, username, club, referralCode });
     
-    try {
-      const { data: referralResult, error: referralError } = await supabase
-        .rpc('process_referral', {
-          p_referred_id: authData.user.id,
-          p_referral_code: referralCode.toUpperCase()
-        });
-      
-      if (referralError) {
-        console.error('🔴 Error en process_referral RPC:', referralError);
-        console.error('Detalle del error:', JSON.stringify(referralError, null, 2));
-      } else {
-        console.log('🟢 Resultado del referido:', referralResult);
-      }
-    } catch (error) {
-      console.error('🔴 Excepción en process_referral:', error);
+    // 1. Verificar si el username existe
+    const { data: existingUsername } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('username', username)
+      .maybeSingle();
+
+    if (existingUsername) {
+      throw new Error('El nombre de usuario ya existe.');
     }
-  } else {
-    console.log('🟡 No hay código de referido para procesar');
-  }
 
-  // 6. Obtener el perfil actualizado
-  const { data: updatedProfile, error: updatedError } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', authData.user.id)
-    .single();
+    // 2. Crear usuario en auth
+    console.log('🟡 Creando usuario en auth...');
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { 
+          username, 
+          club
+        }
+      }
+    });
 
-  if (!updatedError && updatedProfile) {
-    console.log('🟢 Perfil final:', updatedProfile);
-    return updatedProfile;
-  }
+    if (authError) {
+      console.error('🔴 Error en auth:', authError);
+      throw new Error(authError.message);
+    }
+    
+    if (!authData.user) {
+      throw new Error('Error creating user');
+    }
+    
+    console.log('🟢 Usuario creado en auth:', authData.user.id);
 
-  return profileData;
-},
+    // 3. Esperar a que el trigger cree el perfil
+    console.log('🟡 Esperando creación de perfil...');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // 4. Obtener el perfil creado
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (profileError) {
+      console.error('🔴 Error obteniendo perfil:', profileError);
+      throw new Error('Error al crear el perfil');
+    }
+    
+    console.log('🟢 Perfil creado:', profileData);
+
+    // 5. Procesar referido si existe
+    if (referralCode && referralCode.trim() !== '') {
+      console.log('🟡 Procesando referido con código:', referralCode.toUpperCase());
+      
+      try {
+        const { data: referralResult, error: referralError } = await supabase
+          .rpc('process_referral', {
+            p_referred_id: authData.user.id,
+            p_referral_code: referralCode.toUpperCase()
+          });
+        
+        if (referralError) {
+          console.error('🔴 Error en process_referral RPC:', referralError);
+          console.error('Detalle del error:', JSON.stringify(referralError, null, 2));
+        } else {
+          console.log('🟢 Resultado del referido:', referralResult);
+        }
+      } catch (error) {
+        console.error('🔴 Excepción en process_referral:', error);
+      }
+    } else {
+      console.log('🟡 No hay código de referido para procesar');
+    }
+
+    // 6. Obtener el perfil actualizado
+    const { data: updatedProfile, error: updatedError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authData.user.id)
+      .single();
+
+    if (!updatedError && updatedProfile) {
+      console.log('🟢 Perfil final:', updatedProfile);
+      return updatedProfile;
+    }
+
+    return profileData;
+  },
 
   // Login
   login: async ({ email, password }: { email: string; password: string }): Promise<AppUser> => {
@@ -184,135 +201,134 @@ register: async ({ email, username, club, password, referralCode }: RegisterData
   },
 
   // Submit ticket
-  // Submit ticket
-submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ ticket: Ticket; newPoints: number }> => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('No session found');
+  submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ ticket: Ticket; newPoints: number }> => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error('No session found');
 
-  const userId = session.user.id;
-  const clean = ticketNumber.trim().replace(/\s/g, "");
-  
-  if (!/^\d{6,12}$/.test(clean)) {
-    throw new Error("El número de entrada debe tener entre 6 y 12 dígitos.");
-  }
+    const userId = session.user.id;
+    const clean = ticketNumber.trim().replace(/\s/g, "");
+    
+    if (!/^\d{6,12}$/.test(clean)) {
+      throw new Error("El número de entrada debe tener entre 6 y 12 dígitos.");
+    }
 
-  // Calcular inicio de semana (domingo)
-  const now = new Date();
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay());
-  startOfWeek.setHours(0, 0, 0, 0);
-  
-  // Formatear fecha para Supabase (ISO string sin milisegundos)
-  const startOfWeekISO = startOfWeek.toISOString().split('.')[0];
+    // Calcular inicio de semana (domingo)
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    // Formatear fecha para Supabase (ISO string sin milisegundos)
+    const startOfWeekISO = startOfWeek.toISOString().split('.')[0];
 
-  // VERIFICACIÓN 1: ¿Ya cargó un ticket esta semana con el mismo número?
-  const { data: weeklyTicket, error: weeklyError } = await supabase
-    .from('tickets')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('ticket_number', clean)
-    .gte('created_at', startOfWeekISO);
+    // VERIFICACIÓN 1: ¿Ya cargó un ticket esta semana con el mismo número?
+    const { data: weeklyTicket, error: weeklyError } = await supabase
+      .from('tickets')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('ticket_number', clean)
+      .gte('created_at', startOfWeekISO);
 
-  if (weeklyError) {
-    console.error('Error checking weekly ticket:', weeklyError);
-  }
+    if (weeklyError) {
+      console.error('Error checking weekly ticket:', weeklyError);
+    }
 
-  if (weeklyTicket && weeklyTicket.length > 0) {
-    throw new Error("Ya cargaste una entrada esta semana.");
-  }
+    if (weeklyTicket && weeklyTicket.length > 0) {
+      throw new Error("Ya cargaste una entrada esta semana.");
+    }
 
-  // VERIFICACIÓN 2: ¿El número de ticket ya existe en el sistema?
-  const { data: existingTicket, error: existingError } = await supabase
-    .from('tickets')
-    .select('id')
-    .eq('ticket_number', clean);
+    // VERIFICACIÓN 2: ¿El número de ticket ya existe en el sistema?
+    const { data: existingTicket, error: existingError } = await supabase
+      .from('tickets')
+      .select('id')
+      .eq('ticket_number', clean);
 
-  if (existingError) {
-    console.error('Error checking existing ticket:', existingError);
-  }
+    if (existingError) {
+      console.error('Error checking existing ticket:', existingError);
+    }
 
-  if (existingTicket && existingTicket.length > 0) {
-    throw new Error("Este número de entrada ya fue registrado.");
-  }
+    if (existingTicket && existingTicket.length > 0) {
+      throw new Error("Este número de entrada ya fue registrado.");
+    }
 
-  // Get user profile data
-  const { data: profileData, error: profileError } = await supabase
-    .from('profiles')
-    .select('club, points')
-    .eq('id', userId)
-    .single();
+    // Get user profile data
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('club, points')
+      .eq('id', userId)
+      .single();
 
-  if (profileError) {
-    console.error('Error fetching profile:', profileError);
-    throw new Error("Usuario no encontrado.");
-  }
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
+      throw new Error("Usuario no encontrado.");
+    }
 
-  // Create ticket
-  const { data: ticket, error: ticketError } = await supabase
-    .from('tickets')
-    .insert({
-      user_id: userId,
-      ticket_number: clean,
-      club: profileData.club,
-      status: "pendiente"
-    })
-    .select()
-    .single();
+    // Create ticket
+    const { data: ticket, error: ticketError } = await supabase
+      .from('tickets')
+      .insert({
+        user_id: userId,
+        ticket_number: clean,
+        club: profileData.club,
+        status: "pendiente"
+      })
+      .select()
+      .single();
 
-  if (ticketError) {
-    console.error('Error creating ticket:', ticketError);
-    throw new Error("Error al registrar la entrada.");
-  }
+    if (ticketError) {
+      console.error('Error creating ticket:', ticketError);
+      throw new Error("Error al registrar la entrada.");
+    }
 
-  // Update user points
-  const newPoints = (profileData.points || 0) + POINTS_PER_TICKET;
-  const { data: updatedProfile, error: updateError } = await supabase
-    .from('profiles')
-    .update({ points: newPoints })
-    .eq('id', userId)
-    .select()
-    .single();
+    // Update user points
+    const newPoints = (profileData.points || 0) + POINTS_PER_TICKET;
+    const { data: updatedProfile, error: updateError } = await supabase
+      .from('profiles')
+      .update({ points: newPoints })
+      .eq('id', userId)
+      .select()
+      .single();
 
-  if (updateError) {
-    console.error('Error updating points:', updateError);
-    throw new Error("Error al actualizar puntos.");
-  }
+    if (updateError) {
+      console.error('Error updating points:', updateError);
+      throw new Error("Error al actualizar puntos.");
+    }
 
-  return {
-    ticket: {
+    return {
+      ticket: {
+        id: ticket.id,
+        ticketNumber: ticket.ticket_number,
+        userId: ticket.user_id,
+        club: ticket.club,
+        status: ticket.status,
+        createdAt: ticket.created_at
+      },
+      newPoints: updatedProfile.points
+    };
+  },
+
+  // Get user tickets
+  getUserTickets: async (userId: string): Promise<Ticket[]> => {
+    const { data, error } = await supabase
+      .from('tickets')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching user tickets:', error);
+      throw error;
+    }
+
+    return (data || []).map((ticket: TicketFromDB) => ({
       id: ticket.id,
       ticketNumber: ticket.ticket_number,
       userId: ticket.user_id,
       club: ticket.club,
       status: ticket.status,
       createdAt: ticket.created_at
-    },
-    newPoints: updatedProfile.points
-  };
-},
-
-  // Get user tickets
-getUserTickets: async (userId: string): Promise<Ticket[]> => {
-  const { data, error } = await supabase
-    .from('tickets')
-    .select('*')
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching user tickets:', error);
-    throw error;
-  }
-
-  return (data || []).map(ticket => ({
-    id: ticket.id,
-    ticketNumber: ticket.ticket_number,
-    userId: ticket.user_id,
-    club: ticket.club,
-    status: ticket.status,
-    createdAt: ticket.created_at
-  }));
-},
+    }));
+  },
 
   // Get leaderboard
   getLeaderboard: async (): Promise<LeaderEntry[]> => {
@@ -384,8 +400,8 @@ getUserTickets: async (userId: string): Promise<Ticket[]> => {
           table: 'notifications',
           filter: `user_id=eq.${userId}`
         },
-        (payload) => {
-          callback(payload.new as Notification);
+        (payload: { new: Notification }) => {
+          callback(payload.new);
         }
       )
       .subscribe();

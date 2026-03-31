@@ -6,6 +6,13 @@ interface ReferralPanelProps {
   userId: string;
 }
 
+// Add proper types
+interface ReferralData {
+  code: string;
+  count: number;
+  points: number;
+}
+
 export function ReferralPanel({ userId }: ReferralPanelProps) {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
