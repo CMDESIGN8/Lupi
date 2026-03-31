@@ -190,7 +190,7 @@ const styles = `
   .loading-logo { font-family: var(--font-display); font-size: 48px; letter-spacing: 4px; }
   .loading-logo span { color: var(--accent); }
   .spinner-lg { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
- /* Estilos mejorados para el scanner */
+ /* Estilos mejorados para el scanner con scroll */
 .scanner-modal {
   position: fixed;
   top: 0;
@@ -203,17 +203,23 @@ const styles = `
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.2s ease;
+  padding: 16px;
 }
 
 .scanner-container {
-  width: 90%;
-  max-width: 450px;
+  width: 100%;
+  max-width: 500px;
+  height: 90vh;
+  max-height: 700px;
   background: var(--surface);
   border-radius: 24px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
+/* Header fijo */
 .scanner-header {
   display: flex;
   justify-content: space-between;
@@ -221,6 +227,7 @@ const styles = `
   padding: 16px 20px;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
+  flex-shrink: 0;
 }
 
 .scanner-header h3 {
@@ -251,35 +258,119 @@ const styles = `
   color: var(--text);
 }
 
-.scanner-guide-text {
-  text-align: center;
-  padding: 16px;
-  color: var(--text2);
-  font-size: 14px;
-  border-top: 1px solid var(--border);
+/* Área con scroll */
+.scanner-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
 }
 
-.scanner-actions {
-  display: flex;
-  gap: 12px;
-  padding: 16px 20px 20px;
-  border-top: 1px solid var(--border);
-}
-
-/* Mejoras para el componente html5-qrcode */
-#qr-scanner-container {
+/* Vista del scanner */
+.scanner-view {
   background: #000;
+  min-height: 300px;
+  width: 100%;
+  position: relative;
+}
+
+#qr-scanner-container {
+  width: 100%;
   min-height: 300px;
 }
 
 #qr-scanner-container video {
-  border-radius: 12px;
   width: 100% !important;
   height: auto !important;
+  object-fit: cover;
 }
 
 #qr-scanner-container div {
   margin: 0 auto;
+}
+
+/* Instrucciones */
+.scanner-instructions {
+  padding: 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.instruction-icon {
+  font-size: 32px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.instruction-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.instruction-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+
+.instruction-list li {
+  padding: 6px 0;
+  color: var(--text2);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instruction-list li::before {
+  content: "•";
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.instruction-note {
+  background: rgba(24, 157, 245, 0.1);
+  border: 1px solid rgba(24, 157, 245, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 12px;
+  color: var(--accent);
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* Footer con botones fijos */
+.scanner-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.scanner-footer .btn {
+  flex: 1;
+}
+
+/* Alert dentro del scroll */
+.alert {
+  margin: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-error {
+  background: rgba(255, 77, 109, 0.12);
+  border: 1px solid rgba(255, 77, 109, 0.3);
+  color: var(--accent2);
 }
 
 /* Animaciones */
@@ -291,6 +382,22 @@ const styles = `
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* Responsive para móviles pequeños */
+@media (max-width: 480px) {
+  .scanner-container {
+    height: 85vh;
+    max-height: none;
+  }
+  
+  .scanner-view {
+    min-height: 250px;
+  }
+  
+  .instruction-list li {
+    font-size: 12px;
   }
 }
 `;
@@ -490,6 +597,7 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
   const [showScanner, setShowScanner] = useState(false); // Nuevo estado
+  
 
   const loadTickets = useCallback(async () => {
     try {
@@ -537,11 +645,30 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   };
 
   const handleScan = (scannedNumber: string) => {
-    setTicketNumber(scannedNumber);
-    setShowScanner(false);
-    // Opcional: auto-enviar después de escanear
-    setTimeout(() => handleSubmit(scannedNumber), 100);
-  };
+  // Asegurar que solo hay números
+  const cleanNumber = scannedNumber.replace(/[^0-9]/g, '');
+  
+  console.log('Número escaneado y limpio:', cleanNumber);
+  
+  setTicketNumber(cleanNumber);
+  setShowScanner(false);
+  
+  // Mostrar feedback visual
+  showToast(`✅ Código escaneado: ${cleanNumber}`, 'success');
+  
+  // Auto-enviar después de escanear
+  setTimeout(() => handleSubmit(cleanNumber), 500);
+};
+
+// Función auxiliar para toasts
+const showToast = (message: string, type: 'success' | 'error') => {
+  // Podés implementar un toast simple o usar una librería
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.textContent = message;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+};
 
   return (
     <div className="main-content">
