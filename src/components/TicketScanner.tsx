@@ -1,5 +1,5 @@
 // src/components/TicketScanner.tsx
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect  } from 'react';
 import { createWorker } from 'tesseract.js';
 
 interface TicketScannerProps {
