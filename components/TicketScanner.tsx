@@ -16,30 +16,31 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
   const streamRef = useRef<MediaStream | null>(null);
 
   // Función para extraer números de 8-12 dígitos del texto
-  const extractTicketNumber = (text: string): string | null => {
-    // Buscar números de 8 a 12 dígitos consecutivos
-    const patterns = [
-      /\b(\d{8,12})\b/g,  // Números aislados de 8-12 dígitos
-      /(\d{8,12})/g        // Cualquier número de 8-12 dígitos
-    ];
-    
-    for (const pattern of patterns) {
-      const matches = text.match(pattern);
-      if (matches && matches.length > 0) {
-        // Tomar el primer número válido
-        return matches[0];
-      }
-    }
-    
-    // Si no encuentra números de 8-12, buscar cualquier número de 6+ dígitos
-    const fallbackPattern = /\b(\d{6,})\b/g;
-    const fallbackMatch = text.match(fallbackPattern);
-    if (fallbackMatch) {
-      return fallbackMatch[0];
-    }
-    
-    return null;
-  };
+  // En extractTicketNumber, agregá:
+const extractTicketNumber = (text: string): string | null => {
+  console.log('🔍 Texto completo recibido:', text);
+  console.log('📏 Longitud del texto:', text.length);
+  
+  // Mostrar todos los números encontrados
+  const allNumbers = text.match(/\d+/g);
+  console.log('🔢 Todos los números encontrados:', allNumbers);
+  
+  // Buscar números de 8-12 dígitos
+  const longPattern = /\b(\d{8,12})\b/g;
+  const longMatches = text.match(longPattern);
+  console.log('📊 Números de 8-12 dígitos:', longMatches);
+  
+  if (longMatches && longMatches.length > 0) {
+    return longMatches[0];
+  }
+  
+  // Fallback: buscar cualquier número de 6+ dígitos
+  const fallbackPattern = /\b(\d{6,})\b/g;
+  const fallbackMatch = text.match(fallbackPattern);
+  console.log('⚠️ Fallback (6+ dígitos):', fallbackMatch);
+  
+  return fallbackMatch ? fallbackMatch[0] : null;
+};
 
   // Función para procesar imagen con OCR
   const processImage = async (imageFile: File | string) => {
@@ -156,14 +157,14 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
   };
 
   // Iniciar cámara al montar
-  useState(() => {
-    takePhoto();
-    return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
+  useEffect(() => {
+  takePhoto();
+  return () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+  };
+}, []);
 
   return (
     <div className="scanner-modal">
