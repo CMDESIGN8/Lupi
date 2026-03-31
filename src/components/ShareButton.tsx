@@ -113,7 +113,7 @@ Descargá LupiApp: ${window.location.origin}`;
         showToast('📱 Copiado al portapapeles. Abrí Instagram y pegá el texto.', 'info');
         
         // Mostrar modal con instrucciones
-        setShowInstagramGuide(true);
+        
       }, 500);
       
       setShowSocialOptions(false);
@@ -131,7 +131,7 @@ Descargá LupiApp: ${window.location.origin}`;
         showToast('📱 Copiado al portapapeles. Abrí TikTok y pegá el texto.', 'info');
         
         // Mostrar modal con instrucciones
-        setShowTikTokGuide(true);
+        
       }, 500);
       
       setShowSocialOptions(false);
