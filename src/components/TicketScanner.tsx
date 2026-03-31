@@ -111,7 +111,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       // Configurar parámetros para mejor reconocimiento
       await worker.setParameters({
         tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        tessedit_pageseg_mode: '6', // Modo para texto uniforme
+        tessedit_pageseg_mode: 6, // Modo para texto uniforme
         preserve_interword_spaces: '0',
         textord_force_make_prop_words: '1',
       });
