@@ -237,7 +237,7 @@ function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
           password: form.password,
           username: form.username,
           club: form.club,
-          referralCode: form.referralCode || null
+          referralCode: form.referralCode || undefined
         });
         onAuth(user);
       }
@@ -248,7 +248,7 @@ function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
     }
   };
 
-  return (
+return (
     <div className="auth-screen">
       <div className="container">
         <div className="auth-logo">
@@ -582,6 +582,11 @@ export default function App() {
   const [tab, setTab] = useState<Tab>("home");
   const [hydrated, setHydrated] = useState(false);
 
+  // Create a wrapper function to handle navigation from DashboardTab
+  const handleNavigate = useCallback((tabName: string) => {
+    setTab(tabName as Tab);
+  }, []);
+
   // Restaurar sesión al iniciar
   useEffect(() => {
     api.getSession().then((u) => {
@@ -628,10 +633,10 @@ export default function App() {
               </div>
             </header>
 
-            {tab === "home"    && <DashboardTab user={user} onNavigate={setTab} />}
+            {tab === "home"    && <DashboardTab user={user} onNavigate={handleNavigate} />}
             {tab === "ticket"  && <TicketTab user={user} onPointsUpdate={handlePointsUpdate} />}
             {tab === "ranking" && <LeaderboardTab user={user} />}
-            {tab === "profile" && <ProfileTab user={user} onLogout={handleLogout} /> }
+            {tab === "profile" && <ProfileTab user={user} onLogout={handleLogout} />}
             
 
             <nav className="bottom-nav">
