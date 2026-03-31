@@ -3,6 +3,8 @@ import { api, AppUser, Ticket, LeaderEntry } from "./lib/api";
 import { CLUBS } from "./lib/constants";
 import { Notifications } from './components/Notifications';
 import { ReferralPanel } from './components/ReferralPanel';
+import { TicketScanner } from './components/TicketScanner';
+
 
 
 // ============================================================
@@ -188,6 +190,109 @@ const styles = `
   .loading-logo { font-family: var(--font-display); font-size: 48px; letter-spacing: 4px; }
   .loading-logo span { color: var(--accent); }
   .spinner-lg { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
+ /* Estilos mejorados para el scanner */
+.scanner-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.scanner-container {
+  width: 90%;
+  max-width: 450px;
+  background: var(--surface);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.scanner-header h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin: 0;
+  color: var(--text);
+}
+
+.scanner-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.scanner-close:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.scanner-guide-text {
+  text-align: center;
+  padding: 16px;
+  color: var(--text2);
+  font-size: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.scanner-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--border);
+}
+
+/* Mejoras para el componente html5-qrcode */
+#qr-scanner-container {
+  background: #000;
+  min-height: 300px;
+}
+
+#qr-scanner-container video {
+  border-radius: 12px;
+  width: 100% !important;
+  height: auto !important;
+}
+
+#qr-scanner-container div {
+  margin: 0 auto;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 `;
 
 // ============================================================
@@ -384,6 +489,7 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   const [success, setSuccess] = useState("");
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
+  const [showScanner, setShowScanner] = useState(false); // Nuevo estado
 
   const loadTickets = useCallback(async () => {
     try {
@@ -398,34 +504,102 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
 
   useEffect(() => { loadTickets(); }, [loadTickets]);
 
-  const handleSubmit = async () => {
-    setError(""); setSuccess("");
-    if (!ticketNumber.trim()) { setError("Ingresá el número de tu entrada."); return; }
+  const handleSubmit = async (number?: string) => {
+    const ticketToSubmit = number || ticketNumber;
+    
+    setError(""); 
+    setSuccess("");
+    
+    if (!ticketToSubmit.trim()) { 
+      setError("Ingresá o escaneá el número de tu entrada."); 
+      return; 
+    }
+    
     setLoading(true);
     try {
-      const res = await api.submitTicket({ ticketNumber });
+      const res = await api.submitTicket({ ticketNumber: ticketToSubmit });
       setSuccess(`¡Entrada cargada! Sumaste 10 puntos. Total: ${res.newPoints} pts 🎉`);
       setTicketNumber("");
       loadTickets();
       onPointsUpdate(res.newPoints);
+      
+      // Feedback háptico
+      if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+      }
+      
     } catch (e: any) {
       setError(e.message);
     } finally {
       setLoading(false);
+      setShowScanner(false); // Cerrar scanner si estaba abierto
     }
+  };
+
+  const handleScan = (scannedNumber: string) => {
+    setTicketNumber(scannedNumber);
+    setShowScanner(false);
+    // Opcional: auto-enviar después de escanear
+    setTimeout(() => handleSubmit(scannedNumber), 100);
   };
 
   return (
     <div className="main-content">
       <div className="container">
+        {/* Scanner Modal */}
+        {showScanner && (
+          <TicketScanner 
+            onScan={handleScan}
+            onClose={() => setShowScanner(false)}
+          />
+        )}
+
         <div className="section-title fade-up">🎟️ Cargar entrada</div>
 
         <div className="ticket-card fade-up">
           <div className="ticket-info-box">
-            Ingresá el <strong>número impreso en tu entrada</strong> para participar por entradas gratis. Cada entrada suma <strong>+10 puntos</strong>.
+            Escaneá el <strong>código QR de tu entrada</strong> o ingresá el número manualmente. 
+            Cada entrada suma <strong>+10 puntos</strong>.
           </div>
+          
           <Alert type="error" msg={error} />
           <Alert type="success" msg={success} />
+          
+          {/* Botón de escanear - Principal */}
+          <button 
+            className="btn btn-primary" 
+            onClick={() => setShowScanner(true)}
+            style={{ 
+              marginBottom: 16,
+              background: 'linear-gradient(135deg, var(--accent), #0f6bc0)'
+            }}
+          >
+            📷 ESCANEAR QR
+          </button>
+          
+          {/* Divider con texto */}
+          <div style={{ 
+            textAlign: 'center', 
+            margin: '16px 0', 
+            position: 'relative',
+            color: 'var(--text2)',
+            fontSize: 12,
+            fontWeight: 600,
+            textTransform: 'uppercase'
+          }}>
+            <span style={{ background: 'var(--surface)', padding: '0 12px' }}>O INGRESÁ MANUALMENTE</span>
+            <div style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: 0, 
+              right: 0, 
+              height: 1, 
+              background: 'var(--border)',
+              zIndex: -1
+            }} />
+          </div>
+          
+          {/* Input manual */}
           <div className="form-group">
             <label className="form-label">Número de entrada</label>
             <input
@@ -434,42 +608,61 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
               value={ticketNumber}
               onChange={(e) => setTicketNumber(e.target.value)}
               maxLength={12}
-              style={{ fontSize: 22, fontFamily: "var(--font-display)", letterSpacing: 4, textAlign: "center" }}
+              style={{ 
+                fontSize: 22, 
+                fontFamily: "var(--font-display)", 
+                letterSpacing: 4, 
+                textAlign: "center",
+                textTransform: 'uppercase'
+              }}
             />
           </div>
-          <button className="btn btn-primary" onClick={handleSubmit} disabled={loading} style={{ marginTop: 8 }}>
-            {loading ? <><div className="spinner" />Verificando...</> : "REGISTRAR ENTRADA"}
+          
+          <button 
+            className="btn btn-ghost" 
+            onClick={() => handleSubmit()} 
+            disabled={loading} 
+            style={{ marginTop: 8 }}
+          >
+            {loading ? <><div className="spinner" />Verificando...</> : "REGISTRAR ENTRADA MANUAL"}
           </button>
         </div>
 
+        {/* Resto del componente igual... */}
         <div className="section-title fade-up">📋 Mis entradas ({tickets.length})</div>
         {loadingTickets ? (
           <div className="empty-state"><div className="spinner" style={{ margin: "0 auto", borderTopColor: "var(--accent)", borderColor: "var(--border)" }} /></div>
         ) : tickets.length === 0 ? (
-          <div className="empty-state fade-up"><div className="empty-icon">🎟️</div><div className="empty-text">Todavía no cargaste ninguna entrada.</div></div>
+          <div className="empty-state fade-up">
+            <div className="empty-icon">🎟️✨</div>
+            <div className="empty-text">¡Escaneá tu primera entrada!</div>
+            <div className="empty-subtext" style={{ fontSize: 13, color: 'var(--text2)', marginTop: 8 }}>
+              Usá la cámara para escanear el código QR<br />
+              y comenzá a sumar puntos
+            </div>
+          </div>
         ) : (
           tickets.map((t) => (
             <div key={t.id} className="ticket-item fade-up">
-    <div>
-      <div className="ticket-number"># {t.ticketNumber}</div>
-      <div className="ticket-meta">{formatDate(t.createdAt)}</div>
-    </div>
-    <div>
-      <span className={`ticket-badge badge-${t.status}`}>
-        {t.status === 'pendiente' && '⏳ Pendiente de validación'}
-        {t.status === 'participando' && '🎯 ¡Participando en sorteo!'}
-        {t.status === 'ganador' && '🏆 ¡ENTRADA GANADORA!'}
-        {t.status === 'invalido' && '❌ Inválida'}
-      </span>
-    </div>
-  </div>
+              <div>
+                <div className="ticket-number"># {t.ticketNumber}</div>
+                <div className="ticket-meta">{formatDate(t.createdAt)}</div>
+              </div>
+              <div>
+                <span className={`ticket-badge badge-${t.status}`}>
+                  {t.status === 'pendiente' && '⏳ Pendiente'}
+                  {t.status === 'participando' && '🎯 ¡En sorteo!'}
+                  {t.status === 'ganador' && '🏆 ¡GANADORA!'}
+                  {t.status === 'invalido' && '❌ Inválida'}
+                </span>
+              </div>
+            </div>
           ))
         )}
       </div>
     </div>
   );
 }
-
 // ============================================================
 // LEADERBOARD TAB
 // ============================================================
