@@ -242,6 +242,8 @@ const styles = `
   border-color: var(--text2);
 }
 
+
+
 /* Overlay de procesamiento */
 .processing-overlay {
   position: absolute;
