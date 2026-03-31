@@ -1,4 +1,4 @@
-// components/ShareButton.tsx - Versión mejorada
+// components/ShareButton.tsx - Versión corregida
 import { useState } from 'react';
 import { useShareReward } from '../hooks/useShareReward';
 import { useToast } from '../hooks/useToast';
@@ -36,7 +36,10 @@ Descargá LupiApp: ${window.location.origin}`;
 
   // Compartir con la API nativa
   const shareWithNative = async () => {
-    if (navigator.share) {
+    // Verificar si la Web Share API está disponible
+    const isShareAvailable = typeof navigator !== 'undefined' && navigator.share && typeof navigator.share === 'function';
+    
+    if (isShareAvailable) {
       try {
         await navigator.share(shareData);
         // Si el usuario completó el compartido, registrar puntos
@@ -53,20 +56,25 @@ Descargá LupiApp: ${window.location.origin}`;
         if ((error as Error).name === 'AbortError') {
           showToast('Compartido cancelado', 'info');
         } else {
+          console.error('Share error:', error);
           showToast('No se pudo compartir', 'error');
         }
       }
     } else {
-      // Fallback para desktop
-      await navigator.clipboard.writeText(shareText);
-      const result = await registerShareAndGetPoints();
-      if (result.success) {
-        setShowConfetti(true);
-        setTimeout(() => setShowConfetti(false), 3000);
-        if (onShareSuccess && result.newPoints) {
-          onShareSuccess(result.newPoints);
+      // Fallback para desktop o navegadores sin soporte
+      try {
+        await navigator.clipboard.writeText(shareText);
+        const result = await registerShareAndGetPoints();
+        if (result.success) {
+          setShowConfetti(true);
+          setTimeout(() => setShowConfetti(false), 3000);
+          if (onShareSuccess && result.newPoints) {
+            onShareSuccess(result.newPoints);
+          }
+          showToast('📋 Enlace copiado! +50 puntos', 'success');
         }
-        showToast('📋 Enlace copiado! +50 puntos', 'success');
+      } catch (err) {
+        showToast('No se pudo copiar el enlace', 'error');
       }
     }
     setShowSocialOptions(false);
@@ -95,12 +103,15 @@ Descargá LupiApp: ${window.location.origin}`;
         // Instagram no tiene URL directa, mostrar mensaje
         showToast('📱 Abrí Instagram y pegá el texto que copiamos', 'info');
         navigator.clipboard.writeText(shareText);
+        setShowSocialOptions(false);
         return;
       case 'tiktok':
         showToast('📱 Abrí TikTok y pegá el texto que copiamos', 'info');
         navigator.clipboard.writeText(shareText);
+        setShowSocialOptions(false);
         return;
       default:
+        setShowSocialOptions(false);
         return;
     }
     
@@ -172,7 +183,8 @@ Descargá LupiApp: ${window.location.origin}`;
             <div className="share-modal-body">
               <p className="share-modal-desc">Elegí cómo querés compartir:</p>
               <div className="social-buttons">
-                {navigator.share && (
+                {/* Verificar si Web Share API está disponible */}
+                {typeof navigator !== 'undefined' && navigator.share && typeof navigator.share === 'function' && (
                   <button className="social-btn native" onClick={shareWithNative}>
                     <span className="social-icon">📱</span>
                     <span>Compartir con...</span>
