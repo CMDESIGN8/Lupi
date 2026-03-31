@@ -5,6 +5,9 @@ import { Notifications } from './components/Notifications';
 import { ReferralPanel } from './components/ReferralPanel';
 import { TicketScanner } from './components/TicketScanner';
 import { ConfirmationDialog } from './components/ConfirmationDialog';
+import { ShareButton } from './components/ShareButton';
+import { useToast } from './hooks/useToast';
+import { Toast } from './components/Toast';
 
 
 
@@ -242,7 +245,66 @@ const styles = `
   border-color: var(--text2);
 }
 
+/* Estilos para Toast */
+.toast-message {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border-radius: 100px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  z-index: 2000;
+  animation: slideUp 0.3s ease;
+  max-width: 90%;
+}
 
+.toast-success {
+  border-left: 3px solid var(--success);
+}
+
+.toast-error {
+  border-left: 3px solid var(--accent2);
+}
+
+.toast-info {
+  border-left: 3px solid var(--accent);
+}
+
+.toast-icon {
+  font-size: 18px;
+}
+
+.toast-text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.toast-close:hover {
+  background: var(--surface2);
+}
 
 /* Overlay de procesamiento */
 .processing-overlay {
@@ -268,6 +330,348 @@ const styles = `
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
+}
+  /* Estilos para el componente de compartir */
+
+  /* Modal de compartir */
+.share-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.share-modal-content {
+  background: var(--surface);
+  border-radius: 24px;
+  max-width: 400px;
+  width: 100%;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.share-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.share-modal-header h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin: 0;
+  color: var(--text);
+}
+
+.share-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text2);
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-modal-close:hover {
+  background: var(--surface2);
+}
+
+.share-modal-body {
+  padding: 20px;
+}
+
+.share-modal-desc {
+  color: var(--text2);
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.social-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.social-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.social-btn:hover {
+  transform: translateX(4px);
+  border-color: var(--accent);
+}
+
+.social-icon {
+  font-size: 24px;
+  width: 32px;
+  text-align: center;
+}
+
+.social-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #0a0a0f;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.social-btn.native {
+  background: linear-gradient(135deg, var(--accent), #0f6bc0);
+  border-color: transparent;
+  color: #0a0a0f;
+}
+
+.social-btn.whatsapp:hover {
+  border-color: #25D366;
+}
+.social-btn.instagram:hover {
+  border-color: #E4405F;
+}
+.social-btn.tiktok:hover {
+  border-color: #000000;
+}
+.social-btn.facebook:hover {
+  border-color: #1877F2;
+}
+.social-btn.twitter:hover {
+  border-color: #1DA1F2;
+}
+.social-btn.telegram:hover {
+  border-color: #26A5E4;
+}
+
+.share-modal-footer {
+  text-align: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text2);
+  font-size: 11px;
+}
+
+.share-card {
+  background: linear-gradient(135deg, var(--surface), var(--surface2));
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.share-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--success));
+}
+
+.share-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.share-icon {
+  font-size: 32px;
+}
+
+.share-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--text);
+  flex: 1;
+  margin-left: 12px;
+}
+
+.share-cooldown {
+  font-size: 12px;
+  background: rgba(61, 255, 160, 0.1);
+  padding: 4px 8px;
+  border-radius: 100px;
+  color: var(--success);
+}
+
+.share-reward {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(24, 157, 245, 0.1);
+  padding: 8px 16px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+
+.reward-badge {
+  background: var(--accent);
+  color: #0a0a0f;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.reward-text {
+  color: var(--text2);
+  font-size: 13px;
+}
+
+.share-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--surface2);
+  border-radius: 12px;
+}
+
+.share-stats .stat {
+  flex: 1;
+  text-align: center;
+}
+
+.share-stats .stat-value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.share-stats .stat-label {
+  font-size: 10px;
+  color: var(--text2);
+  text-transform: uppercase;
+}
+
+.share-description {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.share-description strong {
+  color: var(--accent);
+}
+
+.share-button {
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), #0f6bc0);
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  color: #0a0a0f;
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.share-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 157, 245, 0.3);
+}
+
+.share-button.disabled {
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: not-allowed;
+}
+
+.share-timer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text2);
+  margin-top: 12px;
+}
+
+/* Versión compacta */
+.share-compact {
+  display: inline-block;
+}
+
+.share-btn-compact {
+  position: relative;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.share-btn-compact:not(.disabled):hover {
+  border-color: var(--accent);
+  background: var(--surface);
+  transform: scale(1.05);
+}
+
+.share-btn-compact.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.share-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(10, 10, 15, 0.3);
+  border-top-color: #0a0a0f;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
 }
 /* Estilos para confirmación */
 .confirmation-modal {
@@ -1101,11 +1505,26 @@ function LeaderboardTab({ user }: { user: AppUser }) {
 // ProfileTab actualizado
 function ProfileTab({ user, onLogout }: { user: AppUser; onLogout: () => void }) {
   const [loading, setLoading] = useState(false);
+  const [rank, setRank] = useState(0);
+  const [points, setPoints] = useState(user.points);
+  const { toasts, hideToast } = useToast();
+
+  useEffect(() => {
+    // Obtener el ranking actual del usuario
+    api.getLeaderboard().then(leaders => {
+      const userRank = leaders.findIndex(l => l.id === user.id) + 1;
+      setRank(userRank);
+    }).catch(console.error);
+  }, [user.id]);
 
   const handleLogout = async () => {
     setLoading(true);
     await api.logout();
     onLogout();
+  };
+
+  const handlePointsUpdate = (newPoints: number) => {
+    setPoints(newPoints);
   };
 
   return (
@@ -1121,19 +1540,47 @@ function ProfileTab({ user, onLogout }: { user: AppUser; onLogout: () => void })
           </div>
         </div>
 
+        {/* Botón de compartir con recompensa */}
+        <ShareButton
+          userId={user.id}
+          user={{
+            username: user.username,
+            points: points,
+            rank: rank,
+            club: user.club
+          }}
+          onShareSuccess={handlePointsUpdate}
+          variant="full"
+        />
+
         {/* Panel de referidos */}
         <ReferralPanel userId={user.id} />
 
         {/* Estadísticas */}
         <div className="stats-grid fade-up">
           <div className="stat-card">
-            <div className="stat-number">{user.points}</div>
+            <div className="stat-number">{points}</div>
             <div className="stat-label">Puntos totales</div>
           </div>
           <div className="stat-card">
-            <div className="stat-number">{Math.floor(user.points / 10)}</div>
+            <div className="stat-number">{Math.floor(points / 10)}</div>
             <div className="stat-label">Entradas cargadas</div>
           </div>
+          <div className="stat-card">
+            <div className="stat-number">#{rank || '—'}</div>
+            <div className="stat-label">Posición</div>
+          </div>
+        </div>
+
+        <div className="toast-container">
+          {toasts.map(toast => (
+            <Toast
+              key={toast.id}
+              message={toast.message}
+              type={toast.type}
+              onClose={() => hideToast(toast.id)}
+            />
+          ))}
         </div>
 
         {/* Información de cómo funciona */}
@@ -1144,7 +1591,8 @@ function ProfileTab({ user, onLogout }: { user: AppUser; onLogout: () => void })
             ⭐ Sumás <strong style={{ color: "var(--accent)" }}>10 puntos</strong> por cada entrada registrada<br />
             🏆 Los 3 mejores del ranking ganan entradas gratis<br />
             🔄 El ranking se resetea cada temporada<br />
-            🎁 Invitá amigos con tu código y ganá <strong style={{ color: "var(--accent)" }}>50 puntos extra</strong>
+            🎁 Invitá amigos con tu código y ganá <strong style={{ color: "var(--accent)" }}>50 puntos extra</strong><br />
+            📤 Compartí LupiApp y ganá <strong style={{ color: "var(--accent)" }}>50 puntos extra</strong> por día
           </div>
         </div>
 

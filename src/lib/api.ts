@@ -388,6 +388,80 @@ export const api = {
     return count || 0;
   },
 
+  // Verificar si puede compartir hoy
+canShareToday: async (userId: string): Promise<{ canShare: boolean; nextShareDate?: string }> => {
+  try {
+    const { data, error } = await supabase
+      .rpc('can_share_today', { p_user_id: userId });
+
+    if (error) {
+      console.error('Error in can_share_today RPC:', error);
+      // Si hay error, asumir que puede compartir (fallback seguro)
+      return { canShare: true };
+    }
+
+    return {
+      canShare: data?.[0]?.can_share ?? true,
+      nextShareDate: data?.[0]?.next_share_date
+    };
+  } catch (error) {
+    console.error('Error checking share eligibility:', error);
+    return { canShare: true };
+  }
+},
+
+// Registrar compartido y sumar puntos
+registerShare: async (userId: string, shareType: string = 'social'): Promise<{ success: boolean; newPoints: number; message: string }> => {
+  try {
+    const { data, error } = await supabase
+      .rpc('register_share', {
+        p_user_id: userId,
+        p_share_type: shareType
+      });
+
+    if (error) {
+      console.error('Error in register_share RPC:', error);
+      throw new Error(error.message || 'Error al registrar el compartido');
+    }
+
+    if (!data || data.length === 0) {
+      throw new Error('No se recibió respuesta del servidor');
+    }
+
+    return {
+      success: data[0]?.success ?? false,
+      newPoints: data[0]?.new_points ?? 0,
+      message: data[0]?.message ?? 'Error al procesar'
+    };
+  } catch (error: any) {
+    console.error('Error registering share:', error);
+    throw new Error(error.message || 'Error al registrar el compartido');
+  }
+},
+
+// Obtener estadísticas de compartidos
+getShareStats: async (userId: string): Promise<{ totalShares: number; totalPointsFromShares: number }> => {
+  try {
+    const { data, error } = await supabase
+      .from('shares')
+      .select('points_awarded')
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error fetching share stats:', error);
+      return { totalShares: 0, totalPointsFromShares: 0 };
+    }
+
+    const totalShares = data?.length || 0;
+    const totalPointsFromShares = data?.reduce((sum, share) => sum + (share.points_awarded || 0), 0) || 0;
+
+    return { totalShares, totalPointsFromShares };
+  } catch (error) {
+    console.error('Error getting share stats:', error);
+    return { totalShares: 0, totalPointsFromShares: 0 };
+  }
+},
+
   // Suscribirse a notificaciones en tiempo real
   subscribeToNotifications: (userId: string, callback: (notification: Notification) => void) => {
     const subscription = supabase
