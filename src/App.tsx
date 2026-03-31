@@ -103,7 +103,7 @@ const styles = `
   .welcome-banner::after { content: '🏟️'; position: absolute; right: 16px; bottom: -8px; font-size: 72px; opacity: 0.12; }
   .welcome-name { font-family: var(--font-display); font-size: 32px; letter-spacing: 1px; line-height: 1.1; margin-bottom: 4px; }
   .welcome-club { font-size: 13px; color: var(--accent); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-
+  .welcome-club-flores { font-size: 13px; color: #03b129; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
   .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
   .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; }
   .stat-number { font-family: var(--font-display); font-size: 36px; letter-spacing: 1px; color: var(--accent); line-height: 1; margin-bottom: 4px; }
@@ -340,7 +340,7 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
       <div className="container">
         <div className="welcome-banner fade-up">
           <div className="welcome-name">¡Hola, {user.username}! 👋</div>
-          <div className="welcome-club">🏟️ {user.club}</div>
+          <div className="welcome-club-flores">🏟️ {user.club}</div>
           <div style={{ marginTop: 12, fontSize: 13, color: "var(--text2)" }}>
             Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
           </div>
