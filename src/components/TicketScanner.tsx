@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { createWorker } from 'tesseract.js';
 
 interface TicketScannerProps {
-  onScan: (ticketNumber: string) => void;
+  onScan: (ticketNumber: string, originalText: string) => void; // Cambiar para recibir texto original
   onClose: () => void;
 }
 
@@ -131,7 +131,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
           navigator.vibrate(200);
         }
         
-        onScan(ticketNumber);
+        onScan(ticketNumber, text);
       } else {
         console.log('❌ No se encontró número válido');
         setError('No se pudo encontrar el número de entrada. Intentá con mejor iluminación y enfoque.');

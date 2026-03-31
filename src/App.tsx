@@ -4,6 +4,7 @@ import { CLUBS } from "./lib/constants";
 import { Notifications } from './components/Notifications';
 import { ReferralPanel } from './components/ReferralPanel';
 import { TicketScanner } from './components/TicketScanner';
+import { ConfirmationDialog } from './components/ConfirmationDialog';
 
 
 
@@ -266,7 +267,176 @@ const styles = `
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
+/* Estilos para confirmación */
+.confirmation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.2s ease;
+}
 
+.confirmation-container {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  animation: slideUp 0.3s ease;
+}
+
+.confirmation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.confirmation-header h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin: 0;
+  color: var(--text);
+}
+
+.confirmation-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.confirmation-close:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+.confirmation-content {
+  padding: 20px;
+}
+
+.detected-number-box {
+  background: rgba(24, 157, 245, 0.1);
+  border: 1px solid rgba(24, 157, 245, 0.2);
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.detected-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+
+.detected-number {
+  font-family: monospace;
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--accent);
+  letter-spacing: 2px;
+  word-break: break-all;
+}
+
+.edit-input {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid var(--accent);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--text);
+  font-family: monospace;
+  font-size: 24px;
+  text-align: center;
+  letter-spacing: 2px;
+  outline: none;
+}
+
+.original-text-box {
+  background: var(--surface2);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.original-text-box details {
+  cursor: pointer;
+}
+
+.original-text-box summary {
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 0;
+}
+
+.original-text {
+  margin-top: 12px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--text2);
+  line-height: 1.5;
+  max-height: 150px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.confirmation-warning {
+  background: rgba(255, 77, 109, 0.1);
+  border-left: 3px solid var(--accent2);
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--accent2);
+  margin-bottom: 20px;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.confirmation-buttons .btn {
+  flex: 1;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .scanner-header h3 {
   font-family: var(--font-display);
   font-size: 20px;
@@ -671,6 +841,9 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
   const [showScanner, setShowScanner] = useState(false); // Nuevo estado
+  const [showConfirmation, setShowConfirmation] = useState(false);
+const [detectedNumber, setDetectedNumber] = useState('');
+const [detectedText, setDetectedText] = useState('');
   
 
   const loadTickets = useCallback(async () => {
@@ -719,17 +892,24 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   };
 
   // En TicketTab, modificar handleScan
-const handleScan = (scannedNumber: string) => {
-  // Asegurar que solo números
-  const cleanNumber = scannedNumber.replace(/[^0-9]/g, '');
+const handleScan = (scannedNumber: string, originalText: string) => {
+  console.log('🎫 Número escaneado:', scannedNumber);
+  console.log('📄 Texto original:', originalText);
   
-  console.log('✅ Número escaneado:', cleanNumber);
+  setDetectedNumber(scannedNumber);
+  setDetectedText(originalText);
+  setShowConfirmation(true);
+};
+
+// Confirmar número
+const handleConfirmNumber = async (number: string) => {
+  setShowConfirmation(false);
   
+  const cleanNumber = number.replace(/[^0-9]/g, '');
   setTicketNumber(cleanNumber);
-  setShowScanner(false);
   
   // Mostrar feedback
-  const successMsg = `✅ Número encontrado: ${cleanNumber}`;
+  const successMsg = `✅ Número verificado: ${cleanNumber}`;
   setSuccess(successMsg);
   setTimeout(() => setSuccess(''), 3000);
   
@@ -737,16 +917,35 @@ const handleScan = (scannedNumber: string) => {
   setTimeout(() => handleSubmit(cleanNumber), 500);
 };
 
+// Cancelar
+const handleCancelScan = () => {
+  setShowConfirmation(false);
+  setDetectedNumber('');
+  setDetectedText('');
+};
+
+
   return (
     <div className="main-content">
       <div className="container">
         {/* Scanner Modal */}
         {showScanner && (
-          <TicketScanner 
-            onScan={handleScan}
-            onClose={() => setShowScanner(false)}
-          />
-        )}
+        <TicketScanner 
+          onScan={handleScan}
+          onClose={() => setShowScanner(false)}
+        />
+      )}
+
+      {/* Diálogo de confirmación */}
+      {showConfirmation && (
+        <ConfirmationDialog
+          detectedNumber={detectedNumber}
+          originalText={detectedText}
+          onConfirm={handleConfirmNumber}
+          onCancel={handleCancelScan}
+          onEdit={() => {}} // Opcional: para edición avanzada
+        />
+      )}
 
         <div className="section-title fade-up">🎟️ Cargar entrada</div>
 
