@@ -190,7 +190,7 @@ const styles = `
   .loading-logo { font-family: var(--font-display); font-size: 48px; letter-spacing: 4px; }
   .loading-logo span { color: var(--accent); }
   .spinner-lg { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
- /* Estilos mejorados para el scanner con scroll */
+ /* Estilos para el scanner OCR */
 .scanner-modal {
   position: fixed;
   top: 0;
@@ -219,7 +219,6 @@ const styles = `
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-/* Header fijo */
 .scanner-header {
   display: flex;
   justify-content: space-between;
@@ -253,81 +252,130 @@ const styles = `
   transition: all 0.2s;
 }
 
-.scanner-close:hover {
-  background: var(--surface2);
-  color: var(--text);
-}
-
-/* Área con scroll */
 .scanner-content {
   flex: 1;
   overflow-y: auto;
   padding: 0;
 }
 
-/* Vista del scanner */
-.scanner-view {
+/* Vista de cámara */
+.camera-view {
+  position: relative;
   background: #000;
   min-height: 300px;
   width: 100%;
-  position: relative;
 }
 
-#qr-scanner-container {
+.camera-preview {
   width: 100%;
+  height: auto;
   min-height: 300px;
-}
-
-#qr-scanner-container video {
-  width: 100% !important;
-  height: auto !important;
   object-fit: cover;
 }
 
-#qr-scanner-container div {
-  margin: 0 auto;
+.camera-guide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
-/* Instrucciones */
+.guide-frame {
+  width: 80%;
+  height: 40%;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  animation: pulse-border 1.5s infinite;
+}
+
+.guide-text {
+  color: white;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 8px 16px;
+  border-radius: 100px;
+  font-size: 14px;
+  margin-top: 16px;
+  text-align: center;
+  backdrop-filter: blur(4px);
+}
+
+.guide-text small {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* Vista previa */
+.preview-view {
+  position: relative;
+  min-height: 300px;
+  background: #000;
+}
+
+.image-preview {
+  width: 100%;
+  height: auto;
+  min-height: 300px;
+  object-fit: contain;
+  background: #000;
+}
+
+.processing-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: white;
+}
+
+/* Ejemplo de entrada */
+.example-ticket {
+  background: rgba(24, 157, 245, 0.1);
+  border: 1px solid rgba(24, 157, 245, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  margin: 12px 0;
+}
+
+.example-number {
+  font-family: monospace;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--accent);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.example-label {
+  font-size: 12px;
+  color: var(--text2);
+}
+
 .scanner-instructions {
   padding: 20px;
   background: var(--surface);
   border-top: 1px solid var(--border);
 }
 
-.instruction-icon {
-  font-size: 32px;
-  text-align: center;
-  margin-bottom: 12px;
-}
-
 .instruction-title {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text);
-  text-align: center;
   margin-bottom: 12px;
-}
-
-.instruction-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 12px 0;
-}
-
-.instruction-list li {
-  padding: 6px 0;
-  color: var(--text2);
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.instruction-list li::before {
-  content: "•";
-  color: var(--accent);
-  font-size: 18px;
+  text-align: center;
 }
 
 .instruction-note {
@@ -341,10 +389,10 @@ const styles = `
   margin-top: 12px;
 }
 
-/* Footer con botones fijos */
+/* Footer con botones */
 .scanner-footer {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   padding: 16px 20px;
   border-top: 1px solid var(--border);
   background: var(--surface);
@@ -353,27 +401,31 @@ const styles = `
 
 .scanner-footer .btn {
   flex: 1;
-}
-
-/* Alert dentro del scroll */
-.alert {
-  margin: 16px;
-  padding: 12px 16px;
-  border-radius: var(--radius);
+  padding: 12px 8px;
   font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
-.alert-error {
-  background: rgba(255, 77, 109, 0.12);
-  border: 1px solid rgba(255, 77, 109, 0.3);
-  color: var(--accent2);
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
 }
 
-/* Animaciones */
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: var(--accent);
+    transform: scale(1);
+  }
+  50% {
+    border-color: var(--accent2);
+    transform: scale(1.02);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -382,22 +434,6 @@ const styles = `
   to {
     opacity: 1;
     transform: scale(1);
-  }
-}
-
-/* Responsive para móviles pequeños */
-@media (max-width: 480px) {
-  .scanner-container {
-    height: 85vh;
-    max-height: none;
-  }
-  
-  .scanner-view {
-    min-height: 250px;
-  }
-  
-  .instruction-list li {
-    font-size: 12px;
   }
 }
 `;
@@ -644,30 +680,23 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
     }
   };
 
-  const handleScan = (scannedNumber: string) => {
-  // Asegurar que solo hay números
+  // En TicketTab, modificar handleScan
+const handleScan = (scannedNumber: string) => {
+  // Asegurar que solo números
   const cleanNumber = scannedNumber.replace(/[^0-9]/g, '');
   
-  console.log('Número escaneado y limpio:', cleanNumber);
+  console.log('✅ Número escaneado:', cleanNumber);
   
   setTicketNumber(cleanNumber);
   setShowScanner(false);
   
-  // Mostrar feedback visual
-  showToast(`✅ Código escaneado: ${cleanNumber}`, 'success');
+  // Mostrar feedback
+  const successMsg = `✅ Número encontrado: ${cleanNumber}`;
+  setSuccess(successMsg);
+  setTimeout(() => setSuccess(''), 3000);
   
-  // Auto-enviar después de escanear
+  // Auto-enviar
   setTimeout(() => handleSubmit(cleanNumber), 500);
-};
-
-// Función auxiliar para toasts
-const showToast = (message: string, type: 'success' | 'error') => {
-  // Podés implementar un toast simple o usar una librería
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
 };
 
   return (

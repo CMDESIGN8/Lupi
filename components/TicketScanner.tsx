@@ -1,6 +1,6 @@
 // src/components/TicketScanner.tsx
-import { useEffect, useRef, useState } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { useState, useRef } from 'react';
+import { createWorker } from 'tesseract.js';
 
 interface TicketScannerProps {
   onScan: (ticketNumber: string) => void;
@@ -9,129 +9,172 @@ interface TicketScannerProps {
 
 export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
   const [error, setError] = useState<string>('');
-  const [isScanning, setIsScanning] = useState(true);
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const containerId = 'qr-scanner-container';
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  // Función para extraer SOLO números
-  const extractNumbers = (text: string): string => {
-    // Remover todo lo que no sea número
-    let numbers = text.replace(/[^0-9]/g, '');
+  // Función para extraer números de 8-12 dígitos del texto
+  const extractTicketNumber = (text: string): string | null => {
+    // Buscar números de 8 a 12 dígitos consecutivos
+    const patterns = [
+      /\b(\d{8,12})\b/g,  // Números aislados de 8-12 dígitos
+      /(\d{8,12})/g        // Cualquier número de 8-12 dígitos
+    ];
     
-    // Si el número tiene más de 12 dígitos, tomar los últimos 12
-    if (numbers.length > 12) {
-      numbers = numbers.slice(-12);
+    for (const pattern of patterns) {
+      const matches = text.match(pattern);
+      if (matches && matches.length > 0) {
+        // Tomar el primer número válido
+        return matches[0];
+      }
     }
     
-    return numbers;
+    // Si no encuentra números de 8-12, buscar cualquier número de 6+ dígitos
+    const fallbackPattern = /\b(\d{6,})\b/g;
+    const fallbackMatch = text.match(fallbackPattern);
+    if (fallbackMatch) {
+      return fallbackMatch[0];
+    }
+    
+    return null;
   };
 
-  // Función para validar si es un número de entrada válido
-  const isValidTicketNumber = (numbers: string): boolean => {
-    // Validar que tenga entre 4 y 12 dígitos
-    return numbers.length >= 4 && numbers.length <= 12;
-  };
-
-  useEffect(() => {
-    // Crear el scanner con opciones optimizadas
-    const scanner = new Html5QrcodeScanner(
-      containerId,
-      {
-        fps: 10,
-        qrbox: { width: 250, height: 250 },
-        aspectRatio: 1,
-        showTorchButtonIfSupported: true,
-        showZoomSliderIfSupported: true,
-        defaultZoomValueIfSupported: 2,
-        formatsToSupport: [Html5QrcodeScanner.QR_CODE],
-      },
-      false
-    );
-
-    scannerRef.current = scanner;
-
-    const onScanSuccess = (decodedText: string) => {
-      console.log('Texto escaneado:', decodedText);
+  // Función para procesar imagen con OCR
+  const processImage = async (imageFile: File | string) => {
+    setIsProcessing(true);
+    setError('');
+    
+    try {
+      console.log('🔍 Procesando imagen con OCR...');
       
-      // Extraer SOLO números
-      const numbersOnly = extractNumbers(decodedText);
-      console.log('Solo números:', numbersOnly);
+      const worker = await createWorker('spa'); // Usar español para mejor reconocimiento
       
-      if (isValidTicketNumber(numbersOnly)) {
-        // Detener el scanner inmediatamente
-        if (scannerRef.current) {
-          scannerRef.current.clear().catch(console.error);
-        }
+      // Reconocer texto
+      const { data: { text } } = await worker.recognize(imageFile);
+      await worker.terminate();
+      
+      console.log('📝 Texto reconocido:', text);
+      
+      // Extraer número de entrada
+      const ticketNumber = extractTicketNumber(text);
+      
+      if (ticketNumber) {
+        console.log('✅ Número encontrado:', ticketNumber);
         
-        // Feedback háptico de éxito
+        // Feedback háptico
         if ('vibrate' in navigator) {
           navigator.vibrate(200);
         }
         
-        // Llamar al callback con el número limpio
-        onScan(numbersOnly);
+        onScan(ticketNumber);
       } else {
-        // Error: número inválido
-        setError(`Número inválido: "${decodedText}". Solo se aceptan números de 4 a 12 dígitos.`);
+        console.log('❌ No se encontró número válido');
+        setError('No se pudo encontrar el número de entrada. Asegurate de que la imagen sea clara y muestre el número.');
         
-        // Feedback háptico de error
         if ('vibrate' in navigator) {
           navigator.vibrate([100, 50, 100]);
         }
-        
-        // Opcional: continuar escaneando después de error
-        setTimeout(() => setError(''), 3000);
       }
-    };
+    } catch (err: any) {
+      console.error('Error OCR:', err);
+      setError('Error al procesar la imagen. Intentá nuevamente con mejor iluminación.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
-    const onScanError = (err: string) => {
-      console.warn('Scan error:', err);
-      // No mostrar errores de escaneo continuo al usuario
-    };
-
-    scanner.render(onScanSuccess, onScanError);
-
-    // Cleanup al desmontar
-    return () => {
-      if (scannerRef.current) {
-        scannerRef.current.clear().catch(console.error);
-      }
-    };
-  }, [onScan]);
-
-  // Solicitar permiso de cámara
-  const requestCameraPermission = async () => {
+  // Tomar foto con la cámara
+  const takePhoto = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach(track => track.stop());
-      setError('');
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      
+      streamRef.current = stream;
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
     } catch (err: any) {
       if (err.name === 'NotAllowedError') {
-        setError('❌ Necesitamos acceso a la cámara para escanear. Por favor, permití el acceso.');
-      } else if (err.name === 'NotFoundError') {
-        setError('❌ No se encontró ninguna cámara en este dispositivo');
+        setError('Necesitamos acceso a la cámara para leer tu entrada.');
       } else {
-        setError('❌ Error al acceder a la cámara');
+        setError('Error al acceder a la cámara.');
       }
     }
   };
 
-  useEffect(() => {
-    requestCameraPermission();
+  // Capturar foto actual
+  const capturePhoto = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx?.drawImage(videoRef.current, 0, 0);
+      
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      setPreviewUrl(imageDataUrl);
+      
+      // Detener stream
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+      
+      // Procesar la imagen
+      processImage(imageDataUrl);
+    }
+  };
+
+  // Seleccionar imagen de galería
+  const selectFromGallery = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setPreviewUrl(previewUrl);
+      processImage(file);
+    }
+  };
+
+  const reset = () => {
+    setPreviewUrl(null);
+    setError('');
+    setIsProcessing(false);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    takePhoto(); // Reiniciar cámara
+  };
+
+  // Iniciar cámara al montar
+  useState(() => {
+    takePhoto();
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
 
   return (
     <div className="scanner-modal">
       <div className="scanner-container">
-        {/* Header fijo */}
         <div className="scanner-header">
-          <h3>📷 Escanear entrada</h3>
+          <h3>📷 Leer entrada</h3>
           <button className="scanner-close" onClick={onClose}>
             ✕
           </button>
         </div>
 
-        {/* Área de contenido con scroll */}
         <div className="scanner-content">
           {error && (
             <div className="alert alert-error">
@@ -139,66 +182,82 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
             </div>
           )}
 
-          {/* Contenedor del scanner */}
-          <div id={containerId} className="scanner-view"></div>
+          {!previewUrl ? (
+            // Vista de cámara
+            <div className="camera-view">
+              <video 
+                ref={videoRef}
+                autoPlay
+                playsInline
+                className="camera-preview"
+              />
+              <div className="camera-guide">
+                <div className="guide-frame"></div>
+                <p className="guide-text">
+                  📸 Enfocá el número de tu entrada<br/>
+                  <small>Asegurate de tener buena iluminación</small>
+                </p>
+              </div>
+            </div>
+          ) : (
+            // Vista previa de la imagen capturada
+            <div className="preview-view">
+              <img src={previewUrl} alt="Preview" className="image-preview" />
+              {isProcessing && (
+                <div className="processing-overlay">
+                  <div className="spinner"></div>
+                  <p>Leyendo número de entrada...</p>
+                </div>
+              )}
+            </div>
+          )}
 
-          {/* Instrucciones */}
           <div className="scanner-instructions">
-            <div className="instruction-icon">📱</div>
-            <p className="instruction-title">¿Cómo escanear?</p>
-            <ul className="instruction-list">
-              <li>✓ Asegurate de tener buena iluminación</li>
-              <li>✓ Mantené el código QR dentro del marco</li>
-              <li>✓ El código debe contener el número de entrada</li>
-            </ul>
+            <p className="instruction-title">📌 ¿Qué estás buscando?</p>
+            <div className="example-ticket">
+              <div className="example-number">268275132</div>
+              <div className="example-label">Número de entrada (8-12 dígitos)</div>
+            </div>
             <div className="instruction-note">
-              💡 Solo se aceptan números de 4 a 12 dígitos
+              💡 La app busca automáticamente números de 8 a 12 dígitos en el texto
             </div>
           </div>
         </div>
 
-        {/* Botones fijos al final */}
         <div className="scanner-footer">
-          <button className="btn btn-ghost" onClick={onClose}>
-            Cancelar
-          </button>
-          <button 
-            className="btn btn-primary" 
-            onClick={() => {
-              if (scannerRef.current) {
-                scannerRef.current.clear().catch(console.error);
-                setError('');
-                setIsScanning(true);
-                // Reiniciar scanner
-                const newScanner = new Html5QrcodeScanner(
-                  containerId,
-                  {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1,
-                  },
-                  false
-                );
-                scannerRef.current = newScanner;
-                newScanner.render(
-                  (text) => {
-                    const numbersOnly = text.replace(/[^0-9]/g, '');
-                    if (numbersOnly.length >= 4 && numbersOnly.length <= 12) {
-                      newScanner.clear().catch(console.error);
-                      onScan(numbersOnly);
-                    } else {
-                      setError(`Número inválido: solo se permiten ${numbersOnly.length} dígitos (mínimo 4, máximo 12)`);
-                      setTimeout(() => setError(''), 3000);
-                    }
-                  },
-                  (err) => console.warn(err)
-                );
-              }
-            }}
-          >
-            Reintentar
-          </button>
+          {!previewUrl ? (
+            // Botones cuando está la cámara activa
+            <>
+              <button className="btn btn-ghost" onClick={onClose}>
+                Cancelar
+              </button>
+              <button className="btn btn-primary" onClick={capturePhoto}>
+                📸 Tomar foto
+              </button>
+              <button className="btn btn-secondary" onClick={selectFromGallery}>
+                🖼️ Galería
+              </button>
+            </>
+          ) : (
+            // Botones después de capturar
+            <>
+              <button className="btn btn-ghost" onClick={reset}>
+                ↺ Volver a tomar
+              </button>
+              <button className="btn btn-secondary" onClick={selectFromGallery}>
+                🖼️ Otra imagen
+              </button>
+            </>
+          )}
         </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleFileSelect}
+        />
       </div>
     </div>
   );
