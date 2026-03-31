@@ -100,47 +100,20 @@ Descargá LupiApp: ${window.location.origin}`;
         url = `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`;
         break;
       case 'instagram':
-      // Abrir Instagram directamente si está instalada
-      const instagramUrl = `instagram://library?AssetPath=${encodeURIComponent(shareText)}`;
-      const instagramWebUrl = 'https://www.instagram.com';
-      
-      // Intentar abrir la app primero
-      window.location.href = instagramUrl;
-      
-      // Si no abre la app después de 500ms, mostrar mensaje
-      setTimeout(async () => {
-        await navigator.clipboard.writeText(shareText);
-        showToast('📱 Copiado al portapapeles. Abrí Instagram y pegá el texto.', 'info');
-        
-        // Mostrar modal con instrucciones
-        
-      }, 500);
-      
-      setShowSocialOptions(false);
-      return;
-      
-    case 'tiktok':
-      // TikTok tiene URL scheme similar
-      const tiktokUrl = `tiktok://`;
-      const tiktokWebUrl = 'https://www.tiktok.com';
-      
-      window.location.href = tiktokUrl;
-      
-      setTimeout(async () => {
-        await navigator.clipboard.writeText(shareText);
-        showToast('📱 Copiado al portapapeles. Abrí TikTok y pegá el texto.', 'info');
-        
-        // Mostrar modal con instrucciones
-        
-      }, 500);
-      
-      setShowSocialOptions(false);
-      return;
-      
-    default:
-      setShowSocialOptions(false);
-      return;
-  }
+        // Instagram no tiene URL directa, mostrar mensaje
+        showToast('📱 Abrí Instagram y pegá el texto que copiamos', 'info');
+        navigator.clipboard.writeText(shareText);
+        setShowSocialOptions(false);
+        return;
+      case 'tiktok':
+        showToast('📱 Abrí TikTok y pegá el texto que copiamos', 'info');
+        navigator.clipboard.writeText(shareText);
+        setShowSocialOptions(false);
+        return;
+      default:
+        setShowSocialOptions(false);
+        return;
+    }
     
     if (url) {
       window.open(url, '_blank', 'noopener,noreferrer');
