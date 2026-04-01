@@ -11,12 +11,17 @@ export interface RegisterData {
 }
 
 // Types
+// api.ts - Actualizar la interfaz AppUser
 export interface AppUser {
   id: string;
   email: string;
   username: string;
   club: string;
   points: number;
+  streak: number;              // 🔥 NUEVO: días consecutivos
+  last_ticket_date: string | null;  // 📅 NUEVO: última fecha de carga
+  best_streak: number;         // 🏆 NUEVO: récord personal
+  referral_code: string;       // 🎫 NUEVO: código de referido
   created_at?: string;
 }
 
