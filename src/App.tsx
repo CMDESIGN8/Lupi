@@ -1327,7 +1327,6 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
       </div>
     </div>
   );
-} 
 
   return (
     <div className="main-content">
