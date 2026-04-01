@@ -18,10 +18,10 @@ export interface AppUser {
   username: string;
   club: string;
   points: number;
-  streak: number;              // 🔥 NUEVO: días consecutivos
-  last_ticket_date: string | null;  // 📅 NUEVO: última fecha de carga
-  best_streak: number;         // 🏆 NUEVO: récord personal
-  referral_code: string;       // 🎫 NUEVO: código de referido
+  streak: number;              // 🔥 Días consecutivos
+  last_ticket_date: string | null;  // 📅 Última fecha
+  best_streak: number;         // 🏆 Récord personal
+  referral_code: string;
   created_at?: string;
 }
 
@@ -206,7 +206,7 @@ export const api = {
   },
 
   // Submit ticket
-  submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ ticket: Ticket; newPoints: number }> => {
+  submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ ticket: Ticket; newPoints: number; streakReward?: { points: number; message: string } }> => {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error('No session found');
 
@@ -217,7 +217,7 @@ export const api = {
     throw new Error("El número de entrada debe tener entre 6 y 12 dígitos.");
   }
 
-  // Usar la función add_ticket de la base de datos
+  // Insertar ticket (el trigger actualizará la racha automáticamente)
   const { data: ticketId, error: addError } = await supabase.rpc('add_ticket', {
     p_user_id: userId,
     p_ticket_number: clean,
@@ -225,6 +225,18 @@ export const api = {
   });
 
   if (addError) throw new Error(addError.message);
+
+  // Verificar recompensas por racha
+  const { data: rewardData, error: rewardError } = await supabase
+    .rpc('check_streak_rewards', { p_user_id: userId });
+
+  let streakReward = null;
+  if (!rewardError && rewardData && rewardData.length > 0 && rewardData[0].reward_given) {
+    streakReward = {
+      points: rewardData[0].points_awarded,
+      message: rewardData[0].message
+    };
+  }
 
   // Obtener el ticket creado
   const { data: ticket, error: ticketError } = await supabase
@@ -235,7 +247,7 @@ export const api = {
 
   if (ticketError) throw new Error('Error al obtener el ticket');
 
-  // Actualizar puntos del usuario (si corresponde)
+  // Actualizar puntos del usuario
   const { data: profile } = await supabase
     .from('profiles')
     .select('points')
@@ -243,11 +255,6 @@ export const api = {
     .single();
 
   const newPoints = (profile?.points || 0) + POINTS_PER_TICKET;
-  
-  await supabase
-    .from('profiles')
-    .update({ points: newPoints })
-    .eq('id', userId);
 
   return {
     ticket: {
@@ -258,7 +265,8 @@ export const api = {
       status: ticket.status,
       createdAt: ticket.created_at
     },
-    newPoints: newPoints
+    newPoints: newPoints,
+    streakReward: streakReward || undefined
   };
 },
 

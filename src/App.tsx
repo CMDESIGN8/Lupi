@@ -11,6 +11,8 @@ import { Toast } from './components/Toast';
 import { CountdownTimer } from './components/CountdownTimer';
 import { getNextThursday20h } from './lib/dateUtils';
 import { OnboardingTour } from './components/OnboardingTour';
+import { StreakBadge } from './components/StreakBadge';
+
 
 
 
@@ -1068,6 +1070,131 @@ const styles = `
     transform: scale(1);
   }
 }
+  /* Estilos para el sistema de rachas */
+.streak-card {
+  border-radius: 16px;
+  padding: 16px;
+  margin: 12px 0;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.streak-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.streak-icon {
+  font-size: 32px;
+}
+
+.streak-current {
+  font-size: 18px;
+}
+
+.streak-current strong {
+  font-size: 28px;
+  margin-right: 4px;
+}
+
+.streak-best {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.streak-reward {
+  margin-top: 12px;
+  padding: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  animation: pulse-glow 1s infinite;
+}
+
+.streak-next-milestone {
+  margin-top: 12px;
+  font-size: 12px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.streak-progress {
+  margin-top: 12px;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.streak-progress-bar {
+  height: 100%;
+  transition: width 0.5s ease;
+  border-radius: 4px;
+}
+
+/* Modal de recompensa */
+.streak-reward-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.streak-reward-content {
+  background: linear-gradient(135deg, var(--accent), #ff4d6d);
+  border-radius: 32px;
+  padding: 32px;
+  text-align: center;
+  max-width: 300px;
+  animation: bounce 0.5s ease;
+}
+
+.streak-reward-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.streak-reward-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.streak-reward-message {
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.streak-reward-points {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(0.9); }
+  50% { transform: scale(1.05); }
+}
+
+/* Versión compacta */
+.streak-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: 14px;
+  border: 1px solid;
+}
   /* Agregar a los estilos existentes */
 @keyframes pulse {
   0%, 100% {
@@ -1139,35 +1266,44 @@ function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const handleSubmit = async () => {
-    setError("");
-    setLoading(true);
-    try {
-      if (mode === "login") {
-        if (!form.email || !form.password) throw new Error("Completá todos los campos.");
-        const user = await api.login({ email: form.email, password: form.password });
-        onAuth(user);
-      } else {
-        if (!form.email || !form.password || !form.username || !form.club)
-          throw new Error("Completá todos los campos.");
-        if (form.password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
-        
-        console.log('📝 Registrando con código:', form.referralCode);
-        
-        const user = await api.register({ 
-          email: form.email,
-          password: form.password,
-          username: form.username,
-          club: form.club,
-          referralCode: form.referralCode || undefined
-        });
-        onAuth(user);
+  setError("");
+  setLoading(true);
+  try {
+    if (mode === "login") {
+      if (!form.email || !form.password) throw new Error("Completá todos los campos.");
+      const user = await api.login({ email: form.email, password: form.password });
+      onAuth(user);
+    } else {
+      if (!form.email || !form.password || !form.username || !form.club)
+        throw new Error("Completá todos los campos.");
+      if (form.password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
+      
+      console.log('📝 Registrando con código:', form.referralCode);
+      
+      const user = await api.register({ 
+        email: form.email,
+        password: form.password,
+        username: form.username,
+        club: form.club,
+        referralCode: form.referralCode || undefined
+      });
+      
+      // Mostrar mensaje de éxito con recompensa por referido si aplica
+      if (form.referralCode) {
+        setTimeout(() => {
+          alert("🎉 ¡Bienvenido! Si usaste un código de referido, ganaste 25 puntos extra.");
+        }, 500);
       }
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
+      
+      onAuth(user);
     }
-  };
+  } catch (e: any) {
+    setError(e.message);
+    console.error('Error en autenticación:', e);
+  } finally {
+    setLoading(false);
+  }
+};
 
 return (
     <div className="auth-screen">
@@ -1290,6 +1426,10 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
         <div className="welcome-banner fade-up">
           <div className="welcome-name">¡Hola, {user.username}! 👋</div>
           <div className="welcome-club-flores">🏟️ {user.club}</div>
+           {/* Agregar el badge de racha */}
+          <div style={{ marginTop: 12 }}>
+            <StreakBadge userId={user.id} variant="full" />
+          </div>
           <div style={{ marginTop: 12, fontSize: 13, color: "var(--text)" }}>
             Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
           </div>
@@ -1328,7 +1468,7 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
     </div>
   );
 
-  return (
+    return (
     <div className="main-content">
       <div className="container">
         <div className="welcome-banner fade-up">
@@ -1390,6 +1530,7 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [detectedNumber, setDetectedNumber] = useState('');
   const [detectedText, setDetectedText] = useState('');
+  const [streakReward, setStreakReward] = useState<{ points: number; message: string } | null>(null);
 
   // Cargar tickets activos de la semana actual
   const loadTickets = useCallback(async () => {
