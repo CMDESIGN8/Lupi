@@ -8,6 +8,10 @@ import { ConfirmationDialog } from './components/ConfirmationDialog';
 import { ShareButton } from './components/ShareButton';
 import { useToast } from './hooks/useToast';
 import { Toast } from './components/Toast';
+import { CountdownTimer } from './components/CountdownTimer';
+import { getNextThursday20h } from './lib/dateUtils';
+import { OnboardingTour } from './components/OnboardingTour';
+
 
 
 
@@ -699,6 +703,20 @@ const styles = `
   animation: slideUp 0.3s ease;
 }
 
+/* Agregar a los estilos existentes */
+.tour-floating-button {
+  animation: float 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
 .confirmation-header {
   display: flex;
   justify-content: space-between;
@@ -1050,6 +1068,47 @@ const styles = `
     transform: scale(1);
   }
 }
+  /* Agregar a los estilos existentes */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.countdown-timer {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+  /* Agregar a los estilos existentes */
+.tour-highlight {
+  position: relative;
+  z-index: 10002;
+  animation: pulse-highlight 1s ease-in-out 3;
+  box-shadow: 0 0 0 4px var(--accent);
+  border-radius: 8px;
+}
+
+@keyframes pulse-highlight {
+  0%, 100% {
+    box-shadow: 0 0 0 4px var(--accent);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(24, 157, 245, 0.5);
+  }
+}
 `;
 
 // ============================================================
@@ -1189,6 +1248,7 @@ return (
 function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: string) => void }) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
+  const [raffleCompleted, setRaffleCompleted] = useState(false);
 
   useEffect(() => {
     api.getUserTickets(user.id).then(setTickets).catch(console.error);
@@ -1196,6 +1256,12 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
   }, [user.id, user.points]);
 
   const myRank = leaderboard.findIndex((u) => u.id === user.id) + 1;
+  const handleRaffleComplete = () => {
+    setRaffleCompleted(true);
+    // Recargar datos del sorteo
+    loadLeaderboard();
+    loadTickets();
+  };
 
   return (
     <div className="main-content">
@@ -1207,6 +1273,12 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
             Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
           </div>
         </div>
+
+        {/* Contador regresivo */}
+        <CountdownTimer 
+          targetDate={getNextThursday20h()}
+          onComplete={handleRaffleComplete}
+        />
 
         <div className="stats-grid fade-up">
           <div className="stat-card"><div className="stat-number">{user.points}</div><div className="stat-label">Puntos</div></div>
@@ -1629,8 +1701,12 @@ function LeaderboardTab({ user }: { user: AppUser }) {
 // ============================================================
 // PROFILE TAB
 // ============================================================
-// ProfileTab actualizado
-function ProfileTab({ user, onLogout }: { user: AppUser; onLogout: () => void }) {
+// ProfileTab actualizado con onRestartTour
+function ProfileTab({ user, onLogout, onRestartTour }: { 
+  user: AppUser; 
+  onLogout: () => void;
+  onRestartTour: () => void;  // <-- AGREGAR ESTA LÍNEA
+}) {
   const [loading, setLoading] = useState(false);
   const [rank, setRank] = useState(0);
   const [points, setPoints] = useState(user.points);
@@ -1693,11 +1769,36 @@ function ProfileTab({ user, onLogout }: { user: AppUser; onLogout: () => void })
             <div className="stat-number">{Math.floor(points / 10)}</div>
             <div className="stat-label">Entradas cargadas</div>
           </div>
+          
           <div className="stat-card">
             <div className="stat-number">#{rank || '—'}</div>
             <div className="stat-label">Posición</div>
           </div>
         </div>
+
+        {/* Botón para ver tutorial - AGREGAR ESTE BOTÓN */}
+        <button 
+          onClick={onRestartTour}
+          className="btn-ghost fade-up"
+          style={{
+            width: '100%',
+            marginBottom: '16px',
+            padding: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            background: 'rgba(24, 157, 245, 0.1)',
+            border: '1px solid rgba(24, 157, 245, 0.3)',
+            borderRadius: '12px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600'
+          }}
+        >
+          <span style={{ fontSize: '18px' }}>🎓</span>
+          Ver tutorial nuevamente
+        </button>
 
         <div className="toast-container">
           {toasts.map(toast => (
@@ -1744,6 +1845,10 @@ export default function App() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [tab, setTab] = useState<Tab>("home");
   const [hydrated, setHydrated] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [tourKey, setTourKey] = useState(0);
+
+
 
   // Create a wrapper function to handle navigation from DashboardTab
   const handleNavigate = useCallback((tabName: string) => {
@@ -1758,9 +1863,25 @@ export default function App() {
     });
   }, []);
 
-  const handleAuth = (u: AppUser) => setUser(u);
+  const handleAuth = (u: AppUser) => {
+    setUser(u);
+    // Mostrar tour después de login exitoso
+    setTimeout(() => {
+      setShowTour(true);
+    }, 500);
+  };
+   const handleTourComplete = () => {
+    setShowTour(false);
+  };
   const handleLogout = () => { setUser(null); setTab("home"); };
   const handlePointsUpdate = (newPoints: number) => setUser((u) => u ? { ...u, points: newPoints } : u);
+  const handleRestartTour = () => {
+  // Limpiar localStorage para que el tour se muestre de nuevo
+  localStorage.removeItem('tour_completed');
+  // Forzar reinicio del componente
+  setTourKey(prev => prev + 1);
+  setShowTour(true);
+};
 
   if (!hydrated) {
     return (
@@ -1784,6 +1905,8 @@ export default function App() {
           <AuthScreen onAuth={handleAuth} />
         ) : (
           <>
+          {/* Tour interactivo */}
+            {showTour && <OnboardingTour onComplete={handleTourComplete} />}
             <header className="app-header">
               <div className="container">
                 <div className="header-inner">
@@ -1799,7 +1922,7 @@ export default function App() {
             {tab === "home"    && <DashboardTab user={user} onNavigate={handleNavigate} />}
             {tab === "ticket"  && <TicketTab user={user} onPointsUpdate={handlePointsUpdate} />}
             {tab === "ranking" && <LeaderboardTab user={user} />}
-            {tab === "profile" && <ProfileTab user={user} onLogout={handleLogout} />}
+            {tab === "profile" && <ProfileTab user={user} onLogout={handleLogout} onRestartTour={handleRestartTour} />}
             
 
             <nav className="bottom-nav">
