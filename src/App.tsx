@@ -119,7 +119,7 @@ const styles = `
 
   .ticket-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; margin-bottom: 20px; }
   .ticket-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent)); }
-  .ticket-info-box { background: rgba(245,197,24,0.06); border: 1px solid rgba(245,197,24,0.2); border-radius: var(--radius); padding: 14px; margin-bottom: 20px; font-size: 13px; color: var(--text2); line-height: 1.6; }
+  .ticket-info-box { background: rgba(245,197,24,0.06); border: 1px solid rgba(245,197,24,0.2); border-radius: var(--radius); padding: 14px; margin-bottom: 20px; font-size: 13px; color: var(--text); line-height: 1.6; }
   .ticket-info-box strong { color: var(--accent); }
 
   .ticket-item { display: flex; align-items: center; justify-content: space-between; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; }
@@ -1203,7 +1203,7 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
         <div className="welcome-banner fade-up">
           <div className="welcome-name">¡Hola, {user.username}! 👋</div>
           <div className="welcome-club-flores">🏟️ {user.club}</div>
-          <div style={{ marginTop: 12, fontSize: 13, color: "var(--text2)" }}>
+          <div style={{ marginTop: 12, fontSize: 13, color: "var(--text)" }}>
             Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
           </div>
         </div>
@@ -1245,16 +1245,19 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [ticketHistory, setTicketHistory] = useState<Ticket[]>([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
-  const [showScanner, setShowScanner] = useState(false); // Nuevo estado
+  const [loadingHistory, setLoadingHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-const [detectedNumber, setDetectedNumber] = useState('');
-const [detectedText, setDetectedText] = useState('');
-  
+  const [detectedNumber, setDetectedNumber] = useState('');
+  const [detectedText, setDetectedText] = useState('');
 
+  // Cargar tickets activos de la semana actual
   const loadTickets = useCallback(async () => {
     try {
-      const t = await api.getUserTickets(user.id);
+      const t = await api.getCurrentWeekTickets(user.id);
       setTickets(t);
     } catch (e: any) {
       console.error(e);
@@ -1263,7 +1266,23 @@ const [detectedText, setDetectedText] = useState('');
     }
   }, [user.id]);
 
-  useEffect(() => { loadTickets(); }, [loadTickets]);
+  // Cargar historial de tickets
+  const loadTicketHistory = useCallback(async () => {
+    setLoadingHistory(true);
+    try {
+      const history = await api.getTicketHistory(user.id);
+      setTicketHistory(history);
+    } catch (e: any) {
+      console.error(e);
+    } finally {
+      setLoadingHistory(false);
+    }
+  }, [user.id]);
+
+  useEffect(() => { 
+    loadTickets(); 
+    loadTicketHistory();
+  }, [loadTickets, loadTicketHistory]);
 
   const handleSubmit = async (number?: string) => {
     const ticketToSubmit = number || ticketNumber;
@@ -1276,12 +1295,21 @@ const [detectedText, setDetectedText] = useState('');
       return; 
     }
     
+    // Verificar si el ticket ya fue usado esta semana
+    const cleanNumber = ticketToSubmit.replace(/[^0-9]/g, '');
+    const isValid = await api.isTicketValid(cleanNumber);
+    if (!isValid) {
+      setError("Este número de entrada ya fue utilizado en una semana anterior y ya no es válido para el sorteo actual.");
+      return;
+    }
+    
     setLoading(true);
     try {
-      const res = await api.submitTicket({ ticketNumber: ticketToSubmit });
+      const res = await api.submitTicket({ ticketNumber: cleanNumber });
       setSuccess(`¡Entrada cargada! Sumaste 10 puntos. Total: ${res.newPoints} pts 🎉`);
       setTicketNumber("");
       loadTickets();
+      loadTicketHistory(); // Actualizar historial también
       onPointsUpdate(res.newPoints);
       
       // Feedback háptico
@@ -1293,72 +1321,91 @@ const [detectedText, setDetectedText] = useState('');
       setError(e.message);
     } finally {
       setLoading(false);
-      setShowScanner(false); // Cerrar scanner si estaba abierto
+      setShowScanner(false);
     }
   };
 
-  // En TicketTab, modificar handleScan
-const handleScan = (scannedNumber: string, originalText: string) => {
-  console.log('🎫 Número escaneado:', scannedNumber);
-  console.log('📄 Texto original:', originalText);
-  
-  setDetectedNumber(scannedNumber);
-  setDetectedText(originalText);
-  setShowConfirmation(true);
-};
+  const handleScan = (scannedNumber: string, originalText: string) => {
+    console.log('🎫 Número escaneado:', scannedNumber);
+    console.log('📄 Texto original:', originalText);
+    
+    setDetectedNumber(scannedNumber);
+    setDetectedText(originalText);
+    setShowConfirmation(true);
+  };
 
-// Confirmar número
-const handleConfirmNumber = async (number: string) => {
-  setShowConfirmation(false);
-  
-  const cleanNumber = number.replace(/[^0-9]/g, '');
-  setTicketNumber(cleanNumber);
-  
-  // Mostrar feedback
-  const successMsg = `✅ Número verificado: ${cleanNumber}`;
-  setSuccess(successMsg);
-  setTimeout(() => setSuccess(''), 3000);
-  
-  // Auto-enviar
-  setTimeout(() => handleSubmit(cleanNumber), 500);
-};
+  const handleConfirmNumber = async (number: string) => {
+    setShowConfirmation(false);
+    
+    const cleanNumber = number.replace(/[^0-9]/g, '');
+    setTicketNumber(cleanNumber);
+    
+    // Mostrar feedback
+    const successMsg = `✅ Número verificado: ${cleanNumber}`;
+    setSuccess(successMsg);
+    setTimeout(() => setSuccess(''), 3000);
+    
+    // Auto-enviar
+    setTimeout(() => handleSubmit(cleanNumber), 500);
+  };
 
-// Cancelar
-const handleCancelScan = () => {
-  setShowConfirmation(false);
-  setDetectedNumber('');
-  setDetectedText('');
-};
+  const handleCancelScan = () => {
+    setShowConfirmation(false);
+    setDetectedNumber('');
+    setDetectedText('');
+  };
 
+  // Contar tickets ganadores activos
+  const activeWinners = tickets.filter(t => t.status === 'ganador').length;
+  const activeTickets = tickets.filter(t => t.status !== 'ganador').length;
 
   return (
     <div className="main-content">
       <div className="container">
         {/* Scanner Modal */}
         {showScanner && (
-        <TicketScanner 
-          onScan={handleScan}
-          onClose={() => setShowScanner(false)}
-        />
-      )}
+          <TicketScanner 
+            onScan={handleScan}
+            onClose={() => setShowScanner(false)}
+          />
+        )}
 
-      {/* Diálogo de confirmación */}
-      {showConfirmation && (
-        <ConfirmationDialog
-          detectedNumber={detectedNumber}
-          originalText={detectedText}
-          onConfirm={handleConfirmNumber}
-          onCancel={handleCancelScan}
-          onEdit={() => {}} // Opcional: para edición avanzada
-        />
-      )}
+        {/* Diálogo de confirmación */}
+        {showConfirmation && (
+          <ConfirmationDialog
+            detectedNumber={detectedNumber}
+            originalText={detectedText}
+            onConfirm={handleConfirmNumber}
+            onCancel={handleCancelScan}
+            onEdit={() => {}}
+          />
+        )}
 
         <div className="section-title fade-up">🎟️ Cargar entrada</div>
 
+        {/* Banner de tickets ganadores activos */}
+        {activeWinners > 0 && (
+          <div className="fade-up" style={{
+            background: "linear-gradient(135deg, rgba(61,255,160,0.2), rgba(61,255,160,0.05))",
+            border: "1px solid rgba(61,255,160,0.4)",
+            borderRadius: 16,
+            padding: 12,
+            marginBottom: 20,
+            textAlign: "center"
+          }}>
+            <span style={{ fontSize: 20, marginRight: 8 }}>🏆</span>
+            ¡Tenés {activeWinners} {activeWinners === 1 ? 'entrada ganadora' : 'entradas ganadoras'}!
+            Contactá al administrador para reclamar tu premio.
+          </div>
+        )}
+
         <div className="ticket-card fade-up">
           <div className="ticket-info-box">
-            Escaneá el <strong>código QR de tu entrada</strong> o ingresá el número manualmente. 
-            Cada entrada suma <strong>+10 puntos</strong>.
+            Escaneá el <strong>código número de tu entrada</strong> o ingresalo  manualmente. 
+            Cada entrada suma <strong>+10 puntos</strong>.<br />
+            <small style={{ color: "var(--text2)", fontSize: 11, display: "block", marginTop: 8 }}>
+              📅 Solo las entradas cargadas esta semana participan del sorteo
+            </small>
           </div>
           
           <Alert type="error" msg={error} />
@@ -1427,36 +1474,116 @@ const handleCancelScan = () => {
           </button>
         </div>
 
-        {/* Resto del componente igual... */}
-        <div className="section-title fade-up">📋 Mis entradas ({tickets.length})</div>
-        {loadingTickets ? (
-          <div className="empty-state"><div className="spinner" style={{ margin: "0 auto", borderTopColor: "var(--accent)", borderColor: "var(--border)" }} /></div>
-        ) : tickets.length === 0 ? (
-          <div className="empty-state fade-up">
-            <div className="empty-icon">🎟️✨</div>
-            <div className="empty-text">¡Escaneá tu primera entrada!</div>
-            <div className="empty-subtext" style={{ fontSize: 13, color: 'var(--text2)', marginTop: 8 }}>
-              Usá la cámara para escanear el código QR<br />
-              y comenzá a sumar puntos
+        {/* Selector de vista */}
+        <div style={{ display: "flex", gap: 12, marginBottom: 16, marginTop: 24 }}>
+          <button
+            onClick={() => setShowHistory(false)}
+            className="btn-ghost"
+            style={{
+              flex: 1,
+              padding: "10px",
+              background: !showHistory ? "var(--accent)" : "transparent",
+              color: !showHistory ? "#0a0a0f" : "var(--text2)",
+              border: !showHistory ? "none" : "1px solid var(--border)",
+              fontWeight: 700,
+              fontSize: 14,
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+          >
+            🎯 Activas ({activeTickets})
+          </button>
+          <button
+            onClick={() => setShowHistory(true)}
+            className="btn-ghost"
+            style={{
+              flex: 1,
+              padding: "10px",
+              background: showHistory ? "var(--accent)" : "transparent",
+              color: showHistory ? "#0a0a0f" : "var(--text2)",
+              border: showHistory ? "none" : "1px solid var(--border)",
+              fontWeight: 700,
+              fontSize: 14,
+              cursor: "pointer",
+              transition: "all 0.2s"
+            }}
+          >
+            📜 Historial ({ticketHistory.length})
+          </button>
+        </div>
+
+        {/* Contenido según selección */}
+        {!showHistory ? (
+          // Entradas activas de la semana
+          <>
+            <div className="section-title fade-up">
+              🎯 Entradas activas ({activeTickets})
             </div>
-          </div>
+            {loadingTickets ? (
+              <div className="empty-state">
+                <div className="spinner" style={{ margin: "0 auto", borderTopColor: "var(--accent)", borderColor: "var(--border)" }} />
+              </div>
+            ) : activeTickets === 0 ? (
+              <div className="empty-state fade-up">
+                <div className="empty-icon">🎟️✨</div>
+                <div className="empty-text">¡Escaneá tu primera entrada!</div>
+                <div className="empty-subtext" style={{ fontSize: 13, color: 'var(--text2)', marginTop: 8 }}>
+                  Usá la cámara para escanear el código QR<br />
+                  y comenzá a sumar puntos para el sorteo semanal
+                </div>
+              </div>
+            ) : (
+              tickets.filter(t => t.status !== 'ganador').map((t) => (
+                <div key={t.id} className="ticket-item fade-up">
+                  <div>
+                    <div className="ticket-number"># {t.ticketNumber}</div>
+                    <div className="ticket-meta">{formatDate(t.createdAt)}</div>
+                  </div>
+                  <div>
+                    <span className={`ticket-badge badge-${t.status}`}>
+                      {t.status === 'pendiente' && '⏳ Pendiente de validación'}
+                      {t.status === 'participando' && '🎯 ¡Participando en sorteo!'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </>
         ) : (
-          tickets.map((t) => (
-            <div key={t.id} className="ticket-item fade-up">
-              <div>
-                <div className="ticket-number"># {t.ticketNumber}</div>
-                <div className="ticket-meta">{formatDate(t.createdAt)}</div>
-              </div>
-              <div>
-                <span className={`ticket-badge badge-${t.status}`}>
-                  {t.status === 'pendiente' && '⏳ Pendiente'}
-                  {t.status === 'participando' && '🎯 ¡En sorteo!'}
-                  {t.status === 'ganador' && '🏆 ¡GANADORA!'}
-                  {t.status === 'invalido' && '❌ Inválida'}
-                </span>
-              </div>
+          // Historial de tickets antiguos
+          <>
+            <div className="section-title fade-up">
+              📜 Historial de entradas ({ticketHistory.length})
             </div>
-          ))
+            {loadingHistory ? (
+              <div className="empty-state">
+                <div className="spinner" style={{ margin: "0 auto", borderTopColor: "var(--accent)", borderColor: "var(--border)" }} />
+              </div>
+            ) : ticketHistory.length === 0 ? (
+              <div className="empty-state fade-up">
+                <div className="empty-icon">📭</div>
+                <div className="empty-text">No hay entradas en el historial.</div>
+                <div className="empty-subtext" style={{ fontSize: 13, color: 'var(--text2)', marginTop: 8 }}>
+                  Las entradas anteriores se archivarán automáticamente después del sorteo semanal.
+                </div>
+              </div>
+            ) : (
+              ticketHistory.map((t) => (
+                <div key={t.id} className="ticket-item fade-up" style={{ opacity: 0.8 }}>
+                  <div>
+                    <div className="ticket-number" style={{ fontSize: 16 }}># {t.ticketNumber}</div>
+                    <div className="ticket-meta">{formatDate(t.createdAt)}</div>
+                  </div>
+                  <div>
+                    <span className={`ticket-badge badge-${t.status}`}>
+                      {t.status === 'ganador' && '🏆 ¡ENTRADA GANADORA!'}
+                      {t.status === 'invalido' && '⏰ Sorteo finalizado'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </>
         )}
       </div>
     </div>

@@ -202,110 +202,105 @@ export const api = {
 
   // Submit ticket
   submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ ticket: Ticket; newPoints: number }> => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error('No session found');
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) throw new Error('No session found');
 
-    const userId = session.user.id;
-    const clean = ticketNumber.trim().replace(/\s/g, "");
-    
-    if (!/^\d{6,12}$/.test(clean)) {
-      throw new Error("El número de entrada debe tener entre 6 y 12 dígitos.");
-    }
+  const userId = session.user.id;
+  const clean = ticketNumber.trim().replace(/\s/g, "");
+  
+  if (!/^\d{6,12}$/.test(clean)) {
+    throw new Error("El número de entrada debe tener entre 6 y 12 dígitos.");
+  }
 
-    // Calcular inicio de semana (domingo)
-    const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-    
-    // Formatear fecha para Supabase (ISO string sin milisegundos)
-    const startOfWeekISO = startOfWeek.toISOString().split('.')[0];
+  // Usar la función add_ticket de la base de datos
+  const { data: ticketId, error: addError } = await supabase.rpc('add_ticket', {
+    p_user_id: userId,
+    p_ticket_number: clean,
+    p_club: (await supabase.from('profiles').select('club').eq('id', userId).single()).data?.club
+  });
 
-    // VERIFICACIÓN 1: ¿Ya cargó un ticket esta semana con el mismo número?
-    const { data: weeklyTicket, error: weeklyError } = await supabase
-      .from('tickets')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('ticket_number', clean)
-      .gte('created_at', startOfWeekISO);
+  if (addError) throw new Error(addError.message);
 
-    if (weeklyError) {
-      console.error('Error checking weekly ticket:', weeklyError);
-    }
+  // Obtener el ticket creado
+  const { data: ticket, error: ticketError } = await supabase
+    .from('tickets')
+    .select('*')
+    .eq('id', ticketId)
+    .single();
 
-    if (weeklyTicket && weeklyTicket.length > 0) {
-      throw new Error("Ya cargaste una entrada esta semana.");
-    }
+  if (ticketError) throw new Error('Error al obtener el ticket');
 
-    // VERIFICACIÓN 2: ¿El número de ticket ya existe en el sistema?
-    const { data: existingTicket, error: existingError } = await supabase
-      .from('tickets')
-      .select('id')
-      .eq('ticket_number', clean);
+  // Actualizar puntos del usuario (si corresponde)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('points')
+    .eq('id', userId)
+    .single();
 
-    if (existingError) {
-      console.error('Error checking existing ticket:', existingError);
-    }
+  const newPoints = (profile?.points || 0) + POINTS_PER_TICKET;
+  
+  await supabase
+    .from('profiles')
+    .update({ points: newPoints })
+    .eq('id', userId);
 
-    if (existingTicket && existingTicket.length > 0) {
-      throw new Error("Este número de entrada ya fue registrado.");
-    }
+  return {
+    ticket: {
+      id: ticket.id,
+      ticketNumber: ticket.ticket_number,
+      userId: ticket.user_id,
+      club: ticket.club,
+      status: ticket.status,
+      createdAt: ticket.created_at
+    },
+    newPoints: newPoints
+  };
+},
 
-    // Get user profile data
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('club, points')
-      .eq('id', userId)
-      .single();
-
-    if (profileError) {
-      console.error('Error fetching profile:', profileError);
-      throw new Error("Usuario no encontrado.");
-    }
-
-    // Create ticket
-    const { data: ticket, error: ticketError } = await supabase
-      .from('tickets')
-      .insert({
-        user_id: userId,
-        ticket_number: clean,
-        club: profileData.club,
-        status: "pendiente"
-      })
-      .select()
-      .single();
-
-    if (ticketError) {
-      console.error('Error creating ticket:', ticketError);
-      throw new Error("Error al registrar la entrada.");
-    }
-
-    // Update user points
-    const newPoints = (profileData.points || 0) + POINTS_PER_TICKET;
-    const { data: updatedProfile, error: updateError } = await supabase
-      .from('profiles')
-      .update({ points: newPoints })
-      .eq('id', userId)
-      .select()
-      .single();
-
-    if (updateError) {
-      console.error('Error updating points:', updateError);
-      throw new Error("Error al actualizar puntos.");
-    }
-
-    return {
-      ticket: {
-        id: ticket.id,
-        ticketNumber: ticket.ticket_number,
-        userId: ticket.user_id,
-        club: ticket.club,
-        status: ticket.status,
-        createdAt: ticket.created_at
-      },
-      newPoints: updatedProfile.points
-    };
-  },
+// Función para obtener estado del sorteo
+getRaffleStatus: async (): Promise<{
+  weekStart: Date;
+  weekEnd: Date;
+  totalTickets: number;
+  winners: any[];
+  nextRaffle: Date;
+}> => {
+  const startOfWeek = new Date();
+  startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+  
+  // Próximo sorteo (próximo lunes)
+  const nextRaffle = new Date();
+  const daysUntilMonday = (8 - nextRaffle.getDay()) % 7 || 7;
+  nextRaffle.setDate(nextRaffle.getDate() + daysUntilMonday);
+  nextRaffle.setHours(0, 0, 0, 0);
+  
+  // Contar tickets participantes
+  const { count: totalTickets } = await supabase
+    .from('tickets')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'participando')
+    .gte('created_at', startOfWeek.toISOString());
+  
+  // Obtener ganadores de esta semana
+  const { data: winners } = await supabase
+    .from('tickets')
+    .select('*, profiles(username, club)')
+    .eq('status', 'ganador')
+    .gte('created_at', startOfWeek.toISOString());
+  
+  return {
+    weekStart: startOfWeek,
+    weekEnd: endOfWeek,
+    totalTickets: totalTickets || 0,
+    winners: winners || [],
+    nextRaffle: nextRaffle
+  };
+},
 
   // Get user tickets
   getUserTickets: async (userId: string): Promise<Ticket[]> => {
@@ -460,6 +455,114 @@ getShareStats: async (userId: string): Promise<{ totalShares: number; totalPoint
     console.error('Error getting share stats:', error);
     return { totalShares: 0, totalPointsFromShares: 0 };
   }
+},
+
+// Obtener solo tickets de la semana actual (activos)
+getCurrentWeekTickets: async (userId: string): Promise<Ticket[]> => {
+  const startOfWeek = new Date();
+  startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  
+  const { data, error } = await supabase
+    .from('tickets')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('created_at', startOfWeek.toISOString())
+    .in('status', ['participando', 'pendiente', 'ganador'])
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data || []).map(ticket => ({
+    id: ticket.id,
+    ticketNumber: ticket.ticket_number,
+    userId: ticket.user_id,
+    club: ticket.club,
+    status: ticket.status,
+    createdAt: ticket.created_at
+  }));
+},
+
+// Obtener historial de tickets (tickets antiguos que ya no sirven)
+getTicketHistory: async (userId: string): Promise<Ticket[]> => {
+  // Primero obtener de tickets_history
+  const { data: historyData, error: historyError } = await supabase
+    .from('tickets_history')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (historyError) {
+    console.error('Error fetching ticket history:', historyError);
+  }
+
+  // También incluir tickets ganadores actuales que aún no se archivaron
+  const { data: winnerTickets, error: winnerError } = await supabase
+    .from('tickets')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('status', 'ganador')
+    .order('created_at', { ascending: false });
+
+  if (winnerError) {
+    console.error('Error fetching winner tickets:', winnerError);
+  }
+
+  const history = (historyData || []).map(ticket => ({
+    id: ticket.ticket_id || ticket.id,
+    ticketNumber: ticket.ticket_number,
+    userId: ticket.user_id,
+    club: ticket.club,
+    status: ticket.status,
+    createdAt: ticket.created_at
+  }));
+
+  const winners = (winnerTickets || []).map(ticket => ({
+    id: ticket.id,
+    ticketNumber: ticket.ticket_number,
+    userId: ticket.user_id,
+    club: ticket.club,
+    status: ticket.status,
+    createdAt: ticket.created_at
+  }));
+
+  return [...winners, ...history];
+},
+
+// Obtener ganadores históricos
+getWinnersHistory: async (limit: number = 10): Promise<any[]> => {
+  const { data, error } = await supabase
+    .from('winners_history')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data || [];
+},
+
+// Ejecutar limpieza semanal (se puede llamar manualmente desde admin)
+runWeeklyCleanup: async (): Promise<void> => {
+  const { error } = await supabase.rpc('weekly_cleanup');
+  if (error) throw error;
+},
+
+// Verificar si un ticket es válido para la semana actual
+isTicketValid: async (ticketNumber: string): Promise<boolean> => {
+  const startOfWeek = new Date();
+  startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  
+  const { data: ticket, error } = await supabase
+    .from('tickets')
+    .select('created_at, status')
+    .eq('ticket_number', ticketNumber)
+    .single();
+  
+  if (error || !ticket) return true; // Ticket nuevo es válido
+  
+  const ticketDate = new Date(ticket.created_at);
+  return ticketDate >= startOfWeek;
 },
 
   // Suscribirse a notificaciones en tiempo real
