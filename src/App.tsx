@@ -1250,18 +1250,84 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
   const [raffleCompleted, setRaffleCompleted] = useState(false);
 
+  // Define loadTickets function
+  const loadTickets = useCallback(async () => {
+    try {
+      const t = await api.getUserTickets(user.id);
+      setTickets(t);
+    } catch (error) {
+      console.error('Error loading tickets:', error);
+    }
+  }, [user.id]);
+
+  // Define loadLeaderboard function
+  const loadLeaderboard = useCallback(async () => {
+    try {
+      const l = await api.getLeaderboard();
+      setLeaderboard(l);
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+    }
+  }, []);
+
   useEffect(() => {
-    api.getUserTickets(user.id).then(setTickets).catch(console.error);
-    api.getLeaderboard().then(setLeaderboard).catch(console.error);
-  }, [user.id, user.points]);
+    loadTickets();
+    loadLeaderboard();
+  }, [loadTickets, loadLeaderboard]);
 
   const myRank = leaderboard.findIndex((u) => u.id === user.id) + 1;
+  
   const handleRaffleComplete = () => {
     setRaffleCompleted(true);
     // Recargar datos del sorteo
     loadLeaderboard();
     loadTickets();
   };
+
+  return (
+    <div className="main-content">
+      <div className="container">
+        <div className="welcome-banner fade-up">
+          <div className="welcome-name">¡Hola, {user.username}! 👋</div>
+          <div className="welcome-club-flores">🏟️ {user.club}</div>
+          <div style={{ marginTop: 12, fontSize: 13, color: "var(--text)" }}>
+            Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
+          </div>
+        </div>
+
+        {/* Contador regresivo */}
+        <CountdownTimer 
+          targetDate={getNextThursday20h()}
+          onComplete={handleRaffleComplete}
+        />
+
+        <div className="stats-grid fade-up">
+          <div className="stat-card"><div className="stat-number">{user.points}</div><div className="stat-label">Puntos</div></div>
+          <div className="stat-card"><div className="stat-number">{myRank || "—"}</div><div className="stat-label">Posición</div></div>
+          <div className="stat-card"><div className="stat-number">{tickets.length}</div><div className="stat-label">Entradas</div></div>
+          <div className="stat-card"><div className="stat-number">+10</div><div className="stat-label">Pts x entrada</div></div>
+        </div>
+
+        <div className="section-title fade-up">🏅 Top 5 del momento</div>
+        {leaderboard.slice(0, 5).map((u, i) => (
+          <div key={u.id} className={`leader-item fade-up${u.id === user.id ? " me" : ""}`}>
+            <div className={`leader-rank${i < 3 ? " top" : ""}`}>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</div>
+            <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
+            <div className="leader-info">
+              <div className="leader-name">{u.username}{u.id === user.id ? " (vos)" : ""}</div>
+              <div className="leader-club">{u.club}</div>
+            </div>
+            <div className="leader-points">{u.points}</div>
+          </div>
+        ))}
+
+        <div style={{ marginTop: 24 }} className="fade-up">
+          <button className="btn btn-primary" onClick={() => onNavigate("ticket")}>🎟️ CARGAR ENTRADA</button>
+        </div>
+      </div>
+    </div>
+  );
+} 
 
   return (
     <div className="main-content">
