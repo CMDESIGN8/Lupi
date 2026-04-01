@@ -206,7 +206,8 @@ export const api = {
   },
 
   // Submit ticket
-  submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ ticket: Ticket; newPoints: number; streakReward?: { points: number; message: string } }> => {
+  // En api.ts, corregir submitTicket
+submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ ticket: Ticket; newPoints: number; streakReward?: { points: number; message: string } }> => {
   const { data: { session } } = await supabase.auth.getSession();
   if (!session) throw new Error('No session found');
 
@@ -217,25 +218,74 @@ export const api = {
     throw new Error("El número de entrada debe tener entre 6 y 12 dígitos.");
   }
 
-  // Insertar ticket (el trigger actualizará la racha automáticamente)
+  // Obtener el club del usuario
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('club, points')
+    .eq('id', userId)
+    .single();
+    
+  if (profileError) {
+    console.error('Error getting profile:', profileError);
+    throw new Error('Error al obtener perfil de usuario');
+  }
+
+  // Primero, verificar si el ticket ya existe y es válido
+  const { data: existingTicket, error: checkError } = await supabase
+    .from('tickets')
+    .select('id, created_at, status')
+    .eq('ticket_number', clean)
+    .maybeSingle();
+    
+  if (checkError && checkError.code !== 'PGRST116') {
+    console.error('Error checking existing ticket:', checkError);
+  }
+  
+  // Si el ticket ya existe
+  if (existingTicket) {
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    const ticketDate = new Date(existingTicket.created_at);
+    
+    if (ticketDate >= startOfWeek) {
+      throw new Error('Este número de entrada ya fue cargado esta semana.');
+    } else {
+      throw new Error('Este número de entrada ya fue utilizado en una semana anterior y ya no es válido.');
+    }
+  }
+
+  // Insertar el ticket usando add_ticket RPC
   const { data: ticketId, error: addError } = await supabase.rpc('add_ticket', {
     p_user_id: userId,
     p_ticket_number: clean,
-    p_club: (await supabase.from('profiles').select('club').eq('id', userId).single()).data?.club
+    p_club: profile.club
   });
 
-  if (addError) throw new Error(addError.message);
+  if (addError) {
+    console.error('Error adding ticket:', addError);
+    throw new Error(addError.message || 'Error al cargar la entrada');
+  }
+  
+  if (!ticketId) {
+    throw new Error('No se pudo crear el ticket');
+  }
 
-  // Verificar recompensas por racha
-  const { data: rewardData, error: rewardError } = await supabase
-    .rpc('check_streak_rewards', { p_user_id: userId });
-
+  // Verificar recompensas por racha (si tienes la función)
   let streakReward = null;
-  if (!rewardError && rewardData && rewardData.length > 0 && rewardData[0].reward_given) {
-    streakReward = {
-      points: rewardData[0].points_awarded,
-      message: rewardData[0].message
-    };
+  try {
+    const { data: rewardData, error: rewardError } = await supabase
+      .rpc('check_streak_rewards', { p_user_id: userId });
+    
+    if (!rewardError && rewardData && rewardData.length > 0 && rewardData[0].reward_given) {
+      streakReward = {
+        points: rewardData[0].points_awarded,
+        message: rewardData[0].message
+      };
+    }
+  } catch (error) {
+    console.error('Error checking streak rewards:', error);
   }
 
   // Obtener el ticket creado
@@ -245,16 +295,24 @@ export const api = {
     .eq('id', ticketId)
     .single();
 
-  if (ticketError) throw new Error('Error al obtener el ticket');
+  if (ticketError) {
+    console.error('Error fetching created ticket:', ticketError);
+    throw new Error('Error al obtener el ticket');
+  }
 
   // Actualizar puntos del usuario
-  const { data: profile } = await supabase
+  const pointsToAdd = (streakReward?.points || 0) + 10;
+  const newPoints = (profile.points || 0) + pointsToAdd;
+  
+  const { error: updateError } = await supabase
     .from('profiles')
-    .select('points')
-    .eq('id', userId)
-    .single();
-
-  const newPoints = (profile?.points || 0) + POINTS_PER_TICKET;
+    .update({ points: newPoints })
+    .eq('id', userId);
+    
+  if (updateError) {
+    console.error('Error updating points:', updateError);
+    throw new Error('Error al actualizar puntos');
+  }
 
   return {
     ticket: {

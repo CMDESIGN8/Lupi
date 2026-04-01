@@ -12,6 +12,9 @@ import { CountdownTimer } from './components/CountdownTimer';
 import { getNextThursday20h } from './lib/dateUtils';
 import { OnboardingTour } from './components/OnboardingTour';
 import { StreakBadge } from './components/StreakBadge';
+import { ClickEffect } from './components/ClickEffect';
+import { NotificationPermission } from './components/NotificationPermission';
+import { usePushNotifications } from './hooks/usePushNotifications';
 
 
 
@@ -539,6 +542,137 @@ const styles = `
   padding: 8px 16px;
   border-radius: 100px;
   margin-bottom: 16px;
+}
+
+/* Agregar a los estilos existentes en App.tsx */
+
+/* Puntos flotantes */
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.floating-points {
+  animation: floatUp 1s ease-out forwards;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+
+.floating-points.bonus {
+  filter: drop-shadow(0 0 10px #ffd700);
+  animation: floatUp 1.2s ease-out forwards;
+}
+
+/* Combo text */
+@keyframes comboPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.combo-text {
+  animation: comboPulse 0.5s ease-out;
+}
+
+/* Level Up */
+@keyframes levelUpPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.level-up-text {
+  animation: levelUpPulse 1s ease-out;
+}
+
+/* Achievement popup */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.achievement-popup {
+  animation: slideInRight 0.3s ease-out, fadeOut 0.3s ease-out 2.7s forwards;
+}
+
+/* Streak bonus */
+@keyframes streakBonusPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.streak-bonus {
+  animation: streakBonusPop 0.5s ease-out;
+}
+
+/* Efecto de brillo al pasar el mouse en botones */
+.btn-primary, .btn-ghost {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after, .btn-ghost::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.btn-primary:active::after, .btn-ghost:active::after {
+  width: 200%;
+  height: 200%;
 }
 
 .reward-badge {
@@ -1562,46 +1696,73 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
     loadTicketHistory();
   }, [loadTickets, loadTicketHistory]);
 
-  const handleSubmit = async (number?: string) => {
-    const ticketToSubmit = number || ticketNumber;
-    
-    setError(""); 
-    setSuccess("");
-    
-    if (!ticketToSubmit.trim()) { 
-      setError("Ingresá o escaneá el número de tu entrada."); 
-      return; 
-    }
-    
-    // Verificar si el ticket ya fue usado esta semana
-    const cleanNumber = ticketToSubmit.replace(/[^0-9]/g, '');
+  // En TicketTab, actualizar handleSubmit
+const handleSubmit = async (number?: string) => {
+  const ticketToSubmit = number || ticketNumber;
+  
+  setError(""); 
+  setSuccess("");
+  
+  if (!ticketToSubmit.trim()) { 
+    setError("Ingresá o escaneá el número de tu entrada."); 
+    return; 
+  }
+  
+  // Limpiar el número (solo dígitos)
+  const cleanNumber = ticketToSubmit.replace(/[^0-9]/g, '');
+  
+  if (cleanNumber.length < 6 || cleanNumber.length > 12) {
+    setError("El número de entrada debe tener entre 6 y 12 dígitos.");
+    return;
+  }
+  
+  setLoading(true);
+  
+  try {
+    // Verificar si el ticket ya fue usado
     const isValid = await api.isTicketValid(cleanNumber);
     if (!isValid) {
       setError("Este número de entrada ya fue utilizado en una semana anterior y ya no es válido para el sorteo actual.");
+      setLoading(false);
       return;
     }
     
-    setLoading(true);
-    try {
-      const res = await api.submitTicket({ ticketNumber: cleanNumber });
-      setSuccess(`¡Entrada cargada! Sumaste 10 puntos. Total: ${res.newPoints} pts 🎉`);
-      setTicketNumber("");
-      loadTickets();
-      loadTicketHistory(); // Actualizar historial también
-      onPointsUpdate(res.newPoints);
-      
-      // Feedback háptico
-      if ('vibrate' in navigator) {
-        navigator.vibrate([100, 50, 100]);
-      }
-      
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-      setShowScanner(false);
+    // Enviar el ticket
+    const res = await api.submitTicket({ ticketNumber: cleanNumber });
+    
+    // Mostrar mensaje de éxito
+    let successMessage = `🎟️ ¡Entrada cargada! Sumaste 10 puntos. Total: ${res.newPoints} pts`;
+    
+    // Si hay recompensa de racha, mostrarla
+    if (res.streakReward) {
+      successMessage = `🔥 ${res.streakReward.message} Ahora tenés ${res.newPoints} puntos totales.`;
+      setStreakReward(res.streakReward);
+      setTimeout(() => setStreakReward(null), 5000);
     }
-  };
+    
+    setSuccess(successMessage);
+    setTicketNumber("");
+    
+    // Recargar tickets y actualizar puntos
+    await loadTickets();
+    await loadTicketHistory();
+    onPointsUpdate(res.newPoints);
+    
+    // Feedback háptico
+    if ('vibrate' in navigator) {
+      navigator.vibrate([100, 50, 100]);
+    }
+    
+    // Cerrar scanner si estaba abierto
+    setShowScanner(false);
+    
+  } catch (e: any) {
+    console.error('Error submitting ticket:', e);
+    setError(e.message || "Error al cargar la entrada. Intentá nuevamente.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleScan = (scannedNumber: string, originalText: string) => {
     console.log('🎫 Número escaneado:', scannedNumber);
@@ -2053,8 +2214,21 @@ export default function App() {
   const [hydrated, setHydrated] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [tourKey, setTourKey] = useState(0);
+  const { notifyStreakAtRisk, notifyNewRecord, notifyReward } = usePushNotifications(user?.id);
 
-
+// Efecto para verificar racha y enviar notificaciones
+  useEffect(() => {
+    if (user && user.streak > 0) {
+      // Notificar racha en peligro si no cargó hoy
+      const lastTicketDate = user.last_ticket_date;
+      const today = new Date().toDateString();
+      
+      if (lastTicketDate !== today) {
+        notifyStreakAtRisk(user.streak);
+      }
+    }
+  }, [user, notifyStreakAtRisk]);
+  
 
   // Create a wrapper function to handle navigation from DashboardTab
   const handleNavigate = useCallback((tabName: string) => {
@@ -2080,7 +2254,14 @@ export default function App() {
     setShowTour(false);
   };
   const handleLogout = () => { setUser(null); setTab("home"); };
-  const handlePointsUpdate = (newPoints: number) => setUser((u) => u ? { ...u, points: newPoints } : u);
+  const handlePointsUpdate = useCallback((newPoints: number) => {
+    setUser((u) => u ? { ...u, points: newPoints } : u);
+    
+    // Verificar si es nuevo récord de racha
+    if (user && user.streak > (user.best_streak || 0)) {
+      notifyNewRecord(user.streak);
+    }
+  }, [user, notifyNewRecord]);
   const handleRestartTour = () => {
   // Limpiar localStorage para que el tour se muestre de nuevo
   localStorage.removeItem('tour_completed');
@@ -2113,6 +2294,9 @@ export default function App() {
           <>
           {/* Tour interactivo */}
             {showTour && <OnboardingTour onComplete={handleTourComplete} />}
+             {/* Componente de solicitud de notificaciones */}
+            <NotificationPermission userId={user.id} />
+            <ClickEffect>
             <header className="app-header">
               <div className="container">
                 <div className="header-inner">
@@ -2144,6 +2328,7 @@ export default function App() {
                 </button>
               ))}
             </nav>
+            </ClickEffect>
           </>
         )}
       </div>
