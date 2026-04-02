@@ -114,7 +114,7 @@ const showLocalNotification = useCallback(async (payload: NotificationPayload) =
       await registration.showNotification(payload.title, {
         ...baseOptions,
         actions: payload.actions,
-        vibrate: [200, 100, 200]
+        vibrate: [200, 100, 200]  // ← vibración solo aquí, dentro del SW
       } as any);
       return;
     } catch (error) {
@@ -135,8 +135,8 @@ const showLocalNotification = useCallback(async (payload: NotificationPayload) =
       notification.close();
     };
     
-    // Intentar agregar vibrate si el navegador lo soporta
-    if ('vibrate' in navigator && payload.vibrate !== false) {
+    // Vibración para notificaciones normales (sin Service Worker)
+    if ('vibrate' in navigator) {
       navigator.vibrate([200, 100, 200]);
     }
     
