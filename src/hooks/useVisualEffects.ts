@@ -1,55 +1,46 @@
-// hooks/useVisualEffects.ts
+// hooks/useVisualEffects.ts (versión completa con confeti casero)
 import { useCallback } from 'react';
-import confetti from 'canvas-confetti';
 
 export function useVisualEffects() {
   
-  // Mostrar puntos flotantes
-  const showFloatingPoints = useCallback((points: number, x: number, y: number, isBonus: boolean = false) => {
-    const div = document.createElement('div');
-    div.className = `floating-points ${isBonus ? 'bonus' : ''}`;
-    div.textContent = `+${points}`;
-    div.style.left = `${x}px`;
-    div.style.top = `${y}px`;
-    div.style.position = 'fixed';
-    div.style.zIndex = '10000';
-    div.style.pointerEvents = 'none';
-    div.style.fontSize = isBonus ? '32px' : '24px';
-    div.style.fontWeight = 'bold';
-    div.style.color = isBonus ? '#ffd700' : '#189df5';
-    div.style.textShadow = '0 0 10px currentColor';
-    div.style.animation = 'floatUp 1s ease-out forwards';
-    
-    document.body.appendChild(div);
-    
-    setTimeout(() => div.remove(), 1000);
-  }, []);
-  
-  // Confeti de celebración
+  // Confeti casero
   const celebrate = useCallback((intensity: 'light' | 'medium' | 'epic' = 'medium') => {
-    const configs = {
-      light: {
-        particleCount: 50,
-        spread: 60,
-        origin: { y: 0.6 }
-      },
-      medium: {
-        particleCount: 150,
-        spread: 80,
-        origin: { y: 0.6 },
-        colors: ['#189df5', '#ffd700', '#ff4d6d']
-      },
-      epic: {
-        particleCount: 300,
-        spread: 120,
-        origin: { y: 0.5 },
-        colors: ['#ffd700', '#ff4d6d', '#189df5', '#3dffa0', '#9b59b6'],
-        startVelocity: 20,
-        decay: 0.9
-      }
+    const counts = {
+      light: 30,
+      medium: 80,
+      epic: 150
     };
     
-    confetti(configs[intensity]);
+    const particleCount = counts[intensity];
+    const colors = ['#189df5', '#ffd700', '#ff4d6d', '#3dffa0', '#9b59b6', '#ff8c00'];
+    
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'confetti-particle';
+      
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const size = Math.random() * 8 + 4;
+      const startX = Math.random() * window.innerWidth;
+      const startY = -20;
+      const rotation = Math.random() * 360;
+      const duration = Math.random() * 2 + 1;
+      const delay = Math.random() * 0.5;
+      
+      particle.style.cssText = `
+        left: ${startX}px;
+        top: ${startY}px;
+        width: ${size}px;
+        height: ${size}px;
+        background: ${color};
+        border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
+        transform: rotate(${rotation}deg);
+        animation: confettiFall ${duration}s ease-out ${delay}s forwards;
+      `;
+      
+      document.body.appendChild(particle);
+      
+      setTimeout(() => particle.remove(), (duration + delay) * 1000);
+    }
     
     // Vibración háptica
     if ('vibrate' in navigator) {
@@ -63,29 +54,70 @@ export function useVisualEffects() {
     }
   }, []);
   
+  // Mostrar puntos flotantes
+  const showFloatingPoints = useCallback((points: number, x: number, y: number, isBonus: boolean = false) => {
+    const div = document.createElement('div');
+    div.className = `floating-points ${isBonus ? 'bonus' : ''}`;
+    div.textContent = `+${points}`;
+    div.style.left = `${x}px`;
+    div.style.top = `${y}px`;
+    
+    document.body.appendChild(div);
+    
+    let startTime: number | null = null;
+    const startY = y;
+    
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / 1000, 1);
+      
+      const yOffset = progress * -100;
+      const scale = 1 + progress * 0.5;
+      const opacity = 1 - progress;
+      
+      div.style.transform = `translateY(${yOffset}px) scale(${scale})`;
+      div.style.opacity = opacity.toString();
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        div.remove();
+      }
+    };
+    
+    requestAnimationFrame(animate);
+  }, []);
+  
   // Efecto de combo
   const showCombo = useCallback((combo: number) => {
     const div = document.createElement('div');
     div.className = 'combo-text';
     div.textContent = `${combo}x COMBO!`;
-    div.style.position = 'fixed';
-    div.style.top = '50%';
-    div.style.left = '50%';
-    div.style.transform = 'translate(-50%, -50%)';
-    div.style.zIndex = '10000';
-    div.style.fontSize = '48px';
-    div.style.fontWeight = 'bold';
-    div.style.color = '#ff4d6d';
-    div.style.textShadow = '0 0 20px #ff4d6d';
-    div.style.whiteSpace = 'nowrap';
-    div.style.animation = 'comboPulse 0.5s ease-out';
-    div.style.pointerEvents = 'none';
-    
     document.body.appendChild(div);
     
-    setTimeout(() => div.remove(), 1000);
+    let startTime: number | null = null;
     
-    // Vibración especial para combo
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / 500, 1);
+      
+      const scale = 0.5 + progress * 0.7;
+      const opacity = 1 - progress;
+      
+      div.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      div.style.opacity = opacity.toString();
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        div.remove();
+      }
+    };
+    
+    requestAnimationFrame(animate);
+    
     if ('vibrate' in navigator) {
       navigator.vibrate([50, 30, 50, 30, 100]);
     }
@@ -93,32 +125,37 @@ export function useVisualEffects() {
   
   // Efecto de nivel up
   const showLevelUp = useCallback((level: number) => {
-    // Confeti épico
     celebrate('epic');
     
-    // Texto flotante gigante
     const div = document.createElement('div');
     div.className = 'level-up-text';
     div.textContent = `✨ NIVEL ${level} ✨`;
-    div.style.position = 'fixed';
-    div.style.top = '40%';
-    div.style.left = '50%';
-    div.style.transform = 'translate(-50%, -50%)';
-    div.style.zIndex = '10000';
-    div.style.fontSize = '48px';
-    div.style.fontWeight = 'bold';
-    div.style.color = '#ffd700';
-    div.style.textShadow = '0 0 30px #ffd700';
-    div.style.whiteSpace = 'nowrap';
-    div.style.animation = 'levelUpPulse 1s ease-out';
-    div.style.pointerEvents = 'none';
-    
     document.body.appendChild(div);
     
-    setTimeout(() => div.remove(), 2000);
+    let startTime: number | null = null;
+    
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / 1000, 1);
+      
+      const scale = 0.5 + progress * 0.8;
+      const opacity = 1 - progress * 0.8;
+      
+      div.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      div.style.opacity = opacity.toString();
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        div.remove();
+      }
+    };
+    
+    requestAnimationFrame(animate);
   }, [celebrate]);
   
-  // Efecto de logro desbloqueado
+  // Efecto de logro
   const showAchievement = useCallback((name: string, icon: string) => {
     const div = document.createElement('div');
     div.className = 'achievement-popup';
@@ -131,27 +168,34 @@ export function useVisualEffects() {
         </div>
       </div>
     `;
-    div.style.position = 'fixed';
-    div.style.top = '80px';
-    div.style.right = '20px';
-    div.style.background = 'linear-gradient(135deg, #2a2a3a, #1c1c28)';
-    div.style.borderLeft = '4px solid #ffd700';
-    div.style.borderRadius = '12px';
-    div.style.padding = '12px 20px';
-    div.style.zIndex = '10000';
-    div.style.animation = 'slideInRight 0.3s ease-out, fadeOut 0.3s ease-out 2.7s forwards';
-    div.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
-    
     document.body.appendChild(div);
     
-    setTimeout(() => div.remove(), 3000);
+    let startTime: number | null = null;
     
-    // Sonido (opcional)
-    try {
-      const audio = new Audio('/sounds/achievement.mp3');
-      audio.volume = 0.3;
-      audio.play().catch(() => {});
-    } catch (e) {}
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      
+      if (elapsed < 300) {
+        const progress = elapsed / 300;
+        div.style.transform = `translateX(${100 - progress * 100}%)`;
+        div.style.opacity = progress.toString();
+        requestAnimationFrame(animate);
+      } else if (elapsed < 2700) {
+        div.style.transform = 'translateX(0)';
+        div.style.opacity = '1';
+        requestAnimationFrame(animate);
+      } else if (elapsed < 3000) {
+        const progress = (elapsed - 2700) / 300;
+        div.style.transform = `translateX(${progress * 100}%)`;
+        div.style.opacity = (1 - progress).toString();
+        requestAnimationFrame(animate);
+      } else {
+        div.remove();
+      }
+    };
+    
+    requestAnimationFrame(animate);
   }, []);
   
   // Efecto de racha
@@ -165,21 +209,29 @@ export function useVisualEffects() {
         <div style="font-size: 18px;">+${points} PUNTOS BONUS</div>
       </div>
     `;
-    div.style.position = 'fixed';
-    div.style.top = '50%';
-    div.style.left = '50%';
-    div.style.transform = 'translate(-50%, -50%)';
-    div.style.background = 'linear-gradient(135deg, #ff4d6d, #ff6b4a)';
-    div.style.borderRadius = '24px';
-    div.style.padding = '24px';
-    div.style.zIndex = '10000';
-    div.style.animation = 'streakBonusPop 0.5s ease-out';
-    div.style.boxShadow = '0 0 50px rgba(255,77,109,0.5)';
-    
     document.body.appendChild(div);
     
-    setTimeout(() => div.remove(), 2000);
+    let startTime: number | null = null;
     
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / 2000, 1);
+      
+      const scale = 0.5 + progress * 0.5;
+      const opacity = 1 - progress;
+      
+      div.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      div.style.opacity = opacity.toString();
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        div.remove();
+      }
+    };
+    
+    requestAnimationFrame(animate);
     celebrate('medium');
   }, [celebrate]);
   

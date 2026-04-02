@@ -15,6 +15,8 @@ import { StreakBadge } from './components/StreakBadge';
 import { ClickEffect } from './components/ClickEffect';
 import { NotificationPermission } from './components/NotificationPermission';
 import { usePushNotifications } from './hooks/usePushNotifications';
+import { useVisualEffects } from './hooks/useVisualEffects';
+
 
 
 
@@ -1370,6 +1372,176 @@ const styles = `
     box-shadow: 0 0 0 8px rgba(24, 157, 245, 0.5);
   }
 }
+  /* Animación de confeti casero */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.confetti-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 10000;
+  animation: confettiFall linear forwards;
+}
+
+/* Puntos flotantes */
+@keyframes floatUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100px) scale(1.5);
+    opacity: 0;
+  }
+}
+
+.floating-points {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  font-weight: bold;
+  white-space: nowrap;
+  animation: floatUp 1s ease-out forwards;
+}
+
+.floating-points.bonus {
+  font-size: 32px;
+  color: #ffd700;
+  text-shadow: 0 0 10px #ffd700;
+  animation: floatUp 1.2s ease-out forwards;
+}
+
+/* Combo text */
+@keyframes comboPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.combo-text {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  font-size: 48px;
+  font-weight: bold;
+  color: #ff4d6d;
+  text-shadow: 0 0 20px #ff4d6d;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: comboPulse 0.5s ease-out;
+}
+
+/* Level up text */
+@keyframes levelUpPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  30% {
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  70% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.level-up-text {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  font-size: 48px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 30px #ffd700;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: levelUpPulse 1s ease-out;
+}
+
+/* Achievement popup */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+.achievement-popup {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 10000;
+  background: linear-gradient(135deg, #2a2a3a, #1c1c28);
+  border-left: 4px solid #ffd700;
+  border-radius: 12px;
+  padding: 12px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* Streak bonus */
+@keyframes streakBonusPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.streak-bonus {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+  background: linear-gradient(135deg, #ff4d6d, #ff6b4a);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 0 50px rgba(255, 77, 109, 0.5);
+  pointer-events: none;
+  animation: streakBonusPop 0.5s ease-out;
+}
 `;
 
 // ============================================================
@@ -1665,6 +1837,8 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   const [detectedNumber, setDetectedNumber] = useState('');
   const [detectedText, setDetectedText] = useState('');
   const [streakReward, setStreakReward] = useState<{ points: number; message: string } | null>(null);
+    const { celebrate, showFloatingPoints, showStreakBonus } = useVisualEffects();
+
 
   // Cargar tickets activos de la semana actual
   const loadTickets = useCallback(async () => {
