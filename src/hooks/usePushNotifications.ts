@@ -93,22 +93,29 @@ export function usePushNotifications(userId: string | undefined) {
   
   // Mostrar notificación local
   // Mostrar notificación local
+// Mostrar notificación local
 const showLocalNotification = useCallback(async (payload: NotificationPayload) => {
   if (!isSupported || permission !== 'granted') return;
+  
+  // Opciones base sin propiedades no estándar
+  const baseOptions = {
+    body: payload.body,
+    icon: payload.icon || '/icons/icon-192x192.png',
+    badge: payload.badge || '/icons/badge-72x72.png',
+    data: payload.data,
+    silent: false
+  };
   
   // Si tiene actions, intentar usar Service Worker
   if (payload.actions && payload.actions.length > 0) {
     try {
       const registration = await navigator.serviceWorker.ready;
-      registration.showNotification(payload.title, {
-        body: payload.body,
-        icon: payload.icon || '/icons/icon-192x192.png',
-        badge: payload.badge || '/icons/badge-72x72.png',
-        data: payload.data,
+      // Usar 'as any' para evitar el error de TypeScript con actions
+      await registration.showNotification(payload.title, {
+        ...baseOptions,
         actions: payload.actions,
-        vibrate: [200, 100, 200],
-        silent: false
-      });
+        vibrate: [200, 100, 200]
+      } as any);
       return;
     } catch (error) {
       console.error('Error mostrando notificación con Service Worker:', error);
@@ -116,27 +123,27 @@ const showLocalNotification = useCallback(async (payload: NotificationPayload) =
   }
   
   // Fallback para notificaciones sin actions (usando window.Notification)
-  const options: NotificationOptions = {
-    body: payload.body,
-    icon: payload.icon || '/icons/icon-192x192.png',
-    badge: payload.badge || '/icons/badge-72x72.png',
-    data: payload.data,
-    vibrate: [200, 100, 200],
-    silent: false
-  };
-  
-  const notification = new Notification(payload.title, options);
-  
-  notification.onclick = (event) => {
-    event.preventDefault();
-    window.focus();
-    if (payload.data?.url) {
-      window.location.href = payload.data.url;
+  try {
+    const notification = new Notification(payload.title, baseOptions as NotificationOptions);
+    
+    notification.onclick = (event) => {
+      event.preventDefault();
+      window.focus();
+      if (payload.data?.url) {
+        window.location.href = payload.data.url;
+      }
+      notification.close();
+    };
+    
+    // Intentar agregar vibrate si el navegador lo soporta
+    if ('vibrate' in navigator && payload.vibrate !== false) {
+      navigator.vibrate([200, 100, 200]);
     }
-    notification.close();
-  };
-  
-  return notification;
+    
+    return notification;
+  } catch (error) {
+    console.error('Error mostrando notificación:', error);
+  }
 }, [isSupported, permission]);
   
   // Programar notificación
