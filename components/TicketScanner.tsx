@@ -1,9 +1,9 @@
 // src/components/TicketScanner.tsx
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { createWorker } from 'tesseract.js';
 
 interface TicketScannerProps {
-  onScan: (ticketNumber: string) => void;
+  onScan: (ticketNumber: string, originalText: string) => void;
   onClose: () => void;
 }
 
@@ -15,32 +15,99 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Función para extraer números de 8-12 dígitos del texto
-  // En extractTicketNumber, agregá:
-const extractTicketNumber = (text: string): string | null => {
-  console.log('🔍 Texto completo recibido:', text);
-  console.log('📏 Longitud del texto:', text.length);
-  
-  // Mostrar todos los números encontrados
-  const allNumbers = text.match(/\d+/g);
-  console.log('🔢 Todos los números encontrados:', allNumbers);
-  
-  // Buscar números de 8-12 dígitos
-  const longPattern = /\b(\d{8,12})\b/g;
-  const longMatches = text.match(longPattern);
-  console.log('📊 Números de 8-12 dígitos:', longMatches);
-  
-  if (longMatches && longMatches.length > 0) {
-    return longMatches[0];
-  }
-  
-  // Fallback: buscar cualquier número de 6+ dígitos
-  const fallbackPattern = /\b(\d{6,})\b/g;
-  const fallbackMatch = text.match(fallbackPattern);
-  console.log('⚠️ Fallback (6+ dígitos):', fallbackMatch);
-  
-  return fallbackMatch ? fallbackMatch[0] : null;
-};
+  // Función para mejorar la imagen antes de OCR
+  const enhanceImage = (imageDataUrl: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Aumentar resolución y mejorar contraste
+        canvas.width = img.width * 2;
+        canvas.height = img.height * 2;
+        
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imageData.data;
+          
+          // Mejorar contraste
+          for (let i = 0; i < data.length; i += 4) {
+            const gray = (data[i] + data[i+1] + data[i+2]) / 3;
+            const enhanced = gray > 70 ? 255 : 0;
+            data[i] = enhanced;
+            data[i+1] = enhanced;
+            data[i+2] = enhanced;
+          }
+          
+          ctx.putImageData(imageData, 0, 0);
+        }
+        
+        resolve(canvas.toDataURL('image/jpeg', 0.95));
+      };
+      img.src = imageDataUrl;
+    });
+  };
+
+  // Función mejorada para extraer números
+  const extractTicketNumber = (text: string): string | null => {
+    console.log('🔍 Texto completo recibido:', text);
+    
+    // Limpiar el texto
+    const cleanText = text.replace(/[^\w\s\d]/g, ' ').toUpperCase();
+    
+    // Buscar números de 8-12 dígitos con diferentes patrones
+    const patterns = [
+      // Patrón 1: Números aislados
+      /\b(\d{8,12})\b/g,
+      // Patrón 2: Números después de palabras clave
+      /(?:ENTRADA|TICKET|N[°º]|NUMERO|NRO)\s*:?\s*(\d{6,12})/gi,
+      // Patrón 3: Números con letras alrededor (como en la entrada)
+      /[A-Z]{0,2}(\d{8,12})[A-Z]{0,2}/g,
+      // Patrón 4: Números al final de línea
+      /[\n\r](\d{8,12})[\n\r]/g,
+    ];
+    
+    for (const pattern of patterns) {
+      const matches = text.match(pattern);
+      if (matches) {
+        for (const match of matches) {
+          const numbers = match.replace(/[^0-9]/g, '');
+          if (numbers.length >= 8 && numbers.length <= 12) {
+            console.log('✅ Encontrado por patrón:', numbers);
+            return numbers;
+          }
+        }
+      }
+    }
+    
+    // Estrategia: Tomar todos los números y elegir el más largo
+    const allNumbers = text.match(/\d+/g);
+    console.log('🔢 Todos los números encontrados:', allNumbers);
+    
+    if (allNumbers && allNumbers.length > 0) {
+      // Filtrar números pequeños
+      const validNumbers = allNumbers.filter(num => num.length >= 6);
+      
+      if (validNumbers.length > 0) {
+        // Ordenar por longitud
+        const sorted = validNumbers.sort((a, b) => b.length - a.length);
+        const candidate = sorted[0];
+        
+        if (candidate.length >= 8) {
+          console.log('✅ Tomando número de 8+ dígitos:', candidate);
+          return candidate;
+        } else if (candidate.length >= 6) {
+          console.log('⚠️ Usando número de 6-7 dígitos:', candidate);
+          return candidate;
+        }
+      }
+    }
+    
+    return null;
+  };
 
   // Función para procesar imagen con OCR
   const processImage = async (imageFile: File | string) => {
@@ -50,29 +117,40 @@ const extractTicketNumber = (text: string): string | null => {
     try {
       console.log('🔍 Procesando imagen con OCR...');
       
-      const worker = await createWorker('spa'); // Usar español para mejor reconocimiento
+      let imageToProcess = imageFile;
       
-      // Reconocer texto
-      const { data: { text } } = await worker.recognize(imageFile);
+      // Mejorar calidad de imagen
+      if (typeof imageToProcess === 'string' && imageToProcess.startsWith('data:')) {
+        console.log('📸 Mejorando calidad de imagen...');
+        imageToProcess = await enhanceImage(imageToProcess);
+      }
+      
+      const worker = await createWorker('spa');
+      
+      // Configurar para mejor reconocimiento de números
+      await worker.setParameters({
+        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+        preserve_interword_spaces: '0',
+      });
+      
+      const { data: { text } } = await worker.recognize(imageToProcess);
       await worker.terminate();
       
       console.log('📝 Texto reconocido:', text);
       
-      // Extraer número de entrada
       const ticketNumber = extractTicketNumber(text);
       
       if (ticketNumber) {
         console.log('✅ Número encontrado:', ticketNumber);
         
-        // Feedback háptico
         if ('vibrate' in navigator) {
           navigator.vibrate(200);
         }
         
-        onScan(ticketNumber);
+        onScan(ticketNumber, text);
       } else {
         console.log('❌ No se encontró número válido');
-        setError('No se pudo encontrar el número de entrada. Asegurate de que la imagen sea clara y muestre el número.');
+        setError('No se pudo encontrar el número de entrada. Intentá:\n• Mejor iluminación\n• Enfocar mejor el número\n• El número debe tener 8-12 dígitos');
         
         if ('vibrate' in navigator) {
           navigator.vibrate([100, 50, 100]);
@@ -80,26 +158,35 @@ const extractTicketNumber = (text: string): string | null => {
       }
     } catch (err: any) {
       console.error('Error OCR:', err);
-      setError('Error al procesar la imagen. Intentá nuevamente con mejor iluminación.');
+      setError('Error al procesar la imagen. Intentá nuevamente.');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Tomar foto con la cámara
-  const takePhoto = async () => {
+  // Iniciar cámara
+  const startCamera = async () => {
     try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
       });
       
       streamRef.current = stream;
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        await videoRef.current.play();
       }
     } catch (err: any) {
+      console.error('Error al iniciar cámara:', err);
       if (err.name === 'NotAllowedError') {
         setError('Necesitamos acceso a la cámara para leer tu entrada.');
       } else {
@@ -108,7 +195,7 @@ const extractTicketNumber = (text: string): string | null => {
     }
   };
 
-  // Capturar foto actual
+  // Capturar foto
   const capturePhoto = () => {
     if (videoRef.current) {
       const canvas = document.createElement('canvas');
@@ -117,21 +204,19 @@ const extractTicketNumber = (text: string): string | null => {
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(videoRef.current, 0, 0);
       
-      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 1.0);
       setPreviewUrl(imageDataUrl);
       
-      // Detener stream
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
         streamRef.current = null;
       }
       
-      // Procesar la imagen
       processImage(imageDataUrl);
     }
   };
 
-  // Seleccionar imagen de galería
+  // Seleccionar de galería
   const selectFromGallery = () => {
     fileInputRef.current?.click();
   };
@@ -149,22 +234,18 @@ const extractTicketNumber = (text: string): string | null => {
     setPreviewUrl(null);
     setError('');
     setIsProcessing(false);
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    takePhoto(); // Reiniciar cámara
+    startCamera();
   };
 
-  // Iniciar cámara al montar
   useEffect(() => {
-  takePhoto();
-  return () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-    }
-  };
-}, []);
+    startCamera();
+    
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   return (
     <div className="scanner-modal">
@@ -178,13 +259,12 @@ const extractTicketNumber = (text: string): string | null => {
 
         <div className="scanner-content">
           {error && (
-            <div className="alert alert-error">
+            <div className="alert alert-error" style={{ whiteSpace: 'pre-line' }}>
               ⚠️ {error}
             </div>
           )}
 
           {!previewUrl ? (
-            // Vista de cámara
             <div className="camera-view">
               <video 
                 ref={videoRef}
@@ -196,38 +276,40 @@ const extractTicketNumber = (text: string): string | null => {
                 <div className="guide-frame"></div>
                 <p className="guide-text">
                   📸 Enfocá el número de tu entrada<br/>
-                  <small>Asegurate de tener buena iluminación</small>
+                  <small>El número suele ser de 8-12 dígitos</small>
                 </p>
               </div>
             </div>
           ) : (
-            // Vista previa de la imagen capturada
             <div className="preview-view">
               <img src={previewUrl} alt="Preview" className="image-preview" />
               {isProcessing && (
                 <div className="processing-overlay">
                   <div className="spinner"></div>
                   <p>Leyendo número de entrada...</p>
+                  <small style={{ fontSize: '11px', marginTop: '8px' }}>Esto puede tomar unos segundos</small>
                 </div>
               )}
             </div>
           )}
 
           <div className="scanner-instructions">
-            <p className="instruction-title">📌 ¿Qué estás buscando?</p>
+            <p className="instruction-title">📌 Consejos para mejor lectura:</p>
+            <ul className="instruction-list">
+              <li>✓ Iluminación clara (evitá sombras)</li>
+              <li>✓ Enfocá bien el número</li>
+              <li>✓ Mantené la cámara estable</li>
+              <li>✓ El número debe estar dentro del marco</li>
+            </ul>
             <div className="example-ticket">
               <div className="example-number">268275132</div>
-              <div className="example-label">Número de entrada (8-12 dígitos)</div>
-            </div>
-            <div className="instruction-note">
-              💡 La app busca automáticamente números de 8 a 12 dígitos en el texto
+              <div className="example-label">Busca números como este (8-12 dígitos)</div>
             </div>
           </div>
         </div>
 
         <div className="scanner-footer">
           {!previewUrl ? (
-            // Botones cuando está la cámara activa
             <>
               <button className="btn btn-ghost" onClick={onClose}>
                 Cancelar
@@ -240,7 +322,6 @@ const extractTicketNumber = (text: string): string | null => {
               </button>
             </>
           ) : (
-            // Botones después de capturar
             <>
               <button className="btn btn-ghost" onClick={reset}>
                 ↺ Volver a tomar
