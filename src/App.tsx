@@ -16,6 +16,8 @@ import { ClickEffect } from './components/ClickEffect';
 import { NotificationPermission } from './components/NotificationPermission';
 import { usePushNotifications } from './hooks/usePushNotifications';
 import { useVisualEffects } from './hooks/useVisualEffects';
+import { SpinWheel, SpinResult } from './components/SpinWheel';
+import { supabase } from "./lib/supabaseClient";
 
 
 
@@ -1691,7 +1693,7 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
   const [raffleCompleted, setRaffleCompleted] = useState(false);
-
+  const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
   // Define loadTickets function
   const loadTickets = useCallback(async () => {
     try {
@@ -1715,7 +1717,10 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
   useEffect(() => {
     loadTickets();
     loadLeaderboard();
+    api.getClubRanking().then(setClubRanking).catch(console.error);
   }, [loadTickets, loadLeaderboard]);
+
+  const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
 
   const myRank = leaderboard.findIndex((u) => u.id === user.id) + 1;
   
@@ -1735,6 +1740,40 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
            {/* Agregar el badge de racha */}
           <div style={{ marginTop: 12 }}>
             <StreakBadge userId={user.id} variant="full" />
+            {myClubRank > 0 && (
+  <div
+    style={{
+      marginTop: 10,
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      background: myClubRank === 1
+        ? "rgba(61,255,160,0.12)"
+        : myClubRank <= 3
+        ? "rgba(245,197,24,0.10)"
+        : "rgba(136,136,170,0.10)",
+      border: `1px solid ${
+        myClubRank === 1
+          ? "rgba(61,255,160,0.3)"
+          : myClubRank <= 3
+          ? "rgba(245,197,24,0.25)"
+          : "var(--border)"
+      }`,
+      borderRadius: 100,
+      padding: "5px 14px",
+      fontSize: 13,
+      fontWeight: 700,
+      color: myClubRank === 1
+        ? "var(--success)"
+        : myClubRank <= 3
+        ? "var(--accent)"
+        : "var(--text2)",
+    }}
+  >
+    {myClubRank === 1 ? "🔥" : myClubRank <= 3 ? "⚡" : "📍"}
+    Tu club está {myClubRank}° en el ranking
+  </div>
+)}
           </div>
           <div style={{ marginTop: 12, fontSize: 13, color: "var(--text)" }}>
             Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
@@ -1838,6 +1877,7 @@ function TicketTab({ user, onPointsUpdate }: { user: AppUser; onPointsUpdate: (p
   const [detectedText, setDetectedText] = useState('');
   const [streakReward, setStreakReward] = useState<{ points: number; message: string } | null>(null);
     const { celebrate, showFloatingPoints, showStreakBonus } = useVisualEffects();
+    const [showSpin, setShowSpin] = useState(false);
 
 
   // Cargar tickets activos de la semana actual
@@ -1917,6 +1957,11 @@ const handleSubmit = async (number?: string) => {
     setSuccess(successMessage);
     setTicketNumber("");
     
+    const isFirstThisWeek = tickets.length === 0; // tickets aún no tiene la nueva
+    if (isFirstThisWeek) {
+      setTimeout(() => setShowSpin(true), 800); // leve delay para que se vea el éxito primero
+      }
+
     // Recargar tickets y actualizar puntos
     await loadTickets();
     await loadTicketHistory();
@@ -1937,6 +1982,25 @@ const handleSubmit = async (number?: string) => {
     setLoading(false);
   }
 };
+
+const handleSpinResult = async (result: SpinResult) => {
+      if (result.extraPoints > 0) {
+         // Sumar puntos extra a Supabase
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          await supabase
+            .from('profiles')
+            .update({ points: user.points + result.extraPoints })
+            .eq('id', session.user.id);
+          onPointsUpdate(user.points + result.extraPoints);
+        }
+      }
+      if (result.streakDouble) {
+         // Guardar en localStorage que la racha está duplicada hasta mañana
+        const expires = Date.now() + 24 * 60 * 60 * 1000;
+        localStorage.setItem('streak_double_until', expires.toString());
+      }
+    };
 
   const handleScan = (scannedNumber: string, originalText: string) => {
     console.log('🎫 Número escaneado:', scannedNumber);
@@ -1982,7 +2046,12 @@ const handleSubmit = async (number?: string) => {
             onClose={() => setShowScanner(false)}
           />
         )}
-
+        {showSpin && (
+      <SpinWheel
+        onClose={() => setShowSpin(false)}
+        onResult={handleSpinResult}
+      />
+    )}
         {/* Diálogo de confirmación */}
         {showConfirmation && (
           <ConfirmationDialog
@@ -2207,32 +2276,302 @@ const handleSubmit = async (number?: string) => {
 // ============================================================
 function LeaderboardTab({ user }: { user: AppUser }) {
   const [leaders, setLeaders] = useState<LeaderEntry[]>([]);
+  const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
+  const [rival, setRival] = useState<{ rival: LeaderEntry; diff: number; isAhead: boolean } | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [activeView, setActiveView] = useState<"individual" | "clubes">("individual");
+ 
   useEffect(() => {
-    api.getLeaderboard().then((l) => { setLeaders(l); setLoading(false); }).catch(console.error);
-  }, []);
-
+    Promise.all([
+      api.getLeaderboard(),
+      api.getClubRanking(),
+      api.getRival(user.id, user.points),
+    ])
+      .then(([l, clubs, rv]) => {
+        setLeaders(l);
+        setClubRanking(clubs);
+        setRival(rv);
+        setLoading(false);
+      })
+      .catch(console.error);
+  }, [user.id, user.points]);
+ 
+  const myRank = leaders.findIndex((u) => u.id === user.id) + 1;
+  const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
+ 
+  // Cuántas entradas necesita para superar al rival
+  const ticketsNeeded = rival && rival.isAhead ? Math.ceil(rival.diff / 10) : 0;
+ 
   return (
     <div className="main-content">
       <div className="container">
-        <div className="section-title fade-up">🏆 Ranking general</div>
-        {loading ? (
-          <div className="empty-state"><div className="spinner" style={{ margin: "0 auto", borderTopColor: "var(--accent)", borderColor: "var(--border)" }} /></div>
-        ) : leaders.length === 0 ? (
-          <div className="empty-state fade-up"><div className="empty-icon">🏟️</div><div className="empty-text">Nadie cargó entradas todavía. ¡Sé el primero!</div></div>
-        ) : (
-          leaders.map((u, i) => (
-            <div key={u.id} className={`leader-item fade-up${u.id === user.id ? " me" : ""}`}>
-              <div className={`leader-rank${i < 3 ? " top" : ""}`}>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</div>
-              <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
-              <div className="leader-info">
-                <div className="leader-name">{u.username}{u.id === user.id ? " (vos)" : ""}</div>
-                <div className="leader-club">{u.club}</div>
-              </div>
-              <div className="leader-points">{u.points} pts</div>
+ 
+        {/* ── CARD DE RIVAL ── */}
+        {rival && (
+          <div
+            className="fade-up"
+            style={{
+              background: rival.isAhead
+                ? "linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.04))"
+                : "linear-gradient(135deg, rgba(61,255,160,0.12), rgba(61,255,160,0.04))",
+              border: `1px solid ${rival.isAhead ? "rgba(255,77,109,0.35)" : "rgba(61,255,160,0.35)"}`,
+              borderRadius: 16,
+              padding: "16px 18px",
+              marginBottom: 20,
+            }}
+          >
+            {/* Encabezado */}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 20 }}>{rival.isAhead ? "⚔️" : "🛡️"}</span>
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: 18,
+                  letterSpacing: 1,
+                  color: rival.isAhead ? "var(--accent2)" : "var(--success)",
+                }}
+              >
+                {rival.isAhead ? "TU RIVAL MÁS CERCANO" : "¡ERES EL LÍDER!"}
+              </span>
             </div>
-          ))
+ 
+            {/* Info del rival */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  background: "var(--surface2)",
+                  border: `2px solid ${rival.isAhead ? "var(--accent2)" : "var(--success)"}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "var(--font-display)",
+                  fontSize: 20,
+                  color: rival.isAhead ? "var(--accent2)" : "var(--success)",
+                  flexShrink: 0,
+                }}
+              >
+                {rival.rival.username[0].toUpperCase()}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 700, fontSize: 16 }}>{rival.rival.username}</div>
+                <div style={{ fontSize: 12, color: "var(--text2)" }}>{rival.rival.club}</div>
+              </div>
+              <div
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: 24,
+                  color: rival.isAhead ? "var(--accent2)" : "var(--success)",
+                  letterSpacing: 0.5,
+                }}
+              >
+                {rival.rival.points} pts
+              </div>
+            </div>
+ 
+            {/* Diferencia + CTA */}
+            <div
+              style={{
+                background: rival.isAhead ? "rgba(255,77,109,0.1)" : "rgba(61,255,160,0.1)",
+                borderRadius: 10,
+                padding: "10px 14px",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "var(--text)",
+                lineHeight: 1.5,
+              }}
+            >
+              {rival.isAhead ? (
+                <>
+                  <span style={{ color: "var(--accent2)" }}>
+                    {rival.rival.username} te lleva {rival.diff} pts de ventaja.
+                  </span>
+                  {ticketsNeeded > 0 && (
+                    <>
+                      {" "}Cargá{" "}
+                      <strong style={{ color: "var(--accent)" }}>
+                        {ticketsNeeded} {ticketsNeeded === 1 ? "entrada más" : "entradas más"}
+                      </strong>{" "}
+                      para superarlo. 🎯
+                    </>
+                  )}
+                </>
+              ) : (
+                <>
+                  <span style={{ color: "var(--success)" }}>
+                    Sos el líder 🏆
+                  </span>{" "}
+                  {rival.rival.username} te sigue por{" "}
+                  <strong style={{ color: "var(--accent)" }}>{rival.diff} pts</strong>. ¡No te durmás!
+                </>
+              )}
+            </div>
+          </div>
+        )}
+ 
+        {/* ── SELECTOR DE VISTA ── */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+          {(["individual", "clubes"] as const).map((view) => (
+            <button
+              key={view}
+              onClick={() => setActiveView(view)}
+              style={{
+                flex: 1,
+                padding: "10px 0",
+                background: activeView === view ? "var(--accent)" : "transparent",
+                color: activeView === view ? "#0a0a0f" : "var(--text2)",
+                border: activeView === view ? "none" : "1.5px solid var(--border)",
+                borderRadius: "var(--radius)",
+                fontFamily: "var(--font-display)",
+                fontSize: 16,
+                letterSpacing: 1,
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              {view === "individual" ? "👤 Individual" : "🏟️ Por club"}
+            </button>
+          ))}
+        </div>
+ 
+        {loading ? (
+          <div className="empty-state">
+            <div
+              className="spinner"
+              style={{
+                margin: "0 auto",
+                borderTopColor: "var(--accent)",
+                borderColor: "var(--border)",
+              }}
+            />
+          </div>
+        ) : activeView === "individual" ? (
+          <>
+            <div className="section-title fade-up">🏆 Ranking individual</div>
+            {leaders.length === 0 ? (
+              <div className="empty-state fade-up">
+                <div className="empty-icon">🏟️</div>
+                <div className="empty-text">Nadie cargó entradas todavía. ¡Sé el primero!</div>
+              </div>
+            ) : (
+              leaders.map((u, i) => (
+                <div
+                  key={u.id}
+                  className={`leader-item fade-up${u.id === user.id ? " me" : ""}`}
+                >
+                  <div className={`leader-rank${i < 3 ? " top" : ""}`}>
+                    {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                  </div>
+                  <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
+                  <div className="leader-info">
+                    <div className="leader-name">
+                      {u.username}
+                      {u.id === user.id ? " (vos)" : ""}
+                    </div>
+                    <div className="leader-club">{u.club}</div>
+                  </div>
+                  <div className="leader-points">{u.points} pts</div>
+                </div>
+              ))
+            )}
+          </>
+        ) : (
+          <>
+            <div className="section-title fade-up">🏟️ Ranking por club</div>
+ 
+            {/* Badge "tu club está N°" */}
+            {myClubRank > 0 && (
+              <div
+                className="fade-up"
+                style={{
+                  background: "rgba(245,197,24,0.08)",
+                  border: "1px solid rgba(245,197,24,0.25)",
+                  borderRadius: 12,
+                  padding: "10px 16px",
+                  marginBottom: 16,
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "var(--text)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <span style={{ fontSize: 18 }}>
+                  {myClubRank === 1 ? "🔥" : myClubRank <= 3 ? "⚡" : "📍"}
+                </span>
+                <span>
+                  Tu club <strong style={{ color: "var(--accent)" }}>{user.club}</strong> está{" "}
+                  <strong style={{ color: "var(--accent)" }}>
+                    {myClubRank === 1
+                      ? "¡1° en el ranking!"
+                      : myClubRank === 2
+                      ? "2° — muy cerca del top!"
+                      : `${myClubRank}° en el ranking`}
+                  </strong>
+                  {myClubRank > 1 && " 🏟️"}
+                </span>
+              </div>
+            )}
+ 
+            {clubRanking.length === 0 ? (
+              <div className="empty-state fade-up">
+                <div className="empty-icon">🏟️</div>
+                <div className="empty-text">No hay datos de clubes todavía.</div>
+              </div>
+            ) : (
+              clubRanking.map((c, i) => {
+                const isMyClub = c.club === user.club;
+                return (
+                  <div
+                    key={c.club}
+                    className={`leader-item fade-up${isMyClub ? " me" : ""}`}
+                    style={
+                      isMyClub
+                        ? {
+                            borderColor: "var(--accent)",
+                            background: "rgba(245,197,24,0.05)",
+                          }
+                        : {}
+                    }
+                  >
+                    {/* Posición */}
+                    <div className={`leader-rank${i < 3 ? " top" : ""}`}>
+                      {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+                    </div>
+ 
+                    {/* Icono de club */}
+                    <div
+                      className="leader-avatar"
+                      style={
+                        isMyClub
+                          ? { borderColor: "var(--accent)", color: "var(--accent)" }
+                          : {}
+                      }
+                    >
+                      🏟️
+                    </div>
+ 
+                    {/* Info */}
+                    <div className="leader-info">
+                      <div className="leader-name">
+                        {c.club}
+                        {isMyClub ? " (tu club)" : ""}
+                      </div>
+                      <div className="leader-club">
+                        {c.memberCount} {c.memberCount === 1 ? "miembro" : "miembros"}
+                      </div>
+                    </div>
+ 
+                    {/* Puntos */}
+                    <div className="leader-points">{c.points} pts</div>
+                  </div>
+                );
+              })
+            )}
+          </>
         )}
       </div>
     </div>
@@ -2470,7 +2809,6 @@ export default function App() {
             {showTour && <OnboardingTour onComplete={handleTourComplete} />}
              {/* Componente de solicitud de notificaciones */}
             <NotificationPermission userId={user.id} />
-            <ClickEffect>
             <header className="app-header">
               <div className="container">
                 <div className="header-inner">
@@ -2502,7 +2840,6 @@ export default function App() {
                 </button>
               ))}
             </nav>
-            </ClickEffect>
           </>
         )}
       </div>

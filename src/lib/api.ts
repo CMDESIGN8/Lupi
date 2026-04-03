@@ -635,6 +635,71 @@ isTicketValid: async (ticketNumber: string): Promise<boolean> => {
   const ticketDate = new Date(ticket.created_at);
   return ticketDate >= startOfWeek;
 },
+getClubRanking: async (): Promise<{ club: string; points: number; memberCount: number }[]> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('club, points');
+ 
+  if (error) throw error;
+ 
+  // Agrupar por club en el frontend (sin necesitar una función RPC nueva)
+  const clubMap = new Map<string, { points: number; memberCount: number }>();
+ 
+  for (const profile of data || []) {
+    const existing = clubMap.get(profile.club) || { points: 0, memberCount: 0 };
+    clubMap.set(profile.club, {
+      points: existing.points + (profile.points || 0),
+      memberCount: existing.memberCount + 1,
+    });
+  }
+ 
+  return Array.from(clubMap.entries())
+    .map(([club, stats]) => ({ club, ...stats }))
+    .sort((a, b) => b.points - a.points);
+},
+ 
+// Rival más cercano: el usuario con más puntos que está justo por encima del usuario actual
+// Si el usuario ya es 1°, devuelve al que tiene menos ventaja por debajo
+getRival: async (userId: string, userPoints: number): Promise<{
+  rival: LeaderEntry;
+  diff: number;
+  isAhead: boolean; // true = rival está por encima (lo estamos persiguiendo)
+} | null> => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, club, points')
+    .neq('id', userId)
+    .order('points', { ascending: false })
+    .limit(50); // suficiente para encontrar al rival cercano
+ 
+  if (error || !data || data.length === 0) return null;
+ 
+  // Buscar el que tiene menos puntos y está por ENCIMA
+  const ahead = data.filter(p => p.points > userPoints);
+  const behind = data.filter(p => p.points <= userPoints);
+ 
+  if (ahead.length > 0) {
+    // El rival más cercano que nos supera (el último de los que están por delante)
+    const closest = ahead[ahead.length - 1];
+    return {
+      rival: closest,
+      diff: closest.points - userPoints,
+      isAhead: true,
+    };
+  }
+ 
+  // Si somos 1°, el rival es el que está justo detrás
+  if (behind.length > 0) {
+    const closest = behind[0];
+    return {
+      rival: closest,
+      diff: userPoints - closest.points,
+      isAhead: false,
+    };
+  }
+ 
+  return null;
+},
 
   // Suscribirse a notificaciones en tiempo real
   subscribeToNotifications: (userId: string, callback: (notification: Notification) => void) => {
@@ -658,4 +723,5 @@ isTicketValid: async (ticketNumber: string): Promise<boolean> => {
       subscription.unsubscribe();
     };
   }
+  
 };
