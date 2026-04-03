@@ -22,6 +22,7 @@ export interface AppUser {
   last_ticket_date: string | null;  // 📅 Última fecha
   best_streak: number;         // 🏆 Récord personal
   referral_code: string;
+   referral_count: number;
   created_at?: string;
 }
 
@@ -700,6 +701,57 @@ getRival: async (userId: string, userPoints: number): Promise<{
  
   return null;
 },
+
+// Obtener misiones completadas esta semana
+getCompletedMissions: async (userId: string): Promise<string[]> => {
+  const { data, error } = await supabase.rpc('get_completed_missions', {
+    p_user_id: userId,
+  });
+  if (error) {
+    console.error('Error fetching completed missions:', error);
+    return [];
+  }
+  return (data || []).map((r: { mission_id: string }) => r.mission_id);
+},
+ 
+// Completar una misión y sumar puntos (llama al RPC atómico)
+completeMission: async (
+  userId: string,
+  missionId: string,
+  points: number
+): Promise<{ success: boolean; newPoints?: number; pointsAwarded?: number }> => {
+  const { data, error } = await supabase.rpc('complete_mission', {
+    p_user_id: userId,
+    p_mission_id: missionId,
+    p_points: points,
+  });
+  if (error) {
+    console.error('Error completing mission:', error);
+    return { success: false };
+  }
+  return {
+    success: data?.success ?? false,
+    newPoints: data?.new_points,
+    pointsAwarded: data?.points_awarded,
+  };
+},
+ 
+// Obtener datos necesarios para evaluar misiones (shares de esta semana)
+getWeeklyShareCount: async (userId: string): Promise<number> => {
+  const startOfWeek = new Date();
+  startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+ 
+  const { count, error } = await supabase
+    .from('shares')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', startOfWeek.toISOString());
+ 
+  if (error) return 0;
+  return count || 0;
+},
+ 
 
   // Suscribirse a notificaciones en tiempo real
   subscribeToNotifications: (userId: string, callback: (notification: Notification) => void) => {

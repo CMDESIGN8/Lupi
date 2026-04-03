@@ -18,6 +18,7 @@ import { usePushNotifications } from './hooks/usePushNotifications';
 import { useVisualEffects } from './hooks/useVisualEffects';
 import { SpinWheel, SpinResult } from './components/SpinWheel';
 import { supabase } from "./lib/supabaseClient";
+import { WeeklyMissions } from './components/WeeklyMissions';
 
 
 
@@ -1689,7 +1690,15 @@ return (
 // ============================================================
 // DASHBOARD TAB
 // ============================================================
-function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: string) => void }) {
+function DashboardTab({
+  user,
+  onNavigate,
+  onPointsUpdate,
+}: {
+  user: AppUser;
+  onNavigate: (t: string) => void;
+  onPointsUpdate: (newPoints: number) => void;
+}) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
   const [raffleCompleted, setRaffleCompleted] = useState(false);
@@ -1792,6 +1801,13 @@ function DashboardTab({ user, onNavigate }: { user: AppUser; onNavigate: (t: str
           <div className="stat-card"><div className="stat-number">{tickets.length}</div><div className="stat-label">Entradas</div></div>
           <div className="stat-card"><div className="stat-number">+10</div><div className="stat-label">Pts x entrada</div></div>
         </div>
+
+        <WeeklyMissions
+           user={user}
+           tickets={tickets}
+           leaderboard={leaderboard}
+           onPointsUpdate={onPointsUpdate}
+         />
 
         <div className="section-title fade-up">🏅 Top 5 del momento</div>
         {leaderboard.slice(0, 5).map((u, i) => (
@@ -2821,7 +2837,7 @@ export default function App() {
               </div>
             </header>
 
-            {tab === "home"    && <DashboardTab user={user} onNavigate={handleNavigate} />}
+            {tab === "home"    && <DashboardTab user={user} onNavigate={handleNavigate} onPointsUpdate={handlePointsUpdate}/>}
             {tab === "ticket"  && <TicketTab user={user} onPointsUpdate={handlePointsUpdate} />}
             {tab === "ranking" && <LeaderboardTab user={user} />}
             {tab === "profile" && <ProfileTab user={user} onLogout={handleLogout} onRestartTour={handleRestartTour} />}
