@@ -2218,7 +2218,7 @@
                   background: 'linear-gradient(135deg, var(--accent), #0f6bc0)'
                 }}
               >
-                📷 ESCANEAR QR
+                📷 ESCANEAR ENTRADA
               </button>
               
               {/* Divider con texto */}
