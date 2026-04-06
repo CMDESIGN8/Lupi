@@ -105,9 +105,9 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       
       // Configuración corregida - sin tipo incorrecto
       await worker.setParameters({
-      tessedit_char_whitelist: '0123456789N°º',
-      tessedit_pageseg_mode: PSM.SINGLE_LINE as any,
-    });
+  tessedit_char_whitelist: '0123456789N°º',
+  tessedit_pageseg_mode: Number(PSM.SINGLE_LINE),
+});
     
     const { data: { text } } = await worker.recognize(processedImage);
     await worker.terminate();
