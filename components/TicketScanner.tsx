@@ -104,11 +104,18 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
     }
     
     const worker = await createWorker('spa');
+
       
       // Configuración corregida - sin tipo incorrecto
       await worker.setParameters({
       tessedit_char_whitelist: '0123456789N°º',
       tessedit_pageseg_mode: PSM.SINGLE_LINE as any,
+    });
+
+      // @ts-ignore: Solución para error TS2322 en Render
+    await worker.setParameters({
+      tessedit_char_whitelist: '0123456789N°º',
+      tessedit_pageseg_mode: '6', // Volvemos al string pero con el ignore arriba
     });
     
     const { data: { text } } = await worker.recognize(processedImage);
