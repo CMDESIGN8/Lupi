@@ -214,26 +214,39 @@ const styles = `
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
-  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.2s ease;
-  padding: 16px;
 }
 
 .scanner-container {
   width: 100%;
-  max-width: 500px;
-  height: 90vh;
-  max-height: 700px;
-  background: var(--surface);
-  border-radius: 24px;
+  height: 100%;
+  background: #000;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+}
+
+/* Para esconder la barra de direcciones en iOS */
+@media screen and (max-width: 768px) {
+  .scanner-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+/* Forzar fullscreen en Android */
+.scanner-modal:-webkit-full-screen {
+  width: 100%;
+  height: 100%;
 }
 
 .scanner-header {
