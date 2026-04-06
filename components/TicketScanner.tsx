@@ -94,9 +94,6 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
     
     try {
       console.log('🚀 Iniciando OCR...');
-      
-      let processedImage = imageFile;
-      
       // Si es dataURL de la cámara, preprocesar
       let processedImage = imageFile;
     if (typeof processedImage === 'string' && processedImage.startsWith('data:')) {
@@ -110,12 +107,6 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       await worker.setParameters({
       tessedit_char_whitelist: '0123456789N°º',
       tessedit_pageseg_mode: PSM.SINGLE_LINE as any,
-    });
-
-      // @ts-ignore: Solución para error TS2322 en Render
-    await worker.setParameters({
-      tessedit_char_whitelist: '0123456789N°º',
-      tessedit_pageseg_mode: '6', // Volvemos al string pero con el ignore arriba
     });
     
     const { data: { text } } = await worker.recognize(processedImage);
