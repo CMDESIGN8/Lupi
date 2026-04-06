@@ -751,6 +751,35 @@ getWeeklyShareCount: async (userId: string): Promise<number> => {
   if (error) return 0;
   return count || 0;
 },
+
+getUnlockedAchievements: async (userId: string): Promise<string[]> => {
+  const { data, error } = await supabase.rpc('get_unlocked_achievements', {
+    p_user_id: userId,
+  });
+  if (error) { console.error('Error fetching achievements:', error); return []; }
+  return (data || []).map((r: { achievement_id: string }) => r.achievement_id);
+},
+ 
+unlockAchievement: async (
+  userId: string,
+  achievementId: string
+): Promise<{ success: boolean }> => {
+  const { data, error } = await supabase.rpc('unlock_achievement', {
+    p_user_id: userId,
+    p_achievement_id: achievementId,
+  });
+  if (error) { console.error('Error unlocking achievement:', error); return { success: false }; }
+  return { success: data?.success ?? false };
+},
+ 
+getCompletedMissionsCount: async (userId: string): Promise<number> => {
+  const { count, error } = await supabase
+    .from('missions_completed')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
+  if (error) return 0;
+  return count || 0;
+},
  
 
   // Suscribirse a notificaciones en tiempo real

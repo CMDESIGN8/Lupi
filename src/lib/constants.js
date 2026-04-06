@@ -1,5 +1,5 @@
 export const CLUBS = [
-  "Flores Club Futsal",
+  "Atlético San Lorenzo",
   "Club Defensores del Barrio",
   "Sportivo Belgrano",
   "Club Vélez (barrial)",
