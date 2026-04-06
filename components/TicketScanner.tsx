@@ -81,11 +81,10 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
 
       const worker = await createWorker('spa');
 
-      // ✅ FIX DEFINITIVO TS + OCR OPTIMIZADO
       await worker.setParameters({
-        tessedit_char_whitelist: '0123456789',
-        tessedit_pageseg_mode: Number(PSM.SINGLE_WORD), // 🔥 clave
-      });
+  tessedit_char_whitelist: '0123456789',
+  tessedit_pageseg_mode: PSM.SINGLE_WORD,
+} as any);
 
       const { data: { text } } = await worker.recognize(processedImage);
       await worker.terminate();
