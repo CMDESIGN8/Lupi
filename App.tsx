@@ -2367,7 +2367,7 @@ const handleSpinResult = async (result: SpinResult) => {
                 <div className="empty-icon">🎟️✨</div>
                 <div className="empty-text">¡Escaneá tu primera entrada!</div>
                 <div className="empty-subtext" style={{ fontSize: 13, color: 'var(--text2)', marginTop: 8 }}>
-                  Usá la cámara para escanear el código QR<br />
+                  Usá la cámara para escanear el número de la entrada<br />
                   y comenzá a sumar puntos para el sorteo semanal
                 </div>
               </div>
