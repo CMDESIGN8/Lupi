@@ -1,6 +1,6 @@
 // src/components/TicketScanner.tsx
 import { useState, useRef, useEffect } from 'react';
-import { createWorker } from 'tesseract.js';
+import { createWorker, PSM } from 'tesseract.js';
 
 interface TicketScannerProps {
   onScan: (ticketNumber: string, originalText: string) => void;
@@ -98,20 +98,22 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       let processedImage = imageFile;
       
       // Si es dataURL de la cámara, preprocesar
-      if (typeof processedImage === 'string' && processedImage.startsWith('data:')) {
-        console.log('📸 Preprocesando imagen de cámara...');
-        processedImage = await preprocessImage(processedImage);
-      }
-      
-      const worker = await createWorker('spa');
+      let processedImage = imageFile;
+    if (typeof processedImage === 'string' && processedImage.startsWith('data:')) {
+      processedImage = await preprocessImage(processedImage);
+    }
+    
+    const worker = await createWorker('spa');
       
       // Configuración corregida - sin tipo incorrecto
       await worker.setParameters({
-        tessedit_char_whitelist: '0123456789N°º',
-      });
-      
-      const { data: { text } } = await worker.recognize(processedImage);
-      await worker.terminate();
+      tessedit_char_whitelist: '0123456789N°º',
+      // PSM.SINGLE_LINE (7) o PSM.SINGLE_BLOCK (6) son los más precisos para tickets
+      tessedit_pageseg_mode: PSM.SINGLE_LINE, 
+    });
+    
+    const { data: { text } } = await worker.recognize(processedImage);
+    await worker.terminate();
       
       console.log('📝 Texto reconocido:', text);
       
