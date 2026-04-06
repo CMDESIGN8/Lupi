@@ -1,6 +1,6 @@
 // src/components/TicketScanner.tsx
 import { useState, useRef, useEffect } from 'react';
-import { createWorker, PSM } from 'tesseract.js';
+import { createWorker } from 'tesseract.js';
 
 interface TicketScannerProps {
   onScan: (ticketNumber: string, originalText: string) => void;
