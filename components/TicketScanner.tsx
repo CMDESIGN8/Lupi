@@ -108,8 +108,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       // Configuración corregida - sin tipo incorrecto
       await worker.setParameters({
       tessedit_char_whitelist: '0123456789N°º',
-      // PSM.SINGLE_LINE (7) o PSM.SINGLE_BLOCK (6) son los más precisos para tickets
-      tessedit_pageseg_mode: PSM.SINGLE_LINE, 
+      tessedit_pageseg_mode: PSM.SINGLE_LINE as any,
     });
     
     const { data: { text } } = await worker.recognize(processedImage);
