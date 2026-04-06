@@ -302,7 +302,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
               <li>✓ El número debe estar dentro del marco</li>
             </ul>
             <div className="example-ticket">
-              <div className="example-number">268275132</div>
+              <div className="example-number">N°00001458</div>
               <div className="example-label">Busca números como este (8-12 dígitos)</div>
             </div>
           </div>
