@@ -209,363 +209,6 @@ const styles = `
   .spinner-lg { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; }
  /* Estilos para el scanner OCR */
 
-/* Modal base */
-.scanner-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.95);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.2s ease;
-  padding: 0;
-  /* Forzar fullscreen */
-  height: 100vh;
-  width: 100vw;
-}
-
-.scanner-container {
-  width: 100%;
-  max-width: 500px;
-  height: 100vh;
-  max-height: 100vh;
-  background: var(--surface, #1a1a1a);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-  position: relative;
-}
-
-/* Header fijo */
-.scanner-header {
-  flex-shrink: 0;
-  padding: 16px 20px;
-  background: rgba(0, 0, 0, 0.9);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 10;
-}
-
-.scanner-header h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  color: white;
-}
-
-.scanner-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: white;
-  padding: 0;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: background 0.2s;
-}
-
-.scanner-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Contenido scrollable */
-.scanner-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
-  min-height: 0; /* Importante para flexbox */
-  padding: 0;
-}
-
-/* Vista de cámara */
-.camera-view {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 300px;
-  background: #000;
-}
-
-.camera-preview {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.camera-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-}
-
-.scanning-frame {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  max-width: 300px;
-  aspect-ratio: 4/3;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: 12px;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-}
-
-.scanning-line {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #00ff00, transparent);
-  animation: scan 2s linear infinite;
-}
-
-@keyframes scan {
-  0% { top: 0; }
-  100% { top: 100%; }
-}
-
-.auto-capture-indicator {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 14px;
-  animation: pulse 1s infinite;
-  white-space: nowrap;
-}
-
-.camera-guide {
-  position: absolute;
-  bottom: 80px;
-  left: 0;
-  right: 0;
-  text-align: center;
-  color: white;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-  pointer-events: none;
-  padding: 16px;
-}
-
-.camera-guide p {
-  margin: 0 0 4px 0;
-  font-size: 14px;
-}
-
-.camera-guide small {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-/* Preview de imagen */
-.preview-view {
-  position: relative;
-  width: 100%;
-  min-height: 300px;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-preview {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.processing-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #00ff00;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.progress-bar {
-  width: 200px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-  margin-top: 12px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  width: 100%;
-  height: 100%;
-  background: #00ff00;
-  animation: loading 1.5s ease-in-out infinite;
-  transform-origin: left;
-}
-
-@keyframes loading {
-  0% { transform: scaleX(0); }
-  50% { transform: scaleX(1); }
-  100% { transform: scaleX(0); }
-}
-
-/* Alertas */
-.alert {
-  margin: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  line-height: 1.4;
-  white-space: pre-line;
-}
-
-.alert-error {
-  background: rgba(255, 0, 0, 0.2);
-  border-left: 3px solid #ff4444;
-  color: #ff8888;
-}
-
-/* Footer con botones - IMPORTANTE: fijo en la parte inferior */
-.scanner-footer {
-  flex-shrink: 0;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.9);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  z-index: 10;
-  /* Asegurar que los botones sean accesibles */
-  position: relative;
-  bottom: 0;
-}
-
-/* Estilos de botones */
-.btn {
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-  flex: 1;
-  text-align: center;
-}
-
-.btn:active {
-  transform: scale(0.98);
-}
-
-.btn-primary {
-  background: #00ff00;
-  color: #000;
-}
-
-.btn-primary:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-ghost {
-  background: transparent;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.btn-active {
-  background: #00ff00;
-  color: #000;
-  border: none;
-}
-
-/* Responsive para móviles */
-@media (max-width: 768px) {
-  .scanner-container {
-    max-width: 100%;
-    border-radius: 0;
-  }
-  
-  .btn {
-    padding: 12px 16px;
-    font-size: 13px;
-  }
-  
-  .scanner-footer {
-    padding: 12px;
-    gap: 8px;
-  }
-  
-  .camera-guide {
-    bottom: 70px;
-  }
-}
-
-/* Para pantallas muy pequeñas */
-@media (max-height: 600px) {
-  .btn {
-    padding: 8px 12px;
-  }
-  
-  .scanner-footer {
-    padding: 8px;
-  }
-  
-  .camera-guide {
-    bottom: 60px;
-  }
-  
-  .camera-guide p {
-    font-size: 11px;
-  }
-  
-  .camera-guide small {
-    font-size: 10px;
-  }
-}
 
 /* Estilos para Toast */
 .toast-message {
@@ -1142,6 +785,217 @@ const styles = `
   animation: fadeIn 0.2s ease;
 }
 
+/* Estilos mejorados para el scanner con scroll */
+.scanner-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+  padding: 16px;
+}
+
+.scanner-container {
+  width: 100%;
+  max-width: 500px;
+  height: 90vh;
+  max-height: 700px;
+  background: var(--surface);
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Header fijo */
+.scanner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.scanner-header h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  margin: 0;
+  color: var(--text);
+}
+
+.scanner-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text2);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.scanner-close:hover {
+  background: var(--surface2);
+  color: var(--text);
+}
+
+/* Área con scroll */
+.scanner-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* Vista del scanner */
+.scanner-view {
+  background: #000;
+  min-height: 300px;
+  width: 100%;
+  position: relative;
+}
+
+#qr-scanner-container {
+  width: 100%;
+  min-height: 300px;
+}
+
+#qr-scanner-container video {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover;
+}
+
+#qr-scanner-container div {
+  margin: 0 auto;
+}
+
+/* Instrucciones */
+.scanner-instructions {
+  padding: 20px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+
+.instruction-icon {
+  font-size: 32px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.instruction-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.instruction-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px 0;
+}
+
+.instruction-list li {
+  padding: 6px 0;
+  color: var(--text2);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instruction-list li::before {
+  content: "•";
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.instruction-note {
+  background: rgba(24, 157, 245, 0.1);
+  border: 1px solid rgba(24, 157, 245, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 12px;
+  color: var(--accent);
+  text-align: center;
+  margin-top: 12px;
+}
+
+/* Footer con botones fijos */
+.scanner-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+
+.scanner-footer .btn {
+  flex: 1;
+}
+
+/* Alert dentro del scroll */
+.alert {
+  margin: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.alert-error {
+  background: rgba(255, 77, 109, 0.12);
+  border: 1px solid rgba(255, 77, 109, 0.3);
+  color: var(--accent2);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive para móviles pequeños */
+@media (max-width: 480px) {
+  .scanner-container {
+    height: 85vh;
+    max-height: none;
+  }
+  
+  .scanner-view {
+    min-height: 250px;
+  }
+  
+  .instruction-list li {
+    font-size: 12px;
+  }
+}
+
 .confirmation-container {
   width: 100%;
   max-width: 400px;
@@ -1331,12 +1185,6 @@ const styles = `
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s;
-}
-
-.scanner-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0;
 }
 
 /* Vista de cámara */
