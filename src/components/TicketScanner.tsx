@@ -5,18 +5,19 @@ import { createWorker } from 'tesseract.js';
 interface TicketScannerProps {
   onScan: (ticketNumber: string, originalText: string) => void;
   onClose: () => void;
+  existingTickets?: string[]; // Lista de números ya cargados
 }
 
-export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
+export function TicketScanner({ onScan, onClose, existingTickets = [] }: TicketScannerProps) {
   const [error, setError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [cameraError, setCameraError] = useState<string>('');
+  const [duplicateError, setDuplicateError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Función para mejorar la imagen
   const enhanceImage = (imageDataUrl: string): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -105,10 +106,16 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
     return null;
   };
 
+  // Verificar si el número ya existe
+  const isDuplicateTicket = (ticketNumber: string): boolean => {
+    return existingTickets.includes(ticketNumber);
+  };
+
   const processImage = async (imageSource: File | string) => {
     setIsProcessing(true);
     setError('');
     setCameraError('');
+    setDuplicateError('');
     
     try {
       console.log('🔍 Iniciando OCR...');
@@ -141,7 +148,21 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       const ticketNumber = extractTicketNumber(text);
       
       if (ticketNumber) {
-        console.log('✅ Éxito! Número:', ticketNumber);
+        console.log('✅ Número encontrado:', ticketNumber);
+        
+        // Verificar duplicado ANTES de llamar a onScan
+        if (isDuplicateTicket(ticketNumber)) {
+          console.log('⚠️ Entrada duplicada:', ticketNumber);
+          setDuplicateError(`⚠️ La entrada N° ${ticketNumber} ya fue cargada anteriormente`);
+          if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
+          
+          // Limpiar la preview después de 2 segundos para permitir nueva carga
+          setTimeout(() => {
+            reset();
+          }, 2000);
+          return;
+        }
+        
         if ('vibrate' in navigator) navigator.vibrate(100);
         onScan(ticketNumber, text);
       } else {
@@ -228,6 +249,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
     setPreviewUrl(null);
     setError('');
     setCameraError('');
+    setDuplicateError('');
     setIsProcessing(false);
     startCamera();
   };
@@ -242,7 +264,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
     };
   }, []);
 
-  // Estilos inline para asegurar centrado correcto
+  // Estilos inline corregidos - ahora con altura fija y scroll solo en contenido
   const styles = {
     modal: {
       position: 'fixed' as const,
@@ -255,13 +277,15 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
+      padding: '16px',
     },
     container: {
       backgroundColor: '#12121a',
       borderRadius: '16px',
-      width: '90%',
+      width: '100%',
       maxWidth: '500px',
-      maxHeight: '90vh',
+      height: '90vh',
+      maxHeight: '700px',
       display: 'flex',
       flexDirection: 'column' as const,
       overflow: 'hidden',
@@ -274,6 +298,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       padding: '16px 20px',
       borderBottom: '1px solid #e5e7eb',
       backgroundColor: '#12121a',
+      flexShrink: 0 as const,
     },
     title: {
       fontSize: '18px',
@@ -294,11 +319,13 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: '8px',
-    },
+      transition: 'background-color 0.2s',
+    } as React.CSSProperties,
     content: {
       flex: 1,
-      overflow: 'auto',
+      overflowY: 'auto' as const,
       padding: '20px',
+      minHeight: 0, // Importante para flexbox
     },
     errorAlert: {
       backgroundColor: '#fee2e2',
@@ -309,6 +336,16 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       color: '#991b1b',
       fontSize: '14px',
       whiteSpace: 'pre-line' as const,
+    },
+    successAlert: {
+      backgroundColor: '#d1fae5',
+      border: '1px solid #a7f3d0',
+      borderRadius: '8px',
+      padding: '12px',
+      marginBottom: '16px',
+      color: '#065f46',
+      fontSize: '14px',
+      fontWeight: 500,
     },
     cameraView: {
       position: 'relative' as const,
@@ -390,6 +427,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       padding: '16px 20px',
       borderTop: '1px solid #e5e7eb',
       backgroundColor: '#12121a',
+      flexShrink: 0 as const,
     },
     button: {
       flex: 1,
@@ -399,7 +437,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       fontWeight: 500,
       cursor: 'pointer',
       border: 'none',
-      transition: 'background-color 0.2s',
+      transition: 'all 0.2s',
     },
     buttonGhost: {
       backgroundColor: 'transparent',
@@ -414,6 +452,10 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       backgroundColor: '#10b981',
       color: 'white',
     },
+    buttonDisabled: {
+      opacity: 0.5,
+      cursor: 'not-allowed',
+    },
   };
 
   return (
@@ -421,21 +463,35 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       <div style={styles.container}>
         <div style={styles.header}>
           <h3 style={styles.title}>📷 Leer entrada</h3>
-          <button style={styles.closeButton} onClick={onClose}>✕</button>
+          <button 
+            style={styles.closeButton} 
+            onClick={onClose}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f3f4f6'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          >
+            ✕
+          </button>
         </div>
 
         <div style={styles.content}>
+          {/* Error de duplicado */}
+          {duplicateError && (
+            <div style={styles.errorAlert}>
+              {duplicateError}
+            </div>
+          )}
+
           {/* Error de cámara */}
-          {cameraError && (
+          {cameraError && !duplicateError && (
             <div style={styles.errorAlert}>
               ⚠️ {cameraError}
             </div>
           )}
 
           {/* Error de OCR */}
-          {error && !cameraError && (
+          {error && !cameraError && !duplicateError && (
             <div style={styles.errorAlert}>
-              ⚠️ {error}
+              {error}
             </div>
           )}
 
@@ -501,7 +557,11 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
                 Cancelar
               </button>
               <button 
-                style={{ ...styles.button, ...styles.buttonPrimary }}
+                style={{ 
+                  ...styles.button, 
+                  ...styles.buttonPrimary,
+                  ...(cameraError ? styles.buttonDisabled : {})
+                }}
                 onClick={capturePhoto}
                 disabled={!!cameraError}
               >
@@ -541,7 +601,6 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
         />
       </div>
 
-      {/* Animación del spinner */}
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
