@@ -1652,45 +1652,44 @@
         setForm((f) => ({ ...f, [k]: e.target.value }));
 
       const handleSubmit = async () => {
-      setError("");
-      setLoading(true);
-      try {
-        if (mode === "login") {
-          if (!form.email || !form.password) throw new Error("Completá todos los campos.");
-          const user = await api.login({ email: form.email, password: form.password });
-          onAuth(user);
-        } else {
-          if (!form.email || !form.password || !form.username || !form.club)
-            throw new Error("Completá todos los campos.");
-          if (form.password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
-          
-          console.log('📝 Registrando con código:', form.referralCode);
-          
-          const user = await api.register({ 
-            email: form.email,
-            password: form.password,
-            username: form.username,
-            club: form.club,
-            referralCode: form.referralCode || undefined
-          });
-          
-          // Mostrar mensaje de éxito con recompensa por referido si aplica
-          if (form.referralCode) {
-            setTimeout(() => {
-              alert("🎉 ¡Bienvenido! Si usaste un código de referido, ganaste 25 puntos extra.");
-            }, 500);
-          }
-          
-          onAuth(user);
-        }
-      } catch (e: any) {
-        setError(e.message);
-        console.error('Error en autenticación:', e);
-      } finally {
-        setLoading(false);
+  setError("");
+  setLoading(true);
+  try {
+    if (mode === "login") {
+      if (!form.email || !form.password) throw new Error("Completá todos los campos.");
+      const user = await api.login({ email: form.email, password: form.password });
+      onAuth(user);
+    } else {
+      if (!form.email || !form.password || !form.username || !form.club)
+        throw new Error("Completá todos los campos.");
+      if (form.password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
+      
+      console.log('📝 Registrando con código:', form.referralCode);
+      
+      const user = await api.register({ 
+        email: form.email,
+        password: form.password,
+        username: form.username,
+        club: form.club,
+        referralCode: form.referralCode || undefined
+      });
+      
+      // Mostrar mensaje de éxito con recompensa por referido si aplica
+      if (form.referralCode) {
+        setTimeout(() => {
+          alert("🎉 ¡Bienvenido! Si usaste un código de referido, ganaste 25 puntos extra.");
+        }, 500);
       }
-    };
-
+      
+      onAuth(user);
+    }
+  } catch (e: any) {
+    setError(e.message);
+    console.error('Error en autenticación:', e);
+  } finally {
+    setLoading(false);
+  }
+};
     return (
         <div className="auth-screen">
           <div className="container">
@@ -1972,6 +1971,8 @@
         const { celebrate, showFloatingPoints, showStreakBonus } = useVisualEffects();
         const [showSpin, setShowSpin] = useState(false);
         const { checkAndUnlock, toastQueue, setToastQueue } = useAchievements(user);
+        const [scannedNumbers, setScannedNumbers] = useState<string[]>([]);
+
 
 
       // Cargar tickets activos de la semana actual
@@ -2116,28 +2117,31 @@
         };
 
       const handleScan = (scannedNumber: string, originalText: string) => {
-        console.log('🎫 Número escaneado:', scannedNumber);
-        console.log('📄 Texto original:', originalText);
-        
-        setDetectedNumber(scannedNumber);
-        setDetectedText(originalText);
-        setShowConfirmation(true);
-      };
+  console.log('🎫 Número escaneado:', scannedNumber);
+  console.log('📄 Texto original:', originalText);
+  
+  setDetectedNumber(scannedNumber);
+  setDetectedText(originalText);
+  setShowConfirmation(true);
+};
 
       const handleConfirmNumber = async (number: string) => {
-        setShowConfirmation(false);
-        
-        const cleanNumber = number.replace(/[^0-9]/g, '');
-        setTicketNumber(cleanNumber);
-        
-        // Mostrar feedback
-        const successMsg = `✅ Número verificado: ${cleanNumber}`;
-        setSuccess(successMsg);
-        setTimeout(() => setSuccess(''), 3000);
-        
-        // Auto-enviar
-        setTimeout(() => handleSubmit(cleanNumber), 500);
-      };
+  setShowConfirmation(false);
+  
+  const cleanNumber = number.replace(/[^0-9]/g, '');
+  setTicketNumber(cleanNumber);
+  
+  // Agregar a la lista de números escaneados (para detectar duplicados)
+  setScannedNumbers(prev => [...prev, cleanNumber]);
+  
+  // Mostrar feedback
+  const successMsg = `✅ Número verificado: ${cleanNumber}`;
+  setSuccess(successMsg);
+  setTimeout(() => setSuccess(''), 3000);
+  
+  // Auto-enviar
+  setTimeout(() => handleSubmit(cleanNumber), 500);
+};
 
       const handleCancelScan = () => {
         setShowConfirmation(false);
@@ -2157,11 +2161,12 @@
 
             {/* Scanner Modal */}
             {showScanner && (
-              <TicketScanner 
-                onScan={handleScan}
-                onClose={() => setShowScanner(false)}
-              />
-            )}
+          <TicketScanner 
+            onScan={handleScan}
+            onClose={() => setShowScanner(false)}
+            existingTickets={[...tickets.map(t => t.ticketNumber), ...scannedNumbers]} // 👈 CLAVE
+          />
+        )}
             {showSpin && (
           <SpinWheel
             onClose={() => setShowSpin(false)}
