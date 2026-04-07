@@ -11,11 +11,12 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
   const [error, setError] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [cameraError, setCameraError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
-  // Función para mejorar la imagen antes de OCR
+  // Función para mejorar la imagen
   const enhanceImage = (imageDataUrl: string): Promise<string> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -23,85 +24,80 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         
-        // Aumentar resolución y mejorar contraste
-        canvas.width = img.width * 2;
-        canvas.height = img.height * 2;
+        let targetWidth = img.width;
+        let targetHeight = img.height;
+        
+        if (img.width < 1000) {
+          const scale = 1000 / img.width;
+          targetWidth = 1000;
+          targetHeight = img.height * scale;
+        }
+        
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
         
         if (ctx) {
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
           
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, targetWidth, targetHeight);
           const data = imageData.data;
           
-          // Mejorar contraste
+          const contrast = 1.4;
+          const brightness = 10;
+          
           for (let i = 0; i < data.length; i += 4) {
-            const gray = (data[i] + data[i+1] + data[i+2]) / 3;
-            const enhanced = gray > 70 ? 255 : 0;
-            data[i] = enhanced;
-            data[i+1] = enhanced;
-            data[i+2] = enhanced;
+            data[i] = Math.min(255, Math.max(0, (data[i] - 128) * contrast + 128 + brightness));
+            data[i+1] = Math.min(255, Math.max(0, (data[i+1] - 128) * contrast + 128 + brightness));
+            data[i+2] = Math.min(255, Math.max(0, (data[i+2] - 128) * contrast + 128 + brightness));
           }
           
           ctx.putImageData(imageData, 0, 0);
         }
         
-        resolve(canvas.toDataURL('image/jpeg', 0.95));
+        resolve(canvas.toDataURL('image/jpeg', 0.9));
       };
       img.src = imageDataUrl;
     });
   };
 
-  // Función mejorada para extraer números
   const extractTicketNumber = (text: string): string | null => {
-    console.log('🔍 Texto completo recibido:', text);
+    console.log('🔍 Texto OCR:', text);
     
-    // Limpiar el texto
-    const cleanText = text.replace(/[^\w\s\d]/g, ' ').toUpperCase();
+    let normalized = text.toUpperCase()
+      .replace(/O/g, '0')
+      .replace(/I/g, '1')
+      .replace(/Z/g, '2')
+      .replace(/S/g, '5')
+      .replace(/B/g, '8');
     
-    // Buscar números de 8-12 dígitos con diferentes patrones
     const patterns = [
-      // Patrón 1: Números aislados
-      /\b(\d{8,12})\b/g,
-      // Patrón 2: Números después de palabras clave
-      /(?:ENTRADA|TICKET|N[°º]|NUMERO|NRO)\s*:?\s*(\d{6,12})/gi,
-      // Patrón 3: Números con letras alrededor (como en la entrada)
-      /[A-Z]{0,2}(\d{8,12})[A-Z]{0,2}/g,
-      // Patrón 4: Números al final de línea
-      /[\n\r](\d{8,12})[\n\r]/g,
+      /N[°º]\s*(\d{8,12})/i,
+      /N[°º]\s+(\d{8,12})/i,
+      /(?:ENTRADA|TICKET|NRO|NUMERO)[^\d]*(\d{8,12})/i,
+      /\b(\d{8,12})\b/,
+      /0{2,}(\d{6,10})/,
     ];
     
     for (const pattern of patterns) {
-      const matches = text.match(pattern);
-      if (matches) {
-        for (const match of matches) {
-          const numbers = match.replace(/[^0-9]/g, '');
-          if (numbers.length >= 8 && numbers.length <= 12) {
-            console.log('✅ Encontrado por patrón:', numbers);
-            return numbers;
-          }
+      const match = normalized.match(pattern);
+      if (match && match[1]) {
+        const num = match[1];
+        if (num.length >= 8 && num.length <= 12) {
+          console.log('✅ Número encontrado:', num);
+          return num;
         }
       }
     }
     
-    // Estrategia: Tomar todos los números y elegir el más largo
-    const allNumbers = text.match(/\d+/g);
-    console.log('🔢 Todos los números encontrados:', allNumbers);
-    
+    const allNumbers = normalized.match(/\d+/g);
     if (allNumbers && allNumbers.length > 0) {
-      // Filtrar números pequeños
-      const validNumbers = allNumbers.filter(num => num.length >= 6);
-      
-      if (validNumbers.length > 0) {
-        // Ordenar por longitud
-        const sorted = validNumbers.sort((a, b) => b.length - a.length);
-        const candidate = sorted[0];
-        
-        if (candidate.length >= 8) {
-          console.log('✅ Tomando número de 8+ dígitos:', candidate);
-          return candidate;
-        } else if (candidate.length >= 6) {
-          console.log('⚠️ Usando número de 6-7 dígitos:', candidate);
-          return candidate;
+      const candidates = allNumbers.filter(n => n.length >= 7);
+      if (candidates.length > 0) {
+        candidates.sort((a, b) => b.length - a.length);
+        const best = candidates[0];
+        if (best.length >= 8) {
+          console.log('✅ Número encontrado (fallback):', best);
+          return best;
         }
       }
     }
@@ -109,63 +105,59 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
     return null;
   };
 
-  // Función para procesar imagen con OCR
-  const processImage = async (imageFile: File | string) => {
+  const processImage = async (imageSource: File | string) => {
     setIsProcessing(true);
     setError('');
+    setCameraError('');
     
     try {
-      console.log('🔍 Procesando imagen con OCR...');
+      console.log('🔍 Iniciando OCR...');
       
-      let imageToProcess = imageFile;
+      let imageDataUrl: string;
       
-      // Mejorar calidad de imagen
-      if (typeof imageToProcess === 'string' && imageToProcess.startsWith('data:')) {
-        console.log('📸 Mejorando calidad de imagen...');
-        imageToProcess = await enhanceImage(imageToProcess);
+      if (typeof imageSource === 'string') {
+        imageDataUrl = imageSource;
+      } else {
+        imageDataUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(imageSource);
+        });
       }
+      
+      const enhancedImage = await enhanceImage(imageDataUrl);
       
       const worker = await createWorker('spa');
       
-      // Configurar para mejor reconocimiento de números
       await worker.setParameters({
-        tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        preserve_interword_spaces: '0',
+        tessedit_char_whitelist: '0123456789N°ABCDEFGHIJKLMNOPQRSTUVWXYZ',
       });
       
-      const { data: { text } } = await worker.recognize(imageToProcess);
+      const { data: { text } } = await worker.recognize(enhancedImage);
       await worker.terminate();
       
-      console.log('📝 Texto reconocido:', text);
+      console.log('📝 Texto OCR:', text);
       
       const ticketNumber = extractTicketNumber(text);
       
       if (ticketNumber) {
-        console.log('✅ Número encontrado:', ticketNumber);
-        
-        if ('vibrate' in navigator) {
-          navigator.vibrate(200);
-        }
-        
+        console.log('✅ Éxito! Número:', ticketNumber);
+        if ('vibrate' in navigator) navigator.vibrate(100);
         onScan(ticketNumber, text);
       } else {
-        console.log('❌ No se encontró número válido');
-        setError('No se pudo encontrar el número de entrada. Intentá:\n• Mejor iluminación\n• Enfocar mejor el número\n• El número debe tener 8-12 dígitos');
-        
-        if ('vibrate' in navigator) {
-          navigator.vibrate([100, 50, 100]);
-        }
+        setError('⚠️ No se pudo encontrar el número de entrada.\n\nConsejos:\n• Mejor iluminación\n• Enfocar bien el número\n• El número tiene 8 dígitos');
+        if ('vibrate' in navigator) navigator.vibrate([100, 50, 100]);
       }
     } catch (err: any) {
-      console.error('Error OCR:', err);
-      setError('Error al procesar la imagen. Intentá nuevamente.');
+      console.error('❌ Error OCR:', err);
+      setError('Error al procesar la imagen. Verificá que la foto sea clara.');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Iniciar cámara
   const startCamera = async () => {
+    setCameraError('');
     try {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
@@ -174,8 +166,8 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
         } 
       });
       
@@ -188,35 +180,37 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
     } catch (err: any) {
       console.error('Error al iniciar cámara:', err);
       if (err.name === 'NotAllowedError') {
-        setError('Necesitamos acceso a la cámara para leer tu entrada.');
+        setCameraError('Permiso denegado. Permití el acceso a la cámara en la configuración del navegador.');
+      } else if (err.name === 'NotFoundError') {
+        setCameraError('No se encontró ninguna cámara en este dispositivo.');
       } else {
-        setError('Error al acceder a la cámara.');
+        setCameraError('No se pudo acceder a la cámara. Usá la opción "Galería" para subir una foto.');
       }
     }
   };
 
-  // Capturar foto
   const capturePhoto = () => {
-    if (videoRef.current) {
+    if (videoRef.current && videoRef.current.videoWidth > 0) {
       const canvas = document.createElement('canvas');
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext('2d');
-      ctx?.drawImage(videoRef.current, 0, 0);
       
-      const imageDataUrl = canvas.toDataURL('image/jpeg', 1.0);
-      setPreviewUrl(imageDataUrl);
-      
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-        streamRef.current = null;
+      if (ctx) {
+        ctx.drawImage(videoRef.current, 0, 0);
+        const imageDataUrl = canvas.toDataURL('image/jpeg', 1.0);
+        setPreviewUrl(imageDataUrl);
+        
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => track.stop());
+          streamRef.current = null;
+        }
+        
+        processImage(imageDataUrl);
       }
-      
-      processImage(imageDataUrl);
     }
   };
 
-  // Seleccionar de galería
   const selectFromGallery = () => {
     fileInputRef.current?.click();
   };
@@ -233,6 +227,7 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
   const reset = () => {
     setPreviewUrl(null);
     setError('');
+    setCameraError('');
     setIsProcessing(false);
     startCamera();
   };
@@ -247,86 +242,290 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
     };
   }, []);
 
+  // Estilos inline para asegurar centrado correcto
+  const styles = {
+    modal: {
+      position: 'fixed' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.9)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 1000,
+    },
+    container: {
+      backgroundColor: '#12121a',
+      borderRadius: '16px',
+      width: '90%',
+      maxWidth: '500px',
+      maxHeight: '90vh',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      overflow: 'hidden',
+      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+    },
+    header: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '16px 20px',
+      borderBottom: '1px solid #e5e7eb',
+      backgroundColor: '#12121a',
+    },
+    title: {
+      fontSize: '18px',
+      fontWeight: 600,
+      margin: 0,
+      color: '#fff',
+    },
+    closeButton: {
+      background: 'none',
+      border: 'none',
+      fontSize: '24px',
+      cursor: 'pointer',
+      color: '#6b7280',
+      padding: '0',
+      width: '32px',
+      height: '32px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: '8px',
+    },
+    content: {
+      flex: 1,
+      overflow: 'auto',
+      padding: '20px',
+    },
+    errorAlert: {
+      backgroundColor: '#fee2e2',
+      border: '1px solid #fecaca',
+      borderRadius: '8px',
+      padding: '12px',
+      marginBottom: '16px',
+      color: '#991b1b',
+      fontSize: '14px',
+      whiteSpace: 'pre-line' as const,
+    },
+    cameraView: {
+      position: 'relative' as const,
+      backgroundColor: '#000',
+      borderRadius: '12px',
+      overflow: 'hidden',
+      marginBottom: '16px',
+    },
+    video: {
+      width: '100%',
+      height: 'auto',
+      display: 'block',
+    },
+    guideFrame: {
+      position: 'absolute' as const,
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: '80%',
+      height: '120px',
+      border: '2px solid #ffffff',
+      borderRadius: '8px',
+      boxShadow: '0 0 0 2000px rgba(0, 0, 0, 0.5)',
+    },
+    previewView: {
+      position: 'relative' as const,
+      backgroundColor: '#12121a',
+      borderRadius: '12px',
+      overflow: 'hidden',
+      marginBottom: '16px',
+    },
+    imagePreview: {
+      width: '100%',
+      height: 'auto',
+      display: 'block',
+    },
+    processingOverlay: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'white',
+    },
+    spinner: {
+      width: '40px',
+      height: '40px',
+      border: '3px solid rgba(255,255,255,0.3)',
+      borderTopColor: 'white',
+      borderRadius: '50%',
+      animation: 'spin 1s linear infinite',
+    },
+    instructions: {
+      backgroundColor: '#12121a',
+      borderRadius: '8px',
+      padding: '12px',
+      marginTop: '16px',
+    },
+    instructionTitle: {
+      fontSize: '13px',
+      fontWeight: 600,
+      marginBottom: '8px',
+      color: '#fff',
+    },
+    instructionList: {
+      fontSize: '12px',
+      color: '#fff',
+      margin: 0,
+      paddingLeft: '20px',
+    },
+    footer: {
+      display: 'flex',
+      gap: '8px',
+      padding: '16px 20px',
+      borderTop: '1px solid #e5e7eb',
+      backgroundColor: '#12121a',
+    },
+    button: {
+      flex: 1,
+      padding: '10px 16px',
+      borderRadius: '8px',
+      fontSize: '14px',
+      fontWeight: 500,
+      cursor: 'pointer',
+      border: 'none',
+      transition: 'background-color 0.2s',
+    },
+    buttonGhost: {
+      backgroundColor: 'transparent',
+      color: '#6b7280',
+      border: '1px solid #d1d5db',
+    },
+    buttonPrimary: {
+      backgroundColor: '#3b82f6',
+      color: 'white',
+    },
+    buttonSecondary: {
+      backgroundColor: '#10b981',
+      color: 'white',
+    },
+  };
+
   return (
-    <div className="scanner-modal">
-      <div className="scanner-container">
-        <div className="scanner-header">
-          <h3>📷 Leer entrada</h3>
-          <button className="scanner-close" onClick={onClose}>
-            ✕
-          </button>
+    <div style={styles.modal}>
+      <div style={styles.container}>
+        <div style={styles.header}>
+          <h3 style={styles.title}>📷 Leer entrada</h3>
+          <button style={styles.closeButton} onClick={onClose}>✕</button>
         </div>
 
-        <div className="scanner-content">
-          {error && (
-            <div className="alert alert-error" style={{ whiteSpace: 'pre-line' }}>
+        <div style={styles.content}>
+          {/* Error de cámara */}
+          {cameraError && (
+            <div style={styles.errorAlert}>
+              ⚠️ {cameraError}
+            </div>
+          )}
+
+          {/* Error de OCR */}
+          {error && !cameraError && (
+            <div style={styles.errorAlert}>
               ⚠️ {error}
             </div>
           )}
 
           {!previewUrl ? (
-            <div className="camera-view">
-              <video 
-                ref={videoRef}
-                autoPlay
-                playsInline
-                className="camera-preview"
-              />
-              <div className="camera-guide">
-                <div className="guide-frame"></div>
-                <p className="guide-text">
-                  📸 Enfocá el número de tu entrada<br/>
-                  <small>El número suele ser de 8-12 dígitos</small>
-                </p>
+            <>
+              <div style={styles.cameraView}>
+                {!cameraError ? (
+                  <>
+                    <video 
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      style={styles.video}
+                    />
+                    <div style={styles.guideFrame}></div>
+                  </>
+                ) : (
+                  <div style={{
+                    backgroundColor: '#12121a',
+                    padding: '40px',
+                    textAlign: 'center',
+                    borderRadius: '12px'
+                  }}>
+                    <div style={{ fontSize: '48px', marginBottom: '12px' }}>📷</div>
+                    <p style={{ color: '#6b7280', margin: 0 }}>
+                      No se pudo acceder a la cámara<br/>
+                      Usá la opción "Galería" para subir una foto
+                    </p>
+                  </div>
+                )}
               </div>
-            </div>
+              
+              <div style={styles.instructions}>
+                <p style={styles.instructionTitle}>📌 Consejos para mejor lectura:</p>
+                <ul style={styles.instructionList}>
+                  <li>✓ Iluminación clara (evitá sombras)</li>
+                  <li>✓ Enfocá bien el número</li>
+                  <li>✓ Mantené la cámara estable</li>
+                  <li>✓ El número tiene 8 dígitos (ej: 00001680)</li>
+                </ul>
+              </div>
+            </>
           ) : (
-            <div className="preview-view">
-              <img src={previewUrl} alt="Preview" className="image-preview" />
+            <div style={styles.previewView}>
+              <img src={previewUrl} alt="Preview" style={styles.imagePreview} />
               {isProcessing && (
-                <div className="processing-overlay">
-                  <div className="spinner"></div>
-                  <p>Leyendo número de entrada...</p>
-                  <small style={{ fontSize: '11px', marginTop: '8px' }}>Esto puede tomar unos segundos</small>
+                <div style={styles.processingOverlay}>
+                  <div style={styles.spinner}></div>
+                  <p style={{ marginTop: '12px' }}>Leyendo número de entrada...</p>
                 </div>
               )}
             </div>
           )}
-
-          <div className="scanner-instructions">
-            <p className="instruction-title">📌 Consejos para mejor lectura:</p>
-            <ul className="instruction-list">
-              <li>✓ Iluminación clara (evitá sombras)</li>
-              <li>✓ Enfocá bien el número</li>
-              <li>✓ Mantené la cámara estable</li>
-              <li>✓ El número debe estar dentro del marco</li>
-            </ul>
-            <div className="example-ticket">
-              <div className="example-number">268275132</div>
-              <div className="example-label">Busca números como este (8-12 dígitos)</div>
-            </div>
-          </div>
         </div>
 
-        <div className="scanner-footer">
+        <div style={styles.footer}>
           {!previewUrl ? (
             <>
-              <button className="btn btn-ghost" onClick={onClose}>
+              <button 
+                style={{ ...styles.button, ...styles.buttonGhost }}
+                onClick={onClose}
+              >
                 Cancelar
               </button>
-              <button className="btn btn-primary" onClick={capturePhoto}>
+              <button 
+                style={{ ...styles.button, ...styles.buttonPrimary }}
+                onClick={capturePhoto}
+                disabled={!!cameraError}
+              >
                 📸 Tomar foto
               </button>
-              <button className="btn btn-secondary" onClick={selectFromGallery}>
+              <button 
+                style={{ ...styles.button, ...styles.buttonSecondary }}
+                onClick={selectFromGallery}
+              >
                 🖼️ Galería
               </button>
             </>
           ) : (
             <>
-              <button className="btn btn-ghost" onClick={reset}>
+              <button 
+                style={{ ...styles.button, ...styles.buttonGhost }}
+                onClick={reset}
+              >
                 ↺ Volver a tomar
               </button>
-              <button className="btn btn-secondary" onClick={selectFromGallery}>
+              <button 
+                style={{ ...styles.button, ...styles.buttonSecondary }}
+                onClick={selectFromGallery}
+              >
                 🖼️ Otra imagen
               </button>
             </>
@@ -341,6 +540,13 @@ export function TicketScanner({ onScan, onClose }: TicketScannerProps) {
           onChange={handleFileSelect}
         />
       </div>
+
+      {/* Animación del spinner */}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
