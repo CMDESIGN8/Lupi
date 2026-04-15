@@ -1708,7 +1708,7 @@
               {mode === "register" && (
                 <div className="form-group">
                   <label className="form-label">Nombre de usuario</label>
-                  <input className="form-input" placeholder="@tupapito10" value={form.username} onChange={set("username")} />
+                  <input className="form-input" placeholder="@LupiApp" value={form.username} onChange={set("username")} />
                 </div>
               )}
 
