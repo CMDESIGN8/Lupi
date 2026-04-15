@@ -20,6 +20,10 @@
     import { WeeklyMissions } from './components/WeeklyMissions';
     import { Achievements} from './components/Achievements';
     import { useAchievements, AchievementContext } from './components/Achievements';
+    import { DailyCardReward } from './components/DailyCardReward';
+    import { CardBattle } from './components/CardBattle';
+    import { CardAlbum } from './components/CardAlbum';
+    import { UserCard, Deck } from './types/cards';
 
 
 
@@ -2845,7 +2849,8 @@
     // ============================================================
     // MAIN APP
     // ============================================================
-    type Tab = "home" | "ticket" | "ranking" | "profile";
+    type Tab = "home" | "ticket" | "ranking" | "profile" | "album" | "battle";
+
 
     export default function App() {
       const [user, setUser] = useState<AppUser | null>(null);
@@ -2854,6 +2859,60 @@
       const [showTour, setShowTour] = useState(false);
       const [tourKey, setTourKey] = useState(0);
       const { notifyStreakAtRisk, notifyNewRecord, notifyReward } = usePushNotifications(user?.id);
+      const [userCards, setUserCards] = useState<UserCard[]>([]);
+const [activeDeck, setActiveDeck] = useState<Deck>({ id: '', name: '', is_active: true, cards: [] });
+
+// Función para cargar las cartas del usuario
+const loadUserCards = useCallback(async () => {
+  if (!user) return;
+  const { data } = await supabase
+    .from('user_cards')
+    .select('*, player:players(*)')
+    .eq('user_id', user.id);
+  setUserCards(data || []);
+}, [user]);
+
+// Función para cargar el mazo activo
+const loadActiveDeck = useCallback(async () => {
+  if (!user) return;
+  
+  // Obtener o crear mazo activo
+  let { data: deck } = await supabase
+    .from('decks')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('is_active', true)
+    .single();
+  
+  if (!deck) {
+    const { data: newDeck } = await supabase
+      .from('decks')
+      .insert({ user_id: user.id, name: 'Mi Mazo', is_active: true })
+      .select()
+      .single();
+    deck = newDeck;
+  }
+  
+  // Obtener cartas del mazo
+  const { data: deckCards } = await supabase
+    .from('deck_cards')
+    .select('*, user_card:user_cards(*, player:players(*))')
+    .eq('deck_id', deck.id)
+    .order('position');
+  
+  setActiveDeck({
+    ...deck,
+    cards: deckCards?.map(dc => ({ ...dc.user_card, position: dc.position })) || []
+  });
+}, [user]);
+
+// Llamar las funciones cuando cambia el usuario
+useEffect(() => {
+  if (user) {
+    loadUserCards();
+    loadActiveDeck();
+  }
+}, [user, loadUserCards, loadActiveDeck]);
 
     // Efecto para verificar racha y enviar notificaciones
       useEffect(() => {
@@ -2950,6 +3009,18 @@
                 {tab === "home"    && <DashboardTab user={user} onNavigate={handleNavigate} onPointsUpdate={handlePointsUpdate}/>}
                 {tab === "ticket"  && <TicketTab user={user} onPointsUpdate={handlePointsUpdate} />}
                 {tab === "ranking" && <LeaderboardTab user={user} />}
+                {tab === "album" && <CardAlbum userId={user.id} />}
+                {tab === "battle" && (
+  <>
+    <DailyCardReward userId={user.id} onCardReceived={() => { loadUserCards(); loadActiveDeck(); }} />
+    <CardBattle 
+      userCards={userCards}
+      userDeck={activeDeck}
+      userId={user.id}
+      onBattleComplete={() => { loadUserCards(); loadActiveDeck(); }}
+    />
+  </>
+)}
                 {tab === "profile" && <ProfileTab user={user} onLogout={handleLogout} onRestartTour={handleRestartTour} />}
                 
 
@@ -2958,6 +3029,8 @@
                     { id: "home",    icon: "🏠", label: "Inicio"  },
                     { id: "ticket",  icon: "🎟️", label: "Entrada" },
                     { id: "ranking", icon: "🏆", label: "Ranking" },
+                    { id: "album", icon: "📖", label: "Álbum" },
+                    { id: "battle", icon: "⚔️", label: "Batalla" },
                     { id: "profile", icon: "👤", label: "Perfil"  },
                   ] as { id: Tab; icon: string; label: string }[]).map((n) => (
                     <button key={n.id} className={`nav-item${tab === n.id ? " active" : ""}`} onClick={() => setTab(n.id)}>
