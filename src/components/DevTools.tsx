@@ -79,9 +79,9 @@ export function DevTools({ userId, onCardReceived }: DevToolsProps) {
 
       // Si es carta repetida, dar EXP extra para subir nivel
       if (!isNewCard && userCard) {
-        const newExp = (userCard.experience || 0) + 50;
-        let newLevel = userCard.level;
-        let leveledUp = false;
+        let newExp = (userCard.experience || 0) + 50;  // <-- usar let en lugar de const
+let newLevel = userCard.level;
+let leveledUp = false;
         
         while (newExp >= newLevel * 100) {
           newExp -= newLevel * 100;
