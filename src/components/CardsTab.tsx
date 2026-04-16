@@ -27,7 +27,7 @@ import {
   MatchResult,
   MatchEvent,
   calcOVR,
-} from "../lib/api.cards";
+} from "../lib/api";
 import { FifaCard } from "./FifaCard";
 import { MysteryBox } from "./MysteryBox";
 
