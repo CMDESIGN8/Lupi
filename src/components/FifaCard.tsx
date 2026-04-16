@@ -12,7 +12,7 @@
  */
 
 import { useState } from "react";
-import { PlayerCard } from "../lib/api.cards";
+import { PlayerCard } from "../lib/api";
 
 // ── Paleta por rareza ────────────────────────────────────────
 const RARITY_THEME: Record<string, {
