@@ -583,14 +583,16 @@ export function CardsTab({ user }: CardsTabProps) {
                 <div style={{ height: 6, background: 'var(--surface2)', borderRadius: 100, overflow: 'hidden' }}>
                   <div style={{
                     height: '100%',
-                    width: `${albumProgress.percent}%`,
+                    width: `${(albumProgress.owned / albumProgress.total) * 100}%`,
+
                     background: 'linear-gradient(90deg, var(--accent), var(--accent2))',
                     borderRadius: 100,
                     transition: 'width 0.6s ease',
                   }} />
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 6, fontWeight: 700, letterSpacing: 0.5 }}>
-                  {albumProgress.percent}% completado
+                  {Math.round((albumProgress.owned / albumProgress.total) * 100)}% completado
+
                 </div>
               </div>
 
