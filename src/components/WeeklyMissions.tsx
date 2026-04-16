@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { api, AppUser, LeaderEntry, Ticket } from "../lib/api";
 import { supabase } from "../lib/supabaseClient";
@@ -10,8 +9,8 @@ interface Mission {
   title: string;
   description: string;
   points: number;
-  target: number;          // valor objetivo
-  getValue: (ctx: MissionContext) => number; // valor actual
+  target: number;
+  getValue: (ctx: MissionContext) => number;
   accentColor: string;
   glowColor: string;
 }
@@ -21,6 +20,14 @@ interface MissionContext {
   leaderboard: LeaderEntry[];
   user: AppUser;
   weeklyShares: number;
+}
+
+// ── Props del componente ─────────────────────────────────────
+interface WeeklyMissionsProps {
+  user: AppUser;
+  tickets: Ticket[];
+  leaderboard: LeaderEntry[];
+  onPointsUpdate: (newPoints: number) => void;
 }
 
 // ── Definición de misiones ───────────────────────────────────
@@ -53,9 +60,6 @@ const MISSIONS: Mission[] = [
     accentColor: "#3dffa0",
     glowColor: "rgba(61,255,160,0.35)",
     getValue: ({ user }) => {
-      // referral_count ya existe en el perfil; tomamos si tiene al menos 1 esta semana
-      // Como no tenemos fecha de referido en el perfil, usamos el total como proxy
-      // Si ya completó la misión, el hook lo marca como done
       return user.referral_count ?? 0;
     },
   },
@@ -99,6 +103,16 @@ const MISSIONS: Mission[] = [
 
 // ── CSS ──────────────────────────────────────────────────────
 const MISSIONS_CSS = `
+/* Contenedor wrapper que ocupa todo el ancho */
+.weekly-missions-wrapper {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .wm-section-title {
   font-family: var(--font-display);
   font-size: 22px;
@@ -107,6 +121,8 @@ const MISSIONS_CSS = `
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  text-align: left;
 }
 
 .wm-card {
@@ -117,6 +133,8 @@ const MISSIONS_CSS = `
   margin-bottom: 20px;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .wm-card::before {
@@ -134,6 +152,7 @@ const MISSIONS_CSS = `
   margin-bottom: 16px;
   padding-bottom: 14px;
   border-bottom: 1px solid var(--border);
+  width: 100%;
 }
 
 .wm-summary-text {
@@ -156,6 +175,8 @@ const MISSIONS_CSS = `
   padding: 14px 0;
   border-bottom: 1px solid rgba(42,42,58,0.6);
   transition: opacity 0.3s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .wm-mission:last-child {
@@ -286,13 +307,7 @@ const MISSIONS_CSS = `
 `;
 
 // ── Toast de misión completada ───────────────────────────────
-function MissionToast({
-  mission,
-  onHide,
-}: {
-  mission: Mission;
-  onHide: () => void;
-}) {
+function MissionToast({ mission, onHide }: { mission: Mission; onHide: () => void }) {
   const [hiding, setHiding] = useState(false);
 
   useEffect(() => {
@@ -304,8 +319,11 @@ function MissionToast({
   return (
     <div
       className={`wm-toast${hiding ? " hide" : ""}`}
-      style={{ borderColor: mission.accentColor, color: mission.accentColor,
-        boxShadow: `0 8px 24px rgba(0,0,0,0.4), 0 0 20px ${mission.glowColor}` }}
+      style={{ 
+        borderColor: mission.accentColor, 
+        color: mission.accentColor,
+        boxShadow: `0 8px 24px rgba(0,0,0,0.4), 0 0 20px ${mission.glowColor}`
+      }}
     >
       <span style={{ fontSize: 20 }}>{mission.emoji}</span>
       <span style={{ color: "var(--text)" }}>
@@ -317,13 +335,6 @@ function MissionToast({
 }
 
 // ── Componente principal ─────────────────────────────────────
-interface WeeklyMissionsProps {
-  user: AppUser;
-  tickets: Ticket[];
-  leaderboard: LeaderEntry[];
-  onPointsUpdate: (newPoints: number) => void;
-}
-
 export function WeeklyMissions({
   user,
   tickets,
@@ -334,10 +345,8 @@ export function WeeklyMissions({
   const [weeklyShares, setWeeklyShares] = useState(0);
   const [loading, setLoading] = useState(true);
   const [toastMission, setToastMission] = useState<Mission | null>(null);
-  // Evitar doble-trigger en el mismo render
   const processingRef = useRef<Set<string>>(new Set());
 
-  // Cargar estado inicial
   useEffect(() => {
     Promise.all([
       api.getCompletedMissions(user.id),
@@ -349,7 +358,6 @@ export function WeeklyMissions({
     });
   }, [user.id]);
 
-  // Evaluar misiones y disparar completado si corresponde
   const ctx: MissionContext = { tickets, leaderboard, user, weeklyShares };
 
   useEffect(() => {
@@ -376,7 +384,6 @@ export function WeeklyMissions({
         processingRef.current.delete(mission.id);
       }
     });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickets, leaderboard, weeklyShares, loading]);
 
   const completedCount = MISSIONS.filter((m) => completedIds.has(m.id)).length;
@@ -399,101 +406,91 @@ export function WeeklyMissions({
         />
       )}
 
-      <div className="wm-section-title fade-up">🎯 Misiones de la semana</div>
+      <div className="weekly-missions-wrapper">
+        <div className="wm-section-title">🎯 Misiones de la semana</div>
 
-      <div className="wm-card fade-up">
-        {/* Resumen */}
-        <div className="wm-summary">
-          <div>
-            <div className="wm-summary-text">
-              {completedCount}/{MISSIONS.length} completadas
-            </div>
-            <div style={{ marginTop: 6, height: 5, width: 160, background: "var(--surface2)", borderRadius: 100, overflow: "hidden" }}>
-              <div
-                style={{
-                  height: "100%",
-                  width: `${(completedCount / MISSIONS.length) * 100}%`,
-                  background: "linear-gradient(90deg, var(--accent), var(--accent2))",
-                  borderRadius: 100,
-                  transition: "width 0.6s ease",
-                }}
-              />
-            </div>
-          </div>
-          <div>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "var(--text2)", textAlign: "right", marginBottom: 2 }}>
-              Ganado
-            </div>
-            <div className="wm-summary-pts">
-              {earnedPts}<span style={{ fontSize: 14, color: "var(--text2)" }}>/{totalPossiblePts}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Lista de misiones */}
-        {MISSIONS.map((mission) => {
-          const current = mission.getValue(ctx);
-          const done = completedIds.has(mission.id);
-          const pct = Math.min((current / mission.target) * 100, 100);
-
-          return (
-            <div
-              key={mission.id}
-              className={`wm-mission${done ? " done" : ""}`}
-            >
-              {/* Ícono */}
-              <div
-                className={`wm-icon${done ? " done" : ""}`}
-                style={{
-                  background: `${mission.accentColor}18`,
-                  boxShadow: done ? `0 0 14px ${mission.glowColor}` : "none",
-                  transition: "box-shadow 0.4s",
-                }}
-              >
-                {mission.emoji}
+        <div className="wm-card">
+          <div className="wm-summary">
+            <div>
+              <div className="wm-summary-text">
+                {completedCount}/{MISSIONS.length} completadas
               </div>
-
-              {/* Info + barra */}
-              <div className="wm-info">
-                <div className="wm-title">{mission.title}</div>
-                <div className="wm-desc">{mission.description}</div>
-                <div className="wm-progress-track">
-                  <div
-                    className="wm-progress-fill"
-                    style={{
-                      width: `${pct}%`,
-                      background: done
-                        ? `linear-gradient(90deg, ${mission.accentColor}, ${mission.accentColor}aa)`
-                        : `linear-gradient(90deg, ${mission.accentColor}88, ${mission.accentColor})`,
-                      boxShadow: done ? `0 0 6px ${mission.glowColor}` : "none",
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Puntos + progreso */}
-              <div className="wm-right">
+              <div style={{ marginTop: 6, height: 5, width: 160, background: "var(--surface2)", borderRadius: 100, overflow: "hidden" }}>
                 <div
-                  className="wm-pts-badge"
                   style={{
-                    background: done
-                      ? `${mission.accentColor}22`
-                      : "var(--surface2)",
-                    color: done ? mission.accentColor : "var(--text2)",
-                    border: `1px solid ${done ? mission.accentColor + "44" : "var(--border)"}`,
+                    height: "100%",
+                    width: `${(completedCount / MISSIONS.length) * 100}%`,
+                    background: "linear-gradient(90deg, var(--accent), var(--accent2))",
+                    borderRadius: 100,
+                    transition: "width 0.6s ease",
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "var(--text2)", textAlign: "right", marginBottom: 2 }}>
+                Ganado
+              </div>
+              <div className="wm-summary-pts">
+                {earnedPts}<span style={{ fontSize: 14, color: "var(--text2)" }}>/{totalPossiblePts}</span>
+              </div>
+            </div>
+          </div>
+
+          {MISSIONS.map((mission) => {
+            const current = mission.getValue(ctx);
+            const done = completedIds.has(mission.id);
+            const pct = Math.min((current / mission.target) * 100, 100);
+
+            return (
+              <div key={mission.id} className={`wm-mission${done ? " done" : ""}`}>
+                <div
+                  className={`wm-icon${done ? " done" : ""}`}
+                  style={{
+                    background: `${mission.accentColor}18`,
+                    boxShadow: done ? `0 0 14px ${mission.glowColor}` : "none",
+                    transition: "box-shadow 0.4s",
                   }}
                 >
-                  {done ? "✓" : "+"}{mission.points} pts
+                  {mission.emoji}
                 </div>
-                <div className="wm-progress-label">
-                  {done
-                    ? "¡Completada!"
-                    : `${Math.min(current, mission.target)}/${mission.target}`}
+
+                <div className="wm-info">
+                  <div className="wm-title">{mission.title}</div>
+                  <div className="wm-desc">{mission.description}</div>
+                  <div className="wm-progress-track">
+                    <div
+                      className="wm-progress-fill"
+                      style={{
+                        width: `${pct}%`,
+                        background: done
+                          ? `linear-gradient(90deg, ${mission.accentColor}, ${mission.accentColor}aa)`
+                          : `linear-gradient(90deg, ${mission.accentColor}88, ${mission.accentColor})`,
+                        boxShadow: done ? `0 0 6px ${mission.glowColor}` : "none",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="wm-right">
+                  <div
+                    className="wm-pts-badge"
+                    style={{
+                      background: done ? `${mission.accentColor}22` : "var(--surface2)",
+                      color: done ? mission.accentColor : "var(--text2)",
+                      border: `1px solid ${done ? mission.accentColor + "44" : "var(--border)"}`,
+                    }}
+                  >
+                    {done ? "✓" : "+"}{mission.points} pts
+                  </div>
+                  <div className="wm-progress-label">
+                    {done ? "¡Completada!" : `${Math.min(current, mission.target)}/${mission.target}`}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </>
   );

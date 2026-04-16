@@ -24,8 +24,11 @@
     import { CardBattle } from './components/CardBattle';
     import { CardAlbum } from './components/CardAlbum';
     import { UserCard, Deck } from './types/cards';
-
-
+    import { UserCardProfile } from './components/UserCardProfile';
+import { UserCardGuide } from './components/UserCardGuide';
+import { DeckBuilder } from './components/DeckBuilder';
+import { DevTools } from './components/DevTools';
+import { UserFifaCard } from './components/UserFifaCard';
 
 
 
@@ -72,7 +75,22 @@
         background-size: 40px 40px; pointer-events: none; z-index: 0;
       }
 
-      .container { max-width: 480px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 1; }
+      /* Contenedor principal */
+.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Asegurar que todo dentro del container ocupe el ancho completo */
+.container > * {
+  width: 100%;
+  box-sizing: border-box;
+}
 
       .auth-screen { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 40px 0; }
       .auth-logo { text-align: center; margin-bottom: 32px; }
@@ -95,8 +113,11 @@
 
       .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px 20px; border: none; border-radius: var(--radius); font-family: var(--font-display); font-size: 18px; letter-spacing: 1.5px; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
       .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-      .btn-primary { background: var(--accent); color: #0a0a0f; }
-      .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(245,197,24,0.35); }
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(245,197,24,0.35);
+}
       .btn-primary:active:not(:disabled) { transform: translateY(0); }
       .btn-ghost { background: transparent; color: var(--text2); border: 1.5px solid var(--border); font-family: var(--font-body); font-size: 14px; font-weight: 600; letter-spacing: 0; }
       .btn-ghost:hover:not(:disabled) { border-color: var(--text2); color: var(--text); }
@@ -109,7 +130,7 @@
       .alert-error { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.3); color: var(--accent2); }
       .alert-success { background: rgba(61,255,160,0.1); border: 1px solid rgba(61,255,160,0.25); color: var(--success); }
 
-      .app-header { position: sticky; top: 0; z-index: 100; background: rgba(10,10,15,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 0; }
+      .app-header {  top: 0; z-index: 100; background: rgba(10,10,15,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 0; }
       .header-inner { display: flex; align-items: center; justify-content: space-between; }
       .header-logo { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; color: var(--text); }
       .header-logo span { color: var(--accent); }
@@ -121,19 +142,131 @@
       .nav-item.active { color: var(--accent); }
       .nav-item .nav-icon { font-size: 22px; }
 
-      .main-content { padding: 24px 0 100px; }
+      /* Forzar centrado absoluto */
+/* Main content - centrado */
+.main-content {
+  padding: 24px 0 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* El container dentro de main-content debe estar centrado */
+.main-content > .container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+
+/* Todos los hijos directos del container deben tener ancho completo */
+.main-content > .container > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 
       .welcome-banner { background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; }
       .welcome-banner::after { content: '🏟️'; position: absolute; right: 16px; bottom: -8px; font-size: 72px; opacity: 0.12; }
       .welcome-name { font-family: var(--font-display); font-size: 32px; letter-spacing: 1px; line-height: 1.1; margin-bottom: 4px; }
       .welcome-club { font-size: 13px; color: var(--accent); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
       .welcome-club-flores { font-size: 13px; color: #03b129; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-      .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-      .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; text-align: center; }
-      .stat-number { font-family: var(--font-display); font-size: 36px; letter-spacing: 1px; color: var(--accent); line-height: 1; margin-bottom: 4px; }
-      .stat-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text2); }
+      /* Grid de estadísticas */
+/* ============================================================
+   ESTILOS EXCLUSIVOS PARA EL DASHBOARD (PÁGINA PRINCIPAL)
+   ============================================================ */
 
-      .section-title { font-family: var(--font-display); font-size: 22px; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+/* Contenedor principal del dashboard */
+/* Dashboard container */
+.dashboard-container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Todos los elementos dentro del dashboard deben tener ancho completo */
+.dashboard-container > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+  width: 100%;
+}
+
+/* Stat card */
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Section title */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 1px;
+  margin: 20px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+/* Leader items */
+.leader-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Botón principal */
+.btn-primary {
+  background: var(--accent);
+  color: #0a0a0f;
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
 
       .ticket-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; margin-bottom: 20px; }
       .ticket-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent)); }
@@ -179,16 +312,67 @@
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.05); background: rgba(61,255,160,0.3); }
     }
-      .leader-item { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; transition: border-color 0.2s; }
-      .leader-item.me { border-color: var(--accent); background: rgba(245,197,24,0.05); }
-      .leader-rank { font-family: var(--font-display); font-size: 22px; color: var(--text2); width: 28px; text-align: center; }
-      .leader-rank.top { color: var(--accent); }
-      .leader-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--surface2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 16px; color: var(--text2); flex-shrink: 0; }
-      .leader-info { flex: 1; min-width: 0; }
-      .leader-name { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .leader-club { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .leader-points { font-family: var(--font-display); font-size: 22px; color: var(--accent); letter-spacing: 0.5px; }
 
+
+.leader-item.me {
+  border-color: var(--accent);
+  background: rgba(245,197,24,0.05);
+}
+
+.leader-rank {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--text2);
+  width: 28px;
+  text-align: center;
+}
+
+.leader-rank.top {
+  color: var(--accent);
+}
+
+.leader-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--text2);
+  flex-shrink: 0;
+}
+
+.leader-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.leader-name {
+  font-weight: 700;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leader-club {
+  font-size: 12px;
+  color: var(--text2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leader-points {
+  font-family: var(--font-display);
+  font-size: 22px;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
       .empty-state { text-align: center; padding: 40px 20px; color: var(--text2); }
       .empty-icon { font-size: 48px; margin-bottom: 12px; }
       .empty-text { font-size: 15px; }
@@ -1626,6 +1810,47 @@
       cursor: pointer;
       color: var(--text2);
     }
+      /* Notificación flotante de stat upgrade */
+.stat-upgrade-floating {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  animation: floatUp 0.3s ease-out;
+}
+
+.stat-upgrade-content {
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 60px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+.stat-upgrade-icon {
+  background: rgba(255,255,255,0.2);
+  padding: 6px 10px;
+  border-radius: 50%;
+  font-size: 18px;
+}
+
+@keyframes floatUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
     `;
 
     // ============================================================
@@ -1676,7 +1901,7 @@
         username: form.username,
         club: form.club,
         referralCode: form.referralCode || undefined
-      });
+      }); 
       
       // Mostrar mensaje de éxito con recompensa por referido si aplica
       if (form.referralCode) {
@@ -1771,188 +1996,126 @@
     // DASHBOARD TAB
     // ============================================================
     function DashboardTab({
-      user,
-      onNavigate,
-      onPointsUpdate,
-    }: {
-      user: AppUser;
-      onNavigate: (t: string) => void;
-      onPointsUpdate: (newPoints: number) => void;
-    }) {
-      const [tickets, setTickets] = useState<Ticket[]>([]);
-      const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
-      const [raffleCompleted, setRaffleCompleted] = useState(false);
-      const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
-      // Define loadTickets function
-      const loadTickets = useCallback(async () => {
-        try {
-          const t = await api.getUserTickets(user.id);
-          setTickets(t);
-        } catch (error) {
-          console.error('Error loading tickets:', error);
-        }
-      }, [user.id]);
-
-      // Define loadLeaderboard function
-      const loadLeaderboard = useCallback(async () => {
-        try {
-          const l = await api.getLeaderboard();
-          setLeaderboard(l);
-        } catch (error) {
-          console.error('Error loading leaderboard:', error);
-        }
-      }, []);
-
-      useEffect(() => {
-        loadTickets();
-        loadLeaderboard();
-        api.getClubRanking().then(setClubRanking).catch(console.error);
-      }, [loadTickets, loadLeaderboard]);
-
-      const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
-
-      const myRank = leaderboard.findIndex((u) => u.id === user.id) + 1;
-      
-      const handleRaffleComplete = () => {
-        setRaffleCompleted(true);
-        // Recargar datos del sorteo
-        loadLeaderboard();
-        loadTickets();
-      };
-
-      return (
-        <div className="main-content">
-          <div className="container">
-            <div className="welcome-banner fade-up">
-              <div className="welcome-name">¡Hola, {user.username}! 👋</div>
-              <div className="welcome-club-flores">🏟️ {user.club}</div>
-              {/* Agregar el badge de racha */}
-              <div style={{ marginTop: 12 }}>
-                <StreakBadge userId={user.id} variant="full" />
-                {myClubRank > 0 && (
-      <div
-        style={{
-          marginTop: 10,
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 6,
-          background: myClubRank === 1
-            ? "rgba(61,255,160,0.12)"
-            : myClubRank <= 3
-            ? "rgba(245,197,24,0.10)"
-            : "rgba(136,136,170,0.10)",
-          border: `1px solid ${
-            myClubRank === 1
-              ? "rgba(61,255,160,0.3)"
-              : myClubRank <= 3
-              ? "rgba(245,197,24,0.25)"
-              : "var(--border)"
-          }`,
-          borderRadius: 100,
-          padding: "5px 14px",
-          fontSize: 13,
-          fontWeight: 700,
-          color: myClubRank === 1
-            ? "var(--success)"
-            : myClubRank <= 3
-            ? "var(--accent)"
-            : "var(--text2)",
-        }}
-      >
-        {myClubRank === 1 ? "🔥" : myClubRank <= 3 ? "⚡" : "📍"}
-        Tu club está {myClubRank}° en el ranking
-      </div>
-    )}
-              </div>
-              <div style={{ marginTop: 12, fontSize: 13, color: "var(--text)" }}>
-                Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
-              </div>
-            </div>
-
-            {/* Contador regresivo */}
-            <CountdownTimer 
-              targetDate={getNextThursday20h()}
-              onComplete={handleRaffleComplete}
-            />
-
-            <div className="stats-grid fade-up">
-              <div className="stat-card"><div className="stat-number">{user.points}</div><div className="stat-label">Puntos</div></div>
-              <div className="stat-card"><div className="stat-number">{myRank || "—"}</div><div className="stat-label">Posición</div></div>
-              <div className="stat-card"><div className="stat-number">{tickets.length}</div><div className="stat-label">Entradas</div></div>
-              <div className="stat-card"><div className="stat-number">+10</div><div className="stat-label">Pts x entrada</div></div>
-            </div>
-
-            <WeeklyMissions
-              user={user}
-              tickets={tickets}
-              leaderboard={leaderboard}
-              onPointsUpdate={onPointsUpdate}
-            />
-
-            <div className="section-title fade-up">🏅 Top 5 del momento</div>
-            {leaderboard.slice(0, 5).map((u, i) => (
-              <div key={u.id} className={`leader-item fade-up${u.id === user.id ? " me" : ""}`}>
-                <div className={`leader-rank${i < 3 ? " top" : ""}`}>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</div>
-                <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
-                <div className="leader-info">
-                  <div className="leader-name">{u.username}{u.id === user.id ? " (vos)" : ""}</div>
-                  <div className="leader-club">{u.club}</div>
-                </div>
-                <div className="leader-points">{u.points}</div>
-              </div>
-            ))}
-
-            <div style={{ marginTop: 24 }} className="fade-up">
-              <button className="btn btn-primary" onClick={() => onNavigate("ticket")}>🎟️ CARGAR ENTRADA</button>
-            </div>
-          </div>
-        </div>
-      );
-
-        return (
-        <div className="main-content">
-          <div className="container">
-            <div className="welcome-banner fade-up">
-              <div className="welcome-name">¡Hola, {user.username}! 👋</div>
-              <div className="welcome-club-flores">🏟️ {user.club}</div>
-              <div style={{ marginTop: 12, fontSize: 13, color: "var(--text)" }}>
-                Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
-              </div>
-            </div>
-
-            {/* Contador regresivo */}
-            <CountdownTimer 
-              targetDate={getNextThursday20h()}
-              onComplete={handleRaffleComplete}
-            />
-
-            <div className="stats-grid fade-up">
-              <div className="stat-card"><div className="stat-number">{user.points}</div><div className="stat-label">Puntos</div></div>
-              <div className="stat-card"><div className="stat-number">{myRank || "—"}</div><div className="stat-label">Posición</div></div>
-              <div className="stat-card"><div className="stat-number">{tickets.length}</div><div className="stat-label">Entradas</div></div>
-              <div className="stat-card"><div className="stat-number">+10</div><div className="stat-label">Pts x entrada</div></div>
-            </div>
-
-            <div className="section-title fade-up">🏅 Top 5 del momento</div>
-            {leaderboard.slice(0, 5).map((u, i) => (
-              <div key={u.id} className={`leader-item fade-up${u.id === user.id ? " me" : ""}`}>
-                <div className={`leader-rank${i < 3 ? " top" : ""}`}>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}</div>
-                <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
-                <div className="leader-info">
-                  <div className="leader-name">{u.username}{u.id === user.id ? " (vos)" : ""}</div>
-                  <div className="leader-club">{u.club}</div>
-                </div>
-                <div className="leader-points">{u.points}</div>
-              </div>
-            ))}
-
-            <div style={{ marginTop: 24 }} className="fade-up">
-              <button className="btn btn-primary" onClick={() => onNavigate("ticket")}>🎟️ CARGAR ENTRADA</button>
-            </div>
-          </div>
-        </div>
-      );
+  user,
+  onNavigate,
+  onPointsUpdate,
+}: {
+  user: AppUser;
+  onNavigate: (t: string) => void;
+  onPointsUpdate: (newPoints: number) => void;
+}) {
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
+  const [raffleCompleted, setRaffleCompleted] = useState(false);
+  const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
+  
+  const loadTickets = useCallback(async () => {
+    try {
+      const t = await api.getUserTickets(user.id);
+      setTickets(t);
+    } catch (error) {
+      console.error('Error loading tickets:', error);
     }
+  }, [user.id]);
+
+  const loadLeaderboard = useCallback(async () => {
+    try {
+      const l = await api.getLeaderboard();
+      setLeaderboard(l);
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTickets();
+    loadLeaderboard();
+    api.getClubRanking().then(setClubRanking).catch(console.error);
+  }, [loadTickets, loadLeaderboard]);
+
+  const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
+  const myRank = leaderboard.findIndex((u) => u.id === user.id) + 1;
+  
+  const handleRaffleComplete = () => {
+    setRaffleCompleted(true);
+    loadLeaderboard();
+    loadTickets();
+  };
+
+  return (
+    <div className="main-content">
+      <div className="dashboard-container">
+        {/* Carta FIFA del usuario */}
+        <UserFifaCard
+          userId={user.id}
+          username={user.username}
+          club={user.club}
+          clubRank={myClubRank}
+          onLevelUp={(newLevel, newRarity) => {
+            console.log(`🎉 ¡Subiste a Nivel ${newLevel} (${newRarity.toUpperCase()})!`);
+          }}
+        />
+
+        {/* Contador regresivo */}
+        <CountdownTimer 
+          targetDate={getNextThursday20h()}
+          onComplete={handleRaffleComplete}
+        />
+
+        {/* Grid de estadísticas */}
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-number">{user.points}</div>
+            <div className="stat-label">Puntos</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{myRank || "—"}</div>
+            <div className="stat-label">Posición</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">{tickets.length}</div>
+            <div className="stat-label">Entradas</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-number">+10</div>
+            <div className="stat-label">Pts x entrada</div>
+          </div>
+        </div>
+
+        {/* Misiones semanales */}
+        <WeeklyMissions
+  user={user}
+  tickets={tickets}
+  leaderboard={leaderboard}
+  onPointsUpdate={onPointsUpdate}
+/>
+
+        {/* Top 5 */}
+        <div className="section-title">🏅 Top 5 del momento</div>
+        {leaderboard.slice(0, 5).map((u, i) => (
+          <div key={u.id} className={`leader-item${u.id === user.id ? " me" : ""}`}>
+            <div className={`leader-rank${i < 3 ? " top" : ""}`}>
+              {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+            </div>
+            <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
+            <div className="leader-info">
+              <div className="leader-name">{u.username}{u.id === user.id ? " (vos)" : ""}</div>
+              <div className="leader-club">{u.club}</div>
+            </div>
+            <div className="leader-points">{u.points}</div>
+          </div>
+        ))}
+
+        {/* Botón cargar entrada */}
+        <div style={{ marginTop: 24, width: '100%' }}>
+          <button className="btn btn-primary" onClick={() => onNavigate("ticket")}>
+            🎟️ CARGAR ENTRADA
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
     // ============================================================
     // TICKET TAB
@@ -1976,6 +2139,8 @@
         const [showSpin, setShowSpin] = useState(false);
         const { checkAndUnlock, toastQueue, setToastQueue } = useAchievements(user);
         const [scannedNumbers, setScannedNumbers] = useState<string[]>([]);
+          const { showToast } = useToast();
+
 
 
 
@@ -2043,9 +2208,59 @@
         
         // Enviar el ticket
         const res = await api.submitTicket({ ticketNumber: cleanNumber });
+
+         // ============================================================
+  // MOSTRAR NOTIFICACIÓN DE STAT UPGRADE INMEDIATA
+  // ============================================================
+  if (res.statUpgraded) {
+    const statIcons: Record<string, string> = {
+      'pace': '⚡',
+      'dribbling': '🪄',
+      'passing': '🎯',
+      'defending': '🛡️',
+      'finishing': '🎯',
+      'physical': '💪'
+    };
+    const statNames: Record<string, string> = {
+      'pace': 'Velocidad',
+      'dribbling': 'Regate',
+      'passing': 'Pase',
+      'defending': 'Defensa',
+      'finishing': 'Remate',
+      'physical': 'Físico'
+    };
+    
+    const icon = statIcons[res.statUpgraded.stat] || '⬆️';
+    const name = statNames[res.statUpgraded.stat] || res.statUpgraded.stat;
+    const diff = res.statUpgraded.newValue - res.statUpgraded.oldValue;
+    
+    // Mostrar notificación flotante
+    showToast(`${icon} ${name} +${diff} → ${res.statUpgraded.newValue}`, 'info');
+    
+    // También crear un elemento flotante animado
+    const notificationDiv = document.createElement('div');
+    notificationDiv.className = 'stat-upgrade-floating';
+    notificationDiv.innerHTML = `
+      <div class="stat-upgrade-content">
+        <span class="stat-upgrade-icon">${icon}</span>
+        <span class="stat-upgrade-text">${name} +${diff} → ${res.statUpgraded.newValue}</span>
+      </div>
+    `;
+    document.body.appendChild(notificationDiv);
+    setTimeout(() => notificationDiv.remove(), 3000);
+  }
+  
+  // Mostrar notificación de level up
+  if (res.leveledUp) {
+    showToast(`🎉 ¡SUBISTE A NIVEL ${res.newLevel}!`, 'info');
+  }
         
         // Mostrar mensaje de éxito
-        let successMessage = `🎟️ ¡Entrada cargada! Sumaste 10 puntos. Total: ${res.newPoints} pts`;
+        let successMessage = `🎟️ ¡Entrada cargada! +10 puntos`;
+if (res.statUpgraded) {
+  const statName = { pace: 'Velocidad' }[res.statUpgraded.stat] || res.statUpgraded.stat;
+  successMessage = `🎟️ +10 puntos | ⚡ +1 ${statName} | +10 EXP`;
+}
         
         // Si hay recompensa de racha, mostrarla
         if (res.streakReward) {
@@ -2715,7 +2930,7 @@
       const [loading, setLoading] = useState(false);
       const [rank, setRank] = useState(0);
       const [points, setPoints] = useState(user.points);
-      const { toasts, hideToast } = useToast();
+      const { showToast, toasts, hideToast } = useToast();
 
 
       useEffect(() => {
@@ -2749,6 +2964,7 @@
               </div>
             </div>
 
+              
             {/* Botón de compartir con recompensa */}
             <ShareButton
               userId={user.id}
@@ -2786,6 +3002,7 @@
   user={user}
   rank={rank}   // rank ya existe como estado en ProfileTab
 />
+
             {/* Botón para ver tutorial - AGREGAR ESTE BOTÓN */}
             <button 
               onClick={onRestartTour}
@@ -2849,7 +3066,7 @@
     // ============================================================
     // MAIN APP
     // ============================================================
-    type Tab = "home" | "ticket" | "ranking" | "profile" | "album" | "battle";
+    type Tab = "home" | "ticket" | "ranking" | "profile" | "album" | "battle" | "deck";
 
 
     export default function App() {
@@ -2870,6 +3087,25 @@ const loadUserCards = useCallback(async () => {
     .select('*, player:players(*)')
     .eq('user_id', user.id);
   setUserCards(data || []);
+}, [user]);
+
+const loadAlbumProgress = useCallback(async () => {
+  if (!user) return;
+  
+  // You'll need to implement this based on your album logic
+  // For example, if you have an album_progress table:
+  const { data, error } = await supabase
+    .from('album_progress')
+    .select('*')
+    .eq('user_id', user.id)
+    .single();
+    
+  if (error && error.code !== 'PGRST116') { // PGRST116 means no rows returned
+    console.error('Error loading album progress:', error);
+  }
+  
+  // Update state if you have one for album progress
+  // setAlbumProgress(data);
 }, [user]);
 
 // Función para cargar el mazo activo
@@ -3011,19 +3247,47 @@ useEffect(() => {
                 {tab === "ranking" && <LeaderboardTab user={user} />}
                 {tab === "album" && <CardAlbum userId={user.id} />}
                 {tab === "battle" && (
-  <>
-    <DailyCardReward userId={user.id} onCardReceived={() => { loadUserCards(); loadActiveDeck(); }} />
-    <CardBattle 
-      userCards={userCards}
-      userDeck={activeDeck}
-      userId={user.id}
-      onBattleComplete={() => { loadUserCards(); loadActiveDeck(); }}
-    />
-  </>
+  <div className="main-content">
+    <div className="container">
+      <DailyCardReward 
+        userId={user.id} 
+        onCardReceived={() => { 
+          loadUserCards(); 
+          loadActiveDeck(); 
+          loadAlbumProgress();
+        }} 
+      />
+      <CardBattle 
+        userCards={userCards}
+        userDeck={activeDeck}
+        userId={user.id}
+        onBattleComplete={() => { loadUserCards(); loadActiveDeck(); loadAlbumProgress(); }}
+        onNavigateToDeck={() => setTab("deck")}
+      />
+    </div>
+  </div>
+)}
+
+{tab === "deck" && (
+  <DeckBuilder
+    userId={user.id}
+    userCards={userCards}
+    activeDeck={activeDeck}
+    onDeckUpdate={setActiveDeck}
+  />
 )}
                 {tab === "profile" && <ProfileTab user={user} onLogout={handleLogout} onRestartTour={handleRestartTour} />}
-                
-
+                {user && import.meta.env.DEV && (
+  <DevTools 
+    userId={user.id} 
+    onCardReceived={() => {
+      // Recargar cartas después de abrir sobre
+      loadUserCards();
+      loadActiveDeck();
+    }}
+  />
+)}
+      
                 <nav className="bottom-nav">
                   {([
                     { id: "home",    icon: "🏠", label: "Inicio"  },
@@ -3031,9 +3295,11 @@ useEffect(() => {
                     { id: "ranking", icon: "🏆", label: "Ranking" },
                     { id: "album", icon: "📖", label: "Álbum" },
                     { id: "battle", icon: "⚔️", label: "Batalla" },
+                    { id: "deck", icon: "⚔️", label: "Mazo" },
+
                     { id: "profile", icon: "👤", label: "Perfil"  },
                   ] as { id: Tab; icon: string; label: string }[]).map((n) => (
-                    <button key={n.id} className={`nav-item${tab === n.id ? " active" : ""}`} onClick={() => setTab(n.id)}>
+                     <button key={n.id} className={`nav-item${tab === n.id ? " active" : ""}`} onClick={() => setTab(n.id)}>
                       <span className="nav-icon">{n.icon}</span>
                       {n.label}
                     </button>
