@@ -1578,7 +1578,29 @@ import { cardApi } from './lib/api';
         opacity: 0;
       }
     }
+.rank-toast {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  animation: pop 0.4s ease;
+}
 
+.rank-toast.up {
+  background: linear-gradient(135deg, #00e5ff, #00c853);
+  color: #000;
+}
+
+.rank-toast.down {
+  background: linear-gradient(135deg, #ff4d6d, #ff1744);
+  color: #fff;
+}
+
+@keyframes pop {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
     .confetti-particle {
       position: fixed;
       pointer-events: none;
@@ -1643,6 +1665,32 @@ import { cardApi } from './lib/api';
       pointer-events: none;
       animation: comboPulse 0.5s ease-out;
     }
+
+    /* SUBE DE POSICIÓN */
+.rank-up {
+  animation: rankUpAnim 0.6s ease;
+  border: 2px solid #00e5ff;
+  box-shadow: 0 0 20px rgba(0,229,255,0.6);
+}
+
+@keyframes rankUpAnim {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* BAJA (opcional) */
+.rank-down {
+  animation: rankDownAnim 0.6s ease;
+  border: 2px solid #ff4d6d;
+}
+
+@keyframes rankDownAnim {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(-6px); }
+  60% { transform: translateX(6px); }
+  100% { transform: translateX(0); }
+}
 
     /* Level up text */
     @keyframes levelUpPulse {
@@ -2043,6 +2091,86 @@ import { cardApi } from './lib/api';
   cursor: pointer;
 }
 
+/* CONTENEDOR */
+.stats-container {
+  margin-top: 20px;
+}
+
+/* HEADER */
+.stats-header {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #ffd700;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+/* GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* CARD */
+.stat-card {
+  position: relative;
+  padding: 12px;
+  border-radius: 14px;
+  text-align: center;
+
+  background:
+    linear-gradient(rgba(10,10,20,0.8), rgba(10,10,20,0.95)),
+    url('/images/fifa-bg.jpg') center/cover;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+/* glow */
+.stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, rgba(255,255,255,0.08), transparent);
+}
+
+/* NUMERO */
+.stat-number {
+  font-size: 24px;
+  font-weight: 900;
+  color: white;
+}
+
+/* LABEL */
+.stat-label {
+  font-size: 10px;
+  color: #aaa;
+  letter-spacing: 1px;
+}
+
+/* SUB */
+.stat-sub {
+  font-size: 9px;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* DESTACADOS */
+.stat-card.highlight .stat-number {
+  color: #00e5ff;
+}
+
+.stat-card.rank .stat-number {
+  color: #ffd700;
+}
+
+.stat-card.bonus .stat-number {
+  color: #4caf50;
+}
+
 /* HOVER = INVITA A ACCION */
 .ticket-hint:hover {
   transform: translateY(-2px) scale(1.01);
@@ -2098,6 +2226,7 @@ import { cardApi } from './lib/api';
 .ticket-hint:hover::after {
   opacity: 1;
 }
+  
     `;
 
     // ============================================================
@@ -2323,25 +2452,45 @@ import { cardApi } from './lib/api';
             🎟️ CARGAR ENTRADA
           </button>
         {/* Grid de estadísticas */}
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-number">{user.points}</div>
-            <div className="stat-label">Puntos</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{myRank || "—"}</div>
-            <div className="stat-label">Posición</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">{tickets.length}</div>
-            <div className="stat-label">Entradas</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-number">+10</div>
-            <div className="stat-label">Pts x entrada</div>
-          </div>
-        </div>
+        <div className="stats-container">
 
+  <div className="stats-header">
+    🏆 TU PROGRESO
+  </div>
+
+  <div className="stats-grid">
+
+    <div className="stat-card highlight">
+      <div className="stat-number">{user.points}</div>
+      <div className="stat-label">PUNTOS</div>
+      <div className="stat-sub">Seguí sumando</div>
+    </div>
+
+    <div className="stat-card rank">
+      <div className="stat-number">#{myRank || "—"}</div>
+      <div className="stat-label">RANKING</div>
+      <div className="stat-sub">Top jugadores</div>
+    </div>
+
+    <div className="stat-card">
+      <div className="stat-number">{tickets.length}</div>
+      <div className="stat-label">ENTRADAS</div>
+      <div className="stat-sub">Más = más chances</div>
+    </div>
+
+    <div className="stat-card bonus">
+      <div className="stat-number">+10</div>
+      <div className="stat-label">PTS x TICKET</div>
+      <div className="stat-sub">Bonus activo</div>
+    </div>
+
+  </div>
+</div>
+<DailyCardReward 
+    userId={user.id} 
+    onCardReceived={onCardReceived}  // 👈 Usar la prop
+  />
+<br></br>
         {/* Misiones semanales */}
         <WeeklyMissions
   user={user}
@@ -2349,12 +2498,7 @@ import { cardApi } from './lib/api';
   leaderboard={leaderboard}
   onPointsUpdate={onPointsUpdate}
 />
-<DailyCardReward 
-    userId={user.id} 
-    onCardReceived={onCardReceived}  // 👈 Usar la prop
-  />
-
-        {/* Top 5 */}
+{/* Top 5 */}
         <div className="section-title">🏅 Top 5 del momento</div>
         {leaderboard.slice(0, 5).map((u, i) => (
           <div key={u.id} className={`leader-item${u.id === user.id ? " me" : ""}`}>
@@ -2369,6 +2513,8 @@ import { cardApi } from './lib/api';
             <div className="leader-points">{u.points}</div>
           </div>
         ))}
+
+
       </div>
     </div>
   );
@@ -2871,27 +3017,54 @@ if (res.statUpgraded) {
     // ============================================================
     // LEADERBOARD TAB
     // ============================================================
-    function LeaderboardTab({ user }: { user: AppUser }) {
+     function LeaderboardTab({ user }: { user: AppUser }) {
       const [leaders, setLeaders] = useState<LeaderEntry[]>([]);
       const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
       const [rival, setRival] = useState<{ rival: LeaderEntry; diff: number; isAhead: boolean } | null>(null);
       const [loading, setLoading] = useState(true);
       const [activeView, setActiveView] = useState<"individual" | "clubes">("individual");
+      const [prevLeaders, setPrevLeaders] = useState<LeaderEntry[]>([]);
+      const [rankChange, setRankChange] = useState<"up" | "down" | null>(null);
     
       useEffect(() => {
-        Promise.all([
-          api.getLeaderboard(),
-          api.getClubRanking(),
-          api.getRival(user.id, user.points),
-        ])
-          .then(([l, clubs, rv]) => {
-            setLeaders(l);
-            setClubRanking(clubs);
-            setRival(rv);
-            setLoading(false);
-          })
-          .catch(console.error);
-      }, [user.id, user.points]);
+  const fetchData = async () => {
+    try {
+      const [l, clubs, rv] = await Promise.all([
+        api.getLeaderboard(),
+        api.getClubRanking(),
+        api.getRival(user.id, user.points),
+      ]);
+
+      // detectar cambio de ranking
+      if (leaders.length > 0) {
+        const oldRank = leaders.findIndex(u => u.id === user.id);
+        const newRank = l.findIndex(u => u.id === user.id);
+
+        if (oldRank !== -1 && newRank !== -1) {
+          if (newRank < oldRank) setRankChange("up");
+          else if (newRank > oldRank) setRankChange("down");
+
+          setTimeout(() => setRankChange(null), 1500);
+        }
+      }
+
+      setPrevLeaders(leaders);
+      setLeaders(l);
+      setClubRanking(clubs);
+      setRival(rv);
+      setLoading(false);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  fetchData();
+
+  const interval = setInterval(fetchData, 4000); // cada 4s
+  return () => clearInterval(interval);
+
+}, [user.id, user.points]);
     
       const myRank = leaders.findIndex((u) => u.id === user.id) + 1;
       const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
@@ -3055,9 +3228,15 @@ if (res.statUpgraded) {
                 ) : (
                   leaders.map((u, i) => (
                     <div
-                      key={u.id}
-                      className={`leader-item fade-up${u.id === user.id ? " me" : ""}`}
-                    >
+  key={u.id}
+  className={`
+    leader-item 
+    fade-up 
+    ${u.id === user.id ? "me" : ""} 
+    ${u.id === user.id && rankChange === "up" ? "rank-up" : ""}
+    ${u.id === user.id && rankChange === "down" ? "rank-down" : ""}
+  `}
+>
                       <div className={`leader-rank${i < 3 ? " top" : ""}`}>
                         {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                       </div>
@@ -3069,7 +3248,10 @@ if (res.statUpgraded) {
                         </div>
                         <div className="leader-club">{u.club}</div>
                       </div>
-                      <div className="leader-points">{u.points} pts</div>
+                      <div className="leader-points">
+  {u.points} pts
+  {u.id === user.id && rankChange === "up" && " 🔥"}
+</div>
                     </div>
                   ))
                 )}
@@ -3112,6 +3294,14 @@ if (res.statUpgraded) {
                     </span>
                   </div>
                 )}
+
+                {rankChange === "up" && (
+  <div className="rank-toast up">🚀 Subiste de posición</div>
+)}
+
+{rankChange === "down" && (
+  <div className="rank-toast down">⚠️ Te pasaron</div>
+)}
     
                 {clubRanking.length === 0 ? (
                   <div className="empty-state fade-up">

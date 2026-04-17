@@ -957,7 +957,7 @@ const applyMove = (card: UserCard, position: number) => {
         /* ===== ÁREA SEMICÍRCULO (centrada real) ===== */
 .semicircle-area {
   position: absolute;
-  bottom: 755px; /* 👈 px real (no %) */
+  bottom: 820px; /* 👈 px real (no %) */
   left: 50%;
   transform: translateX(-50%);
 
@@ -1030,13 +1030,13 @@ const applyMove = (card: UserCard, position: number) => {
   width: 110px;
   height: 150px;
 }
-          .slot-1 { top: 12%; left: 50%; }   /* ARQ */
-.slot-2 { top: 35%; left: 50%; }   /* CIERRE */
+          .slot-1 { top: 15%; left: 50%; }   /* ARQ */
+.slot-2 { top: 43%; left: 50%; }   /* CIERRE */
 
-.slot-3 { top: 55%; left: 18%; }   /* ALA IZQ */
-.slot-4 { top: 55%; left: 83%; }   /* ALA DER */
+.slot-3 { top: 65%; left: 18%; }   /* ALA IZQ */
+.slot-4 { top: 65%; left: 83%; }   /* ALA DER */
 
-.slot-5 { top: 74%; left: 50%; }   /* PIVOT */
+.slot-5 { top: 84%; left: 50%; }   /* PIVOT */
         .slot-label {
           display: flex;
           align-items: center;
