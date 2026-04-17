@@ -1,6 +1,7 @@
-// src/components/CardBattle.tsx
+// src/components/CardBattle.tsx - Versión CORREGIDA
+
 import { useState } from 'react';
-import { UserCard, Deck } from '../types/cards';
+import { UserCard, Deck, UnifiedCard } from '../types/cards';
 import { calculateBattle, addExperienceToCard } from '../utils/battleEngine';
 import { supabase } from '../lib/supabaseClient';
 
@@ -10,6 +11,70 @@ interface CardBattleProps {
   userId: string;
   onBattleComplete: (updatedCards: UserCard[]) => void;
   onNavigateToDeck?: () => void;
+}
+
+// Función helper para obtener datos de la carta (ya sea de card o de player)
+function getCardData(card: UserCard): { 
+  name: string; 
+  position: string; 
+  overall_rating: number; 
+  pace: number; 
+  dribbling: number; 
+  passing: number; 
+  defending: number; 
+  finishing: number; 
+  physical: number;
+  category?: string;
+} {
+  if (card.card) {
+    // Usar UnifiedCard
+    return {
+      name: card.card.name,
+      position: card.card.position,
+      overall_rating: card.card.overall_rating,
+      pace: card.card.pace,
+      dribbling: card.card.dribbling,
+      passing: card.card.passing,
+      defending: card.card.defending,
+      finishing: card.card.finishing,
+      physical: card.card.physical,
+      category: card.card.category,
+    };
+  }
+  
+  // Fallback para compatibilidad (si card.player existía antes)
+  const player = (card as any).player;
+  if (player) {
+    return {
+      name: player.name,
+      position: player.position,
+      overall_rating: player.overall_rating,
+      pace: player.pace,
+      dribbling: player.dribbling,
+      passing: player.passing,
+      defending: player.defending,
+      finishing: player.finishing,
+      physical: player.physical,
+      category: player.category,
+    };
+  }
+  
+  // Default fallback
+  return {
+    name: 'Desconocido',
+    position: 'ala',
+    overall_rating: 50,
+    pace: 50,
+    dribbling: 50,
+    passing: 50,
+    defending: 50,
+    finishing: 50,
+    physical: 50,
+  };
+}
+
+function getPlayerPosition(card: UserCard): string {
+  return getCardData(card).position;
 }
 
 const POSITION_COORDS: Record<string, { x: number; y: number }> = {
@@ -44,8 +109,6 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
   const [selectedBot, setSelectedBot] = useState<typeof BOT_PLAYERS[0]>(BOT_PLAYERS[0]);
   const [result, setResult]         = useState<any>(null);
 
-  const getPlayerPosition = (card: UserCard): string => card.player?.position || 'ala';
-
   const startBattle = async () => {
     if (!userDeck.cards || userDeck.cards.length < 5) {
       alert('Necesitás 5 cartas en tu mazo para jugar');
@@ -64,19 +127,23 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
       experience: 0,
       is_favorite: false,
       obtained_at: new Date().toISOString(),
-      player: {
+      card_type: 'npc',
+      card: {
         id: `bot-${bot.name}`,
         name: `${bot.name} (${label})`,
         position: pos as any,
         category: bot.category as any,
         overall_rating: bot.overall_rating,
-        pace:      50 + bot.level * 5,
+        pace: 50 + bot.level * 5,
         dribbling: 50 + bot.level * 5,
-        passing:   50 + bot.level * 5,
+        passing: 50 + bot.level * 5,
         defending: 50 + bot.level * 5,
         finishing: 50 + bot.level * 5,
-        physical:  50 + bot.level * 5,
-      },
+        physical: 50 + bot.level * 5,
+        card_type: 'npc',
+        can_be_replaced: false,
+        is_replaced: false,
+      } as any,
     });
 
     const opponentCards: UserCard[] = [
@@ -93,8 +160,8 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
       const battleResult = calculateBattle(
         userBattleCards,
         opponentCards,
-        userBattleCards[0]?.player?.category,
-        opponentCards[0]?.player?.category
+        userBattleCards[0]?.card?.category || '1era',
+        opponentCards[0]?.card?.category || '8va'
       );
 
       let leveledUpCards: string[] = [];
@@ -104,7 +171,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
         if (!updatedCards[i]) continue;
         const { card, leveledUp } = addExperienceToCard(updatedCards[i], battleResult.experienceGained);
         updatedCards[i] = card;
-        if (leveledUp) leveledUpCards.push(card.player.name);
+        if (leveledUp) leveledUpCards.push(getCardData(card).name);
         await supabase.from('user_cards').update({ level: card.level, experience: card.experience }).eq('id', card.id);
       }
 
@@ -157,7 +224,6 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
   return (
     <div className="arena-container">
-
       {/* ── Encabezado ── */}
       <div className="arena-header">
         <div className="arena-title">
@@ -173,34 +239,23 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
       {/* ── Cancha ── */}
       <div className="futsal-court">
-
-        {/* Líneas SVG */}
+        {/* SVG de cancha (igual que antes) */}
         <svg className="court-svg" viewBox="0 0 600 400" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          {/* Borde interno */}
           <rect x="14" y="14" width="572" height="372" rx="10" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5"/>
-          {/* Línea de medio */}
           <line x1="300" y1="14" x2="300" y2="386" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5"/>
-          {/* Círculo central */}
           <circle cx="300" cy="200" r="58" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5"/>
           <circle cx="300" cy="200" r="4" fill="rgba(255,255,255,0.6)"/>
-          {/* Área penal izq */}
-          <rect x="14" y="110" width="105" height="180" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.2"/>
-          {/* Área penal der */}
-          <rect x="481" y="110" width="105" height="180" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.2"/>
-          {/* Área chica izq */}
-          <rect x="14" y="150" width="50" height="100" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
-          {/* Área chica der */}
-          <rect x="536" y="150" width="50" height="100" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1"/>
-          {/* Arco izq */}
-          <rect x="0" y="162" width="14" height="76" rx="2" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5"/>
-          {/* Arco der */}
-          <rect x="586" y="162" width="14" height="76" rx="2" fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.55)" strokeWidth="1.5"/>
-          {/* Puntos de penal */}
-          <circle cx="98"  cy="200" r="3.5" fill="rgba(255,255,255,0.6)"/>
-          <circle cx="502" cy="200" r="3.5" fill="rgba(255,255,255,0.6)"/>
+          <path d="M 14,105 A 95,95 0 0,1 14,295" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.4)" strokeWidth="1.3"/>
+          <path d="M 586,105 A 95,95 0 0,0 586,295" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.4)" strokeWidth="1.3"/>
+          <path d="M 14,155 A 45,45 0 0,1 14,245" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1"/>
+          <path d="M 586,155 A 45,45 0 0,0 586,245" fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth="1"/>
+          <rect x="0" y="162" width="14" height="76" rx="2" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.6)" strokeWidth="1.8"/>
+          <rect x="586" y="162" width="14" height="76" rx="2" fill="rgba(0,0,0,0.45)" stroke="rgba(255,255,255,0.6)" strokeWidth="1.8"/>
+          <circle cx="110" cy="200" r="3.5" fill="rgba(255,255,255,0.65)"/>
+          <circle cx="490" cy="200" r="3.5" fill="rgba(255,255,255,0.65)"/>
+          <circle cx="300" cy="200" r="3" fill="rgba(255,255,255,0.5)"/>
         </svg>
 
-        {/* VS central */}
         <div className="center-vs">VS</div>
 
         {/* ── Jugadores usuario ── */}
@@ -208,6 +263,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
           <>
             {(Object.keys(POSITION_COORDS) as string[]).map(pos => {
               const card = playersByPosition[pos];
+              const cardData = card ? getCardData(card) : null;
               return (
                 <div
                   key={pos}
@@ -216,7 +272,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
                 >
                   <div className={`player-token user-token ${!card ? 'empty' : ''}`}>
                     <div className="token-icon">{POSITION_ICONS[pos]}</div>
-                    <div className="token-name">{card?.player?.name?.substring(0, 10) || pos.charAt(0).toUpperCase() + pos.slice(1)}</div>
+                    <div className="token-name">{cardData?.name?.substring(0, 10) || pos.charAt(0).toUpperCase() + pos.slice(1)}</div>
                     {card
                       ? <div className="token-level user-level">Nv.{card.level}</div>
                       : <div className="token-empty">Sin jugador</div>
@@ -271,7 +327,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
         )}
       </div>
 
-      {/* ── Selector de rival (fuera de la cancha) ── */}
+      {/* ── Selector de rival ── */}
       {!battling && !result && (
         <div className="rival-selector">
           <div className="rival-selector-title">⚔️ ELEGIR RIVAL</div>

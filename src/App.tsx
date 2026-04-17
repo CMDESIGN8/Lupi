@@ -29,6 +29,10 @@ import { UserCardGuide } from './components/UserCardGuide';
 import { DeckBuilder } from './components/DeckBuilder';
 import { DevTools } from './components/DevTools';
 import { UserFifaCard } from './components/UserFifaCard';
+import { calculateOVR } from './types/cards';
+import { cardApi } from './lib/api';
+
+
 
 
 
@@ -130,7 +134,7 @@ import { UserFifaCard } from './components/UserFifaCard';
       .alert-error { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.3); color: var(--accent2); }
       .alert-success { background: rgba(61,255,160,0.1); border: 1px solid rgba(61,255,160,0.25); color: var(--success); }
 
-      .app-header {  top: 0; z-index: 100; background: rgba(10,10,15,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 0; }
+      .app-header { position: sticky; top: 0; z-index: 100; background: rgba(10,10,15,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 0; }
       .header-inner { display: flex; align-items: center; justify-content: space-between; }
       .header-logo { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; color: var(--text); }
       .header-logo span { color: var(--accent); }
@@ -1995,14 +1999,16 @@ import { UserFifaCard } from './components/UserFifaCard';
     // ============================================================
     // DASHBOARD TAB
     // ============================================================
-    function DashboardTab({
-  user,
-  onNavigate,
+    function DashboardTab({ 
+  user, 
+  onNavigate, 
   onPointsUpdate,
-}: {
-  user: AppUser;
-  onNavigate: (t: string) => void;
+  onCardReceived  // 👈 Nueva prop
+}: { 
+  user: AppUser; 
+  onNavigate: (t: string) => void; 
   onPointsUpdate: (newPoints: number) => void;
+  onCardReceived: () => void;  // 👈 Nueva prop
 }) {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
@@ -2089,6 +2095,10 @@ import { UserFifaCard } from './components/UserFifaCard';
   leaderboard={leaderboard}
   onPointsUpdate={onPointsUpdate}
 />
+<DailyCardReward 
+    userId={user.id} 
+    onCardReceived={onCardReceived}  // 👈 Usar la prop
+  />
 
         {/* Top 5 */}
         <div className="section-title">🏅 Top 5 del momento</div>
@@ -3077,68 +3087,282 @@ if (res.statUpgraded) {
       const [tourKey, setTourKey] = useState(0);
       const { notifyStreakAtRisk, notifyNewRecord, notifyReward } = usePushNotifications(user?.id);
       const [userCards, setUserCards] = useState<UserCard[]>([]);
-const [activeDeck, setActiveDeck] = useState<Deck>({ id: '', name: '', is_active: true, cards: [] });
+      const [activeDeck, setActiveDeck] = useState<Deck>({ 
+      id: '', 
+       user_id: '',  // 👈 Agregar user_id
+      name: '', 
+      is_active: true, 
+      cards: [] 
+      });
+  // Transformar a UserCard con la estructura correcta
 
-// Función para cargar las cartas del usuario
+// App.tsx - Versión CORREGIDA con logs de depuración
+
 const loadUserCards = useCallback(async () => {
   if (!user) return;
-  const { data } = await supabase
+  
+  console.log('🔍 Cargando cartas para usuario:', user.id);
+  
+  // Primero, obtener todas las cartas del usuario
+  const { data: userCardsData, error } = await supabase
     .from('user_cards')
-    .select('*, player:players(*)')
+    .select('*')
     .eq('user_id', user.id);
-  setUserCards(data || []);
+  
+  if (error) {
+    console.error('Error loading user cards:', error);
+    return;
+  }
+  
+  console.log('📊 Cartas encontradas en user_cards:', userCardsData?.length || 0);
+  console.log('📋 Datos crudos:', userCardsData);
+  
+  if (!userCardsData || userCardsData.length === 0) {
+    setUserCards([]);
+    return;
+  }
+  
+  // Separar IDs de NPCs y Socios
+  const npcIds = userCardsData.filter(uc => uc.card_type === 'npc' && uc.player_id).map(uc => uc.player_id);
+  const socioIds = userCardsData.filter(uc => uc.card_type === 'socio' && uc.socio_id).map(uc => uc.socio_id);
+  
+  console.log('🎴 NPC IDs:', npcIds);
+  console.log('👥 Socio IDs:', socioIds);
+  
+  // Obtener datos de NPCs
+  let npcCards: any[] = [];
+  if (npcIds.length > 0) {
+    const { data } = await supabase
+      .from('players')
+      .select('*')
+      .in('id', npcIds);
+    npcCards = data || [];
+    console.log('📦 NPCs encontrados:', npcCards.length);
+  }
+  
+  // Obtener datos de Socios
+  let socioCards: any[] = [];
+  if (socioIds.length > 0) {
+    const { data } = await supabase
+      .from('profiles')
+      .select('id, username, position, category, user_card_pace, user_card_dribbling, user_card_passing, user_card_defending, user_card_finishing, user_card_physical, total_wins_lifetime, total_battles_lifetime')
+      .in('id', socioIds);
+    socioCards = data || [];
+    console.log('👤 Socios encontrados:', socioCards.length);
+    console.log('👤 Datos de socios:', socioCards);
+  }
+  
+  // Crear maps para búsqueda rápida
+  const npcMap = new Map(npcCards.map(npc => [npc.id, npc]));
+  const socioMap = new Map(socioCards.map(socio => [socio.id, socio]));
+  
+  // Transformar a UserCard
+  const transformedCards: UserCard[] = userCardsData.map(uc => {
+    console.log(`🃏 Procesando carta ${uc.id}: type=${uc.card_type}, player_id=${uc.player_id}, socio_id=${uc.socio_id}`);
+    
+    if (uc.card_type === 'socio' && uc.socio_id) {
+      const socio = socioMap.get(uc.socio_id);
+      if (socio) {
+        console.log(`✅ Carta SOCIO encontrada: ${socio.username}`);
+        return {
+          id: uc.id,
+          user_id: uc.user_id,
+          player_id: uc.player_id,
+          socio_id: uc.socio_id,
+          card_type: 'socio',
+          card: {
+            id: socio.id,
+            name: socio.username,
+            position: socio.position || 'ala',
+            category: socio.category || '1era',
+            overall_rating: calculateOVR({
+              pace: socio.user_card_pace || 40,
+              dribbling: socio.user_card_dribbling || 40,
+              passing: socio.user_card_passing || 40,
+              defending: socio.user_card_defending || 40,
+              finishing: socio.user_card_finishing || 40,
+              physical: socio.user_card_physical || 40,
+            }),
+            pace: socio.user_card_pace || 40,
+            dribbling: socio.user_card_dribbling || 40,
+            passing: socio.user_card_passing || 40,
+            defending: socio.user_card_defending || 40,
+            finishing: socio.user_card_finishing || 40,
+            physical: socio.user_card_physical || 40,
+            card_type: 'socio',
+            profile_id: socio.id,
+            total_wins_lifetime: socio.total_wins_lifetime || 0,
+            total_battles_lifetime: socio.total_battles_lifetime || 0,
+            is_real: true,
+          },
+          level: uc.level,
+          experience: uc.experience,
+          is_favorite: uc.is_favorite,
+          obtained_at: uc.obtained_at,
+        };
+      } else {
+        console.warn(`⚠️ No se encontró socio para ID: ${uc.socio_id}`);
+      }
+    }
+    
+    if (uc.card_type === 'npc' && uc.player_id) {
+      const npc = npcMap.get(uc.player_id);
+      if (npc) {
+        console.log(`✅ Carta NPC encontrada: ${npc.name}`);
+        return {
+          id: uc.id,
+          user_id: uc.user_id,
+          player_id: uc.player_id,
+          socio_id: uc.socio_id,
+          card_type: 'npc',
+          card: {
+            id: npc.id,
+            name: npc.name,
+            position: npc.position,
+            category: npc.category,
+            overall_rating: npc.overall_rating,
+            pace: npc.pace,
+            dribbling: npc.dribbling,
+            passing: npc.passing,
+            defending: npc.defending,
+            finishing: npc.finishing,
+            physical: npc.physical,
+            card_type: 'npc',
+            can_be_replaced: npc.can_be_replaced,
+            is_replaced: npc.is_replaced,
+          },
+          level: uc.level,
+          experience: uc.experience,
+          is_favorite: uc.is_favorite,
+          obtained_at: uc.obtained_at,
+        };
+      } else {
+        console.warn(`⚠️ No se encontró NPC para ID: ${uc.player_id}`);
+      }
+    }
+    
+    // Fallback
+    console.warn(`⚠️ Fallback para carta ${uc.id}`);
+    return {
+      id: uc.id,
+      user_id: uc.user_id,
+      player_id: uc.player_id,
+      socio_id: uc.socio_id,
+      card_type: uc.card_type || 'npc',
+      level: uc.level,
+      experience: uc.experience,
+      is_favorite: uc.is_favorite,
+      obtained_at: uc.obtained_at,
+    } as UserCard;
+  });
+  
+  console.log('✅ Cartas transformadas:', transformedCards.length);
+  console.log('📋 Cartas finales:', transformedCards.map(c => ({ 
+    name: c.card?.name, 
+    type: c.card_type,
+    level: c.level 
+  })));
+  
+  setUserCards(transformedCards);
 }, [user]);
 
 const loadAlbumProgress = useCallback(async () => {
   if (!user) return;
   
-  // You'll need to implement this based on your album logic
-  // For example, if you have an album_progress table:
-  const { data, error } = await supabase
-    .from('album_progress')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
-    
-  if (error && error.code !== 'PGRST116') { // PGRST116 means no rows returned
-    console.error('Error loading album progress:', error);
-  }
+  // Como no tenemos tabla album_progress, podemos:
+  // Opción 1: Simplemente no hacer nada (recomendado)
+  // Opción 2: Calcular el progreso desde user_cards
   
-  // Update state if you have one for album progress
-  // setAlbumProgress(data);
+  // Opción 2: Calcular progreso real desde user_cards
+  try {
+    const { data: userCards } = await supabase
+      .from('user_cards')
+      .select('id', { count: 'exact' })
+      .eq('user_id', user.id);
+    
+    const totalCards = userCards?.length || 0;
+    console.log('📊 Progreso del álbum:', totalCards, 'cartas');
+    // setAlbumProgress(totalCards); // Si tienes estado para esto
+  } catch (err) {
+    console.error('Error loading album progress:', err);
+  }
 }, [user]);
 
 // Función para cargar el mazo activo
+// App.tsx - Corregir loadActiveDeck
+
+// App.tsx - Actualizar loadActiveDeck para que use los mismos datos
+
 const loadActiveDeck = useCallback(async () => {
   if (!user) return;
   
-  // Obtener o crear mazo activo
   let { data: deck } = await supabase
     .from('decks')
     .select('*')
     .eq('user_id', user.id)
     .eq('is_active', true)
-    .single();
+    .maybeSingle();
   
   if (!deck) {
-    const { data: newDeck } = await supabase
+    const { data: newDeck, error: createError } = await supabase
       .from('decks')
-      .insert({ user_id: user.id, name: 'Mi Mazo', is_active: true })
+      .insert({ 
+        user_id: user.id,
+        name: 'Mi Mazo', 
+        is_active: true 
+      })
       .select()
       .single();
+    
+    if (createError) {
+      console.error('Error creating deck:', createError);
+      setActiveDeck({
+        id: '',
+        user_id: user.id,
+        name: 'Mi Mazo',
+        is_active: true,
+        cards: []
+      });
+      return;
+    }
     deck = newDeck;
   }
   
   // Obtener cartas del mazo
   const { data: deckCards } = await supabase
     .from('deck_cards')
-    .select('*, user_card:user_cards(*, player:players(*))')
+    .select('user_card_id, position')
     .eq('deck_id', deck.id)
     .order('position');
   
+  if (!deckCards) {
+    setActiveDeck({
+      id: deck.id,
+      user_id: deck.user_id,
+      name: deck.name,
+      is_active: deck.is_active,
+      cards: []
+    });
+    return;
+  }
+  
+  // Cargar todas las cartas del usuario primero
+  const userCardsList = await cardApi.getUserCards(user.id);
+  
+  // Mapear las cartas del mazo
+  const cardsInDeck = deckCards
+    .map(dc => {
+      const foundCard = userCardsList.find(uc => uc.id === dc.user_card_id);
+      return foundCard ? { ...foundCard, position: dc.position } : null;
+    })
+    .filter(Boolean) as UserCard[];
+  
   setActiveDeck({
-    ...deck,
-    cards: deckCards?.map(dc => ({ ...dc.user_card, position: dc.position })) || []
+    id: deck.id,
+    user_id: deck.user_id,
+    name: deck.name,
+    is_active: deck.is_active,
+    cards: cardsInDeck
   });
 }, [user]);
 
@@ -3242,21 +3466,16 @@ useEffect(() => {
                   </div>
                 </header>
 
-                {tab === "home"    && <DashboardTab user={user} onNavigate={handleNavigate} onPointsUpdate={handlePointsUpdate}/>}
+                {tab === "home"    && <DashboardTab user={user} onNavigate={handleNavigate} onPointsUpdate={handlePointsUpdate} onCardReceived={() => {
+      loadUserCards(); 
+      loadActiveDeck(); 
+    }}/>}
                 {tab === "ticket"  && <TicketTab user={user} onPointsUpdate={handlePointsUpdate} />}
                 {tab === "ranking" && <LeaderboardTab user={user} />}
                 {tab === "album" && <CardAlbum userId={user.id} />}
                 {tab === "battle" && (
   <div className="main-content">
     <div className="container">
-      <DailyCardReward 
-        userId={user.id} 
-        onCardReceived={() => { 
-          loadUserCards(); 
-          loadActiveDeck(); 
-          loadAlbumProgress();
-        }} 
-      />
       <CardBattle 
         userCards={userCards}
         userDeck={activeDeck}
@@ -3294,8 +3513,8 @@ useEffect(() => {
                     { id: "ticket",  icon: "🎟️", label: "Entrada" },
                     { id: "ranking", icon: "🏆", label: "Ranking" },
                     { id: "album", icon: "📖", label: "Álbum" },
-                    { id: "battle", icon: "⚔️", label: "Batalla" },
-                    { id: "deck", icon: "⚔️", label: "Mazo" },
+                    { id: "battle", icon: "🏟️", label: "Competir" },
+                    { id: "deck", icon: "⚽", label: "Equipo" },
 
                     { id: "profile", icon: "👤", label: "Perfil"  },
                   ] as { id: Tab; icon: string; label: string }[]).map((n) => (

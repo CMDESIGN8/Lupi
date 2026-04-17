@@ -1,236 +1,244 @@
-// src/components/DailyCardReward.tsx (versión simplificada y corregida)
+// src/components/DailyCardReward.tsx
 import { useState, useEffect } from 'react';
-import { cardApi, PlayerCard } from '../lib/api';
+import { supabase } from '../lib/supabaseClient';
+import { UnifiedCard } from '../types/cards';
 
 interface DailyCardRewardProps {
   userId: string;
-  onCardReceived: (card: PlayerCard) => void;
+  onCardReceived: (card: UnifiedCard) => void;
 }
 
 export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps) {
-  const [canClaim, setCanClaim] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [claimed, setClaimed] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState('');
 
-  const checkStatus = async () => {
+  useEffect(() => {
+    if (userId) {
+      checkDailyReward();
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (claimed) {
+      updateCountdown();
+      const interval = setInterval(updateCountdown, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [claimed]);
+
+  const checkDailyReward = async () => {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Usar maybeSingle para evitar error 406
+    const { data, error } = await supabase
+      .from('daily_rewards')
+      .select('id, claimed')
+      .eq('user_id', userId)
+      .eq('reward_date', today)
+      .maybeSingle();
+    
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error checking daily reward:', error);
+      return;
+    }
+    
+    setClaimed(data?.claimed || false);
+  };
+
+  const updateCountdown = () => {
+    const now = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const diff = tomorrow.getTime() - now.getTime();
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+    
+    setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+  };
+
+  const handleClaim = async () => {
+    if (claimed || loading) return;
+    
+    setLoading(true);
+    
     try {
-      const result = await cardApi.checkDailyBoxStatus(userId);
-      console.log('📦 Estado:', result);
-      setCanClaim(!result.claimed);
+      const today = new Date().toISOString().split('T')[0];
+      
+      // 1. Verificar si ya reclamó
+      const { data: existing } = await supabase
+        .from('daily_rewards')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('reward_date', today)
+        .maybeSingle();
+      
+      if (existing?.id) {
+        setClaimed(true);
+        setLoading(false);
+        return;
+      }
+      
+      // 2. Obtener carta aleatoria (NPC no reemplazado o socio)
+      const { data: availableCards } = await supabase
+        .from('players')
+        .select('*')
+        .eq('can_be_replaced', true)
+        .eq('is_replaced', false);
+      
+      // También obtener socios que el usuario no tiene
+      const { data: userCards } = await supabase
+        .from('user_cards')
+        .select('socio_id')
+        .eq('user_id', userId);
+      
+      const ownedSocioIds = new Set(userCards?.map(c => c.socio_id) || []);
+      
+      const { data: availableSocios } = await supabase
+        .from('profiles')
+        .select('*')
+        .neq('id', userId);
+      
+      const filteredSocios = (availableSocios || []).filter(s => !ownedSocioIds.has(s.id));
+      
+      // Combinar NPCs y socios disponibles
+      const allCards = [
+        ...(availableCards || []).map(c => ({ ...c, card_type: 'npc' })),
+        ...filteredSocios.map(s => ({ 
+          ...s, 
+          card_type: 'socio',
+          overall_rating: Math.floor(
+            (s.user_card_pace + s.user_card_dribbling + s.user_card_passing + 
+             s.user_card_defending + s.user_card_finishing + s.user_card_physical) / 6
+          )
+        }))
+      ];
+      
+      if (allCards.length === 0) {
+        alert('¡Completaste todo el álbum! 🎉');
+        setLoading(false);
+        return;
+      }
+      
+      const randomCard = allCards[Math.floor(Math.random() * allCards.length)];
+      
+      // 3. Guardar la carta
+      const { error: insertError } = await supabase
+        .from('user_cards')
+        .insert({
+          user_id: userId,
+          card_type: randomCard.card_type,
+          ...(randomCard.card_type === 'npc' 
+            ? { player_id: randomCard.id }
+            : { socio_id: randomCard.id }),
+          level: 1,
+          obtained_at: new Date(),
+        });
+      
+      if (insertError) throw insertError;
+      
+      // 4. Registrar daily reward
+      await supabase
+        .from('daily_rewards')
+        .insert({
+          user_id: userId,
+          reward_date: today,
+          claimed: true,
+          claimed_at: new Date(),
+        });
+      
+      setClaimed(true);
+      onCardReceived(randomCard as UnifiedCard);
+      
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error claiming reward:', error);
+      alert('Error al obtener la carta. Intenta de nuevo.');
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    checkStatus();
-  }, [userId]);
-
-  useEffect(() => {
-    if (canClaim) {
-      setTimeLeft('');
-      return;
-    }
-
-    // Calcular tiempo hasta medianoche
-    const updateTimer = () => {
-      const now = new Date();
-      const midnight = new Date();
-      midnight.setDate(midnight.getDate() + 1);
-      midnight.setHours(0, 0, 0, 0);
-      
-      const diff = midnight.getTime() - now.getTime();
-      
-      if (diff <= 0) {
-        checkStatus();
-        return;
-      }
-      
-      const hours = Math.floor(diff / 3600000);
-      const minutes = Math.floor((diff % 3600000) / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-      
-      setTimeLeft(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
-    };
-
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, [canClaim]);
-
-  const handleClaim = async () => {
-    if (!canClaim) return;
-    try {
-      const result = await cardApi.openDailyBox(userId);
-      if (result.card) {
-        onCardReceived(result.card);
-        await checkStatus();
-      }
-    } catch (error) {
-      console.error('Error claiming:', error);
-    }
-  };
-
-  if (loading) return <div className="daily-card-compact loading">Cargando...</div>;
-
   return (
-    <div className="daily-card-compact">
-      <div className="daily-card-header">
-        <div className="daily-header-left">
-          <span className="daily-icon">📦</span>
-          <span className="daily-title">CARTA DIARIA</span>
-        </div>
-        {!canClaim && timeLeft && (
-          <div className="daily-timer-badge">
-            <span className="timer-icon">⏰</span>
-            <span className="timer-value">{timeLeft}</span>
-          </div>
-        )}
-      </div>
-      
-      <div className="daily-card-body">
-        {canClaim ? (
-          <button className="daily-claim-btn" onClick={handleClaim}>
-            🎁 RECLAMAR CARTA GRATIS
+    <div className="daily-card-reward">
+      <div className="reward-card">
+        <div className="reward-icon">🎁</div>
+        <h3>¡Carta Diaria!</h3>
+        <p>Una nueva carta para tu colección</p>
+        
+        {!claimed ? (
+          <button 
+            className="claim-btn"
+            onClick={handleClaim}
+            disabled={loading}
+          >
+            {loading ? 'Obteniendo...' : '📦 Abrir Caja'}
           </button>
         ) : (
-          <div className="next-card-info">
-            <div className="next-card-message">
-              <span>📅 Próxima carta disponible en</span>
-              <div className="countdown-display">
-                <div className="countdown-block">
-                  <span className="countdown-number">{timeLeft.split(':')[0] || '00'}</span>
-                  <span className="countdown-label">horas</span>
-                </div>
-                <span className="countdown-sep">:</span>
-                <div className="countdown-block">
-                  <span className="countdown-number">{timeLeft.split(':')[1] || '00'}</span>
-                  <span className="countdown-label">min</span>
-                </div>
-                <span className="countdown-sep">:</span>
-                <div className="countdown-block">
-                  <span className="countdown-number">{timeLeft.split(':')[2] || '00'}</span>
-                  <span className="countdown-label">seg</span>
-                </div>
-              </div>
-            </div>
-            <div className="claimed-badge">✅ Reclamada hoy</div>
+          <div className="claimed-info">
+            <p>✅ Ya reclamaste tu carta hoy</p>
+            <p className="countdown">⏰ Próxima en {timeLeft}</p>
           </div>
         )}
-      </div>
-      
-      <div className="daily-footer">
-        <span className="collection-info">📖 150 cartas disponibles para coleccionar</span>
       </div>
       
       <style>{`
-        .daily-card-compact {
+        .daily-card-reward {
           background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
           border-radius: 20px;
-          padding: 16px 20px;
-          margin: 8px 0 16px 0;
-          border: 1px solid rgba(24, 157, 245, 0.2);
+          padding: 20px;
+          text-align: center;
+          border: 1px solid var(--accent);
         }
-        .daily-card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 16px;
-          flex-wrap: wrap;
-          gap: 12px;
-        }
-        .daily-header-left {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .daily-icon { font-size: 24px; }
-        .daily-title {
-          font-family: var(--font-display);
-          font-size: 18px;
-          color: var(--accent);
-          font-weight: bold;
-        }
-        .daily-timer-badge {
-          background: rgba(24, 157, 245, 0.15);
-          border: 1px solid rgba(24, 157, 245, 0.3);
-          border-radius: 40px;
-          padding: 6px 14px;
-        }
-        .timer-value {
-          font-family: monospace;
-          font-size: 16px;
-          font-weight: bold;
-          color: var(--accent);
-        }
-        .daily-claim-btn {
-          width: 100%;
-          background: linear-gradient(135deg, var(--accent), #0f6bc0);
-          border: none;
-          border-radius: 40px;
-          padding: 12px;
-          font-family: var(--font-display);
-          font-size: 16px;
-          font-weight: bold;
-          cursor: pointer;
-        }
-        .next-card-info { text-align: center; }
-        .next-card-message span {
-          font-size: 12px;
-          color: var(--text2);
-          display: block;
-          margin-bottom: 8px;
-        }
-        .countdown-display {
-          display: flex;
-          justify-content: center;
-          gap: 8px;
-          background: rgba(0,0,0,0.3);
-          border-radius: 60px;
-          padding: 8px 16px;
-          margin: 8px 0;
-        }
-        .countdown-block {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          min-width: 50px;
-        }
-        .countdown-number {
-          font-family: monospace;
-          font-size: 24px;
-          font-weight: bold;
-          color: var(--accent);
-        }
-        .countdown-label {
-          font-size: 8px;
-          color: var(--text2);
-          text-transform: uppercase;
-        }
-        .countdown-sep {
-          font-size: 20px;
-          color: var(--accent);
+        
+        .reward-icon {
+          font-size: 48px;
           margin-bottom: 12px;
         }
-        .claimed-badge {
-          display: inline-flex;
-          background: rgba(61,255,160,0.15);
-          border: 1px solid rgba(61,255,160,0.3);
-          border-radius: 40px;
-          padding: 8px 16px;
-          font-size: 13px;
-          color: var(--success);
-          margin-top: 8px;
+        
+        .reward-card h3 {
+          font-family: var(--font-display);
+          font-size: 20px;
+          margin-bottom: 8px;
+          color: var(--accent);
         }
-        .daily-footer {
-          padding-top: 12px;
-          border-top: 1px solid rgba(255,255,255,0.05);
-        }
-        .collection-info {
-          font-size: 11px;
+        
+        .reward-card p {
+          font-size: 12px;
           color: var(--text2);
+          margin-bottom: 20px;
+        }
+        
+        .claim-btn {
+          background: linear-gradient(135deg, var(--accent), #ffd700);
+          border: none;
+          border-radius: 40px;
+          padding: 12px 24px;
+          font-weight: bold;
+          font-size: 16px;
+          cursor: pointer;
+          transition: transform 0.2s;
+        }
+        
+        .claim-btn:hover:not(:disabled) {
+          transform: scale(1.05);
+        }
+        
+        .claim-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        
+        .claimed-info {
+          color: var(--success);
+        }
+        
+        .countdown {
+          font-size: 14px;
+          font-family: monospace;
+          margin-top: 8px;
         }
       `}</style>
     </div>

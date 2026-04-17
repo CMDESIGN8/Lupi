@@ -1,6 +1,8 @@
 import { supabase } from './supabaseClient';
 import { POINTS_PER_TICKET } from './constants';
 import { updateUserProgression } from '../utils/userProgression';
+import { UnifiedCard, UserCard, Deck, Position, Category, calculateOVR } from '../types/cards';
+
 
 
 // Add missing RegisterData type
@@ -79,6 +81,57 @@ interface TicketFromDB {
   club: string;
   status: 'pendiente' | 'participando' | 'ganador' | 'invalido';
   created_at: string;
+}
+
+// Función para convertir perfil a carta
+function profileToCard(profile: any): UnifiedCard {
+  return {
+    id: profile.id,
+    name: profile.username,
+    position: profile.position || 'ala',
+    category: profile.category || '1era',
+    overall_rating: calculateOVR({
+      pace: profile.user_card_pace || 40,
+      dribbling: profile.user_card_dribbling || 40,
+      passing: profile.user_card_passing || 40,
+      defending: profile.user_card_defending || 40,
+      finishing: profile.user_card_finishing || 40,
+      physical: profile.user_card_physical || 40,
+    }),
+    pace: profile.user_card_pace || 40,
+    dribbling: profile.user_card_dribbling || 40,
+    passing: profile.user_card_passing || 40,
+    defending: profile.user_card_defending || 40,
+    finishing: profile.user_card_finishing || 40,
+    physical: profile.user_card_physical || 40,
+    card_type: 'socio',
+    profile_id: profile.id,
+    total_wins_lifetime: profile.total_wins_lifetime || 0,
+    total_battles_lifetime: profile.total_battles_lifetime || 0,
+    is_real: true,
+  };
+}
+
+// Función para convertir NPC a carta
+function npcToCard(npc: any): UnifiedCard {
+  return {
+    id: npc.id,
+    name: npc.name,
+    position: npc.position,
+    category: npc.category,
+    overall_rating: npc.overall_rating,
+    pace: npc.pace,
+    dribbling: npc.dribbling,
+    passing: npc.passing,
+    defending: npc.defending,
+    finishing: npc.finishing,
+    physical: npc.physical,
+    card_type: 'npc',
+    can_be_replaced: npc.can_be_replaced,
+    is_replaced: npc.is_replaced,
+    replaces_profile_id: npc.replaces_profile_id,
+    original_name: npc.original_name,
+  };
 }
 
 export const api = {
@@ -902,15 +955,6 @@ export interface PlayerCard {
   rarity: 'bronze' | 'silver' | 'gold' | 'special';
 }
  
-export interface UserCard {
-  id: string;           // user_cards.id
-  player: PlayerCard;
-  level: number;
-  experience: number;
-  is_favorite: boolean;
-  obtained_at: string;
-}
- 
 export interface DailyRewardResult {
   already_claimed: boolean;
   card: PlayerCard | null;
@@ -971,560 +1015,222 @@ export function generateRandomStats(): Omit<PlayerCard, 'id' | 'name' | 'positio
 // ============================================================
 // FUNCIONES — agregar dentro del objeto `api` en api.ts
 // ============================================================
- 
+
+
 export const cardApi = {
- 
-  /**
-   * Obtiene la carta propia del usuario (la que representa al jugador en el juego).
-   * Se guarda en la tabla profiles con los campos user_card_*.
-   */
-  getMyCard: async (userId: string): Promise<PlayerCard | null> => {
-    const { data, error } = await supabase
+  // Obtener todas las cartas disponibles (NPCs no reemplazados + Socios)
+  async getAllAvailableCards(userId: string): Promise<UnifiedCard[]> {
+    // 1. Obtener NPCs no reemplazados
+    const { data: npcs } = await supabase
+      .from('players')
+      .select('*')
+      .eq('can_be_replaced', true)
+      .eq('is_replaced', false);
+    
+    // 2. Obtener socios (excluyendo al usuario actual)
+    const { data: socios } = await supabase
       .from('profiles')
-      .select(`
-        id, username,
-        user_card_level, user_card_exp, user_card_rarity,
-        user_card_pace, user_card_dribbling, user_card_passing,
-        user_card_defending, user_card_finishing, user_card_physical
-      `)
-      .eq('id', userId)
-      .single();
- 
-    if (error || !data) return null;
- 
-    const ovr = calcOVR({
-      pace: data.user_card_pace,
-      dribbling: data.user_card_dribbling,
-      passing: data.user_card_passing,
-      defending: data.user_card_defending,
-      finishing: data.user_card_finishing,
-      physical: data.user_card_physical,
-    });
- 
-    return {
-      id: data.id,
-      name: data.username,
-      position: 'pivot',         // default; se puede hacer editable
-      category: 'Jugador',
-      photo_url: null,
-      overall_rating: ovr,
-      pace: data.user_card_pace,
-      dribbling: data.user_card_dribbling,
-      passing: data.user_card_passing,
-      defending: data.user_card_defending,
-      finishing: data.user_card_finishing,
-      physical: data.user_card_physical,
-      rarity: data.user_card_rarity as PlayerCard['rarity'],
-    };
+      .select('*')
+      .neq('id', userId);
+    
+    const npcCards = (npcs || []).map(npcToCard);
+    const socioCards = (socios || []).map(profileToCard);
+    
+    return [...npcCards, ...socioCards];
   },
- 
-  /**
-   * Obtiene la colección de cartas del usuario (álbum).
-   * Son los jugadores de Flores Futsal que fue coleccionando.
-   */
-  getMyCollection: async (userId: string): Promise<UserCard[]> => {
+
+  // Obtener cartas del usuario (colección)
+  async getUserCards(userId: string): Promise<UserCard[]> {
     const { data, error } = await supabase
       .from('user_cards')
       .select(`
-        id, level, experience, is_favorite, obtained_at,
-        player:players (
-          id, name, position, category, photo_url,
-          overall_rating, pace, dribbling, passing, defending, finishing, physical
+        *,
+        npc:players!player_id (*),
+        socio:profiles!socio_id (
+          id,
+          username,
+          position,
+          category,
+          user_card_pace,
+          user_card_dribbling,
+          user_card_passing,
+          user_card_defending,
+          user_card_finishing,
+          user_card_physical,
+          total_wins_lifetime,
+          total_battles_lifetime
         )
       `)
-      .eq('user_id', userId)
-      .order('obtained_at', { ascending: false });
- 
-    if (error || !data) return [];
- 
-    return data.map((uc: any) => ({
-      id: uc.id,
-      level: uc.level,
-      experience: uc.experience,
-      is_favorite: uc.is_favorite,
-      obtained_at: uc.obtained_at,
-      player: {
-        ...uc.player,
-        rarity: getRarity(uc.player.overall_rating),
-      },
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    
+    return (data || []).map(uc => ({
+      ...uc,
+      card: uc.card_type === 'npc' 
+        ? npcToCard(uc.npc)
+        : profileToCard(uc.socio),
     }));
   },
- 
-  /**
-   * Abre la caja misteriosa diaria.
-   * Devuelve una carta de un jugador que el usuario aún no tiene.
-   * Si ya la abrió hoy, devuelve already_claimed: true.
-   */
-  openDailyBox: async (userId: string): Promise<DailyRewardResult> => {
-  const today = new Date().toISOString().split('T')[0];
 
-  // 1. Verificar si ya reclamó hoy usando daily_rewards
-  const { data: existing, error: checkError } = await supabase
-    .from('daily_rewards')
-    .select('id, claimed, player_id')
-    .eq('user_id', userId)
-    .eq('reward_date', today)
-    .maybeSingle();
-
-  if (checkError && checkError.code !== 'PGRST116') {
-    console.error('Error checking daily reward:', checkError);
-  }
-
-  // Si ya reclamó hoy
-  if (existing?.claimed) {
-    return {
-      already_claimed: true,
-      card: null,
-      is_new_card: false,
-      message: '¡Ya abriste tu caja de hoy! Volvé mañana.',
-    };
-  }
-
-  // 2. Obtener IDs de cartas que ya tiene el usuario
-  const { data: ownedCards } = await supabase
-    .from('user_cards')
-    .select('player_id')
-    .eq('user_id', userId);
-
-  const ownedIds = (ownedCards || []).map((c: any) => c.player_id);
-
-  // 3. Buscar jugadores que NO tiene
-  let query = supabase
-    .from('players')
-    .select('id, name, position, category, photo_url, overall_rating, pace, dribbling, passing, defending, finishing, physical');
-
-  if (ownedIds.length > 0) {
-    query = query.not('id', 'in', `(${ownedIds.join(',')})`);
-  }
-
-  const { data: availablePlayers, error: playersError } = await query;
-
-  if (playersError) {
-    console.error('Error fetching players:', playersError);
-  }
-
-  // Si no hay más cartas disponibles (álbum completo)
-  if (!availablePlayers || availablePlayers.length === 0) {
-    // Aún así marcar como reclamado para que no intente de nuevo hoy
-    if (existing) {
-      await supabase
-        .from('daily_rewards')
-        .update({ claimed: true, claimed_at: new Date().toISOString() })
-        .eq('id', existing.id);
-    } else {
-      await supabase
-        .from('daily_rewards')
-        .insert({
-          user_id: userId,
-          reward_date: today,
-          claimed: true,
-          claimed_at: new Date().toISOString(),
-        });
-    }
+  // Obtener progreso del álbum
+  async getAlbumProgress(userId: string): Promise<{ owned: number; total: number }> {
+    // Total de cartas posibles = NPCs no reemplazados + Socios
+    const { count: npcCount } = await supabase
+      .from('players')
+      .select('*', { count: 'exact', head: true })
+      .eq('can_be_replaced', true)
+      .eq('is_replaced', false);
     
-    return {
-      already_claimed: false,
-      card: null,
-      is_new_card: false,
-      message: '¡Colección completa! No quedan cartas nuevas.',
-    };
-  }
-
-  // 4. Seleccionar carta aleatoria de las disponibles
-  const randomIndex = Math.floor(Math.random() * availablePlayers.length);
-  const chosenPlayer = availablePlayers[randomIndex];
-
-  // 5. Agregar la carta a la colección del usuario
-  const { error: insertCardError } = await supabase
-    .from('user_cards')
-    .insert({
-      user_id: userId,
-      player_id: chosenPlayer.id,
-      level: 1,
-      experience: 0,
-      obtained_at: new Date().toISOString(),
-    });
-
-  if (insertCardError) {
-    console.error('Error inserting user_card:', insertCardError);
-    throw new Error('Error al guardar la carta');
-  }
-
-  // 6. Registrar la recompensa diaria como reclamada
-  if (existing) {
-    await supabase
-      .from('daily_rewards')
-      .update({ 
-        claimed: true, 
-        player_id: chosenPlayer.id, 
-        claimed_at: new Date().toISOString() 
-      })
-      .eq('id', existing.id);
-  } else {
-    await supabase
-      .from('daily_rewards')
-      .insert({
-        user_id: userId,
-        reward_date: today,
-        claimed: true,
-        player_id: chosenPlayer.id,
-        claimed_at: new Date().toISOString(),
-      });
-  }
-
-  // 7. Incrementar contador de cartas diarias
-  try {
-    await supabase.rpc('increment_daily_cards', { p_user_id: userId });
-  } catch (rpcError) {
-    console.error('Error incrementing daily cards:', rpcError);
-    // Si el RPC no existe, actualizar manualmente
-    const { data: profile } = await supabase
+    const { count: socioCount } = await supabase
       .from('profiles')
-      .select('total_daily_cards')
-      .eq('id', userId)
+      .select('*', { count: 'exact', head: true });
+    
+    const total = (npcCount || 0) + (socioCount || 0);
+    
+    const { count: owned } = await supabase
+      .from('user_cards')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId);
+    
+    return { owned: owned || 0, total };
+  },
+
+  // Abrir caja misteriosa
+  async openDailyBox(userId: string): Promise<{ card: UnifiedCard | null; already_claimed: boolean }> {
+    // Verificar si ya reclamó hoy
+    const today = new Date().toISOString().split('T')[0];
+    const { data: existing } = await supabase
+      .from('daily_rewards')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('reward_date', today)
       .single();
     
-    if (profile) {
-      await supabase
-        .from('profiles')
-        .update({ total_daily_cards: (profile.total_daily_cards || 0) + 1 })
-        .eq('id', userId);
+    if (existing) {
+      return { card: null, already_claimed: true };
     }
-  }
-
-  const card: PlayerCard = {
-    ...chosenPlayer,
-    rarity: getRarity(chosenPlayer.overall_rating),
-  };
-
-  return {
-    already_claimed: false,
-    card,
-    is_new_card: true,
-    message: `¡Nueva carta obtenida! ${card.name}`,
-  };
-},
- 
-  /**
-   * Verifica si el usuario ya abrió su caja hoy.
-   */
-  // Reemplaza la función checkDailyBoxStatus con esta versión que usa la tabla daily_rewards
-// Reemplaza la función checkDailyBoxStatus con esta versión CORREGIDA
-checkDailyBoxStatus: async (userId: string): Promise<{ claimed: boolean; nextAvailable: string | null }> => {
-  const today = new Date().toISOString().split('T')[0];
-  
-  const { data, error } = await supabase
-    .from('daily_rewards')
-    .select('claimed, reward_date, claimed_at')
-    .eq('user_id', userId)
-    .eq('reward_date', today)
-    .maybeSingle();
-
-  if (error && error.code !== 'PGRST116') {
-    console.error('Error checking daily box:', error);
-    return { claimed: false, nextAvailable: null };
-  }
-
-  // Si no hay registro para hoy, puede reclamar
-  if (!data) {
-    return { claimed: false, nextAvailable: null };
-  }
-
-  // Si ya reclamó hoy
-  if (data.claimed) {
-    // Calcular la próxima fecha disponible (medianoche de mañana)
-    const nextAvailable = new Date();
-    nextAvailable.setDate(nextAvailable.getDate() + 1);
-    nextAvailable.setHours(0, 0, 0, 0);
     
-    console.log('📅 Próxima carta disponible en:', nextAvailable);
+    // Obtener IDs de cartas que el usuario ya tiene
+    const { data: userCards } = await supabase
+      .from('user_cards')
+      .select('player_id, socio_id, card_type')
+      .eq('user_id', userId);
     
-    return {
-      claimed: true,
-      nextAvailable: nextAvailable.toISOString()
-    };
-  }
-
-  return { claimed: false, nextAvailable: null };
-},
- 
-  /**
-   * Obtiene todos los jugadores del club (los 150).
-   * Usado para mostrar el álbum completo con cartas bloqueadas/desbloqueadas.
-   */
-  getAllPlayers: async (): Promise<PlayerCard[]> => {
-    const { data, error } = await supabase
+    const ownedNpcIds = new Set(userCards?.filter(c => c.card_type === 'npc').map(c => c.player_id) || []);
+    const ownedSocioIds = new Set(userCards?.filter(c => c.card_type === 'socio').map(c => c.socio_id) || []);
+    
+    // Obtener NPCs disponibles (no reemplazados y que no tenga)
+    const { data: availableNpcs } = await supabase
       .from('players')
       .select('*')
-      .order('overall_rating', { ascending: false });
- 
-    if (error || !data) return [];
- 
-    return data.map(p => ({
-      ...p,
-      rarity: getRarity(p.overall_rating),
-    }));
-  },
- 
-  /**
-   * Simula un partido entre el mazo activo del usuario y un oponente (bot o jugador).
-   * 
-   * La simulación usa los OVR promedio de cada equipo + aleatoriedad para generar
-   * el resultado y los eventos narrativos del partido.
-   */
-  simulateMatch: async (
-    userId: string,
-    deckId: string,
-    opponentType: 'bot' | 'user' = 'bot',
-    opponentId?: string
-  ): Promise<MatchResult> => {
-    // 1. Obtener las 5 cartas del mazo del usuario
-    const { data: deckData, error: deckError } = await supabase
-      .from('deck_cards')
-      .select(`
-        position,
-        user_card:user_cards (
-          player:players (name, overall_rating, pace, dribbling, finishing, defending, physical, passing)
-        )
-      `)
-      .eq('deck_id', deckId)
-      .order('position');
- 
-    if (deckError || !deckData || deckData.length === 0) {
-      throw new Error('No se pudo cargar el mazo');
+      .eq('can_be_replaced', true)
+      .eq('is_replaced', false);
+    
+    const filteredNpcs = (availableNpcs || []).filter(npc => !ownedNpcIds.has(npc.id));
+    
+    // Obtener socios disponibles (excluyendo al usuario y los que ya tiene)
+    const { data: availableSocios } = await supabase
+      .from('profiles')
+      .select('*')
+      .neq('id', userId);
+    
+    const filteredSocios = (availableSocios || []).filter(socio => !ownedSocioIds.has(socio.id));
+    
+    // Combinar disponibles
+    const availableCards: UnifiedCard[] = [
+      ...filteredNpcs.map(npcToCard),
+      ...filteredSocios.map(profileToCard)
+    ];
+    
+    if (availableCards.length === 0) {
+      return { card: null, already_claimed: false }; // Álbum completo
     }
- 
-    const userPlayers = deckData.map((dc: any) => dc.user_card?.player).filter(Boolean);
- 
-    // 2. Armar equipo oponente (bot usa jugadores random de la BD, o mazo del otro usuario)
-    let opponentPlayers: any[] = [];
- 
-    if (opponentType === 'bot' || !opponentId) {
-      // Bot: 5 jugadores random de la tabla players
-      const { data: botPlayers } = await supabase
-        .from('players')
-        .select('name, overall_rating, pace, dribbling, finishing, defending, physical, passing')
-        .limit(100);
- 
-      if (botPlayers && botPlayers.length >= 5) {
-        const shuffled = [...botPlayers].sort(() => Math.random() - 0.5);
-        opponentPlayers = shuffled.slice(0, 5);
-      }
-    } else {
-      // PVP: obtener mazo activo del oponente
-      const { data: oppDeck } = await supabase
-        .from('decks')
-        .select('id')
-        .eq('user_id', opponentId)
-        .eq('is_active', true)
-        .single();
- 
-      if (oppDeck) {
-        const { data: oppDeckCards } = await supabase
-          .from('deck_cards')
-          .select(`user_card:user_cards(player:players(name, overall_rating, pace, dribbling, finishing, defending, physical, passing))`)
-          .eq('deck_id', oppDeck.id);
- 
-        opponentPlayers = (oppDeckCards || []).map((dc: any) => dc.user_card?.player).filter(Boolean);
-      }
-    }
- 
-    if (opponentPlayers.length === 0) {
-      // Fallback: oponente con stats estándar
-      opponentPlayers = Array(5).fill({ name: 'Bot', overall_rating: 65, pace: 65, dribbling: 65, finishing: 65, defending: 65, physical: 65, passing: 65 });
-    }
- 
-    // 3. Calcular OVR promedio de cada equipo
-    const userOVR = userPlayers.reduce((s: number, p: any) => s + p.overall_rating, 0) / userPlayers.length;
-    const oppOVR  = opponentPlayers.reduce((s: number, p: any) => s + p.overall_rating, 0) / opponentPlayers.length;
- 
-    // 4. Simular goles (distribución de Poisson aproximada con factor OVR)
-    const userGoalProb  = 0.3 + (userOVR - oppOVR) * 0.008;   // rango ~0.1–0.5
-    const oppGoalProb   = 0.3 - (userOVR - oppOVR) * 0.008;
- 
-    const MINUTES = [3, 7, 12, 16, 20, 24]; // momentos posibles de gol en futsal (20 min)
-    const events: MatchEvent[] = [];
-    let userScore = 0;
-    let oppScore  = 0;
- 
-    for (const minute of MINUTES) {
-      // ¿Gol del usuario?
-      if (Math.random() < Math.max(0.05, Math.min(0.55, userGoalProb))) {
-        const scorer = userPlayers[Math.floor(Math.random() * userPlayers.length)];
-        userScore++;
-        events.push({
-          minute,
-          team: 'user',
-          type: 'goal',
-          player_name: scorer.name,
-          description: `¡GOL! ${scorer.name} anota el ${userScore}-${oppScore}`,
-        });
-      } else if (Math.random() < 0.3) {
-        const saver = opponentPlayers[Math.floor(Math.random() * opponentPlayers.length)];
-        events.push({
-          minute,
-          team: 'opponent',
-          type: 'save',
-          player_name: saver.name,
-          description: `Buena atajada del rival`,
-        });
-      }
- 
-      // ¿Gol del oponente?
-      if (Math.random() < Math.max(0.05, Math.min(0.55, oppGoalProb))) {
-        const scorer = opponentPlayers[Math.floor(Math.random() * opponentPlayers.length)];
-        oppScore++;
-        events.push({
-          minute,
-          team: 'opponent',
-          type: 'goal',
-          player_name: scorer.name,
-          description: `Gol del rival — ${userScore}-${oppScore}`,
-        });
-      }
-    }
- 
-    const won = userScore > oppScore;
-    const expGained = won ? 50 : 15;
- 
-    // 5. Guardar el partido en la BD
-    const { data: matchRecord, error: matchError } = await supabase
-      .from('matches')
-      .insert({
-        user_id: userId,
-        opponent_type: opponentType,
-        opponent_id: opponentId ?? null,
-        user_deck_id: deckId,
-        user_score: userScore,
-        opponent_score: oppScore,
-        winner_id: won ? userId : (opponentId ?? null),
-        experience_gained: expGained,
-      })
-      .select('id')
-      .single();
- 
-    if (matchError) console.error('Error saving match:', matchError);
- 
-    // 6. Si ganó, mejorar ligeramente los stats propios del usuario
-    if (won) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('user_card_pace, user_card_dribbling, user_card_passing, user_card_defending, user_card_finishing, user_card_physical')
-        .eq('id', userId)
-        .single();
- 
-      if (profile) {
-        const bump = (v: number) => Math.min(99, v + Math.floor(Math.random() * 2)); // +0 o +1
-        const newStats = {
-          user_card_pace:      bump(profile.user_card_pace),
-          user_card_dribbling: bump(profile.user_card_dribbling),
-          user_card_passing:   bump(profile.user_card_passing),
-          user_card_defending: bump(profile.user_card_defending),
-          user_card_finishing: bump(profile.user_card_finishing),
-          user_card_physical:  bump(profile.user_card_physical),
-        };
-        const newOVR = calcOVR({
-          pace: newStats.user_card_pace,
-          dribbling: newStats.user_card_dribbling,
-          passing: newStats.user_card_passing,
-          defending: newStats.user_card_defending,
-          finishing: newStats.user_card_finishing,
-          physical: newStats.user_card_physical,
-        });
-        await supabase
-          .from('profiles')
-          .update({
-            ...newStats,
-            user_card_rarity: getRarity(newOVR),
-            total_wins_lifetime: supabase.rpc as any, // se actualiza abajo
-          })
-          .eq('id', userId);
-      }
-      await supabase.rpc('increment_battle_win', { p_user_id: userId });
-    } else {
-      await supabase.rpc('increment_battle_loss', { p_user_id: userId });
-    }
- 
-    return {
-      match_id: matchRecord?.id ?? '',
-      user_score: userScore,
-      opponent_score: oppScore,
-      won,
-      experience_gained: expGained,
-      events,
+    
+    // Seleccionar carta aleatoria
+    const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+    
+    // Guardar en user_cards
+    const newCard = {
+      user_id: userId,
+      card_type: randomCard.card_type,
+      ...(randomCard.card_type === 'npc' 
+        ? { player_id: randomCard.id }
+        : { socio_id: randomCard.id }),
+      level: 1,
+      experience: 0,
+      obtained_at: new Date(),
     };
+    
+    await supabase.from('user_cards').insert(newCard);
+    
+    // Registrar en daily_rewards
+    await supabase.from('daily_rewards').insert({
+      user_id: userId,
+      reward_date: today,
+      claimed: true,
+      claimed_at: new Date(),
+    });
+    
+    return { card: randomCard, already_claimed: false };
   },
- 
-  /**
-   * Obtiene o crea el mazo activo del usuario.
-   */
-  getActiveDeck: async (userId: string): Promise<{ deck_id: string; cards: UserCard[] }> => {
-    // Buscar mazo activo
-    let { data: deck } = await supabase
+
+  // Verificar estado de la caja diaria
+  async checkDailyBoxStatus(userId: string): Promise<{ claimed: boolean }> {
+    const today = new Date().toISOString().split('T')[0];
+    const { data } = await supabase
+      .from('daily_rewards')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('reward_date', today)
+      .single();
+    
+    return { claimed: !!data };
+  },
+
+  // Obtener mazo activo del usuario
+  async getActiveDeck(userId: string): Promise<{ deck_id: string; cards: UserCard[] }> {
+    const { data: deck } = await supabase
       .from('decks')
       .select('id')
       .eq('user_id', userId)
       .eq('is_active', true)
       .single();
- 
-    // Si no tiene mazo, crear uno vacío
+    
     if (!deck) {
-      const { data: newDeck, error } = await supabase
+      // Crear mazo por defecto
+      const { data: newDeck } = await supabase
         .from('decks')
-        .insert({ user_id: userId, name: 'Mi Equipo', is_active: true })
-        .select('id')
+        .insert({ user_id: userId, name: 'Mi Mazo', is_active: true })
+        .select()
         .single();
- 
-      if (error || !newDeck) throw new Error('No se pudo crear el mazo');
-      deck = newDeck;
+      
+      return { deck_id: newDeck.id, cards: [] };
     }
- 
+    
     const { data: deckCards } = await supabase
       .from('deck_cards')
-      .select(`
-        position,
-        user_card:user_cards (
-          id, level, experience, is_favorite, obtained_at,
-          player:players (id, name, position, category, photo_url, overall_rating, pace, dribbling, passing, defending, finishing, physical)
-        )
-      `)
+      .select('user_card_id, position')
       .eq('deck_id', deck.id)
       .order('position');
- 
-    const cards: UserCard[] = (deckCards || [])
-      .map((dc: any) => dc.user_card)
+    
+    const userCards = await this.getUserCards(userId);
+    const cardsInDeck = (deckCards || [])
+      .map(dc => userCards.find(uc => uc.id === dc.user_card_id))
       .filter(Boolean)
-      .map((uc: any) => ({
-        ...uc,
-        player: { ...uc.player, rarity: getRarity(uc.player.overall_rating) },
-      }));
- 
-    return { deck_id: deck.id, cards };
+      .map((uc, idx) => ({ ...uc!, position: idx + 1 }));
+    
+    return { deck_id: deck.id, cards: cardsInDeck };
   },
- 
-  /**
-   * Agrega o reemplaza una carta en el mazo activo.
-   */
-  updateDeckCard: async (deckId: string, position: number, userCardId: string): Promise<void> => {
-    // Upsert: si ya hay carta en esa posición, la reemplaza
-    const { error } = await supabase
+
+  // Actualizar carta en el mazo
+  async updateDeckCard(deckId: string, position: number, userCardId: string): Promise<void> {
+    await supabase
       .from('deck_cards')
-      .upsert({ deck_id: deckId, position, user_card_id: userCardId });
- 
-    if (error) throw new Error('Error actualizando el mazo: ' + error.message);
-  },
- 
-  /**
-   * Cuenta cuántas cartas le faltan al usuario para completar el álbum.
-   */
-  getAlbumProgress: async (userId: string): Promise<{ owned: number; total: number; percent: number }> => {
-    const [{ count: owned }, { count: total }] = await Promise.all([
-      supabase.from('user_cards').select('*', { count: 'exact', head: true }).eq('user_id', userId),
-      supabase.from('players').select('*', { count: 'exact', head: true }),
-    ]);
- 
-    const o = owned ?? 0;
-    const t = total ?? 150;
-    return { owned: o, total: t, percent: Math.round((o / t) * 100) };
+      .upsert({
+        deck_id: deckId,
+        user_card_id: userCardId,
+        position,
+      });
   },
 };
