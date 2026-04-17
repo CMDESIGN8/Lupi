@@ -59,9 +59,6 @@ export function DevTools({ userId, onCardReceived }: DevToolsProps) {
         selectedPlayer = availablePlayers[Math.floor(Math.random() * availablePlayers.length)];
         showMessage(`🎉 ¡Nueva carta! ${selectedPlayer.name}`, 'success');
       }
-
-      // Generar stats según posición
-      const stats = generateCardStats(selectedPlayer.position, selectedPlayer.category);
       
       // Insertar carta
       const { data: userCard, error: insertError } = await supabase
@@ -120,7 +117,8 @@ let leveledUp = false;
         if (!players || players.length === 0) continue;
         
         const randomPlayer = players[Math.floor(Math.random() * players.length)];
-        const stats = generateCardStats(randomPlayer.position, randomPlayer.category);
+        const stats = generateCardStats(randomPlayer.category); // o generateCardStats(randomPlayer.position)
+
         
         await supabase
           .from('user_cards')

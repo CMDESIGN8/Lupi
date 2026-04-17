@@ -64,6 +64,16 @@ export interface Deck {
   cards: UserCard[];
 }
 
+export interface Player {
+  id: string;
+  name: string;
+  position: 'GK' | 'DEF' | 'MID' | 'FW';
+  category: 'standard' | 'rare' | 'epic' | 'legendary';
+  team?: string;
+  nationality?: string;
+  overall?: number;
+}
+
 // Posiciones con íconos
 export const POSITION_ICONS: Record<Position, { icon: string; name: string; color: string }> = {
   arquero: { icon: '🧤', name: 'ARQ', color: '#4a90d9' },

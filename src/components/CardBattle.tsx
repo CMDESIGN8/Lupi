@@ -198,7 +198,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
         leveledUpCards,
         bonusMessage: battleResult.bonusMessage,
         bot,
-      });
+      }); 
 
       setBattling(false);
       onBattleComplete(updatedCards);
