@@ -742,7 +742,7 @@ const applyMove = (card: UserCard, position: number) => {
                         <div className="bench-card-level">⭐{card.level}</div>
                         <div className="bench-card-stats">
                           <span>⚡{data?.pace}</span>
-                          <span>🪄{data?.dribbling}</span>
+                          <span>✨{data?.dribbling}</span>
                         </div>
                         <div className="bench-use-btn">USAR</div>
                       </div>

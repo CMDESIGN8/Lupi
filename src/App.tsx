@@ -1855,6 +1855,249 @@ import { cardApi } from './lib/api';
     transform: translateX(-50%) translateY(0);
   }
 }
+  /* BASE */
+.streak-card {
+  border-radius: 18px;
+  padding: 16px;
+  border: 2px solid  #ff6b00;
+  background: var(--surface2);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* HOVER */
+.streak-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* HEADER */
+.streak-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.streak-icon {
+  font-size: 26px;
+  animation: flameFlicker 1.5s infinite alternate;
+}
+
+@keyframes flameFlicker {
+  from { transform: scale(1); }
+  to { transform: scale(1.15); }
+}
+
+.streak-current {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.streak-best {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* REWARD */
+.streak-reward {
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #00e676, #00c853);
+  color: #0a0a0f;
+  text-align: center;
+  animation: rewardPop 0.5s ease;
+}
+
+@keyframes rewardPop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); }
+}
+
+.pulse {
+  animation: pulseReward 1s infinite;
+}
+
+@keyframes pulseReward {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* WARNING */
+.streak-warning {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #ff5252;
+  font-weight: bold;
+}
+
+/* PROGRESS */
+.streak-progress {
+  margin-top: 10px;
+  height: 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+.streak-progress-bar {
+  height: 100%;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #ff6b00, #ff3d00, #ff9100);
+  transition: width 0.6s ease;
+  box-shadow: 0 0 10px rgba(255,100,0,0.6);
+}
+
+/* SHIMMER */
+.streak-progress-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.5), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  to { left: 120%; }
+}
+
+/* NEXT */
+.streak-next-milestone {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #ffd700;
+  font-weight: bold;
+}
+
+/* ESTADOS */
+.streak-card.good {
+  box-shadow: 0 0 12px rgba(24,157,245,0.6);
+}
+
+.streak-card.great {
+  box-shadow: 0 0 15px rgba(255,215,0,0.6);
+}
+
+.streak-card.epic {
+  box-shadow: 0 0 15px rgba(155,89,182,0.6);
+}
+
+.streak-card.legendary {
+  box-shadow: 0 0 20px rgba(255,80,80,0.8);
+}
+
+/* PARTICLES (pro) */
+.streak-card.legendary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: particlesMove 6s linear infinite;
+  opacity: 0.3;
+}
+
+@keyframes particlesMove {
+  from { transform: translateY(0); }
+  to { transform: translateY(-40px); }
+}
+
+/* COMPACT */
+.streak-compact {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--surface2);
+}
+
+/* MINIMAL */
+.streak-minimal {
+  font-size: 12px;
+}
+  /* CONTENEDOR */
+.ticket-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 136, 0.08),
+    rgba(0, 200, 255, 0.05)
+  );
+
+  border: 1px solid rgba(0,255,136,0.2);
+
+  backdrop-filter: blur(6px);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+/* HOVER = INVITA A ACCION */
+.ticket-hint:hover {
+  transform: translateY(-2px) scale(1.01);
+  border-color: #00ff88;
+  box-shadow: 0 6px 20px rgba(0,255,136,0.2);
+}
+
+/* ICONO */
+.ticket-icon {
+  font-size: 20px;
+  animation: floatIcon 2s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0); }
+}
+
+/* TEXTO */
+.ticket-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.ticket-text strong {
+  font-size: 15px;
+  color: #00d9ff;
+}
+
+.ticket-text span {
+  font-size: 12px;
+  color: var(--white);
+}
+
+/* SHIMMER SUAVE */
+.ticket-hint::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.15),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.ticket-hint:hover::after {
+  opacity: 1;
+}
     `;
 
     // ============================================================
@@ -2062,12 +2305,23 @@ import { cardApi } from './lib/api';
           }}
         />
 
+          <div className="ticket-hint">
+  <span className="ticket-icon">🎟️</span>
+  <div className="ticket-text">
+    <strong>Cargá tu entrada de los partidos</strong>
+    <span>y acumulá puntos para ganar premios 🎁</span>
+  </div>
+</div>  
+<br></br>
+
         {/* Contador regresivo */}
         <CountdownTimer 
           targetDate={getNextThursday20h()}
           onComplete={handleRaffleComplete}
         />
-
+<button className="btn btn-primary" onClick={() => onNavigate("ticket")}>
+            🎟️ CARGAR ENTRADA
+          </button>
         {/* Grid de estadísticas */}
         <div className="stats-grid">
           <div className="stat-card">
@@ -2115,13 +2369,6 @@ import { cardApi } from './lib/api';
             <div className="leader-points">{u.points}</div>
           </div>
         ))}
-
-        {/* Botón cargar entrada */}
-        <div style={{ marginTop: 24, width: '100%' }}>
-          <button className="btn btn-primary" onClick={() => onNavigate("ticket")}>
-            🎟️ CARGAR ENTRADA
-          </button>
-        </div>
       </div>
     </div>
   );
@@ -2225,8 +2472,8 @@ import { cardApi } from './lib/api';
   if (res.statUpgraded) {
     const statIcons: Record<string, string> = {
       'pace': '⚡',
-      'dribbling': '🪄',
-      'passing': '🎯',
+      'dribbling': '✨',
+      'passing': '⚽',
       'defending': '🛡️',
       'finishing': '🎯',
       'physical': '💪'

@@ -162,83 +162,233 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
   };
 
   return (
-    <div className="daily-card-reward">
-      <div className="reward-card">
-        <div className="reward-icon">🎁</div>
-        <h3>¡Carta Diaria!</h3>
-        <p>Una nueva carta para tu colección</p>
-        
+  <div className="daily-card-reward">
+    
+    <div className={`pack ${!claimed ? 'available' : 'opened'}`}>
+      
+      {/* Brillo plástico */}
+      <div className="pack-shine" />
+
+
+      {/* Contenido */}
+      <div className="pack-content">
+        <br></br>
+        <h3>SOBRE DIARIO</h3>
+        <p className="pack-description">
+    Abrí tu sobre 
+    <br></br>Descubrí qué jugador <br></br>te toca hoy
+  </p>
+
         {!claimed ? (
           <button 
-            className="claim-btn"
+            className="open-pack-btn"
             onClick={handleClaim}
             disabled={loading}
           >
-            {loading ? 'Obteniendo...' : '📦 Abrir Caja'}
+            {loading ? 'Abriendo...' : '📦 Abrir Sobre'}
           </button>
         ) : (
           <div className="claimed-info">
-            <p>✅ Ya reclamaste tu carta hoy</p>
-            <p className="countdown">⏰ Próxima en {timeLeft}</p>
+            <p>✅ Ya abriste tu sobre</p>
+            <p className="countdown">⏰ {timeLeft}</p>
           </div>
         )}
       </div>
+
+      {/* Borde foil */}
+      <div className="pack-border" />
+
+    </div>
       
       <style>{`
-        .daily-card-reward {
-          background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
-          border-radius: 20px;
-          padding: 20px;
-          text-align: center;
-          border: 1px solid var(--accent);
-        }
-        
-        .reward-icon {
-          font-size: 48px;
-          margin-bottom: 12px;
-        }
-        
-        .reward-card h3 {
-          font-family: var(--font-display);
-          font-size: 20px;
-          margin-bottom: 8px;
-          color: var(--accent);
-        }
-        
-        .reward-card p {
-          font-size: 12px;
-          color: var(--text2);
-          margin-bottom: 20px;
-        }
-        
-        .claim-btn {
-          background: linear-gradient(135deg, var(--accent), #ffd700);
-          border: none;
-          border-radius: 40px;
-          padding: 12px 24px;
-          font-weight: bold;
-          font-size: 16px;
+        /* CONTENEDOR */
+.daily-card-reward {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* SOBRE */
+.pack {
+  width: 220px;
+          height: 290px;
+          border-radius: 16px;
+          position: relative;
+          overflow: hidden;
           cursor: pointer;
-          transition: transform 0.2s;
+          transition: all 0.3s ease;
+          border: 2px solid rgb(255, 222, 38);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
-        
-        .claim-btn:hover:not(:disabled) {
-          transform: scale(1.05);
+
+        .pack-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+          pointer-events: none;
+          z-index: 0;
         }
+
         
-        .claim-btn:disabled {
+
+/* 👇 ESTE ES EL FIX CLAVE */
+.pack::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55); /* oscurece la imagen */
+  z-index: 1;
+}
+  .pack-content {
+  position: relative;
+  top: 10px;
+  z-index: 2;
+}
+  .pack::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(10, 10, 20, 0.56), rgba(10, 10, 20, 0.63)),
+  url('/images/fifa-pack-bg.png');
+  background-size: cover;
+background-position: center;
+background-repeat: no-repeat;
+  z-index: 1;
+}
+/* EFECTO HOVER */
+.pack.available:hover {
+          transform: translateY(-6px) scale(1.05) rotate(-1deg);
+          box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+          border-color: rgba(255, 215, 0, 0.6);
+        }
+
+
+/* BRILLO */
+.pack-shine {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            120deg,
+            transparent,
+            rgba(255,255,255,0.2),
+            transparent
+          );
+          animation: packShine 4s infinite;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        @keyframes packShine {
+          from { transform: translateX(-100%); }
+          to { transform: translateX(100%); }
+        }
+
+/* BORDE FOIL */
+.pack-border {
+          position: absolute;
+          inset: 0;
+          border-radius: 16px;
+          border: 2px solid transparent;
+          pointer-events: none;
+          z-index: 3;
+        }
+
+/* CONTENIDO */
+        .pack-content {
+          position: relative;
+          z-index: 4;
+          padding: 35px 10px;
+          text-align: center;
+        }
+
+        /* ICONO */
+        .pack-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 10px;
+  animation: floatPack 2s infinite ease-in-out;
+  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5));
+}
+        @keyframes floatPack {
+          0% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+          100% { transform: translateY(0); }
+        }
+
+        /* TITULO */
+        .pack-content h3 {
+          font-size: 16px;
+          letter-spacing: 2px;
+          margin-bottom: 8px;
+          background: linear-gradient(135deg, #ffd700, #ffaa00);
+          -webkit-background-clip: text;
+          background-clip: text;
+          color: transparent;
+          font-weight: 800;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* TEXTO */
+        .pack-content p {
+          font-size: 18px;
+          color: rgb(255, 255, 255);
+          margin-bottom: 10px;
+          margin-top: 20px;
+          font-weight: 500;
+        }
+
+        /* BOTON */
+        .open-pack-btn {
+          background: linear-gradient(135deg, #ffd700, #ff9800);
+          border: none;
+          border-radius: 30px;
+          padding: 10px 20px;
+          font-weight: bold;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s;
+          color: #1a1a2e;
+          box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .open-pack-btn:hover {
+          transform: scale(1.08);
+          box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
+        }
+
+        .open-pack-btn:disabled {
           opacity: 0.6;
-          cursor: not-allowed;
+          transform: none;
         }
-        
+
+        /* CLAIMED */
+        .pack.opened {
+          opacity: 0.7;
+          filter: grayscale(0.3);
+          cursor: default;
+        }
+
+        .pack.opened:hover {
+          transform: none;
+        }
+
+        /* COUNTDOWN */
         .claimed-info {
-          color: var(--success);
+          margin-top: 10px;
         }
-        
+
+        .claimed-info p {
+          font-size: 11px;
+          margin: 4px 0;
+        }
+
         .countdown {
-          font-size: 14px;
           font-family: monospace;
-          margin-top: 8px;
+          font-size: 13px;
+          margin-top: 6px;
+          color: #ffd700;
+          font-weight: bold;
         }
       `}</style>
     </div>

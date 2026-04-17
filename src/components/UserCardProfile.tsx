@@ -65,8 +65,8 @@ export function UserCardProfile({ userId, onLevelUp }: UserCardProfileProps) {
         // 2. Detectar cambios en STATS
         const statChanges = [
           { name: '⚡ Velocidad', key: 'pace', oldValue: old.pace, newValue: newStats.pace },
-          { name: '🪄 Regate', key: 'dribbling', oldValue: old.dribbling, newValue: newStats.dribbling },
-          { name: '🎯 Pase', key: 'passing', oldValue: old.passing, newValue: newStats.passing },
+          { name: '✨ Regate', key: 'dribbling', oldValue: old.dribbling, newValue: newStats.dribbling },
+          { name: '⚽ Pase', key: 'passing', oldValue: old.passing, newValue: newStats.passing },
           { name: '🛡️ Defensa', key: 'defending', oldValue: old.defending, newValue: newStats.defending },
           { name: '🎯 Remate', key: 'finishing', oldValue: old.finishing, newValue: newStats.finishing },
           { name: '💪 Físico', key: 'physical', oldValue: old.physical, newValue: newStats.physical }
@@ -138,10 +138,10 @@ export function UserCardProfile({ userId, onLevelUp }: UserCardProfileProps) {
               <span>⚡</span> {stats.pace}
             </div>
             <div className="stat" title="Regate (abrí sobres diarios)">
-              <span>🪄</span> {stats.dribbling}
+              <span>✨</span> {stats.dribbling}
             </div>
             <div className="stat" title="Pase (compartí la app)">
-              <span>🎯</span> {stats.passing}
+              <span>⚽</span> {stats.passing}
             </div>
             <div className="stat" title="Defensa (batallas perdidas)">
               <span>🛡️</span> {stats.defending}

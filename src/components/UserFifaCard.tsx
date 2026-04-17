@@ -48,8 +48,8 @@ export function UserFifaCard({ userId, username, club, clubRank = 0, onLevelUp }
       if (stats) {
         const statChanges = [
           { stat: '⚡ Velocidad', key: 'pace', oldValue: stats.pace, newValue: newStats.pace },
-          { stat: '🪄 Regate', key: 'dribbling', oldValue: stats.dribbling, newValue: newStats.dribbling },
-          { stat: '🎯 Pase', key: 'passing', oldValue: stats.passing, newValue: newStats.passing },
+          { stat: '✨ Regate', key: 'dribbling', oldValue: stats.dribbling, newValue: newStats.dribbling },
+          { stat: '⚽ Pase', key: 'passing', oldValue: stats.passing, newValue: newStats.passing },
           { stat: '🛡️ Defensa', key: 'defending', oldValue: stats.defending, newValue: newStats.defending },
           { stat: '🎯 Remate', key: 'finishing', oldValue: stats.finishing, newValue: newStats.finishing },
           { stat: '💪 Físico', key: 'physical', oldValue: stats.physical, newValue: newStats.physical }
@@ -161,7 +161,7 @@ export function UserFifaCard({ userId, username, club, clubRank = 0, onLevelUp }
             </div>
           </div>
           <div className="fifa-stat">
-            <div className="fifa-stat-icon">🪄</div>
+            <div className="fifa-stat-icon">✨</div>
             <div className="fifa-stat-info">
               <span className="fifa-stat-label">Regate</span>
               <span className="fifa-stat-value">{stats.dribbling}</span>
@@ -171,7 +171,7 @@ export function UserFifaCard({ userId, username, club, clubRank = 0, onLevelUp }
             </div>
           </div>
           <div className="fifa-stat">
-            <div className="fifa-stat-icon">🎯</div>
+            <div className="fifa-stat-icon">⚽</div>
             <div className="fifa-stat-info">
               <span className="fifa-stat-label">Pase</span>
               <span className="fifa-stat-value">{stats.passing}</span>
@@ -260,14 +260,17 @@ export function UserFifaCard({ userId, username, club, clubRank = 0, onLevelUp }
           <StreakBadge userId={userId} variant="full" />
           {clubRank > 0 && (
             <div className={`club-rank-badge ${clubRank === 1 ? 'top' : clubRank <= 3 ? 'good' : ''}`}>
-              {clubRank === 1 ? '🔥' : clubRank <= 3 ? '⚡' : '📍'}
-              Tu Club esta #{clubRank} en el Ranking
-            </div>
+  <div className="rank-icon">
+    {clubRank === 1 ? '🏆' : clubRank <= 3 ? '🔥' : '⭐'}
+  </div>
+
+  <div className="rank-info">
+    <span className="rank-position">#{clubRank}</span>
+    <span className="rank-text">Ranking del Club</span>
+  </div>
+</div>
           )}
         </div>
-        <div style={{ marginTop: 12, fontSize: 13, color: "var(--text)" }}>
-                Cargá el número de tu entrada y acumulá puntos para ganar entradas gratis.
-              </div>
       </div>
 
       <style>{`
@@ -521,28 +524,84 @@ export function UserFifaCard({ userId, username, club, clubRank = 0, onLevelUp }
         }
         
         .club-rank-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 4px;
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 11px;
-          font-weight: bold;
-          background: rgba(136,136,170,0.1);
-          border: 1px solid var(--border);
-        }
-        
-        .club-rank-badge.top {
-          background: rgba(61,255,160,0.12);
-          border-color: var(--success);
-          color: var(--success);
-        }
-        
-        .club-rank-badge.good {
-          background: rgba(245,197,24,0.1);
-          border-color: var(--accent);
-          color: var(--accent);
-        }
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin: 12px 0;
+  padding: 12px 16px;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    145deg,
+    rgba(255,255,255,0.05),
+    rgba(255,255,255,0.02)
+  );
+
+  border: 1px solid rgba(255,255,255,0.12);
+
+  backdrop-filter: blur(6px);
+
+  box-shadow:
+    0 4px 14px rgba(0,0,0,0.25),
+    inset 0 1px 2px rgba(255,255,255,0.1);
+
+  transition: all 0.25s ease;
+}
+
+/* ICONO */
+.rank-icon {
+  font-size: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CONTENIDO */
+.rank-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+/* NUMERO GRANDE */
+.rank-position {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+/* TEXTO CHICO */
+.rank-text {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* 🟢 TOP */
+.club-rank-badge.top {
+  border-color: rgba(0,255,136,0.6);
+  color: #00ff88;
+
+  box-shadow:
+    0 0 12px rgba(0,255,136,0.4),
+    inset 0 0 10px rgba(0,255,136,0.15);
+}
+
+/* 🟡 TOP 3 */
+.club-rank-badge.good {
+  border-color: rgba(255,200,0,0.6);
+  color: #ffd54f;
+
+  box-shadow:
+    0 0 10px rgba(255,200,0,0.3),
+    inset 0 0 8px rgba(255,200,0,0.1);
+}
+
+/* HOVER */
+.club-rank-badge:hover {
+  transform: translateY(-2px) scale(1.02);
+}
         
         .level-up-notification {
           position: fixed;

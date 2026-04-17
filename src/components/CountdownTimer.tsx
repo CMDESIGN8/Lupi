@@ -64,7 +64,7 @@ export function CountdownTimer({ targetDate, onComplete }: CountdownTimerProps) 
       boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
     }}>
       <div style={{ fontSize: '12px', opacity: 0.9, letterSpacing: '1px' }}>
-        🎯 PRÓXIMO SORTEO
+        🎯 PRÓXIMO SORTEO SEMANAL
       </div>
       <div style={{ 
         display: 'flex', 

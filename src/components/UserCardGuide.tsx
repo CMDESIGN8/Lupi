@@ -21,9 +21,9 @@ export function UserCardGuide() {
 </div>
 
 <div className="guide-section">
-  <h4>🪄 Regate</h4>
+  <h4>✨ Regate</h4>
   <p>Abrí el sobre diario. Cada día = +1 Regate</p>
-  <div className="tip">💡 Abrir sobre = +25 EXP, +1 🪄</div>
+  <div className="tip">💡 Abrir sobre = +25 EXP, +1 ✨</div>
 </div>
 
 <div className="guide-section">
@@ -39,9 +39,9 @@ export function UserCardGuide() {
 </div>
 
 <div className="guide-section">
-  <h4>🎯 Pase</h4>
+  <h4>⚽ Pase</h4>
   <p>Compartí la app y completá misiones</p>
-  <div className="tip">💡 Compartir = +30 EXP, +1 🎯 | Misión = +50 EXP, +1 🎯</div>
+  <div className="tip">💡 Compartir = +30 EXP, +1 ⚽ | Misión = +50 EXP, +1 🎯</div>
 </div>
         
 <div className="guide-section">
