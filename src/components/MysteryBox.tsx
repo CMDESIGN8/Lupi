@@ -367,39 +367,51 @@ export function MysteryBox({ userId, albumProgress, onCardObtained }: MysteryBox
     });
   }, [userId]);
 
-  const handleOpenBox = async () => {
-    if (boxState !== 'idle') return;
+  // Modifica la función handleOpenBox
+const handleOpenBox = async () => {
+  if (boxState !== 'idle') return;
 
-    setBoxState('shaking');
-    await new Promise(r => setTimeout(r, 500));
+  setBoxState('shaking');
+  await new Promise(r => setTimeout(r, 500));
 
-    setBoxState('opening');
-    await new Promise(r => setTimeout(r, 400));
+  setBoxState('opening');
+  await new Promise(r => setTimeout(r, 400));
 
-    try {
-      const result = await cardApi.openDailyBox(userId);
+  try {
+    const result = await cardApi.openDailyBox(userId);
 
-      if (result.already_claimed) {
-        setBoxState('claimed');
-        return;
-      }
-
-      if (!result.card) {
-        setBoxState('complete');
-        return;
-      }
-
-      setRevealedCard(result.card);
-      setShowParticles(true);
-      setBoxState('revealed');
-
-      setTimeout(() => setShowParticles(false), 1000);
-      onCardObtained?.(result.card);
-    } catch (err) {
-      console.error('Error opening box:', err);
-      setBoxState('idle');
+    if (result.already_claimed) {
+      setBoxState('claimed');
+      return;
     }
-  };
+
+    if (!result.card) {
+      setBoxState('complete');
+      return;
+    }
+
+    // Verificar que sea una PlayerCard (tiene rarity)
+    const isPlayerCard = (card: any): card is PlayerCard => {
+      return card && 'rarity' in card;
+    };
+
+    if (!isPlayerCard(result.card)) {
+      // Si es NPCCard, no la mostramos como carta jugable
+      setBoxState('complete');
+      return;
+    }
+
+    setRevealedCard(result.card); // Ahora TypeScript sabe que es PlayerCard
+    setShowParticles(true);
+    setBoxState('revealed');
+
+    setTimeout(() => setShowParticles(false), 1000);
+    onCardObtained?.(result.card);
+  } catch (err) {
+    console.error('Error opening box:', err);
+    setBoxState('idle');
+  }
+};
 
   if (loading) return null;
 
