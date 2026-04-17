@@ -2899,6 +2899,19 @@ if (res.statUpgraded) {
               </button>
             </div>
 
+            {/* Información de cómo funciona */}
+            <div className="fade-up" style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 20, marginBottom: 16 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "var(--text2)", marginBottom: 12 }}>¿Cómo funciona?</div>
+              <div style={{ fontSize: 14, color: "var(--text2)", lineHeight: 1.7 }}>
+                🎟️ Cargá el número de tu entrada del partido<br />
+                ⭐ Sumás <strong style={{ color: "var(--accent)" }}>10 puntos</strong> por cada entrada registrada<br />
+                🏆 Los 3 mejores del ranking ganan entradas gratis<br />
+                🔄 El ranking se resetea cada temporada<br />
+                🎁 Invitá amigos con tu código y ganá <strong style={{ color: "var(--accent)" }}>50 puntos extra</strong><br />
+                📤 Compartí LupiApp y ganá <strong style={{ color: "var(--accent)" }}>50 puntos extra</strong> por día
+              </div>
+            </div>
+
             {/* Selector de vista */}
             <div style={{ display: "flex", gap: 12, marginBottom: 16, marginTop: 24 }}>
               <button
@@ -3012,6 +3025,7 @@ if (res.statUpgraded) {
             )}
           </div>
         </div>
+        
       );
     }
     // ============================================================
@@ -3483,19 +3497,6 @@ if (res.statUpgraded) {
                   onClose={() => hideToast(toast.id)}
                 />
               ))}
-            </div>
-
-            {/* Información de cómo funciona */}
-            <div className="fade-up" style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 20, marginBottom: 16 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "var(--text2)", marginBottom: 12 }}>¿Cómo funciona?</div>
-              <div style={{ fontSize: 14, color: "var(--text2)", lineHeight: 1.7 }}>
-                🎟️ Cargá el número de tu entrada del partido<br />
-                ⭐ Sumás <strong style={{ color: "var(--accent)" }}>10 puntos</strong> por cada entrada registrada<br />
-                🏆 Los 3 mejores del ranking ganan entradas gratis<br />
-                🔄 El ranking se resetea cada temporada<br />
-                🎁 Invitá amigos con tu código y ganá <strong style={{ color: "var(--accent)" }}>50 puntos extra</strong><br />
-                📤 Compartí LupiApp y ganá <strong style={{ color: "var(--accent)" }}>50 puntos extra</strong> por día
-              </div>
             </div>
 
             <div className="divider" />
