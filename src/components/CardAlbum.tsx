@@ -1408,18 +1408,6 @@ export function CardAlbum({ userId }: { userId: string }) {
   z-index: 2;
 }
 
-/* Capa de brillo superior */
-.modal-card-gloss {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 45%;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
-  border-radius: 24px 24px 0 0;
-  pointer-events: none;
-  z-index: 2;
-}
 
 /* Textura de patrón */
 .modal-card-texture {
