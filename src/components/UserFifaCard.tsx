@@ -351,11 +351,11 @@ function getCurrentRarityMinLevel(rarity: string): number {
 
       <style>{`
           .fifa-card {
-      background: linear-gradient(145deg, 
-    #0a0a1a 0%, 
-    #1a1a3e 30%,
-    #2a1040 60%,
-    #0d0d1a 100%
+       background: linear-gradient(145deg,
+    #1a3a1a 0%,
+    #0d2a0d 30%,
+    #2a1a0a 70%,
+    #1a0f05 100%
   );
   border-radius: 20px;
   padding: 0;
@@ -393,7 +393,9 @@ function getCurrentRarityMinLevel(rarity: string): number {
   inset: 0;
   border-radius: 20px;
   padding: 2px;
-  background: var(--card-border, linear-gradient(135deg, #CD7F32, #A0522D));
+  background: 
+  var(--card-border, linear-gradient(135deg, #CD7F32, #A0522D));
+  
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -406,12 +408,18 @@ function getCurrentRarityMinLevel(rarity: string): number {
 .fifa-card::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(circle at 25% 40%, rgba(255,215,0,0.03) 2px, transparent 2px);
-  background-size: 30px 30px;
+  bottom: 15%;
+  left: -10%;
+  width: 120%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255,255,255,0.08) 20%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0.08) 80%,
+    transparent
+  );
+  transform: rotate(-3deg);
   pointer-events: none;
 }
         
