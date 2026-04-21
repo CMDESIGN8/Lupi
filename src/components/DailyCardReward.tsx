@@ -190,6 +190,7 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
         ) : (
           <div className="claimed-info">
             <p>✅ Ya abriste tu sobre</p>
+            <p className='proximo'>Próximo Sobre</p>
             <p className="countdown">⏰ {timeLeft}</p>
           </div>
         )}
@@ -205,13 +206,17 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
 .daily-card-reward {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  align-items: center;
+
+  width: 100%;
+  flex: 1;              /* 👈 clave */
+  min-height: 300px;    /* fallback */
 }
 
 /* SOBRE */
 .pack {
-  width: 220px;
-          height: 290px;
+          width: 320px;
+          height: 390px;
           border-radius: 16px;
           position: relative;
           overflow: hidden;
@@ -226,7 +231,7 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
           inset: 0;
           background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
           pointer-events: none;
-          z-index: 0;
+          
         }
 
         
@@ -237,12 +242,12 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.55); /* oscurece la imagen */
-  z-index: 1;
+  
 }
   .pack-content {
   position: relative;
   top: 10px;
-  z-index: 2;
+  
 }
   .pack::after {
   content: "";
@@ -253,7 +258,7 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
   background-size: cover;
 background-position: center;
 background-repeat: no-repeat;
-  z-index: 1;
+  
 }
 /* EFECTO HOVER */
 .pack.available:hover {
@@ -275,7 +280,7 @@ background-repeat: no-repeat;
           );
           animation: packShine 4s infinite;
           pointer-events: none;
-          z-index: 1;
+          
         }
 
         @keyframes packShine {
@@ -290,7 +295,7 @@ background-repeat: no-repeat;
           border-radius: 16px;
           border: 2px solid transparent;
           pointer-events: none;
-          z-index: 3;
+          
         }
 
 /* CONTENIDO */
@@ -318,7 +323,7 @@ background-repeat: no-repeat;
 
         /* TITULO */
         .pack-content h3 {
-          font-size: 16px;
+          font-size: 28px;
           letter-spacing: 2px;
           margin-bottom: 8px;
           background: linear-gradient(135deg, #ffd700, #ffaa00);
@@ -329,17 +334,45 @@ background-repeat: no-repeat;
           text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
 
-        /* TEXTO */
-        .pack-content p {
-          font-size: 18px;
-          color: rgb(255, 255, 255);
-          margin-bottom: 10px;
-          margin-top: 20px;
-          font-weight: 500;
-        }
+        /* TEXTO PRINCIPAL - ESTILO FIFA ULTIMATE TEAM */
+.pack-content p {
+  font-size: 22px;
+  color: #ffffff;
+  margin-top: 20px;
+  font-weight: 700;
+  font-family: 'Teko', 'Poppins', sans-serif;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  background: linear-gradient(135deg, #fff, #e0e0e0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  display: inline-block;
+}
+
+/* Versión con número (ej: x3, x5) */
+.pack-content p strong,
+.pack-content .pack-quantity {
+  font-size: 32px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffd700, #ff8c00);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  display: inline-block;
+  animation: quantityPop 0.4s ease-out;
+}
+
+@keyframes quantityPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  80% { transform: scale(1.2); }
+  100% { transform: scale(1); opacity: 1; }
+}
 
         /* BOTON */
         .open-pack-btn {
+          margin-top:90px;
           background: linear-gradient(135deg, #ffd700, #ff9800);
           border: none;
           border-radius: 30px;
@@ -375,14 +408,90 @@ background-repeat: no-repeat;
 
         /* COUNTDOWN */
         .claimed-info {
-          margin-top: 10px;
+          margin-top: 1px;
+          color: #ffd700;
         }
 
-        .claimed-info p {
-          font-size: 11px;
-          margin: 4px 0;
-        }
+        .claimed-info {
+  text-align: center;
+  padding: 12px;
+}
 
+.claimed-info p {
+  font-size: 20px;
+  margin: 8px 0;
+  color: #ffd700;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  animation: slideIn 0.3s ease-out;
+}
+
+.claimed-info p:first-child {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 3px;
+}
+
+.claimed-info p:last-child {
+  font-size: 28px;
+  color: #3dffa0;
+  text-shadow: 0 0 15px rgba(61, 255, 160, 0.5);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .claimed-info p {
+    font-size: 16px;
+  }
+  
+  .claimed-info p:last-child {
+    font-size: 22px;
+  }
+}
+        .proximo {
+  /* Colores y texto */
+  color: #ffd700;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  
+  /* Fondo y bordes */
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 16px;
+  border-radius: 30px;
+  display: inline-block;
+  
+  /* Efectos */
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  
+  /* Animación sutil */
+  animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+  }
+}
         .countdown {
           font-family: monospace;
           font-size: 13px;

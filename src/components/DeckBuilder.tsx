@@ -957,7 +957,7 @@ const applyMove = (card: UserCard, position: number) => {
         /* ===== ÁREA SEMICÍRCULO (centrada real) ===== */
 .semicircle-area {
   position: absolute;
-  bottom: 820px; /* 👈 px real (no %) */
+  bottom: 810px; /* 👈 px real (no %) */
   left: 50%;
   transform: translateX(-50%);
 

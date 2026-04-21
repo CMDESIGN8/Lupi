@@ -917,10 +917,13 @@ export function CardAlbum({ userId }: { userId: string }) {
         
         /* Carta obtenida */
         .album-card.owned {
-          background: linear-gradient(135deg, #1e3a3a, #0f2a2a);
-          border: 2px solid;
-          animation: cardAppear 0.4s ease;
-        }
+  background: linear-gradient(rgba(10, 10, 20, 0.81), rgba(10, 10, 20, 0.81)), url('/images/logo.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  border: 2px solid;
+  animation: cardAppear 0.4s ease;
+}
         
         @keyframes cardAppear {
           from { opacity: 0; transform: scale(0.8); }
@@ -1348,19 +1351,27 @@ export function CardAlbum({ userId }: { userId: string }) {
           z-index: 2001;
         }
         
-        .modal-card {
-  background: radial-gradient(circle at top, #fff7d6 0%, #f3d98b 40%, #d4af37 100%);
-  border-radius: 22px;
-  padding: 22px;
+        /* ============================================
+   TARJETA PRINCIPAL - ESTRUCTURA FIJA
+   ============================================ */
+.modal-card {
+  background: linear-gradient(135deg, rgba(2, 53, 2, 0.88), rgba(1, 35, 3, 0.92)), url('/images/logo.png');
+  background-size: 180px;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 24px;
+  padding: 20px 24px 24px;
   text-align: center;
-  border: 3px solid rgba(255, 215, 0, 0.8);
+  border: 3px solid rgba(255, 215, 0, 0.85);
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  animation: modalPop 0.25s ease-out;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+  animation: modalPop 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  max-width: 380px;
+  margin: 0 auto;
 }
 
-/* brillo diagonal tipo foil */
+/* Brillo diagonal tipo foil */
 .modal-card::before {
   content: "";
   position: absolute;
@@ -1369,136 +1380,288 @@ export function CardAlbum({ userId }: { userId: string }) {
   width: 200%;
   height: 200%;
   background: linear-gradient(
-    120deg,
-    transparent 40%,
-    rgba(255,255,255,0.35) 50%,
-    transparent 60%
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.3) 48%,
+    rgba(255, 255, 255, 0.15) 52%,
+    transparent 65%
   );
-  transform: rotate(25deg);
-  animation: shine 2.5s infinite linear;
+  transform: rotate(28deg);
+  animation: shine 3.5s infinite linear;
   pointer-events: none;
+  z-index: 1;
 }
 
 @keyframes shine {
-  0% { transform: translateX(-30%) rotate(25deg); }
-  100% { transform: translateX(30%) rotate(25deg); }
+  0% { transform: translateX(-35%) rotate(28deg); }
+  100% { transform: translateX(35%) rotate(28deg); }
 }
 
-/* borde interno estilo tarjeta FUT */
+/* Borde interno estilo tarjeta FUT */
 .modal-card::after {
   content: "";
   position: absolute;
-  inset: 8px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.35);
+  inset: 10px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
   pointer-events: none;
+  z-index: 2;
 }
 
-        
-        @keyframes modalPop {
-          from { transform: scale(0.8); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-        
-        .modal-card-gloss {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 50%;
-          background: linear-gradient(135deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%);
-          pointer-events: none;
-        }
-        
-        .modal-card-texture {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 8px);
-          pointer-events: none;
-        }
-        
-        
-        .modal-category {
-          font-size: 12px;
-          color: #666;
-          margin-bottom: 20px;
-        }
-        
-        .modal-real-badge {
-          font-size: 11px;
-          color: #E91E63;
-          margin-bottom: 12px;
-          font-weight: bold;
-        }
-        
-        .modal-rarity {
+/* Capa de brillo superior */
+.modal-card-gloss {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 24px 24px 0 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Textura de patrón */
+.modal-card-texture {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0, 0, 0, 0.04) 2px, rgba(0, 0, 0, 0.04) 10px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Animación de entrada */
+@keyframes modalPop {
+  from {
+    transform: scale(0.75) translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   ELEMENTOS INTERNOS - DISPOSICIÓN CONSISTENTE
+   ============================================ */
+
+/* Categoría (arriba del todo) */
+.modal-category {
+  font-size: 14px;
+  color: #ffec3e;
+  margin-bottom: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 6px rgba(255, 236, 62, 0.5);
+  border-bottom: 1px solid rgba(255, 236, 62, 0.4);
+  padding-bottom: 6px;
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
+  position: relative;
+  z-index: 5;
+}
+
+/* Badge real / autenticidad */
+.modal-real-badge {
+  font-size: 10px;
+  color: #ff6b9d;
+  margin-bottom: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(0, 0, 0, 0.4);
+  display: inline-block;
+  padding: 2px 12px;
+  border-radius: 30px;
+  backdrop-filter: blur(2px);
+  position: relative;
+  z-index: 5;
+}
+
+/* Rareza */
+.modal-rarity {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 40px;
   font-weight: 800;
   font-size: 11px;
-  letter-spacing: 1px;
-  color: #111;
-  background: linear-gradient(90deg, #fff, #ffd700);
+  letter-spacing: 1.5px;
+  color: #fff;
+  background: linear-gradient(135deg, #fef9e0, #ffea9e);
   text-transform: uppercase;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(255, 215, 0, 0.7);
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 5;
+  transition: all 0.2s ease;
 }
 
-/* Nombre estilo FUT */
+.modal-rarity:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #ffffff, #ffec8a);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Nombre */
 .modal-name {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', 'Poppins', 'Impact', sans-serif;
   font-size: 26px;
-  font-weight: 900;
-  margin: 6px 0 2px;
-  color: #1a1a1a;
+  font-weight: 700;
+  margin: 6px 0 4px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+  letter-spacing: 1.5px;
+  background: linear-gradient(135deg, #f5f5f5 20%, #f3f0e5 50%, #e0e0e0 80%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  display: block;
+  position: relative;
+  z-index: 5;
+  padding: 0 4px;
 }
 
-/* Stats estilo card FIFA */
+/* Stats grid */
 .modal-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
-  margin-top: 14px;
+  gap: 8px;
+  margin: 16px 0 0;
+  position: relative;
+  z-index: 5;
 }
 
+/* Fila de cada stat */
 .stat-row {
   display: flex;
   justify-content: space-between;
-  background: rgba(0,0,0,0.12);
-  padding: 8px 10px;
-  border-radius: 6px;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.15));
+  padding: 8px 12px;
+  border-radius: 14px;
   font-size: 12px;
-  font-weight: 700;
-  color: #111;
+  font-weight: 800;
+  color: #f5f5f5;
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 215, 0, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-/* Footer estilo card */
-.modal-footer {
-  display: flex;
-  justify-content: space-between;
-  font-size: 10px;
-  color: rgba(0,0,0,0.7);
-  margin-top: 12px;
-  border-top: 1px solid rgba(0,0,0,0.15);
-  padding-top: 10px;
+.stat-row:hover {
+  transform: translateX(3px);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(0, 0, 0, 0.2));
+  border-color: rgba(255, 215, 0, 0.9);
+}
+
+.stat-label {
   text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 900;
+  color: #ffdf6e;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+  font-size: 11px;
+}
+
+.stat-value {
+  font-family: 'Montserrat', monospace;
+  font-weight: 900;
+  font-size: 13px;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 2px 8px;
+  border-radius: 30px;
   letter-spacing: 0.5px;
 }
 
-/* Número tipo serial FIFA */
+/* Footer de la carta */
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 18px;
+  border-top: 1.5px solid rgba(255, 215, 0, 0.5);
+  padding-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.1));
+  position: relative;
+  z-index: 5;
+}
+
+/* Número serial */
 .modal-number {
-  font-family: monospace;
-  font-weight: bold;
-  color: #000;
-} 
+  font-family: 'Courier New', 'SF Mono', monospace;
+  font-weight: 900;
+  font-size: 11px;
+  color: #ffd966;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 2px 10px;
+  border-radius: 30px;
+  letter-spacing: 1px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   VARIANTES ESPECIALES (opcionales)
+   ============================================ */
+.stat-row.special {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.35), rgba(0, 0, 0, 0.25));
+  border: 1px solid #ffd966;
+}
+
+.stat-row.special .stat-value {
+  background: #ffd700;
+  color: #1a1a1a;
+  text-shadow: none;
+}
+
+/* ============================================
+   RESPONSIVE (misma estructura)
+   ============================================ */
+@media (max-width: 480px) {
+  .modal-card {
+    padding: 16px 18px 20px;
+    max-width: 320px;
+  }
+
+  .modal-name {
+    font-size: 22px;
+    letter-spacing: 1px;
+  }
+
+  .modal-stats {
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .stat-row {
+    padding: 6px 10px;
+    font-size: 10px;
+  }
+
+  .stat-value {
+    font-size: 11px;
+    padding: 2px 6px;
+  }
+
+  .modal-footer {
+    font-size: 9px;
+    margin-top: 14px;
+  }
+}
         
         /* Loading */
         .loading-state {

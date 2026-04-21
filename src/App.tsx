@@ -81,7 +81,7 @@ import { cardApi } from './lib/api';
 
       /* Contenedor principal */
 .container {
-  max-width: 480px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 16px;
   position: relative;
@@ -160,7 +160,7 @@ import { cardApi } from './lib/api';
 /* El container dentro de main-content debe estar centrado */
 .main-content > .container {
   width: 100%;
-  max-width: 480px;
+  
   margin: 0 auto;
   padding: 0 16px;
   display: flex;
@@ -361,6 +361,15 @@ import { cardApi } from './lib/api';
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.sobre {
+  top: 0;
+  left: 0;
+  margin-bottom: 20px;
+  width: 100%;
+  height: 100%;
+  margin-buttom: 10px;
 }
 
 .leader-club {
@@ -2486,11 +2495,12 @@ import { cardApi } from './lib/api';
 
   </div>
 </div>
-<DailyCardReward 
+<div className="sobre">
+  <DailyCardReward 
     userId={user.id} 
     onCardReceived={onCardReceived}  // 👈 Usar la prop
   />
-<br></br>
+</div>
         {/* Misiones semanales */}
         <WeeklyMissions
   user={user}
