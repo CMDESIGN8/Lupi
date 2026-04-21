@@ -152,7 +152,10 @@ function getCurrentRarityMinLevel(rarity: string): number {
           <div className="fifa-rarity" style={{ background: rarity.color }}>
             {rarity.icon} {rarity.name}
           </div>
-          <div className="fifa-level">Nivel {stats.level}</div>
+          <div className="fifa-overall">
+            <span className="fifa-overall-label">OVR</span>
+            <span className="fifa-overall-value">{Math.floor((stats.pace + stats.dribbling + stats.passing + stats.defending + stats.finishing + stats.physical) / 6)}</span>
+          </div>
         </div>
 
         {/* Info del jugador */}
@@ -179,10 +182,6 @@ function getCurrentRarityMinLevel(rarity: string): number {
   {clubRank === 2 && <span className="rank-badge">🥈 #2</span>}
   {clubRank === 3 && <span className="rank-badge">🥉 #3</span>}
 </div>
-          </div>
-          <div className="fifa-overall">
-            <span className="fifa-overall-label">OVR</span>
-            <span className="fifa-overall-value">{Math.floor((stats.pace + stats.dribbling + stats.passing + stats.defending + stats.finishing + stats.physical) / 6)}</span>
           </div>
         </div>
 
@@ -252,6 +251,7 @@ function getCurrentRarityMinLevel(rarity: string): number {
 
         {/* Barra de experiencia */}
         <div className="fifa-exp-section">
+          
           <div className="fifa-exp-header">
             <span className="fifa-exp-icon">⭐</span>
             <span className="fifa-exp-label">Experiencia</span>
@@ -393,9 +393,7 @@ function getCurrentRarityMinLevel(rarity: string): number {
   inset: 0;
   border-radius: 20px;
   padding: 2px;
-  background: 
-  var(--card-border, linear-gradient(135deg, #CD7F32, #A0522D));
-  
+  background: var(--card-border, linear-gradient(135deg, #CD7F32, #A0522D));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -403,12 +401,11 @@ function getCurrentRarityMinLevel(rarity: string): number {
   pointer-events: none;
 }
 
-
 /* Patrón de puntos de suerte sutil */
 .fifa-card::after {
   content: '';
   position: absolute;
-  bottom: 15%;
+  top: 8%;
   left: -10%;
   width: 120%;
   height: 2px;
@@ -791,18 +788,12 @@ function getCurrentRarityMinLevel(rarity: string): number {
 
 .fifa-level {
   font-family: 'Teko', 'Poppins', sans-serif;
-  font-size: 14px;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 600;
   color: #ffd700;
-  background: linear-gradient(145deg, rgba(0,0,0,0.6), rgba(0,0,0,0.8));
   padding: 5px 14px;
-  border-radius: 40px;
-  border: 1px solid rgba(255,215,0,0.4);
   letter-spacing: 1px;
   backdrop-filter: blur(4px);
-  box-shadow: 
-    0 2px 8px rgba(0,0,0,0.3),
-    inset 0 1px 0 rgba(255,255,255,0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-flex;
   align-items: center;
@@ -813,12 +804,7 @@ function getCurrentRarityMinLevel(rarity: string): number {
 
 /* Efecto shine al hover */
 .fifa-level:hover {
-  transform: translateY(-2px);
   border-color: rgba(255,215,0,0.7);
-  box-shadow: 
-    0 4px 12px rgba(0,0,0,0.4),
-    inset 0 1px 0 rgba(255,255,255,0.15),
-    0 0 10px rgba(255,215,0,0.3);
 }
 
 .fifa-level:hover::before {
@@ -1748,7 +1734,7 @@ function getCurrentRarityMinLevel(rarity: string): number {
 }
 
 .next-rarity-label {
-  font-size: 9px;
+  font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
   color: rgba(255,217,102,0.6);
@@ -1806,7 +1792,7 @@ function getCurrentRarityMinLevel(rarity: string): number {
 }
 
 .progress-text {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   color: rgba(255,217,102,0.8);
   display: flex;
