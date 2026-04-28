@@ -25,7 +25,8 @@ const ALBUM_PAGES: AlbumPage[] = [
   { id: '7ma', title: '7ª DIVISIÓN', shortTitle: '7ª', icon: '🎯', category: '7ma', totalCards: 20, color: '#9C27B0', gradient: 'linear-gradient(135deg, #9C27B020, #4A148C20)', description: 'Precisión y técnica' },
   { id: '8va', title: '8ª DIVISIÓN', shortTitle: '8ª', icon: '🌱', category: '8va', totalCards: 15, color: '#FF9800', gradient: 'linear-gradient(135deg, #FF980020, #E6510020)', description: 'La cantera del club' },
   { id: 'femenino', title: 'FEMENINO', shortTitle: 'FEM', icon: '👩', category: 'femenino', totalCards: 40, color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E6320, #880E4F20)', description: 'Las guerreras' },
-  { id: 'promos', title: 'PROMOCIONALES', shortTitle: 'PROMO', icon: '✨', category: 'Promocionales', totalCards: 25, color: '#00BCD4', gradient: 'linear-gradient(135deg, #00BCD420, #00606420)', description: 'Ediciones especiales' },
+  { id: 'promos', title: 'PROMOCIONALES', shortTitle: 'PROMO', icon: '👦🏼', category: 'Promocionales', totalCards: 25, color: '#00BCD4', gradient: 'linear-gradient(135deg, #00BCD420, #00606420)', description: 'Ediciones especiales' },
+  { id: 'socios', title: 'SOCIOS', shortTitle: 'SOC', icon: '👥', category: 'socios', totalCards: 0, color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E6320, #880E4F20)', description: 'Jugadores reales que se suman al club' },
 ];
 
 const POSITION_ORDER = ['arquero', 'cierre', 'ala', 'pivot'];
@@ -170,33 +171,31 @@ export function CardAlbum({ userId }: { userId: string }) {
       });
       
       socios?.forEach(socio => {
-        if (socio.id === userId) return;
-        
-        const owned = ownedCardsMap.get(socio.id);
-        const overall = Math.floor(
-          (socio.user_card_pace + socio.user_card_dribbling + 
-           socio.user_card_passing + socio.user_card_defending + 
-           socio.user_card_finishing + socio.user_card_physical) / 6
-        );
-        
-        unifiedPlayers.push({
-          id: socio.id,
-          name: socio.username,
-          position: socio.position || 'ala',
-          category: socio.category || '1era',
-          overall_rating: overall,
-          pace: socio.user_card_pace || 40,
-          dribbling: socio.user_card_dribbling || 40,
-          passing: socio.user_card_passing || 40,
-          defending: socio.user_card_defending || 40,
-          finishing: socio.user_card_finishing || 40,
-          physical: socio.user_card_physical || 40,
-          source_type: 'socio',
-          is_owned: !!owned,
-          user_card_level: owned?.level,
-          user_card_id: owned?.card_id,
-        });
-      });
+  const owned = ownedCardsMap.get(socio.id);
+  const overall = Math.floor(
+    (socio.user_card_pace + socio.user_card_dribbling + 
+     socio.user_card_passing + socio.user_card_defending + 
+     socio.user_card_finishing + socio.user_card_physical) / 6
+  );
+  
+  unifiedPlayers.push({
+    id: socio.id,
+    name: socio.username,
+    position: socio.position || 'ala',
+    category: socio.category || 'socios',  // 👈 Usar su categoría real
+    overall_rating: overall,
+    pace: socio.user_card_pace || 10,
+    dribbling: socio.user_card_dribbling || 10,
+    passing: socio.user_card_passing || 10,
+    defending: socio.user_card_defending || 10,
+    finishing: socio.user_card_finishing || 10,
+    physical: socio.user_card_physical || 10,
+    source_type: 'socio',
+    is_owned: !!owned,
+    user_card_level: owned?.level,
+    user_card_id: owned?.card_id,
+  });
+});
       
       // Detectar nuevas cartas
       const newOwnedCount = unifiedPlayers.filter(p => p.is_owned).length;
@@ -1006,7 +1005,7 @@ export function CardAlbum({ userId }: { userId: string }) {
           padding: 2px 8px;
           border-radius: 12px;
           font-size: 12px;
-          color: #0a0a0f;
+          color: #fff;
           z-index: 2;
         }
         
@@ -1058,88 +1057,153 @@ export function CardAlbum({ userId }: { userId: string }) {
           color: rgba(255,255,255,0.8);
         }
         
-        .real-badge {
-          position: absolute;
-          top: -1px;
-          right: 35px;
-          background: #E91E63;
-          color: white;
-          font-size: 8px;
-          font-weight: bold;
-          padding: 2px 6px;
-          border-radius: 10px;
-          z-index: 2;
-        }
+        /* Badge de jugador real */
+.real-badge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #e91e63, #c2185b);
+  color: white;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: 0 0 12px 12px;
+  z-index: 3;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
         
         /* Carta faltante */
-        .album-card.missing {
-          background: rgba(255,255,255,0.05);
-          border: 2px dashed rgba(255,255,255,0.2);
-          position: relative;
-        }
-        
-        .album-card.missing:hover {
-          background: rgba(255,255,255,0.08);
-          transform: scale(1.02);
-        }
-        
-        .missing-overlay {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          height: 100%;
-          opacity: 0.5;
-        }
-        
-        .missing-question {
-          font-size: 32px;
-          font-weight: bold;
-          color: rgba(255,255,255,0.5);
-        }
-        
-        .missing-name {
-          font-size: 10px;
-          color: rgba(255,255,255,0.4);
-          margin: 4px 0;
-        }
-        
-        .missing-position {
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 14px;
-        }
-        
-        .missing-text {
-          position: absolute;
-          bottom: 8px;
-          left: 0;
-          right: 0;
-          text-align: center;
-          font-size: 12px;
-          font-weight: bold;
-          color: rgba(255,100,100,0.8);
-          text-transform: uppercase;
-        }
-        
-        .missing-shine {
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-          animation: missingShimmer 3s infinite;
-        }
-        
-        @keyframes missingShimmer {
-          0% { left: -100%; }
-          100% { left: 200%; }
-        }
+        /* ============================================
+   CARTAS FALTANTES - VERSIÓN MEJORADA
+   ============================================ */
+
+/* Base carta faltante */
+.album-card.missing {
+  background: linear-gradient(135deg, rgba(20, 20, 30, 0.6), rgba(10, 10, 18, 0.7));
+  border: 2px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  backdrop-filter: blur(2px);
+}
+
+/* Hover en carta faltante */
+.album-card.missing:hover {
+  background: linear-gradient(135deg, rgba(30, 30, 45, 0.7), rgba(15, 15, 25, 0.8));
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Overlay principal (centrado) */
+.missing-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+/* Signo de interrogación animado */
+.missing-question {
+  font-size: 40px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.4);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  animation: subtlePulse 2s ease-in-out infinite;
+}
+
+@keyframes subtlePulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Nombre de carta faltante */
+.missing-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 20px;
+  max-width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Badge de posición */
+.missing-position {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+}
+
+/* Texto "FALTA" en la parte inferior */
+.missing-text {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: rgba(255, 100, 100, 0.7);
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4px 8px;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.album-card.missing:hover .missing-text {
+  color: rgba(255, 120, 120, 0.9);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+/* Efecto de brillo sutil (solo en hover para no saturar) */
+.album-card.missing:hover .missing-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  animation: missingShimmer 2.5s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@keyframes missingShimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* Versión simplificada sin brillo constante (mejor rendimiento) */
+.album-card.missing .missing-shine {
+  display: none;
+}
+
+.album-card.missing:hover .missing-shine {
+  display: block;
+}
         
         /* Miniaturas */
         .page-thumbnails {
@@ -1369,6 +1433,8 @@ export function CardAlbum({ userId }: { userId: string }) {
   animation: modalPop 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
   max-width: 380px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Brillo diagonal tipo foil */
@@ -1407,6 +1473,7 @@ export function CardAlbum({ userId }: { userId: string }) {
   pointer-events: none;
   z-index: 2;
 }
+
 
 
 /* Textura de patrón */
@@ -1491,6 +1558,10 @@ export function CardAlbum({ userId }: { userId: string }) {
   position: relative;
   z-index: 5;
   transition: all 0.2s ease;
+  width: auto;
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;  /* Para centrarlo horizontalmente */
 }
 
 .modal-rarity:hover {
