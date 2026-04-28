@@ -14,138 +14,403 @@ export function DevTools({ userId, onCardReceived }: DevToolsProps) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  // Solo mostrar en desarrollo o con click secreto
   const showMessage = (text: string, type: 'success' | 'error') => {
     setMessage({ text, type });
     setTimeout(() => setMessage(null), 3000);
   };
 
-  // Abrir sobre instantáneo (1 carta aleatoria)
+  // ==================== SOBRES ====================
+  
+  // Abrir sobre instantáneo (1 carta aleatoria) - CORREGIDO
   const openInstantPack = async () => {
-    setLoading(true);
+  setLoading(true);
+  try {
+    // Obtener NPCs
+    const { data: npcs, error: npcsError } = await supabase
+      .from('players')
+      .select('*')
+      .eq('can_be_replaced', true)
+      .eq('is_replaced', false);
+    
+    if (npcsError) throw npcsError;
+    
+    // Obtener Socios (perfiles activos)
+    const { data: socios, error: sociosError } = await supabase
+      .from('profiles')
+      .select('id, username, position, category');
+    
+    if (sociosError) throw sociosError;
+    
+    // Unificar ambos arrays
+    const allCards = [
+      ...(npcs || []).map(npc => ({ 
+        ...npc, 
+        source_type: 'npc',
+        npc_id: npc.id,
+        socio_id: null,
+        name: npc.name 
+      })),
+      ...(socios || []).map(socio => ({ 
+        id: socio.id,
+        npc_id: null,
+        socio_id: socio.id,
+        name: socio.username,
+        position: socio.position || 'ala',
+        category: socio.category || 'socios',
+        source_type: 'socio'
+      }))
+    ];
+    
+    if (allCards.length === 0) {
+      showMessage('❌ No hay jugadores ni socios disponibles', 'error');
+      return;
+    }
+
+    // Obtener cartas que ya tiene el usuario
+    const { data: ownedCards } = await supabase
+      .from('user_cards')
+      .select('player_id, socio_id, card_type')
+      .eq('user_id', userId);
+
+    const ownedIds = new Set();
+    ownedCards?.forEach(card => {
+      if (card.card_type === 'npc' && card.player_id) {
+        ownedIds.add(`npc:${card.player_id}`);
+      } else if (card.card_type === 'socio' && card.socio_id) {
+        ownedIds.add(`socio:${card.socio_id}`);
+      }
+    });
+    
+    // Filtrar jugadores que NO tiene
+    const availableCards = allCards.filter(c => 
+      !ownedIds.has(`${c.source_type}:${c.source_type === 'npc' ? c.npc_id : c.socio_id}`)
+    );
+    
+    let selectedCard;
+    let isNewCard = true;
+
+    if (availableCards.length === 0) {
+      selectedCard = allCards[Math.floor(Math.random() * allCards.length)];
+      isNewCard = false;
+      showMessage(`📦 Álbum completo! Carta repetida de ${selectedCard.name}`, 'success');
+    } else {
+      selectedCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+      showMessage(`🎉 ¡Nueva carta! ${selectedCard.name}`, 'success');
+    }
+    
+    // Insertar carta usando la columna correcta según el tipo
+    const insertData: any = {
+      user_id: userId,
+      card_type: selectedCard.source_type,
+      level: 1,
+      experience: 0
+    };
+    
+    if (selectedCard.source_type === 'npc') {
+      insertData.player_id = selectedCard.npc_id;
+      insertData.socio_id = null;
+    } else {
+      insertData.player_id = null;
+      insertData.socio_id = selectedCard.socio_id;
+    }
+    
+    const { data: userCard, error: insertError } = await supabase
+      .from('user_cards')
+      .insert(insertData)
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    // Subir nivel si es repetida
+    if (!isNewCard && userCard) {
+      let newExp = (userCard.experience || 0) + 50;
+      let newLevel = userCard.level;
+      let leveledUp = false;
+      
+      while (newExp >= newLevel * 100) {
+        newExp -= newLevel * 100;
+        newLevel++;
+        leveledUp = true;
+      }
+      
+      await supabase
+        .from('user_cards')
+        .update({ level: newLevel, experience: newExp })
+        .eq('id', userCard.id);
+      
+      if (leveledUp) {
+        showMessage(`⬆️ ¡${selectedCard.name} subió a nivel ${newLevel}!`, 'success');
+      }
+    }
+
+    if (onCardReceived) onCardReceived(userCard);
+    
+  } catch (error) {
+    console.error('Error opening pack:', error);
+    showMessage('❌ Error al abrir el sobre', 'error');
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // Abrir sobre múltiple (5 cartas) - CORREGIDO
+  // Abrir sobre múltiple (5 cartas)
+const openMultiPack = async () => {
+  setLoading(true);
+  let successCount = 0;
+  
+  for (let i = 0; i < 5; i++) {
     try {
-      // Obtener todos los jugadores
-      const { data: players, error: playersError } = await supabase
+      // Obtener NPCs y socios
+      const { data: npcs } = await supabase
         .from('players')
-        .select('*');
+        .select('id, name')
+        .eq('can_be_replaced', true)
+        .eq('is_replaced', false);
       
-      if (playersError) throw playersError;
-      if (!players || players.length === 0) {
-        showMessage('❌ No hay jugadores en la base de datos', 'error');
-        return;
-      }
-
-      // Obtener cartas que ya tiene el usuario
-      const { data: ownedCards } = await supabase
-        .from('user_cards')
-        .select('player_id')
-        .eq('user_id', userId);
-
-      const ownedIds = new Set(ownedCards?.map(c => c.player_id) || []);
+      const { data: socios } = await supabase
+        .from('profiles')
+        .select('id, username');
       
-      // Filtrar jugadores que NO tiene
-      const availablePlayers = players.filter(p => !ownedIds.has(p.id));
+      const allCards = [
+        ...(npcs || []).map(npc => ({ 
+          source_type: 'npc',
+          player_id: npc.id,
+          socio_id: null,
+          name: npc.name 
+        })),
+        ...(socios || []).map(socio => ({ 
+          source_type: 'socio',
+          player_id: null,
+          socio_id: socio.id,
+          name: socio.username 
+        }))
+      ];
       
-      let selectedPlayer: Player;
-      let isNewCard = true;
-
-      if (availablePlayers.length === 0) {
-        // Si ya tiene todas, dar una carta repetida (para subir nivel)
-        selectedPlayer = players[Math.floor(Math.random() * players.length)];
-        isNewCard = false;
-        showMessage(`📦 Álbum completo! Carta repetida de ${selectedPlayer.name}`, 'success');
+      if (allCards.length === 0) continue;
+      
+      const randomCard = allCards[Math.floor(Math.random() * allCards.length)];
+      
+      const insertData: any = {
+        user_id: userId,
+        card_type: randomCard.source_type,
+        level: 1,
+        experience: 0
+      };
+      
+      if (randomCard.source_type === 'npc') {
+        insertData.player_id = randomCard.player_id;
+        insertData.socio_id = null;
       } else {
-        // Dar una carta nueva
-        selectedPlayer = availablePlayers[Math.floor(Math.random() * availablePlayers.length)];
-        showMessage(`🎉 ¡Nueva carta! ${selectedPlayer.name}`, 'success');
+        insertData.player_id = null;
+        insertData.socio_id = randomCard.socio_id;
       }
       
-      // Insertar carta
-      const { data: userCard, error: insertError } = await supabase
-        .from('user_cards')
-        .insert({
+      await supabase.from('user_cards').insert(insertData);
+      
+      successCount++;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  
+  showMessage(`📦 ¡${successCount} cartas añadidas!`, 'success');
+  setLoading(false);
+  if (onCardReceived) onCardReceived({} as UserCard);
+};
+
+// Completar TODO el álbum
+const completeAlbum = async () => {
+  if (!confirm('⚠️ ¿Estás seguro? Esto te dará TODAS las cartas disponibles (NPCs + Socios).')) return;
+  
+  setLoading(true);
+  try {
+    // Obtener NPCs
+    const { data: npcs, error: npcsError } = await supabase
+      .from('players')
+      .select('id, name')
+      .eq('can_be_replaced', true)
+      .eq('is_replaced', false);
+    
+    if (npcsError) throw npcsError;
+    
+    // Obtener Socios
+    const { data: socios, error: sociosError } = await supabase
+      .from('profiles')
+      .select('id, username');
+    
+    if (sociosError) throw sociosError;
+    
+    // Obtener cartas existentes
+    const { data: existingCards } = await supabase
+      .from('user_cards')
+      .select('player_id, socio_id, card_type')
+      .eq('user_id', userId);
+    
+    const existingKeySet = new Set();
+    existingCards?.forEach(card => {
+      if (card.card_type === 'npc' && card.player_id) {
+        existingKeySet.add(`npc:${card.player_id}`);
+      } else if (card.card_type === 'socio' && card.socio_id) {
+        existingKeySet.add(`socio:${card.socio_id}`);
+      }
+    });
+    
+    // Preparar nuevas cartas
+    const newCards = [];
+    
+    for (const npc of (npcs || [])) {
+      const key = `npc:${npc.id}`;
+      if (!existingKeySet.has(key)) {
+        newCards.push({
           user_id: userId,
-          player_id: selectedPlayer.id,
+          player_id: npc.id,
+          socio_id: null,
+          card_type: 'npc',
           level: 1,
           experience: 0
-        })
-        .select('*, player:players(*)')
-        .single();
-
-      if (insertError) throw insertError;
-
-      // Si es carta repetida, dar EXP extra para subir nivel
-      if (!isNewCard && userCard) {
-        let newExp = (userCard.experience || 0) + 50;  // <-- usar let en lugar de const
-let newLevel = userCard.level;
-let leveledUp = false;
-        
-        while (newExp >= newLevel * 100) {
-          newExp -= newLevel * 100;
-          newLevel++;
-          leveledUp = true;
-        }
-        
-        await supabase
-          .from('user_cards')
-          .update({ level: newLevel, experience: newExp })
-          .eq('id', userCard.id);
-        
-        if (leveledUp) {
-          showMessage(`⬆️ ¡${selectedPlayer.name} subió a nivel ${newLevel}!`, 'success');
-        }
+        });
       }
+    }
+    
+    for (const socio of (socios || [])) {
+      const key = `socio:${socio.id}`;
+      if (!existingKeySet.has(key)) {
+        newCards.push({
+          user_id: userId,
+          player_id: null,
+          socio_id: socio.id,
+          card_type: 'socio',
+          level: 1,
+          experience: 0
+        });
+      }
+    }
+    
+    if (newCards.length === 0) {
+      showMessage('✨ ¡Ya tienes todas las cartas disponibles!', 'success');
+      setLoading(false);
+      return;
+    }
+    
+    // Insertar en batches
+    const BATCH_SIZE = 50;
+    let insertedCount = 0;
+    
+    for (let i = 0; i < newCards.length; i += BATCH_SIZE) {
+      const batch = newCards.slice(i, i + BATCH_SIZE);
+      const { error: insertError } = await supabase
+        .from('user_cards')
+        .insert(batch);
+      
+      if (insertError) throw insertError;
+      insertedCount += batch.length;
+      showMessage(`📦 Generando... ${insertedCount}/${newCards.length}`, 'success');
+      await new Promise(resolve => setTimeout(resolve, 200));
+    }
+    
+    showMessage(`✅ ¡Álbum completado! Se añadieron ${insertedCount} cartas nuevas`, 'success');
+    if (onCardReceived) onCardReceived({} as UserCard);
+    setTimeout(() => window.location.reload(), 1500);
+    
+  } catch (error) {
+    console.error('Error completing album:', error);
+    showMessage('❌ Error al completar el álbum', 'error');
+  } finally {
+    setLoading(false);
+  }
+};
 
-      if (onCardReceived) onCardReceived(userCard);
+// Solo cartas de socios
+const completeSociosCards = async () => {
+  if (!confirm('⚠️ Esto te dará TODAS las cartas de SOCIOS disponibles. ¿Continuar?')) return;
+  
+  setLoading(true);
+  try {
+    // Obtener socios
+    const { data: socios, error: sociosError } = await supabase
+      .from('profiles')
+      .select('id, username');
+    
+    if (sociosError) throw sociosError;
+    
+    // Obtener cartas de socios que ya tiene
+    const { data: existingSocioCards } = await supabase
+      .from('user_cards')
+      .select('socio_id')
+      .eq('user_id', userId)
+      .eq('card_type', 'socio');
+    
+    const existingIds = new Set(existingSocioCards?.map(c => c.socio_id) || []);
+    const newSocios = (socios || []).filter(s => !existingIds.has(s.id));
+    
+    if (newSocios.length === 0) {
+      showMessage('✨ ¡Ya tienes todos los socios!', 'success');
+      setLoading(false);
+      return;
+    }
+    
+    // Insertar en batches
+    const newCards = newSocios.map(socio => ({
+      user_id: userId,
+      player_id: null,
+      socio_id: socio.id,
+      card_type: 'socio',
+      level: 1,
+      experience: 0
+    }));
+    
+    for (let i = 0; i < newCards.length; i += 50) {
+      const batch = newCards.slice(i, i + 50);
+      const { error } = await supabase.from('user_cards').insert(batch);
+      if (error) throw error;
+    }
+    
+    showMessage(`✅ Se añadieron ${newSocios.length} cartas de socios`, 'success');
+    if (onCardReceived) onCardReceived({} as UserCard);
+    
+  } catch (error) {
+    console.error(error);
+    showMessage('❌ Error al generar cartas de socios', 'error');
+  } finally {
+    setLoading(false);
+  }
+};
+
+  // ==================== ÁLBUM COMPLETO ====================
+  
+
+  // Resetear y regenerar - NUEVO
+  const resetAndRegenerate = async () => {
+    if (!confirm('⚠️⚠️⚠️ ¡PELIGRO! Esto ELIMINARÁ todas tus cartas y luego te dará TODAS disponibles. ¿Estás 100% seguro?')) return;
+    
+    setLoading(true);
+    try {
+      const { error: deleteError } = await supabase
+        .from('user_cards')
+        .delete()
+        .eq('user_id', userId);
+      
+      if (deleteError) throw deleteError;
+      await completeAlbum();
+      showMessage('🔄 Álbum regenerado completamente', 'success');
       
     } catch (error) {
-      console.error('Error opening pack:', error);
-      showMessage('❌ Error al abrir el sobre', 'error');
+      console.error(error);
+      showMessage('❌ Error en regeneración', 'error');
     } finally {
       setLoading(false);
     }
   };
 
-  // Abrir sobre múltiple (5 cartas)
-  const openMultiPack = async () => {
-    setLoading(true);
-    let successCount = 0;
-    
-    for (let i = 0; i < 5; i++) {
-      try {
-        const { data: players } = await supabase.from('players').select('*');
-        if (!players || players.length === 0) continue;
-        
-        const randomPlayer = players[Math.floor(Math.random() * players.length)];
-        const stats = generateCardStats(randomPlayer.category); // o generateCardStats(randomPlayer.position)
-
-        
-        await supabase
-          .from('user_cards')
-          .insert({
-            user_id: userId,
-            player_id: randomPlayer.id,
-            level: 1,
-            experience: 0
-          });
-        
-        successCount++;
-        await new Promise(resolve => setTimeout(resolve, 100)); // Pequeña pausa
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    
-    showMessage(`📦 ¡${successCount} cartas añadidas!`, 'success');
-    setLoading(false);
-    if (onCardReceived) onCardReceived({} as UserCard);
-  };
-
-  // Dar EXP masiva para subir nivel rápido
+  // ==================== MEJORAS ====================
+  
+  // Dar EXP masiva
   const giveMassiveExp = async () => {
     setLoading(true);
     try {
-      // Obtener todas las cartas del usuario
       const { data: userCards } = await supabase
         .from('user_cards')
         .select('*')
@@ -188,13 +453,14 @@ let leveledUp = false;
     }
   };
 
-  // Resetear progreso (peligroso, solo para pruebas)
+  // ==================== PELIGROSO ====================
+  
+  // Resetear progreso
   const resetProgress = async () => {
-    if (!confirm('⚠️ ¿ESTÁS SEGURO? Esto eliminará TODAS tus cartas y progreso. Esta acción NO se puede deshacer.')) return;
+    if (!confirm('⚠️ ¿ESTÁS SEGURO? Esto eliminará TODAS tus cartas y progreso.')) return;
     
     setLoading(true);
     try {
-      // Eliminar cartas del mazo
       const { data: decks } = await supabase
         .from('decks')
         .select('id')
@@ -207,10 +473,8 @@ let leveledUp = false;
         await supabase.from('decks').delete().eq('user_id', userId);
       }
       
-      // Eliminar cartas del usuario
       await supabase.from('user_cards').delete().eq('user_id', userId);
       
-      // Resetear estadísticas del perfil
       await supabase
         .from('profiles')
         .update({
@@ -233,7 +497,8 @@ let leveledUp = false;
     }
   };
 
-  // Botón flotante para abrir panel
+  // ==================== UI ====================
+  
   if (!isOpen) {
     return (
       <>
@@ -292,6 +557,19 @@ let leveledUp = false;
             📦 Abrir Sobre Múltiple (5 cartas)
           </button>
         </div>
+
+        <div className="dev-section">
+          <h4>🏆 Álbum Completo</h4>
+          <button onClick={completeAlbum} disabled={loading} className="dev-btn complete">
+            📖 Completar Todo el Álbum
+          </button>
+          <button onClick={completeSociosCards} disabled={loading} className="dev-btn socios">
+            👥 Solo Cartas de Socios
+          </button>
+          <button onClick={resetAndRegenerate} disabled={loading} className="dev-btn danger">
+            🔄 Resetear y Regenerar
+          </button>
+        </div>
         
         <div className="dev-section">
           <h4>✨ Mejoras</h4>
@@ -303,7 +581,7 @@ let leveledUp = false;
         <div className="dev-section">
           <h4>⚠️ Peligroso</h4>
           <button onClick={resetProgress} disabled={loading} className="dev-btn danger">
-            🗑️ Resetear Progreso (Todas las cartas)
+            🗑️ Resetear Progreso
           </button>
         </div>
         
@@ -392,6 +670,17 @@ let leveledUp = false;
         
         .dev-btn.danger {
           background: linear-gradient(135deg, #ef4444, #dc2626);
+          color: white;
+        }
+        
+        .dev-btn.complete {
+          background: linear-gradient(135deg, #fbbf24, #d97706);
+          color: #0a0a0f;
+          font-weight: bold;
+        }
+        
+        .dev-btn.socios {
+          background: linear-gradient(135deg, #ec4899, #be185d);
           color: white;
         }
         

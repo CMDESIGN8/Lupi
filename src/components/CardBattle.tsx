@@ -95,7 +95,7 @@ const BOT_PLAYERS: BotPlayer[] = [
     xpBase: 25,
     ptsBase: 15,
     coinsBase: 12,
-    reqWins: 3,
+    reqWins: 0,
   },
   {
     name: 'Bot Leyenda',
@@ -108,7 +108,20 @@ const BOT_PLAYERS: BotPlayer[] = [
     xpBase: 50,
     ptsBase: 30,
     coinsBase: 25,
-    reqWins: 10,
+    reqWins: 0,
+  },
+  {
+    name: 'Bot Veterano',
+    overall_rating: 72,
+    category: 'veteranos',
+    position: 'pivot',
+    level: 3,
+    avatar: '👴',
+    color: '#FF6B35',
+    xpBase: 40,
+    ptsBase: 25,
+    coinsBase: 20,
+    reqWins: 0, // Se desbloquea después de 20 victorias
   },
 ];  
 
@@ -125,10 +138,10 @@ const FORMATION_ROMBO = [
 
 
 const POSITION_ICONS: Record<string, string> = {
-  arquero: '🧤',
-  cierre: '🛡️',
-  ala: '⚡',
-  pivot: '🎯',
+  arquero: '/images/crowd.png',  // Ajusta la extensión (.png, .svg, etc.)
+  cierre: '/images/player.png',
+  ala: '/images/player.png',
+  pivot: '/images/player.png',
 };
 
 const GOAL_MESSAGES = [
@@ -158,9 +171,36 @@ function delay(ms: number): Promise<void> {
 }
 
 function getCardData(card: UserCard) {
+  // Si ya tiene card (datos unificados)
   if (card.card) return card.card;
-  const player = (card as any).player;
-  if (player) return player;
+  
+  // Si tiene player (legacy)
+  if ((card as any).player) return (card as any).player;
+  
+  // Si es socio, construir desde socio_id
+  if (card.card_type === 'socio' && card.socio_id) {
+    // Esto debería venir cargado desde el padre
+    // Por ahora, retornamos valores por defecto
+    return {
+      id: card.socio_id,
+      name: `Socio ${card.socio_id.slice(0, 6)}`,
+      position: card.position ? 
+        (card.position === 1 ? 'arquero' : 
+         card.position === 2 ? 'cierre' : 
+         card.position === 3 ? 'ala' : 'pivot') : 'ala',
+      category: 'socios',
+      overall_rating: 50,
+      pace: 50,
+      dribbling: 50,
+      passing: 50,
+      defending: 50,
+      finishing: 50,
+      physical: 50,
+      card_type: 'socio',
+    };
+  }
+  
+  // Default fallback
   return {
     name: 'Desconocido',
     position: 'ala',
@@ -172,8 +212,10 @@ function getCardData(card: UserCard) {
     finishing: 50,
     physical: 50,
     category: '1era',
+    card_type: 'npc',
   };
 }
+
 
 function getPlayerPosition(card: UserCard): string {
   return getCardData(card).position;
@@ -382,6 +424,17 @@ export function CardBattle({
       alert('Necesitás 5 cartas en tu mazo para jugar');
       return;
     }
+
+     // Validar que todas las cartas tengan posición asignada
+  const invalidCards = userDeck.cards.filter(card => {
+    const cardData = getCardData(card);
+    return !cardData.position || !POSITION_ICONS[cardData.position];
+  });
+  
+  if (invalidCards.length > 0) {
+    alert(`Las siguientes cartas no tienen posición válida: ${invalidCards.map(c => getCardData(c).name).join(', ')}`);
+    return;
+  }
 
     const bot = selectedBot;
     setBattleLog([]);
@@ -634,12 +687,12 @@ const getFormationFromDeck = () => {
   
   // Definir las coordenadas según el número de posición táctico
   const tacticalPositions: Record<number, { x: number; y: number; label: string; icon: string }> = {
-    1: { x: 12, y: 52, label: 'ARQUERO', icon: '🧤' },      // Arquero
-    2: { x: 22, y: 52, label: 'CIERRE', icon: '🛡️' },      // Cierre (defensa central)
-    3: { x: 30, y: 25, label: 'ALA IZQ', icon: '⚡' },      // Ala izquierda
-    4: { x: 30, y: 75, label: 'ALA DER', icon: '⚡' },      // Ala derecha
-    5: { x: 41, y: 52, label: 'PIVOT', icon: '🎯' },        // Pivot
-  };
+  1: { x: 12, y: 52, label: 'ARQUERO', icon: '/images/crowd.png' },      // Arquero
+  2: { x: 22, y: 52, label: 'CIERRE', icon: '/images/player.png' },        // Cierre
+  3: { x: 30, y: 25, label: 'ALA IZQ', icon: '/images/player.png' },          // Ala izquierda
+  4: { x: 30, y: 75, label: 'ALA DER', icon: '/images/player.png' },          // Ala derecha
+  5: { x: 41, y: 52, label: 'PIVOT', icon: '/images/player.png' },          // Pivot
+};
   
   // Si no hay 5 jugadores, mostrar los que hay en orden
   const formation = [];
@@ -662,11 +715,11 @@ const getFormationFromDeck = () => {
 // ✅ AGREGAR LA FUNCIÓN AQUÍ (dentro del componente)
 const getRivalFormation = () => {
   const rivalPositions = [
-    { pos: 1, label: 'ARQUERO', x: 86, y: 52, icon: '🧤' },
-    { pos: 2, label: 'CIERRE', x: 78, y: 52, icon: '🛡️' },
-    { pos: 3, label: 'ALA IZQ', x: 70, y: 25, icon: '⚡' },
-    { pos: 4, label: 'ALA DER', x: 70, y: 75, icon: '⚡' },
-    { pos: 5, label: 'PIVOT', x: 59, y: 52, icon: '🎯' },
+    { pos: 1, label: 'ARQUERO', x: 86, y: 52, icon: '/images/bot.png' },
+    { pos: 2, label: 'CIERRE', x: 78, y: 52, icon: '/images/bot.png'},
+    { pos: 3, label: 'ALA IZQ', x: 70, y: 25, icon: '/images/bot.png' },
+    { pos: 4, label: 'ALA DER', x: 70, y: 75, icon: '/images/bot.png' },
+    { pos: 5, label: 'PIVOT', x: 59, y: 52, icon: '/images/bot.png' },
   ];
   
   return rivalPositions.map(pos => ({
@@ -756,11 +809,23 @@ const getRivalFormation = () => {
       }}
     >
       <div className={`player-token user-token ${isOutOfPosition ? 'out-of-position' : ''}`}>
-        <div className="token-icon">{player.icon}</div>
+        <div className="token-icon">
+    {player.icon.startsWith('/') ? (
+      <img 
+        src={player.icon} 
+        alt={player.label}
+        style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+      />
+    ) : (
+      <span style={{ fontSize: '18px' }}>{player.icon}</span>
+    )}
+  </div>
         <div className="token-name">
           {cardData?.name?.substring(0, 10) || 'Jugador'}
         </div>
-        <div className="token-level user-level">Nv.{player.card.level}</div>
+        <span className={`token-overall user-overall`}>
+            {cardData?.overall_rating || 50}
+          </span>
         {isOutOfPosition && (
           <div className="token-warning" title={`Jugando fuera de posición (${player.actualPosition})`}>
             ⚠️
@@ -779,7 +844,17 @@ const getRivalFormation = () => {
     style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
   >
     <div className="player-token rival-token">
-      <div className="token-icon">{pos.icon}</div>
+       <div className="token-icon">
+        {pos.icon && pos.icon.startsWith('/') ? (
+          <img 
+            src={pos.icon} 
+            alt={pos.label}
+            style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+          />
+        ) : (
+          <span style={{ fontSize: '18px' }}>{pos.icon}</span>
+        )}
+      </div>
       <div className="token-name">
         {selectedBot.name.split(' ')[1]?.substring(0, 6) ?? selectedBot.name.substring(0, 6)}
       </div>
@@ -1161,19 +1236,47 @@ const getRivalFormation = () => {
   position: relative;
   width: 100%;
   height: 560px;
-  border-radius: 14px;
+  border-radius: 16px;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.15);
   background: linear-gradient(
     90deg,
-    rgba(0,0,0,0.6 ) 0px, rgba(0,0,0,0.6) 40px,
+    rgba(0,0,0,0.5) 0px, rgba(0,0,0,0.5) 40px,
     transparent 40px, transparent 80px
   ),
-  linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.1)),
+  linear-gradient(135deg, rgba(30,200,120,0.08), rgba(0,0,0,0.2)),
   url('/images/cancha.jpg') center/cover no-repeat,
-  #0b2b44;
+  linear-gradient(145deg, #0a2a18, #0a1510);
   margin-bottom: 14px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* Círculo central estilo FIFA */
+.futsal-court::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Punto central */
+.futsal-court::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  pointer-events: none;
 }
         .court-svg {
           position: absolute;
@@ -1202,51 +1305,315 @@ const getRivalFormation = () => {
           align-items: center;
           gap: 3px;
         }
-        .player-token {
-          width: 60px;
-          border-radius: 12px;
-          padding: 7px 5px 5px;
-          text-align: center;
-          border: 1.5px solid;
-          backdrop-filter: blur(6px);
-          transition: transform 0.15s;
-        }
-        .user-token {
-          background: rgba(30,200,120,0.18);
-          border-color: rgba(30,200,120,0.65);
-        }
-        .rival-token {
-          background: rgba(255,110,60,0.18);
-          border-color: rgba(255,110,60,0.6);
-        }
-        .player-token.empty {
-          background: rgba(255,255,255,0.05);
-          border-color: rgba(255,255,255,0.18);
-          opacity: 0.55;
-        }
-        .token-icon { font-size: 18px; line-height: 1; display: block; }
-        .token-name {
-          font-size: 9px;
-          font-weight: bold;
-          color: #fff;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 56px;
-          margin-top: 3px;
-        }
-        .token-level { font-size: 8px; margin-top: 2px; }
-        .user-level  { color: #3dffa0; }
-        .rival-level { color: #ff9060; }
-        .token-empty { font-size: 8px; color: rgba(255,255,255,0.35); margin-top: 2px; }
-        .pos-label {
-          font-size: 7px;
-          letter-spacing: 1px;
-          color: rgba(255,255,255,0.45);
-          background: rgba(0,0,0,0.5);
-          padding: 1px 5px;
-          border-radius: 8px;
-        }
+        /* ── Estilo FIFA Ultimate Team ── */
+.player-token {
+  width: 70px;
+  border-radius: 8px;
+  padding: 0;
+  text-align: center;
+  background: linear-gradient(145deg, rgba(0,0,0,0.85), rgba(20,20,30,0.95));
+  border: none;
+  backdrop-filter: blur(8px);
+  transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* Efecto hover FIFA */
+.player-token:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+/* Brillo superior estilo carta FIFA */
+.player-token::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition: left 0.5s ease;
+}
+
+.player-token:hover::before {
+  left: 100%;
+}
+
+/* Rareza/calidad de jugador - borde colorido estilo FIFA */
+.user-token {
+  background: linear-gradient(145deg, rgba(30,200,120,0.2), rgba(20,150,90,0.15));
+  border-bottom: 3px solid #3dffa0;
+  box-shadow: 0 4px 12px rgba(61,255,160,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.rival-token {
+  background: linear-gradient(145deg, rgba(255,110,60,0.2), rgba(200,70,35,0.15));
+  border-bottom: 3px solid #ff6e3c;
+  box-shadow: 0 4px 12px rgba(255,110,60,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* Élite/Destacado */
+.user-token.elite {
+  border-bottom: 3px solid #ffd700;
+  background: linear-gradient(145deg, rgba(255,215,0,0.15), rgba(200,160,0,0.1));
+}
+
+/* Contenedor de la imagen/icono estilo FIFA */
+.token-icon {
+  background: rgba(0,0,0,0.4);
+  border-radius: 6px 6px 4px 4px;
+  padding: 6px;
+  margin: 4px 6px 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+}
+
+.token-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.token-icon span {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+}
+
+/* Nombre estilo FIFA (como en Ultimate Team) */
+.token-name {
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  white-space: normal;  /* Cambiar de nowrap a normal */
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 64px;
+  margin-top: 4px;
+  padding: 2px 4px;
+  background: linear-gradient(90deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3));
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  font-family: 'FIFA', 'Arial Black', sans-serif;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;  /* Máximo 2 líneas */
+  -webkit-box-orient: vertical;
+  min-height: 24px;
+}
+
+/* Contenedor de stats (overall + nivel) */
+.token-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 3px 6px 5px;
+}
+
+/* Rating overall (estilo FIFA) */
+.token-overall {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #1a1a2e, #0a0a15);
+  color: #ffd700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,215,0,0.3);
+  letter-spacing: -0.5px;
+}
+
+.user-overall {
+  color: #3dffa0;
+  border-color: rgba(61,255,160,0.4);
+}
+
+.rival-overall {
+  color: #ff9060;
+  border-color: rgba(255,144,96,0.4);
+}
+
+
+/* Rating/Nivel estilo FIFA */
+.token-level {
+  font-size: 8px;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.5);
+  display: inline-block;
+  backdrop-filter: blur(4px);
+}
+
+.user-level {
+  color: #3dffa0;
+  background: linear-gradient(135deg, rgba(61,255,160,0.2), rgba(61,255,160,0.05));
+  border: 1px solid rgba(61,255,160,0.3);
+}
+
+.rival-level {
+  color: #ff9060;
+  background: linear-gradient(135deg, rgba(255,144,96,0.2), rgba(255,144,96,0.05));
+  border: 1px solid rgba(255,144,96,0.3);
+}
+
+/* Rareza (color según overall) */
+.token-rarity {
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 6px;
+  font-weight: bold;
+  padding: 1px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+.user-rarity.common { color: #c0c0c0; border: 1px solid #c0c0c0; }
+.user-rarity.rare { color: #3dffa0; border: 1px solid #3dffa0; }
+.user-rarity.epic { color: #9b59b6; border: 1px solid #9b59b6; }
+.user-rarity.legendary { color: #ffd700; border: 1px solid #ffd700; }
+
+/* Indicador de posición (como en FIFA) */
+.pos-label {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  color: rgba(255,255,255,0.7);
+  background: rgba(0,0,0,0.7);
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 4px;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.15);
+  font-family: monospace;
+}
+
+/* Overlay de posición incorrecta (fuera de posición) */
+.player-token.out-of-position {
+  border-bottom: 3px solid #ffaa00;
+  background: linear-gradient(145deg, rgba(255,170,0,0.15), rgba(200,130,0,0.1));
+  animation: positionWarning 2s ease-in-out infinite;
+}
+
+@keyframes positionWarning {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,170,0,0.2); }
+  50% { box-shadow: 0 0 0 4px rgba(255,170,0,0.15); }
+}
+
+.token-warning {
+  position: absolute;
+  top: -2px;
+  right: 1px;
+  background: #ffaa00;
+  color: #000;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  animation: pulseWarning 1s infinite;
+}
+
+@keyframes pulseWarning {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+/* Efecto de "química" estilo FIFA */
+.player-token.chem-full::after {
+  content: '✓';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: #3dffa0;
+  color: #000;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+/* Versión móvil responsive */
+@media (max-width: 640px) {
+  .player-token {
+    width: 55px;
+  }
+  
+  .token-icon img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .token-icon span {
+    font-size: 22px;
+  }
+  
+  .token-name {
+    font-size: 8px;
+    max-width: 50px;
+  }
+  
+  .token-level {
+    font-size: 7px;
+  }
+  
+  .pos-label {
+    font-size: 6px;
+    padding: 1px 5px;
+  }
+}
+
+/* Animación de entrada estilo FIFA */
+@keyframes cardReveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.player-on-court {
+  animation: cardReveal 0.3s cubic-bezier(0.34, 1.2, 0.64, 1) backwards;
+  animation-delay: calc(var(--index, 0) * 0.05s);
+}
+
+/* Diferentes calidades de carta (opcional) */
+.player-token.gold {
+  border-bottom: 3px solid #ffd700;
+  background: linear-gradient(145deg, rgba(255,215,0,0.12), rgba(255,215,0,0.06));
+}
+
+.player-token.silver {
+  border-bottom: 3px solid #c0c0c0;
+}
+
+.player-token.bronze {
+  border-bottom: 3px solid #cd7f32;
+}
 
         /* ── Selector de rival ── */
         .rival-selector {
@@ -1813,21 +2180,6 @@ const getRivalFormation = () => {
   border-color: #ffaa00;
   background: rgba(255, 170, 0, 0.15);
   position: relative;
-}
-
-.token-warning {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  font-size: 12px;
-  background: rgba(0,0,0,0.7);
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: help;
 }
       `}</style>
     </div>

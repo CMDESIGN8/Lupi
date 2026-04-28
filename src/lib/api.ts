@@ -85,31 +85,34 @@ interface TicketFromDB {
 
 // Función para convertir perfil a carta
 function profileToCard(profile: any): UnifiedCard {
-  return {
-    id: profile.id,
-    name: profile.username,
-    position: profile.position || 'ala',
-    category: profile.category || '1era',
-    overall_rating: calculateOVR({
-      pace: profile.user_card_pace || 10,
-      dribbling: profile.user_card_dribbling || 10,
-      passing: profile.user_card_passing || 10,
-      defending: profile.user_card_defending || 10,
-      finishing: profile.user_card_finishing || 10,
-      physical: profile.user_card_physical || 10,
-    }),
-    pace: profile.user_card_pace || 10,
-    dribbling: profile.user_card_dribbling || 10,
-    passing: profile.user_card_passing || 10,
-    defending: profile.user_card_defending || 10,
-    finishing: profile.user_card_finishing || 10,
-    physical: profile.user_card_physical || 10,
-    card_type: 'socio',
-    profile_id: profile.id,
-    total_wins_lifetime: profile.total_wins_lifetime || 0,
-    total_battles_lifetime: profile.total_battles_lifetime || 0,
-    is_real: true,
-  };
+    // Asegurarse de que la categoría sea 'socios' para todos los perfiles
+    const category = profile.category === 'socios' ? 'socios' : (profile.category || 'socios');
+    
+    return {
+        id: profile.id,
+        name: profile.username,
+        position: profile.position || 'ala',
+        category: category, 
+        overall_rating: calculateOVR({
+            pace: profile.user_card_pace || 10,
+            dribbling: profile.user_card_dribbling || 10,
+            passing: profile.user_card_passing || 10,
+            defending: profile.user_card_defending || 10,
+            finishing: profile.user_card_finishing || 10,
+            physical: profile.user_card_physical || 10,
+        }),
+        pace: profile.user_card_pace || 10,
+        dribbling: profile.user_card_dribbling || 10,
+        passing: profile.user_card_passing || 10,
+        defending: profile.user_card_defending || 10,
+        finishing: profile.user_card_finishing || 10,
+        physical: profile.user_card_physical || 10,
+        card_type: 'socio',
+        profile_id: profile.id,
+        total_wins_lifetime: profile.total_wins_lifetime || 0,
+        total_battles_lifetime: profile.total_battles_lifetime || 0,
+        is_real: true,
+    };
 }
 
 // Función para convertir NPC a carta
@@ -1019,15 +1022,21 @@ export function generateRandomStats(): Omit<PlayerCard, 'id' | 'name' | 'positio
 
 export const cardApi = {
   // Obtener todas las cartas disponibles (NPCs no reemplazados + Socios)
-  async getAllAvailableCards(userId: string): Promise<UnifiedCard[]> {
-    // 1. Obtener NPCs no reemplazados
+  // ============================================================
+// FUNCIONES MODIFICADAS PARA LA CATEGORÍA "SOCIOS"
+// ============================================================
+
+async getAllAvailableCards(userId: string): Promise<UnifiedCard[]> {
+    // 1. Obtener NPCs no reemplazados (EXCLUYENDO la categoría 'socios')
     const { data: npcs } = await supabase
       .from('players')
       .select('*')
       .eq('can_be_replaced', true)
-      .eq('is_replaced', false);
+      .eq('is_replaced', false)
+      .neq('category', 'socios');  // 👈 IMPORTANTE: Excluir socios de NPCs
     
-    // 2. Obtener socios (excluyendo al usuario actual)
+    // 2. Obtener socios (todos los usuarios registrados, excluyendo al actual)
+    //    Los socios NATURALMENTE tienen categoría 'socios' por el trigger
     const { data: socios } = await supabase
       .from('profiles')
       .select('*')
@@ -1036,11 +1045,13 @@ export const cardApi = {
     const npcCards = (npcs || []).map(npcToCard);
     const socioCards = (socios || []).map(profileToCard);
     
+    console.log(`📊 Cartas disponibles: ${npcCards.length} NPCs + ${socioCards.length} Socios = ${npcCards.length + socioCards.length} total`);
+    
     return [...npcCards, ...socioCards];
-  },
+},
 
-  // Obtener cartas del usuario (colección)
-  async getUserCards(userId: string): Promise<UserCard[]> {
+// Obtener cartas del usuario (colección)
+async getUserCards(userId: string): Promise<UserCard[]> {
     const { data, error } = await supabase
       .from('user_cards')
       .select(`
@@ -1065,36 +1076,158 @@ export const cardApi = {
     
     if (error) throw error;
     
-    return (data || []).map(uc => ({
-      ...uc,
-      card: uc.card_type === 'npc' 
-        ? npcToCard(uc.npc)
-        : profileToCard(uc.socio),
-    }));
-  },
+    return (data || []).map(uc => {
+      // Verificar que los datos existan antes de mapear
+      if (uc.card_type === 'npc' && uc.npc) {
+        return {
+          ...uc,
+          card: npcToCard(uc.npc),
+        };
+      } else if (uc.card_type === 'socio' && uc.socio) {
+        return {
+          ...uc,
+          card: profileToCard(uc.socio),
+        };
+      }
+      // Fallback si no hay datos
+      return {
+        ...uc,
+        card: null,
+      };
+    }).filter(uc => uc.card !== null); // Filtrar cartas sin datos
+},
 
-  // Obtener progreso del álbum
-  async getAlbumProgress(userId: string): Promise<{ owned: number; total: number }> {
-    // Total de cartas posibles = NPCs no reemplazados + Socios
+// Obtener progreso del álbum
+async getAlbumProgress(userId: string): Promise<{ owned: number; total: number }> {
+    // Total de cartas posibles = NPCs no reemplazados (sin categoría socios) + Socios
     const { count: npcCount } = await supabase
       .from('players')
       .select('*', { count: 'exact', head: true })
       .eq('can_be_replaced', true)
-      .eq('is_replaced', false);
+      .eq('is_replaced', false)
+      .neq('category', 'socios');  // 👈 Excluir socios de NPCs
     
+    // Contar TODOS los socios (usuarios registrados)
     const { count: socioCount } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true });
     
     const total = (npcCount || 0) + (socioCount || 0);
     
+    // Cartas que el usuario ya tiene (tanto NPCs como Socios)
     const { count: owned } = await supabase
       .from('user_cards')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId);
     
+    console.log(`📊 Progreso álbum: ${owned || 0}/${total} cartas (${npcCount} NPCs + ${socioCount} Socios)`);
+    
     return { owned: owned || 0, total };
-  },
+},
+
+// 👇 NUEVA FUNCIÓN: Obtener cartas por categoría específica
+async getCardsByCategory(category: string): Promise<UnifiedCard[]> {
+    if (category === 'socios') {
+        // Para socios, obtener de profiles
+        const { data: socios } = await supabase
+            .from('profiles')
+            .select('*');
+        return (socios || []).map(profileToCard);
+    } else {
+        // Para categorías oficiales, obtener de players
+        const { data: npcs } = await supabase
+            .from('players')
+            .select('*')
+            .eq('category', category)
+            .eq('can_be_replaced', true)
+            .eq('is_replaced', false);
+        return (npcs || []).map(npcToCard);
+    }
+},
+
+// 👇 NUEVA FUNCIÓN: Obtener estadísticas del álbum por categoría
+async getAlbumStatsByCategory(userId: string): Promise<{
+    category: string;
+    total: number;
+    owned: number;
+    progress: number;
+}[]> {
+    const categories = ['1era', '3ra', '4ta', '5ta', '6ta', '7ma', '8va', 'femenino', 'Promocionales', 'socios'];
+    const stats = [];
+    
+    // Obtener todas las cartas del usuario
+    const { data: userCards } = await supabase
+        .from('user_cards')
+        .select('player_id, socio_id, card_type')
+        .eq('user_id', userId);
+    
+    const ownedIds = new Set();
+    userCards?.forEach(card => {
+        if (card.card_type === 'npc' && card.player_id) {
+            ownedIds.add(card.player_id);
+        } else if (card.card_type === 'socio' && card.socio_id) {
+            ownedIds.add(card.socio_id);
+        }
+    });
+    
+    for (const cat of categories) {
+        let total = 0;
+        let owned = 0;
+        
+        if (cat === 'socios') {
+            // Contar socios
+            const { count } = await supabase
+                .from('profiles')
+                .select('*', { count: 'exact', head: true });
+            total = count || 0;
+            
+            // Contar socios que el usuario tiene
+            const { data: sociosOwned } = await supabase
+                .from('user_cards')
+                .select('socio_id')
+                .eq('user_id', userId)
+                .eq('card_type', 'socio')
+                .not('socio_id', 'is', null);
+            owned = sociosOwned?.length || 0;
+        } else {
+            // Contar NPCs por categoría
+            const { count } = await supabase
+                .from('players')
+                .select('*', { count: 'exact', head: true })
+                .eq('category', cat)
+                .eq('can_be_replaced', true)
+                .eq('is_replaced', false);
+            total = count || 0;
+            
+            // Contar NPCs que el usuario tiene de esta categoría
+            const { data: npcsOwned } = await supabase
+                .from('user_cards')
+                .select('player_id')
+                .eq('user_id', userId)
+                .eq('card_type', 'npc')
+                .not('player_id', 'is', null);
+            
+            const npcIds = npcsOwned?.map(c => c.player_id) || [];
+            if (npcIds.length > 0) {
+                const { count: ownedCount } = await supabase
+                    .from('players')
+                    .select('*', { count: 'exact', head: true })
+                    .in('id', npcIds)
+                    .eq('category', cat);
+                owned = ownedCount || 0;
+            }
+        }
+        
+        stats.push({
+            category: cat,
+            total,
+            owned,
+            progress: total > 0 ? (owned / total) * 100 : 0,
+        });
+    }
+    
+    return stats;
+},
 
   // Abrir caja misteriosa
   async openDailyBox(userId: string): Promise<{ card: UnifiedCard | null; already_claimed: boolean }> {

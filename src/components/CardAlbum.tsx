@@ -26,6 +26,18 @@ const ALBUM_PAGES: AlbumPage[] = [
   { id: '8va', title: '8ª DIVISIÓN', shortTitle: '8ª', icon: '🌱', category: '8va', totalCards: 15, color: '#FF9800', gradient: 'linear-gradient(135deg, #FF980020, #E6510020)', description: 'La cantera del club' },
   { id: 'femenino', title: 'FEMENINO', shortTitle: 'FEM', icon: '👩', category: 'femenino', totalCards: 40, color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E6320, #880E4F20)', description: 'Las guerreras' },
   { id: 'promos', title: 'PROMOCIONALES', shortTitle: 'PROMO', icon: '👦🏼', category: 'Promocionales', totalCards: 25, color: '#00BCD4', gradient: 'linear-gradient(135deg, #00BCD420, #00606420)', description: 'Ediciones especiales' },
+  // Agregar esta nueva página en ALBUM_PAGES (después de 'socios' o donde prefieras)
+{
+  id: 'veteranos',
+  title: 'VETERANOS',
+  shortTitle: 'VET',
+  icon: '👨🏼',
+  category: 'veteranos',
+  totalCards: 15, // Ajusta según cuántos veteranos tengas
+  color: '#FF6B35',
+  gradient: 'linear-gradient(135deg, #FF6B3520, #8B3A0020)',
+  description: 'La experiencia y el oficio de los cracks de siempre',
+},
   { id: 'socios', title: 'SOCIOS', shortTitle: 'SOC', icon: '👥', category: 'socios', totalCards: 0, color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E6320, #880E4F20)', description: 'Jugadores reales que se suman al club' },
 ];
 
@@ -243,7 +255,7 @@ export function CardAlbum({ userId }: { userId: string }) {
   
   // Estadísticas globales
   const totalCards = allPlayers.filter(p => p.is_owned).length;
-  const totalPossible = 150;
+  const totalPossible = 165;
   const globalProgress = (totalCards / totalPossible) * 100;
   
   // Detectar álbum completado
@@ -1767,6 +1779,29 @@ export function CardAlbum({ userId }: { userId: string }) {
           .album-legend { gap: 12px; }
           .legend-item { font-size: 9px; }
         }
+          // Dentro del <style> en CardAlbum.tsx
+/* Estilo especial para página de veteranos */
+.page-cover[data-category="veteranos"] {
+  background: linear-gradient(135deg, #FF6B3520, #8B3A0020);
+  border-bottom-color: #FF6B35;
+}
+
+/* Efecto vintage para cartas de veteranos */
+.album-card.owned.veteran {
+  filter: sepia(0.15);
+  border-color: #FF6B35 !important;
+}
+
+.album-card.owned.veteran::before {
+  content: "⭐";
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  font-size: 12px;
+  color: #FFD700;
+  text-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+
       `}</style>
     </div>
   );

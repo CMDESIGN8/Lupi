@@ -1,6 +1,6 @@
 // src/types/cards.ts
 export type Position = 'arquero' | 'cierre' | 'ala' | 'pivot';
-export type Category = '1era' | '3ra' | '4ta' | '5ta' | '6ta' | '7ma' | '8va' | 'femenino' | 'Promocionales';
+export type Category = '1era' | '3ra' | '4ta' | '5ta' | '6ta' | '7ma' | '8va' | 'femenino' | 'Promocionales'  | 'socios' | 'veteranos';
 export type CardType = 'npc' | 'socio';
 
 // Carta base (unificada)

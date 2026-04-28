@@ -31,7 +31,11 @@ import { DevTools } from './components/DevTools';
 import { UserFifaCard } from './components/UserFifaCard';
 import { calculateOVR } from './types/cards';
 import { cardApi } from './lib/api';
+import { AdminAlbumPanel } from './components/AdminAlbumPanel';
 
+
+const ADMIN_EMAILS = ['lupi@lupiapp.com', 'info.aynonline@gmail.com']; // Cambiá por los emails de admin
+const ADMIN_IDS = ['id-del-admin-1', 'id-del-admin-2']; // O podés usar IDs
 
 
 
@@ -3524,7 +3528,7 @@ if (res.statUpgraded) {
     // ============================================================
     // MAIN APP
     // ============================================================
-    type Tab = "home" | "ticket" | "ranking" | "profile" | "album" | "battle" | "deck";
+    type Tab = "home" | "ticket" | "ranking" | "profile" | "album" | "battle" | "deck" | "admin";
 
 
     export default function App() {
@@ -3943,6 +3947,10 @@ useEffect(() => {
     onDeckUpdate={setActiveDeck}
   />
 )}
+{/* Panel de Administración - SOLO para admins */}
+{(ADMIN_EMAILS.includes(user.email) || ADMIN_IDS.includes(user.id)) && tab === "admin" && (
+  <AdminAlbumPanel />
+)}
                 {tab === "profile" && <ProfileTab user={user} onLogout={handleLogout} onRestartTour={handleRestartTour} />}
                 {user && import.meta.env.DEV && (
   <DevTools 
@@ -3965,12 +3973,20 @@ useEffect(() => {
                     { id: "deck", icon: "⚽", label: "Equipo" },
 
                     { id: "profile", icon: "👤", label: "Perfil"  },
-                  ] as { id: Tab; icon: string; label: string }[]).map((n) => (
-                     <button key={n.id} className={`nav-item${tab === n.id ? " active" : ""}`} onClick={() => setTab(n.id)}>
-                      <span className="nav-icon">{n.icon}</span>
-                      {n.label}
-                    </button>
-                  ))}
+                    // 🔐 Botón de ADMIN - solo visible para administradores
+    ...(ADMIN_EMAILS.includes(user.email) || ADMIN_IDS.includes(user.id) ? [
+      { id: "admin", icon: "⚙️", label: "Admin" }
+    ] : []),
+  ] as { id: Tab | "admin"; icon: string; label: string }[]).map((n) => (
+    <button 
+      key={n.id} 
+      className={`nav-item${tab === n.id ? " active" : ""}`} 
+      onClick={() => setTab(n.id as Tab)}
+    >
+      <span className="nav-icon">{n.icon}</span>
+      {n.label}
+    </button>
+  ))}
                 </nav>
               </>
             )}
