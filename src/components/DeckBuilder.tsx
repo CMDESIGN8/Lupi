@@ -1,4 +1,4 @@
-// src/components/DeckBuilder.tsx - Versión ESTILO FIFA
+// src/components/DeckBuilder.tsx - Versión ESTILO FIFA CON IMÁGENES
 
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
@@ -19,10 +19,10 @@ function getCardData(card: UserCard): any {
 }
 
 function getRarityColor(ovr: number): string {
-  if (ovr >= 85) return '#9B59B6'; // Legendario
-  if (ovr >= 75) return '#FFD700'; // Dorado
-  if (ovr >= 65) return '#C0C0C0'; // Plateado
-  return '#CD7F32'; // Bronce
+  if (ovr >= 85) return '#9B59B6';
+  if (ovr >= 75) return '#FFD700';
+  if (ovr >= 65) return '#C0C0C0';
+  return '#CD7F32';
 }
 
 function getRarityGradient(ovr: number): string {
@@ -48,23 +48,58 @@ function findBestMoves(deck: UserCard[], allCards: UserCard[]) {
       const diff = newChem - currentChem
 
       if (diff > 2) {
-  const data = getCardData(benchCard)
-
-  moves.push({
-    type: 'swap',
-    description: `Reemplazar ${data?.name || 'jugador'} en posicion ${slot} mejora química →  (+${diff})`,
-    bonus: diff,
-    action: {
-      cardIn: benchCard,
-      position: slot
-    }
-  })
-}
+        const data = getCardData(benchCard)
+        moves.push({
+          type: 'swap',
+          description: `Reemplazar ${data?.name || 'jugador'} en posicion ${slot} mejora química →  (+${diff})`,
+          bonus: diff,
+          action: {
+            cardIn: benchCard,
+            position: slot
+          }
+        })
+      }
     }
   }
 
   return moves.sort((a,b) => b.bonus - a.bonus).slice(0,3)
 }
+
+// Componente para mostrar imagen del jugador o fallback a emoji
+const PlayerImage = ({ card, size = 40, className = "" }: { card: UserCard; size?: number; className?: string }) => {
+  const [imgError, setImgError] = useState(false);
+  const data = getCardData(card);
+  
+  // Intentar cargar imagen específica del jugador o usar genérica
+  const imagePath = data?.image_url 
+    ? data.image_url 
+    : `/images/player.png`;
+  
+  if (imgError || !imagePath) {
+    // Fallback a emoji según posición
+    const fallbackEmoji: Record<string, string> = {
+      arquero: '🧤',
+      cierre: '🛡️',
+      ala: '⚡',
+      pivot: '🎯'
+    };
+    return (
+      <span className={`player-emoji-fallback ${className}`} style={{ fontSize: size }}>
+        {fallbackEmoji[data?.position] || '⚽'}
+      </span>
+    );
+  }
+  
+  return (
+    <img 
+      src={imagePath}
+      alt={data?.name || 'Jugador'}
+      className={`player-image ${className}`}
+      style={{ width: size, height: size, objectFit: 'cover', borderRadius: '50%' }}
+      onError={() => setImgError(true)}
+    />
+  );
+};
 
 export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: DeckBuilderProps) {
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
@@ -124,31 +159,27 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
   const totalWithBonus = totalPower + bonusPoints;
   const chemistry = calculateChemistry(localDeck.cards)
   const bestMoves = useMemo(() => 
-  findBestMoves(localDeck.cards, userCards),
-  [localDeck.cards, userCards]
-)
+    findBestMoves(localDeck.cards, userCards),
+    [localDeck.cards, userCards]
+  )
 
-const applyMove = (card: UserCard, position: number) => {
-  const newCards = [...localDeck.cards]
-
-  const existingIndex = newCards.findIndex(c => c.position === position)
-
-  if (existingIndex >= 0) {
-    newCards[existingIndex] = { ...card, position }
-  } else {
-    newCards.push({ ...card, position })
+  const applyMove = (card: UserCard, position: number) => {
+    const newCards = [...localDeck.cards]
+    const existingIndex = newCards.findIndex(c => c.position === position)
+    if (existingIndex >= 0) {
+      newCards[existingIndex] = { ...card, position }
+    } else {
+      newCards.push({ ...card, position })
+    }
+    setLocalDeck({ ...localDeck, cards: newCards })
   }
 
-  setLocalDeck({ ...localDeck, cards: newCards })
-}
+  const [activePositionTab, setActivePositionTab] = useState<'arquero' | 'cierre' | 'ala' | 'pivot'>('arquero');
+  const [showOnlySocios, setShowOnlySocios] = useState(false);
+  const [sortByRating, setSortByRating] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
 
-const [activePositionTab, setActivePositionTab] = useState<'arquero' | 'cierre' | 'ala' | 'pivot'>('arquero');
-const [showOnlySocios, setShowOnlySocios] = useState(false);
-const [sortByRating, setSortByRating] = useState(false);
-const [filterCategory, setFilterCategory] = useState<string>('all');
-const [showCategoryFilter, setShowCategoryFilter] = useState(false);
-
-  
   // ===== ARMADO AUTOMÁTICO =====
   const autoBuildTeam = () => {
     setAutoBuilding(true);
@@ -207,8 +238,6 @@ const [showCategoryFilter, setShowCategoryFilter] = useState(false);
     setTimeout(() => setAutoBuilding(false), 500);
   };
 
-  
-
   const saveDeck = async () => {
     setSaving(true);
     try {
@@ -231,76 +260,69 @@ const [showCategoryFilter, setShowCategoryFilter] = useState(false);
   };
 
   const ChemistryLines = ({ deck }: { deck: Deck }) => {
-  const getCard = (pos: number) => deck.cards.find(c => c.position === pos)
+    const getCard = (pos: number) => deck.cards.find(c => c.position === pos)
 
-  const links = [
-    [1, 2],
-    [2, 3],
-    [2, 4],
-    [3, 5],
-    [4, 5],
-  ]
+    const links = [
+      [1, 2],
+      [2, 3],
+      [2, 4],
+      [3, 5],
+      [4, 5],
+    ]
 
-  const getChemistryColor = (a: any, b: any) => {
-    if (!a || !b) return 'transparent'
+    const getChemistryColor = (a: any, b: any) => {
+      if (!a || !b) return 'transparent'
+      if (a.category === b.category) return '#4ade80'
+      if (a.club === b.club) return '#facc15'
+      return '#ef4444'
+    }
 
-    if (a.category === b.category) return '#4ade80' // verde
-    if (a.club === b.club) return '#facc15' // amarillo
-    return '#ef4444' // rojo
+    return (
+      <svg className="chemistry-lines">
+        {links.map(([from, to], i) => {
+          const cardA = getCard(from)
+          const cardB = getCard(to)
+          if (!cardA || !cardB) return null
+
+          const elA = document.querySelector(`.slot-${from}`)
+          const elB = document.querySelector(`.slot-${to}`)
+          if (!elA || !elB) return null
+
+          const parent = elA.closest('.futsal-pitch-fifa')
+          if (!parent) return null
+
+          const rectA = elA.getBoundingClientRect()
+          const rectB = elB.getBoundingClientRect()
+          const parentRect = parent.getBoundingClientRect()
+
+          const x1 = rectA.left + rectA.width / 2 - parentRect.left
+          const y1 = rectA.top + rectA.height / 2 - parentRect.top
+          const x2 = rectB.left + rectB.width / 2 - parentRect.left
+          const y2 = rectB.top + rectB.height / 2 - parentRect.top
+
+          const dataA = getCardData(cardA)
+          const dataB = getCardData(cardB)
+          const color = getChemistryColor(dataA, dataB)
+
+          const midX = (x1 + x2) / 2
+          const midY = (y1 + y2) / 2 - 40
+          const path = `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`
+
+          return (
+            <path
+              key={i}
+              d={path}
+              fill="none"
+              stroke={color}
+              strokeWidth={color === '#4ade80' ? 4 : color === '#facc15' ? 3 : 2}
+              strokeLinecap="round"
+              className="chem-line"
+            />
+          )
+        })}
+      </svg>
+    )
   }
-
-  return (
-    <svg className="chemistry-lines">
-      {links.map(([from, to], i) => {
-  const cardA = getCard(from)
-  const cardB = getCard(to)
-
-  if (!cardA || !cardB) return null
-
-  const elA = document.querySelector(`.slot-${from}`)
-  const elB = document.querySelector(`.slot-${to}`)
-
-  if (!elA || !elB) return null
-
-  const parent = elA.closest('.futsal-pitch-fifa')
-  if (!parent) return null
-
-  const rectA = elA.getBoundingClientRect()
-  const rectB = elB.getBoundingClientRect()
-  const parentRect = parent.getBoundingClientRect()
-
-  const x1 = rectA.left + rectA.width / 2 - parentRect.left
-  const y1 = rectA.top + rectA.height / 2 - parentRect.top
-
-  const x2 = rectB.left + rectB.width / 2 - parentRect.left
-  const y2 = rectB.top + rectB.height / 2 - parentRect.top
-
-  const dataA = getCardData(cardA)
-  const dataB = getCardData(cardB)
-
-  const color = getChemistryColor(dataA, dataB)
-
-  // 🧠 CURVA (punto de control)
-  const midX = (x1 + x2) / 2
-  const midY = (y1 + y2) / 2 - 40 // 👈 altura de la curva (ajustable)
-
-  const path = `M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`
-
-  return (
-    <path
-      key={i}
-      d={path}
-      fill="none"
-      stroke={color}
-      strokeWidth={color === '#4ade80' ? 4 : color === '#facc15' ? 3 : 2}
-      strokeLinecap="round"
-      className="chem-line"
-    />
-  )
-})}
-    </svg>
-  )
-}
 
   const openCardSelector = (slot: number) => {
     setSelectedSlot(slot);
@@ -347,18 +369,16 @@ const [showCategoryFilter, setShowCategoryFilter] = useState(false);
 
   const [showCardSelector, setShowCardSelector] = useState(false);
   const [filterPosition, setFilterPosition] = useState<'all' | 'arquero' | 'cierre' | 'ala' | 'pivot'>('all');
-const [sortBy, setSortBy] = useState<'rating' | 'level' | 'name'>('rating');
+  const [sortBy, setSortBy] = useState<'rating' | 'level' | 'name'>('rating');
 
-// Función para obtener nombre de posición
-const getPositionName = (slot: number | null): string => {
-  if (slot === 1) return 'arquero';
-  if (slot === 2) return 'cierre';
-  if (slot === 3 || slot === 4) return 'ala';
-  if (slot === 5) return 'pivot';
-  return '';
-};
+  const getPositionName = (slot: number | null): string => {
+    if (slot === 1) return 'arquero';
+    if (slot === 2) return 'cierre';
+    if (slot === 3 || slot === 4) return 'ala';
+    if (slot === 5) return 'pivot';
+    return '';
+  };
 
-// Obtener categorías únicas (DEFINIR ANTES de filteredCards)
   const availableCategories = useMemo(() => {
     const categories = new Set<string>();
     sortedAvailableCards.forEach(card => {
@@ -368,11 +388,9 @@ const getPositionName = (slot: number | null): string => {
     return Array.from(categories).sort();
   }, [sortedAvailableCards]);
 
-  // Filtrar y ordenar cartas (USA availableCategories indirectamente, pero no depende de él)
   const filteredCards = useMemo(() => {
     let filtered = [...sortedAvailableCards];
     
-    // Filtrar por posición
     if (filterPosition !== 'all') {
       filtered = filtered.filter(card => {
         const data = getCardData(card);
@@ -380,7 +398,6 @@ const getPositionName = (slot: number | null): string => {
       });
     }
     
-    // Filtrar por categoría
     if (filterCategory !== 'all') {
       filtered = filtered.filter(card => {
         const data = getCardData(card);
@@ -388,7 +405,6 @@ const getPositionName = (slot: number | null): string => {
       });
     }
     
-    // Ordenar
     filtered.sort((a, b) => {
       const aData = getCardData(a);
       const bData = getCardData(b);
@@ -409,42 +425,38 @@ const getPositionName = (slot: number | null): string => {
   }, [sortedAvailableCards, filterPosition, filterCategory, sortBy]);
 
   const Tooltip = ({ text, children }: { text: string; children: React.ReactNode }) => {
-  const [show, setShow] = useState(false);
-  return (
-    <div className="tooltip-container" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
-      {children}
-      {show && <div className="tooltip-content">{text}</div>}
-    </div>
-  );
-};
-  
+    const [show, setShow] = useState(false);
+    return (
+      <div className="tooltip-container" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+        {children}
+        {show && <div className="tooltip-content">{text}</div>}
+      </div>
+    );
+  };
 
   const benchCards = useMemo(() => {
-  const usedIds = new Set(localDeck.cards.map(c => c.id))
+    const usedIds = new Set(localDeck.cards.map(c => c.id))
+    const available = userCards
+      .filter(c => !usedIds.has(c.id))
+      .sort((a, b) => {
+        const aData = getCardData(a)
+        const bData = getCardData(b)
+        return (bData?.overall_rating || 0) - (aData?.overall_rating || 0)
+      })
+    const pickBest = (pos: string, count = 1) => {
+      return available
+        .filter(c => getCardData(c)?.position === pos)
+        .slice(0, count)
+    }
+    return [
+      ...pickBest('arquero', 1),
+      ...pickBest('cierre', 1),
+      ...pickBest('ala', 2),
+      ...pickBest('pivot', 1),
+    ].slice(0, 5)
+  }, [userCards, localDeck.cards])
 
-  const available = userCards
-    .filter(c => !usedIds.has(c.id))
-    .sort((a, b) => {
-      const aData = getCardData(a)
-      const bData = getCardData(b)
-      return (bData?.overall_rating || 0) - (aData?.overall_rating || 0)
-    })
-
-  const pickBest = (pos: string, count = 1) => {
-    return available
-      .filter(c => getCardData(c)?.position === pos)
-      .slice(0, count)
-  }
-
-  return [
-    ...pickBest('arquero', 1),
-    ...pickBest('cierre', 1),
-    ...pickBest('ala', 2),
-    ...pickBest('pivot', 1),
-  ].slice(0, 5)
-}, [userCards, localDeck.cards])
-
-  // Componente de Carta estilo FIFA
+  // Componente de Carta estilo FIFA CORREGIDO
   const FiFACard = ({ card, slot, onClick, onRemove }: { card?: UserCard; slot?: number; onClick?: () => void; onRemove?: () => void }) => {
     if (!card) {
       return (
@@ -459,23 +471,14 @@ const getPositionName = (slot: number | null): string => {
     
     const data = getCardData(card);
     const gradient = getRarityGradient(data?.overall_rating);
-    const positionIcon: Record<string, string> = {
-      arquero: '🧤', cierre: '🛡️', ala: '⚡', pivot: '🎯'
-    };
-    // Función para obtener nombre de posición desde slot
-const getPositionName = (slot: number | null): string => {
-  if (slot === 1) return 'arquero';
-  if (slot === 2) return 'cierre';
-  if (slot === 3 || slot === 4) return 'ala';
-  if (slot === 5) return 'pivot';
-  return '';
-};
     
     return (
       <div className="fifa-card" onClick={onClick} style={{ background: gradient }}>
         <div className="card-pattern"></div>
         <div className="card-header">
-          <span className="card-position-icon">{positionIcon[data?.position] || '⚽'}</span>
+          <div className="card-player-image">
+            <PlayerImage card={card} size={36} />
+          </div>
           <span className="card-rating">{data?.overall_rating}</span>
         </div>
         <div className="card-body">
@@ -531,23 +534,17 @@ const getPositionName = (slot: number | null): string => {
           <ChemistryLines deck={localDeck} />
           <div className="pitch-background"></div>
           <div className="center-circle"></div>
-        <div className="sideline-deco"></div>
-        <div className="corner-mark corner-tl"></div>
-        <div className="corner-mark corner-tr"></div>
-        <div className="corner-mark corner-bl"></div>
-        <div className="corner-mark corner-br"></div>
-
-         
-        <div className="semicircle-area semicircle-left"></div>
-        <div className="semicircle-area semicircle-right"></div>
-        
-        
-        <div className="penalty-spot penalty-left"></div>
-        <div className="penalty-spot penalty-right"></div>
-        
-        
-        <div className="goal-area goal-area-left"></div>
-        <div className="goal-area goal-area-right"></div>
+          <div className="sideline-deco"></div>
+          <div className="corner-mark corner-tl"></div>
+          <div className="corner-mark corner-tr"></div>
+          <div className="corner-mark corner-bl"></div>
+          <div className="corner-mark corner-br"></div>
+          <div className="semicircle-area semicircle-left"></div>
+          <div className="semicircle-area semicircle-right"></div>
+          <div className="penalty-spot penalty-left"></div>
+          <div className="penalty-spot penalty-right"></div>
+          <div className="goal-area goal-area-left"></div>
+          <div className="goal-area goal-area-right"></div>
           
           {/* ARQUERO */}
           <div className="pitch-slot slot-1">
@@ -620,8 +617,6 @@ const getPositionName = (slot: number | null): string => {
           </div>
         </div>
         
-           
-        
         {/* PANEL DE BONIFICACIONES */}
         <div className="bonus-panel-fifa">
           <div className="bonus-header-fifa">
@@ -632,7 +627,7 @@ const getPositionName = (slot: number | null): string => {
             </Tooltip>
           </div>
           
-           <div className="bonus-list-fifa">
+          <div className="bonus-list-fifa">
             <div className={`bonus-row ${isComplete ? 'active' : ''}`}>
               <span className="bonus-check">{isComplete ? '🏆' : '⬜'}</span>
               <span className="bonus-name">5 jugadores en cancha</span>
@@ -702,237 +697,210 @@ const getPositionName = (slot: number | null): string => {
               ¡Ganás <strong>{bonusPoints}</strong> puntos extras!
             </div>
           </div>
-           <br></br>
-            <br></br>
+          <br></br>
+          <br></br>
              
           {/* BOTONES DE ACCIÓN */}
-      <div className="action-buttons-fifa">
-        <button 
-          className="auto-btn" 
-          onClick={autoBuildTeam}
-          disabled={autoBuilding || userCards.length === 0}
-        >
-          {autoBuilding ? '🔄 ARMANDO...' : '🤖 ARMADO AUTOMÁTICO'}
-        </button>
-        <button
-          className={`save-btn-fifa ${localDeck.cards.length === 5 ? 'ready' : 'disabled'}`}
-          onClick={saveDeck}
-          disabled={saving || localDeck.cards.length !== 5}
-        >
-          {saving ? '💾 GUARDANDO...' : localDeck.cards.length === 5 ? '✅ GUARDAR EQUIPO' : `🔒 FALTAN ${5 - localDeck.cards.length}`}
-        </button>
-      </div>
-
-<div className="bench-fifa-banco">
-  <div className="bench-header-fifa-banco">
-    <span>🔄</span>
-    <span>BANCO DE SUPLENTES</span>
-    <span className="bench-count-banco">Top 5</span>
-  </div>
-
-  <div className="bench-row-fifa">
-    {benchCards.map(card => {
-      const data = getCardData(card)
-
-      return (
-        <div key={card.id} className="bench-card-fifa-banco" onClick={() => selectCard(card)}>
-          <div className="bench-card-rating" style={{ background: getRarityColor(data?.overall_rating) }}>
-            {data?.overall_rating}
+          <div className="action-buttons-fifa">
+            <button 
+              className="auto-btn" 
+              onClick={autoBuildTeam}
+              disabled={autoBuilding || userCards.length === 0}
+            >
+              {autoBuilding ? '🔄 ARMANDO...' : '🤖 ARMADO AUTOMÁTICO'}
+            </button>
+            <button
+              className={`save-btn-fifa ${localDeck.cards.length === 5 ? 'ready' : 'disabled'}`}
+              onClick={saveDeck}
+              disabled={saving || localDeck.cards.length !== 5}
+            >
+              {saving ? '💾 GUARDANDO...' : localDeck.cards.length === 5 ? '✅ GUARDAR EQUIPO' : `🔒 FALTAN ${5 - localDeck.cards.length}`}
+            </button>
           </div>
 
-          <div className="bench-card-name-banco">{data?.name}</div>
-          <div className="bench-card-level-banco">⭐{card.level}</div>
-
-          <div className="bench-card-position-banco">
-            {data?.position?.toUpperCase()}
-          </div>
-        </div>
-      )
-    })}
-  </div>
-</div>
-
-<div className="chemistry-recommendations">
-        <div className="chemistry-rec-title">
-          💡 ¡CONSEJOS PARA MEJORAR TU EQUIPO!
-        </div>
-        {bestMoves.map((move, i) => {
-          const cardData = move.action?.cardIn ? getCardData(move.action.cardIn) : null;
-          return (
-            <div key={i} className="chem-rec-card">
-              <div className="chem-rec-left">
-                <div className="chem-rec-bonus">
-                  +{move.bonus}
-                </div>
-                <div className="chem-rec-text">
-                  {move.description}
-                </div>
-                {cardData && (
-                  <div className="chem-rec-player">
-                    ⭐ {cardData.name} (Nivel {move.action?.cardIn?.level})
+          <div className="bench-fifa-banco">
+            <div className="bench-header-fifa-banco">
+              <span>🔄</span>
+              <span>BANCO DE SUPLENTES</span>
+              <span className="bench-count-banco">Top 5</span>
+            </div>
+            <div className="bench-row-fifa">
+              {benchCards.map(card => {
+                const data = getCardData(card)
+                return (
+                  <div key={card.id} className="bench-card-fifa-banco" onClick={() => selectCard(card)}>
+                    <div className="bench-card-rating" style={{ background: getRarityColor(data?.overall_rating) }}>
+                      {data?.overall_rating}
+                    </div>
+                    <div className="bench-card-name-banco">{data?.name}</div>
+                    <div className="bench-card-level-banco">⭐{card.level}</div>
+                    <div className="bench-card-position-banco">
+                      {data?.position?.toUpperCase()}
+                    </div>
                   </div>
-                )}
-              </div>
-              <button
-                className="chem-rec-action"
-                onClick={() => {
-                  if (!move.action) return;
-                  applyMove(move.action.cardIn!, move.action.position!);
-                }}
-              >
-                👆 PONERLO
-              </button>
+                )
+              })}
             </div>
-          );
-        })}
-        {bestMoves.length === 0 && (
-          <div className="chem-rec-empty">
-            🎉 ¡Tu equipo ya está muy bien armado!
           </div>
-        )}
-      </div>
 
-        </div>
-      </div>
-
-      
-
-      {/* BANCO DE SUPLENTES */}
-      {sortedAvailableCards.length > 0 && (
-  <div className="bench-fifa-enhanced">
-    {/* HEADER MEJORADO */}
-    <div className="bench-header-enhanced">
-      <div className="header-left">
-        <span className="header-icon">📚</span>
-        <span className="header-title">MI COLECCIÓN</span>
-      </div>
-      <div className="header-stats">
-        <span className="stat-badge">
-          <span className="stat-icon">⭐</span>
-          {sortedAvailableCards.length}
-        </span>
-        <span className="stat-badge">
-          <span className="stat-icon">🏆</span>
-          {sortedAvailableCards.filter(c => getCardData(c)?.overall_rating >= 80).length}
-        </span>
-      </div>
-    </div>
-
-    {/* TABS POR POSICIÓN (más compacto) */}
-    <div className="position-tabs">
-      {[
-        { key: 'arquero', icon: '🧤', label: 'ARQ', color: '#4a90d9' },
-        { key: 'cierre', icon: '🛡️', label: 'CIE', color: '#e67e22' },
-        { key: 'ala', icon: '⚡', label: 'ALA', color: '#2ecc71' },
-        { key: 'pivot', icon: '🎯', label: 'PIV', color: '#e74c3c' }
-      ].map(pos => (
-        <button
-          key={pos.key}
-          className={`position-tab ${activePositionTab === pos.key ? 'active' : ''}`}
-          onClick={() => setActivePositionTab(pos.key as keyof typeof cardsByPos)}
-          style={{ '--tab-color': pos.color } as React.CSSProperties}
-        >
-          <span className="tab-icon">{pos.icon}</span>
-          <span className="tab-label">{pos.label}</span>
-          <span className="tab-count">{cardsByPos[pos.key as keyof typeof cardsByPos]?.length || 0}</span>
-        </button>
-      ))}
-    </div>
-
-    {/* GRID DE CARTAS MEJORADO */}
-    <div className="cards-grid-enhanced">
-      {cardsByPos[activePositionTab]?.map(card => {
-        const data = getCardData(card);
-        const isSocio = card.card_type === 'socio';
-        const rarity = getRarityColor(data?.overall_rating);
-        
-        return (
-          <div 
-            key={card.id} 
-            className={`enhanced-card ${isSocio ? 'socio-card' : ''}`}
-            onClick={() => selectCard(card)}
-          >
-            {/* Badge de rareza */}
-            <div className="card-rarity-badge" style={{ background: rarity }}>
-              {data?.overall_rating}
+          <div className="chemistry-recommendations">
+            <div className="chemistry-rec-title">
+              💡 ¡CONSEJOS PARA MEJORAR TU EQUIPO!
             </div>
-            
-            {/* Badge de tipo */}
-            {isSocio && (
-              <div className="card-type-badge" title="Jugador real - Stats dinámicos">
-                🔴 REAL
+            {bestMoves.map((move, i) => {
+              const cardData = move.action?.cardIn ? getCardData(move.action.cardIn) : null;
+              return (
+                <div key={i} className="chem-rec-card">
+                  <div className="chem-rec-left">
+                    <div className="chem-rec-bonus">
+                      +{move.bonus}
+                    </div>
+                    <div className="chem-rec-text">
+                      {move.description}
+                    </div>
+                    {cardData && (
+                      <div className="chem-rec-player">
+                        ⭐ {cardData.name} (Nivel {move.action?.cardIn?.level})
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    className="chem-rec-action"
+                    onClick={() => {
+                      if (!move.action) return;
+                      applyMove(move.action.cardIn!, move.action.position!);
+                    }}
+                  >
+                    👆 PONERLO
+                  </button>
+                </div>
+              );
+            })}
+            {bestMoves.length === 0 && (
+              <div className="chem-rec-empty">
+                🎉 ¡Tu equipo ya está muy bien armado!
               </div>
             )}
-            
-            {/* Icono de posición grande */}
-            <div className="card-position-icon">
-              {activePositionTab === 'arquero' && '🧤'}
-              {activePositionTab === 'cierre' && '🛡️'}
-              {activePositionTab === 'ala' && '⚡'}
-              {activePositionTab === 'pivot' && '🎯'}
-            </div>
-            
-            {/* Nombre */}
-            <div className="card-name-enhanced" title={data?.name}>
-              {data?.name?.length > 12 ? data?.name?.slice(0, 10) + '...' : data?.name}
-            </div>
-            
-            {/* Nivel */}
-            <div className="card-level-enhanced">
-              <span className="level-icon">⭐</span>
-              <span className="level-value">{card.level}</span>
-            </div>
-            
-            {/* Stats principales según posición */}
-            <div className="card-stats-enhanced">
-              {activePositionTab === 'arquero' && (
-                <>
-                  <span>🧤 {data?.defending}</span>
-                  <span>💪 {data?.physical}</span>
-                </>
-              )}
-              {activePositionTab === 'cierre' && (
-                <>
-                  <span>🛡️ {data?.defending}</span>
-                  <span>💪 {data?.physical}</span>
-                </>
-              )}
-              {activePositionTab === 'ala' && (
-                <>
-                  <span>⚡ {data?.pace}</span>
-                  <span>✨ {data?.dribbling}</span>
-                </>
-              )}
-              {activePositionTab === 'pivot' && (
-                <>
-                  <span>🎯 {data?.finishing}</span>
-                  <span>💪 {data?.physical}</span>
-                </>
-              )}
-            </div>
-            
-            {/* Botón de acción */}
-            <div className="card-action-btn">
-              <span>➕ SELECCIONAR</span>
-            </div>
-            
-            {/* Efecto de brillo */}
-            <div className="card-shine-effect"></div>
           </div>
-        );
-      })}
-      
-      {/* Empty state si no hay cartas en esta categoría */}
-      {cardsByPos[activePositionTab]?.length === 0 && (
-        <div className="empty-category">
-          <span>📭</span>
-          <p>No tienes cartas de esta posición</p>
-          <small>Abre sobres para conseguir más</small>
+        </div>
+      </div>
+
+      {/* BANCO DE SUPLENTES COMPLETO */}
+      {sortedAvailableCards.length > 0 && (
+        <div className="bench-fifa-enhanced">
+          <div className="bench-header-enhanced">
+            <div className="header-left">
+              <span className="header-icon">📚</span>
+              <span className="header-title">MI COLECCIÓN</span>
+            </div>
+            <div className="header-stats">
+              <span className="stat-badge">
+                <span className="stat-icon">⭐</span>
+                {sortedAvailableCards.length}
+              </span>
+              <span className="stat-badge">
+                <span className="stat-icon">🏆</span>
+                {sortedAvailableCards.filter(c => getCardData(c)?.overall_rating >= 80).length}
+              </span>
+            </div>
+          </div>
+
+          <div className="position-tabs">
+            {[
+              { key: 'arquero', icon: '🧤', label: 'ARQ', color: '#4a90d9' },
+              { key: 'cierre', icon: '🛡️', label: 'CIE', color: '#e67e22' },
+              { key: 'ala', icon: '⚡', label: 'ALA', color: '#2ecc71' },
+              { key: 'pivot', icon: '🎯', label: 'PIV', color: '#e74c3c' }
+            ].map(pos => (
+              <button
+                key={pos.key}
+                className={`position-tab ${activePositionTab === pos.key ? 'active' : ''}`}
+                onClick={() => setActivePositionTab(pos.key as keyof typeof cardsByPos)}
+                style={{ '--tab-color': pos.color } as React.CSSProperties}
+              >
+                <span className="tab-icon">{pos.icon}</span>
+                <span className="tab-label">{pos.label}</span>
+                <span className="tab-count">{cardsByPos[pos.key as keyof typeof cardsByPos]?.length || 0}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="cards-grid-enhanced">
+            {cardsByPos[activePositionTab]?.map(card => {
+              const data = getCardData(card);
+              const isSocio = card.card_type === 'socio';
+              const rarity = getRarityColor(data?.overall_rating);
+              
+              return (
+                <div 
+                  key={card.id} 
+                  className={`enhanced-card ${isSocio ? 'socio-card' : ''}`}
+                  onClick={() => selectCard(card)}
+                >
+                  <div className="card-rarity-badge" style={{ background: rarity }}>
+                    {data?.overall_rating}
+                  </div>
+                  {isSocio && (
+                    <div className="card-type-badge" title="Jugador real - Stats dinámicos">
+                      🔴 REAL
+                    </div>
+                  )}
+                  <div className="card-player-image-large">
+                    <PlayerImage card={card} size={56} />
+                  </div>
+                  <div className="card-name-enhanced" title={data?.name}>
+                    {data?.name?.length > 12 ? data?.name?.slice(0, 10) + '...' : data?.name}
+                  </div>
+                  <div className="card-level-enhanced">
+                    <span className="level-icon">⭐</span>
+                    <span className="level-value">{card.level}</span>
+                  </div>
+                  <div className="card-stats-enhanced">
+                    {activePositionTab === 'arquero' && (
+                      <>
+                        <span>🧤 {data?.defending}</span>
+                        <span>💪 {data?.physical}</span>
+                      </> 
+                      
+                    )}
+                    {activePositionTab === 'cierre' && (
+                      <>
+                        <span>🛡️ {data?.defending}</span>
+                        <span>💪 {data?.physical}</span>
+                      </>
+                    )}
+                    {activePositionTab === 'ala' && (
+                      <>
+                        <span>⚡ {data?.pace}</span>
+                        <span>✨ {data?.dribbling}</span>
+                      </>
+                    )}
+                    {activePositionTab === 'pivot' && (
+                      <>
+                        <span>🎯 {data?.finishing}</span>
+                        <span>💪 {data?.physical}</span>
+                      </>
+                    )}
+                  </div>
+                  <div className="card-action-btn">
+                    <span>➕ SELECCIONAR</span>
+                  </div>
+                  <div className="card-shine-effect"></div>
+                </div>
+              );
+            })}
+            
+            {cardsByPos[activePositionTab]?.length === 0 && (
+              <div className="empty-category">
+                <span>📭</span>
+                <p>No tienes cartas de esta posición</p>
+                <small>Abre sobres para conseguir más</small>
+              </div>
+            )}
+          </div>
         </div>
       )}
-    </div>
-  </div>
-)}
+      
       {sortedAvailableCards.length === 0 && (
         <div className="no-cards-fifa">
           <span>📭</span>
@@ -941,255 +909,310 @@ const getPositionName = (slot: number | null): string => {
         </div>
       )}
 
-      {/* MODAL MEJORADO - ESTILO FIFA ULTIMATE TEAM */}
-{/* MODAL MEJORADO */}
-{showCards && (
-  <div className="modal-enhanced" onClick={() => setShowCards(false)}>
-    <div className="modal-enhanced-content" onClick={e => e.stopPropagation()}>
-      
-      {/* HEADER */}
-      <div className="modal-enhanced-header">
-        <div className="position-badge" style={{ 
-          background: selectedSlot ? 
-            (selectedSlot === 1 ? '#4a90d9' :
-             selectedSlot === 2 ? '#e67e22' :
-             selectedSlot === 3 || selectedSlot === 4 ? '#2ecc71' : '#e74c3c') 
-            : '#888' 
-        }}>
-          <span className="position-icon">
-            {selectedSlot === 1 && '🧤'}
-            {selectedSlot === 2 && '🛡️'}
-            {selectedSlot === 3 && '⚡'}
-            {selectedSlot === 4 && '⚡'}
-            {selectedSlot === 5 && '🎯'}
-          </span>
-          <span className="position-name">
-            {selectedSlot === 1 && 'ARQUERO'}
-            {selectedSlot === 2 && 'CIERRE'}
-            {selectedSlot === 3 && 'ALA IZQUIERDO'}
-            {selectedSlot === 4 && 'ALA DERECHO'}
-            {selectedSlot === 5 && 'PIVOT'}
-          </span>
-        </div>
-        <button className="modal-enhanced-close" onClick={() => setShowCards(false)}>
-          ✕
-        </button>
-      </div>
-
-      {/* FILTROS */}
-      <div className="modal-filters">
-        {/* Filtro de posición */}
-        <div className="filter-section">
-          <label className="filter-label">Posición</label>
-          <div className="filter-buttons">
-            <button 
-              className={`filter-btn ${filterPosition === 'all' ? 'active' : ''}`}
-              onClick={() => setFilterPosition('all')}
-            >
-              📋 Todas
-            </button>
-            <button 
-              className={`filter-btn ${filterPosition === 'arquero' ? 'active' : ''}`}
-              onClick={() => setFilterPosition('arquero')}
-            >
-              🧤 ARQ
-            </button>
-            <button 
-              className={`filter-btn ${filterPosition === 'cierre' ? 'active' : ''}`}
-              onClick={() => setFilterPosition('cierre')}
-            >
-              🛡️ CIE
-            </button>
-            <button 
-              className={`filter-btn ${filterPosition === 'ala' ? 'active' : ''}`}
-              onClick={() => setFilterPosition('ala')}
-            >
-              ⚡ ALA
-            </button>
-            <button 
-              className={`filter-btn ${filterPosition === 'pivot' ? 'active' : ''}`}
-              onClick={() => setFilterPosition('pivot')}
-            >
-              🎯 PIV
-            </button>
-          </div>
-        </div>
-
-        {/* Filtro de categoría */}
-        {availableCategories.length > 0 && (
-          <div className="filter-section">
-            <label className="filter-label">Categoría</label>
-            <div className="filter-buttons category-buttons">
-              <button 
-                className={`filter-btn ${filterCategory === 'all' ? 'active' : ''}`}
-                onClick={() => setFilterCategory('all')}
-              >
-                🏆 Todas
+      {/* MODAL MEJORADO */}
+      {showCards && (
+        <div className="modal-enhanced" onClick={() => setShowCards(false)}>
+          <div className="modal-enhanced-content" onClick={e => e.stopPropagation()}>
+            
+            <div className="modal-enhanced-header">
+              <div className="position-badge" style={{ 
+                background: selectedSlot ? 
+                  (selectedSlot === 1 ? '#4a90d9' :
+                   selectedSlot === 2 ? '#e67e22' :
+                   selectedSlot === 3 || selectedSlot === 4 ? '#2ecc71' : '#e74c3c') 
+                  : '#888' 
+              }}>
+                <span className="position-icon">
+                  {selectedSlot === 1 && '🧤'}
+                  {selectedSlot === 2 && '🛡️'}
+                  {selectedSlot === 3 && '⚡'}
+                  {selectedSlot === 4 && '⚡'}
+                  {selectedSlot === 5 && '🎯'}
+                </span>
+                <span className="position-name">
+                  {selectedSlot === 1 && 'ARQUERO'}
+                  {selectedSlot === 2 && 'CIERRE'}
+                  {selectedSlot === 3 && 'ALA IZQUIERDO'}
+                  {selectedSlot === 4 && 'ALA DERECHO'}
+                  {selectedSlot === 5 && 'PIVOT'}
+                </span>
+              </div>
+              <button className="modal-enhanced-close" onClick={() => setShowCards(false)}>
+                ✕
               </button>
-              {availableCategories.map(cat => (
-                <button 
-                  key={cat}
-                  className={`filter-btn ${filterCategory === cat ? 'active' : ''}`}
-                  onClick={() => setFilterCategory(cat)}
-                >
-                  {cat === 'femenino' && '👩'}
-                  {cat === 'Promocionales' && '⭐'}
-                  {cat === 'socios' && '🔴'}
-                  {!['femenino', 'Promocionales', 'socios'].includes(cat) && '🏆'}
-                  {' '}{cat}
-                </button>
-              ))}
             </div>
-          </div>
-        )}
 
-        {/* Ordenamiento */}
-        <div className="filter-section">
-          <label className="filter-label">Ordenar por</label>
-          <div className="filter-buttons sort-buttons">
-            <button 
-              className={`sort-btn ${sortBy === 'rating' ? 'active' : ''}`}
-              onClick={() => setSortBy('rating')}
-            >
-              ⭐ Rating
-            </button>
-            <button 
-              className={`sort-btn ${sortBy === 'level' ? 'active' : ''}`}
-              onClick={() => setSortBy('level')}
-            >
-              📈 Nivel
-            </button>
-            <button 
-              className={`sort-btn ${sortBy === 'name' ? 'active' : ''}`}
-              onClick={() => setSortBy('name')}
-            >
-              🔤 Nombre
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* CONTADOR DE RESULTADOS */}
-      <div className="modal-results-count">
-        <span>📚 {filteredCards.length} jugadores encontrados</span>
-        {(filterPosition !== 'all' || filterCategory !== 'all') && (
-          <button 
-            className="clear-filters-btn"
-            onClick={() => {
-              setFilterPosition('all');
-              setFilterCategory('all');
-            }}
-          >
-            ✕ Limpiar filtros
-          </button>
-        )}
-      </div>
-
-      {/* GRID DE CARTAS */}
-      <div className="modal-cards-grid">
-        {filteredCards.map(card => {
-          const data = getCardData(card);
-          const isSocio = card.card_type === 'socio';
-          const isSamePosition = data?.position === getPositionName(selectedSlot);
-          
-          return (
-            <div 
-              key={card.id} 
-              className={`modal-card-enhanced ${isSocio ? 'socio' : ''}`}
-              onClick={() => {
-                if (navigator.vibrate) navigator.vibrate(50);
-                selectCard(card);
-              }}
-            >
-              <div className="card-rarity" style={{ background: getRarityColor(data?.overall_rating) }}>
-                {data?.overall_rating}
+            <div className="modal-filters">
+              <div className="filter-section">
+                <label className="filter-label">Posición</label>
+                <div className="filter-buttons">
+                  <button 
+                    className={`filter-btn ${filterPosition === 'all' ? 'active' : ''}`}
+                    onClick={() => setFilterPosition('all')}
+                  >
+                    📋 Todas
+                  </button>
+                  <button 
+                    className={`filter-btn ${filterPosition === 'arquero' ? 'active' : ''}`}
+                    onClick={() => setFilterPosition('arquero')}
+                  >
+                    🧤 ARQ
+                  </button>
+                  <button 
+                    className={`filter-btn ${filterPosition === 'cierre' ? 'active' : ''}`}
+                    onClick={() => setFilterPosition('cierre')}
+                  >
+                    🛡️ CIE
+                  </button>
+                  <button 
+                    className={`filter-btn ${filterPosition === 'ala' ? 'active' : ''}`}
+                    onClick={() => setFilterPosition('ala')}
+                  >
+                    ⚡ ALA
+                  </button>
+                  <button 
+                    className={`filter-btn ${filterPosition === 'pivot' ? 'active' : ''}`}
+                    onClick={() => setFilterPosition('pivot')}
+                  >
+                    🎯 PIV
+                  </button>
+                </div>
               </div>
-              
-              {isSamePosition && (
-                <div className="card-recommended">✓ RECOMENDADA</div>
+
+              {availableCategories.length > 0 && (
+                <div className="filter-section">
+                  <label className="filter-label">Categoría</label>
+                  <div className="filter-buttons category-buttons">
+                    <button 
+                      className={`filter-btn ${filterCategory === 'all' ? 'active' : ''}`}
+                      onClick={() => setFilterCategory('all')}
+                    >
+                      🏆 Todas
+                    </button>
+                    {availableCategories.map(cat => (
+                      <button 
+                        key={cat}
+                        className={`filter-btn ${filterCategory === cat ? 'active' : ''}`}
+                        onClick={() => setFilterCategory(cat)}
+                      >
+                        {cat === 'femenino' && '👩'}
+                        {cat === 'Promocionales' && '⭐'}
+                        {cat === 'socios' && '🔴'}
+                        {!['femenino', 'Promocionales', 'socios'].includes(cat) && '🏆'}
+                        {' '}{cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
-              
-              <div className="card-position-large">
-                {data?.position === 'arquero' && '🧤'}
-                {data?.position === 'cierre' && '🛡️'}
-                {data?.position === 'ala' && '⚡'}
-                {data?.position === 'pivot' && '🎯'}
-              </div>
-              
-              <div className="card-info">
-                <div className="card-name">{data?.name}</div>
-                <div className="card-category">
-                  {data?.category === 'femenino' && '👩 Femenino'}
-                  {data?.category === 'Promocionales' && '⭐ Promocional'}
-                  {data?.category === 'socios' && '🔴 Socio Real'}
-                  {!['femenino', 'Promocionales', 'socios'].includes(data?.category || '') && `🏆 ${data?.category}`}
-                </div>
-              </div>
-              
-              <div className="card-stats-grid">
-                <div className="stat-item">
-                  <span className="stat-label">NIVEL</span>
-                  <span className="stat-value">⭐{card.level}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">POSICIÓN</span>
-                  <span className="stat-value">{data?.position?.toUpperCase()}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">RITMO</span>
-                  <span className="stat-value">⚡{data?.pace}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">TIRO</span>
-                  <span className="stat-value">🎯{data?.finishing}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">DEFENSA</span>
-                  <span className="stat-value">🛡️{data?.defending}</span>
-                </div>
-                <div className="stat-item">
-                  <span className="stat-label">FÍSICO</span>
-                  <span className="stat-value">💪{data?.physical}</span>
-                </div>
-              </div>
-              
-              <div className="card-select-btn">
-                <span>➕ SELECCIONAR</span>
-              </div>
-              
-              <div className="card-shine"></div>
-            </div>
-          );
-        })}
-      </div>
 
-      {/* EMPTY STATE */}
-      {filteredCards.length === 0 && (
-        <div className="modal-empty">
-          <span>📭</span>
-          <p>No hay jugadores que coincidan con los filtros</p>
-          <button 
-            className="clear-all-btn"
-            onClick={() => {
-              setFilterPosition('all');
-              setFilterCategory('all');
-              setSortBy('rating');
-            }}
-          >
-            Limpiar todos los filtros
-          </button>
+              <div className="filter-section">
+                <label className="filter-label">Ordenar por</label>
+                <div className="filter-buttons sort-buttons">
+                  <button 
+                    className={`sort-btn ${sortBy === 'rating' ? 'active' : ''}`}
+                    onClick={() => setSortBy('rating')}
+                  >
+                    ⭐ Rating
+                  </button>
+                  <button 
+                    className={`sort-btn ${sortBy === 'level' ? 'active' : ''}`}
+                    onClick={() => setSortBy('level')}
+                  >
+                    📈 Nivel
+                  </button>
+                  <button 
+                    className={`sort-btn ${sortBy === 'name' ? 'active' : ''}`}
+                    onClick={() => setSortBy('name')}
+                  >
+                    🔤 Nombre
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-results-count">
+              <span>📚 {filteredCards.length} jugadores encontrados</span>
+              {(filterPosition !== 'all' || filterCategory !== 'all') && (
+                <button 
+                  className="clear-filters-btn"
+                  onClick={() => {
+                    setFilterPosition('all');
+                    setFilterCategory('all');
+                  }}
+                >
+                  ✕ Limpiar filtros
+                </button>
+              )}
+            </div>
+
+            <div className="modal-cards-grid">
+              {filteredCards.map(card => {
+                const data = getCardData(card);
+                const isSocio = card.card_type === 'socio';
+                const isSamePosition = data?.position === getPositionName(selectedSlot);
+                
+                return (
+                  <div 
+                    key={card.id} 
+                    className={`modal-card-enhanced ${isSocio ? 'socio' : ''}`}
+                    onClick={() => {
+                      if (navigator.vibrate) navigator.vibrate(50);
+                      selectCard(card);
+                    }}
+                  >
+                    <div className="card-rarity" style={{ background: getRarityColor(data?.overall_rating) }}>
+                      {data?.overall_rating}
+                    </div>
+                    
+                    {isSamePosition && (
+                      <div className="card-recommended">✓ RECOMENDADA</div>
+                    )}
+                    
+                    <div className="card-player-image-large">
+                      <PlayerImage card={card} size={60} />
+                    </div>
+                    
+                    <div className="card-info">
+                      <div className="card-name">{data?.name}</div>
+                      <div className="card-category">
+                        {data?.category === 'femenino' && '👩 Femenino'}
+                        {data?.category === 'Promocionales' && '⭐ Promocional'}
+                        {data?.category === 'socios' && '🔴 Socio Real'}
+                        {!['femenino', 'Promocionales', 'socios'].includes(data?.category || '') && `🏆 ${data?.category}`}
+                      </div>
+                    </div>
+                    
+                    <div className="card-stats-grid">
+  <div className="stat"><span className="stat-label">PAC</span><span className="stat-value">{data?.pace || 0}</span></div>
+  <div className="stat"><span className="stat-label">DEF</span><span className="stat-value">{data?.defending || 0}</span></div>
+  <div className="stat"><span className="stat-label">FIN</span><span className="stat-value">{data?.finishing || 0}</span></div>
+  <div className="stat"><span className="stat-label">PAS</span><span className="stat-value">{data?.passing || 0}</span></div>
+  <div className="stat"><span className="stat-label">REG</span><span className="stat-value">{data?.dribbling || 0}</span></div>
+  <div className="stat"><span className="stat-label">FIS</span><span className="stat-value">{data?.physical || 0}</span></div>
+</div>
+                    
+                    <div className="card-select-btn">
+                      <span>➕ SELECCIONAR</span>
+                    </div>
+                    
+                    <div className="card-shine"></div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {filteredCards.length === 0 && (
+              <div className="modal-empty">
+                <span>📭</span>
+                <p>No hay jugadores que coincidan con los filtros</p>
+                <button 
+                  className="clear-all-btn"
+                  onClick={() => {
+                    setFilterPosition('all');
+                    setFilterCategory('all');
+                    setSortBy('rating');
+                  }}
+                >
+                  Limpiar todos los filtros
+                </button>
+              </div>
+            )}
+
+            <button className="modal-fab-close" onClick={() => setShowCards(false)}>
+              ✕ CERRAR
+            </button>
+          </div>
         </div>
       )}
 
-      {/* BOTÓN FLOTANTE MÓVIL */}
-      <button className="modal-fab-close" onClick={() => setShowCards(false)}>
-        ✕ CERRAR
-      </button>
-    </div>
-  </div>
-)}  
-
       <style>{`
+
+      /* Alternativa con grid */
+/* Stats grid para 6 stats (2 filas de 3) */
+.card-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 12px 0 16px 0;
+}
+
+.card-stats-grid .stat {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 6px 4px;
+  border-radius: 8px;
+}
+
+.card-stats-grid .stat-label {
+  display: block;
+  font-size: 8px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 2px;
+}
+
+.card-stats-grid .stat-value {
+  font-size: 12px;
+  font-weight: bold;
+  color: #ffd700;
+}
+        /* Estilos adicionales para imágenes */
+        .player-image {
+          border-radius: 50%;
+          border: 2px solid #ffd700;
+          background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
+          object-fit: cover;
+        }
+
+        .player-emoji-fallback {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0,0,0,0.4);
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          font-size: 24px;
+        }
+
+        .fifa-card .card-player-image {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .fifa-card .player-image {
+          width: 36px;
+          height: 36px;
+          border: 2px solid #ffd700;
+        }
+
+        .card-player-image-large {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 12px 0;
+        }
+
+        .card-player-image-large .player-image {
+          width: 56px;
+          height: 56px;
+          border: 3px solid #ffd700;
+        }
+
+        .modal-card-enhanced .player-image {
+          width: 60px;
+          height: 60px;
+          border: 3px solid #ffd700;
+        }
+
+        .fifa-card .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 8px;
+        }
       /* FILTROS */
 .modal-filters {
   padding: 16px 20px;
@@ -2907,13 +2930,6 @@ const getPositionName = (slot: number | null): string => {
   color: #888;
 }
 
-/* Stats grid */
-.card-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
 
 .stat-item {
   text-align: center;

@@ -14,18 +14,19 @@ interface AlbumPage {
   color: string;
   gradient: string;
   description: string;
+  backgroundImage?: string;
 }
 
 const ALBUM_PAGES: AlbumPage[] = [
-  { id: '1era', title: '1ª DIVISIÓN', shortTitle: '1ª', icon: '🏆', category: '1era', totalCards: 25, color: '#FFD700', gradient: 'linear-gradient(135deg, #FFD70020, #B8860B20)', description: 'Los mejores jugadores del club' },
-  { id: '3ra', title: '3ª DIVISIÓN', shortTitle: '3ª', icon: '⚡', category: '3ra', totalCards: 20, color: '#C0C0C0', gradient: 'linear-gradient(135deg, #C0C0C020, #80808020)', description: 'Jóvenes promesas' },
-  { id: '4ta', title: '4ª DIVISIÓN', shortTitle: '4ª', icon: '🛡️', category: '4ta', totalCards: 20, color: '#CD7F32', gradient: 'linear-gradient(135deg, #CD7F3220, #8B451320)', description: 'Defensores sólidos' },
-  { id: '5ta', title: '5ª DIVISIÓN', shortTitle: '5ª', icon: '🌟', category: '5ta', totalCards: 20, color: '#4CAF50', gradient: 'linear-gradient(135deg, #4CAF5020, #2E7D3220)', description: 'Equilibrio y talento' },
-  { id: '6ta', title: '6ª DIVISIÓN', shortTitle: '6ª', icon: '💪', category: '6ta', totalCards: 20, color: '#2196F3', gradient: 'linear-gradient(135deg, #2196F320, #0D47A120)', description: 'Fuerza y resistencia' },
-  { id: '7ma', title: '7ª DIVISIÓN', shortTitle: '7ª', icon: '🎯', category: '7ma', totalCards: 20, color: '#9C27B0', gradient: 'linear-gradient(135deg, #9C27B020, #4A148C20)', description: 'Precisión y técnica' },
-  { id: '8va', title: '8ª DIVISIÓN', shortTitle: '8ª', icon: '🌱', category: '8va', totalCards: 15, color: '#FF9800', gradient: 'linear-gradient(135deg, #FF980020, #E6510020)', description: 'La cantera del club' },
-  { id: 'femenino', title: 'FEMENINO', shortTitle: 'FEM', icon: '👩', category: 'femenino', totalCards: 40, color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E6320, #880E4F20)', description: 'Las guerreras' },
-  { id: 'promos', title: 'PROMOCIONALES', shortTitle: 'PROMO', icon: '👦🏼', category: 'Promocionales', totalCards: 25, color: '#00BCD4', gradient: 'linear-gradient(135deg, #00BCD420, #00606420)', description: 'Ediciones especiales' },
+  { id: '1era', title: '1ª DIVISIÓN', shortTitle: '1ª', icon: '🏆', category: '1era', totalCards: 25, color: '#FFD700', gradient: 'linear-gradient(135deg, #FFD70020, #B8860B20)', description: 'Los mejores jugadores del club', backgroundImage: '/images/logo.png' },
+  { id: '3ra', title: '3ª DIVISIÓN', shortTitle: '3ª', icon: '⚡', category: '3ra', totalCards: 20, color: '#C0C0C0', gradient: 'linear-gradient(135deg, #C0C0C020, #80808020)', description: 'Jóvenes promesas', backgroundImage: '/images/logo.png' },
+  { id: '4ta', title: '4ª DIVISIÓN', shortTitle: '4ª', icon: '🛡️', category: '4ta', totalCards: 20, color: '#CD7F32', gradient: 'linear-gradient(135deg, #CD7F3220, #8B451320)', description: 'Defensores sólidos' , backgroundImage: '/images/logo.png' },
+  { id: '5ta', title: '5ª DIVISIÓN', shortTitle: '5ª', icon: '🌟', category: '5ta', totalCards: 20, color: '#4CAF50', gradient: 'linear-gradient(135deg, #4CAF5020, #2E7D3220)', description: 'Equilibrio y talento' , backgroundImage: '/images/logo.png' },
+  { id: '6ta', title: '6ª DIVISIÓN', shortTitle: '6ª', icon: '💪', category: '6ta', totalCards: 20, color: '#2196F3', gradient: 'linear-gradient(135deg, #2196F320, #0D47A120)', description: 'Fuerza y resistencia' , backgroundImage: '/images/logo.png' },
+  { id: '7ma', title: '7ª DIVISIÓN', shortTitle: '7ª', icon: '🎯', category: '7ma', totalCards: 20, color: '#9C27B0', gradient: 'linear-gradient(135deg, #9C27B020, #4A148C20)', description: 'Precisión y técnica' , backgroundImage: '/images/logo.png' },
+  { id: '8va', title: '8ª DIVISIÓN', shortTitle: '8ª', icon: '🌱', category: '8va', totalCards: 15, color: '#FF9800', gradient: 'linear-gradient(135deg, #FF980020, #E6510020)', description: 'La cantera del club' , backgroundImage: '/images/logo.png' },
+  { id: 'femenino', title: 'FEMENINO', shortTitle: 'FEM', icon: '👩', category: 'femenino', totalCards: 40, color: '#E91E63', gradient: 'linear-gradient(135deg, #E91E6320, #880E4F20)', description: 'Las guerreras' , backgroundImage: '/images/logo.png' },
+  { id: 'promos', title: 'PROMOCIONALES', shortTitle: 'PROMO', icon: '👦🏼', category: 'Promocionales', totalCards: 25, color: '#00BCD4', gradient: 'linear-gradient(135deg, #00BCD420, #00606420)', description: 'Ediciones especiales' , backgroundImage: '/images/logo.png' },
   // Agregar esta nueva página en ALBUM_PAGES (después de 'socios' o donde prefieras)
 {
   id: 'veteranos',
@@ -73,6 +74,7 @@ interface UnifiedPlayer {
   is_owned: boolean;
   user_card_level?: number;
   user_card_id?: string;
+  image_url?: string;
 }
 
 // ==================== COMPONENTE PRINCIPAL ====================
@@ -334,67 +336,103 @@ export function CardAlbum({ userId }: { userId: string }) {
   };
   
   // ==================== RENDER DE CARTA ====================
-  const renderCard = (player: UnifiedPlayer) => {
-    const posInfo = POSITION_ICONS[player.position] || { icon: '⚽', name: 'JUG', color: '#888' };
-    const isNewlyAcquired = newlyAcquiredId === player.id;
-    
-    if (player.is_owned) {
-      return (
-        <div 
-          key={player.id}
-          className={`album-card owned level-${Math.min(player.user_card_level || 1, 5)} ${isNewlyAcquired ? 'newly-acquired' : ''}`}
-          onClick={() => {
-            enableAudio();
-            setSelectedCard(player);
-          }}
-          style={{ animationDelay: isNewlyAcquired ? '0s' : '0s' }}
-        >
-          <div className="card-shine" />
-          <div className="card-gloss" />
-          <div className="card-rarity" style={{ background: getRarityColor(player.overall_rating) }}>
-            {player.overall_rating}
-          </div>
-          <div className="card-position-badge" style={{ background: posInfo.color }}>
-            {posInfo.icon}
-          </div>
-          <div className="card-name">{player.name}</div>
-          <div className="card-level">⭐ {player.user_card_level || 1}</div>
-          <div className="card-stats">
-            <span>⚡{player.pace}</span>
-            <span>✨{player.dribbling}</span>
-            <span>🎯{player.finishing}</span>
-          </div>
-          {player.source_type === 'socio' && (
-            <div className="real-badge" title="¡Jugador real! Sus stats mejoran cuando juega">🔴 REAL</div>
-          )}
-          
-          <div className="card-texture" />
+  // ==================== RENDER DE CARTA CON IMAGEN ====================
+const renderCard = (player: UnifiedPlayer) => {
+  const posInfo = POSITION_ICONS[player.position] || { icon: '⚽', name: 'JUG', color: '#888' };
+  const isNewlyAcquired = newlyAcquiredId === player.id;
+  
+  if (player.is_owned) {
+    return (
+      <div 
+        key={player.id}
+        className={`album-card owned level-${Math.min(player.user_card_level || 1, 5)} ${isNewlyAcquired ? 'newly-acquired' : ''}`}
+        onClick={() => {
+          enableAudio();
+          setSelectedCard(player);
+        }}
+        style={{ animationDelay: isNewlyAcquired ? '0s' : '0s' }}
+      >
+        {/* CAPA DE IMAGEN PRINCIPAL - arriba del nombre */}
+        <div className="card-image-container">
+          <img 
+            src="/images/player.png" 
+            alt={player.name}
+            className="card-player-image"
+            onError={(e) => {
+              // Si la imagen no existe, mostrar iniciales
+              (e.target as HTMLImageElement).style.display = 'none';
+              const parent = (e.target as HTMLImageElement).parentElement;
+              if (parent) {
+                const fallback = document.createElement('div');
+                fallback.className = 'card-image-fallback';
+                fallback.textContent = player.name.charAt(0);
+                parent.appendChild(fallback);
+              }
+            }}
+          />
         </div>
-      );
-    } else {
-      return (
-        <div 
-          key={player.id} 
-          className="album-card missing"
-          onClick={() => {
-            enableAudio();
-            // Feedback de que falta la figurita
-            if (navigator.vibrate) navigator.vibrate(50);
-          }}
-        >
+        
+        <div className="card-shine" />
+        <div className="card-gloss" />
+        <div className="card-rarity" style={{ background: getRarityColor(player.overall_rating) }}>
+          {player.overall_rating}
+        </div>
+        <div className="card-position-badge" style={{ background: posInfo.color }}>
+          {posInfo.icon}
+        </div>
+        
+        {/* NOMBRE DEBAJO DE LA IMAGEN */}
+        <div className="card-name">{player.name}</div>
+        <div className="card-level">⭐ {player.user_card_level || 1}</div>
+        <div className="card-stats">
+          <span>⚡{player.pace}</span>
+          <span>✨{player.dribbling}</span>
+          <span>⚽{player.finishing}</span>
+          <span>💪{player.physical}</span>
+          <span>🛡️{player.defending}</span>
+          <span>🎯{player.passing}</span>
+        </div>
+        {player.source_type === 'socio' && (
+          <div className="real-badge" title="¡Jugador real! Sus stats mejoran cuando juega">🔴 REAL</div>
+        )}
+        
+        <div className="card-texture" />
+      </div>
+    );
+  } else {
+    // Cartas faltantes también pueden tener imagen placeholder
+    return (
+      <div 
+        key={player.id} 
+        className="album-card missing"
+        onClick={() => {
+          enableAudio();
+          if (navigator.vibrate) navigator.vibrate(50);
+        }}
+      >
+        <div className="card-image-container missing-image">
+          <img 
+            src="/images/playre.png" 
+            alt="missing"
+            className="card-player-image missing-opacity"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
           <div className="missing-overlay">
             <div className="missing-question">?</div>
-            <div className="missing-name">{player.name}</div>
-            <div className="missing-position" style={{ background: posInfo.color + '40' }}>
-              {posInfo.icon}
-            </div>
           </div>
-          <div className="missing-text">FALTA</div>
-          <div className="missing-shine" />
         </div>
-      );
-    }
-  };
+        <div className="missing-name">{player.name}</div>
+        <div className="missing-position" style={{ background: posInfo.color + '40' }}>
+          {posInfo.icon}
+        </div>
+        <div className="missing-text">FALTA</div>
+        <div className="missing-shine" />
+      </div>
+    );
+  }
+};
   
   // ==================== CONFETTI ====================
   const ConfettiEffect = () => {
@@ -489,7 +527,18 @@ export function CardAlbum({ userId }: { userId: string }) {
         <div 
           className={`current-page ${isTransitioning ? `flipping-${flipDirection}` : ''}`}
         >
-          <div className="page-cover" style={{ background: currentPage.gradient, borderBottomColor: currentPage.color }}>
+          <div 
+  className="page-cover"  
+  style={{ 
+    backgroundImage: currentPage.backgroundImage 
+      ? `url('${currentPage.backgroundImage}')` 
+      : currentPage.gradient,
+    backgroundSize: 'cover',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
+    borderBottomColor: currentPage.color 
+  }}
+>
             <div className="page-icon-large">{currentPage.icon}</div>
             <h2>{currentPage.title}</h2>
             <p className="page-description">{currentPage.description}</p>
@@ -847,36 +896,124 @@ export function CardAlbum({ userId }: { userId: string }) {
         }
         
         .page-cover h2 {
-          font-family: var(--font-display);
-          font-size: 24px;
-          margin: 0 0 4px;
-          color: white;
-        }
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0 0 4px;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #ffffff, #ffd700);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  position: relative;
+  display: inline-block;
+  padding: 0 16px;
+}
+
+/* Versión con borde para mejor legibilidad */
+.page-cover h2 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0 0 4px;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-shadow: 
+    2px 2px 0 rgba(0, 0, 0, 0.5),
+    -1px -1px 0 rgba(0, 0, 0, 0.3),
+    0 0 10px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  display: inline-block;
+  padding: 4px 20px;
+  border-radius: 40px;
+  background: rgba(0, 0, 0, 0.3);
+}
+  /* Línea decorativa arriba y abajo del título */
+.page-cover h2::before,
+.page-cover h2::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+}
+
+.page-cover h2::before {
+  right: 100%;
+  margin-right: 12px;
+}
+
+.page-cover h2::after {
+  left: 100%;
+  margin-left: 12px;
+}
+
         
         .page-description {
-          font-size: 11px;
-          color: rgba(255,255,255,0.6);
+          font-size: 20px;
+          color: rgba(255, 255, 255, 0.9);
           margin-bottom: 16px;
-        }
+          font-weight: 800;
+          font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);padding: 6px 20px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
         
         .page-complete-badge {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          background: #4CAF50;
-          color: white;
-          padding: 4px 8px;
-          border-radius: 20px;
-          font-size: 10px;
-          font-weight: bold;
-          animation: badgePop 0.5s ease;
-        }
-        
-        @keyframes badgePop {
-          0% { transform: scale(0); }
-          70% { transform: scale(1.2); }
-          100% { transform: scale(1); }
-        }
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #FFD700;
+  animation: badgePop 0.5s ease;
+}
+
+@keyframes badgePop {
+  0% { transform: scale(0) rotate(-10deg); }
+  70% { transform: scale(1.1) rotate(2deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+  @media (max-width: 768px) {
+  .page-cover h2 {
+    font-size: 20px;
+    letter-spacing: 1px;
+  }
+  
+  .page-cover h2::before,
+  .page-cover h2::after {
+    width: 20px;
+  }
+  
+  .page-description {
+    font-size: 10px;
+    padding: 4px 12px;
+    letter-spacing: 1px;
+  }
+  
+  .page-icon-large {
+    font-size: 40px;
+  }
+}
         
         .page-progress-ring {
           position: relative;
@@ -928,7 +1065,7 @@ export function CardAlbum({ userId }: { userId: string }) {
         
         /* Carta obtenida */
         .album-card.owned {
-  background: linear-gradient(rgba(10, 10, 20, 0.81), rgba(10, 10, 20, 0.81)), url('/images/logo.png');
+  background: linear-gradient(145deg, #1a3a1a5b 0%, #0d2a0de1 30%, #2a1a0a 70%, #1a0f05 100%), url('/images/logo.png');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -1058,16 +1195,40 @@ export function CardAlbum({ userId }: { userId: string }) {
         }
         
         .card-stats {
-          display: flex;
-          justify-content: center;
-          gap: 12px;
-          font-size: 12px;
-          position: absolute;
-          bottom: 10px;
-          left: 0;
-          right: 0;
-          color: rgba(255,255,255,0.8);
-        }
+  position: absolute;
+  bottom: 1px;
+  left: 8px;
+  right: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+  grid-template-rows: repeat(2, auto);   /* 2 filas */
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  border-radius: 12px;
+  z-index: 5;
+  text-align: center;
+}
+
+/* El orden automático será:
+   Fila 1: span 1, span 2, span 3
+   Fila 2: span 4, span 5, span 6
+*/
+  .card-stats > :nth-child(1),
+.card-stats > :nth-child(2),
+.card-stats > :nth-child(3) {
+  grid-row: 1;
+  display: flex;
+  justify-content: space-around;
+}
+  /* Los últimos 3 van abajo */
+.card-stats > :nth-child(4),
+.card-stats > :nth-child(5),
+.card-stats > :nth-child(6) {
+  grid-row: 2;
+  display: flex;
+  justify-content: space-around;
+}
         
         /* Badge de jugador real */
 .real-badge {
@@ -1431,7 +1592,7 @@ export function CardAlbum({ userId }: { userId: string }) {
    TARJETA PRINCIPAL - ESTRUCTURA FIJA
    ============================================ */
 .modal-card {
-  background: linear-gradient(135deg, rgba(2, 53, 2, 0.88), rgba(1, 35, 3, 0.92)), url('/images/logo.png');
+  background: linear-gradient(135deg, rgba(2, 53, 2, 0.88), rgba(1, 35, 3, 0)), url('/images/player.png');
   background-size: 180px;
   background-position: center;
   background-repeat: no-repeat;
@@ -1800,6 +1961,280 @@ export function CardAlbum({ userId }: { userId: string }) {
   font-size: 12px;
   color: #FFD700;
   text-shadow: 0 0 4px rgba(0,0,0,0.5);
+}
+
+/* ============================================
+   ESTILOS PARA IMAGEN DEL JUGADOR (como FIFA)
+   ============================================ */
+
+/* Contenedor de la imagen - centrado arriba */
+.card-image-container {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Imagen del jugador */
+.card-player-image {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+  transition: all 0.2s ease;
+}
+
+.album-card.owned:hover .card-player-image {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 8px rgba(0, 255, 136, 0.3));
+}
+
+/* Fallback cuando no hay imagen */
+.card-image-fallback {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border: 2px solid rgba(255,255,255,0.5);
+}
+
+/* Ajustar posición del nombre para que quede debajo de la imagen */
+.album-card.owned .card-name {
+  position: absolute;
+  bottom: 48px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-weight: 800;
+  font-size: 12px;
+  margin: 0;
+  padding: 4px 8px;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.6));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  z-index: 5;
+}
+
+/* Ajustar nivel debajo del nombre */
+.album-card.owned .card-level {
+  position: absolute;
+  bottom: 28px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 10px;
+  color: #FFD700;
+  font-weight: bold;
+  z-index: 5;
+}
+
+/* Stats en la parte inferior */
+
+/* Ajustar badges para que no tapen la imagen */
+.card-rarity {
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+}
+
+.card-position-badge {
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+.real-badge {
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  white-space: nowrap;
+  font-size: 8px;
+  padding: 2px 8px;
+}
+
+/* ============================================
+   ESTILOS PARA CARTAS FALTANTES CON IMAGEN
+   ============================================ */
+
+.missing-opacity {
+  opacity: 0.15;
+  filter: grayscale(1);
+}
+
+.album-card.missing .card-image-container {
+  top: 20px;
+}
+
+.album-card.missing .missing-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+}
+
+.album-card.missing .missing-question {
+  font-size: 48px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.5);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  animation: subtlePulse 2s ease-in-out infinite;
+}
+
+.album-card.missing .missing-name {
+  position: absolute;
+  bottom: 48px;
+  left: 8px;
+  right: 8px;
+  text-align: center;
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.5);
+  padding: 4px;
+  border-radius: 8px;
+  z-index: 6;
+}
+
+.album-card.missing .missing-position {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+}
+
+.album-card.missing .missing-text {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 6;
+}
+
+/* Responsive para imágenes más pequeñas */
+@media (max-width: 768px) {
+  .card-player-image {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .card-image-fallback {
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+  }
+  
+  .album-card.owned .card-name {
+    font-size: 10px;
+    bottom: 42px;
+  }
+  
+  .album-card.owned .card-level {
+    bottom: 24px;
+    font-size: 9px;
+  }
+  
+  .album-card.owned {
+    font-size: 8px;
+    bottom: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-player-image {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .card-image-fallback {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+}
+  /* Efecto parallax suave */
+.page-cover {
+  background-attachment: fixed;
+  transition: transform 0.3s ease;
+}
+
+.page-cover:hover {
+  transform: scale(1.02);
+}
+
+/* Efecto de zoom lento (ken burns) */
+@keyframes slowZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
+}
+
+.page-cover {
+  animation: slowZoom 20s ease-in-out infinite alternate;
+}
+
+/* Overlay con degradado para mejor legibilidad */
+.page-cover::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0,0,0,0.6) 0%,
+    rgba(0,0,0,0.2) 50%,
+    rgba(0,0,0,0.6) 100%
+  );
+  pointer-events: none;
+}
+
+/* Efecto de brillo en la imagen */
+.page-cover {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-cover::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.page-cover:hover::before {
+  opacity: 1;
 }
 
       `}</style>
