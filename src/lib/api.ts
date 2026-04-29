@@ -83,6 +83,27 @@ interface TicketFromDB {
   created_at: string;
 }
 
+// Convertir UnifiedCard a PlayerCard
+export function unifiedToPlayerCard(card: UnifiedCard): PlayerCard {
+  const overall_rating = card.overall_rating;
+  
+  return {
+    id: card.id,
+    name: card.name,
+    position: card.position,
+    category: card.category,
+    photo_url: null,
+    overall_rating,
+    pace: card.pace,
+    dribbling: card.dribbling,
+    passing: card.passing,
+    defending: card.defending,
+    finishing: card.finishing,
+    physical: card.physical,
+    rarity: getRarity(overall_rating),
+  };
+}
+
 // Función para convertir perfil a carta
 function profileToCard(profile: any): UnifiedCard {
     // Asegurarse de que la categoría sea 'socios' para todos los perfiles
@@ -358,6 +379,8 @@ submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ tick
   } catch (error) {
     console.error('Error checking streak rewards:', error);
   }
+
+  
 
   // Obtener el ticket creado
   const { data: ticket, error: ticketError } = await supabase
@@ -907,11 +930,38 @@ updateProgression: async (
   return updateUserProgression(userId, action);
 },
 
-getUserCardStats: async (userId: string): Promise<any> => {
-  const { getUserCardStats } = await import('../utils/userProgression');
-  return getUserCardStats(userId);
+// En api.ts, dentro de getUserCards:
+async getUserCards(userId: string): Promise<UserCard[]> {
+    const { data, error } = await supabase
+      .from('user_cards')
+      .select(`
+        *,
+        npc:players!player_id (*),
+        socio:profiles!socio_id (*)
+      `)
+      .eq('user_id', userId);
+    
+    if (error) throw error;
+    
+    return (data || [])
+      .map(uc => {
+        if (uc.card_type === 'npc' && uc.npc) {
+          return {
+            ...uc,
+            card: npcToCard(uc.npc),
+          };
+        } else if (uc.card_type === 'socio' && uc.socio) {
+          return {
+            ...uc,
+            card: profileToCard(uc.socio),
+          };
+        }
+        return null; // Retorna null si no hay datos
+      })
+      .filter((uc): uc is UserCard => uc !== null && uc.card !== null); // Filtra los null
 },
- 
+
+
 
   // Suscribirse a notificaciones en tiempo real
   subscribeToNotifications: (userId: string, callback: (notification: Notification) => void) => {
@@ -1021,10 +1071,223 @@ export function generateRandomStats(): Omit<PlayerCard, 'id' | 'name' | 'positio
 
 
 export const cardApi = {
-  // Obtener todas las cartas disponibles (NPCs no reemplazados + Socios)
-  // ============================================================
-// FUNCIONES MODIFICADAS PARA LA CATEGORÍA "SOCIOS"
-// ============================================================
+
+// NUEVO: Obtener la carta principal del usuario
+  async getMyCard(userId: string): Promise<PlayerCard | null> {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (error || !profile) return null;
+    
+    // Calcular OVR
+    const pace = profile.user_card_pace || 40;
+    const dribbling = profile.user_card_dribbling || 40;
+    const passing = profile.user_card_passing || 40;
+    const defending = profile.user_card_defending || 40;
+    const finishing = profile.user_card_finishing || 40;
+    const physical = profile.user_card_physical || 40;
+    
+    const overall_rating = calcOVR({ pace, dribbling, passing, defending, finishing, physical });
+    
+    return {
+      id: profile.id,
+      name: profile.username,
+      position: 'pivot',
+      category: 'Jugador',
+      photo_url: null,
+      overall_rating,
+      pace,
+      dribbling,
+      passing,
+      defending,
+      finishing,
+      physical,
+      rarity: getRarity(overall_rating),
+    };
+  },
+
+  // NUEVO: Obtener colección del usuario (alias de getUserCards)
+  async getMyCollection(userId: string): Promise<UserCard[]> {
+    return this.getUserCards(userId);
+  },
+
+  // NUEVO: Obtener todos los jugadores para el álbum
+  async getAllPlayers(): Promise<PlayerCard[]> {
+    // Obtener NPCs
+    const { data: npcs } = await supabase
+      .from('players')
+      .select('*')
+      .eq('can_be_replaced', true)
+      .eq('is_replaced', false);
+    
+    // Obtener Socios
+    const { data: socios } = await supabase
+      .from('profiles')
+      .select('*');
+    
+    const allPlayers: PlayerCard[] = [];
+    
+    // Convertir NPCs a PlayerCard
+    (npcs || []).forEach(npc => {
+      const overall_rating = calcOVR({
+        pace: npc.pace,
+        dribbling: npc.dribbling,
+        passing: npc.passing,
+        defending: npc.defending,
+        finishing: npc.finishing,
+        physical: npc.physical,
+      });
+      
+      allPlayers.push({
+        id: npc.id,
+        name: npc.name,
+        position: npc.position,
+        category: npc.category,
+        photo_url: null,
+        overall_rating,
+        pace: npc.pace,
+        dribbling: npc.dribbling,
+        passing: npc.passing,
+        defending: npc.defending,
+        finishing: npc.finishing,
+        physical: npc.physical,
+        rarity: getRarity(overall_rating),
+      });
+    });
+    
+    // Convertir Socios a PlayerCard
+    (socios || []).forEach(socio => {
+      const pace = socio.user_card_pace || 40;
+      const dribbling = socio.user_card_dribbling || 40;
+      const passing = socio.user_card_passing || 40;
+      const defending = socio.user_card_defending || 40;
+      const finishing = socio.user_card_finishing || 40;
+      const physical = socio.user_card_physical || 40;
+      
+      const overall_rating = calcOVR({ pace, dribbling, passing, defending, finishing, physical });
+      
+      allPlayers.push({
+        id: socio.id,
+        name: socio.username,
+        position: 'ala',
+        category: 'socios',
+        photo_url: null,
+        overall_rating,
+        pace,
+        dribbling,
+        passing,
+        defending,
+        finishing,
+        physical,
+        rarity: getRarity(overall_rating),
+      });
+    });
+    
+    return allPlayers;
+  },
+
+  // NUEVO: Simular partido
+  async simulateMatch(userId: string, deckId: string, opponent: string): Promise<MatchResult> {
+    // Obtener el mazo del usuario
+    const deck = await this.getActiveDeck(userId);
+    const userCards = deck.cards;
+    
+    if (userCards.length === 0) {
+      throw new Error('No hay cartas en el mazo');
+    }
+    
+    // Calcular OVR promedio del equipo del usuario
+    const userAvgOVR = userCards.reduce((sum, card) => {
+      return sum + (card.card?.overall_rating || 0);
+    }, 0) / userCards.length;
+    
+    // OVR del bot (entre 40 y 80)
+    const botOVR = 40 + Math.random() * 40;
+    
+    // Probabilidad de gol basada en diferencia de OVR
+    const getGoalProbability = (attackerOVR: number, defenderOVR: number) => {
+      const diff = attackerOVR - defenderOVR;
+      return Math.min(0.6, Math.max(0.1, 0.25 + diff / 100));
+    };
+    
+    // Simular partido de 20 minutos
+    const events: MatchEvent[] = [];
+    let userScore = 0;
+    let opponentScore = 0;
+    
+    const minutes = [3, 8, 12, 15, 18, 22, 25, 28, 32, 35, 38, 42, 45];
+    
+    for (const minute of minutes) {
+      // Probabilidad de ataque del usuario
+      if (Math.random() < getGoalProbability(userAvgOVR, botOVR)) {
+        userScore++;
+        events.push({
+          minute,
+          team: 'user',
+          type: 'goal',
+          player_name: userCards[Math.floor(Math.random() * userCards.length)]?.card?.name || 'Jugador',
+          description: `¡GOOOL! ${userCards[0]?.card?.name || 'Tu equipo'} marca el ${userScore}º`,
+        });
+      }
+      
+      // Probabilidad de ataque del bot
+      if (Math.random() < getGoalProbability(botOVR, userAvgOVR)) {
+        opponentScore++;
+        events.push({
+          minute: minute + 1,
+          team: 'opponent',
+          type: 'goal',
+          player_name: 'Bot',
+          description: `El Bot marca el ${opponentScore}º`,
+        });
+      }
+    }
+    
+    // Determinar si ganó
+    const won = userScore > opponentScore;
+    const experience_gained = won ? 50 : 20;
+    
+    // Registrar resultado en la base de datos
+    const { data: match, error } = await supabase
+      .from('matches')
+      .insert({
+        user_id: userId,
+        deck_id: deckId,
+        opponent,
+        user_score: userScore,
+        opponent_score: opponentScore,
+        won,
+        experience_gained,
+        events,
+      })
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error saving match:', error);
+    }
+    
+    // Actualizar estadísticas del usuario
+    await supabase
+      .from('profiles')
+      .update({
+        total_battles_lifetime: supabase.rpc('increment', { row_id: userId, count: 1 }),
+        total_wins_lifetime: won ? supabase.rpc('increment', { row_id: userId, count: 1 }) : undefined,
+      })
+      .eq('id', userId);
+    
+    return {
+      match_id: match?.id || `match_${Date.now()}`,
+      user_score: userScore,
+      opponent_score: opponentScore,
+      won,
+      experience_gained,
+      events,
+    };
+  },
 
 async getAllAvailableCards(userId: string): Promise<UnifiedCard[]> {
     // 1. Obtener NPCs no reemplazados (EXCLUYENDO la categoría 'socios')

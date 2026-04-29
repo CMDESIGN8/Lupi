@@ -1,33 +1,9 @@
-/**
- * CardsTab.tsx
- * Tab principal del sistema de cartas de Flores Futsal.
- * Incluye: Mi Carta, Caja Misteriosa, Álbum y Juego.
- *
- * INSTALACIÓN:
- *   1. Copiá este archivo a src/components/CardsTab.tsx
- *   2. En App.tsx agregá la tab "cards" al sistema de navegación (ver abajo)
- *
- * INTEGRACIÓN EN App.tsx:
- *   // Agregar al tipo Tab:
- *   type Tab = "home" | "ticket" | "ranking" | "profile" | "cards";
- *
- *   // Agregar al render:
- *   {tab === "cards" && <CardsTab user={user} />}
- *
- *   // Agregar al nav:
- *   { id: "cards", icon: "🃏", label: "Cartas" }
- */
+
 
 import { useState, useEffect, useCallback } from "react";
-import { AppUser } from "../lib/api";
-import {
-  cardApi,
-  PlayerCard,
-  UserCard,
-  MatchResult,
-  MatchEvent,
-  calcOVR,
-} from "../lib/api.cards";
+import { AppUser, cardApi, calcOVR, unifiedToPlayerCard } from "../lib/api";
+import type { UserCard } from '../types/cards';
+import type { PlayerCard, MatchResult, MatchEvent, DailyRewardResult } from '../lib/api';
 import { FifaCard } from "./FifaCard";
 import { MysteryBox } from "./MysteryBox";
 
@@ -437,7 +413,7 @@ export function CardsTab({ user }: CardsTabProps) {
   } : null);
 
   // Filtrar álbum
-  const ownedIds = new Set(collection.map(uc => uc.player.id));
+  const ownedIds = new Set(collection.map(uc => uc.card?.id));
   const filteredPlayers = allPlayers.filter(p =>
     rarityFilter === 'all' || p.rarity === rarityFilter
   );
@@ -583,14 +559,14 @@ export function CardsTab({ user }: CardsTabProps) {
                 <div style={{ height: 6, background: 'var(--surface2)', borderRadius: 100, overflow: 'hidden' }}>
                   <div style={{
                     height: '100%',
-                    width: `${albumProgress.percent}%`,
+                    width: `${(albumProgress.owned / albumProgress.total) * 100}%`,
                     background: 'linear-gradient(90deg, var(--accent), var(--accent2))',
                     borderRadius: 100,
                     transition: 'width 0.6s ease',
                   }} />
                 </div>
                 <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 6, fontWeight: 700, letterSpacing: 0.5 }}>
-                  {albumProgress.percent}% completado
+                  {Math.round((albumProgress.owned / albumProgress.total) * 100)}% completado
                 </div>
               </div>
 
@@ -658,17 +634,17 @@ export function CardsTab({ user }: CardsTabProps) {
                 {/* 5 slots del mazo */}
                 <div className="deck-grid">
                   {Array.from({ length: 5 }, (_, i) => {
-                    const card = deckCards[i];
-                    return (
-                      <div key={i} className={`deck-slot${card ? ' filled' : ''}`}>
-                        {card ? (
-                          <FifaCard card={card.player} size="sm" />
-                        ) : (
-                          <span style={{ color: 'var(--text2)', fontSize: 20 }}>+</span>
-                        )}
-                      </div>
-                    );
-                  })}
+  const userCard = deckCards[i];
+  return (
+    <div key={i} className={`deck-slot${userCard ? ' filled' : ''}`}>
+      {userCard && userCard.card ? (
+  <FifaCard card={unifiedToPlayerCard(userCard.card)} size="sm" />
+) : (
+  <span style={{ color: 'var(--text2)', fontSize: 20 }}>+</span>
+)}
+    </div>
+  );
+})}
                 </div>
 
                 {/* Cartas disponibles para agregar */}
@@ -679,26 +655,26 @@ export function CardsTab({ user }: CardsTabProps) {
                     </div>
                     <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
                       {collection
-                        .filter(uc => !deckCards.some(dc => dc.id === uc.id))
-                        .slice(0, 10)
-                        .map(uc => (
-                          <div
-                            key={uc.id}
-                            style={{ flexShrink: 0, cursor: 'pointer' }}
-                            onClick={async () => {
-                              const nextPos = deckCards.length + 1;
-                              if (nextPos > 5) return;
-                              try {
-                                await cardApi.updateDeckCard(activeDeckId, nextPos, uc.id);
-                                setDeckCards(prev => [...prev, uc]);
-                              } catch (err) {
-                                console.error(err);
-                              }
-                            }}
-                          >
-                            <FifaCard card={uc.player} size="sm" />
-                          </div>
-                        ))}
+  .filter(uc => !deckCards.some(dc => dc.id === uc.id) && uc.card)  // ✅ Filtra las que tienen card
+  .slice(0, 10)
+  .map(uc => (
+    <div
+      key={uc.id}
+      style={{ flexShrink: 0, cursor: 'pointer' }}
+      onClick={async () => {
+        const nextPos = deckCards.length + 1;
+        if (nextPos > 5) return;
+        try {
+          await cardApi.updateDeckCard(activeDeckId, nextPos, uc.id);
+          setDeckCards(prev => [...prev, uc]);
+        } catch (err) {
+          console.error(err);
+        }
+      }}
+    >
+      <FifaCard card={unifiedToPlayerCard(uc.card!)} size="sm" />
+    </div>
+  ))}
                     </div>
                     <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 6 }}>
                       Tocá una carta para agregarla al equipo
