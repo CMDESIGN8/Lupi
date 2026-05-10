@@ -514,7 +514,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
 
           {/* LEYENDA DE QUÍMICA */}
           <div className="chem-legend">
-            <span className="chem-dot green"></span><span>Mismo equipo</span>
+            <span className="chem-dot green"></span><span>Misma Categoria</span>
             <span className="chem-dot yellow"></span><span>Mismo club</span>
             <span className="chem-dot red"></span><span>Sin conexión</span>
           </div>
