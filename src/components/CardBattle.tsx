@@ -1,11 +1,4 @@
 // src/components/CardBattle.tsx — Versión ADICTIVA completa
-// Mejoras incluidas:
-//   1. Sistema de racha con bonus XP multiplicado
-//   2. Log de batalla por turnos async con HP en tiempo real
-//   3. Rivales bloqueados por victorias acumuladas
-//   4. Monedas como recompensa variable
-//   5. Desafíos diarios persistidos en Supabase
-//   6. Barra de XP visible en el header de batalla
 
 import { useState, useRef, useEffect } from 'react';
 import { UserCard, Deck, UnifiedCard } from '../types/cards';
@@ -743,7 +736,7 @@ const getRivalFormation = () => {
       <div className="arena-header">
         <div className="arena-title">
           <span className="arena-icon">⚽</span>
-          <span>ESTADIO DE FUTSAL</span>
+          <span>FLORES CLUB ARENA</span>
           <span className="arena-badge">FUTSAL</span>
         </div>
         <button className="deck-link-btn" onClick={onNavigateToDeck}>
