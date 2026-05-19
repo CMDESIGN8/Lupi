@@ -589,7 +589,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
       {/* ════════════════════════ CANCHA ════════════════════════ */}
     <div className="arena-match-core">
-      <div className="futsal-court">
+      <div className={`futsal-court ${moment ? 'court-tension' : ''} ${flash?.type === 'goal' ? 'flash-futsal-gol' : ''}`}>
 
         {/* Marcador */}
         {phase === 'battle' && (
@@ -784,19 +784,43 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
       )}
     
       {/* ════════════════════════ LOG BATTLE ════════════════════════ */}
-      {phase === 'battle' && (
-      <div className="live-ticker-container">
-        <div className="ticker-badge">🔴 EN DIRECTO</div>
-        <div className="battle-log-strip" ref={logRef}>
-          {log.slice(-7).map((l, idx) => (
+      {/* FASE BATTLE: Transmisión en directo integrada */}
+{phase === 'battle' && (
+  <div className="live-ticker-container">
+    <div className="ticker-header-row">
+      <div className="ticker-badge">🔴 EN DIRECTO</div>
+      
+      {/* 📊 BARRA DE POSESIÓN DINÁMICA */}
+      <div className="possession-bar-wrap">
+        <div className="possession-bar">
+          {/* Si ballTeam es 'user', simulamos 58% de dominio, si no, 42% (con sutiles variantes) */}
+          <div 
+            className="possession-fill user-fill" 
+            style={{ width: `${ballTeam === 'user' ? 58 : 42}%` }}
+          >
+            {ballTeam === 'user' ? '58%' : '42%'}
+          </div>
+          <div 
+            className="possession-fill rival-fill" 
+            style={{ width: `${ballTeam === 'rival' ? 58 : 42}%` }}
+          >
+            {ballTeam === 'rival' ? '58%' : '42%'}
+          </div>
+        </div>
+        <span className="possession-label">POSESIÓN</span>
+      </div>
+    </div>
+
+    <div className="battle-log-strip" ref={logRef}>
+      {log.slice(-7).map((l, idx) => (
         <div key={`log_strip_${l.id}_${idx}`} className={`log-line log-${l.type}`}>
           {l.text}
         </div>
       ))}
-          {log.length === 0 && <div className="log-line">⏳ El partido está por comenzar…</div>}
-        </div>
-      </div>
-    )}
+      {log.length === 0 && <div className="log-line">⏳ El partido está por comenzar…</div>}
+    </div>
+  </div>
+)}
       {/* ════════════════════════ MODAL RESULTADO ════════════════════════ */}
       {phase === 'result' && matchResult && (
   <div className="result-modal-overlay" onClick={() => { setMatchResult(null); setPhase('select'); }}>
@@ -1217,7 +1241,19 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    animation: slideNewLog 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.1) forwards;
   }
+    /* Animación: entra desde abajo con un sutil rebotecito */
+@keyframes slideNewLog {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 }
 
 /* =====================================================================
@@ -1276,6 +1312,143 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
   background-size: 100% 2px, 3px 100%;
   pointer-events: none; /* Para que no te rompa los clicks */
   opacity: 0.4;
+}
+  /* --- Cabecera del Ticker --- */
+.ticker-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  z-index: 3; /* Por encima del filtro CRT */
+}
+
+/* --- Contenedor de la Barra de Posesión --- */
+.possession-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.possession-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.5px;
+}
+
+.possession-bar {
+  display: flex;
+  width: 120px;
+  height: 14px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #1f2937;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --- Rellenos de la barra con transiciones suaves --- */
+.possession-fill {
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.possession-fill.user-fill {
+  background: #3dffa0; /* Verde LupiApp */
+  color: #0d1117;
+}
+
+.possession-fill.rival-fill {
+  background: #1f2937;
+  color: rgba(255, 255, 255, 0.6);
+  border-left: 1px solid rgba(0,0,0,0.3);
+}
+
+/* =====================================================================
+   📺 EFECTO CRT SCANLINES PARA EL TRANSMISOR (Estilo Monitor de Estadio)
+   ===================================================================== */
+.live-ticker-container::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  /* Capa de líneas horizontales de 2px de alto */
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.3) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 2;
+  pointer-events: none; /* Permite clicks e interacciones debajo de la capa */
+  opacity: 0.6;
+}
+
+/* Aseguramos que los textos queden por encima del filtro para que no pierdan nitidez */
+.battle-log-strip {
+  position: relative;
+  z-index: 3;
+}
+  /* =====================================================================
+   🚨 ATMÓSFERA DE MOMENTO CLAVE (Cancha en Tensión)
+   ===================================================================== */
+
+.futsal-court {
+  /* Aseguramos que tu cancha tenga transición para que el cambio no sea brusco */
+  transition: box-shadow 0.5s ease, border-color 0.5s ease, filter 0.5s ease;
+  position: relative;
+}
+
+/* Cuando se activa el momento clave: */
+.futsal-court.court-tension {
+  /* 1. Sombra interna pesada que oscurece los córners y bordes de la cancha */
+  box-shadow: 
+    inset 0 0 80px rgba(0, 0, 0, 0.85),
+    0 0 15px rgba(255, 174, 0, 0.2);
+    
+  /* 2. El borde exterior de la cancha cambia a un color de alerta (dorado/ámbar) */
+  border-color: #ffae00 !important;
+  
+  /* 3. Animación de pulso para simular luces perimetrales de estadio en pausa */
+  animation: courtPulseAlerta 2s infinite ease-in-out;
+}
+
+/* Si querés llevarlo al extremo: atenuamos un toque el fondo del pasto/parqué 
+   para que resalte el triple el modal de decisión que está flotando arriba */
+.futsal-court.court-tension .player-token:not(.token-active) {
+  filter: grayscale(0.3) brightness(0.7);
+  transition: filter 0.5s ease;
+}
+
+/* ── Animación del pulso de luz de la Arena ── */
+@keyframes courtPulseAlerta {
+  0% {
+    border-color: rgba(255, 174, 0, 0.4);
+    box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.85);
+  }
+  50% {
+    border-color: rgba(255, 174, 0, 0.8);
+    /* El destello invade un poquito más la cancha en el pico de tensión */
+    box-shadow: 
+      inset 0 0 100px rgba(0, 0, 0, 0.9),
+      0 0 20px rgba(255, 174, 0, 0.3);
+  }
+  100% {
+    border-color: rgba(255, 174, 0, 0.4);
+    box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.85);
+  }
+}
+  .flash-futsal-gol {
+  animation: flashFocos 0.4s ease-out;
+}
+
+@keyframes flashFocos {
+  0% { filter: brightness(1); }
+  30% { filter: brightness(1.8); } /* Destello de luz */
+  100% { filter: brightness(1); }
 }
         @media(max-width:640px){.futsal-court{height:280px;}.rival-selector-row{flex-direction:column;}.result-modal{padding:20px 16px;} .court-scoreboard {top:-8px;}}
       `}</style>
