@@ -1096,7 +1096,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
         /* LEYENDA QUÍMICA */
         .chem-legend {
           position: absolute;
-          bottom: 12px;
+          bottom: 1px;
           left: 50%;
           transform: translateX(-50%);
           display: flex;

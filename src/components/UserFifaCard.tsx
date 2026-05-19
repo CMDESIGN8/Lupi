@@ -187,67 +187,96 @@ function getCurrentRarityMinLevel(rarity: string): number {
 
         {/* Stats grid estilo FIFA */}
         <div className="fifa-stats-grid">
-          <div className="fifa-stat">
-            <div className="fifa-stat-icon">⚡</div>
-            <div className="fifa-stat-info">
-              <span className="fifa-stat-label">Velocidad</span>
-              <span className="fifa-stat-value">{stats.pace}</span>
-            </div>
-            <div className="fifa-stat-bar">
-              <div className="fifa-stat-fill" style={{ width: `${(stats.pace / 99) * 100}%`, background: '#4CAF50' }} />
-            </div>
-          </div>
-          <div className="fifa-stat">
-            <div className="fifa-stat-icon">✨</div>
-            <div className="fifa-stat-info">
-              <span className="fifa-stat-label">Regate</span>
-              <span className="fifa-stat-value">{stats.dribbling}</span>
-            </div>
-            <div className="fifa-stat-bar">
-              <div className="fifa-stat-fill" style={{ width: `${(stats.dribbling / 99) * 100}%`, background: '#2196F3' }} />
-            </div>
-          </div>
-          <div className="fifa-stat">
-            <div className="fifa-stat-icon">⚽</div>
-            <div className="fifa-stat-info">
-              <span className="fifa-stat-label">Pase</span>
-              <span className="fifa-stat-value">{stats.passing}</span>
-            </div>
-            <div className="fifa-stat-bar">
-              <div className="fifa-stat-fill" style={{ width: `${(stats.passing / 99) * 100}%`, background: '#FF9800' }} />
-            </div>
-          </div>
-          <div className="fifa-stat">
-            <div className="fifa-stat-icon">🛡️</div>
-            <div className="fifa-stat-info">
-              <span className="fifa-stat-label">Defensa</span>
-              <span className="fifa-stat-value">{stats.defending}</span>
-            </div>
-            <div className="fifa-stat-bar">
-              <div className="fifa-stat-fill" style={{ width: `${(stats.defending / 99) * 100}%`, background: '#9C27B0' }} />
-            </div>
-          </div>
-          <div className="fifa-stat">
-            <div className="fifa-stat-icon">🎯</div>
-            <div className="fifa-stat-info">
-              <span className="fifa-stat-label">Remate</span>
-              <span className="fifa-stat-value">{stats.finishing}</span>
-            </div>
-            <div className="fifa-stat-bar">
-              <div className="fifa-stat-fill" style={{ width: `${(stats.finishing / 99) * 100}%`, background: '#E91E63' }} />
-            </div>
-          </div>
-          <div className="fifa-stat">
-            <div className="fifa-stat-icon">💪</div>
-            <div className="fifa-stat-info">
-              <span className="fifa-stat-label">Físico</span>
-              <span className="fifa-stat-value">{stats.physical}</span>
-            </div>
-            <div className="fifa-stat-bar">
-              <div className="fifa-stat-fill" style={{ width: `${(stats.physical / 99) * 100}%`, background: '#00BCD4' }} />
-            </div>
-          </div>
-        </div>
+  {/* Velocidad */}
+  <div className="fifa-stat" data-color="#4CAF50">
+    <div className="fifa-stat-bg">
+      <div className="fifa-stat-bg-fill" style={{ width: `${(stats.pace / 99) * 100}%` }} />
+    </div>
+    <div className="fifa-stat-icon">⚡</div>
+    <div className="fifa-stat-info">
+      <span className="fifa-stat-label">Velocidad</span>
+      <span className="fifa-stat-value">{stats.pace}</span>
+    </div>
+    <div className="fifa-stat-bar">
+      <div className="fifa-stat-fill" style={{ width: `${(stats.pace / 99) * 100}%` }} />
+    </div>
+  </div>
+
+  {/* Regate */}
+  <div className="fifa-stat" data-color="#2196F3">
+    <div className="fifa-stat-bg">
+      <div className="fifa-stat-bg-fill" style={{ width: `${(stats.dribbling / 99) * 100}%` }} />
+    </div>
+    <div className="fifa-stat-icon">✨</div>
+    <div className="fifa-stat-info">
+      <span className="fifa-stat-label">Regate</span>
+      <span className="fifa-stat-value">{stats.dribbling}</span>
+    </div>
+    <div className="fifa-stat-bar">
+      <div className="fifa-stat-fill" style={{ width: `${(stats.dribbling / 99) * 100}%` }} />
+    </div>
+  </div>
+
+  {/* Pase */}
+  <div className="fifa-stat" data-color="#FF9800">
+    <div className="fifa-stat-bg">
+      <div className="fifa-stat-bg-fill" style={{ width: `${(stats.passing / 99) * 100}%` }} />
+    </div>
+    <div className="fifa-stat-icon">⚽</div>
+    <div className="fifa-stat-info">
+      <span className="fifa-stat-label">Pase</span>
+      <span className="fifa-stat-value">{stats.passing}</span>
+    </div>
+    <div className="fifa-stat-bar">
+      <div className="fifa-stat-fill" style={{ width: `${(stats.passing / 99) * 100}%` }} />
+    </div>
+  </div>
+
+  {/* Defensa */}
+  <div className="fifa-stat" data-color="#9C27B0">
+    <div className="fifa-stat-bg">
+      <div className="fifa-stat-bg-fill" style={{ width: `${(stats.defending / 99) * 100}%` }} />
+    </div>
+    <div className="fifa-stat-icon">🛡️</div>
+    <div className="fifa-stat-info">
+      <span className="fifa-stat-label">Defensa</span>
+      <span className="fifa-stat-value">{stats.defending}</span>
+    </div>
+    <div className="fifa-stat-bar">
+      <div className="fifa-stat-fill" style={{ width: `${(stats.defending / 99) * 100}%` }} />
+    </div>
+  </div>
+
+  {/* Remate */}
+  <div className="fifa-stat" data-color="#E91E63">
+    <div className="fifa-stat-bg">
+      <div className="fifa-stat-bg-fill" style={{ width: `${(stats.finishing / 99) * 100}%` }} />
+    </div>
+    <div className="fifa-stat-icon">🎯</div>
+    <div className="fifa-stat-info">
+      <span className="fifa-stat-label">Remate</span>
+      <span className="fifa-stat-value">{stats.finishing}</span>
+    </div>
+    <div className="fifa-stat-bar">
+      <div className="fifa-stat-fill" style={{ width: `${(stats.finishing / 99) * 100}%` }} />
+    </div>
+  </div>
+
+  {/* Físico */}
+  <div className="fifa-stat" data-color="#00BCD4">
+    <div className="fifa-stat-bg">
+      <div className="fifa-stat-bg-fill" style={{ width: `${(stats.physical / 99) * 100}%` }} />
+    </div>
+    <div className="fifa-stat-icon">💪</div>
+    <div className="fifa-stat-info">
+      <span className="fifa-stat-label">Físico</span>
+      <span className="fifa-stat-value">{stats.physical}</span>
+    </div>
+    <div className="fifa-stat-bar">
+      <div className="fifa-stat-fill" style={{ width: `${(stats.physical / 99) * 100}%` }} />
+    </div>
+  </div>
+</div>
 
         {/* Barra de experiencia */}
         <div className="fifa-exp-section">
@@ -261,8 +290,7 @@ function getCurrentRarityMinLevel(rarity: string): number {
             <div className="fifa-exp-fill" style={{ width: `${progressPercent}%`, background: rarity.color }} />
           </div>
         </div>
-
-        {/* Próxima rareza */}
+  
         {/* Próxima rareza - con progreso real */}
 {stats.rarity !== 'elite' && (() => {
   const nextRarity = getNextRarityData(stats.rarity);
@@ -1545,137 +1573,491 @@ function getCurrentRarityMinLevel(rarity: string): number {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  padding: 16px 20px;
-  background: rgba(0,0,0,0.3);
-  margin: 0 16px 16px;
-  border-radius: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2));
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  margin: 16px;
 }
 
+/* Stat individual - Contenedor principal */
 .fifa-stat {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 8px;
-  background: rgba(255,255,255,0.03);
-  border-radius: 12px;
-  transition: all 0.2s;
+  gap: 12px;
+  padding: 12px 14px;
+  background: rgba(10, 10, 20, 0.4);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
+/* Efecto hover mejorado */
 .fifa-stat:hover {
-  background: rgba(255,255,255,0.08);
-  transform: translateX(4px);
+  transform: translateX(6px) scale(1.02);
+  background: rgba(20, 20, 40, 0.6);
+  border-color: rgba(255,255,255,0.15);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
+/* Capa de fondo de la barra de progreso */
+.fifa-stat-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 14px;
+  z-index: 0;
+}
+
+/* Barra de progreso de fondo (la que se extiende sobre todo el stat) */
+.fifa-stat-bg-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  background: linear-gradient(90deg, 
+    var(--stat-color, currentColor) 0%, 
+    var(--stat-color, currentColor) 60%,
+    rgba(var(--stat-color-rgb, 0), 0.3) 100%);
+  opacity: 0.35;
+  border-radius: 14px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+}
+
+/* Animación de brillo para la barra de fondo */
+@keyframes bgShine {
+  0% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.fifa-stat:hover .fifa-stat-bg-fill {
+  animation: bgShine 1s ease infinite;
+  opacity: 0.5;
+}
+
+/* Icono */
 .fifa-stat-icon {
-  font-size: 20px;
-  width: 30px;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+  position: relative;
+  z-index: 2;
+  font-size: 24px;
+  width: 36px;
+  text-align: center;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  transition: transform 0.2s ease;
 }
 
+.fifa-stat:hover .fifa-stat-icon {
+  transform: scale(1.1);
+}
+
+/* Información del stat */
 .fifa-stat-info {
+  position: relative;
+  z-index: 2;
   flex: 1;
   min-width: 0;
 }
 
 .fifa-stat-label {
-  font-size: 9px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.5);
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   display: block;
+  margin-bottom: 2px;
+  font-family: 'Poppins', sans-serif;
 }
 
 .fifa-stat-value {
   font-family: 'Teko', 'Poppins', sans-serif;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: #fff;
   line-height: 1;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  letter-spacing: 0.5px;
 }
 
+/* Barra pequeña (indicador fino) */
 .fifa-stat-bar {
-  width: 70px;
+  position: relative;
+  z-index: 2;
+  width: 80px;
   height: 6px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(0, 0, 0, 0.6);
   border-radius: 3px;
   overflow: hidden;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .fifa-stat-fill {
   height: 100%;
   border-radius: 3px;
-  animation: statBarFill 0.6s ease-out;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--stat-color, currentColor);
+  box-shadow: 0 0 6px var(--stat-color, currentColor);
   position: relative;
-  overflow: hidden;
 }
 
+/* Efecto de brillo animado en la barra pequeña */
 .fifa-stat-fill::after {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255,255,255,0.4), 
+    transparent);
+  animation: shine 1.5s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
+}
+
+/* Asignación de colores personalizados */
+.fifa-stat[data-color="#4CAF50"] {
+  --stat-color: #4CAF50;
+  --stat-color-rgb: 76, 175, 80;
+}
+.fifa-stat[data-color="#2196F3"] {
+  --stat-color: #2196F3;
+  --stat-color-rgb: 33, 150, 243;
+}
+.fifa-stat[data-color="#FF9800"] {
+  --stat-color: #FF9800;
+  --stat-color-rgb: 255, 152, 0;
+}
+.fifa-stat[data-color="#9C27B0"] {
+  --stat-color: #9C27B0;
+  --stat-color-rgb: 156, 39, 176;
+}
+.fifa-stat[data-color="#E91E63"] {
+  --stat-color: #E91E63;
+  --stat-color-rgb: 233, 30, 99;
+}
+.fifa-stat[data-color="#00BCD4"] {
+  --stat-color: #00BCD4;
+  --stat-color-rgb: 0, 188, 212;
+}
+
+/* Aplicar colores a los elementos */
+.fifa-stat-bg-fill {
+  background: linear-gradient(90deg, var(--stat-color) 0%, var(--stat-color) 60%, rgba(var(--stat-color-rgb), 0.3) 100%);
+}
+
+.fifa-stat-fill {
+  background: var(--stat-color);
+  box-shadow: 0 0 8px var(--stat-color);
+}
+
+/* Responsive */
+@media (max-width: 560px) {
+  .fifa-stats-grid {
+    gap: 10px;
+    padding: 12px;
+    margin: 12px;
+  }
+  
+  .fifa-stat {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  
+  .fifa-stat-icon {
+    font-size: 18px;
+    width: 28px;
+  }
+  
+  .fifa-stat-value {
+    font-size: 18px;
+  }
+  
+  .fifa-stat-bar {
+    width: 60px;
+    height: 5px;
+  }
+  
+  .fifa-stat-label {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .fifa-stat-bar {
+    width: 45px;
+  }
+  
+  .fifa-stat-icon {
+    font-size: 16px;
+    width: 24px;
+  }
 }
 
 /* Experiencia - Barra estilo FIFA */
+/* ============================================
+   SECCIÓN DE EXPERIENCIA - ESTILO FIFA PREMIUM
+   INTEGRADA CON EL DISEÑO DE STATS
+   ============================================ */
+
 .fifa-exp-section {
-  padding: 0 20px 16px;
+  margin: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2));
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fifa-exp-section:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(0,0,0,0.3));
+  border-color: rgba(255,215,0,0.3);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
 }
 
 .fifa-exp-header {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  font-size: 11px;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
 .fifa-exp-icon {
-  font-size: 12px;
-  color: #ffd700;
+  font-size: 18px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  animation: starPulse 2s ease-in-out infinite;
+}
+
+@keyframes starPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px #ffd700);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 8px #ffd700);
+  }
 }
 
 .fifa-exp-label {
   flex: 1;
-  color: rgba(255,255,255,0.5);
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1.5px;
+  font-family: 'Poppins', sans-serif;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .fifa-exp-values {
-  color: #ffd700;
-  font-family: 'Teko', monospace;
-  font-weight: 600;
+  font-family: 'Teko', 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffd700, #ffed4e);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  letter-spacing: 0.5px;
+}
+
+/* Wrapper para la barra con efecto de glassmorphism */
+.fifa-exp-bar-wrapper {
+  position: relative;
+  padding: 2px 0;
 }
 
 .fifa-exp-bar {
-  height: 8px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.05);
+  position: relative;
+}
+
+/* Fondo de la barra con efecto de brillo */
+.fifa-exp-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255,255,255,0.1), 
+    transparent);
+  animation: expShine 2s infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes expShine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
 }
 
 .fifa-exp-fill {
   height: 100%;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
   position: relative;
+  background: linear-gradient(90deg, 
+    #ffd700 0%, 
+    #ffed4e 50%, 
+    #ffd700 100%);
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  animation: expGlow 2s ease-in-out infinite;
 }
 
-.fifa-exp-fill::after {
+@keyframes expGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+  }
+}
+
+/* Efecto de brillo superior en el relleno */
+.fifa-exp-fill::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,0.6) 0%, 
+    rgba(255,255,255,0.2) 50%,
+    transparent 100%);
+  border-radius: 8px 8px 0 0;
+}
+
+/* Efecto de partículas doradas en hover */
+.fifa-exp-section:hover .fifa-exp-fill::after {
+  content: '✦';
+  position: absolute;
+  right: 5px;
+  top: -15px;
+  font-size: 12px;
+  color: #ffd700;
+  animation: particleFloat 0.5s ease-out;
+}
+
+@keyframes particleFloat {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+/* Niveles de experiencia con colores */
+  .fifa-exp-fill[data-level="bronze"] {
+    background: linear-gradient(90deg, #cd7f32, #e8a94e);
+  }
+  .fifa-exp-fill[data-level="silver"] {
+    background: linear-gradient(90deg, #c0c0c0, #e8e8e8);
+  }
+  .fifa-exp-fill[data-level="gold"] {
+    background: linear-gradient(90deg, #ffd700, #ffed4e);
+  }
+  .fifa-exp-fill[data-level="elite"] {
+    background: linear-gradient(90deg, #00bfff, #1e90ff);
+    box-shadow: 0 0 15px rgba(0, 191, 255, 0.6);
+  }
+
+/* Texto de nivel de experiencia opcional */
+.fifa-exp-level {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: rgba(255,215,0,0.2);
+  color: #ffd700;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Responsive para experiencia */
+@media (max-width: 560px) {
+  .fifa-exp-section {
+    margin: 12px;
+    padding: 12px 16px;
+  }
+  
+  .fifa-exp-icon {
+    font-size: 14px;
+  }
+  
+  .fifa-exp-label {
+    font-size: 9px;
+    letter-spacing: 1px;
+  }
+  
+  .fifa-exp-values {
+    font-size: 16px;
+  }
+  
+  .fifa-exp-bar {
+    height: 8px;
+  }
+}
+
+@media (max-width: 400px) {
+  .fifa-exp-section {
+    margin: 8px;
+    padding: 10px 14px;
+  }
+  
+  .fifa-exp-header {
+    gap: 8px;
+  }
 }
 
 /* Próxima rareza - versión avanzada con progreso real */
