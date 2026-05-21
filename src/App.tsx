@@ -32,6 +32,8 @@
   import { calculateOVR } from './types/cards';
   import { cardApi } from './lib/api';
   import { AdminAlbumPanel } from './components/AdminAlbumPanel';
+  import { CampaignMode } from './components/CampaignMode';
+
 
 
   const ADMIN_EMAILS = ['lupi@lupiapp.com', 'info.aynonline@gmail.com']; // Cambiá por los emails de admin
@@ -2239,6 +2241,55 @@
   .ticket-hint:hover::after {
     opacity: 1;
   }
+
+.battle-mode-selector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: rgba(0,0,0,0.3);
+  padding: 8px;
+  border-radius: 60px;
+}
+
+.mode-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #fff;
+}
+
+.mode-btn span:first-child {
+  font-size: 24px;
+}
+
+.mode-btn span:last-child {
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.mode-btn small {
+  font-size: 9px;
+  color: rgba(255,255,255,0.4);
+}
+
+.mode-btn.active {
+  background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,100,50,0.1));
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255,215,0,0.2);
+}
+
+@media (max-width: 640px) {
+  .mode-btn span:last-child { font-size: 11px; }
+  .mode-btn small { display: none; }
+}
     /* ============================================================
     MEJORAS RESPONSIVE - AGREGAR AL FINAL DE TUS ESTILOS
     ============================================================ */
@@ -3890,10 +3941,12 @@
         // ============================================================
         // MAIN APP
         // ============================================================
-        type Tab = "home" | "ticket" | "ranking" | "profile" | "album" | "battle" | "deck" | "admin";
+        type Tab = "home" | "ticket" | "ranking" | "profile" | "album" | "battle" | "campaign" | "deck" | "admin";
 
 
         export default function App() {
+          const [battleMode, setBattleMode] = useState<'quick' | 'campaign'>('quick');
+
           const [user, setUser] = useState<AppUser | null>(null);
           const [tab, setTab] = useState<Tab>("home");
           const [hydrated, setHydrated] = useState(false);
@@ -4287,19 +4340,50 @@
                     {tab === "ticket"  && <TicketTab user={user} onPointsUpdate={handlePointsUpdate} />}
                     {tab === "ranking" && <LeaderboardTab user={user} />}
                     {tab === "album" && <CardAlbum userId={user.id} />}
-                    {tab === "battle" && (
-      <div className="main-content">
-        <div className="container">
-          <CardBattle 
-            userCards={userCards}
-            userDeck={activeDeck}
-            userId={user.id}
-            onBattleComplete={() => { loadUserCards(); loadActiveDeck(); loadAlbumProgress(); }}
-            onNavigateToDeck={() => setTab("deck")}
-          />
-        </div>
+{tab === "battle" && (
+  <div className="main-content">
+    <div className="container">
+      {/* Selector de modo de juego */}
+      <div className="battle-mode-selector">
+        <button
+          className={`mode-btn ${battleMode === 'quick' ? 'active' : ''}`}
+          onClick={() => setBattleMode('quick')}
+        >
+          <span>⚡</span>
+          <span>PARTIDO RÁPIDO</span>
+          <small>Enfrentá bots al azar</small>
+        </button>
+        <button
+          className={`mode-btn ${battleMode === 'campaign' ? 'active' : ''}`}
+          onClick={() => setBattleMode('campaign')}
+        >
+          <span>🏆</span>
+          <span>MODO HISTORIA</span>
+          <small>Ganá ligas y desbloqueá insignias</small>
+        </button>
       </div>
-    )}
+
+      {/* Renderizar según modo seleccionado */}
+      {battleMode === 'quick' ? (
+        <CardBattle 
+          userCards={userCards}
+          userDeck={activeDeck}
+          userId={user.id}
+          onBattleComplete={() => { loadUserCards(); loadActiveDeck(); loadAlbumProgress(); }}
+          onNavigateToDeck={() => setTab("deck")}
+        />
+      ) : (
+        <CampaignMode
+          userCards={userCards}
+          userDeck={activeDeck}
+          userId={user.id}
+          onBattleComplete={() => { loadUserCards(); loadActiveDeck(); loadAlbumProgress(); }}
+          onNavigateToDeck={() => setTab("deck")}
+        />
+      )}
+    </div>
+  </div>
+)}
 
     {tab === "deck" && (
       <DeckBuilder
@@ -4326,30 +4410,28 @@
     )}
           
                     <nav className="bottom-nav">
-                      {([
-                        { id: "home",    icon: "🏠", label: "Inicio"  },
-                        { id: "ticket",  icon: "🎟️", label: "Entrada" },
-                        { id: "ranking", icon: "🏆", label: "Ranking" },
-                        { id: "album", icon: "📖", label: "Álbum" },
-                        { id: "battle", icon: "🏟️", label: "Competir" },
-                        { id: "deck", icon: "⚽", label: "Equipo" },
-
-                        { id: "profile", icon: "👤", label: "Perfil"  },
-                        // 🔐 Botón de ADMIN - solo visible para administradores
-        ...(ADMIN_EMAILS.includes(user.email) || ADMIN_IDS.includes(user.id) ? [
-          { id: "admin", icon: "⚙️", label: "Admin" }
-        ] : []),
-      ] as { id: Tab | "admin"; icon: string; label: string }[]).map((n) => (
-        <button 
-          key={n.id} 
-          className={`nav-item${tab === n.id ? " active" : ""}`} 
-          onClick={() => setTab(n.id as Tab)}
-        >
-          <span className="nav-icon">{n.icon}</span>
-          {n.label}
-        </button>
-      ))}
-                    </nav>
+  {[
+    { id: "home", icon: "🏠", label: "Inicio" },
+    { id: "ticket", icon: "🎟️", label: "Entrada" },
+    { id: "ranking", icon: "🏆", label: "Ranking" },
+    { id: "album", icon: "📖", label: "Álbum" },
+    { id: "battle", icon: "⚔️", label: "Jugar" }, // Cambiado de Competir a Jugar
+    { id: "deck", icon: "⚽", label: "Equipo" },
+    { id: "profile", icon: "👤", label: "Perfil" },
+    ...(ADMIN_EMAILS.includes(user.email) || ADMIN_IDS.includes(user.id) ? [
+      { id: "admin", icon: "⚙️", label: "Admin" }
+    ] : []),
+  ].map((n) => (
+    <button 
+      key={n.id} 
+      className={`nav-item${tab === n.id ? " active" : ""}`} 
+      onClick={() => setTab(n.id as Tab)}
+    >
+      <span className="nav-icon">{n.icon}</span>
+      {n.label}
+    </button>
+  ))}
+</nav>  
                   </>
                 )}
               </div>

@@ -1,7 +1,8 @@
-// src/components/CardBattle.tsx — v5 (mobile fixes)
+// src/components/CardBattle.tsx — v6 (con soporte para modo campaña)
 // Fix #1: arena-container width:10% removido
 // Fix #2: scoreboard top corregido en mobile
 // Fix #3: battle log reescrito sin Tailwind, usando CSS custom
+// Fix #4: Modo campaña con rival forzado y selector condicional
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { UserCard, Deck } from '../types/cards';
@@ -17,6 +18,8 @@ import {
   SkillGroup,
 } from '../utils/battleEngine';
 import { supabase } from '../lib/supabaseClient';
+import { AnimeEffects, AnimeEffectsHandle } from './AnimeEffects';
+
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -26,12 +29,21 @@ interface CardBattleProps {
   userId: string;
   onBattleComplete: (updatedCards: UserCard[]) => void;
   onNavigateToDeck?: () => void;
+  // Nuevas props para modo campaña
+  forcedOpponent?: BotPlayer | null;  // Oponente forzado (no permite selección)
+  isCampaignMode?: boolean;            // Si es true, oculta el selector de bots
+  onCampaignMatchComplete?: (won: boolean, bot: BotPlayer) => void; // Callback para campaña
 }
 
-interface BotPlayer {
-  name: string; overall_rating: number; category: string;
-  level: number; avatar: string; color: string;
-  xpBase: number; reqWins: number;
+export interface BotPlayer {
+  name: string; 
+  overall_rating: number; 
+  category: string;
+  level: number; 
+  avatar: string; 
+  color: string;
+  xpBase: number; 
+  reqWins: number;
 }
 
 interface UserStats {
@@ -104,11 +116,28 @@ function calcOvr(cards: UserCard[]) {
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
-export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNavigateToDeck }: CardBattleProps) {
+export function CardBattle({ 
+  userCards, 
+  userDeck, 
+  userId, 
+  onBattleComplete, 
+  onNavigateToDeck,
+  forcedOpponent = null,
+  isCampaignMode = false,
+  onCampaignMatchComplete
+}: CardBattleProps) {
 
-  const [phase, setPhase] = useState<'select'|'battle'|'result'>('select');
-  const [bot, setBot]     = useState<BotPlayer>(BOTS[0]);
+  const [phase, setPhase] = useState<'select'|'battle'|'result'>(
+  isCampaignMode && forcedOpponent ? 'battle' : 'select'
+);
+  
+  // En modo campaña, el bot se setea automáticamente al oponente forzado
+  const [bot, setBot] = useState<BotPlayer>(
+    forcedOpponent || BOTS[0]
+  );
+  
   const [userStats, setUserStats] = useState<UserStats>({ level:1, xp:0, xp_needed:100, total_wins:0, streak:0 });
+  const animeRef = useRef<AnimeEffectsHandle>(null);
 
   const [uGoals, setUGoals] = useState(0);
   const [rGoals, setRGoals] = useState(0);
@@ -138,10 +167,19 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
 
+  
+
   // ─────────────────────────────────────────────────────────────────────────────
 
   useEffect(() => { loadStats(); }, [userId]);
   useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [log]);
+  
+  // Si cambia el oponente forzado en modo campaña, actualizar el bot seleccionado
+  useEffect(() => {
+  if (isCampaignMode && forcedOpponent && phase === 'battle' && !isRunning.current) {
+    startBattle();
+  }
+}, [])
 
   async function loadStats() {
     const { data } = await supabase.from('user_stats').select('*').eq('user_id', userId).single();
@@ -158,6 +196,35 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
     logId.current++;
     setLog(prev => [...prev.slice(-50), { id: logId.current, text, type }]);
   }
+
+  function calculateTeamStats(deckCards: UserCard[]) {
+  if (!deckCards.length) return {
+    overall: 0,
+    attack: 0,
+    defense: 0,
+    technique: 0,
+    cardCount: 0
+  };
+  
+  const stats = deckCards.reduce((acc, card) => {
+    const cardData = getCardData(card);
+    return {
+      overall: acc.overall + cardData.overall_rating,
+      attack: acc.attack + calcGroupValue(card, 'attack'),
+      defense: acc.defense + calcGroupValue(card, 'defense'),
+      technique: acc.technique + calcGroupValue(card, 'technique')
+    };
+  }, { overall: 0, attack: 0, defense: 0, technique: 0 });
+  
+  const count = deckCards.length;
+  return {
+    overall: Math.round(stats.overall / count),
+    attack: Math.round(stats.attack / count),
+    defense: Math.round(stats.defense / count),
+    technique: Math.round(stats.technique / count),
+    cardCount: count
+  };
+}
 
   // ── Animaciones ────────────────────────────────────────────────────────────
 
@@ -256,6 +323,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
     return new Promise(resolve => {
       decisionResolve.current = resolve;
       setMoment(ctx); setDecidedId(null);
+      animeRef.current?.triggerKeyMoment();
       const safe = ctx.options.find(o => o.isSafe) ?? ctx.options[ctx.options.length - 1];
       startTimer(ctx.timeLimit, () => {
         decisionResolve.current = null;
@@ -284,7 +352,6 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
     if (deckCards.length < 5) { alert('Necesitás 5 cartas en el mazo'); return; }
     if (isRunning.current) return;
     isRunning.current = true;
-
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
     let ug = 0, rg = 0;
 
@@ -328,12 +395,14 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
           if (res.goalFor === 'user') {
             await animateGoalUser();
+            animeRef.current?.triggerGoal('user');   // ← agregar
             ug++; setUGoals(ug);
             addLog(`  Marcador: ${ug} – ${rg}`, 'good');
             showFlash('⚽ ¡GOOOOL!', 'goal', 50, 38);
             await delay(GOAL_MS);
           } else if (res.goalFor === 'rival') {
             await animateGoalRival();
+            animeRef.current?.triggerGoal('rival');  // ← agregar
             rg++; setRGoals(rg);
             addLog(`  Marcador: ${ug} – ${rg}`, 'bad');
             showFlash(`⚽ ${bot.name}`, 'bad', 50, 38);
@@ -366,6 +435,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
         if (rp.autoGoal === 'rival') {
           await animateRivalBuild();
+          animeRef.current?.triggerDanger();
           await delay(300);
           await animateGoalRival();
           rg++; setRGoals(rg);
@@ -505,9 +575,30 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
     setPhase('result');
   }
 
+  // ─── Manejar cierre del modal en modo campaña ───────────────────────────────
+  
+  const handleCloseResult = () => {
+    setMatchResult(null);
+    setPhase('select');
+    
+    // Si es modo campaña y hay callback, notificar el resultado
+    if (isCampaignMode && onCampaignMatchComplete && matchResult) {
+      const won = matchResult.winner === 'user';
+      onCampaignMatchComplete(won, bot);
+    }
+  };
+
+  // ─── Iniciar batalla desde el selector (modo campaña o rápido) ──────────────
+  
+  const handleStartBattle = () => {
+  setPhase('battle'); // Oculta el selector inmediatamente
+  startBattle();
+};
+
   // ─── Render ───────────────────────────────────────────────────────────────────
 
   const deckCards   = (userDeck.cards ?? []) as UserCard[];
+  const teamStats   = calculateTeamStats(deckCards); // <-- Agrega esta línea
   const needsCards  = deckCards.length < 5;
   const timerColor  = timerPct > 50 ? '#3DFFA0' : timerPct > 25 ? '#FFD700' : '#FF6B6B';
   const flashColors = {
@@ -515,6 +606,22 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
     miss: { bg:'rgba(255,100,60,0.88)', text:'#fff' },
     ok:   { bg:'rgba(61,255,160,0.88)', text:'#000' },
     bad:  { bg:'rgba(255,60,60,0.92)',  text:'#fff' },
+  };
+  
+  // Determinar si mostrar el selector de rivales
+  const showRivalSelector = phase === 'select' && !isCampaignMode;
+  
+  // Determinar el texto del botón de inicio
+  const getStartButtonText = () => {
+    if (needsCards) return '📦 AGREGAR JUGADORES';
+    if (isCampaignMode) return `▶ JUGAR PARTIDO (vs ${bot.name.replace('Bot ', '')})`;
+    return `▶ JUGAR VS ${bot.name.toUpperCase()}`;
+  };
+  
+  // Determinar la acción del botón de inicio
+  const getStartButtonAction = () => {
+    if (needsCards && onNavigateToDeck) return onNavigateToDeck;
+    return handleStartBattle;
   };
 
   return (
@@ -524,7 +631,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
       <div className="arena-header">
         <div className="arena-title">
           <span>⚽</span><span>FLORES CLUB ARENA</span>
-          <span className="arena-badge">FUTSAL</span>
+          <span className="arena-badge">{isCampaignMode ? 'CAMPAÑA' : 'FUTSAL'}</span>
         </div>
         <button className="deck-link-btn" onClick={onNavigateToDeck}>
           📋 MI EQUIPO <span className="deck-count">{deckCards.length}/5</span>
@@ -533,6 +640,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
       {/* ════════════════════════ CANCHA ════════════════════════ */}
       <div className="arena-match-core">
+        <AnimeEffects ref={animeRef} />
         <div className={`futsal-court ${moment ? 'court-tension' : ''} ${flash?.type === 'goal' ? 'flash-futsal-gol' : ''}`}>
 
           {/* Marcador */}
@@ -701,28 +809,105 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
         {/* ════════════════════════ FASE SELECT ════════════════════════ */}
         {phase === 'select' && (
-          <div className="rival-selector">
-            <div className="rival-selector-title">⚔️ ELEGIR RIVAL</div>
-            <div className="rival-selector-row">
-              {BOTS.map(b => (
-                <button key={b.name}
-                  className={`bot-card${bot.name === b.name?' selected':''}`}
-                  onClick={() => setBot(b)}
-                  style={{ '--bc':b.color } as React.CSSProperties}
-                >
-                  <span className="bot-avatar">{b.avatar}</span>
-                  <span className="bot-name">{b.name.replace('Bot ','')}</span>
-                  <span className="bot-ovr">OVR {b.overall_rating}</span>
-                  <span className="bot-exp">+{b.xpBase} XP</span>
-                </button>
-              ))}
-            </div>
-            {needsCards
-              ? <button className="cta-btn deck-btn" onClick={onNavigateToDeck}>📦 AGREGAR JUGADORES</button>
-              : <button className="cta-btn start-btn" onClick={startBattle}>▶ JUGAR VS {bot.name.toUpperCase()}</button>
-            }
+  <div className="rival-selector">
+    {/* TARJETA DE ESTADÍSTICAS DEL EQUIPO - ARRIBA */}
+    <div className="team-stats-card">
+      <div className="team-stats-header">
+        <span className="team-stats-icon">📊</span>
+        <span className="team-stats-title">MI EQUIPO</span>
+        <span className="team-stats-cards">{deckCards.length}/5 cartas</span>
+      </div>
+      
+      <div className="team-stats-grid">
+        <div className="team-stat">
+          <div className="team-stat-value team-stat-overall">{teamStats.overall}</div>
+          <div className="team-stat-label">OVR</div>
+        </div>
+        <div className="team-stat">
+          <div className="team-stat-value" style={{ color: SKILL_GROUP_INFO.attack.color }}>
+            {teamStats.attack}
           </div>
-        )}
+          <div className="team-stat-label">
+            <span>{SKILL_GROUP_INFO.attack.icon}</span> ATAQUE
+          </div>
+        </div>
+        <div className="team-stat">
+          <div className="team-stat-value" style={{ color: SKILL_GROUP_INFO.defense.color }}>
+            {teamStats.defense}
+          </div>
+          <div className="team-stat-label">
+            <span>{SKILL_GROUP_INFO.defense.icon}</span> DEFENSA
+          </div>
+        </div>
+        <div className="team-stat">
+          <div className="team-stat-value" style={{ color: SKILL_GROUP_INFO.technique.color }}>
+            {teamStats.technique}
+          </div>
+          <div className="team-stat-label">
+            <span>{SKILL_GROUP_INFO.technique.icon}</span> TÉCNICA
+          </div>
+        </div>
+      </div>
+      
+      {deckCards.length < 5 && (
+        <div className="team-stats-warning">
+          ⚠️ Necesitas {5 - deckCards.length} {5 - deckCards.length === 1 ? 'carta más' : 'cartas más'} para jugar
+        </div>
+      )}
+    </div>
+
+    <div className="rival-selector-title">
+      {isCampaignMode ? '⚔️ PARTIDO DE CAMPAÑA' : '⚔️ ELEGIR RIVAL'}
+    </div>
+    
+    {/* Selector de rivales - solo se muestra en modo rápido */}
+    {showRivalSelector && (
+      <div className="rival-selector-row">
+        {BOTS.map(b => (
+          <button key={b.name}
+            className={`bot-card${bot.name === b.name?' selected':''}`}
+            onClick={() => setBot(b)}
+            style={{ '--bc':b.color } as React.CSSProperties}
+          >
+            <span className="bot-avatar">{b.avatar}</span>
+            <span className="bot-name">{b.name.replace('Bot ','')}</span>
+            <span className="bot-ovr">OVR {b.overall_rating}</span>
+            <span className="bot-exp">+{b.xpBase} XP</span>
+          </button>
+        ))}
+      </div>
+    )}
+    
+    {/* En modo campaña, mostrar info del rival actual */}
+    {isCampaignMode && forcedOpponent && (
+      <div className="campaign-opponent-info">
+        <div className="campaign-opponent-card" style={{ '--bc':forcedOpponent.color } as React.CSSProperties}>
+          <span className="campaign-opponent-avatar">{forcedOpponent.avatar}</span>
+          <div className="campaign-opponent-details">
+            <div className="campaign-opponent-name">{forcedOpponent.name}</div>
+            <div className="campaign-opponent-stats">
+              <span>OVR {forcedOpponent.overall_rating}</span>
+              <span>•</span>
+              <span>Nv.{forcedOpponent.level}</span>
+              <span>•</span>
+              <span>+{forcedOpponent.xpBase} XP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )}
+    
+    {/* Botón de inicio */}
+    <button 
+      className="cta-btn start-btn" 
+      onClick={getStartButtonAction()}
+      disabled={needsCards}
+      style={{ opacity: needsCards ? 0.6 : 1 }}
+    >
+      {getStartButtonText()}
+    </button>
+  </div>
+)}
 
         {/* ════════════════════════ BATTLE LOG — sin Tailwind ════════════════════════ */}
         {phase === 'battle' && (
@@ -766,7 +951,7 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
 
         {/* ════════════════════════ MODAL RESULTADO ════════════════════════ */}
         {phase === 'result' && matchResult && (
-          <div className="result-modal-overlay" onClick={() => { setMatchResult(null); setPhase('select'); }}>
+          <div className="result-modal-overlay" onClick={handleCloseResult}>
             <div
               className={`result-modal ${matchResult.winner === 'user' ? 'win' : matchResult.winner === 'draw' ? 'draw' : 'lose'}`}
               onClick={e => e.stopPropagation()}
@@ -838,16 +1023,15 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
                 </div>
               )}
 
-              <button className="cta-btn start-btn rm-btn"
-                onClick={() => { setMatchResult(null); setPhase('select'); }}>
-                JUGAR DE NUEVO
+              <button className="cta-btn start-btn rm-btn" onClick={handleCloseResult}>
+                {isCampaignMode ? 'CONTINUAR' : 'JUGAR DE NUEVO'}
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* ════════════════════════ ESTILOS ════════════════════════ */}
+      {/* ════════════════════════ ESTILOS ADICIONALES ════════════════════════ */}
       <style>{`
         *{user-select:none;-webkit-tap-highlight-color:transparent;}
 
@@ -1047,12 +1231,21 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
         /* Selector rival */
         .rival-selector{margin-bottom:14px;background:rgba(0,0,0,0.3);border-radius:18px;padding:14px 16px 16px;border:1px solid rgba(255,100,50,0.2);}
         .rival-selector-title{font-size:10px;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:10px;}
-        .rival-selector-row{display:flex;gap:8px;margin-bottom:12px;}
+        .rival-selector-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
         .bot-card{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 6px;border-radius:14px;border:1.5px solid rgba(255,100,50,0.3);background:rgba(255,100,50,0.06);cursor:pointer;color:#fff;transition:all 0.18s;}
         .bot-card:hover{background:rgba(255,100,50,0.14);border-color:rgba(255,100,50,0.65);transform:translateY(-3px);}
         .bot-card.selected{background:rgba(255,100,50,0.2);border-color:var(--bc,#ff7040);box-shadow:0 0 12px rgba(255,100,50,0.25);}
         .bot-avatar{font-size:20px;} .bot-name{font-size:11px;font-weight:bold;}
         .bot-ovr{font-size:9px;color:#ff9060;} .bot-exp{font-size:9px;color:#3dffa0;}
+
+        /* Estilos para modo campaña */
+        .campaign-opponent-info{margin-bottom:16px;}
+        .campaign-opponent-card{display:flex;align-items:center;gap:14px;padding:14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,100,50,0.12),rgba(255,100,50,0.05));border:2px solid var(--bc,#ff7040);margin-bottom:12px;}
+        .campaign-opponent-avatar{font-size:42px;}
+        .campaign-opponent-details{flex:1;}
+        .campaign-opponent-name{font-size:16px;font-weight:bold;color:#fff;margin-bottom:4px;}
+        .campaign-opponent-stats{display:flex;gap:8px;font-size:11px;color:rgba(255,255,255,0.6);}
+        .campaign-opponent-stats span{color:#ff9060;}
 
         .cta-btn{width:100%;padding:13px;border-radius:40px;border:none;font-weight:bold;font-size:13px;cursor:pointer;transition:all 0.2s;}
         .cta-btn:hover{transform:translateY(-2px);opacity:0.92;}
@@ -1130,7 +1323,122 @@ export function CardBattle({ userCards, userDeck, userId, onBattleComplete, onNa
           .csb-score{font-size:20px;}
           .rival-selector-row{flex-direction:column;}
           .result-modal{padding:20px 16px;}
+          .campaign-opponent-card{padding:10px;}
+          .campaign-opponent-avatar{font-size:32px;}
         }
+          .team-stats-card {
+  background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(20,40,20,0.4));
+  border-radius: 16px;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(61,255,160,0.3);
+  backdrop-filter: blur(4px);
+}
+
+.team-stats-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.team-stats-icon {
+  font-size: 20px;
+}
+
+.team-stats-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #3dffa0;
+  letter-spacing: 1px;
+}
+
+.team-stats-cards {
+  font-size: 10px;
+  color: rgba(255,255,255,0.5);
+  background: rgba(0,0,0,0.5);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.team-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.team-stat {
+  text-align: center;
+  padding: 8px 4px;
+  background: rgba(0,0,0,0.3);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.team-stat:hover {
+  transform: translateY(-2px);
+  background: rgba(0,0,0,0.5);
+}
+
+.team-stat-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.team-stat-overall {
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255,215,0,0.3);
+}
+
+.team-stat-label {
+  font-size: 8px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.team-stat-label span {
+  font-size: 10px;
+}
+
+.team-stats-warning {
+  margin-top: 8px;
+  padding: 6px;
+  background: rgba(255,100,60,0.15);
+  border: 1px solid rgba(255,100,60,0.3);
+  border-radius: 8px;
+  font-size: 10px;
+  color: #ff9060;
+  text-align: center;
+}
+
+/* Ajustes responsive */
+@media(max-width: 640px) {
+  .team-stat-value {
+    font-size: 16px;
+  }
+  
+  .team-stat-label {
+    font-size: 7px;
+  }
+  
+  .team-stats-grid {
+    gap: 6px;
+  }
+  
+  .team-stat {
+    padding: 6px 2px;
+  }
+}
       `}</style>
     </div>
   );

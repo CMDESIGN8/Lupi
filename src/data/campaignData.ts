@@ -1,0 +1,97 @@
+// src/data/campaignData.ts
+import { League, BotConfig } from '../types/campaign';
+
+export const LEAGUES: League[] = [
+  {
+    id: 'rookie',
+    name: 'LIGA ROOKIE',
+    tier: 1,
+    icon: '🌱',
+    color: '#4ade80',
+    requiredOverall: 40,
+    bots: [
+      { name: 'FC Novatos', overall: 42, avatar: '🐣', difficulty: 'easy', xpBase: 15 },
+      { name: 'Junior Stars', overall: 45, avatar: '⭐', difficulty: 'easy', xpBase: 18 },
+      { name: 'Academy FC', overall: 48, avatar: '📚', difficulty: 'easy', xpBase: 20 },
+    ],
+    rewardXp: 50,
+    rewardPoints: 30,
+    rewardTitle: 'Novato Prometedor',
+  },
+  {
+    id: 'bronze',
+    name: 'LIGA BRONCE',
+    tier: 2,
+    icon: '🥉',
+    color: '#cd7f32',
+    requiredOverall: 55,
+    bots: [
+      { name: 'Thunder FC', overall: 55, avatar: '⚡', difficulty: 'medium', xpBase: 25 },
+      { name: 'Phoenix Utd', overall: 58, avatar: '🔥', difficulty: 'medium', xpBase: 28 },
+      { name: 'Dragons SC', overall: 62, avatar: '🐉', difficulty: 'medium', xpBase: 30 },
+    ],
+    rewardXp: 100,
+    rewardPoints: 60,
+    rewardTitle: 'Guerrero de Bronce',
+    rewardBadge: 'bronze_warrior',
+  },
+  {
+    id: 'silver',
+    name: 'LIGA PLATA',
+    tier: 3,
+    icon: '🥈',
+    color: '#c0c0c0',
+    requiredOverall: 68,
+    bots: [
+      { name: 'Silver Hawks', overall: 68, avatar: '🦅', difficulty: 'medium', xpBase: 40 },
+      { name: 'Storm Riders', overall: 72, avatar: '🌊', difficulty: 'hard', xpBase: 45 },
+      { name: 'Shadow Legion', overall: 75, avatar: '🌙', difficulty: 'hard', xpBase: 50 },
+    ],
+    rewardXp: 150,
+    rewardPoints: 100,
+    rewardTitle: 'Caballero de Plata',
+    rewardBadge: 'silver_knight',
+  },
+  {
+    id: 'gold',
+    name: 'LIGA ORO',
+    tier: 4,
+    icon: '🥇',
+    color: '#ffd700',
+    requiredOverall: 80,
+    bots: [
+      { name: 'Golden Army', overall: 80, avatar: '👑', difficulty: 'hard', xpBase: 60 },
+      { name: 'Royal FC', overall: 83, avatar: '🏰', difficulty: 'hard', xpBase: 70 },
+      { name: 'Legendarios', overall: 86, avatar: '🏆', difficulty: 'hard', xpBase: 80 },
+    ],
+    rewardXp: 250,
+    rewardPoints: 150,
+    rewardTitle: 'Leyenda Dorada',
+    rewardBadge: 'golden_legend',
+  },
+  {
+    id: 'champion',
+    name: 'LIGA CAMPEONES',
+    tier: 5,
+    icon: '🏆',
+    color: '#ff6b6b',
+    requiredOverall: 90,
+    bots: [
+      { name: 'Titans FC', overall: 90, avatar: '💪', difficulty: 'hard', xpBase: 100 },
+      { name: 'Eternal XI', overall: 93, avatar: '♾️', difficulty: 'hard', xpBase: 120 },
+      { name: 'The Invincibles', overall: 96, avatar: '⚔️', difficulty: 'hard', xpBase: 150 },
+    ],
+    rewardXp: 500,
+    rewardPoints: 300,
+    rewardTitle: 'CAMPEÓN ABSOLUTO',
+    rewardBadge: 'ultimate_champion',
+  },
+];
+
+export const BOSS_MATCHES: Record<string, BotConfig> = {
+  rookie_boss: { name: 'MAESTRO ROOKIE', overall: 55, avatar: '🧙', difficulty: 'hard', xpBase: 40 },
+  bronze_boss: { name: 'GUARDIÓN DE BRONCE', overall: 68, avatar: '🛡️', difficulty: 'hard', xpBase: 60 },
+  silver_boss: { name: 'SEÑOR DE PLATA', overall: 80, avatar: '⚜️', difficulty: 'hard', xpBase: 90 },
+  gold_boss: { name: 'REY ORO', overall: 92, avatar: '👑', difficulty: 'hard', xpBase: 130 },
+  champion_boss: { name: 'LEYENDA ETERNA', overall: 99, avatar: '🌟', difficulty: 'hard', xpBase: 200 },
+};
