@@ -26,7 +26,7 @@ export interface DailyMission {
   title: string;
   description: string;
   icon: string;
-  type: 'play_match' | 'share' | 'open_pack' | 'watch_ad' | 'complete_training' | 'claim_reward' | 'social_share';
+  type: 'play_match' | 'share' | 'open_pack' | 'watch_ad' | 'complete_training' | 'claim_reward' | 'social_share'| 'training';
   requirement: number;
   currentProgress: number;
   reward: {

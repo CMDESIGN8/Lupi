@@ -17,6 +17,11 @@ import { useProgressiveStory } from '../hooks/useProgressiveStory';
 import { CoachButton } from './campaign/CoachButton';
 import { CoachPanel } from './campaign/CoachPanel';
 import ContextualHelp  from './campaign/ContextualHelp';
+import { useTrainingSystem } from '../hooks/useTrainingSystem';
+import { TrainingHub } from './campaign/TrainingHub';
+import { TrainingModal } from './campaign/TrainingModal';
+import { TrainingCenter } from './campaign/TrainingCenter';
+
 
 
 
@@ -111,6 +116,12 @@ const { checkStoryProgress, showStoryNotification, notificationMessage } = usePr
 const [showCoachPanel, setShowCoachPanel] = useState(false);
 const [unreadTips, setUnreadTips] = useState(0);
 const [showContextualHelp, setShowContextualHelp] = useState(false);
+ const { dailyLoop, applyTraining, canTrain, history } = useTrainingSystem(userId, userCards);
+  const [showTrainingModal, setShowTrainingModal] = useState(false);
+    const deckCardIds = userDeck?.cards?.map(card => card.id) || [];
+    const [showTrainingCenter, setShowTrainingCenter] = useState(false);
+
+
 
 // Función para reiniciar el tutorial
 const restartTutorial = () => {
@@ -297,19 +308,19 @@ const countUnreadTips = () => {
   };
 
   const updateMissionProgress = (missionType: string) => {
-    const updatedDays = [...campaignDays];
-    const currentDayData = updatedDays[currentDay - 1];
-    
-    const mission = currentDayData.dailyMissions.find(m => m.type === missionType);
-    if (mission && !mission.isCompleted) {
-      mission.currentProgress++;
-      if (mission.currentProgress >= mission.requirement) {
-        mission.isCompleted = true;
-      }
-      setCampaignDays(updatedDays);
-      saveCampaignDays(updatedDays);
+  const updatedDays = [...campaignDays];
+  const currentDayData = updatedDays[currentDay - 1];
+  
+  const mission = currentDayData.dailyMissions.find(m => m.type === missionType);
+  if (mission && !mission.isCompleted) {
+    mission.currentProgress++;
+    if (mission.currentProgress >= mission.requirement) {
+      mission.isCompleted = true;
     }
-  };
+    setCampaignDays(updatedDays);
+    saveCampaignDays(updatedDays);
+  }
+};
 
   useEffect(() => {
   const tutorialSeen = localStorage.getItem(`tutorial_seen_${userId}`);
@@ -567,6 +578,13 @@ useEffect(() => {
   unreadTips={unreadTips}
 />
 
+<TrainingHub
+        dailyLoop={dailyLoop}
+        history={history}
+        canTrain={canTrain}
+        onOpenTraining={() => setShowTrainingModal(true)}
+      />
+
 {showContextualHelp && (
   <ContextualHelp
     userId={userId}
@@ -658,6 +676,13 @@ useEffect(() => {
         </div>
       </div>
 
+      <button 
+  onClick={() => setShowTrainingCenter(true)}
+  style={s.trainingCenterButton}  // ← CAMBIADO de styles a s
+>
+  🏋️ CENTRO DE ENTRENAMIENTO
+</button>
+
       {/* VER HISTORIA DEL DÍA */}
       {!activeCinematic && campaignDays[currentDay - 1]?.storyChapters[0] && (
         <div style={s.storyButtonContainer}>
@@ -669,6 +694,30 @@ useEffect(() => {
           </button>
         </div>
       )}
+
+   {/* ── NUEVO: MODAL DE ENTRENAMIENTO ── */}
+      <TrainingModal
+  isOpen={showTrainingModal}
+  onClose={() => setShowTrainingModal(false)}
+  onTrain={async (result, cardIds) => {
+    // Convertir string[] a UserCard[] buscando las cartas reales
+    const cardsToTrain = userDeck?.cards?.filter(card => 
+      cardIds.includes(card.id)
+    ) || [];
+    
+    await applyTraining(result, cardsToTrain);
+    
+    setLastReward({ 
+      type: 'mission_reward', 
+      value: `+${result.delta} ${result.stat.toUpperCase()} · Calificación ${result.grade}` 
+    });
+    setShowRewards(true);
+    setTimeout(() => setShowRewards(false), 2000);
+    
+    updateMissionProgress('training');
+  }}
+  deckCardIds={deckCardIds}
+/>
 
       {/* Cinemática de historia */}
       {activeCinematic && (
@@ -805,6 +854,18 @@ useEffect(() => {
           ))}
         </div>
       </div>
+
+      {showTrainingCenter && (
+  <TrainingCenter
+    userId={userId}
+    userCards={userCards}
+    deckCards={userDeck?.cards || []}
+    onCardsUpdated={(updatedCards) => {
+      onBattleComplete(updatedCards);
+    }}
+    onClose={() => setShowTrainingCenter(false)}
+  />
+)}
 
       {/* REWARD POPUP ESTILO MANGA */}
       {showRewards && lastReward && (
@@ -1296,6 +1357,21 @@ const s: Record<string, React.CSSProperties> = {
     color: '#4ade80', 
     fontWeight: 'bold' 
   },
+  trainingCenterButton: {
+  background: 'linear-gradient(135deg, #FFD700, #FF8C00)',
+  border: 'none',
+  borderRadius: 40,
+  padding: '12px 24px',
+  fontSize: 14,
+  fontWeight: 'bold',
+  color: '#0f0020',
+  cursor: 'pointer',
+  fontFamily: RUSSO,
+  marginBottom: 16,
+  width: '100%',
+  boxShadow: '0 4px 15px rgba(255, 215, 0, 0.3)',
+  transition: 'transform 0.2s',
+},
   rewardPopupAnime: { 
     position: 'fixed', 
     bottom: '25%', 
