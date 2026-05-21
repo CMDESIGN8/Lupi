@@ -9,7 +9,7 @@ export interface League {
   bots: BotConfig[];
   rewardXp: number;
   rewardPoints: number;
-  rewardTitle?: string;
+  rewardTitle: string;
   rewardBadge?: string;
 }
 
@@ -19,8 +19,8 @@ export interface BotConfig {
   avatar: string;
   difficulty: 'easy' | 'medium' | 'hard';
   xpBase: number;
-  level?: number;   // ← agregar
-  color?: string;   // ← agregar
+  level?: number;
+  color?: string;
 }
 
 export interface CampaignProgress {

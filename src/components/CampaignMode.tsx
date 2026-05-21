@@ -1,4 +1,4 @@
-// src/components/CampaignMode.tsx - VERSIÓN SUPERCAMPEONES ANIME
+// src/components/CampaignMode.tsx - VERSIÓN ORIGINAL CON BOTONES
 import { useState, useEffect } from 'react';
 import { UserCard, Deck } from '../types/cards';
 import { CardBattle } from './CardBattle';
@@ -8,6 +8,17 @@ import { supabase } from '../lib/supabaseClient';
 import { getCardData, calcGroupValue } from '../utils/battleEngine';
 import { LEAGUE_STORIES, MatchStory } from '../data/campaignStories';
 import { CampaignMatch as CampaignMatchComponent } from './CampaignMatch';
+import  StoryCinematic  from './StoryCinematic';
+import { DailyMissionsPanel } from './DailyMissionsPanel';
+import { CLUB_STORY } from '../data/campaignStoryData';
+import { CampaignDay, DailyMission, StoryChapter } from '../types/campaignStory';
+import TutorialCoach from './campaign/TutorialCoach';
+import { useProgressiveStory } from '../hooks/useProgressiveStory';
+import { CoachButton } from './campaign/CoachButton';
+import { CoachPanel } from './campaign/CoachPanel';
+import ContextualHelp  from './campaign/ContextualHelp';
+
+
 
 interface CampaignModeProps {
   userCards: UserCard[];
@@ -90,11 +101,241 @@ export function CampaignMode({
     story: MatchStory;
   } | null>(null);
   const [matchProgress, setMatchProgress] = useState<Map<string, boolean>>(new Map());
+  const [currentDay, setCurrentDay] = useState(1);
+  const [campaignDays, setCampaignDays] = useState<CampaignDay[]>(CLUB_STORY);
+  const [activeCinematic, setActiveCinematic] = useState<StoryChapter | null>(null);
+  const [lastPlayedDate, setLastPlayedDate] = useState<string | null>(null);
+  const [showTutorial, setShowTutorial] = useState(true);
+const [tutorialComplete, setTutorialComplete] = useState(false);
+const { checkStoryProgress, showStoryNotification, notificationMessage } = useProgressiveStory(userId);
+const [showCoachPanel, setShowCoachPanel] = useState(false);
+const [unreadTips, setUnreadTips] = useState(0);
+const [showContextualHelp, setShowContextualHelp] = useState(false);
+
+// Función para reiniciar el tutorial
+const restartTutorial = () => {
+  // Limpiar localStorage
+  localStorage.removeItem(`tutorial_seen_${userId}`);
+  localStorage.removeItem(`coach_read_tips_${userId}`);
+  
+  // Resetear estados
+  setShowTutorial(true);
+  setTutorialComplete(false);
+  setUnreadTips(6); // Reiniciar contador de tips
+  
+  // Opcional: Mostrar mensaje de confirmación
+  setLastReward({ type: 'mission_reward', value: 'Tutorial reiniciado' });
+  setShowRewards(true);
+  setTimeout(() => setShowRewards(false), 3000);
+};
+
+// Calcular si hay misiones sin completar
+const hasUnreadMissions = campaignDays[currentDay - 1]?.dailyMissions.some(m => !m.isCompleted) || false;
+
+// Calcular si puede mejorar equipo (ejemplo)
+const canUpgradeTeam = userCards.length < 10; // Ajusta según tu lógica
+
+
+// Función para contar tips no leídos
+const countUnreadTips = () => {
+  const saved = localStorage.getItem(`coach_read_tips_${userId}`);
+  const readTips = saved ? JSON.parse(saved) : [];
+  const totalTips = 6; // Número total de tips
+  const unread = totalTips - readTips.length;
+  setUnreadTips(unread > 0 ? unread : 0);
+};
+
+
+  // Función para guardar días de campaña
+  const saveCampaignDays = (days: CampaignDay[]) => {
+    localStorage.setItem(`campaign_days_${userId}`, JSON.stringify(days));
+  };
+
+  // Función para cargar días de campaña guardados
+  const loadCampaignDays = () => {
+    const saved = localStorage.getItem(`campaign_days_${userId}`);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setCampaignDays(parsed);
+      } catch (e) {
+        console.error('Error loading campaign days:', e);
+      }
+    }
+  };
+
+  // Función para abrir sobre
+  const handleOpenPack = async () => {
+    setLastReward({ type: 'pack_opened', value: '¡Sobre legendario!' });
+    setShowRewards(true);
+    setTimeout(() => setShowRewards(false), 3000);
+    updateMissionProgress('open_pack');
+  };
+
+  // Función para mostrar anuncio recompensado
+  const showRewardedAd = async () => {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        updateMissionProgress('watch_ad');
+        setLastReward({ type: 'ad_watched', value: '+40 XP' });
+        setShowRewards(true);
+        setTimeout(() => setShowRewards(false), 2000);
+        resolve();
+      }, 2000);
+    });
+  };
+
+  // Función para reclamar recompensa de misión
+  const handleClaimReward = async (missionId: string) => {
+    const updatedDays = [...campaignDays];
+    const currentDayData = updatedDays[currentDay - 1];
+    const mission = currentDayData.dailyMissions.find(m => m.id === missionId);
+    
+    if (mission && mission.isCompleted && !mission.isClaimed) {
+      mission.isClaimed = true;
+      setCampaignDays(updatedDays);
+      saveCampaignDays(updatedDays);
+      
+      setLastReward({ 
+        type: 'mission_reward', 
+        value: `${mission.reward.xp} XP ${mission.reward.coins ? `+ ${mission.reward.coins} monedas` : ''}` 
+      });
+      setShowRewards(true);
+      setTimeout(() => setShowRewards(false), 3000);
+    }
+  };
+
+  // Función para obtener la racha diaria
+  const getStreak = (): number => {
+    const streak = localStorage.getItem(`daily_streak_${userId}`);
+    return streak ? parseInt(streak) : 0;
+  };
+
+  // Función para verificar si es día consecutivo
+  const isConsecutiveDay = (lastDate: string, today: string): boolean => {
+    const last = new Date(lastDate);
+    const now = new Date(today);
+    const diffDays = (now.getTime() - last.getTime()) / (1000 * 3600 * 24);
+    return diffDays === 1;
+  };
+
+  // Función para desbloquear el siguiente día
+  const unlockNextDay = () => {
+    const updatedDays = [...campaignDays];
+    if (currentDay < updatedDays.length) {
+      const nextDay = updatedDays[currentDay];
+      nextDay.canAdvance = true;
+      if (nextDay.storyChapters.length > 0) {
+        nextDay.storyChapters[0].isUnlocked = true;
+      }
+      setCampaignDays(updatedDays);
+      saveCampaignDays(updatedDays);
+    }
+  };
+
+  // Función para iniciar un capítulo de historia
+  const startStoryChapter = (chapter: StoryChapter) => {
+    setActiveCinematic(chapter);
+  };
+
+  const checkDailyReset = () => {
+    const today = new Date().toDateString();
+    if (lastPlayedDate !== today) {
+      resetDailyMissions();
+      setLastPlayedDate(today);
+      localStorage.setItem(`last_played_${userId}`, today);
+    }
+  };
+
+  const resetDailyMissions = () => {
+    const updatedDays = campaignDays.map(day => ({
+      ...day,
+      dailyMissions: day.dailyMissions.map(mission => ({
+        ...mission,
+        currentProgress: 0,
+        isCompleted: false,
+        isClaimed: false
+      }))
+    }));
+    setCampaignDays(updatedDays);
+    saveCampaignDays(updatedDays);
+  };
+
+  const handleStartMission = async (mission: DailyMission) => {
+    switch (mission.type) {
+      case 'play_match':
+        break;
+      case 'share':
+        await handleSocialShare();
+        break;
+      case 'open_pack':
+        await handleOpenPack();
+        break;
+      case 'watch_ad':
+        await showRewardedAd();
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleSocialShare = async () => {
+    const shareData = {
+      title: 'Mi equipo en Dream League',
+      text: '¡Veni a jugar Dream League! Estoy en la campaña y necesito tu apoyo',
+      url: window.location.href
+    };
+    
+    if (navigator.share) {
+      await navigator.share(shareData);
+      updateMissionProgress('share');
+    } else {
+      await navigator.clipboard.writeText(shareData.text);
+      alert('¡Link copiado! Compartilo con tus amigos');
+      updateMissionProgress('share');
+    }
+  };
+
+  const updateMissionProgress = (missionType: string) => {
+    const updatedDays = [...campaignDays];
+    const currentDayData = updatedDays[currentDay - 1];
+    
+    const mission = currentDayData.dailyMissions.find(m => m.type === missionType);
+    if (mission && !mission.isCompleted) {
+      mission.currentProgress++;
+      if (mission.currentProgress >= mission.requirement) {
+        mission.isCompleted = true;
+      }
+      setCampaignDays(updatedDays);
+      saveCampaignDays(updatedDays);
+    }
+  };
 
   useEffect(() => {
-    loadCampaignProgress();
-    loadMatchProgress();
-  }, [userId]);
+  const tutorialSeen = localStorage.getItem(`tutorial_seen_${userId}`);
+  if (tutorialSeen === 'true') {
+    setShowTutorial(false);
+    setTutorialComplete(true);
+  }
+    
+  countUnreadTips();
+  loadCampaignProgress();
+  loadMatchProgress();
+  loadCampaignDays();
+  checkDailyReset();
+}, [userId]);
+
+// Agregar efecto para verificar progreso de historia después de partidos
+useEffect(() => {
+  if (progress) {
+    checkStoryProgress(
+      totalWins,
+      progress.currentLeagueId,
+      progress.completedLeagueIds,
+      [] // achievements
+    );
+  }
+}, [progress, matchProgress]);
 
   async function loadCampaignProgress() {
     setLoading(true);
@@ -170,6 +411,8 @@ export function CampaignMode({
   const totalLeagues = LEAGUES.length;
   const overallRating = calculateOverall(userCards);
   const teamStats = calculateTeamStats(userDeck?.cards || []);
+  const totalWins = (progress?.completedLeagueIds.length || 0) * 3 + 
+  Array.from(matchProgress.values()).filter(v => v === true).length;
 
   function startMatch(opponent: BotConfig) {
     setSelectedOpponent(opponent);
@@ -313,13 +556,77 @@ export function CampaignMode({
 
   // ── PANTALLA PRINCIPAL ESTILO ANIME ─────────────────────────
   return (
+
     <div style={s.container}>
+      {/* Botón flotante del entrenador */}
+    <CoachButton 
+  userId={userId}
+  onOpenCoach={() => setShowCoachPanel(true)}
+  onOpenContextualHelp={() => setShowContextualHelp(true)}
+  onRestartTutorial={restartTutorial}
+  unreadTips={unreadTips}
+/>
+
+{showContextualHelp && (
+  <ContextualHelp
+    userId={userId}
+    currentLeague={currentLeague?.name || 'Rookie'}
+    completedWins={totalWins % 3} // Victorias en liga actual
+    currentDay={currentDay}
+    hasUnreadMissions={hasUnreadMissions}
+    canUpgradeTeam={canUpgradeTeam}
+    onRestartTutorial={restartTutorial}
+    onClose={() => setShowContextualHelp(false)}
+  />
+)}
+
+    {/* Panel del entrenador */}
+    {showCoachPanel && (
+      <CoachPanel
+  onClose={() => {
+    setShowCoachPanel(false);
+    countUnreadTips();
+  }}
+  userId={userId}
+  currentLeague={currentLeague?.name || 'Rookie'}
+  completedWins={totalWins} // ← Ahora sí está definido
+  onMarkTipRead={() => countUnreadTips()}
+/>
+    )}
+    {/* TUTORIAL DEL ENTRENADOR */}
+    {showTutorial && !tutorialComplete && (
+      <TutorialCoach
+        onComplete={() => {
+          setShowTutorial(false);
+          setTutorialComplete(true);
+        }}
+        onStartMatch={() => {
+          // Auto-iniciar el primer partido
+          if (currentLeague && currentLeague.bots[0]) {
+            startMatchWithStory(currentLeague, 0);
+          }
+        }}
+        userId={userId}
+      />
+    )}
+
+    {/* NOTIFICACIÓN DE HISTORIA */}
+    {showStoryNotification && (
+      <div style={s.storyNotification}>
+        <div style={s.storyNotificationContent}>
+          {notificationMessage.split('\n').map((line, i) => (
+            <p key={i}>{line}</p>
+          ))}
+        </div>
+      </div>
+    )}
+
       <style>{keyframesAnime}</style>
 
       {/* HEADER CON EFECTO FUEGO */}
       <div style={s.header}>
         <div style={s.titleGroup}>
-          <div style={s.fireIcon}>⚡🔥⚡</div>
+          <div style={s.fireIcon}>📖</div>
           <div>
             <h1 style={s.mainTitle}>¡MODO HISTORIA!</h1>
             <p style={s.mainSub}>⚽ El camino hacia la gloria ⚽</p>
@@ -351,25 +658,42 @@ export function CampaignMode({
         </div>
       </div>
 
-      {/* GUÍA DEL GUERRERO (CÓMO JUGAR) */}
-      <div style={s.mangaGuide}>
-        <div style={s.sectionTitleAnime}>📖 GUÍA DEL GUERRERO ⚔️</div>
-        <div style={s.stepsRowAnime}>
-          {[
-            { step: '1', icon: '🎮', text: 'ELEGIR PARTIDO', desc: 'Toca el balón en llamas' },
-            { step: '2', icon: '⚽', text: '¡GANAR!', desc: 'Derrota al rival con tu equipo' },
-            { step: '3', icon: '🌟', text: 'CONSEGUIR ESTRELLAS', desc: 'Cada victoria te da poder' },
-            { step: '4', icon: '🏆', text: '¡CAMPEÓN!', desc: 'Gana la liga y desbloquea la siguiente' },
-          ].map((step, i, arr) => (
-            <div key={step.step} style={s.stepCardAnime}>
-              <div style={s.stepBadge}>{step.step}</div>
-              <div style={s.stepIconAnime}>{step.icon}</div>
-              <div style={s.stepTextAnime}>{step.text}</div>
-              <div style={s.stepDescAnime}>{step.desc}</div>
-              {i < arr.length - 1 && <div style={s.stepConnectorAnime}>⚡</div>}
-            </div>
-          ))}
+      {/* VER HISTORIA DEL DÍA */}
+      {!activeCinematic && campaignDays[currentDay - 1]?.storyChapters[0] && (
+        <div style={s.storyButtonContainer}>
+          <button 
+            style={s.storyButton}
+            onClick={() => startStoryChapter(campaignDays[currentDay - 1].storyChapters[0])}
+          >
+            📖 VER HISTORIA DEL DÍA {currentDay} 📖
+          </button>
         </div>
+      )}
+
+      {/* Cinemática de historia */}
+      {activeCinematic && (
+        <StoryCinematic
+          chapter={activeCinematic}
+          onComplete={() => {
+            setActiveCinematic(null);
+            unlockNextDay();
+          }}
+          dayNumber={currentDay}
+        />
+      )}
+
+      {/* Panel de misiones diarias */}
+      <DailyMissionsPanel
+        missions={campaignDays[currentDay - 1]?.dailyMissions || []}
+        onClaimReward={(missionId) => handleClaimReward(missionId)}
+        onStartMission={handleStartMission}
+        currentDay={currentDay}
+      />
+
+      {/* Indicador de racha diaria */}
+      <div style={s.streakIndicator}>
+        <div>🔥 RACHA: {getStreak()} días seguidos</div>
+        <div>🎯 PRÓXIMA RECOMPENSA EN {3 - (getStreak() % 3)} días</div>
       </div>
 
       {/* MAPA DE LIGAS ESTILO VIDEOJUEGO */}
@@ -461,14 +785,38 @@ export function CampaignMode({
         })}
       </div>
 
+      {/* GUÍA DEL GUERRERO (CÓMO JUGAR) */}
+      <div style={s.mangaGuide}>
+        <div style={s.sectionTitleAnime}>📖 GUÍA DEL GUERRERO ⚔️</div>
+        <div style={s.stepsRowAnime}>
+          {[
+            { step: '1', icon: '🎮', text: 'ELEGIR PARTIDO', desc: 'Toca el balón en llamas' },
+            { step: '2', icon: '⚽', text: '¡GANAR!', desc: 'Derrota al rival con tu equipo' },
+            { step: '3', icon: '🌟', text: 'CONSEGUIR ESTRELLAS', desc: 'Cada victoria te da poder' },
+            { step: '4', icon: '🏆', text: '¡CAMPEÓN!', desc: 'Gana la liga y desbloquea la siguiente' },
+          ].map((step, i, arr) => (
+            <div key={step.step} style={s.stepCardAnime}>
+              <div style={s.stepBadge}>{step.step}</div>
+              <div style={s.stepIconAnime}>{step.icon}</div>
+              <div style={s.stepTextAnime}>{step.text}</div>
+              <div style={s.stepDescAnime}>{step.desc}</div>
+              {i < arr.length - 1 && <div style={s.stepConnectorAnime}>⚡</div>}
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* REWARD POPUP ESTILO MANGA */}
       {showRewards && lastReward && (
         <div style={s.rewardPopupAnime}>
           <div style={s.rewardContentAnime}>
             <div style={s.rewardExplosionAnime}>💥</div>
             <div style={s.rewardTextAnime}>
-              {lastReward.type === 'league_complete' ? '🏆 ¡LIGA CONQUISTADA! 🏆' : '🎉 ¡PARTIDAZO! 🎉'}
-              <div style={s.rewardAmountAnime}>+{lastReward.value} {lastReward.type === 'league_complete' ? 'XP EXTRA' : 'XP'}</div>
+              {lastReward.type === 'league_complete' ? '🏆 ¡LIGA CONQUISTADA! 🏆' : 
+              lastReward.type === 'mission_reward' ? '🎁 ¡RECOMPENSA! 🎁' :
+              lastReward.type === 'pack_opened' ? '📦 ¡SOBRE LEGENDARIO! 📦' :
+              '🎉 ¡PARTIDAZO! 🎉'}
+              <div style={s.rewardAmountAnime}>+{lastReward.value}</div>
             </div>
             <div style={s.rewardGlintAnime}>✨</div>
           </div>
@@ -488,8 +836,8 @@ const keyframesAnime = `
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
   }
   @keyframes fireText {
-    0% { text-shadow: 0 0 2px #ff9900, 0 0 4px #ff5500; }
-    100% { text-shadow: 0 0 8px #ff5500, 0 0 16px #ff0000; }
+    0% { text-shadow: 0 0 2px #00ffff, 0 0 4px #0088ff; }
+    100% { text-shadow: 0 0 8px #00ccff, 0 0 16px #0066ff; }
   }
   @keyframes sparkMove {
     0% { left: 0%; opacity: 1; }
@@ -511,7 +859,6 @@ const keyframesAnime = `
 // ESTILOS ANIME
 // ─────────────────────────────────────────────────────────────────────────────
 const s: Record<string, React.CSSProperties> = {
-  // LOADING
   loadingScreen: {
     display: 'flex',
     flexDirection: 'column',
@@ -524,23 +871,19 @@ const s: Record<string, React.CSSProperties> = {
     width: 50,
     height: 50,
     border: '4px solid rgba(255,215,0,0.2)',
-    borderTopColor: '#ffd700',
+    borderTopColor: '#0088ff',
     borderRadius: '50%',
     animation: 'cmSpin 1s linear infinite',
   },
-
-  // CONTENEDOR PRINCIPAL
   container: {
     background: 'radial-gradient(circle at 10% 20%, #0a0f2a, #03050b)',
     borderRadius: 48,
     padding: '24px 20px',
-    border: '3px solid #ffd700',
+    border: '3px solid #0088ff',
     boxShadow: '0 20px 40px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.1)',
     fontFamily: RUSSO,
     color: '#fff',
   },
-  
-  // HEADER
   header: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -560,14 +903,14 @@ const s: Record<string, React.CSSProperties> = {
   mainTitle: {
     fontSize: 32,
     margin: 0,
-    background: 'linear-gradient(135deg, #ffd700, #ff6600)',
+    background: 'linear-gradient(135deg, #00aeff, #00e1ff)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     textShadow: '0 2px 5px rgba(0,0,0,0.3)',
   },
   mainSub: { 
     fontSize: 12, 
-    color: '#ffcc88', 
+    color: '#fcfbfb', 
     margin: 0 
   },
   statsRow: { 
@@ -597,8 +940,6 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: 10, 
     color: '#ffcc88' 
   },
-  
-  // BARRA DE PODER
   powerBarContainer: { 
     marginBottom: 24 
   },
@@ -607,7 +948,7 @@ const s: Record<string, React.CSSProperties> = {
     justifyContent: 'space-between', 
     fontSize: 12, 
     marginBottom: 6, 
-    color: '#ffd700' 
+    color: '#00ffff' 
   },
   powerBarTrack: { 
     height: 16, 
@@ -619,7 +960,7 @@ const s: Record<string, React.CSSProperties> = {
   },
   powerBarFill: { 
     height: '100%', 
-    background: 'linear-gradient(90deg, #ffaa00, #ff4400)', 
+    background: 'linear-gradient(90deg, #0066ff, #00ffff)', 
     width: '0%', 
     transition: 'width 0.5s' 
   },
@@ -633,20 +974,62 @@ const s: Record<string, React.CSSProperties> = {
     filter: 'blur(4px)', 
     animation: 'sparkMove 2s infinite' 
   },
-  
-  // GUÍA MANGA
+  mainButtonsContainer: {
+    display: 'flex',
+    gap: 16,
+    marginBottom: 24,
+  },
+  quickPlayButton: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+    border: '2px solid #4ade80',
+    borderRadius: 20,
+    padding: '16px 20px',
+    cursor: 'pointer',
+    fontFamily: RUSSO,
+    transition: 'transform 0.2s, box-shadow 0.2s',
+  },
+  historyButton: {
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+    border: '2px solid #0088ff',
+    borderRadius: 20,
+    padding: '16px 20px',
+    cursor: 'pointer',
+    fontFamily: RUSSO,
+    transition: 'transform 0.2s, box-shadow 0.2s',
+  },
+  buttonIcon: {
+    fontSize: 32,
+  },
+  buttonTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  buttonSubtitle: {
+    fontSize: 10,
+    color: 'rgba(255,255,255,0.5)',
+  },
   mangaGuide: { 
     background: 'rgba(0,0,0,0.5)', 
     borderRadius: 32, 
     padding: 16, 
     marginBottom: 28, 
-    border: '1px dashed #ffd700' 
+    border: '1px dashed #00ffff' 
   },
   sectionTitleAnime: { 
     fontSize: 18, 
     textAlign: 'center', 
     marginBottom: 16, 
-    color: '#ffd700', 
+    color: '#00ffff', 
     letterSpacing: 2 
   },
   stepsRowAnime: { 
@@ -667,8 +1050,8 @@ const s: Record<string, React.CSSProperties> = {
     border: '1px solid #ffd70033' 
   },
   stepBadge: { 
-    background: '#ffd700', 
-    color: '#000', 
+    background: '#0066ff', 
+    color: '#fff', 
     width: 28, 
     height: 28, 
     borderRadius: '50%', 
@@ -695,10 +1078,36 @@ const s: Record<string, React.CSSProperties> = {
     right: -16, 
     top: '40%', 
     fontSize: 16, 
-    color: '#ffd700' 
+    color: '#00ffff' 
   },
-  
-  // MAPA MUNDIAL
+  storyButtonContainer: {
+    margin: '16px 0',
+    textAlign: 'center',
+  },
+  storyButton: {
+    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+    border: 'none',
+    padding: '12px 24px',
+    borderRadius: 40,
+    color: '#fff',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontFamily: RUSSO,
+    fontSize: 16,
+  },
+  streakIndicator: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    background: 'linear-gradient(135deg, #ff6b6b, #ff8c00)',
+    padding: '12px 20px',
+    borderRadius: 40,
+    margin: '16px 0',
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#fff',
+    textShadow: '1px 1px 0 rgba(0,0,0,0.3)',
+  },
   worldMap: { 
     display: 'flex', 
     flexDirection: 'column', 
@@ -726,7 +1135,7 @@ const s: Record<string, React.CSSProperties> = {
     background: 'linear-gradient(145deg, #1a2e24, #0a1810)' 
   },
   leagueCurrentAnime: { 
-    borderColor: '#ffd700', 
+    borderColor: '#00ffff', 
     boxShadow: '0 0 30px rgba(255,215,0,0.4)', 
     animation: 'animePulse 2s infinite' 
   },
@@ -749,8 +1158,8 @@ const s: Record<string, React.CSSProperties> = {
     fontWeight: 'bold' 
   },
   currentFlagAnime: { 
-    background: '#ffd700', 
-    color: '#000', 
+    background: '#0066ff', 
+    color: '#fff', 
     padding: '4px 12px', 
     borderRadius: 40, 
     fontSize: 10, 
@@ -800,8 +1209,6 @@ const s: Record<string, React.CSSProperties> = {
     border: '1px solid gold', 
     color: '#ffd700' 
   },
-  
-  // LISTA DE PARTIDOS
   matchesListAnime: { 
     marginTop: 16, 
     borderTop: '1px solid #ffd70030', 
@@ -872,7 +1279,7 @@ const s: Record<string, React.CSSProperties> = {
     fontWeight: 'bold' 
   },
   playButtonAnime: { 
-    background: 'linear-gradient(135deg, #ffaa00, #ff4400)', 
+    background: 'linear-gradient(135deg, #0066ff, #00ffff)', 
     border: 'none', 
     padding: '8px 24px', 
     borderRadius: 40, 
@@ -880,7 +1287,7 @@ const s: Record<string, React.CSSProperties> = {
     color: 'white', 
     fontFamily: RUSSO, 
     cursor: 'pointer', 
-    boxShadow: '0 4px 0 #882200', 
+    boxShadow: '0 4px 0 #00ccff', 
     transform: 'translateY(-2px)', 
     transition: '0.1s' 
   },
@@ -889,8 +1296,6 @@ const s: Record<string, React.CSSProperties> = {
     color: '#4ade80', 
     fontWeight: 'bold' 
   },
-  
-  // REWARD POPUP
   rewardPopupAnime: { 
     position: 'fixed', 
     bottom: '25%', 
