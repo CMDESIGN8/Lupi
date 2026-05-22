@@ -404,6 +404,35 @@
 
         @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(245,197,24,0.3); } 50% { box-shadow: 0 0 0 8px rgba(245,197,24,0); } }
         .pulse { animation: pulse-glow 2s infinite; }
+        @keyframes flashMove {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeIntro {
+  0% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+
+  15% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
 
         .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 16px; text-align: center; }
         .profile-avatar { width: 72px; height: 72px; background: var(--surface2); border: 3px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 32px; margin: 0 auto 12px; color: var(--accent); }

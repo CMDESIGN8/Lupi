@@ -1,6 +1,6 @@
 // src/hooks/useTrainingSystem.ts
 // ─────────────────────────────────────────────────────────────────────────────
-// VERSIÓN CORREGIDA - Sistema de entrenamiento con progresión real
+// VERSIÓN COMPLETA - Con soporte para todas las 6 stats (incluyendo pace)
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect, useCallback } from 'react';
@@ -44,6 +44,17 @@ export interface TrainingHistory {
   xpBonus: number;
   cardId?: string;
   cardName?: string;
+}
+
+// Tipo para las estadísticas de un jugador
+interface PlayerStats {
+  pace: number;
+  dribbling: number;
+  passing: number;
+  defending: number;
+  finishing: number;
+  physical: number;
+  overall_rating?: number;
 }
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
@@ -134,149 +145,265 @@ export function useTrainingSystem(userId: string, userCards: UserCard[]) {
   // ── Función para obtener nombre de carta ────────────────────────────────────
   const getCardName = (card: UserCard): string => {
     const cardData = getCardData(card);
-    return cardData.name || `Carta ${card.id.slice(0, 4)}`;
+    return cardData.name || `Jugador ${card.id.slice(0, 4)}`;
   };
 
-  // ── Función principal para aplicar entrenamiento ────────────────────────────
+  // Función para obtener el player_id de una user_card y verificar si es entrenable
+  const getCardInfo = async (userCardId: string): Promise<{ playerId: string | null; isTrainable: boolean }> => {
+    const { data, error } = await supabase
+      .from('user_cards')
+      .select('player_id, socio_id')
+      .eq('id', userCardId)
+      .single();
+    
+    if (error || !data) {
+      console.error('Error obteniendo información de la carta:', error);
+      return { playerId: null, isTrainable: false };
+    }
+    
+    // Una carta es entrenable si tiene player_id (NPC) y NO tiene socio_id
+    const isTrainable = data.player_id !== null && data.player_id !== undefined && !data.socio_id;
+    
+    return { playerId: data.player_id, isTrainable };
+  };
 
+  // Función para actualizar estadística específica en players
+  const updatePlayerStat = async (playerId: string, stat: TrainingStat, newValue: number) => {
+    const updateData: Record<string, number> = {};
+    updateData[stat] = newValue;
+    
+    const { error } = await supabase
+      .from('players')
+      .update(updateData)
+      .eq('id', playerId);
+    
+    return { error };
+  };
+
+  // Función para obtener estadísticas actuales de un jugador
+  const getPlayerStats = async (playerId: string): Promise<PlayerStats | null> => {
+    const { data, error } = await supabase
+      .from('players')
+      .select('pace, dribbling, passing, defending, finishing, physical, overall_rating')
+      .eq('id', playerId)
+      .single();
+    
+    if (error || !data) {
+      console.error('Error obteniendo stats:', error);
+      return null;
+    }
+    return data as PlayerStats;
+  };
+
+  // Función principal para aplicar entrenamiento
   const applyTraining = useCallback(async (
     result: TrainingResult,
     cardsToTrain: UserCard[],
     selectedCardId?: string
   ) => {
-    if (result.delta === 0) return { success: false };
+    console.log('=== 🏋️ ENTRENAMIENTO ===');
+    console.log('Estadística:', result.stat);
+    console.log('Mejora base:', result.delta);
+    console.log('Cartas a entrenar:', cardsToTrain.length);
+    
+    
+    if (result.delta === 0) {
+      console.log('⚠️ Delta es 0, no se aplican mejoras');
+      return { success: false };
+    }
+    
     setIsLoading(true);
 
     try {
+      // Determinar cartas a mejorar
       let cardsToUpgrade: UserCard[] = [];
       
       if (selectedCardId) {
         const card = cardsToTrain.find(c => c.id === selectedCardId);
-        if (card) cardsToUpgrade = [card];
+        if (card) {
+          cardsToUpgrade = [card];
+          console.log('🎯 Entrenando carta específica:', getCardName(card));
+        }
       } else {
         cardsToUpgrade = [...cardsToTrain];
+        console.log('👥 Entrenando todo el equipo:', cardsToUpgrade.length, 'cartas');
       }
 
       if (cardsToUpgrade.length === 0) {
-        console.error('No hay cartas para mejorar');
+        console.error('❌ No hay cartas para mejorar');
         return { success: false, error: 'No hay cartas' };
       }
 
+      // Primero, verificar qué cartas son entrenables (tienen player_id y no son socios)
+      const validCards: { card: UserCard; playerId: string }[] = [];
+      const skippedCards: { card: UserCard; reason: string }[] = [];
+
+      for (const card of cardsToUpgrade) {
+        const { playerId, isTrainable } = await getCardInfo(card.id);
+        
+        if (isTrainable && playerId) {
+          validCards.push({ card, playerId });
+          console.log(`✅ Carta entrenable: ${getCardName(card)}`);
+        } else {
+          const reason = !playerId ? 'No tiene player_id (posiblemente socio)' : 'Es una carta de socio';
+          skippedCards.push({ card, reason });
+          console.log(`⏭️ Saltando carta no entrenable: ${getCardName(card)} - ${reason}`);
+        }
+      }
+
+      if (validCards.length === 0) {
+        console.error('❌ Ninguna carta seleccionada es entrenable');
+        return { success: false, error: 'No hay cartas entrenables', skippedCards };
+      }
+
+      console.log(`📊 Entrenando ${validCards.length} cartas válidas, saltando ${skippedCards.length}`);
+
+      // Calcular mejora por carta (solo para las válidas)
       const totalDelta = result.delta;
-      const perCardDelta = Math.max(1, Math.floor(totalDelta / cardsToUpgrade.length));
-      const remainder = totalDelta - (perCardDelta * cardsToUpgrade.length);
+      const perCardDelta = Math.max(1, Math.floor(totalDelta / validCards.length));
+      const remainder = totalDelta - (perCardDelta * validCards.length);
       
-      const statColumn = statToColumn(result.stat);
+      const statColumn = result.stat;
+      console.log('📊 Columna a actualizar:', statColumn);
+      console.log('📈 Mejora por carta:', perCardDelta, '+ distribución:', remainder);
+      
       const upgradedCards: UserCard[] = [];
 
-      for (let i = 0; i < cardsToUpgrade.length; i++) {
-        const card = cardsToUpgrade[i];
+      // Aplicar mejoras solo a cartas válidas
+      for (let i = 0; i < validCards.length; i++) {
+        const { card, playerId } = validCards[i];
         const extra = i < remainder ? 1 : 0;
         const finalDelta = perCardDelta + extra;
         
-        const cardData = getCardData(card);
-        let currentValue = 50;
+        console.log(`\n🃏 Procesando carta: ${getCardName(card)}`);
+        console.log('  player_id:', playerId);
         
-        switch (result.stat) {
-          case 'finishing': currentValue = cardData.finishing || 50; break;
-          case 'dribbling': currentValue = cardData.dribbling || 50; break;
-          case 'defending': currentValue = cardData.defending || 50; break;
-          case 'passing': currentValue = cardData.passing || 50; break;
-          case 'physical': currentValue = cardData.physical || 50; break;
+        // Obtener estadísticas actuales
+        const currentStats = await getPlayerStats(playerId);
+        if (!currentStats) {
+          console.error('  ❌ No se pudieron obtener estadísticas actuales');
+          continue;
+        }
+        
+        // Obtener valor actual según la estadística
+        let currentValue = 50;
+        switch (statColumn) {
+          case 'finishing': currentValue = currentStats.finishing; break;
+          case 'dribbling': currentValue = currentStats.dribbling; break;
+          case 'defending': currentValue = currentStats.defending; break;
+          case 'passing': currentValue = currentStats.passing; break;
+          case 'physical': currentValue = currentStats.physical; break;
+          case 'pace': currentValue = currentStats.pace; break;
+          default: currentValue = 50;
         }
         
         const newValue = Math.min(99, currentValue + finalDelta);
         
-        await supabase
-          .from('user_cards')
-          .update({ [statColumn]: newValue })
-          .eq('id', card.id);
+        console.log(`  ${statColumn}: ${currentValue} → +${finalDelta} → ${newValue}`);
         
-        upgradedCards.push({ ...card, [result.stat]: newValue });
+        // Actualizar en la tabla players
+        const { error: updateError } = await updatePlayerStat(playerId, statColumn, newValue);
+        
+        if (updateError) {
+          console.error('  ❌ Error actualizando players:', updateError);
+          continue;
+        }
+        console.log('  ✅ Actualizado correctamente');
+        
+        // Recalcular y actualizar overall_rating
+        const updatedStats = await getPlayerStats(playerId);
+        if (updatedStats) {
+          const newOverall = Math.round(
+            (updatedStats.pace + updatedStats.dribbling + updatedStats.passing + 
+             updatedStats.defending + updatedStats.finishing + updatedStats.physical) / 6
+          );
+          
+          await supabase
+            .from('players')
+            .update({ overall_rating: newOverall })
+            .eq('id', playerId);
+          
+          console.log(`  📊 Nuevo overall: ${newOverall}`);
+        }
+        
+        upgradedCards.push(card);
       }
 
-      // Actualizar estado local del daily loop
-      setDailyLoop(prev => {
-        const newEnergy = Math.max(0, prev.energy - 1);
-        const newTrainings = prev.dailyTrainings + 1;
-        
-        // Clonar el weekly challenge para modificarlo
-        const currentWc = prev.weeklyChallenge;
-        let updatedWc = currentWc;
-        
-        if (currentWc !== null) {
-          const matchesGame = (
-            (currentWc.id === 'wc_shot' && result.stat === 'finishing') ||
-            (currentWc.id === 'wc_dribble' && result.stat === 'dribbling') ||
-            (currentWc.id === 'wc_defense' && result.stat === 'defending') ||
-            (currentWc.id === 'wc_perfect' && result.grade === 'S')
-          );
-          if (matchesGame) {
-            const newProgress = Math.min(currentWc.goal, currentWc.progress + 1);
-            updatedWc = { ...currentWc, progress: newProgress };
-            
-            if (newProgress >= currentWc.goal && !prev.achievements.includes(`wc_${currentWc.id}`)) {
-              setTimeout(() => {
-                alert(`🎉 ¡Completaste el desafío! +${currentWc.reward.delta} ${currentWc.reward.stat} y ${currentWc.reward.xp} XP`);
-              }, 100);
+      // Solo consumir energía si al menos una carta fue entrenada
+      if (upgradedCards.length > 0) {
+        setDailyLoop(prev => {
+          const newEnergy = Math.max(0, prev.energy - 1);
+          const newTrainings = prev.dailyTrainings + 1;
+          
+          // Actualizar desafío semanal si existe
+          let wc = prev.weeklyChallenge;
+          if (wc) {
+            const matchesGame = (
+              (wc.id === 'wc_shot' && result.stat === 'finishing') ||
+              (wc.id === 'wc_dribble' && result.stat === 'dribbling') ||
+              (wc.id === 'wc_defense' && result.stat === 'defending') ||
+              (wc.id === 'wc_perfect' && result.grade === 'S')
+            );
+            if (matchesGame) {
+              wc = { ...wc, progress: Math.min(wc.goal, wc.progress + 1) };
             }
           }
-        }
+          
+          // Logros
+          const achievements = [...prev.achievements];
+          if (result.grade === 'S' && !achievements.includes('first_S')) {
+            achievements.push('first_S');
+          }
+          if (newTrainings >= 5 && !achievements.includes('five_trainings')) {
+            achievements.push('five_trainings');
+          }
+          if (prev.streak >= 7 && !achievements.includes('week_streak')) {
+            achievements.push('week_streak');
+          }
+          
+          const nextRefill = new Date();
+          nextRefill.setHours(nextRefill.getHours() + 1);
+          
+          const updated = {
+            ...prev,
+            energy: newEnergy,
+            dailyTrainings: newTrainings,
+            weeklyChallenge: wc,
+            achievements,
+            energyRefillsAt: newEnergy < prev.maxEnergy ? nextRefill.toISOString() : prev.energyRefillsAt,
+            totalTrainings: prev.totalTrainings + 1,
+            totalSkillPoints: prev.totalSkillPoints + result.delta,
+          };
+          localStorage.setItem(storageKey, JSON.stringify(updated));
+          return updated;
+        });
         
-        const achievements = [...prev.achievements];
-        if (result.grade === 'S' && !achievements.includes('first_S')) {
-          achievements.push('first_S');
-        }
-        if (newTrainings >= 5 && !achievements.includes('five_trainings')) {
-          achievements.push('five_trainings');
-        }
-        if (prev.streak >= 7 && !achievements.includes('week_streak')) {
-          achievements.push('week_streak');
-        }
-        if (prev.totalTrainings + 1 >= 50 && !achievements.includes('50_trainings')) {
-          achievements.push('50_trainings');
-        }
-        
-        const nextRefill = new Date();
-        nextRefill.setHours(nextRefill.getHours() + 1);
-        
-        const updated = {
-          ...prev,
-          energy: newEnergy,
-          dailyTrainings: newTrainings,
-          weeklyChallenge: updatedWc,
-          achievements,
-          energyRefillsAt: newEnergy < prev.maxEnergy ? nextRefill.toISOString() : prev.energyRefillsAt,
-          totalTrainings: prev.totalTrainings + 1,
-          totalSkillPoints: prev.totalSkillPoints + result.delta,
+        // Guardar historial
+        const entry: TrainingHistory = {
+          date: new Date().toISOString(),
+          gameId: result.stat,
+          stat: result.stat,
+          grade: result.grade,
+          delta: result.delta,
+          xpBonus: result.xpBonus,
+          cardId: selectedCardId || cardsToTrain[0]?.id,
+          cardName: selectedCardId ? getCardName(cardsToTrain.find(c => c.id === selectedCardId)!) : 'Todo el equipo',
         };
-        localStorage.setItem(storageKey, JSON.stringify(updated));
-        return updated;
-      });
+        
+        setHistory(prev => {
+          const updated = [entry, ...prev].slice(0, 50);
+          localStorage.setItem(historyKey, JSON.stringify(updated));
+          return updated;
+        });
+      }
       
-      const entry: TrainingHistory = {
-        date: new Date().toISOString(),
-        gameId: result.stat,
-        stat: result.stat,
-        grade: result.grade,
-        delta: result.delta,
-        xpBonus: result.xpBonus,
-        cardId: selectedCardId || cardsToTrain[0]?.id,
-        cardName: selectedCardId 
-          ? getCardName(cardsToTrain.find(c => c.id === selectedCardId)!) 
-          : 'Todo el equipo',
-      };
+      console.log('=== ✅ ENTRENAMIENTO COMPLETADO ===');
+      console.log(`📊 ${upgradedCards.length} cartas mejoradas, ${skippedCards.length} cartas ignoradas`);
       
-      setHistory(prev => {
-        const updated = [entry, ...prev].slice(0, 50);
-        localStorage.setItem(historyKey, JSON.stringify(updated));
-        return updated;
-      });
-      
-      return { success: true, upgradedCards };
+      return { success: upgradedCards.length > 0, upgradedCards, skippedCards };
       
     } catch (error) {
-      console.error('Error aplicando entrenamiento:', error);
+      console.error('❌ Error aplicando entrenamiento:', error);
       return { success: false, error };
     } finally {
       setIsLoading(false);
@@ -299,17 +426,6 @@ export function useTrainingSystem(userId: string, userCards: UserCard[]) {
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function statToColumn(stat: TrainingStat): string {
-  const map: Record<TrainingStat, string> = {
-    finishing: 'finishing',
-    dribbling: 'dribbling',
-    defending: 'defending',
-    passing: 'passing',
-    physical: 'physical',
-  };
-  return map[stat];
-}
 
 export function getEnergyRefillMinutes(refillsAt: string): number {
   if (!refillsAt) return 0;

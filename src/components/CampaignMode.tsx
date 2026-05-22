@@ -120,8 +120,11 @@ const [showContextualHelp, setShowContextualHelp] = useState(false);
   const [showTrainingModal, setShowTrainingModal] = useState(false);
     const deckCardIds = userDeck?.cards?.map(card => card.id) || [];
     const [showTrainingCenter, setShowTrainingCenter] = useState(false);
+    
 
-
+const isDevMode = window.location.search.includes('dev=true') || 
+                  window.location.hash.includes('dev') ||
+                  localStorage.getItem('dev_mode') === 'true';
 
 // Función para reiniciar el tutorial
 const restartTutorial = () => {
@@ -310,6 +313,7 @@ const countUnreadTips = () => {
   const updateMissionProgress = (missionType: string) => {
   const updatedDays = [...campaignDays];
   const currentDayData = updatedDays[currentDay - 1];
+
   
   const mission = currentDayData.dailyMissions.find(m => m.type === missionType);
   if (mission && !mission.isCompleted) {
@@ -578,12 +582,7 @@ useEffect(() => {
   unreadTips={unreadTips}
 />
 
-<TrainingHub
-        dailyLoop={dailyLoop}
-        history={history}
-        canTrain={canTrain}
-        onOpenTraining={() => setShowTrainingModal(true)}
-      />
+
 
 {showContextualHelp && (
   <ContextualHelp
@@ -646,7 +645,7 @@ useEffect(() => {
         <div style={s.titleGroup}>
           <div style={s.fireIcon}>📖</div>
           <div>
-            <h1 style={s.mainTitle}>¡MODO HISTORIA!</h1>
+            <h1 style={s.mainTitle}> HISTORIA</h1>
             <p style={s.mainSub}>⚽ El camino hacia la gloria ⚽</p>
           </div>
         </div>
@@ -654,12 +653,11 @@ useEffect(() => {
           <div style={s.statBubbleAnime}>
             <span style={s.statIcon}>⭐</span>
             <span style={s.statValue}>{progress?.starsEarned || 0}</span>
-            <span style={s.statLabel}>Poder Estrella</span>
           </div>
           <div style={s.statBubbleAnime}>
             <span style={s.statIcon}>🔥</span>
             <span style={s.statValue}>{progress?.currentStreak || 0}</span>
-            <span style={s.statLabel}>Racha de Fuego</span>
+            
           </div>
         </div>
       </div>
@@ -860,10 +858,9 @@ useEffect(() => {
     userId={userId}
     userCards={userCards}
     deckCards={userDeck?.cards || []}
-    onCardsUpdated={(updatedCards) => {
-      onBattleComplete(updatedCards);
-    }}
+    onCardsUpdated={(updatedCards) => onBattleComplete(updatedCards)}
     onClose={() => setShowTrainingCenter(false)}
+    isDevMode={isDevMode}  // ← Agregar esta prop
   />
 )}
 
@@ -976,18 +973,8 @@ const s: Record<string, React.CSSProperties> = {
   },
   statsRow: { 
     display: 'flex', 
-    gap: 12 
-  },
-  statBubbleAnime: {
-    background: 'rgba(0,0,0,0.6)',
-    backdropFilter: 'blur(8px)',
-    borderRadius: 50,
-    padding: '6px 16px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-    border: '1px solid #ffd700',
-    boxShadow: '0 0 8px rgba(255,215,0,0.3)',
+    gap: 12,
+    marginTop: '10px',
   },
   statIcon: { 
     fontSize: 24 

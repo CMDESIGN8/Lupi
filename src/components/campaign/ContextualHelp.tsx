@@ -189,6 +189,8 @@ export default function ContextualHelp({
       `}</style>
 
       <div style={styles.overlay}>
+        {/* FONDO CON IMAGEN */}
+  <div style={styles.backgroundImage} />
         {/* SPEED LINES */}
         <div style={styles.speedLines} />
 
@@ -205,7 +207,7 @@ export default function ContextualHelp({
             <div style={styles.characterAura} />
 
             <img
-              src="https://i.imgur.com/6VBx3io.png"
+              src="/images/l1 .png"
               alt="Coach"
               style={styles.character}
             />
@@ -329,6 +331,16 @@ const styles: Record<string, React.CSSProperties> = {
     zIndex: 10001,
     overflow: 'hidden',
     fontFamily: "'Bangers', cursive",
+  },
+
+  // NUEVO: Fondo con imagen
+  backgroundImage: {
+    position: 'absolute',
+    inset: 0,
+    backgroundImage: 'url("/images/estadio.png")', // Cambia la ruta
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
   },
 
   speedLines: {

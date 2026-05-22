@@ -1,14 +1,47 @@
 // src/components/campaign/TrainingCenter.tsx
-// ─────────────────────────────────────────────────────────────────────────────
-// CENTRO DE ENTRENAMIENTO - Vista completa con selección de cartas
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// TRAINING CENTER - ANIME AAA VERSION
+// BLUELOCK + FIFA ULTIMATE TEAM + CAPTAIN TSUBASA STYLE
+// COMPLETO Y FUNCIONAL
+// ─────────────────────────────────────────────────────────────
 
-import { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { UserCard } from '../../types/cards';
 import { useTrainingSystem } from '../../hooks/useTrainingSystem';
-import { TrainingHub } from './TrainingHub';
 import { TrainingModal } from './TrainingModal';
 import { getCardData } from '../../utils/battleEngine';
+
+// ─────────────────────────────────────────────────────────────
+// COLORS / FONTS
+// ─────────────────────────────────────────────────────────────
+
+const COLORS = {
+  primary: '#00f3ff',
+  primaryDark: '#0099ff',
+  secondary: '#ff00ff',
+  accent: '#ffd500',
+
+  bg: '#020617',
+  bg2: '#071226',
+  bgCard: '#0f172a',
+
+  text: '#ffffff',
+  textDim: '#8ba3c7',
+
+  pace: '#e4ff6b',
+  dribbling: '#00e5ff',
+  passing: '#a855f7',
+  defending: '#2ed573',
+  finishing: '#ff7b00',
+  physical: '#ff5e7a',
+};
+
+const FONT_TITLE = `'Orbitron', sans-serif`;
+const FONT_BODY = `'Rajdhani', sans-serif`;
+
+// ─────────────────────────────────────────────────────────────
+// TYPES
+// ─────────────────────────────────────────────────────────────
 
 interface TrainingCenterProps {
   userId: string;
@@ -16,475 +49,1574 @@ interface TrainingCenterProps {
   deckCards: UserCard[];
   onCardsUpdated: (updatedCards: UserCard[]) => void;
   onClose: () => void;
+  isDevMode?: boolean;
 }
 
-const RUSSO = "'Russo One', sans-serif";
+// ─────────────────────────────────────────────────────────────
+// GAMES
+// ─────────────────────────────────────────────────────────────
 
-// Función auxiliar para obtener el avatar de la carta
-const getCardAvatar = (cardData: any): string => {
-  // Intentar obtener avatar de diferentes fuentes posibles
-  if (cardData.avatar) return cardData.avatar;
-  if (cardData.icon) return cardData.icon;
-  if (cardData.emoji) return cardData.emoji;
-  
-  // Avatares por defecto según posición
-  const position = cardData.position?.toLowerCase() || '';
-  if (position.includes('delanter') || position.includes('forward')) return '⚽';
-  if (position.includes('medioc') || position.includes('midfield')) return '⚡';
-  if (position.includes('defens') || position.includes('defender')) return '🛡️';
-  if (position.includes('porter') || position.includes('goalie')) return '🧤';
-  
-  return '⚽';
-};
+const GAMES = [
+  {
+    id: 'shooting',
+    name: 'REMATE',
+    icon: '🎯',
+    stat: 'finishing',
+    color: '#ff4757',
+    aura: '#ff475755',
 
-export function TrainingCenter({ 
-  userId, 
-  userCards, 
-  deckCards, 
-  onCardsUpdated, 
-  onClose 
-}: TrainingCenterProps) {
-  const { dailyLoop, applyTraining, canTrain, history, isLoading, trainingsLeftToday } = 
-    useTrainingSystem(userId, userCards);
-  
-  const [showTrainingModal, setShowTrainingModal] = useState(false);
-  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
-  const [selectedTab, setSelectedTab] = useState<'stats' | 'cards' | 'history'>('stats');
+    desc: 'Disparo letal',
+    description: '🎯 Reventá el arco con tiros perfectos',
+    difficulty: '⭐⭐',
+    timeSeconds: 10,
+  },
 
-  const handleTrain = async (result: any) => {
-    const updated = await applyTraining(result, deckCards, selectedCardId || undefined);
-    if (updated?.success && updated.upgradedCards) {
-      onCardsUpdated(updated.upgradedCards);
-    }
+  {
+    id: 'dribbling',
+    name: 'GAMBETA',
+    icon: '⚡',
+    stat: 'dribbling',
+    color: '#00f0ff',
+    aura: '#00f0ff55',
+
+    desc: 'Velocidad extrema',
+    description: '⚡ Esquivá rivales y rompé líneas',
+    difficulty: '⭐⭐⭐',
+    timeSeconds: 14,
+  },
+
+  {
+    id: 'passing',
+    name: 'PASE',
+    icon: '🌀',
+    stat: 'passing',
+    color: '#a855f7',
+    aura: '#a855f755',
+
+    desc: 'Visión total',
+    description: '🌀 Ejecutá pases imposibles',
+    difficulty: '⭐⭐⭐',
+    timeSeconds: 12,
+  },
+
+  {
+    id: 'defending',
+    name: 'DEFENSA',
+    icon: '🛡️',
+    stat: 'defending',
+    color: '#22c55e',
+    aura: '#22c55e55',
+
+    desc: 'Muro absoluto',
+    description: '🛡️ Frená cada ataque rival',
+    difficulty: '⭐⭐',
+    timeSeconds: 11,
+  },
+
+  {
+    id: 'physical',
+    name: 'FÍSICO',
+    icon: '💪',
+    stat: 'physical',
+    color: '#ff8800',
+    aura: '#ff880055',
+
+    desc: 'Potencia brutal',
+    description: '💪 Reaccioná rápido y resistí todo',
+    difficulty: '⭐⭐⭐⭐',
+    timeSeconds: 15,
+  },
+
+  {
+    id: 'pace',
+    name: 'RITMO',
+    icon: '🏃',
+    stat: 'pace',
+    color: '#eaff00',
+    aura: '#eaff0055',
+
+    desc: 'Sprint relámpago',
+    description: '🏃 Superá al rival en velocidad',
+    difficulty: '⭐⭐⭐',
+    timeSeconds: 12,
+  },
+];
+
+// ─────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────
+
+function getAvatar(card: UserCard) {
+  const data = getCardData(card);
+  const pos = data.position?.toLowerCase() || '';
+
+  if (pos.includes('del') || pos.includes('striker')) return '⚽';
+  if (pos.includes('mid')) return '⚡';
+  if (pos.includes('def')) return '🛡️';
+  if (pos.includes('goal')) return '🧤';
+
+  return '👤';
+}
+
+function getStats(card: UserCard) {
+  const data = getCardData(card);
+
+  return {
+    name: data.name || 'Jugador',
+    overall: data.overall_rating || 50,
+
+    pace: data.pace || 50,
+    dribbling: data.dribbling || 50,
+    passing: data.passing || 50,
+    defending: data.defending || 50,
+    finishing: data.finishing || 50,
+    physical: data.physical || 50,
   };
-
-  // Calcular estadísticas totales del equipo
-  const teamStats = deckCards.reduce((acc, card) => {
-    const data = getCardData(card);
-    return {
-      finishing: acc.finishing + (data.finishing || 50),
-      dribbling: acc.dribbling + (data.dribbling || 50),
-      defending: acc.defending + (data.defending || 50),
-      passing: acc.passing + (data.passing || 50),
-      physical: acc.physical + (data.physical || 50),
-    };
-  }, { finishing: 0, dribbling: 0, defending: 0, passing: 0, physical: 0 });
-
-  const avgStats = {
-    finishing: Math.round(teamStats.finishing / deckCards.length),
-    dribbling: Math.round(teamStats.dribbling / deckCards.length),
-    defending: Math.round(teamStats.defending / deckCards.length),
-    passing: Math.round(teamStats.passing / deckCards.length),
-    physical: Math.round(teamStats.physical / deckCards.length),
-  };
-
-  return (
-    <div style={styles.overlay}>
-      <div style={styles.container}>
-        {/* Header */}
-        <div style={styles.header}>
-          <div style={styles.headerLeft}>
-            <div style={styles.icon}>🏋️</div>
-            <div>
-              <h2 style={styles.title}>CENTRO DE ENTRENAMIENTO</h2>
-              <p style={styles.subtitle}>Mejorá las habilidades de tu equipo</p>
-            </div>
-          </div>
-          <button onClick={onClose} style={styles.closeBtn}>✕</button>
-        </div>
-
-        {/* Tabs */}
-        <div style={styles.tabs}>
-          <button 
-            onClick={() => setSelectedTab('stats')}
-            style={{...styles.tab, ...(selectedTab === 'stats' ? styles.tabActive : {})}}
-          >
-            📊 ESTADÍSTICAS
-          </button>
-          <button 
-            onClick={() => setSelectedTab('cards')}
-            style={{...styles.tab, ...(selectedTab === 'cards' ? styles.tabActive : {})}}
-          >
-            🃏 CARTAS
-          </button>
-          <button 
-            onClick={() => setSelectedTab('history')}
-            style={{...styles.tab, ...(selectedTab === 'history' ? styles.tabActive : {})}}
-          >
-            📜 HISTORIAL
-          </button>
-        </div>
-
-        {/* Contenido */}
-        <div style={styles.content}>
-          {selectedTab === 'stats' && (
-            <div>
-              <TrainingHub
-                dailyLoop={dailyLoop}
-                history={history}
-                canTrain={canTrain}
-                onOpenTraining={() => setShowTrainingModal(true)}
-              />
-              
-              <div style={styles.teamStats}>
-                <h3 style={styles.sectionTitle}>⚡ ESTADÍSTICAS DEL EQUIPO</h3>
-                <div style={styles.statsGrid}>
-                  <StatBar label="⚽ Remate" value={avgStats.finishing} color="#FF4757" />
-                  <StatBar label="⚡ Gambeta" value={avgStats.dribbling} color="#00E5FF" />
-                  <StatBar label="🛡️ Defensa" value={avgStats.defending} color="#2ED573" />
-                  <StatBar label="🌀 Pase" value={avgStats.passing} color="#A55FEF" />
-                  <StatBar label="💪 Físico" value={avgStats.physical} color="#FFA502" />
-                </div>
-              </div>
-
-              {trainingsLeftToday > 0 && (
-                <div style={styles.remainingCard}>
-                  <div style={styles.remainingIcon}>⚡</div>
-                  <div>
-                    <div style={styles.remainingTitle}>ENTRENAMIENTOS DISPONIBLES</div>
-                    <div style={styles.remainingCount}>{trainingsLeftToday} / {dailyLoop.maxDailyTrainings}</div>
-                  </div>
-                  <button 
-                    onClick={() => setShowTrainingModal(true)}
-                    disabled={!canTrain || isLoading}
-                    style={{...styles.trainButton, ...(!canTrain || isLoading ? styles.trainButtonDisabled : {})}}
-                  >
-                    {isLoading ? '⏳ ENTRENANDO...' : '🏋️ ENTRENAR AHORA'}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {selectedTab === 'cards' && (
-            <div>
-              <h3 style={styles.sectionTitle}>🎴 SELECCIONAR CARTA PARA ENTRENAR</h3>
-              <p style={styles.sectionSubtitle}>
-                {selectedCardId 
-                  ? `Entrenando carta específica: +bonus del 50%` 
-                  : "Entrenando a todo el equipo (sin selección)"}
-              </p>
-              
-              <div style={styles.cardsGrid}>
-                <button
-                  onClick={() => setSelectedCardId(null)}
-                  style={{
-                    ...styles.cardItem,
-                    ...(!selectedCardId ? styles.cardSelected : {}),
-                  }}
-                >
-                  <div style={styles.cardEmoji}>👥</div>
-                  <div style={styles.cardName}>TODO EL EQUIPO</div>
-                  <div style={styles.cardBonus}>Mejora general</div>
-                </button>
-                
-                {deckCards.slice(0, 8).map(card => {
-                  const cardData = getCardData(card);
-                  const isSelected = selectedCardId === card.id;
-                  // Obtener nombre de la carta
-                  const cardName = cardData.name || `Carta ${card.id.slice(0, 4)}`;
-                  const cardAvatar = getCardAvatar(cardData);
-                  
-                  return (
-                    <button
-                      key={card.id}
-                      onClick={() => setSelectedCardId(card.id)}
-                      style={{
-                        ...styles.cardItem,
-                        ...(isSelected ? styles.cardSelected : {}),
-                        position: 'relative' as const,
-                      }}
-                    >
-                      <div style={styles.cardEmoji}>{cardAvatar}</div>
-                      <div style={styles.cardName}>{cardName}</div>
-                      <div style={styles.cardRating}>OVR {cardData.overall_rating || 50}</div>
-                      {isSelected && <div style={styles.cardBadge}>✨ +50% XP</div>}
-                    </button>
-                  );
-                })}
-              </div>
-              
-              <button 
-                onClick={() => setShowTrainingModal(true)}
-                disabled={!canTrain || isLoading}
-                style={{...styles.trainButtonLarge, ...(!canTrain || isLoading ? styles.trainButtonDisabled : {})}}
-              >
-                {isLoading ? '⏳ PROCESANDO...' : `🎮 INICIAR ENTRENAMIENTO (${dailyLoop.energy}⚡ disponibles)`}
-              </button>
-            </div>
-          )}
-
-          {selectedTab === 'history' && (
-            <div>
-              <h3 style={styles.sectionTitle}>📜 HISTORIAL DE ENTRENAMIENTOS</h3>
-              <div style={styles.historyList}>
-                {history.length === 0 ? (
-                  <div style={styles.emptyHistory}>
-                    <div style={styles.emptyIcon}>🏋️</div>
-                    <p>Aún no hay entrenamientos realizados</p>
-                    <p style={styles.emptyHint}>¡Completá tu primer entrenamiento!</p>
-                  </div>
-                ) : (
-                  history.slice(0, 20).map((entry, i) => (
-                    <div key={i} style={styles.historyItem}>
-                      <div style={styles.historyDate}>
-                        {new Date(entry.date).toLocaleDateString()}
-                      </div>
-                      <div style={styles.historyInfo}>
-                        <span style={styles.historyGame}>{getGameIcon(entry.stat)} {entry.stat}</span>
-                        <span style={{...styles.historyGrade, color: getGradeColor(entry.grade)}}>
-                          {entry.grade}
-                        </span>
-                        <span style={styles.historyDelta}>+{entry.delta}</span>
-                      </div>
-                      <div style={styles.historyCard}>
-                        {entry.cardName || 'Equipo completo'}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <TrainingModal
-          isOpen={showTrainingModal}
-          onClose={() => setShowTrainingModal(false)}
-          onTrain={handleTrain}
-          deckCardIds={selectedCardId ? [selectedCardId] : deckCards.map(c => c.id)}
-        />
-      </div>
-    </div>
-  );
 }
 
-// Componentes auxiliares
-function StatBar({ label, value, color }: { label: string; value: number; color: string }) {
-  return (
-    <div style={statStyles.container}>
-      <div style={statStyles.labelRow}>
-        <span style={statStyles.label}>{label}</span>
-        <span style={statStyles.value}>{value}</span>
-      </div>
-      <div style={statStyles.track}>
-        <div style={{...statStyles.fill, width: `${value}%`, background: color }} />
-      </div>
-    </div>
-  );
-}
-
-function getGameIcon(stat: string): string {
-  const icons: Record<string, string> = {
-    finishing: '🎯',
-    dribbling: '⚡',
-    defending: '🛡️',
-    passing: '🌀',
-    physical: '💪',
-  };
-  return icons[stat] || '🏋️';
-}
-
-function getGradeColor(grade: string): string {
-  switch(grade) {
-    case 'S': return '#FFD700';
-    case 'A': return '#00FF87';
-    case 'B': return '#00E5FF';
-    case 'C': return '#FF6B6B';
-    default: return '#fff';
+function statColor(stat: string) {
+  switch (stat) {
+    case 'pace':
+      return COLORS.pace;
+    case 'dribbling':
+      return COLORS.dribbling;
+    case 'passing':
+      return COLORS.passing;
+    case 'defending':
+      return COLORS.defending;
+    case 'finishing':
+      return COLORS.finishing;
+    case 'physical':
+      return COLORS.physical;
+    default:
+      return COLORS.primary;
   }
 }
 
-const statStyles: Record<string, React.CSSProperties> = {
-  container: { marginBottom: 12 },
-  labelRow: { display: 'flex', justifyContent: 'space-between', marginBottom: 4 },
-  label: { fontSize: 11, color: 'rgba(255,255,255,0.6)' },
-  value: { fontSize: 12, fontWeight: 'bold', color: '#FFD700' },
-  track: { height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' },
-  fill: { height: '100%', borderRadius: 3, transition: 'width 0.3s' },
-};
+function getGradeColor(grade: string) {
+  switch (grade) {
+    case 'S':
+      return '#ffd700';
+    case 'A':
+      return '#00ff87';
+    case 'B':
+      return '#00e5ff';
+    case 'C':
+      return '#ff7b7b';
+    default:
+      return '#fff';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMPONENT
+// ─────────────────────────────────────────────────────────────
+
+export function TrainingCenter({
+  userId,
+  deckCards,
+  onCardsUpdated,
+  onClose,
+  isDevMode = false,
+}: TrainingCenterProps) {
+  const {
+    dailyLoop,
+    applyTraining,
+    canTrain,
+    history,
+    trainingsLeftToday,
+  } = useTrainingSystem(userId, deckCards);
+
+  const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
+
+  const [selectedGame, setSelectedGame] =
+    useState<(typeof GAMES)[0] | null>(null);
+
+  const [showTrainingModal, setShowTrainingModal] = useState(false);
+
+  const [showIntro, setShowIntro] = useState(false);
+
+  // ───────────────────────────────────────────────────────────
+  // INTRO
+  // ───────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    if (showTrainingModal) {
+      setShowIntro(true);
+
+      const timer = setTimeout(() => {
+        setShowIntro(false);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showTrainingModal]);
+
+  // ───────────────────────────────────────────────────────────
+  // SELECTED PLAYER
+  // ───────────────────────────────────────────────────────────
+
+  const selectedPlayerName = useMemo(() => {
+    if (!selectedCardId) return 'TODO EL EQUIPO';
+
+    const found = deckCards.find((c) => c.id === selectedCardId);
+
+    if (!found) return 'JUGADOR';
+
+    return getStats(found).name;
+  }, [selectedCardId, deckCards]);
+
+  // ───────────────────────────────────────────────────────────
+  // TRAIN
+  // ───────────────────────────────────────────────────────────
+
+  const handleTrain = async (result: any) => {
+    const cardsToTrain = selectedCardId
+      ? deckCards.filter((c) => c.id === selectedCardId)
+      : deckCards;
+
+    const updated = await applyTraining(
+      result,
+      cardsToTrain,
+      selectedCardId || undefined
+    );
+
+    if (updated?.success && updated.upgradedCards) {
+      onCardsUpdated(updated.upgradedCards);
+    }
+
+    setSelectedGame(null);
+    setShowTrainingModal(false);
+  };
+
+  // ───────────────────────────────────────────────────────────
+  // RENDER
+  // ───────────────────────────────────────────────────────────
+
+  return (
+    <>
+      <style>
+        {`
+        @keyframes scan {
+          0% { transform: translateY(-100%); }
+          100% { transform: translateY(100vh); }
+        }
+
+        @keyframes pulseGlow {
+          0% { opacity: .5; }
+          50% { opacity: 1; }
+          100% { opacity: .5; }
+        }
+
+        @keyframes aura {
+          0% { transform: scale(1); opacity: .6; }
+          50% { transform: scale(1.08); opacity: 1; }
+          100% { transform: scale(1); opacity: .6; }
+        }
+
+        @keyframes floatCard {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-5px); }
+          100% { transform: translateY(0px); }
+        }
+
+        @keyframes shine {
+          0% { left: -40%; }
+          100% { left: 140%; }
+        }
+
+        @keyframes animeIntro {
+          0% {
+            opacity:0;
+            transform:scale(1.4);
+            filter:blur(20px);
+          }
+
+          100% {
+            opacity:1;
+            transform:scale(1);
+            filter:blur(0px);
+          }
+        }
+
+        @keyframes flashMove {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}
+      </style>
+
+      <div style={styles.overlay}>
+        {/* scanlines */}
+        <div style={styles.scanlines} />
+
+        {/* particles */}
+        <div style={styles.particles} />
+
+        <div style={styles.container}>
+          {/* HEADER */}
+
+          <div style={styles.header}>
+            <div style={styles.headerLeft}>
+              <div style={styles.logo}>🏋️</div>
+
+              <div>
+                <div style={styles.title}>
+                  CAMPO DE ENTRENAMIENTO
+                </div>
+
+                <div style={styles.subtitle}>
+                  BLUELOCK TRAINING SYSTEM
+                </div>
+              </div>
+            </div>
+
+            <button style={styles.closeButton} onClick={onClose}>
+              ✕
+            </button>
+          </div>
+
+          {/* SELECTED */}
+
+          <div style={styles.selectedBanner}>
+            <div style={styles.selectedText}>
+              ⚡ ENTRENANDO A:
+            </div>
+
+            <div style={styles.selectedPlayer}>
+              {selectedPlayerName}
+            </div>
+
+            {selectedCardId && (
+              <button
+                style={styles.clearButton}
+                onClick={() => setSelectedCardId(null)}
+              >
+                CAMBIAR
+              </button>
+            )}
+          </div>
+
+          {/* CARDS */}
+
+          <div style={styles.cardsGrid}>
+            {/* TEAM CARD */}
+
+            <div
+              style={{
+                ...styles.card,
+                ...(selectedCardId === null
+                  ? styles.cardSelected
+                  : {}),
+              }}
+              onClick={() => setSelectedCardId(null)}
+            >
+              <div style={styles.cardGlow} />
+
+              <div style={styles.cutIn}>
+                <div style={styles.cutInText}>
+                  TEAM BOOST
+                </div>
+              </div>
+
+              <div style={styles.cardHeader}>
+                <div style={styles.cardAvatar}>👥</div>
+
+                <div>
+                  <div style={styles.cardName}>
+                    TODO EL EQUIPO
+                  </div>
+
+                  <div style={styles.cardRole}>
+                    GENERAL TRAINING
+                  </div>
+                </div>
+              </div>
+
+              <div style={styles.teamInfo}>
+                ⚡ Mejora global para todas las cartas
+              </div>
+            </div>
+
+            {/* PLAYER CARDS */}
+
+            {deckCards.slice(0, 8).map((card) => {
+              const stats = getStats(card);
+
+              const selected = selectedCardId === card.id;
+
+              return (
+                <div
+                  key={card.id}
+                  style={{
+                    ...styles.card,
+                    ...(selected ? styles.cardSelected : {}),
+                  }}
+                  onClick={() => setSelectedCardId(card.id)}
+                >
+                  <div style={styles.cardGlow} />
+
+                  {/* CUT-IN */}
+
+                  <div style={styles.cutIn}>
+                    <div style={styles.cutInText}>
+                      {selected
+                        ? 'LOCKED IN'
+                        : 'EGO PLAYER'}
+                    </div>
+                  </div>
+
+                  {/* HEADER */}
+
+                  <div style={styles.cardHeader}>
+                    <div style={styles.cardAvatar}>
+                      {getAvatar(card)}
+                    </div>
+
+                    <div>
+                      <div style={styles.cardName}>
+                        {stats.name}
+                      </div>
+
+                      <div style={styles.ovrBox}>
+                        <span style={styles.ovrValue}>
+                          {stats.overall}
+                        </span>
+
+                        <span style={styles.ovrLabel}>
+                          OVR
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* STATS */}
+
+                  <div style={styles.stats}>
+                    {[
+                      {
+                        label: 'RITMO',
+                        value: stats.pace,
+                        color: COLORS.pace,
+                        icon: '⚡',
+                      },
+                      {
+                        label: 'GAMBETA',
+                        value: stats.dribbling,
+                        color: COLORS.dribbling,
+                        icon: '🪄',
+                      },
+                      {
+                        label: 'PASE',
+                        value: stats.passing,
+                        color: COLORS.passing,
+                        icon: '🌀',
+                      },
+                      {
+                        label: 'DEFENSA',
+                        value: stats.defending,
+                        color: COLORS.defending,
+                        icon: '🛡️',
+                      },
+                      {
+                        label: 'REMATE',
+                        value: stats.finishing,
+                        color: COLORS.finishing,
+                        icon: '⚽',
+                      },
+                      {
+                        label: 'FÍSICO',
+                        value: stats.physical,
+                        color: COLORS.physical,
+                        icon: '💪',
+                      },
+                    ].map((s) => (
+                      <div
+                        key={s.label}
+                        style={styles.statRow}
+                      >
+                        <div style={styles.statLeft}>
+                          <span>{s.icon}</span>
+
+                          <span>{s.label}</span>
+                        </div>
+
+                        <div style={styles.barTrack}>
+                          <div
+                            style={{
+                              ...styles.barFill,
+                              width: `${s.value}%`,
+                              background: s.color,
+                              boxShadow: `0 0 14px ${s.color}`,
+                            }}
+                          />
+                        </div>
+
+                        <div style={styles.statValue}>
+                          {s.value}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={styles.cardFooter}>
+                    {selected
+                      ? '✨ SELECCIONADO ✨'
+                      : 'CLICK PARA ENTRENAR'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* ENERGY */}
+
+          <div style={styles.energyPanel}>
+            <div style={{ flex: 1 }}>
+              <div style={styles.energyLabel}>
+                <span>⚡ ENERGÍA</span>
+
+                <span>
+                  {dailyLoop.energy}/
+                  {dailyLoop.maxEnergy}
+                </span>
+              </div>
+
+              <div style={styles.energyTrack}>
+                <div
+                  style={{
+                    ...styles.energyFill,
+                    width: `${
+                      (dailyLoop.energy /
+                        dailyLoop.maxEnergy) *
+                      100
+                    }%`,
+                  }}
+                />
+              </div>
+
+              <div style={styles.energyText}>
+                🎯 {trainingsLeftToday} entrenamientos
+                disponibles
+              </div>
+            </div>
+
+            <div style={styles.streakBox}>
+              <div style={styles.streakNumber}>
+                {dailyLoop.streak}
+              </div>
+
+              <div style={styles.streakLabel}>
+                🔥 STREAK
+              </div>
+            </div>
+          </div>
+
+          {/* GAMES */}
+
+          <div style={styles.sectionTitle}>
+            ENTRENAMIENTOS ESPECIALES
+          </div>
+
+          <div style={styles.gamesGrid}>
+            {GAMES.map((game) => (
+              <button
+                key={game.id}
+                disabled={!canTrain && !isDevMode}
+                style={{
+                  ...styles.gameButton,
+                  borderColor: game.color,
+                  boxShadow: `0 0 20px ${game.aura}55`,
+                  opacity:
+                    !canTrain && !isDevMode ? 0.5 : 1,
+                }}
+                onClick={() => {
+                  setSelectedGame(game);
+                  setShowTrainingModal(true);
+                }}
+              >
+                <div
+                  style={{
+                    ...styles.gameAura,
+                    background: game.aura,
+                  }}
+                />
+
+                <div style={styles.gameIcon}>
+                  {game.icon}
+                </div>
+
+                <div style={styles.gameName}>
+                  {game.name}
+                </div>
+
+                <div style={styles.gameDesc}>
+                  {game.desc}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* HISTORY */}
+
+          {history.length > 0 && (
+            <>
+              <div style={styles.sectionTitle}>
+                HISTORIAL
+              </div>
+
+              <div style={styles.historyBox}>
+                {history.slice(0, 5).map((h, i) => (
+                  <div
+                    key={i}
+                    style={styles.historyRow}
+                  >
+                    <div style={styles.historyTime}>
+                      {new Date(
+                        h.date
+                      ).toLocaleTimeString()}
+                    </div>
+
+                    <div style={styles.historyStat}>
+                      {h.stat}
+                    </div>
+
+                    <div
+                      style={{
+                        ...styles.historyGrade,
+                        color: getGradeColor(h.grade),
+                      }}
+                    >
+                      {h.grade}
+                    </div>
+
+                    <div style={styles.historyDelta}>
+                      +{h.delta}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* DEV */}
+
+          {isDevMode && (
+            <div style={styles.devBox}>
+              <div style={styles.devTitle}>
+                🛠 DEV MODE
+              </div>
+
+              <div style={styles.devButtons}>
+                <button
+                  style={styles.devButton}
+                  onClick={() => {
+                    const saved = localStorage.getItem(
+                      `training_loop_${userId}`
+                    );
+
+                    if (saved) {
+                      const parsed = JSON.parse(saved);
+
+                      parsed.energy = 5;
+                      parsed.dailyTrainings = 0;
+
+                      localStorage.setItem(
+                        `training_loop_${userId}`,
+                        JSON.stringify(parsed)
+                      );
+                    }
+
+                    window.location.reload();
+                  }}
+                >
+                  ⚡ RECARGAR
+                </button>
+
+                <button
+                  style={styles.devButtonDanger}
+                  onClick={() => {
+                    localStorage.removeItem(
+                      `training_loop_${userId}`
+                    );
+
+                    localStorage.removeItem(
+                      `training_history_${userId}`
+                    );
+
+                    window.location.reload();
+                  }}
+                >
+                  🔄 RESET
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* INTRO */}
+
+        {showIntro && selectedGame && (
+          <div style={styles.introOverlay}>
+            <div style={styles.introFlash} />
+
+            <div style={styles.introContent}>
+              <div style={styles.introMini}>
+                SPECIAL TRAINING
+              </div>
+
+              <div style={styles.introTitle}>
+                {selectedGame.icon}{' '}
+                {selectedGame.name}
+              </div>
+
+              <div style={styles.introSub}>
+                ⚡ PREPARATE ⚡
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MODAL */}
+
+        {selectedGame && (
+          <TrainingModal
+            isOpen={showTrainingModal}
+            onClose={() => {
+              setShowTrainingModal(false);
+
+              setTimeout(() => {
+                setSelectedGame(null);
+              }, 400);
+            }}
+            onTrain={handleTrain}
+            deckCardIds={
+              selectedCardId
+                ? [selectedCardId]
+                : deckCards.map((c) => c.id)
+            }
+            selectedGame={selectedGame}
+            isDevMode={isDevMode}
+          />
+        )}
+      </div>
+    </>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// STYLES
+// ─────────────────────────────────────────────────────────────
 
 const styles: Record<string, React.CSSProperties> = {
   overlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: 'rgba(0, 0, 0, 0.9)',
-    backdropFilter: 'blur(8px)',
-    zIndex: 1000,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+  position: 'fixed',
+  inset: 0,
+
+  background: `
+    linear-gradient(
+      180deg,
+      #020617 0%,
+      #071226 40%,
+      #020617 100%
+    )
+  `,
+
+  backgroundImage: `
+    repeating-linear-gradient(
+      0deg,
+      rgba(0,255,255,0.03) 0px,
+      rgba(0,255,255,0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    )
+  `,
+
+  zIndex: 1000,
+
+  overflowY: 'auto',
+
+  padding: '24px 0',
+
+  WebkitOverflowScrolling: 'touch',
+
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+},
+
+  scanlines: {
+    position: 'absolute',
+    inset: 0,
+
+    background: `
+      repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,0.02),
+        rgba(255,255,255,0.02) 1px,
+        transparent 1px,
+        transparent 3px
+      )
+    `,
+
+    pointerEvents: 'none',
   },
+
+  particles: {
+    position: 'absolute',
+    inset: 0,
+
+    backgroundImage: `
+      radial-gradient(circle, rgba(0,243,255,.18) 1px, transparent 1px)
+    `,
+
+    backgroundSize: '40px 40px',
+
+    opacity: 0.4,
+
+    pointerEvents: 'none',
+  },
+
   container: {
-    width: '90%',
-    maxWidth: 800,
-    maxHeight: '90vh',
-    background: 'linear-gradient(135deg, #1a0b2e 0%, #0f0020 100%)',
-    borderRadius: 32,
-    border: '2px solid rgba(255, 215, 0, 0.3)',
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
-    fontFamily: RUSSO,
+    width: '100%',
+    maxWidth: 1450,
+
+    position: 'relative',
+
+    borderRadius: 28,
+
+    background: `
+      linear-gradient(
+        180deg,
+        rgba(10,15,35,.95),
+        rgba(3,7,18,.98)
+      )
+    `,
+
+    border: '1px solid rgba(0,243,255,.25)',
+
+    padding: 24,
+
+    boxShadow: `
+      0 0 50px rgba(0,243,255,.15),
+      inset 0 0 50px rgba(0,243,255,.05)
+    `,
+    maxHeight: 'unset',
+overflow: 'visible',
   },
+
   header: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '20px 24px',
-    borderBottom: '1px solid rgba(255, 215, 0, 0.2)',
+
+    marginBottom: 24,
   },
-  headerLeft: { display: 'flex', alignItems: 'center', gap: 12 },
-  icon: { fontSize: 36 },
-  title: { fontSize: 18, color: '#FFD700', margin: 0 },
-  subtitle: { fontSize: 11, color: 'rgba(255,255,255,0.4)', margin: '4px 0 0' },
-  closeBtn: {
-    background: 'none',
-    border: 'none',
-    fontSize: 24,
-    color: '#fff',
-    cursor: 'pointer',
-    padding: '4px 12px',
-    borderRadius: 8,
-  },
-  tabs: {
+
+  headerLeft: {
     display: 'flex',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-    padding: '0 16px',
+    alignItems: 'center',
+    gap: 18,
   },
-  tab: {
-    background: 'none',
-    border: 'none',
-    padding: '12px 20px',
+
+  logo: {
+    fontSize: 58,
+
+    filter: 'drop-shadow(0 0 12px #00f3ff)',
+  },
+
+  title: {
+    fontSize: 30,
+    color: '#fff',
+    fontWeight: 900,
+    letterSpacing: 3,
+    fontFamily: FONT_TITLE,
+
+    textShadow: `
+      0 0 12px rgba(0,243,255,.8)
+    `,
+  },
+
+  subtitle: {
+    color: COLORS.primary,
+    letterSpacing: 3,
     fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.5)',
+    marginTop: 4,
+  },
+
+  closeButton: {
+    width: 52,
+    height: 52,
+
+    borderRadius: 14,
+
+    border: '1px solid rgba(255,255,255,.1)',
+
+    background: 'rgba(255,255,255,.04)',
+
+    color: '#fff',
+
     cursor: 'pointer',
-    fontFamily: RUSSO,
-    transition: 'all 0.2s',
+
+    fontSize: 20,
   },
-  tabActive: {
-    color: '#FFD700',
-    borderBottom: '2px solid #FFD700',
-  },
-  content: {
-    flex: 1,
-    overflow: 'auto',
-    padding: 20,
-  },
-  teamStats: {
-    background: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 12,
-    color: '#FFD700',
-    marginBottom: 12,
-    letterSpacing: 1,
-  },
-  sectionSubtitle: {
-    fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.4)',
-    marginBottom: 16,
-  },
-  statsGrid: { display: 'flex', flexDirection: 'column', gap: 8 },
-  remainingCard: {
+
+  selectedBanner: {
     display: 'flex',
     alignItems: 'center',
     gap: 16,
-    background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 100, 0, 0.1))',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 16,
+
+    padding: 18,
+
+    borderRadius: 20,
+
+    marginBottom: 28,
+
+    background: `
+      linear-gradient(
+        90deg,
+        rgba(0,243,255,.08),
+        rgba(255,0,255,.08)
+      )
+    `,
+
+    border: '1px solid rgba(0,243,255,.2)',
   },
-  remainingIcon: { fontSize: 32 },
-  remainingTitle: { fontSize: 10, color: 'rgba(255,255,255,0.5)' },
-  remainingCount: { fontSize: 24, fontWeight: 'bold', color: '#FFD700' },
-  trainButton: {
+
+  selectedText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    letterSpacing: 2,
+  },
+
+  selectedPlayer: {
+    fontSize: 20,
+    fontWeight: 900,
+    color: '#fff',
+
+    textShadow: `
+      0 0 14px rgba(0,243,255,.8)
+    `,
+  },
+
+  clearButton: {
     marginLeft: 'auto',
-    background: 'linear-gradient(135deg, #FFD700, #FF8C00)',
+
+    padding: '8px 16px',
+
+    borderRadius: 999,
+
     border: 'none',
-    borderRadius: 40,
-    padding: '10px 20px',
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: '#0f0020',
+
+    background: 'rgba(255,255,255,.08)',
+
+    color: '#fff',
+
     cursor: 'pointer',
-    fontFamily: RUSSO,
   },
-  trainButtonLarge: {
-    width: '100%',
-    background: 'linear-gradient(135deg, #FFD700, #FF8C00)',
-    border: 'none',
-    borderRadius: 40,
-    padding: '14px',
-    fontSize: 13,
-    fontWeight: 'bold',
-    color: '#0f0020',
-    cursor: 'pointer',
-    fontFamily: RUSSO,
-    marginTop: 20,
-  },
-  trainButtonDisabled: {
-    opacity: 0.5,
-    cursor: 'not-allowed',
-  },
+
   cardsGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-    gap: 12,
-    marginTop: 12,
+    gridTemplateColumns:
+      'repeat(auto-fill, minmax(340px, 1fr))',
+
+    gap: 18,
+
+    marginBottom: 28,
   },
-  cardItem: {
-    background: 'rgba(0, 0, 0, 0.4)',
-    border: '2px solid rgba(255, 215, 0, 0.2)',
-    borderRadius: 16,
-    padding: 12,
-    textAlign: 'center',
+
+  card: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    borderRadius: 24,
+
+    padding: 18,
+
+    background: `
+      linear-gradient(
+        135deg,
+        rgba(0,243,255,.08),
+        rgba(0,0,0,.9)
+      )
+    `,
+
+    border: '1px solid rgba(0,243,255,.15)',
+
     cursor: 'pointer',
-    transition: 'all 0.2s',
+
+    transition: 'all .25s ease',
+
+    animation: 'floatCard 4s ease-in-out infinite',
+
+    backdropFilter: 'blur(10px)',
   },
+
   cardSelected: {
-    borderColor: '#FFD700',
-    background: 'rgba(255, 215, 0, 0.1)',
-    boxShadow: '0 0 15px rgba(255, 215, 0, 0.3)',
+    transform: 'scale(1.03)',
+
+    border: '1px solid #00f3ff',
+
+    boxShadow: `
+      0 0 22px rgba(0,243,255,.8),
+      0 0 60px rgba(0,243,255,.3)
+    `,
   },
-  cardEmoji: { fontSize: 40, marginBottom: 8 },
-  cardName: { fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
-  cardRating: { fontSize: 10, color: '#FFD700' },
-  cardBonus: { fontSize: 9, color: '#00FF87', marginTop: 6 },
-  cardBadge: {
+
+  cardGlow: {
     position: 'absolute',
-    top: -8,
-    right: -8,
-    background: '#FFD700',
-    color: '#0f0020',
-    fontSize: 8,
-    padding: '2px 6px',
-    borderRadius: 12,
+    inset: -100,
+
+    background: `
+      radial-gradient(circle, rgba(0,243,255,.18), transparent 60%)
+    `,
+
+    animation: 'pulseGlow 3s ease infinite',
   },
-  historyList: {
-    maxHeight: 400,
-    overflow: 'auto',
+
+  cutIn: {
+    position: 'absolute',
+
+    top: 10,
+    left: -20,
+
+    transform: 'skew(-20deg)',
+
+    background: `
+      linear-gradient(
+        90deg,
+        rgba(0,243,255,.15),
+        rgba(0,243,255,.45),
+        rgba(0,243,255,.15)
+      )
+    `,
+
+    padding: '8px 40px',
+
+    border: '1px solid rgba(0,243,255,.25)',
+
+    zIndex: 5,
   },
-  historyItem: {
+
+  cutInText: {
+    transform: 'skew(20deg)',
+
+    color: '#fff',
+
+    fontWeight: 900,
+
+    letterSpacing: 2,
+
+    fontSize: 13,
+  },
+
+  cardHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 14,
+
+    marginTop: 38,
+    marginBottom: 18,
+
+    position: 'relative',
+    zIndex: 2,
+  },
+
+  cardAvatar: {
+    fontSize: 58,
+
+    filter: 'drop-shadow(0 0 12px rgba(0,243,255,.7))',
+  },
+
+  cardName: {
+    color: '#fff',
+    fontWeight: 900,
+    fontSize: 20,
+  },
+
+  cardRole: {
+    color: COLORS.textDim,
+    fontSize: 12,
+    marginTop: 4,
+  },
+
+  ovrBox: {
+    display: 'flex',
+    alignItems: 'baseline',
+    gap: 4,
+
+    marginTop: 4,
+  },
+
+  ovrValue: {
+    color: COLORS.accent,
+    fontSize: 28,
+    fontWeight: 900,
+  },
+
+  ovrLabel: {
+    color: COLORS.textDim,
+    fontSize: 11,
+  },
+
+  stats: {
+    position: 'relative',
+    zIndex: 2,
+  },
+
+  statRow: {
+    display: 'flex',
+    alignItems: 'center',
+
+    gap: 10,
+
+    marginBottom: 10,
+  },
+
+  statLeft: {
+    width: 90,
+
+    display: 'flex',
+    alignItems: 'center',
+    gap: 6,
+
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: 700,
+  },
+
+  barTrack: {
+    flex: 1,
+
+    height: 10,
+
+    borderRadius: 999,
+
+    overflow: 'hidden',
+
+    background: 'rgba(255,255,255,.06)',
+
+    border: '1px solid rgba(255,255,255,.04)',
+  },
+
+  barFill: {
+    height: '100%',
+
+    borderRadius: 999,
+
+    transition: 'width .4s ease',
+  },
+
+  statValue: {
+    width: 32,
+
+    color: '#fff',
+
+    fontSize: 12,
+    fontWeight: 900,
+  },
+
+  cardFooter: {
+    marginTop: 18,
+
+    textAlign: 'center',
+
+    color: COLORS.primary,
+
+    fontWeight: 900,
+
+    letterSpacing: 1,
+  },
+
+  teamInfo: {
+    color: '#fff',
+    marginTop: 24,
+    fontSize: 14,
+  },
+
+  energyPanel: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 24,
+
+    padding: 22,
+
+    borderRadius: 24,
+
+    marginBottom: 28,
+
+    background: `
+      linear-gradient(
+        135deg,
+        rgba(0,243,255,.08),
+        rgba(255,0,255,.05)
+      )
+    `,
+
+    border: '1px solid rgba(0,243,255,.15)',
+  },
+
+  energyLabel: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '12px',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+
+    marginBottom: 10,
+
+    color: '#fff',
+    fontWeight: 700,
   },
-  historyDate: { fontSize: 10, color: 'rgba(255,255,255,0.4)' },
-  historyInfo: { display: 'flex', gap: 12, alignItems: 'center' },
-  historyGame: { fontSize: 11, textTransform: 'capitalize' },
-  historyGrade: { fontSize: 12, fontWeight: 'bold' },
-  historyDelta: { fontSize: 11, color: '#00FF87' },
-  historyCard: { fontSize: 10, color: 'rgba(255,255,255,0.3)' },
-  emptyHistory: { textAlign: 'center', padding: 40 },
-  emptyIcon: { fontSize: 48, marginBottom: 16 },
-  emptyHint: { fontSize: 11, color: 'rgba(255,255,255,0.3)', marginTop: 8 },
+
+  energyTrack: {
+    height: 14,
+
+    borderRadius: 999,
+
+    overflow: 'hidden',
+
+    background: 'rgba(255,255,255,.06)',
+  },
+
+  energyFill: {
+    height: '100%',
+
+    borderRadius: 999,
+
+    background: `
+      linear-gradient(
+        90deg,
+        #00f3ff,
+        #ff00ff
+      )
+    `,
+
+    boxShadow: `
+      0 0 18px rgba(0,243,255,.8)
+    `,
+  },
+
+  energyText: {
+    marginTop: 10,
+    color: COLORS.accent,
+    fontSize: 12,
+  },
+
+  streakBox: {
+    width: 140,
+
+    textAlign: 'center',
+
+    padding: 16,
+
+    borderRadius: 20,
+
+    background: 'rgba(255,255,255,.04)',
+
+    border: '1px solid rgba(255,255,255,.08)',
+  },
+
+  streakNumber: {
+    fontSize: 40,
+    color: COLORS.accent,
+    fontWeight: 900,
+  },
+
+  streakLabel: {
+    color: '#fff',
+    letterSpacing: 2,
+    fontSize: 12,
+  },
+
+  sectionTitle: {
+    color: '#fff',
+
+    fontSize: 22,
+
+    fontWeight: 900,
+
+    letterSpacing: 2,
+
+    marginBottom: 18,
+
+    marginTop: 10,
+
+    fontFamily: FONT_TITLE,
+
+    textShadow: `
+      0 0 10px rgba(0,243,255,.5)
+    `,
+  },
+
+  gamesGrid: {
+    display: 'grid',
+    gridTemplateColumns:
+      'repeat(auto-fill, minmax(220px, 1fr))',
+
+    gap: 18,
+
+    marginBottom: 28,
+  },
+
+  gameButton: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    padding: 22,
+
+    borderRadius: 24,
+
+    background: `
+      linear-gradient(
+        180deg,
+        rgba(0,243,255,.12),
+        rgba(0,0,0,.95)
+      )
+    `,
+
+    borderWidth: 2,
+    borderStyle: 'solid',
+
+    cursor: 'pointer',
+
+    transition: 'all .25s ease',
+  },
+
+  gameAura: {
+    position: 'absolute',
+
+    width: 180,
+    height: 180,
+
+    borderRadius: '50%',
+
+    filter: 'blur(70px)',
+
+    top: -80,
+    right: -50,
+
+    opacity: 0.3,
+  },
+
+  gameIcon: {
+    fontSize: 54,
+
+    marginBottom: 12,
+
+    position: 'relative',
+    zIndex: 2,
+  },
+
+  gameName: {
+    color: '#fff',
+
+    fontSize: 22,
+    fontWeight: 900,
+
+    position: 'relative',
+    zIndex: 2,
+  },
+
+  gameDesc: {
+    color: COLORS.textDim,
+
+    marginTop: 6,
+
+    fontSize: 13,
+
+    position: 'relative',
+    zIndex: 2,
+  },
+
+  historyBox: {
+    borderRadius: 20,
+
+    overflow: 'hidden',
+
+    border: '1px solid rgba(255,255,255,.08)',
+
+    marginBottom: 24,
+  },
+
+  historyRow: {
+    display: 'flex',
+    alignItems: 'center',
+
+    padding: 14,
+
+    background: 'rgba(255,255,255,.03)',
+
+    borderBottom: '1px solid rgba(255,255,255,.04)',
+  },
+
+  historyTime: {
+    width: 110,
+
+    color: COLORS.textDim,
+  },
+
+  historyStat: {
+    flex: 1,
+
+    color: '#fff',
+    fontWeight: 700,
+  },
+
+  historyGrade: {
+    width: 50,
+
+    fontWeight: 900,
+  },
+
+  historyDelta: {
+    width: 50,
+
+    color: COLORS.accent,
+
+    fontWeight: 900,
+  },
+
+  devBox: {
+    marginTop: 20,
+
+    padding: 20,
+
+    borderRadius: 20,
+
+    background: 'rgba(255,255,255,.04)',
+
+    border: '1px solid rgba(255,255,255,.08)',
+  },
+
+  devTitle: {
+    color: COLORS.accent,
+
+    fontWeight: 900,
+
+    marginBottom: 16,
+  },
+
+  devButtons: {
+    display: 'flex',
+    gap: 14,
+  },
+
+  devButton: {
+    padding: '10px 18px',
+
+    borderRadius: 12,
+
+    border: 'none',
+
+    background: COLORS.primary,
+
+    color: '#000',
+
+    fontWeight: 900,
+
+    cursor: 'pointer',
+  },
+
+  devButtonDanger: {
+    padding: '10px 18px',
+
+    borderRadius: 12,
+
+    border: 'none',
+
+    background: '#ff4d6d',
+
+    color: '#fff',
+
+    fontWeight: 900,
+
+    cursor: 'pointer',
+  },
+
+  introOverlay: {
+    position: 'fixed',
+    inset: 0,
+
+    background: 'rgba(0,0,0,.85)',
+
+    zIndex: 999999,
+
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    animation: 'animeIntro .4s ease forwards',
+  },
+
+  introFlash: {
+    position: 'absolute',
+    inset: 0,
+
+    background: `
+      linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,.25),
+        transparent
+      )
+    `,
+
+    animation: 'flashMove .7s linear infinite',
+  },
+
+  introContent: {
+    position: 'relative',
+
+    textAlign: 'center',
+
+    padding: 50,
+
+    borderRadius: 28,
+
+    background: `
+      linear-gradient(
+        135deg,
+        rgba(0,243,255,.18),
+        rgba(0,0,0,.95)
+      )
+    `,
+
+    border: '2px solid rgba(0,243,255,.5)',
+
+    boxShadow: `
+      0 0 60px rgba(0,243,255,.35)
+    `,
+  },
+
+  introMini: {
+    color: COLORS.primary,
+
+    letterSpacing: 6,
+
+    marginBottom: 14,
+  },
+
+  introTitle: {
+    fontSize: 72,
+
+    color: '#fff',
+
+    fontWeight: 900,
+
+    letterSpacing: 2,
+
+    textShadow: `
+      0 0 24px rgba(0,243,255,.9)
+    `,
+  },
+
+  introSub: {
+    marginTop: 14,
+
+    color: COLORS.accent,
+
+    letterSpacing: 4,
+
+    fontWeight: 900,
+  },
 };

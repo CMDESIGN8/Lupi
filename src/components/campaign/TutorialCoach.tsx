@@ -178,6 +178,8 @@ export default function TutorialCoach({
       <div style={styles.overlay}>
         {/* SPEED LINES */}
         <div style={styles.speedLines} />
+          <div style={styles.backgroundImage} />
+
 
         {/* OSCURECER FONDO */}
         <div style={styles.darkLayer} />
@@ -192,7 +194,7 @@ export default function TutorialCoach({
             <div style={styles.characterAura} />
 
             <img
-              src="https://i.imgur.com/6VBx3io.png"
+              src="/images/l1.png"
               alt="Coach"
               style={styles.character}
             />
@@ -250,6 +252,15 @@ const styles: Record<string, React.CSSProperties> = {
     zIndex: 9999,
     overflow: 'hidden',
     fontFamily: "'Bangers', cursive",
+  },
+
+  backgroundImage: {
+    position: 'absolute',
+    inset: 0,
+    backgroundImage: 'url("/images/estadio.png")', // Cambia la ruta
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
   },
 
   speedLines: {
