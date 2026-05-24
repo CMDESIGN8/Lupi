@@ -21,37 +21,37 @@ interface TutorialCoachProps {
 const COACH_MESSAGES: TutorialStep[] = [
   {
     id: 'welcome',
-    title: '¡¡BIENVENIDO A DREAM LEAGUE!!',
+    title: '¡¡BIENVENIDO A LUPIAPP!!',
     message:
       '¡¡HE OBSERVADO A MILES DE JUGADORES!!\n\nPero en tus ojos... veo el fuego de un verdadero campeón.\n\n¿ESTÁS LISTO PARA CAMBIAR TU DESTINO?',
     action: 'next',
   },
   {
     id: 'story_intro',
-    title: '¡¡EL CAMINO HACIA LA GLORIA!!',
+    title: '¡EL CAMINO HACIA LA GLORIA!',
     message:
-      'Aquí no solo jugarás partidos.\n\nCada victoria... cada derrota...\nTODO formará parte de tu leyenda.\n\n¡¡COMO EN LOS GRANDES ANIMES DE FÚTBOL!!',
+      'Aquí no solo jugarás partidos.\n\nCada victoria... cada derrota...\nTODO formará parte de tu leyenda.\n\n¡¡LLEVA A TU   CLUB A LA CIMA!!',
     action: 'next',
   },
   {
     id: 'missions',
-    title: '¡¡MISIONES ESPECIALES!!',
+    title: '¡MISIONES ESPECIALES!',
     message:
-      'Las misiones diarias te harán más fuerte.\n\nEntrena.\nCompite.\nSupérate.\n\n¡¡UN VERDADERO CAMPEÓN NUNCA DESCANSA!!',
+      'Las misiones diarias te harán más fuerte.\n\nEntrena.\nCompite.\nSupérate.\n\n¡UN VERDADERO CAMPEÓN NUNCA DESCANSA!',
     action: 'open_missions',
   },
   {
     id: 'league',
-    title: '¡¡EL SISTEMA DE LIGAS!!',
+    title: '¡EL SISTEMA DE LIGAS!',
     message:
-      'Rookie...\nBronce...\nPlata...\nOro...\n\n¡¡Y FINALMENTE...\nLA LIGA DE LOS CAMPEONES!!',
+      'Conquista todas las ligas\nRookie...\nBronce...\nPlata...\nOro...\n\n¡Y FINALMENTE...\nLA LIGA DE LOS CAMPEONES!',
     action: 'view_league',
   },
   {
     id: 'match',
-    title: '¡¡TU PRIMER PARTIDO!!',
+    title: '¡TU PRIMER PARTIDO!',
     message:
-      'Ha llegado el momento.\n\nEl balón decidirá tu destino.\n\n¡¡SAL AHÍ Y DEMUÉSTRALES QUIÉN ERES!!',
+      'Ha llegado el momento.\n\nEl balón decidirá tu destino.\n\n¡SAL AHÍ Y DEMUÉSTRALES QUIÉN ERES!',
     action: 'play_match',
   },
 ];
@@ -381,7 +381,7 @@ const styles: Record<string, React.CSSProperties> = {
   title: {
     fontSize: 'clamp(22px, 3vw, 38px)',
 
-    color: '#ff3c00',
+    color: '#006eff',
 
     marginBottom: 16,
 
@@ -409,32 +409,32 @@ const styles: Record<string, React.CSSProperties> = {
   },
 
   button: {
-    background:
-      'linear-gradient(to bottom, #ffcc00 0%, #ff5500 100%)',
+      background:
+    'linear-gradient(135deg,#00e1ff  0%,#0077ff  45%,#002bff  100%)',
 
-    color: '#fff',
+      color: '#fff',
 
-    border: '4px solid #000',
+      border: '4px solid #000',
 
-    boxShadow: '0 6px 0 #000',
+      boxShadow: '0 6px 0 #000',
 
-    padding: 'clamp(10px, 1vw, 16px) clamp(18px, 2vw, 30px)',
+      padding: 'clamp(10px, 1vw, 16px) clamp(18px, 2vw, 30px)',
 
-    fontSize: 'clamp(16px, 2vw, 24px)',
+      fontSize: 'clamp(16px, 2vw, 24px)',
 
-    cursor: 'pointer',
+      cursor: 'pointer',
 
-    fontFamily: "'Bangers', cursive",
+      fontFamily: "'Bangers', cursive",
 
-    letterSpacing: '2px',
+      letterSpacing: '2px',
 
-    textTransform: 'uppercase',
+      textTransform: 'uppercase',
 
-    transition: 'all 0.15s ease',
+      transition: 'all 0.15s ease',
 
-    width: '100%',
+      width: '100%',
 
-    maxWidth: '320px',
+      maxWidth: '320px',
   },
 
   progress: {

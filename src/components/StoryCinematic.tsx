@@ -1,7 +1,5 @@
-// src/components/StoryCinematic.tsx
-// VERSION SUPERCAMPEONES / BLUE LOCK / ANIME FOOTBALL - MEJORADA
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { StoryChapter } from '../types/campaignStory';
 
 interface StoryCinematicProps {
@@ -20,26 +18,20 @@ const CHARACTERS = {
   protagonist: {
     name: 'LUPI',
     avatar: '/images/l1.png',
-    color: '#ff2a2a',
-    accentColor: '#ff0000',
+    color: '#E52525',
     side: 'left' as const,
-    catchphrase: '¡NUNCA ME RINDO!',
   },
   rival: {
     name: 'KAISER',
     avatar: '/images/l2.png',
-    color: '#4da6ff',
-    accentColor: '#0080ff',
+    color: '#4169E1',
     side: 'right' as const,
-    catchphrase: 'LA PERFECCIÓN NO EXISTE',
   },
   coach: {
     name: 'ROBERTO',
     avatar: '/images/coach.png',
-    color: '#ffd700',
-    accentColor: '#ffaa00',
+    color: '#F5C518',
     side: 'left' as const,
-    catchphrase: 'EL ESFUERZO ES TALENTO',
   },
 };
 
@@ -51,85 +43,64 @@ export default function StoryCinematic({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(true);
-  const [skipVisible, setSkipVisible] = useState(false);
-  const [showHitEffect, setShowHitEffect] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [showSkip, setShowSkip] = useState(false);
 
   const dialogues: DialogueLine[] = [
     {
       character: 'protagonist',
-      text: '¡¿QUÉ?! ¡ESE DISPARO... ES IMPOSIBLE!',
+      text: '¡¿Qué?! ¡Ese disparo... es imposible!',
       emotion: 'surprised',
     },
     {
       character: 'rival',
-      text: 'JAJAJA... EN ESTE PAÍS EL FÚTBOL ES DIFERENTE. ¡TE VOY A DESTRUIR!',
+      text: 'Jajaja... En este país el fútbol es diferente. ¿Acaso crees que podrás vencerme con esas habilidades?',
       emotion: 'angry',
     },
     {
       character: 'protagonist',
-      text: 'NO ME RENDIRÉ. ¡VOY A DEMOSTRARTE EL VERDADERO PODER DEL FÚTBOL!',
+      text: 'No me rendiré. ¡Voy a demostrarte el verdadero poder del fútbol!',
       emotion: 'determined',
     },
     {
       character: 'coach',
-      text: 'ASÍ SE HABLA. EL VERDADERO TALENTO SE FORJA CON ESFUERZO.',
+      text: 'Así se habla. Recuerda, el verdadero talento no nace, se forja con esfuerzo y dedicación.',
       emotion: 'normal',
     },
     {
       character: 'rival',
-      text: 'INTERESANTE... TE ESPERO EN LA FINAL. ¡PREPÁRATE PARA LA DERROTA!',
+      text: 'Interesante... Muy bien, te espero en la final. ¡Prepárate para conocer la derrota!',
       emotion: 'determined',
     },
   ];
 
   const currentDialogue = dialogues[currentIndex];
   const currentCharacter = CHARACTERS[currentDialogue?.character || 'protagonist'];
-  const isLastDialogue = currentIndex === dialogues.length - 1;
 
   useEffect(() => {
-    const timer = setTimeout(() => setSkipVisible(true), 2000);
+    const timer = setTimeout(() => setShowSkip(true), 1500);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    if (!currentDialogue) return;
-
-    setDisplayedText('');
-    setIsTyping(true);
-
-    const text = currentDialogue.text;
-    let i = 0;
-
-    const interval = setInterval(() => {
-      if (i < text.length) {
-        setDisplayedText((prev) => prev + text[i]);
-        i++;
-      } else {
-        clearInterval(interval);
-        setIsTyping(false);
-      }
-    }, 25);
-
-    return () => clearInterval(interval);
-  }, [currentIndex]);
-
-  // Efecto de impacto para emociones fuertes
-  useEffect(() => {
-    if (currentDialogue.emotion === 'angry' || currentDialogue.emotion === 'determined') {
-      setShowHitEffect(true);
-      const timer = setTimeout(() => setShowHitEffect(false), 300);
-      return () => clearTimeout(timer);
+    if (currentIndex < dialogues.length) {
+      setDisplayedText('');
+      setIsTyping(true);
+      const text = dialogues[currentIndex].text;
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < text.length) {
+          setDisplayedText((prev) => prev + text[i]);
+          i++;
+        } else {
+          clearInterval(interval);
+          setIsTyping(false);
+        }
+      }, 30);
+      return () => clearInterval(interval);
     }
   }, [currentIndex]);
 
   const handleNext = () => {
-    if (isTyping) {
-      setDisplayedText(currentDialogue.text);
-      setIsTyping(false);
-      return;
-    }
-
     if (currentIndex < dialogues.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
@@ -137,256 +108,141 @@ export default function StoryCinematic({
     }
   };
 
-  const handleSkip = () => {
-    onComplete();
-  };
+  const handleSkip = () => onComplete();
 
-  const getEmotionImageStyle = (): React.CSSProperties => {
-    switch (currentDialogue.emotion) {
-      case 'angry':
-        return {
-          transform: 'scale(1.12)',
-          filter: `
-            brightness(1.2)
-            contrast(1.25)
-            drop-shadow(0 0 35px rgba(255,0,0,0.6))
-          `,
-        };
-      case 'determined':
-        return {
-          transform: 'scale(1.1)',
-          filter: `
-            brightness(1.15)
-            contrast(1.2)
-            drop-shadow(0 0 35px rgba(255,215,0,0.5))
-          `,
-        };
-      case 'surprised':
-        return {
-          transform: 'scale(1.15)',
-          filter: 'brightness(1.1)',
-        };
-      default:
-        return {};
-    }
-  };
-
-  const getScreenShake = () => {
-    if (currentDialogue.emotion === 'angry') {
-      return 'screenShake 0.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) both';
-    }
-    return undefined;
+  const getEmotionStyle = () => {
+    const emotions: Record<string, React.CSSProperties> = {
+      normal: {},
+      angry: { transform: 'scale(1.05)', filter: 'brightness(1.2)' },
+      surprised: { transform: 'scale(1.1)' },
+      determined: { filter: 'contrast(1.2)' },
+    };
+    return emotions[currentDialogue?.emotion || 'normal'];
   };
 
   return (
-    <div
-      style={{
-        ...styles.overlay,
-        animation: getScreenShake(),
-      }}
-      onClick={handleNext}
-    >
-      {/* BACKGROUND */}
-      <div style={styles.backgroundImage} />
-
-      {/* DARK OVERLAY */}
-      <div style={styles.darkOverlay} />
-
-      {/* SPEED LINES */}
+    <div style={styles.overlay}>
+      {/* Efectos de fondo */}
+      <div className="scanlines" />
       <div style={styles.speedLines} />
+      <div style={styles.backgroundImage} />
+      <div style={styles.vignette} />
+      <div style={styles.sfxText}>ゴゴゴゴ</div>
 
-      {/* SCANLINES */}
-      <div style={styles.scanlines} />
-
-      {/* HIT EFFECT FLASH */}
-      {showHitEffect && <div style={styles.hitFlash} />}
-
-      {/* JAPANESE FX */}
-      <div style={styles.sfxText}>
-        {currentDialogue.emotion === 'angry' ? 'ドドドド' : 'ゴゴゴゴ'}
-      </div>
-
-      {/* TOP BAR */}
-      <div style={styles.topBar}>
-        <div style={styles.dayBadge}>
-          <span style={styles.dayIcon}>⚡</span>
-          <span>DAY {dayNumber}</span>
-        </div>
-
-        <div style={styles.chapterBadge}>
-          {chapter.title.toUpperCase()}
-        </div>
-
-        {skipVisible && (
+      {/* Header superior */}
+      <div style={styles.header}>
+        <div style={styles.dayBadge}>⚡ DAY {dayNumber}</div>
+        <div style={styles.chapterBadge}>{chapter.title}</div>
+        {showSkip && (
           <button style={styles.skipButton} onClick={handleSkip}>
-            SKIP ✕
+            ✕ SKIP
           </button>
         )}
       </div>
 
-      {/* CHARACTER AREA */}
-      <div
-        style={{
-          ...styles.characterContainer,
-          justifyContent:
-            currentCharacter.side === 'left' ? 'flex-start' : 'flex-end',
-        }}
-      >
-        {/* CUT IN EFFECT */}
-        <div style={styles.cutIn} />
-
-        {/* POWER AURA */}
-        {(currentDialogue.emotion === 'determined' ||
-          currentDialogue.emotion === 'angry') && (
-          <div
-            style={{
-              ...styles.powerAura,
-              background: `radial-gradient(circle, ${currentCharacter.accentColor}80, transparent 70%)`,
-            }}
-          />
-        )}
-
-        <div style={styles.characterWrapper}>
-          <img
-            src={currentCharacter.avatar}
-            alt={currentCharacter.name}
-            style={{
-              ...styles.characterImage,
-              ...getEmotionImageStyle(),
-            }}
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              const parent = target.parentElement;
-              if (parent) {
-                const fallback = document.createElement('div');
-                fallback.style.cssText = `
-                  width: 100%;
-                  aspect-ratio: 3/4;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  justify-content: center;
-                  background: linear-gradient(135deg, #1a1a2e, #0a0a15);
-                  border: 3px solid ${currentCharacter.color};
-                  border-radius: 16px;
-                  font-size: 80px;
-                `;
-                const emoji = currentCharacter.name === 'LUPI' ? '⚡' : 
-                              currentCharacter.name === 'KAISER' ? '🎯' : '👨‍🏫';
-                fallback.innerHTML = `
-                  <span style="font-size:80px">${emoji}</span>
-                  <span style="color:${currentCharacter.color};margin-top:15px;font-size:14px;font-weight:bold">${currentCharacter.name}</span>
-                `;
-                parent.appendChild(fallback);
-              }
-            }}
-          />
-
-          {/* NAME TAG */}
-          <div
-            style={{
-              ...styles.characterName,
-              background: currentCharacter.color,
-              borderColor: currentCharacter.accentColor,
-            }}
-          >
-            {currentCharacter.name}
-          </div>
-
-          {/* CATCHPHRASE */}
-          <div style={styles.catchphrase}>
-            {currentCharacter.catchphrase}
-          </div>
-        </div>
-      </div>
-
-      {/* DIALOGUE */}
-      <div style={styles.dialogueContainer}>
-        <div style={styles.dialogueBox}>
-          {/* HEADER */}
-          <div
-            style={{
-              ...styles.dialogueHeader,
-              background: `linear-gradient(90deg, ${currentCharacter.color}22, transparent)`,
-              borderLeftColor: currentCharacter.color,
-            }}
-          >
-            <div style={styles.dialogueName}>
-              <span style={styles.nameIcon}>
-                {currentCharacter.name === 'LUPI' ? '⚡' : 
-                 currentCharacter.name === 'KAISER' ? '🎯' : '👨‍🏫'}
-              </span>
-              {currentCharacter.name}
-            </div>
-
-            <div
+      {/* Contenedor de personaje - más arriba */}
+      <div style={styles.characterContainer}>
+        <div style={{
+          ...styles.characterInner,
+          justifyContent: currentCharacter.side === 'left' ? 'flex-start' : 'flex-end',
+        }}>
+          <div style={styles.characterCard}>
+            <div style={{
+              ...styles.characterGlow,
+              background: `radial-gradient(circle, ${currentCharacter.color}80, transparent)`,
+            }} />
+            <img
+              src={currentCharacter.avatar}
+              alt={currentCharacter.name}
               style={{
-                ...styles.emotionBadge,
-                background: currentCharacter.color,
+                ...styles.characterImage,
+                ...getEmotionStyle(),
               }}
-            >
-              {currentDialogue.emotion?.toUpperCase() || 'NORMAL'}
-            </div>
-          </div>
-
-          {/* TEXT */}
-          <div style={styles.dialogueText}>
-            <span style={styles.quoteIcon}>「</span>
-            {displayedText}
-            {isTyping && <span style={styles.cursor}>_</span>}
-            <span style={styles.quoteIcon}>」</span>
-          </div>
-
-          {/* BUTTON */}
-          {!isTyping && (
-            <button
-              style={{
-                ...styles.nextButton,
-                background: `linear-gradient(90deg, ${currentCharacter.color}, ${currentCharacter.accentColor})`,
-              }}
-              onClick={handleNext}
-            >
-              {!isLastDialogue ? '▼ TAP TO CONTINUE ▼' : '⚽ START MATCH ⚽'}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* PROGRESS */}
-      <div style={styles.progressContainer}>
-        <div
-          style={{
-            ...styles.progressBar,
-            width: `${((currentIndex + 1) / dialogues.length) * 100}%`,
-            background: `linear-gradient(90deg, ${currentCharacter.color}, ${currentCharacter.accentColor})`,
-          }}
-        />
-        <div style={styles.progressDots}>
-          {dialogues.map((_, idx) => (
-            <div
-              key={idx}
-              style={{
-                ...styles.progressDot,
-                background: idx <= currentIndex ? currentCharacter.color : 'rgba(255,255,255,0.3)',
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  const fallback = document.createElement('div');
+                  fallback.style.cssText = `
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    background: linear-gradient(135deg, #1a1a2e, #16213e);
+                    border: 3px solid ${currentCharacter.color};
+                    border-radius: 20px;
+                  `;
+                  const emoji = currentCharacter.name === 'LUPI' ? '⚡' : 
+                                currentCharacter.name === 'KAISER' ? '🎯' : '👨‍🏫';
+                  fallback.innerHTML = `<span style="font-size:80px">${emoji}</span>
+                                        <span style="color:${currentCharacter.color};margin-top:15px;font-size:14px">${currentCharacter.name}</span>`;
+                  parent.appendChild(fallback);
+                }
               }}
             />
-          ))}
+            <div style={{
+              ...styles.characterName,
+              background: currentCharacter.color,
+            }}>
+              {currentCharacter.name}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* CSS ANIMATIONS */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Press+Start+2P&display=swap');
+      {/* Diálogo - SUBIDO MÁS ARRIBA */}
+      <div style={styles.dialogueContainer}>
+        <div style={styles.dialogueWrapper}>
+          <div style={styles.dialogueBox}>
+            <div style={{
+              ...styles.dialogueHeader,
+              background: `linear-gradient(135deg, ${currentCharacter.color}, ${currentCharacter.color}CC)`,
+            }}>
+              <span style={styles.dialogueName}>{currentCharacter.name}</span>
+              <span style={styles.dialogueEmotion}>
+                {currentDialogue.emotion?.toUpperCase() || 'NORMAL'}
+              </span>
+            </div>
+            <div style={styles.dialogueText}>
+              {displayedText}
+              {isTyping && <span style={styles.cursor}>_</span>}
+            </div>
+            {!isTyping && (
+              <button style={styles.nextButton} onClick={handleNext}>
+                {currentIndex < dialogues.length - 1 ? '▼ PRESS A TO CONTINUE ▼' : '⚽ START MATCH ⚽'}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
 
-        @keyframes speedMove {
+      {/* Barra de progreso */}
+      <div style={styles.progressContainer}>
+        <div style={{
+          ...styles.progressBar,
+          width: `${((currentIndex + 1) / dialogues.length) * 100}%`,
+        }} />
+      </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        @keyframes speedLines {
           0% { background-position: 0 0; }
-          100% { background-position: 300px 0; }
+          100% { background-position: 200px 0; }
         }
 
-        @keyframes pulseAura {
-          from { transform: scale(0.95); opacity: 0.4; }
-          to { transform: scale(1.15); opacity: 0.8; }
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: scale(0.9); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideUp {
+          0% { transform: translateY(50px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
         }
 
         @keyframes cursorBlink {
@@ -394,40 +250,9 @@ export default function StoryCinematic({
           50% { opacity: 0; }
         }
 
-        @keyframes buttonPulse {
-          0% { transform: scale(1); opacity: 0.9; }
-          50% { transform: scale(1.02); opacity: 1; }
-          100% { transform: scale(1); opacity: 0.9; }
-        }
-
-        @keyframes cutFlash {
-          0% { transform: translateX(-100%); opacity: 0; }
-          30% { opacity: 0.6; }
-          100% { transform: translateX(100%); opacity: 0; }
-        }
-
-        @keyframes screenShake {
-          0% { transform: translate(1px, 1px); }
-          25% { transform: translate(-1px, -2px); }
-          50% { transform: translate(-2px, 1px); }
-          75% { transform: translate(1px, -1px); }
-          100% { transform: translate(0, 0); }
-        }
-
-        @keyframes hitFlashAnim {
-          0% { opacity: 0; }
-          20% { opacity: 0.8; }
-          100% { opacity: 0; }
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes characterFloat {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
+        @keyframes pulse {
+          0%, 100% { opacity: 0.5; transform: scale(1); }
+          50% { opacity: 0.2; transform: scale(1.1); }
         }
 
         .scanlines {
@@ -436,25 +261,21 @@ export default function StoryCinematic({
           left: 0;
           width: 100%;
           height: 100%;
-          background: repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 2px, transparent 2px, transparent 4px);
+          background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 2px, transparent 2px, transparent 4px);
           pointer-events: none;
           z-index: 20;
         }
 
         @media (max-width: 768px) {
-          .character-container {
-            padding-bottom: 130px !important;
+          .character-card {
+            width: 130px !important;
           }
           .dialogue-text {
-            font-size: 13px !important;
-            min-height: 80px !important;
+            font-size: 11px !important;
+            min-height: 70px !important;
           }
-          .character-wrapper {
-            width: clamp(200px, 40vw, 300px) !important;
-          }
-          .character-name {
-            font-size: 10px !important;
-            bottom: 20px !important;
+          .dialogue-box {
+            padding: 12px !important;
           }
         }
       `}</style>
@@ -466,14 +287,20 @@ const styles: Record<string, React.CSSProperties> = {
   overlay: {
     position: 'fixed',
     inset: 0,
+    zIndex: 10000,
+    fontFamily: "'Press Start 2P', monospace",
     overflow: 'hidden',
-    zIndex: 999999,
     background: '#000',
     display: 'flex',
     flexDirection: 'column',
-    justifyContent: 'space-between',
-    fontFamily: "'Orbitron', 'Press Start 2P', monospace",
-    cursor: 'pointer',
+  },
+
+  speedLines: {
+    position: 'absolute',
+    inset: 0,
+    background: `repeating-linear-gradient(-75deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 40px)`,
+    animation: 'speedLines 1s linear infinite',
+    pointerEvents: 'none',
   },
 
   backgroundImage: {
@@ -482,275 +309,209 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundImage: 'url("/images/estadio.png")',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    transform: 'scale(1.1)',
-    filter: 'blur(6px) brightness(0.25) saturate(1.5)',
+    filter: 'blur(4px) brightness(0.4)',
   },
 
-  darkOverlay: {
+  vignette: {
     position: 'absolute',
     inset: 0,
-    background: 'radial-gradient(circle at center, transparent 25%, rgba(0,0,0,0.9) 100%)',
-  },
-
-  speedLines: {
-    position: 'absolute',
-    inset: 0,
-    background: `repeating-linear-gradient(-75deg, transparent, transparent 25px, rgba(255,255,255,0.04) 25px, rgba(255,255,255,0.04) 45px)`,
-    animation: 'speedMove 1s linear infinite',
+    background: `radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%)`,
     pointerEvents: 'none',
-  },
-
-  hitFlash: {
-    position: 'absolute',
-    inset: 0,
-    background: 'white',
-    opacity: 0,
-    animation: 'hitFlashAnim 0.3s ease-out',
-    pointerEvents: 'none',
-    zIndex: 15,
   },
 
   sfxText: {
     position: 'absolute',
     top: '15%',
     right: '3%',
-    fontSize: 'clamp(45px, 7vw, 90px)',
-    color: 'rgba(255,255,255,0.04)',
-    fontWeight: 900,
-    transform: 'rotate(-12deg)',
-    zIndex: 1,
+    fontSize: 'clamp(30px, 6vw, 80px)',
+    color: 'rgba(255,255,255,0.03)',
     fontFamily: 'monospace',
+    transform: 'rotate(-15deg)',
+    pointerEvents: 'none',
+    zIndex: 1,
   },
 
-  topBar: {
+  header: {
     position: 'relative',
-    zIndex: 10,
+    top: 0,
+    left: 0,
+    right: 0,
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '16px 20px',
-    gap: 12,
+    padding: '12px 20px',
+    zIndex: 10,
   },
 
   dayBadge: {
     background: 'rgba(0,0,0,0.85)',
-    border: '2px solid #ffd700',
+    border: '2px solid #E52525',
     padding: '6px 12px',
-    color: '#ffd700',
-    fontSize: 11,
+    color: '#F5C518',
+    fontSize: 10,
     letterSpacing: 2,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 6,
-  },
-
-  dayIcon: {
-    fontSize: 14,
   },
 
   chapterBadge: {
     background: 'rgba(0,0,0,0.85)',
-    border: '2px solid #ff2a2a',
+    border: '2px solid #F5C518',
     padding: '6px 12px',
-    color: '#fff',
-    fontSize: 11,
+    color: '#E52525',
+    fontSize: 10,
     letterSpacing: 2,
-    textTransform: 'uppercase' as const,
   },
 
   skipButton: {
     background: 'rgba(0,0,0,0.85)',
-    border: '2px solid #fff',
-    color: '#fff',
-    padding: '6px 16px',
-    fontSize: 10,
+    border: '2px solid #FFF',
+    color: '#FFF',
+    padding: '6px 12px',
+    fontSize: 9,
     cursor: 'pointer',
-    fontFamily: 'inherit',
-    letterSpacing: 1,
-    transition: 'opacity 0.2s',
+    fontFamily: "'Press Start 2P', monospace",
   },
 
+  // Contenedor del personaje - más arriba
   characterContainer: {
-    position: 'absolute',
-    inset: 0,
+    flex: 0.7, // Reducido de 1 a 0.7 para dar más espacio al diálogo
     display: 'flex',
-    alignItems: 'flex-end',
-    paddingBottom: '180px',
-    paddingLeft: 25,
-    paddingRight: 25,
-    zIndex: 3,
-    pointerEvents: 'none',
-    bottom: '150px',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px 20px 0 20px',
+    zIndex: 5,
   },
 
-  characterWrapper: {
+  characterInner: {
+    display: 'flex',
+    width: '100%',
+    maxWidth: 1200,
+    margin: '0 auto',
+  },
+
+  characterCard: {
     position: 'relative',
-    width: 'clamp(280px, 42vw, 480px)',
-    animation: 'fadeIn 0.5s ease-out, characterFloat 3s ease-in-out infinite',
+    width: 'clamp(150px, 18vw, 250px)',
+    animation: 'fadeIn 0.5s ease-out',
+  },
+
+  characterGlow: {
+    position: 'absolute',
+    inset: '-20px',
+    borderRadius: '50%',
+    filter: 'blur(25px)',
+    animation: 'pulse 2s infinite',
   },
 
   characterImage: {
     width: '100%',
-    objectFit: 'contain',
+    height: 'auto',
     display: 'block',
-    transform: 'scale(1.05)',
-    transition: 'all 0.25s ease',
-    filter: 'drop-shadow(15px 15px 0 rgba(0,0,0,0.6)) drop-shadow(0 0 30px rgba(255,255,255,0.1))',
+    filter: 'drop-shadow(8px 8px 0px rgba(0,0,0,0.5))',
+    transition: 'all 0.2s ease',
   },
 
   characterName: {
     position: 'absolute',
-    bottom: 1,
-    left: 15,
-    color: '#fff',
-    padding: '6px 16px',
-    fontWeight: 900,
-    letterSpacing: 2,
-    fontSize: 13,
-    border: '2px solid #fff',
-    boxShadow: '5px 5px 0 rgba(0,0,0,0.5)',
-    textTransform: 'uppercase' as const,
-  },
-
-  catchphrase: {
-    position: 'absolute',
-    bottom: -5,
-    right: 10,
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: 8,
+    bottom: -12,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    padding: '5px 12px',
+    color: '#FFF',
+    fontSize: 'clamp(9px, 1.5vw, 12px)',
     letterSpacing: 1,
-    fontStyle: 'italic',
+    border: '2px solid #000',
+    whiteSpace: 'nowrap',
+    boxShadow: '3px 3px 0px rgba(0,0,0,0.5)',
   },
 
-  cutIn: {
-    position: 'absolute',
-    inset: 0,
-    background: `linear-gradient(120deg, transparent 0%, transparent 35%, rgba(255,255,255,0.12) 48%, transparent 60%, transparent 100%)`,
-    animation: 'cutFlash 0.5s ease-out',
-    pointerEvents: 'none',
-  },
-
-  powerAura: {
-    position: 'absolute',
-    inset: '-50px',
-    filter: 'blur(35px)',
-    animation: 'pulseAura 0.8s infinite alternate',
-    zIndex: 0,
-    borderRadius: '50%',
-  },
-
+  // Contenedor del diálogo - SUBIDO
   dialogueContainer: {
     position: 'relative',
-    zIndex: 20,
+    padding: '0 20px 25px 20px',
+    marginTop: '-20px', // Sube el diálogo
+    zIndex: 5,
+  },
+
+  dialogueWrapper: {
+    maxWidth: 900,
+    margin: '0 auto',
     width: '100%',
-    paddingBottom: 25,
-    bottom: '30px',
   },
 
   dialogueBox: {
-    width: '100%',
-    background: 'rgba(5,5,15,0.96)',
-    borderTop: '3px solid #ffd700',
-    padding: '20px 24px',
-    backdropFilter: 'blur(12px)',
-    boxShadow: '0 -15px 40px rgba(0,0,0,0.6)',
+    background: 'linear-gradient(135deg, rgba(20,20,30,0.98), rgba(10,10,20,0.98))',
+    border: '3px solid #F5C518',
+    borderRadius: 12,
+    padding: '16px',
+    boxShadow: '8px 8px 0px rgba(0,0,0,0.5)',
+    backdropFilter: 'blur(10px)',
+    animation: 'slideUp 0.4s ease-out',
   },
 
   dialogueHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '8px 16px',
-    marginBottom: 16,
-    borderLeft: '4px solid',
+    padding: '6px 12px',
+    marginBottom: 12,
+    borderRadius: 6,
   },
 
   dialogueName: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: 900,
-    letterSpacing: 2,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
-  },
-
-  nameIcon: {
-    fontSize: 18,
-  },
-
-  emotionBadge: {
-    color: '#fff',
-    padding: '4px 12px',
-    fontSize: 9,
-    letterSpacing: 2,
-    borderRadius: 20,
+    color: '#FFF',
+    fontSize: 'clamp(11px, 1.8vw, 14px)',
     fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+
+  dialogueEmotion: {
+    color: '#FFF',
+    fontSize: 'clamp(7px, 1.2vw, 10px)',
+    opacity: 0.8,
   },
 
   dialogueText: {
-    color: '#fff',
-    fontSize: 'clamp(15px, 2.2vw, 22px)',
-    lineHeight: 1.5,
-    minHeight: 100,
-    padding: '12px 8px',
-    fontWeight: 700,
-    letterSpacing: 1,
-    textShadow: '2px 2px 0 rgba(0,0,0,0.5)',
-  },
-
-  quoteIcon: {
-    opacity: 0.5,
-    fontSize: '0.9em',
-    marginRight: 6,
-    marginLeft: 6,
+    color: '#FFF',
+    fontSize: 'clamp(12px, 1.8vw, 16px)',
+    lineHeight: 1.6,
+    minHeight: '70px',
+    padding: '8px',
+    wordBreak: 'break-word',
   },
 
   cursor: {
-    animation: 'cursorBlink 1s infinite',
+    animation: 'cursorBlink 1s step-end infinite',
     marginLeft: 2,
   },
 
   nextButton: {
     width: '100%',
-    marginTop: 12,
-    padding: '14px',
-    border: '2px solid #fff',
-    color: '#fff',
-    fontWeight: 900,
-    letterSpacing: 2,
+    background: 'linear-gradient(135deg, #E52525, #8B0000)',
+    border: 'none',
+    padding: '10px',
+    color: '#FFF',
+    fontSize: 'clamp(9px, 1.5vw, 12px)',
     cursor: 'pointer',
-    fontSize: 12,
-    animation: 'buttonPulse 1.5s infinite',
-    boxShadow: '0 0 20px rgba(255,80,80,0.3)',
-    transition: 'transform 0.1s',
+    fontFamily: "'Press Start 2P', monospace",
+    letterSpacing: 1,
+    marginTop: 12,
+    borderRadius: 6,
+    transition: 'transform 0.1s, opacity 0.2s',
   },
 
   progressContainer: {
-    position: 'absolute',
+    position: 'relative',
     bottom: 0,
     left: 0,
-    width: '100%',
-    zIndex: 50,
+    right: 0,
+    height: 3,
+    background: 'rgba(255,255,255,0.15)',
+    zIndex: 10,
   },
 
   progressBar: {
-    height: 4,
+    height: '100%',
+    background: 'linear-gradient(90deg, #F5C518, #E52525)',
     transition: 'width 0.3s ease',
-  },
-
-  progressDots: {
-    position: 'absolute',
-    bottom: 12,
-    right: 16,
-    display: 'flex',
-    gap: 8,
-  },
-
-  progressDot: {
-    width: 6,
-    height: 6,
-    borderRadius: '50%',
-    transition: 'background 0.2s',
   },
 };

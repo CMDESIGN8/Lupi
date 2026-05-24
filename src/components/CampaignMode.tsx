@@ -21,6 +21,7 @@ import { useTrainingSystem } from '../hooks/useTrainingSystem';
 import { TrainingHub } from './campaign/TrainingHub';
 import { TrainingModal } from './campaign/TrainingModal';
 import { TrainingCenter } from './campaign/TrainingCenter';
+import { DailyMissionPreview } from '../components/campaign/DailyMissionPreview';
 
 
 
@@ -120,6 +121,8 @@ const [showContextualHelp, setShowContextualHelp] = useState(false);
   const [showTrainingModal, setShowTrainingModal] = useState(false);
     const deckCardIds = userDeck?.cards?.map(card => card.id) || [];
     const [showTrainingCenter, setShowTrainingCenter] = useState(false);
+    const [showGuideModal, setShowGuideModal] = useState(false);
+    const [showMissions, setShowMissions] = useState(false);
     
 
 const isDevMode = window.location.search.includes('dev=true') || 
@@ -325,6 +328,14 @@ const countUnreadTips = () => {
     saveCampaignDays(updatedDays);
   }
 };
+
+const currentMissions =
+  campaignDays[currentDay - 1]?.dailyMissions || [];
+
+const nextMission =
+   currentMissions.find(
+    m => !m.isCompleted || !m.isClaimed
+  ) || currentMissions[0];
 
   useEffect(() => {
   const tutorialSeen = localStorage.getItem(`tutorial_seen_${userId}`);
@@ -573,6 +584,9 @@ useEffect(() => {
   return (
 
     <div style={s.container}>
+       <div style={s.energyBg1} />
+  <div style={s.energyBg2} />
+  <div style={s.gridOverlay} />
       {/* Botón flotante del entrenador */}
     <CoachButton 
   userId={userId}
@@ -641,39 +655,121 @@ useEffect(() => {
       <style>{keyframesAnime}</style>
 
       {/* HEADER CON EFECTO FUEGO */}
-      <div style={s.header}>
-        <div style={s.titleGroup}>
-          <div style={s.fireIcon}>📖</div>
-          <div>
-            <h1 style={s.mainTitle}> HISTORIA</h1>
-            <p style={s.mainSub}>⚽ El camino hacia la gloria ⚽</p>
-          </div>
-        </div>
-        <div style={s.statsRow}>
-          <div style={s.statBubbleAnime}>
-            <span style={s.statIcon}>⭐</span>
-            <span style={s.statValue}>{progress?.starsEarned || 0}</span>
-          </div>
-          <div style={s.statBubbleAnime}>
-            <span style={s.statIcon}>🔥</span>
-            <span style={s.statValue}>{progress?.currentStreak || 0}</span>
-            
-          </div>
-        </div>
+      {/* ───────────────── HEADER ANIME ───────────────── */}
+<div style={s.headerAnime}>
+  
+  {/* FONDO EFECTOS */}
+  <div style={s.headerGlow} />
+  <div style={s.headerLines} />
+
+  {/* IZQUIERDA */}
+  <div style={s.titleGroupAnime}>
+
+    <div style={s.logoCircle}>
+      ⚽
+    </div>
+
+    <div>
+      <div style={s.storyBadge}>
+        STORY MODE
       </div>
+
+      <h1 style={s.mainTitleAnime}>
+        HISTORIA
+      </h1>
+
+      <p style={s.mainSubAnime}>
+        EL CAMINO HACIA LA GLORIA
+      </p>
+    </div>
+  </div>
+
+  {/* DERECHA */}
+  <div style={s.statsPanel}>
+
+    <div style={s.statCardBlue}>
+      <div style={s.statTop}>
+        ⭐
+      </div>
+
+      <div style={s.statNumber}>
+        {progress?.starsEarned || 0}
+      </div>
+
+      <div style={s.statText}>
+        STARS
+      </div>
+    </div>
+
+    <div style={s.statCardFire}>
+      <div style={s.statTop}>
+        🔥
+      </div>
+
+      <div style={s.statNumber}>
+        {progress?.currentStreak || 0}
+      </div>
+
+      <div style={s.statText}>
+        STREAK
+      </div>
+    </div>
+
+  </div>
+</div>
 
       {/* BARRA DE PODER GLOBAL */}
-      <div style={s.powerBarContainer}>
-        <div style={s.powerBarLabel}>
-          <span>🏆 PODER DE CAMPEÓN</span>
-          <span>{completedCount} / {totalLeagues} Ligas</span>
-        </div>
-        <div style={s.powerBarTrack}>
-          <div style={{ ...s.powerBarFill, width: `${(completedCount / totalLeagues) * 100}%` }} />
-          <div style={s.powerBarSpark} />
-        </div>
+      {/* ───────────────── POWER BAR ───────────────── */}
+<div style={s.powerWrapper}>
+
+  <div style={s.powerHeader}>
+    <span>⚡ PODER DE CAMPEÓN</span>
+    <span>{completedCount}/{totalLeagues} LIGAS</span>
+  </div>
+
+  <div style={s.powerTrackAnime}>
+
+    <div
+      style={{
+        ...s.powerFillAnime,
+        width: `${(completedCount / totalLeagues) * 100}%`
+      }}
+    />
+
+    <div style={s.powerShine} />
+
+  </div>
+
+</div>
+{/* ───────── MANUAL  ───────── */}
+<div style={s.manualCard}>
+  
+  <div style={s.manualGlow} />
+
+  <div style={s.manualLeft}>
+    <div style={s.manualIcon}>
+      📘
+    </div>
+
+    <div>
+      <div style={s.manualTitle}>
+        MANUAL DEL JUEGO
       </div>
 
+      <div style={s.manualDesc}>
+        Aprendé a convertirte en campeón
+      </div>
+    </div>
+  </div>
+
+  <button
+    style={s.manualButton}
+    onClick={() => setShowGuideModal(true)}
+  >
+    VER
+  </button>
+
+</div>
       <button 
   onClick={() => setShowTrainingCenter(true)}
   style={s.trainingCenterButton}  // ← CAMBIADO de styles a s
@@ -681,17 +777,7 @@ useEffect(() => {
   🏋️ CENTRO DE ENTRENAMIENTO
 </button>
 
-      {/* VER HISTORIA DEL DÍA */}
-      {!activeCinematic && campaignDays[currentDay - 1]?.storyChapters[0] && (
-        <div style={s.storyButtonContainer}>
-          <button 
-            style={s.storyButton}
-            onClick={() => startStoryChapter(campaignDays[currentDay - 1].storyChapters[0])}
-          >
-            📖 VER HISTORIA DEL DÍA {currentDay} 📖
-          </button>
-        </div>
-      )}
+      
 
    {/* ── NUEVO: MODAL DE ENTRENAMIENTO ── */}
       <TrainingModal
@@ -730,18 +816,37 @@ useEffect(() => {
       )}
 
       {/* Panel de misiones diarias */}
-      <DailyMissionsPanel
-        missions={campaignDays[currentDay - 1]?.dailyMissions || []}
-        onClaimReward={(missionId) => handleClaimReward(missionId)}
-        onStartMission={handleStartMission}
-        currentDay={currentDay}
-      />
+        <DailyMissionPreview
+  mission={nextMission}
+  onOpenAll={() =>
+    setShowMissions(true)
+  }
+  onStartMission={
+    handleStartMission
+  }
+  onClaimReward={
+    handleClaimReward
+  }
+  streak={getStreak()}
+/>
 
       {/* Indicador de racha diaria */}
       <div style={s.streakIndicator}>
         <div>🔥 RACHA: {getStreak()} días seguidos</div>
         <div>🎯 PRÓXIMA RECOMPENSA EN {3 - (getStreak() % 3)} días</div>
       </div>
+
+      {/* VER HISTORIA DEL DÍA */}
+      {!activeCinematic && campaignDays[currentDay - 1]?.storyChapters[0] && (
+        <div style={s.storyButtonContainer}>
+          <button 
+            style={s.storyButton}
+            onClick={() => startStoryChapter(campaignDays[currentDay - 1].storyChapters[0])}
+          >
+            📖 VER HISTORIA DEL DÍA {currentDay} 📖
+          </button>
+        </div>
+      )}
 
       {/* MAPA DE LIGAS ESTILO VIDEOJUEGO */}
       <div style={s.worldMap}>
@@ -768,6 +873,7 @@ useEffect(() => {
                 </div>
                 
                 <div style={s.leagueReqsAnime}>
+                  <div style={s.speedLines} />
                   {meetsRequirement ? (
                     <div style={s.reqMetAnime}>✅ REQUISITO OVR {league.requiredOverall} ✅</div>
                   ) : (
@@ -832,26 +938,53 @@ useEffect(() => {
         })}
       </div>
 
-      {/* GUÍA DEL GUERRERO (CÓMO JUGAR) */}
-      <div style={s.mangaGuide}>
-        <div style={s.sectionTitleAnime}>📖 GUÍA DEL GUERRERO ⚔️</div>
-        <div style={s.stepsRowAnime}>
-          {[
-            { step: '1', icon: '🎮', text: 'ELEGIR PARTIDO', desc: 'Toca el balón en llamas' },
-            { step: '2', icon: '⚽', text: '¡GANAR!', desc: 'Derrota al rival con tu equipo' },
-            { step: '3', icon: '🌟', text: 'CONSEGUIR ESTRELLAS', desc: 'Cada victoria te da poder' },
-            { step: '4', icon: '🏆', text: '¡CAMPEÓN!', desc: 'Gana la liga y desbloquea la siguiente' },
-          ].map((step, i, arr) => (
-            <div key={step.step} style={s.stepCardAnime}>
-              <div style={s.stepBadge}>{step.step}</div>
-              <div style={s.stepIconAnime}>{step.icon}</div>
-              <div style={s.stepTextAnime}>{step.text}</div>
-              <div style={s.stepDescAnime}>{step.desc}</div>
-              {i < arr.length - 1 && <div style={s.stepConnectorAnime}>⚡</div>}
-            </div>
-          ))}
+      
+{
+  showMissions && (
+    <div
+      style={s.missionsOverlay}
+      onClick={() =>
+        setShowMissions(false)
+      }
+    >
+      <div
+        style={s.missionsModal}
+        onClick={e =>
+          e.stopPropagation()
+        }
+      >
+        <div
+          style={
+            s.missionsModalHeader
+          }
+        >
+          <div>
+            ⚔️ MISIONES DIARIAS
+          </div>
+
+          <button
+            style={s.closeButton}
+            onClick={() =>
+              setShowMissions(false)
+            }
+          >
+            ✕
+          </button>
         </div>
+
+        <DailyMissionsPanel
+          missions={currentMissions}
+          onClaimReward={
+            handleClaimReward
+          }
+          onStartMission={
+            handleStartMission
+          }
+          currentDay={currentDay}
+        />
       </div>
+    </div>
+  )}
 
       {showTrainingCenter && (
   <TrainingCenter
@@ -863,7 +996,98 @@ useEffect(() => {
     isDevMode={isDevMode}  // ← Agregar esta prop
   />
 )}
+{/* ───────── MODAL MANUAL TÁCTICO ───────── */}
+{showGuideModal && (
 
+  <div style={s.guideOverlay}>
+
+    <div style={s.guideModal}>
+
+      {/* HEADER */}
+      <div style={s.guideHeader}>
+
+        <div>
+          <div style={s.guideMini}>
+            STORY GUIDE
+          </div>
+
+          <div style={s.guideTitle}>
+            📘 MANUAL DEL JUEGO
+          </div>
+        </div>
+
+        <button
+          style={s.closeGuide}
+          onClick={() => setShowGuideModal(false)}
+        >
+          ✕
+        </button>
+
+      </div>
+
+      {/* STEPS */}
+      <div style={s.guideSteps}>
+
+        {[
+          {
+            step: '01',
+            icon: '🎮',
+            title: 'ELEGÍ UN RIVAL',
+            desc: 'Seleccioná un partido para comenzar tu camino.',
+          },
+          {
+            step: '02',
+            icon: '⚽',
+            title: 'GANÁ PARTIDOS',
+            desc: 'Usá tus cartas y derrotá a tus oponentes.',
+          },
+          {
+            step: '03',
+            icon: '⭐',
+            title: 'SUBÍ DE LIGA',
+            desc: 'Conseguí estrellas y desbloqueá nuevos desafíos.',
+          },
+          {
+            step: '04',
+            icon: '🏆',
+            title: 'CONVERTITE EN LEYENDA',
+            desc: 'Dominá todas las ligas y convertite en campeón.',
+          },
+        ].map((item) => (
+
+          <div key={item.step} style={s.guideStepCard}>
+
+            <div style={s.guideStepTop}>
+
+              <div style={s.guideStepBadge}>
+                {item.step}
+              </div>
+
+              <div style={s.guideStepIcon}>
+                {item.icon}
+              </div>
+
+            </div>
+
+            <div style={s.guideStepTitle}>
+              {item.title}
+            </div>
+
+            <div style={s.guideStepDesc}>
+              {item.desc}
+            </div>
+
+          </div>
+
+        ))}
+
+      </div>
+
+    </div>
+
+  </div>
+
+)}
       {/* REWARD POPUP ESTILO MANGA */}
       {showRewards && lastReward && (
         <div style={s.rewardPopupAnime}>
@@ -916,481 +1140,1517 @@ const keyframesAnime = `
 // ─────────────────────────────────────────────────────────────────────────────
 // ESTILOS ANIME
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// AAA GAME UI STYLES - LUPIAPP SUPER CAMPEONES EDITION
+// REEMPLAZÁ TODO TU const s = { ... } POR ESTO
+// ─────────────────────────────────────────────────────────────────────────────
+
 const s: Record<string, React.CSSProperties> = {
+
+  // ───────────────── LOADING ─────────────────
   loadingScreen: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 60,
+
+    minHeight: '100vh',
+
+    background:
+      `
+      radial-gradient(circle at top, rgba(0,180,255,0.15), transparent 30%),
+      linear-gradient(180deg, #050816 0%, #091224 40%, #050816 100%)
+      `,
+
     textAlign: 'center',
+    overflow: 'hidden',
+
+    fontFamily: RUSSO,
   },
+
   spinner: {
-    width: 50,
-    height: 50,
-    border: '4px solid rgba(255,215,0,0.2)',
-    borderTopColor: '#0088ff',
+    width: 70,
+    height: 70,
+
+    border: '5px solid rgba(255,255,255,0.08)',
+    borderTop: '5px solid #00d9ff',
+
     borderRadius: '50%',
+
+    boxShadow:
+      `
+      0 0 20px rgba(0,217,255,.5),
+      inset 0 0 15px rgba(0,217,255,.2)
+      `,
+
     animation: 'cmSpin 1s linear infinite',
   },
+
+  // ───────────────── CONTAINER AAA ─────────────────
   container: {
-    background: 'radial-gradient(circle at 10% 20%, #0a0f2a, #03050b)',
-    borderRadius: 48,
-    padding: '24px 20px',
-    border: '3px solid #0088ff',
-    boxShadow: '0 20px 40px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.1)',
+    position: 'relative',
+
+    minHeight: '100vh',
+
+    overflow: 'hidden',
+
+    padding: '16px 14px 120px',
+
+    background:
+      `
+      radial-gradient(circle at top, rgba(0,180,255,0.16), transparent 30%),
+      linear-gradient(180deg, #040816 0%, #07101f 40%, #03060f 100%)
+      `,
+
     fontFamily: RUSSO,
+
     color: '#fff',
   },
-  header: {
+
+  // ───────────────── BACKGROUND FX ─────────────────
+  energyBg1: {
+    position: 'absolute',
+    top: -180,
+    left: -120,
+
+    width: 500,
+    height: 500,
+
+    borderRadius: '50%',
+
+    background: 'rgba(0,170,255,0.18)',
+
+    filter: 'blur(120px)',
+
+    zIndex: 0,
+  },
+
+  energyBg2: {
+    position: 'absolute',
+    bottom: -240,
+    right: -100,
+
+    width: 450,
+    height: 450,
+
+    borderRadius: '50%',
+
+    background: 'rgba(255,170,0,0.14)',
+
+    filter: 'blur(120px)',
+
+    zIndex: 0,
+  },
+
+  gridOverlay: {
+    position: 'absolute',
+    inset: 0,
+
+    background:
+      `
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)
+      `,
+
+    backgroundSize: '42px 42px',
+
+    opacity: 0.25,
+
+    pointerEvents: 'none',
+  },
+
+  // ───────────────── HEADER AAA ─────────────────
+  headerAnime: {
+    position: 'relative',
+
+    zIndex: 2,
+
+    overflow: 'hidden',
+
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexWrap: 'wrap',
+
+    gap: 18,
+
+    padding: '20px',
+
+    borderRadius: 28,
+
+    background:
+      `
+      linear-gradient(
+        180deg,
+        rgba(10,25,55,.98),
+        rgba(5,10,22,.98)
+      )
+      `,
+
+    border: '2px solid rgba(0,210,255,.35)',
+
+    boxShadow:
+      `
+      0 10px 40px rgba(0,0,0,.45),
+      0 0 30px rgba(0,180,255,.18),
+      inset 0 1px 0 rgba(255,255,255,.06)
+      `,
+
+    marginBottom: 18,
+  },
+
+  headerGlow: {
+    position: 'absolute',
+
+    top: -100,
+    right: -80,
+
+    width: 260,
+    height: 260,
+
+    borderRadius: '50%',
+
+    background: 'rgba(0,180,255,.22)',
+
+    filter: 'blur(90px)',
+  },
+
+  headerLines: {
+    position: 'absolute',
+    inset: 0,
+
+    background:
+      `
+      repeating-linear-gradient(
+        135deg,
+        transparent 0px,
+        transparent 12px,
+        rgba(255,255,255,.03) 13px
+      )
+      `,
+
+    opacity: 0.4,
+  },
+
+  titleGroupAnime: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 16,
+
+    zIndex: 2,
+  },
+
+  logoCircle: {
+    width: 76,
+    height: 76,
+
+    borderRadius: '50%',
+
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    fontSize: 38,
+
+    background:
+      'linear-gradient(135deg, #00c6ff, #0047ff)',
+
+    border: '3px solid rgba(255,255,255,.8)',
+
+    boxShadow:
+      `
+      0 0 25px rgba(0,200,255,.65),
+      inset 0 0 20px rgba(255,255,255,.2)
+      `,
+
+    animation: 'animePulse 2s infinite',
+  },
+
+  storyBadge: {
+    display: 'inline-block',
+
+    padding: '5px 12px',
+
+    borderRadius: 999,
+
+    background: '#00d9ff',
+
+    color: '#001018',
+
+    fontSize: 10,
+    fontWeight: 900,
+
+    letterSpacing: 1.5,
+
+    marginBottom: 8,
+
+    boxShadow: '0 0 18px rgba(0,217,255,.45)',
+  },
+
+  mainTitleAnime: {
+    margin: 0,
+
+    fontSize: 38,
+
+    lineHeight: 1,
+
+    fontWeight: 900,
+
+    letterSpacing: 3,
+
+    color: '#fff',
+
+    textShadow:
+      `
+      0 0 10px #00c3ff,
+      0 0 30px rgba(0,195,255,.6)
+      `,
+  },
+
+  mainSubAnime: {
+    marginTop: 8,
+
+    fontSize: 11,
+
+    letterSpacing: 2,
+
+    color: '#d9f7ff',
+
+    opacity: .9,
+  },
+
+  // ───────────────── STATS ─────────────────
+  statsPanel: {
+    display: 'flex',
+    gap: 10,
+
+    zIndex: 2,
+  },
+
+  statCardBlue: {
+    minWidth: 92,
+
+    padding: '12px 14px',
+
+    borderRadius: 22,
+
+    background:
+      'linear-gradient(180deg, rgba(0,180,255,.2), rgba(0,70,255,.16))',
+
+    border: '2px solid rgba(0,220,255,.35)',
+
+    textAlign: 'center',
+
+    boxShadow:
+      '0 0 18px rgba(0,180,255,.18)',
+  },
+
+  statCardFire: {
+    minWidth: 92,
+
+    padding: '12px 14px',
+
+    borderRadius: 22,
+
+    background:
+      'linear-gradient(180deg, rgba(255,140,0,.22), rgba(255,50,0,.14))',
+
+    border: '2px solid rgba(255,140,0,.35)',
+
+    textAlign: 'center',
+
+    boxShadow:
+      '0 0 18px rgba(255,120,0,.2)',
+  },
+
+  statTop: {
+    fontSize: 22,
+    marginBottom: 6,
+  },
+
+  statNumber: {
+    fontSize: 28,
+    fontWeight: 900,
+  },
+
+  statText: {
+    marginTop: 5,
+
+    fontSize: 9,
+
+    letterSpacing: 2,
+
+    color: '#d7f7ff',
+  },
+
+  // ───────────────── POWER BAR ─────────────────
+  powerWrapper: {
+    position: 'relative',
+
+    zIndex: 2,
+
     marginBottom: 20,
   },
-  titleGroup: { 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: 12 
-  },
-  fireIcon: { 
-    fontSize: 36, 
-    animation: 'fireText 1s infinite alternate' 
-  },
-  mainTitle: {
-    fontSize: 32,
-    margin: 0,
-    background: 'linear-gradient(135deg, #00aeff, #00e1ff)',
-    WebkitBackgroundClip: 'text',
-    WebkitTextFillColor: 'transparent',
-    textShadow: '0 2px 5px rgba(0,0,0,0.3)',
-  },
-  mainSub: { 
-    fontSize: 12, 
-    color: '#fcfbfb', 
-    margin: 0 
-  },
-  statsRow: { 
-    display: 'flex', 
-    gap: 12,
-    marginTop: '10px',
-  },
-  statIcon: { 
-    fontSize: 24 
-  },
-  statValue: { 
-    fontSize: 28, 
-    fontWeight: 'bold', 
-    color: '#ffd700' 
-  },
-  statLabel: { 
-    fontSize: 10, 
-    color: '#ffcc88' 
-  },
-  powerBarContainer: { 
-    marginBottom: 24 
-  },
-  powerBarLabel: { 
-    display: 'flex', 
-    justifyContent: 'space-between', 
-    fontSize: 12, 
-    marginBottom: 6, 
-    color: '#00ffff' 
-  },
-  powerBarTrack: { 
-    height: 16, 
-    background: '#222', 
-    borderRadius: 20, 
-    overflow: 'hidden', 
-    position: 'relative', 
-    border: '1px solid gold' 
-  },
-  powerBarFill: { 
-    height: '100%', 
-    background: 'linear-gradient(90deg, #0066ff, #00ffff)', 
-    width: '0%', 
-    transition: 'width 0.5s' 
-  },
-  powerBarSpark: { 
-    position: 'absolute', 
-    top: 0, 
-    width: 20, 
-    height: '100%', 
-    background: 'white', 
-    opacity: 0.6, 
-    filter: 'blur(4px)', 
-    animation: 'sparkMove 2s infinite' 
-  },
-  mainButtonsContainer: {
+
+  powerHeader: {
     display: 'flex',
-    gap: 16,
-    marginBottom: 24,
+    justifyContent: 'space-between',
+
+    marginBottom: 8,
+
+    fontSize: 11,
+
+    fontWeight: 900,
+
+    letterSpacing: 1.5,
+
+    color: '#8cefff',
   },
-  quickPlayButton: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
-    border: '2px solid #4ade80',
-    borderRadius: 20,
-    padding: '16px 20px',
-    cursor: 'pointer',
-    fontFamily: RUSSO,
-    transition: 'transform 0.2s, box-shadow 0.2s',
+
+  powerTrackAnime: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    height: 20,
+
+    borderRadius: 999,
+
+    background: '#071120',
+
+    border: '2px solid rgba(0,220,255,.3)',
+
+    boxShadow:
+      `
+      inset 0 0 15px rgba(0,0,0,.8),
+      0 0 15px rgba(0,180,255,.15)
+      `,
   },
-  historyButton: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    gap: 12,
-    background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
-    border: '2px solid #0088ff',
-    borderRadius: 20,
-    padding: '16px 20px',
-    cursor: 'pointer',
-    fontFamily: RUSSO,
-    transition: 'transform 0.2s, box-shadow 0.2s',
+
+  powerFillAnime: {
+    height: '100%',
+
+    borderRadius: 999,
+
+    background:
+      `
+      linear-gradient(
+        90deg,
+        #00c6ff,
+        #0072ff,
+        #00e1ff
+      )
+      `,
+
+    boxShadow:
+      '0 0 20px rgba(0,200,255,.8)',
+
+    transition: 'width .6s ease',
   },
-  buttonIcon: {
-    fontSize: 32,
+
+  powerShine: {
+    position: 'absolute',
+
+    top: 0,
+    left: -120,
+
+    width: 120,
+    height: '100%',
+
+    background:
+      'linear-gradient(90deg, transparent, rgba(255,255,255,.45), transparent)',
+
+    transform: 'skewX(-20deg)',
+
+    animation: 'shineMove 2s infinite',
   },
-  buttonTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  buttonSubtitle: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.5)',
-  },
-  mangaGuide: { 
-    background: 'rgba(0,0,0,0.5)', 
-    borderRadius: 32, 
-    padding: 16, 
-    marginBottom: 28, 
-    border: '1px dashed #00ffff' 
-  },
-  sectionTitleAnime: { 
-    fontSize: 18, 
-    textAlign: 'center', 
-    marginBottom: 16, 
-    color: '#00ffff', 
-    letterSpacing: 2 
-  },
-  stepsRowAnime: { 
-    display: 'flex', 
-    justifyContent: 'space-around', 
-    flexWrap: 'wrap', 
-    gap: 12, 
-    position: 'relative' 
-  },
-  stepCardAnime: { 
-    background: '#111a22', 
-    borderRadius: 24, 
-    padding: 12, 
-    textAlign: 'center', 
-    minWidth: 100, 
-    flex: 1, 
-    position: 'relative', 
-    border: '1px solid #ffd70033' 
-  },
-  stepBadge: { 
-    background: '#0066ff', 
-    color: '#fff', 
-    width: 28, 
-    height: 28, 
-    borderRadius: '50%', 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    margin: '0 auto 8px', 
-    fontWeight: 'bold' 
-  },
-  stepIconAnime: { 
-    fontSize: 32 
-  },
-  stepTextAnime: { 
-    fontWeight: 'bold', 
-    fontSize: 12, 
-    marginTop: 8 
-  },
-  stepDescAnime: { 
-    fontSize: 10, 
-    color: '#aaa' 
-  },
-  stepConnectorAnime: { 
-    position: 'absolute', 
-    right: -16, 
-    top: '40%', 
-    fontSize: 16, 
-    color: '#00ffff' 
-  },
-  storyButtonContainer: {
-    margin: '16px 0',
-    textAlign: 'center',
-  },
-  storyButton: {
-    background: 'linear-gradient(135deg, #667eea, #764ba2)',
+
+  // ───────────────── BUTTONS AAA ─────────────────
+  trainingCenterButton: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    zIndex: 2,
+
+    width: '100%',
+
     border: 'none',
-    padding: '12px 24px',
-    borderRadius: 40,
+
+    borderRadius: 999,
+
+    padding: '16px 20px',
+
+    background:
+      'linear-gradient(180deg, #00c6ff, #006dff)',
+
     color: '#fff',
-    fontWeight: 'bold',
+
+    fontSize: 14,
+
+    fontWeight: 900,
+
+    letterSpacing: 2,
+
     cursor: 'pointer',
+
     fontFamily: RUSSO,
-    fontSize: 16,
+
+    marginBottom: 16,
+
+    boxShadow:
+      `
+      0 6px 0 #003e9c,
+      0 0 25px rgba(0,180,255,.35)
+      `,
+
+    textTransform: 'uppercase',
+
+    transition: '.15s',
   },
+
+  storyButtonContainer: {
+    marginBottom: 18,
+
+    textAlign: 'center',
+
+    zIndex: 2,
+
+    position: 'relative',
+  },
+
+  storyButton: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    border: 'none',
+
+    padding: '14px 24px',
+
+    borderRadius: 999,
+
+    background:
+      'linear-gradient(180deg, #8f5cff, #5b36ff)',
+
+    color: '#fff',
+
+    fontWeight: 900,
+
+    fontSize: 13,
+
+    letterSpacing: 1.5,
+
+    cursor: 'pointer',
+
+    fontFamily: RUSSO,
+
+    boxShadow:
+      `
+      0 5px 0 #3f1fbd,
+      0 0 20px rgba(120,80,255,.35)
+      `,
+  },
+
+  // ───────────────── DAILY MISSIONS ─────────────────
   streakIndicator: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    zIndex: 2,
+
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    background: 'linear-gradient(135deg, #ff6b6b, #ff8c00)',
-    padding: '12px 20px',
-    borderRadius: 40,
-    margin: '16px 0',
-    fontSize: 14,
-    fontWeight: 'bold',
+
+    gap: 10,
+
+    padding: '14px 18px',
+
+    borderRadius: 24,
+
+    background:
+      'linear-gradient(180deg, rgba(255,140,0,.22), rgba(255,60,0,.16))',
+
+    border: '2px solid rgba(255,150,0,.3)',
+
+    fontSize: 12,
+
+    fontWeight: 900,
+
+    margin: '18px 0',
+
+    boxShadow:
+      '0 0 22px rgba(255,120,0,.18)',
+  },
+
+  // ───────────────── WORLD MAP ─────────────────
+  worldMap: {
+    display: 'flex',
+    flexDirection: 'column',
+
+    gap: 22,
+
+    position: 'relative',
+
+    zIndex: 2,
+  },
+
+  leagueNode: {
+    position: 'relative',
+  },
+
+  pathConnector: {
+    width: 4,
+    height: 34,
+
+    margin: '0 auto',
+
+    borderRadius: 999,
+
+    background:
+      'linear-gradient(180deg, #00d9ff, transparent)',
+
+    boxShadow:
+      '0 0 12px rgba(0,217,255,.55)',
+  },
+
+  // ───────────────── LEAGUE CARD AAA ─────────────────
+  leagueCardAnime: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    background:
+      `
+      linear-gradient(
+        180deg,
+        rgba(10,18,38,.98),
+        rgba(3,7,16,.98)
+      )
+      `,
+
+    borderRadius: 28,
+
+    padding: 20,
+
+    border: '2px solid rgba(0,180,255,.14)',
+
+    boxShadow:
+      `
+      0 12px 30px rgba(0,0,0,.5),
+      0 0 25px rgba(0,180,255,.08),
+      inset 0 1px 0 rgba(255,255,255,.05)
+      `,
+
+    backdropFilter: 'blur(10px)',
+
+    transition: 'all .25s ease',
+  },
+
+  speedLines: {
+    position: 'absolute',
+    inset: 0,
+
+    background:
+      `
+      repeating-linear-gradient(
+        135deg,
+        transparent 0px,
+        transparent 12px,
+        rgba(255,255,255,.025) 13px
+      )
+      `,
+
+    opacity: 0.4,
+
+    pointerEvents: 'none',
+  },
+
+  leagueCompletedAnime: {
+    border: '2px solid #00ff9d',
+
+    boxShadow:
+      `
+      0 0 25px rgba(0,255,157,.25),
+      0 10px 25px rgba(0,0,0,.45)
+      `,
+  },
+
+  leagueCurrentAnime: {
+    border: '2px solid #00d9ff',
+
+    boxShadow:
+      `
+      0 0 30px rgba(0,217,255,.35),
+      0 0 60px rgba(0,217,255,.16)
+      `,
+
+    animation: 'animePulse 2s infinite',
+  },
+
+  leagueLockedAnime: {
+    opacity: .45,
+    filter: 'grayscale(.8)',
+  },
+
+  leagueHeaderAnime: {
+    display: 'flex',
+    alignItems: 'center',
+
+    gap: 14,
+
+    marginBottom: 16,
+
+    position: 'relative',
+
+    zIndex: 2,
+  },
+
+  leagueIconAnime: {
+    fontSize: 52,
+
+    filter:
+      'drop-shadow(0 0 10px rgba(255,255,255,.3))',
+  },
+
+  leagueNameAnime: {
+    fontSize: 24,
+    fontWeight: 900,
+
+    letterSpacing: 1.5,
+  },
+
+  currentFlagAnime: {
+    padding: '5px 12px',
+
+    borderRadius: 999,
+
+    background:
+      'linear-gradient(90deg, #00d9ff, #006dff)',
+
     color: '#fff',
-    textShadow: '1px 1px 0 rgba(0,0,0,0.3)',
+
+    fontSize: 9,
+
+    fontWeight: 900,
+
+    letterSpacing: 1.5,
+
+    boxShadow:
+      '0 0 15px rgba(0,217,255,.45)',
   },
-  worldMap: { 
-    display: 'flex', 
-    flexDirection: 'column', 
-    gap: 24 
+
+  completedFlagAnime: {
+    padding: '5px 12px',
+
+    borderRadius: 999,
+
+    background:
+      'linear-gradient(90deg, #00ff9d, #00d67f)',
+
+    color: '#00170e',
+
+    fontSize: 9,
+
+    fontWeight: 900,
+
+    letterSpacing: 1.5,
+
+    boxShadow:
+      '0 0 15px rgba(0,255,157,.45)',
   },
-  leagueNode: { 
-    position: 'relative' 
+
+  // ───────────────── MATCHES ─────────────────
+  matchesListAnime: {
+    marginTop: 18,
+
+    borderTop: '1px solid rgba(255,255,255,.08)',
+
+    paddingTop: 18,
   },
-  pathConnector: { 
-    width: 2, 
-    height: 30, 
-    background: '#ffd700', 
-    margin: '0 auto', 
-    boxShadow: '0 0 4px gold' 
+
+  matchesHeaderAnime: {
+    display: 'flex',
+    justifyContent: 'space-between',
+
+    marginBottom: 12,
+
+    fontSize: 11,
+
+    color: '#8cefff',
   },
-  leagueCardAnime: { 
-    background: 'linear-gradient(145deg, #16212e, #0a1118)', 
-    borderRadius: 32, 
-    padding: 20, 
-    border: '2px solid #2a3a48', 
-    transition: 'all 0.2s' 
+
+  matchCardAnime: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    display: 'flex',
+    alignItems: 'center',
+
+    gap: 12,
+
+    padding: 14,
+
+    borderRadius: 24,
+
+    marginBottom: 12,
+
+    background:
+      'linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01))',
+
+    border: '1px solid rgba(255,255,255,.06)',
+
+    transition: '.2s',
   },
-  leagueCompletedAnime: { 
-    borderColor: '#4ade80', 
-    background: 'linear-gradient(145deg, #1a2e24, #0a1810)' 
+
+  matchCurrentAnime: {
+    border: '2px solid #ffd93d',
+
+    boxShadow:
+      '0 0 20px rgba(255,210,0,.28)',
   },
-  leagueCurrentAnime: { 
-    borderColor: '#00ffff', 
-    boxShadow: '0 0 30px rgba(255,215,0,0.4)', 
-    animation: 'animePulse 2s infinite' 
+
+  matchCompletedAnime: {
+    opacity: .72,
   },
-  leagueLockedAnime: { 
-    opacity: 0.5, 
-    filter: 'grayscale(0.5)' 
+
+  matchNumberAnime: {
+    width: 48,
+    height: 48,
+
+    borderRadius: '50%',
+
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    background:
+      'linear-gradient(180deg, #00c6ff, #0047ff)',
+
+    boxShadow:
+      '0 0 18px rgba(0,180,255,.3)',
+
+    fontWeight: 900,
   },
-  leagueHeaderAnime: { 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: 16, 
-    flexWrap: 'wrap', 
-    marginBottom: 16 
+
+  matchInfoAnime: {
+    flex: 1,
+
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
-  leagueIconAnime: { 
-    fontSize: 48 
+
+  opponentAnime: {
+    display: 'flex',
+    alignItems: 'center',
+
+    gap: 12,
   },
-  leagueNameAnime: { 
-    fontSize: 24, 
-    fontWeight: 'bold' 
+
+  avatarAnime: {
+    fontSize: 34,
   },
-  currentFlagAnime: { 
-    background: '#0066ff', 
-    color: '#fff', 
-    padding: '4px 12px', 
-    borderRadius: 40, 
-    fontSize: 10, 
-    fontWeight: 'bold' 
+
+  opponentNameAnime: {
+    fontWeight: 900,
+    fontSize: 14,
   },
-  completedFlagAnime: { 
-    background: '#4ade80', 
-    color: '#000', 
-    padding: '4px 12px', 
-    borderRadius: 40, 
-    fontSize: 10, 
-    fontWeight: 'bold' 
+
+  difficultyAnime: {
+    fontSize: 10,
+
+    marginTop: 3,
   },
-  leagueReqsAnime: { 
-    marginBottom: 12 
+
+  rewardXpAnime: {
+    color: '#ffd93d',
+
+    fontSize: 12,
+
+    fontWeight: 900,
   },
-  reqMetAnime: { 
-    color: '#4ade80', 
-    background: '#4ade8010', 
-    padding: '4px 12px', 
-    borderRadius: 20, 
-    display: 'inline-block', 
-    fontSize: 12 
+
+  playButtonAnime: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    background:
+      'linear-gradient(180deg, #ffd93d, #ff9800)',
+
+    border: 'none',
+
+    padding: '10px 22px',
+
+    borderRadius: 999,
+
+    fontWeight: 900,
+
+    color: '#111',
+
+    fontFamily: RUSSO,
+
+    cursor: 'pointer',
+
+    letterSpacing: 1.5,
+
+    boxShadow:
+      `
+      0 4px 0 #b96a00,
+      0 0 18px rgba(255,180,0,.45)
+      `,
+
+    transform: 'translateY(-2px)',
+
+    transition: '.15s',
   },
-  reqMissingAnime: { 
-    color: '#ff8888', 
-    background: '#ff888810', 
-    padding: '4px 12px', 
-    borderRadius: 20, 
-    display: 'inline-block', 
-    fontSize: 12 
+
+  victoryMarkAnime: {
+    fontSize: 11,
+
+    color: '#00ff9d',
+
+    fontWeight: 900,
+
+    letterSpacing: 1,
   },
-  rewardsAnime: { 
-    display: 'flex', 
-    gap: 8, 
-    flexWrap: 'wrap', 
-    marginBottom: 20 
-  },
-  rewardChipAnime: { 
-    background: '#00000050', 
-    padding: '4px 12px', 
-    borderRadius: 20, 
-    fontSize: 11 
-  },
-  rewardChipAnimeSpecial: { 
-    background: '#ffd70020', 
-    border: '1px solid gold', 
-    color: '#ffd700' 
-  },
-  matchesListAnime: { 
-    marginTop: 16, 
-    borderTop: '1px solid #ffd70030', 
-    paddingTop: 16 
-  },
-  matchesHeaderAnime: { 
-    display: 'flex', 
-    justifyContent: 'space-between', 
-    fontSize: 12, 
-    marginBottom: 12, 
-    color: '#ffd700' 
-  },
-  matchesHint: { 
-    fontSize: 10, 
-    color: '#aaa' 
-  },
-  matchCardAnime: { 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: 12, 
-    background: '#00000040', 
-    borderRadius: 24, 
-    padding: 12, 
-    marginBottom: 12, 
-    transition: 'all 0.2s' 
-  },
-  matchCurrentAnime: { 
-    background: '#ffd70010', 
-    border: '1px solid #ffd700', 
-    boxShadow: '0 0 12px gold' 
-  },
-  matchCompletedAnime: { 
-    opacity: 0.7 
-  },
-  matchNumberAnime: { 
-    width: 40, 
-    height: 40, 
-    background: '#ffd70020', 
-    borderRadius: '50%', 
-    display: 'flex', 
-    alignItems: 'center', 
-    justifyContent: 'center', 
-    fontWeight: 'bold' 
-  },
-  matchInfoAnime: { 
-    flex: 1, 
-    display: 'flex', 
-    justifyContent: 'space-between', 
-    alignItems: 'center' 
-  },
-  opponentAnime: { 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: 12 
-  },
-  avatarAnime: { 
-    fontSize: 32 
-  },
-  opponentNameAnime: { 
-    fontWeight: 'bold' 
-  },
-  difficultyAnime: { 
-    fontSize: 10 
-  },
-  rewardXpAnime: { 
-    color: '#ffd700', 
-    fontSize: 12, 
-    fontWeight: 'bold' 
-  },
-  playButtonAnime: { 
-    background: 'linear-gradient(135deg, #0066ff, #00ffff)', 
-    border: 'none', 
-    padding: '8px 24px', 
-    borderRadius: 40, 
-    fontWeight: 'bold', 
-    color: 'white', 
-    fontFamily: RUSSO, 
-    cursor: 'pointer', 
-    boxShadow: '0 4px 0 #00ccff', 
-    transform: 'translateY(-2px)', 
-    transition: '0.1s' 
-  },
-  victoryMarkAnime: { 
-    fontSize: 12, 
-    color: '#4ade80', 
-    fontWeight: 'bold' 
-  },
-  trainingCenterButton: {
-  background: 'linear-gradient(135deg, #FFD700, #FF8C00)',
-  border: 'none',
-  borderRadius: 40,
-  padding: '12px 24px',
-  fontSize: 14,
-  fontWeight: 'bold',
-  color: '#0f0020',
-  cursor: 'pointer',
-  fontFamily: RUSSO,
-  marginBottom: 16,
-  width: '100%',
-  boxShadow: '0 4px 15px rgba(255, 215, 0, 0.3)',
-  transition: 'transform 0.2s',
+
+  // ───────────────── GUIDE ─────────────────
+  // ───────────────── GUIDE AAA ─────────────────
+
+mangaGuide: {
+  position: 'relative',
+
+  overflow: 'hidden',
+
+  padding: 22,
+
+  borderRadius: 30,
+
+  marginTop: 24,
+
+  background:
+    `
+    linear-gradient(
+      180deg,
+      rgba(0,18,40,.96),
+      rgba(0,8,20,.98)
+    )
+    `,
+
+  border: '2px solid rgba(0,220,255,.18)',
+
+  boxShadow:
+    `
+    0 0 35px rgba(0,180,255,.12),
+    inset 0 0 30px rgba(255,255,255,.03)
+    `,
 },
-  rewardPopupAnime: { 
-    position: 'fixed', 
-    bottom: '25%', 
-    left: '50%', 
-    transform: 'translateX(-50%)', 
-    zIndex: 2000, 
-    pointerEvents: 'none' 
+
+sectionTitleAnime: {
+  textAlign: 'center',
+
+  fontSize: 16,
+
+  marginBottom: 20,
+
+  letterSpacing: 2,
+
+  color: '#8cefff',
+
+  fontWeight: 900,
+
+  textTransform: 'uppercase',
+
+  textShadow:
+    `
+    0 0 12px rgba(0,220,255,.55)
+    `,
+},
+
+stepsRowAnime: {
+  display: 'grid',
+
+  gridTemplateColumns: '1fr 1fr',
+
+  gap: 16,
+},
+
+// ───────────────── STEP CARD AAA ─────────────────
+
+stepCardAAA: {
+  position: 'relative',
+
+  overflow: 'hidden',
+
+  minHeight: 165,
+
+  padding: '16px 14px',
+
+  borderRadius: 24,
+
+  background:
+    `
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.06),
+      rgba(255,255,255,.02)
+    )
+    `,
+
+  border: '1px solid rgba(255,255,255,.08)',
+
+  backdropFilter: 'blur(10px)',
+
+  textAlign: 'center',
+
+  display: 'flex',
+
+  flexDirection: 'column',
+
+  justifyContent: 'space-between',
+
+  boxShadow:
+    `
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 10px 25px rgba(0,0,0,.35)
+    `,
+},
+
+stepTopAAA: {
+  display: 'flex',
+
+  justifyContent: 'center',
+},
+
+stepBadgeAAA: {
+  width: 34,
+  height: 34,
+
+  borderRadius: '50%',
+
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  fontWeight: 900,
+
+  fontSize: 14,
+
+  color: '#fff',
+
+  background:
+    `
+    linear-gradient(
+      180deg,
+      #00c6ff,
+      #0047ff
+    )
+    `,
+
+  boxShadow:
+    `
+    0 0 18px rgba(0,180,255,.7)
+    `,
+},
+
+stepIconAAA: {
+  fontSize: 40,
+
+  marginTop: 4,
+
+  filter:
+    `
+    drop-shadow(0 0 12px rgba(255,255,255,.35))
+    `,
+},
+
+stepTitleAAA: {
+  marginTop: 10,
+
+  fontSize: 12,
+
+  lineHeight: 1.2,
+
+  fontWeight: 900,
+
+  letterSpacing: 1,
+
+  color: '#fff',
+
+  textTransform: 'uppercase',
+},
+
+stepDescAAA: {
+  marginTop: 6,
+
+  fontSize: 10,
+
+  lineHeight: 1.4,
+
+  color: 'rgba(255,255,255,.68)',
+},
+
+stepGlowAAA: {
+  position: 'absolute',
+
+  top: -30,
+  right: -30,
+
+  width: 90,
+  height: 90,
+
+  borderRadius: '50%',
+
+  background:
+    'rgba(0,180,255,.12)',
+
+  filter: 'blur(28px)',
+},
+
+  // ───────────────── REWARD POPUP ─────────────────
+  rewardPopupAnime: {
+    position: 'fixed',
+
+    inset: 0,
+
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    zIndex: 9999,
+
+    pointerEvents: 'none',
   },
-  rewardContentAnime: { 
-    background: '#000000cc', 
-    backdropFilter: 'blur(12px)', 
-    border: '3px solid #ffd700', 
-    borderRadius: 80, 
-    padding: '16px 32px', 
-    display: 'flex', 
-    alignItems: 'center', 
-    gap: 20, 
-    animation: 'floatReward 2s ease-out forwards' 
+
+  rewardContentAnime: {
+    position: 'relative',
+
+    overflow: 'hidden',
+
+    padding: '24px 40px',
+
+    borderRadius: 32,
+
+    display: 'flex',
+    alignItems: 'center',
+
+    gap: 20,
+
+    background:
+      `
+      linear-gradient(
+        135deg,
+        rgba(0,20,60,.95),
+        rgba(0,0,0,.96)
+      )
+      `,
+
+    border: '3px solid #00d9ff',
+
+    boxShadow:
+      `
+      0 0 40px rgba(0,217,255,.4),
+      0 0 120px rgba(0,217,255,.12)
+      `,
+
+    animation: 'floatReward 2s ease-out forwards',
   },
-  rewardExplosionAnime: { 
-    fontSize: 40 
+
+  rewardExplosionAnime: {
+    fontSize: 46,
   },
-  rewardTextAnime: { 
-    fontSize: 20, 
-    fontWeight: 'bold', 
-    textAlign: 'center' 
+
+  rewardTextAnime: {
+    textAlign: 'center',
+
+    fontSize: 22,
+
+    fontWeight: 900,
   },
-  rewardAmountAnime: { 
-    fontSize: 28, 
-    color: '#ffd700' 
+
+  rewardAmountAnime: {
+    marginTop: 8,
+
+    fontSize: 34,
+
+    color: '#ffd93d',
+
+    textShadow:
+      '0 0 18px rgba(255,217,61,.6)',
   },
-  rewardGlintAnime: { 
-    fontSize: 32 
+
+  rewardGlintAnime: {
+    fontSize: 38,
   },
+  // ───────────────── MANUAL CARD ─────────────────
+
+manualCard: {
+  position: 'relative',
+
+  overflow: 'hidden',
+
+  display: 'flex',
+
+  alignItems: 'center',
+
+  justifyContent: 'space-between',
+
+  padding: '18px 20px',
+
+  borderRadius: 28,
+
+  marginTop: 20,
+
+  background:
+    `
+    linear-gradient(
+      135deg,
+      rgba(0,18,40,.95),
+      rgba(0,6,20,.98)
+    )
+    `,
+
+  border: '2px solid rgba(0,220,255,.15)',
+
+  boxShadow:
+    `
+    0 0 30px rgba(0,180,255,.10),
+    inset 0 0 20px rgba(255,255,255,.03)
+    `,
+},
+
+manualGlow: {
+  position: 'absolute',
+
+  top: -40,
+  right: -40,
+
+  width: 120,
+  height: 120,
+
+  borderRadius: '50%',
+
+  background:
+    'rgba(0,180,255,.18)',
+
+  filter: 'blur(40px)',
+},
+
+manualLeft: {
+  display: 'flex',
+
+  alignItems: 'center',
+
+  gap: 16,
+
+  zIndex: 2,
+},
+
+manualIcon: {
+  width: 60,
+  height: 60,
+
+  borderRadius: 20,
+
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  fontSize: 30,
+
+  background:
+    'linear-gradient(180deg, #00c6ff, #0047ff)',
+
+  boxShadow:
+    '0 0 20px rgba(0,180,255,.4)',
+},
+
+manualTitle: {
+  fontSize: 15,
+
+  fontWeight: 900,
+
+  letterSpacing: 1.5,
+
+  color: '#fff',
+},
+
+manualDesc: {
+  marginTop: 4,
+
+  fontSize: 11,
+
+  color: 'rgba(255,255,255,.65)',
+},
+
+manualButton: {
+  position: 'relative',
+
+  zIndex: 2,
+
+  border: 'none',
+
+  padding: '12px 22px',
+
+  borderRadius: 999,
+
+  fontWeight: 900,
+
+  letterSpacing: 1,
+
+  color: '#001018',
+
+  cursor: 'pointer',
+
+  background:
+    'linear-gradient(180deg, #00e1ff, #00a2ff)',
+
+  boxShadow:
+    '0 0 18px rgba(0,220,255,.45)',
+},
+
+// ───────────────── MODAL GUIDE ─────────────────
+
+guideOverlay: {
+  position: 'fixed',
+
+  inset: 0,
+
+  zIndex: 99999,
+
+  background:
+    'rgba(0,0,0,.75)',
+
+  backdropFilter: 'blur(10px)',
+
+  display: 'flex',
+
+  alignItems: 'center',
+
+  justifyContent: 'center',
+
+  padding: 20,
+},
+
+guideModal: {
+  width: '100%',
+
+  maxWidth: 520,
+
+  maxHeight: '90vh',
+
+  overflowY: 'auto',
+
+  borderRadius: 36,
+
+  padding: 24,
+
+  background:
+    `
+    linear-gradient(
+      180deg,
+      #07111d,
+      #02060c
+    )
+    `,
+
+  border: '2px solid rgba(0,220,255,.15)',
+
+  boxShadow:
+    `
+    0 0 50px rgba(0,180,255,.18)
+    `,
+},
+
+guideHeader: {
+  display: 'flex',
+
+  justifyContent: 'space-between',
+
+  alignItems: 'center',
+
+  marginBottom: 24,
+},
+
+guideMini: {
+  fontSize: 10,
+
+  letterSpacing: 2,
+
+  color: '#00d2ff',
+
+  marginBottom: 6,
+},
+
+guideTitle: {
+  fontSize: 26,
+
+  fontWeight: 900,
+
+  color: '#fff',
+},
+
+closeGuide: {
+  width: 44,
+  height: 44,
+
+  borderRadius: '50%',
+
+  border: 'none',
+
+  cursor: 'pointer',
+
+  fontSize: 18,
+
+  color: '#fff',
+
+  background:
+    'rgba(255,255,255,.08)',
+},
+
+guideSteps: {
+  display: 'flex',
+
+  flexDirection: 'column',
+
+  gap: 16,
+},
+
+guideStepCard: {
+  padding: 18,
+
+  borderRadius: 24,
+
+  background:
+    `
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.05),
+      rgba(255,255,255,.02)
+    )
+    `,
+
+  border: '1px solid rgba(255,255,255,.08)',
+},
+
+guideStepTop: {
+  display: 'flex',
+
+  alignItems: 'center',
+
+  justifyContent: 'space-between',
+
+  marginBottom: 16,
+},
+
+guideStepBadge: {
+  padding: '6px 12px',
+
+  borderRadius: 999,
+
+  fontSize: 12,
+
+  fontWeight: 900,
+
+  background:
+    'linear-gradient(180deg, #00c6ff, #0047ff)',
+},
+
+guideStepIcon: {
+  fontSize: 34,
+},
+
+guideStepTitle: {
+  fontSize: 15,
+
+  fontWeight: 900,
+
+  color: '#fff',
+},
+
+guideStepDesc: {
+  marginTop: 6,
+
+  fontSize: 12,
+
+  lineHeight: 1.5,
+
+  color: 'rgba(255,255,255,.65)',
+},
+missionsOverlay: {
+  position: 'fixed',
+  inset: 0,
+  background:
+    'rgba(0,0,0,.82)',
+  backdropFilter: 'blur(8px)',
+  zIndex: 9999,
+
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  padding: 18,
+},
+
+missionsModal: {
+  width: '100%',
+  maxWidth: 520,
+
+  maxHeight: '90vh',
+
+  overflowY: 'auto',
+
+  borderRadius: 34,
+
+  background:
+    'linear-gradient(180deg,#07111d,#04070f)',
+
+  border:
+    '1px solid rgba(0,220,255,.25)',
+
+  padding: 18,
+
+  boxShadow:
+    '0 0 50px rgba(0,180,255,.25)',
+},
+
+missionsModalHeader: {
+  display: 'flex',
+  justifyContent:
+    'space-between',
+
+  alignItems: 'center',
+
+  marginBottom: 16,
+
+  color: '#fff',
+
+  fontWeight: 900,
+
+  fontSize: 22,
+},
+
+closeButton: {
+  width: 42,
+  height: 42,
+
+  borderRadius: '50%',
+
+  border: 'none',
+
+  cursor: 'pointer',
+
+  background:
+    'linear-gradient(135deg,#ff4d4d,#ff0055)',
+
+  color: '#fff',
+
+  fontSize: 18,
+
+  fontWeight: 900,
+},
 };

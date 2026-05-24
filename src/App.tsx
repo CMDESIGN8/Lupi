@@ -12,7 +12,6 @@
       import { getNextThursday20h } from './lib/dateUtils';
       import { OnboardingTour } from './components/OnboardingTour';
       import { StreakBadge } from './components/StreakBadge';
-      import { NotificationPermission } from './components/NotificationPermission';
       import { usePushNotifications } from './hooks/usePushNotifications';
       import { useVisualEffects } from './hooks/useVisualEffects';
       import { SpinWheel, SpinResult } from './components/SpinWheel';
@@ -431,6 +430,16 @@
 
   100% {
     opacity: 0;
+  }
+}
+
+@keyframes shineMove {
+  0% {
+    left: -120px;
+  }
+
+  100% {
+    left: 120%;
   }
 }
 
@@ -4349,7 +4358,6 @@
                   {/* Tour interactivo */}
                     {showTour && <OnboardingTour onComplete={handleTourComplete} />}
                     {/* Componente de solicitud de notificaciones */}
-                    <NotificationPermission userId={user.id} />
                     <header className="app-header">
                       <div className="container">
                         <div className="header-inner">
