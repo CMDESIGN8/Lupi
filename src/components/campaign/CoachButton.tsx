@@ -53,11 +53,14 @@ export function CoachButton({
           onClick={() => setShowMenu(!showMenu)}
         >
           <div style={styles.coachAvatar}>
-            <span style={styles.coachIcon}>🧢</span>
-            <span style={styles.coachGlasses}>⚡</span>
-          </div>
+  <img
+    src="/images/l1.png"
+    alt="Coach"
+    style={styles.coachImage}
+  />
+</div>
           <div style={styles.coachText}>
-            <span style={styles.coachName}>Prof. Takamura</span>
+            <span style={styles.coachName}>Lupi</span>
             <span style={styles.coachTitle}>Tu entrenador</span>
           </div>
           {unreadTips > 0 && (
@@ -127,6 +130,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   buttonWrapper: {
     position: 'relative',
+    bottom:'40px',
   },
   tooltip: {
     position: 'absolute',
@@ -163,7 +167,7 @@ const styles: Record<string, React.CSSProperties> = {
     background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
     borderWidth: 2,
     borderStyle: 'solid',
-    borderColor: '#ffd700',
+    borderColor: '#00aeff',
     borderRadius: 60,
     padding: '8px 20px 8px 12px',
     cursor: 'pointer',
@@ -207,7 +211,7 @@ const styles: Record<string, React.CSSProperties> = {
   coachName: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#ffd700',
+    color: '#0099ff',
   },
   coachTitle: {
     fontSize: 10,
@@ -275,4 +279,19 @@ const styles: Record<string, React.CSSProperties> = {
     pointerEvents: 'none',
     animation: 'floatUp 0.5s ease-out',
   },
+  coachImage: {
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+  borderRadius: '50%',
+  border: '3px solid #fff',
+  boxShadow: `
+    0 0 20px rgba(255,255,255,0.4),
+    0 0 40px rgba(255,215,0,0.25)
+  `,
+  filter: `
+    contrast(1.1)
+    saturate(1.2)
+  `,
+},
 };
