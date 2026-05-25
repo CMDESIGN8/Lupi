@@ -880,6 +880,7 @@ const styles: Record<string, React.CSSProperties> = {
   container: {
     width: '100%',
     maxWidth: 1450,
+    marginTop: '60px',
 
     position: 'relative',
 

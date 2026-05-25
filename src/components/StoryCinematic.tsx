@@ -16,20 +16,20 @@ interface DialogueLine {
 
 const CHARACTERS = {
   protagonist: {
-    name: 'LUPI',
-    avatar: '/images/l1.png',
-    color: '#E52525',
+    name: 'Player',
+    avatar: '/images/l3.png',
+    color: '#2568e5',
     side: 'left' as const,
   },
   rival: {
     name: 'KAISER',
     avatar: '/images/l2.png',
-    color: '#4169E1',
+    color: '#e14141',
     side: 'right' as const,
   },
   coach: {
-    name: 'ROBERTO',
-    avatar: '/images/coach.png',
+    name: 'LUPI',
+    avatar: '/images/l1.png',
     color: '#F5C518',
     side: 'left' as const,
   },

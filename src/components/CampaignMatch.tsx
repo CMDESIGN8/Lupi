@@ -1,172 +1,557 @@
-// src/components/CampaignMatch.tsx - Versión ANIME / FIFA ULTIMATE TEAM
-import { useState,useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BotConfig } from '../types/campaign';
 import { MatchStory } from '../data/campaignStories';
 
-// Dentro del mismo archivo, antes del componente CampaignMatch
-function AnimeTypewriter({ text }: { text: string }) {
-  const [displayed, setDisplayed] = useState('');
-  const [done, setDone] = useState(false);
-
-  useEffect(() => {
-    setDisplayed('');
-    setDone(false);
-    let i = 0;
-    const id = setInterval(() => {
-      i++;
-      setDisplayed(text.slice(0, i));
-      if (i >= text.length) { clearInterval(id); setDone(true); }
-    }, 22);
-    return () => clearInterval(id);
-  }, [text]);
-
-  return (
-    <div className="as-intro-text">
-      {displayed}{!done && <span className="as-cursor">▋</span>}
-    </div>
-  );
-}
-
-interface CampaignMatchProps {
+interface CampaignMatchIntroProps {
   opponent: BotConfig;
-  matchNumber: number;
-  totalMatches: number;
-  leagueName: string;
-  leagueIcon: string;
+
   story: MatchStory;
+
   onStartMatch: () => void;
-  onBack: () => void;
+
+  onBack?: () => void;
+
+  matchNumber?: number;
+
+  totalMatches?: number;
+
+  leagueName?: string;
+
+  leagueIcon?: string;
+
+  userAvatar?: string;
+
   userTeamStats?: {
     overall: number;
     attack: number;
     defense: number;
     technique: number;
-    cardsCount: number;
   };
+
   userTeamName?: string;
-  userAvatar?: string;
 }
 
-type StatKey = 'atk' | 'def' | 'tec' | null;
+interface DialogueLine {
+  character: 'protagonist' | 'rival' | 'coach';
+  text: string;
+  emotion?: 'normal' | 'angry' | 'surprised' | 'determined';
+}
 
-export function CampaignMatch({
+const CHARACTERS = {
+  protagonist: {
+    name: 'PLAYER',
+    avatar: '/images/l3.png',
+    color: '#2568e5',
+    side: 'left' as const,
+  },
+
+  rival: {
+    name: 'KAISER',
+    avatar: '/images/l2.png',
+    color: '#e14141',
+    side: 'right' as const,
+  },
+
+  coach: {
+    name: 'LUPI',
+    avatar: '/images/l1.png',
+    color: '#F5C518',
+    side: 'left' as const,
+  },
+};
+
+export default function CampaignMatchIntro({
   opponent,
-  matchNumber,
-  totalMatches,
-  leagueName,
-  leagueIcon,
   story,
   onStartMatch,
-  onBack,
   userTeamStats,
-  userTeamName = 'MI EQUIPO',
-  userAvatar = '⚡',
-}: CampaignMatchProps) {
-  const [showStory, setShowStory] = useState(true);
-  const [activeTip, setActiveTip] = useState<StatKey>(null);
-  const [introFlash, setIntroFlash] = useState(true);
-const [showPowerAura, setShowPowerAura] = useState(false);
-const [showCutIn, setShowCutIn] = useState(true);
+  userTeamName = 'FC NOVATOS',
+}: CampaignMatchIntroProps) {
 
-useEffect(() => {
+  // ======================================================
+  // STATES
+  // ======================================================
 
-  const cutin = setTimeout(() => {
-    setShowCutIn(false);
-  }, 1600);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  const flash = setTimeout(() => {
-    setIntroFlash(false);
-  }, 2200);
+  const [displayedText, setDisplayedText] = useState('');
 
-  const aura = setTimeout(() => {
-    setShowPowerAura(true);
-  }, 2400);
+  const [isTyping, setIsTyping] = useState(true);
 
-  return () => {
-    clearTimeout(cutin);
-    clearTimeout(flash);
-    clearTimeout(aura);
-  };
+  const [showCutIn, setShowCutIn] = useState(false);
 
-}, []);
+  const [showKickOff, setShowKickOff] = useState(false);
 
-  const teamOverall = userTeamStats?.overall ?? 75;
-  const teamAttack = userTeamStats?.attack ?? 70;
-  const teamDefense = userTeamStats?.defense ?? 70;
-  const teamTechnique = userTeamStats?.technique ?? 70;
-  
+  // ======================================================
+  // DIALOGOS
+  // ======================================================
 
-  const rivalStats = {
-    attack: Math.floor(opponent.overall * 0.9),
-    defense: Math.floor(opponent.overall * 0.85),
-    technique: Math.floor(opponent.overall * 0.88),
-  };
-
-  const maxStat = 100;
-
-  const statDefs = [
+  const dialogues: DialogueLine[] = [
     {
-      key: 'atk' as StatKey,
-      label: '⚔️ Ataque',
-      iconClass: 'icon-atk',
-      userVal: teamAttack,
-      rivalVal: rivalStats.attack,
-      barClass: 'bar-atk',
-      rivalBarClass: 'bar-atk-rival',
-      numColor: '#ff6b6b',
-      tipTitle: '⚔️ Ataque = hacer goles',
-      tipText:
-        'Cuanto más alto, más chances de meter la pelota adentro. Si tu ataque es mayor que el de ellos, ¡vas a hacer más goles!',
+      character: 'protagonist',
+      text:
+        '¡¿Qué?! ¡Ese delantero... es muchísimo más rápido de lo que esperaba!',
+      emotion: 'surprised',
     },
+
     {
-      key: 'def' as StatKey,
-      label: '🛡️ Defensa',
-      iconClass: 'icon-def',
-      userVal: teamDefense,
-      rivalVal: rivalStats.defense,
-      barClass: 'bar-def',
-      rivalBarClass: 'bar-def-rival',
-      numColor: '#4ade80',
-      tipTitle: '🛡️ Defensa = no recibir goles',
-      tipText:
-        'Es el muro de tu equipo. Si tu defensa es alta, el rival va a tener que sudar mucho para meterte un gol.',
+      character: 'rival',
+      text:
+        story.opponentQuotes.before ||
+        'Voy a aplastarte frente a todo el estadio.',
+      emotion: 'angry',
     },
+
     {
-      key: 'tec' as StatKey,
-      label: '✨ Técnica',
-      iconClass: 'icon-tec',
-      userVal: teamTechnique,
-      rivalVal: rivalStats.technique,
-      barClass: 'bar-tec',
-      rivalBarClass: 'bar-tec-rival',
-      numColor: '#a17aff',
-      tipTitle: '✨ Técnica = jugadas mágicas',
-      tipText:
-        'Es la habilidad del equipo. Alta técnica = gambetas, pases increíbles y jugadas que nadie espera. ¡Como Messi!',
+      character: 'coach',
+      text:
+        'Escucha bien... Los verdaderos jugadores despiertan bajo presión.',
+      emotion: 'determined',
+    },
+
+    {
+      character: 'protagonist',
+      text:
+        'No importa quién esté enfrente... ¡voy a ganar este partido!',
+      emotion: 'determined',
     },
   ];
 
-  const totalUser = teamOverall;
-  const totalRival = opponent.overall;
-  const totalSum = totalUser + totalRival;
-  const userPct = Math.round((totalUser / totalSum) * 100);
-  const rivalPct = 100 - userPct;
+  const currentDialogue = dialogues[currentIndex];
 
-  const difficultyLabel: Record<string, string> = {
-    easy: '⭐ FÁCIL',
-    medium: '⚡ MEDIO',
-    hard: '🔥 DIFÍCIL',
+  const currentCharacter =
+    CHARACTERS[currentDialogue.character];
+
+  // ======================================================
+  // TYPEWRITER
+  // ======================================================
+
+  useEffect(() => {
+
+    setDisplayedText('');
+
+    setIsTyping(true);
+
+    const text = currentDialogue.text;
+
+    let i = 0;
+
+    const interval = setInterval(() => {
+
+      if (i < text.length) {
+
+        setDisplayedText((prev) => prev + text[i]);
+
+        i++;
+
+      } else {
+
+        clearInterval(interval);
+
+        setIsTyping(false);
+      }
+
+    }, 24);
+
+    return () => clearInterval(interval);
+
+  }, [currentIndex]);
+
+  // ======================================================
+  // NEXT
+  // ======================================================
+
+  const handleNext = () => {
+
+    if (isTyping) return;
+
+    if (currentIndex < dialogues.length - 1) {
+
+      setCurrentIndex((prev) => prev + 1);
+
+    } else {
+
+      startMatchSequence();
+    }
   };
 
-  if (showCutIn) {
+  // ======================================================
+  // MATCH SEQUENCE
+  // ======================================================
+
+  const startMatchSequence = () => {
+
+    // CUT IN
+    setShowCutIn(true);
+
+    setTimeout(() => {
+
+      setShowKickOff(true);
+
+    }, 1400);
+
+    setTimeout(() => {
+
+      onStartMatch();
+
+    }, 2500);
+  };
+
+  // ======================================================
+  // STATS
+  // ======================================================
+
+  const teamOverall =
+    userTeamStats?.overall ?? 74;
+
+  // ======================================================
+  // RENDER
+  // ======================================================
+
   return (
-    <div className="anime-cutin-screen">
+    <div style={styles.overlay}>
+
+      {/* ======================================================
+          CUT IN
+      ====================================================== */}
+
+      {showCutIn && (
+        <div className="cutin-overlay">
+
+          <div className="cutin-speed-lines" />
+
+          <div className="cutin-slash" />
+
+          <div className="cutin-content">
+
+            <div className="cutin-avatar">
+              {opponent.avatar}
+            </div>
+
+            <div className="cutin-title">
+              SPECIAL ENTRY
+            </div>
+
+            <div className="cutin-quote">
+              {story.opponentQuotes.before}
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================
+          KICK OFF
+      ====================================================== */}
+
+      {showKickOff && (
+        <div className="kickoff-overlay">
+
+          <div className="kickoff-text">
+            KICK OFF
+          </div>
+
+        </div>
+      )}
+
+      {/* BG */}
+
+      <div className="scanlines" />
+
+      <div style={styles.speedLines} />
+
+      <div style={styles.backgroundImage} />
+
+      <div style={styles.vignette} />
+
+      <div style={styles.sfxText}>
+        ゴゴゴゴ
+      </div>
+
+      {/* ======================================================
+          HEADER
+      ====================================================== */}
+
+      <div style={styles.header}>
+
+        <div style={styles.dayBadge}>
+          ⚡ MATCH
+        </div>
+
+        <div style={styles.chapterBadge}>
+          {opponent.name}
+        </div>
+
+      </div>
+
+      {/* ======================================================
+          CHARACTER
+      ====================================================== */}
+
+      <div style={styles.characterContainer}>
+
+        <div
+          style={{
+            ...styles.characterInner,
+
+            justifyContent:
+              currentCharacter.side === 'left'
+                ? 'flex-start'
+                : 'flex-end',
+          }}
+        >
+
+          <div style={styles.characterCard}>
+
+            <div
+              style={{
+                ...styles.characterGlow,
+
+                background: `radial-gradient(circle, ${currentCharacter.color}80, transparent)`,
+              }}
+            />
+
+            <img
+              src={currentCharacter.avatar}
+              alt={currentCharacter.name}
+              style={styles.characterImage}
+            />
+
+            <div
+              style={{
+                ...styles.characterName,
+
+                background: currentCharacter.color,
+              }}
+            >
+              {currentCharacter.name}
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* ======================================================
+          DIALOGUE
+      ====================================================== */}
+
+      <div style={styles.dialogueContainer}>
+
+        <div style={styles.dialogueWrapper}>
+
+          <div style={styles.dialogueBox}>
+
+            {/* HEADER */}
+
+            <div
+              style={{
+                ...styles.dialogueHeader,
+
+                background: `linear-gradient(135deg, ${currentCharacter.color}, ${currentCharacter.color}CC)`,
+              }}
+            >
+
+              <span style={styles.dialogueName}>
+                {currentCharacter.name}
+              </span>
+
+              <span style={styles.dialogueEmotion}>
+                {currentDialogue.emotion?.toUpperCase()}
+              </span>
+
+            </div>
+
+            {/* TEXT */}
+
+            <div style={styles.dialogueText}>
+
+              {displayedText}
+
+              {isTyping && (
+                <span style={styles.cursor}>
+                  _
+                </span>
+              )}
+
+            </div>
+
+            {/* MINI CARD */}
+
+            {!isTyping &&
+              currentIndex === dialogues.length - 1 && (
+
+                <div style={styles.matchCard}>
+
+                  <div style={styles.matchTitle}>
+                    ⚽ PRÓXIMO PARTIDO
+                  </div>
+
+                  <div style={styles.vsRow}>
+
+                    <div style={styles.teamBox}>
+
+                      <div style={styles.teamName}>
+                        {userTeamName}
+                      </div>
+
+                      <div style={styles.teamPower}>
+                        {teamOverall}
+                      </div>
+
+                    </div>
+
+                    <div style={styles.vsText}>
+                      VS
+                    </div>
+
+                    <div style={styles.teamBox}>
+
+                      <div style={styles.teamName}>
+                        {opponent.name}
+                      </div>
+
+                      <div
+                        style={{
+                          ...styles.teamPower,
+                          background: '#ff4d4d',
+                          color: '#2a0000',
+                        }}
+                      >
+                        {opponent.overall}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  <div style={styles.warningBox}>
+                    💀 {story.rivalSpecial}
+                  </div>
+
+                </div>
+              )}
+
+            {/* BUTTON */}
+
+            {!isTyping && (
+
+              <button
+                style={styles.nextButton}
+                onClick={handleNext}
+              >
+
+                {currentIndex < dialogues.length - 1
+                  ? '▼ CONTINUE ▼'
+                  : '⚽ START MATCH ⚽'}
+
+              </button>
+            )}
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* PROGRESS */}
+
+      <div style={styles.progressContainer}>
+
+        <div
+          style={{
+            ...styles.progressBar,
+
+            width: `${
+              ((currentIndex + 1) /
+                dialogues.length) *
+              100
+            }%`,
+          }}
+        />
+
+      </div>
+
+      {/* ======================================================
+          CSS
+      ====================================================== */}
 
       <style>{`
 
-        .anime-cutin-screen{
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        *{
+          box-sizing:border-box;
+        }
+
+        @keyframes speedLines{
+          0%{
+            background-position:0 0;
+          }
+
+          100%{
+            background-position:200px 0;
+          }
+        }
+
+        @keyframes fadeIn{
+          0%{
+            opacity:0;
+            transform:scale(.9);
+          }
+
+          100%{
+            opacity:1;
+            transform:scale(1);
+          }
+        }
+
+        @keyframes slideUp{
+          0%{
+            transform:translateY(50px);
+            opacity:0;
+          }
+
+          100%{
+            transform:translateY(0);
+            opacity:1;
+          }
+        }
+
+        @keyframes cursorBlink{
+          0%,100%{
+            opacity:1;
+          }
+
+          50%{
+            opacity:0;
+          }
+        }
+
+        @keyframes pulse{
+          0%,100%{
+            opacity:.5;
+            transform:scale(1);
+          }
+
+          50%{
+            opacity:.2;
+            transform:scale(1.1);
+          }
+        }
+
+        /* ======================================================
+            CUTIN
+        ====================================================== */
+
+        .cutin-overlay{
           position:fixed;
           inset:0;
+
+          z-index:999999;
+
+          overflow:hidden;
 
           background:
             radial-gradient(circle at center,
@@ -174,22 +559,10 @@ useEffect(() => {
               #06101f 55%,
               #000 100%);
 
-          overflow:hidden;
-
-          display:flex;
-          align-items:center;
-          justify-content:center;
-
-          z-index:99999;
-
-          animation:cutinFade 1.6s ease forwards;
+          animation:cutinFade 1.5s ease forwards;
         }
 
-        /* SPEED LINES */
-
-        .anime-cutin-screen::before{
-          content:'';
-
+        .cutin-speed-lines{
           position:absolute;
           inset:-50%;
 
@@ -204,8 +577,6 @@ useEffect(() => {
 
           animation:speedMove 8s linear infinite;
         }
-
-        /* DIAGONAL */
 
         .cutin-slash{
           position:absolute;
@@ -233,20 +604,20 @@ useEffect(() => {
           animation:slashMove 1s ease forwards;
         }
 
-        /* CONTENT */
-
         .cutin-content{
-          position:relative;
+          position:absolute;
 
-          z-index:3;
+          inset:0;
 
           display:flex;
           flex-direction:column;
+
           align-items:center;
+          justify-content:center;
+
+          z-index:3;
 
           transform:rotate(-6deg);
-
-          animation:contentPop .5s ease;
         }
 
         .cutin-avatar{
@@ -268,8 +639,7 @@ useEffect(() => {
 
           margin-bottom:8px;
 
-          text-shadow:
-            0 0 14px rgba(255,230,0,.8);
+          font-family:'Press Start 2P', monospace;
         }
 
         .cutin-quote{
@@ -279,9 +649,9 @@ useEffect(() => {
 
           color:white;
 
-          font-size:34px;
+          font-size:26px;
 
-          line-height:1.05;
+          line-height:1.2;
 
           text-transform:uppercase;
 
@@ -292,7 +662,41 @@ useEffect(() => {
             0 0 25px rgba(255,255,255,.4);
         }
 
-        /* ANIMS */
+        /* ======================================================
+            KICKOFF
+        ====================================================== */
+
+        .kickoff-overlay{
+          position:fixed;
+          inset:0;
+
+          background:white;
+
+          z-index:9999999;
+
+          display:flex;
+
+          align-items:center;
+          justify-content:center;
+
+          animation:kickoffFlash 1s forwards;
+        }
+
+        .kickoff-text{
+          font-size:72px;
+
+          color:black;
+
+          font-family:'Press Start 2P', monospace;
+
+          transform:skew(-10deg);
+
+          animation:kickoffZoom .8s ease;
+        }
+
+        /* ======================================================
+            ANIMS
+        ====================================================== */
 
         @keyframes slashMove{
           0%{
@@ -305,24 +709,6 @@ useEffect(() => {
             transform:
               rotate(-12deg)
               translateX(40%);
-          }
-        }
-
-        @keyframes contentPop{
-          0%{
-            transform:
-              rotate(-6deg)
-              scale(1.5);
-
-            opacity:0;
-          }
-
-          100%{
-            transform:
-              rotate(-6deg)
-              scale(1);
-
-            opacity:1;
           }
         }
 
@@ -350,1344 +736,395 @@ useEffect(() => {
           }
         }
 
+        @keyframes kickoffFlash{
+          0%{
+            opacity:0;
+          }
+
+          20%{
+            opacity:1;
+          }
+
+          100%{
+            opacity:0;
+          }
+        }
+
+        @keyframes kickoffZoom{
+          0%{
+            transform:
+              scale(2.5)
+              skew(-10deg);
+
+            opacity:0;
+          }
+
+          100%{
+            transform:
+              scale(1)
+              skew(-10deg);
+
+            opacity:1;
+          }
+        }
+
+        .scanlines{
+          position:fixed;
+
+          top:0;
+          left:0;
+
+          width:100%;
+          height:100%;
+
+          background:
+            repeating-linear-gradient(
+              0deg,
+              rgba(0,0,0,.1) 0px,
+              rgba(0,0,0,.1) 2px,
+              transparent 2px,
+              transparent 4px
+            );
+
+          pointer-events:none;
+
+          z-index:20;
+        }
+
       `}</style>
 
-      <div className="cutin-slash" />
-
-      <div className="cutin-content">
-
-        <div className="cutin-avatar">
-          {opponent.avatar}
-        </div>
-
-        <div className="cutin-title">
-          SPECIAL ENTRY
-        </div>
-
-        <div className="cutin-quote">
-          LA NOCHE ES NUESTRA
-        </div>
-
-      </div>
     </div>
   );
 }
 
-  // ─────────────────────────────────────────────────────────────
-  // PANTALLA DE HISTORIA
-  // ─────────────────────────────────────────────────────────────
-    if (showStory) {
-  return (
-    <div style={s.screen}>
-      <style>{`
-@import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+// ======================================================
+// STYLES
+// ======================================================
 
-*{
-  box-sizing:border-box;
-}
+const styles: Record<string, React.CSSProperties> = {
 
-/* =========================
-   SUPER CAMPEONES FX
-========================= */
-
-.as-screen-flash{
-  position:absolute;
-  inset:0;
-  background:white;
-  z-index:999;
-  animation:flashAnime .9s forwards;
-  pointer-events:none;
-}
-
-@keyframes flashAnime{
-  0%{opacity:1;}
-  100%{opacity:0;}
-}
-
-/* SPEED LINES */
-
-.as-speed-bg{
-  position:absolute;
-  inset:0;
-  overflow:hidden;
-  z-index:0;
-}
-
-.anime-rays{
-  background:
-    repeating-linear-gradient(
-      115deg,
-      rgba(120,190,255,0.10) 0px,
-      rgba(120,190,255,0.10) 2px,
-      transparent 2px,
-      transparent 18px
-    );
-  opacity:.35;
-  pointer-events:none;
-}
-
-.as-speed-bg::before{
-  content:'';
-  position:absolute;
-  inset:-50%;
-  background:
-    repeating-linear-gradient(
-      115deg,
-      rgba(255,255,255,.14) 0px,
-      rgba(255,255,255,.14) 2px,
-      transparent 2px,
-      transparent 14px
-    );
-  animation:speedMove 12s linear infinite;
-  transform:scale(1.4);
-}
-
-@keyframes speedMove{
-  from{transform:translateX(0) scale(1.4);}
-  to{transform:translateX(-120px) scale(1.4);}
-}
-
-/* MANGA PANELS */
-
-.as-manga-panel{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  opacity:.06;
-  background-image:
-    linear-gradient(125deg, transparent 48%, white 49%, white 50%, transparent 51%),
-    linear-gradient(-125deg, transparent 48%, white 49%, white 50%, transparent 51%);
-  background-size:100% 100%;
-}
-
-/* ENERGY */
-
-.as-energy{
-  position:absolute;
-  width:240px;
-  height:240px;
-  border-radius:50%;
-
-  background:
-    radial-gradient(circle,
-      rgba(255,255,255,.9) 0%,
-      rgba(255,220,0,.55) 20%,
-      rgba(255,120,0,.18) 45%,
-      transparent 70%);
-
-  filter:blur(18px);
-
-  animation:
-    auraPulse 1.8s ease-in-out infinite,
-    auraRotate 8s linear infinite;
-}
-    @keyframes auraPulse{
-  0%,100%{
-    transform:scale(1);
-    opacity:.8;
-  }
-
-  50%{
-    transform:scale(1.25);
-    opacity:1;
-  }
-}
-
-@keyframes auraRotate{
-  from{ transform:rotate(0deg); }
-  to{ transform:rotate(360deg); }
-}
-
-@keyframes energyPulse{
-  0%,100%{
-    transform:scale(1);
-    opacity:.8;
-  }
-  50%{
-    transform:scale(1.2);
-    opacity:1;
-  }
-}
-
-/* AVATAR */
-
-.as-avatar-emoji{
-  font-size:84px;
-  position:relative;
-  z-index:2;
-  animation:avatarFloat 3s ease-in-out infinite;
-  filter:
-    drop-shadow(0 0 10px rgba(255,255,255,.6))
-    drop-shadow(0 0 30px rgba(255,215,0,.5));
-}
-
-@keyframes avatarFloat{
-  0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-10px);}
-}
-
-/* NAME */
-
-.as-rival-name{
-  font-family:'Russo One', sans-serif;
-
-  font-size:42px;
-
-  text-transform:uppercase;
-
-  letter-spacing:4px;
-
-  background:
-    linear-gradient(
-      180deg,
-      #ffffff 0%,
-      #0066ff 45%,
-      #00ffff 100%
-    );
-
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-
-  transform:skew(-8deg);
-
-  text-shadow:
-    4px 4px 0 #e7e7e7,
-    0 0 25px rgba(0, 4, 255, 0.45);
-
-  margin-bottom:18px;
-
-  animation:titleImpact .5s ease;
-}
-
-@keyframes nameImpact{
-  from{
-    transform:scale(2);
-    opacity:0;
-  }
-  to{
-    transform:scale(1);
-    opacity:1;
-  }
-}
-
-/* EPISODE */
-
-.as-episode{
-  position:absolute;
-  top:18px;
-  left:18px;
-  background:#000;
-  border:2px solid #ffd700;
-  color:#ffd700;
-  padding:6px 14px;
-  border-radius:40px;
-  font-size:11px;
-  letter-spacing:2px;
-  z-index:4;
-}
-
-/* SPEECH */
-
-.as-speech-bubble{
-  position:relative;
-  background:#f5f5f5;
-  color:#111;
-  border-radius:22px;
-  padding:18px 22px;
-  max-width:320px;
-  margin-bottom: 20px;
-  font-size:15px;
-  font-weight:900;
-  line-height:1.5;
-
-  border:4px solid #111;
-
-  box-shadow:
-    0 6px 0 #111,
-    0 0 30px rgba(255,255,255,.1);
-
-  transform:rotate(-1deg);
-}
-
-@keyframes bubblePop{
-  from{
-    transform:scale(.5);
-    opacity:0;
-  }
-  to{
-    transform:scale(1);
-    opacity:1;
-  }
-}
-
-.as-speech-bubble::after{
-  content:'';
-  position:absolute;
-  bottom:-20px;
-  left:50%;
-  transform:translateX(-50%);
-  border-width:20px 18px 0;
-  border-style:solid;
-  border-color:black transparent transparent;
-}
-
-.as-speech-bubble::before{
-  content:'';
-  position:absolute;
-  bottom:-14px;
-  left:50%;
-  transform:translateX(-50%);
-  border-width:16px 14px 0;
-  border-style:solid;
-  border-color:white transparent transparent;
-  z-index:1;
-}
-
-/* TYPEWRITER */
-
-.as-intro-text{
-  font-size:13px;
-  color:rgba(255,255,255,.85);
-
-  line-height:1.8;
-  text-align:center;
-
-  max-width:340px;
-
-  margin:auto;
-  margin-bottom:14px;
-}
-
-.as-cursor{
-  animation:blink .7s infinite;
-}
-
-@keyframes blink{
-  50%{opacity:0;}
-}
-
-/* SPECIAL WARNING */
-
-.as-special-tip{
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,0,0,.22),
-      rgba(255,140,0,.12)
-    );
-  border:2px solid #ff6b6b;
-  color:#fff;
-  border-radius:16px;
-  padding:12px;
-  font-size:12px;
-  line-height:1.5;
-  box-shadow:0 0 18px rgba(255,0,0,.2);
-  animation:dangerPulse 1.6s infinite;
-}
-
-@keyframes dangerPulse{
-  0%,100%{
-    transform:scale(1);
-  }
-  50%{
-    transform:scale(1.03);
-  }
-}
-
-/* START BUTTON */
-
-.as-start-btn{
-  position:relative;
-
-  width:100%;
-
-  background:
-    linear-gradient(
-      135deg,
-      #00e1ff 0%,
-      #0077ff 45%,
-      #002bff 100%
-    );
-
-  border:4px solid white;
-
-  border-radius:18px;
-
-  padding:20px;
-
-  font-size:20px;
-
-  font-weight:900;
-
-  letter-spacing:3px;
-
-  color:white;
-
-  transform:skew(-8deg);
-
-  overflow:hidden;
-
-  box-shadow:
-    0 0 30px rgba(0,140,255,.45),
-    0 0 60px rgba(0,140,255,.25);
-
-  transition:.2s;
-}
-
-.as-start-btn:hover{
-  transform:skew(-8deg) scale(1.04);
-}
-
-.as-start-btn::before{
-  content:'';
-  position:absolute;
-  top:-50%;
-  left:-60%;
-  width:40%;
-  height:200%;
-  background:rgba(255,255,255,.35);
-  transform:skewX(-20deg);
-  animation:btnShine 2s infinite;
-}
-
-@keyframes btnShine{
-  0%{left:-60%;}
-  100%{left:130%;}
-}
-
-/* MOBILE */
-
-@media(max-width:700px){
-
-  .as-rival-name{
-    font-size:22px;
-  }
-
- .as-avatar-emoji{
-  font-size:96px;
-  line-height:1;
-
-  filter:
-    drop-shadow(0 0 25px rgba(255,215,0,.45));
-
-  animation:captainFloat 3s ease-in-out infinite;
-}
-
-@keyframes captainFloat{
-  0%,100%{
-    transform:translateY(0);
-  }
-
-  50%{
-    transform:translateY(-8px);
-  }
-}
-
-  .as-speech-bubble{
-    max-width:100%;
-    font-size:13px;
-  }
-
-  .as-start-btn{
-    font-size:15px;
-    padding:16px;
-  }
-}
-  .impact-kanji{
-  position:absolute;
-
-  top:10px;
-  right:20px;
-
-  font-size:64px;
-  font-weight:900;
-
-  color:white;
-
-  opacity:.08;
-
-  transform:rotate(-12deg);
-
-  text-shadow:
-    0 0 10px rgba(255,255,255,.5);
-
-  animation:kanjiPulse 2s infinite;
-}
-  @keyframes kanjiPulse{
-  0%,100%{
-    transform:rotate(-12deg) scale(1);
-  }
-
-  50%{
-    transform:rotate(-12deg) scale(1.08);
-  }
-}
-  /* =========================
-   ANIME CUT-IN
-========================= */
-
-.anime-cutin{
-  position:absolute;
-  inset:0;
-
-  z-index:50;
-
-  overflow:hidden;
-
-  pointer-events:none;
-
-  animation:cutinFade 1.1s ease forwards;
-}
-
-/* FRANJA DIAGONAL */
-
-.cutin-slash{
-  position:absolute;
-
-  width:160%;
-  height:180px;
-
-  background:
-    linear-gradient(
-      90deg,
-      rgba(0,0,0,.0),
-      rgba(0,140,255,.95),
-      rgba(255,255,255,.95),
-      rgba(0,140,255,.95),
-      rgba(0,0,0,.0)
-    );
-
-  top:50%;
-
-  left:-120%;
-
-  transform:
-    translateY(-50%)
-    rotate(-12deg);
-
-  box-shadow:
-    0 0 40px rgba(0,140,255,.8);
-
-  animation:slashMove .9s ease forwards;
-}
-
-/* CONTENIDO */
-
-.cutin-content{
-  position:absolute;
-
-  inset:0;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:18px;
-
-  transform:rotate(-8deg);
-}
-
-/* AVATAR */
-
-.cutin-avatar{
-  font-size:90px;
-
-  filter:
-    drop-shadow(0 0 12px rgba(255,255,255,.9))
-    drop-shadow(0 0 40px rgba(0,140,255,.9));
-
-  animation:cutinPop .5s ease;
-}
-
-/* TEXTO */
-
-.cutin-text-wrap{
-  display:flex;
-  flex-direction:column;
-}
-
-.cutin-title{
-  font-size:14px;
-
-  letter-spacing:3px;
-
-  color:#ffe600;
-
-  text-shadow:
-    0 0 10px rgba(255,230,0,.8);
-
-  margin-bottom:4px;
-}
-
-.cutin-quote{
-  max-width:240px;
-
-  font-size:20px;
-
-  line-height:1.2;
-
-  color:white;
-
-  font-weight:900;
-
-  text-transform:uppercase;
-
-  text-shadow:
-    4px 4px 0 #000,
-    0 0 18px rgba(255,255,255,.45);
-}
-
-/* ANIMACIONES */
-
-@keyframes slashMove{
-  0%{
-    left:-140%;
-  }
-
-  100%{
-    left:40%;
-  }
-}
-
-@keyframes cutinFade{
-  0%{
-    opacity:0;
-  }
-
-  10%{
-    opacity:1;
-  }
-
-  80%{
-    opacity:1;
-  }
-
-  100%{
-    opacity:0;
-  }
-}
-
-@keyframes cutinPop{
-  0%{
-    transform:scale(2);
-    opacity:0;
-  }
-
-  100%{
-    transform:scale(1);
-    opacity:1;
-  }
-}
-`}</style>
-      <div style={{ ...s.storyCard, background:
-'linear-gradient(180deg,#06101f 0%,#0b2347 50%,#020814 100%)', border: '2px solid #ffd700', boxShadow: '0 0 0 4px rgba(255,215,0,0.08)', overflow: 'hidden', position: 'relative', fontFamily: "'Russo One', sans-serif" }}>
-
-        {introFlash && <div className="as-screen-flash" />}
-
-<div className="as-manga-panel" />
-<div className="anime-rays" />
-
-        {/* Destellos decorativos */}
-        <span className="as-star" style={{ top: 30, left: 20 }}>✦</span>
-        <span className="as-star" style={{ top: 80, right: 25, animationDelay: '-2s' }}>✧</span>
-        <span className="as-star" style={{ bottom: 80, left: 30, animationDelay: '-4s' }}>✦</span>
-
-        {/* Header */}
-        <div style={s.storyHeader}>
-          <span style={{ color: '#ffd700', fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-            {leagueIcon} {leagueName}
-          </span>
-          <button style={s.skipBtn} onClick={() => setShowStory(false)}>SALTAR ✕</button>
-        </div>
-        {/* Panel principal */}
-        <div style={{ position: 'relative', zIndex: 2, padding: '20px 20px 0', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-
-          <div className="impact-kanji">危</div>
-
-          {/* Avatar con ki rings */}
-          <div style={{ position: 'relative', width: 120, height: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 6 }}>
-            <div className="as-entry-flash" />
-            <div className="as-ki-ring as-ki-1" />
-            <>
-  {showPowerAura && <div className="as-energy" />}
-  <div className="as-avatar-emoji">
-    {opponent.avatar}
-  </div>
-</>
-          </div>
-
-          <div className="as-rival-name">{opponent.name}</div>
-
-          <div className="as-speech-bubble">"{story.opponentQuotes.before}"</div>
-
-          <div className="as-panel-div" />
-
-          <AnimeTypewriter text={story.intro} />
-
-          <div className="as-special-tip">💀 {story.rivalSpecial}</div>
-        </div>
-
-        <div className="as-panel-div" style={{ margin: '12px 0 0' }} />
-
-        <div style={{ position: 'relative', zIndex: 2, padding: '12px 16px 16px' }}>
-          <button className="as-start-btn" onClick={() => setShowStory(false)}>
-            ⚡ COMENZAR PARTIDO ⚡
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-  // ─────────────────────────────────────────────────────────────
-  // PANTALLA PRINCIPAL DE PARTIDO
-  // ─────────────────────────────────────────────────────────────
-  return (
-    <div style={s.screen}>
-      {/* Fuente Russo One desde Google Fonts */}
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
-
-        .cm-btn-play {
-            width: 100%;
-    background: linear-gradient(135deg, #00e1ff, #0077ff, #002bff);
-    border: 4px solid white;
-    box-shadow: 0 0 30px rgba(0, 140, 255, 0.45), 0 0 60px rgba(0, 140, 255, 0.25);
-    padding: 16px;
-    font-weight: 700;
-    font-size: 16px;
-    cursor: pointer;
-    color: #fff;
-    font-family: 'Russo One', sans-serif; /* asumiendo RUSSO es Russo One */
-    letter-spacing: 1px;}
-    
-        .cm-btn-play::after {
-          content: '';
-          position: absolute;
-          top: -50%; left: -60%;
-          width: 40%; height: 200%;
-          background: rgba(255,255,255,0.25);
-          transform: skewX(-20deg);
-          animation: cmShine 3s ease-in-out infinite;
-        }
-        @keyframes cmShine {
-          0%   { left: -60%; }
-          40%, 100% { left: 120%; }
-        }
-        @keyframes cmSpin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
-        }
-        .cm-ball-spin { animation: cmSpin 4s linear infinite; display: inline-block; }
-
-        .cm-stat-row { cursor: pointer; transition: background 0.2s; border-radius: 10px; padding: 6px 8px; }
-        .cm-stat-row:hover { background: rgba(255,255,255,0.05); }
-
-        .bar-atk       { background: #ff6b6b; }
-        .bar-atk-rival { background: #cc3333; opacity: 0.75; }
-        .bar-def       { background: #4ade80; }
-        .bar-def-rival { background: #22a35a; opacity: 0.75; }
-        .bar-tec       { background: #a17aff; }
-        .bar-tec-rival { background: #7a44ee; opacity: 0.75; }
-
-        .icon-atk { background: rgba(255,107,107,0.2); border: 1px solid rgba(255,107,107,0.4); }
-        .icon-def { background: rgba(74,222,128,0.2);  border: 1px solid rgba(74,222,128,0.4); }
-        .icon-tec { background: rgba(161,122,255,0.2); border: 1px solid rgba(161,122,255,0.4); }
-
-        .diff-easy   { background: #4ade80; color: #052010; }
-        .diff-medium { background: #fbbf24; color: #2a1800; }
-        .diff-hard   { background: #ff6b6b; color: #2a0000; }
-      `}</style>
-
-      <div style={s.card}>
-
-        {/* ── FONDO CANCHA ── */}
-        <div style={s.pitchBg}>
-          <div style={s.pitchGrid} />
-          <div style={s.pitchCircle} />
-
-          {/* Banner de liga */}
-          <div style={s.leagueBanner}>
-            <span>{leagueIcon} {leagueName}</span>
-            <span>Partido {matchNumber} de {totalMatches}</span>
-          </div>
-
-          {/* ── ÁREA VS ── */}
-          <div style={s.vsArea}>
-
-            {/* EQUIPO USUARIO */}
-            <div style={s.teamSide}>
-              <div style={{ ...s.avatarRing, ...s.avatarUser }}>{userAvatar}</div>
-              <div style={s.teamLabel}>{userTeamName}</div>
-              <div style={{ ...s.overallPill, ...s.pillUser }}>{teamOverall}</div>
-            </div>
-
-            {/* VS CENTRAL */}
-            <div style={s.vsCenter}>
-              <div style={{
-  ...s.vsText,
-  fontSize: 42,
-  transform: 'skew(-10deg)',
-  color: '#fff',
-  textShadow: `
-    0 0 10px #ffd700,
-    0 0 30px #ff6600,
-    4px 4px 0 #000
-  `,
-}}>
-  VS
-</div>
-              <span className="cm-ball-spin" style={{ fontSize: 22 }}>⚽</span>
-            </div>
-
-            {/* EQUIPO RIVAL */}
-            <div style={s.teamSide}>
-              <div style={{ ...s.avatarRing, ...s.avatarRival }}>{opponent.avatar}</div>
-              <div style={s.teamLabel}>{opponent.name}</div>
-              <div style={{ ...s.overallPill, ...s.pillRival }}>{opponent.overall}</div>
-              <span
-                className={`diff-${opponent.difficulty ?? 'medium'}`}
-                style={s.diffBadge}
-              >
-                {difficultyLabel[opponent.difficulty ?? 'medium'] ?? '⚡ MEDIO'}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* ── STATS ENFRENTADAS ── */}
-        <div style={s.statsSection}>
-          <div style={s.statsTitle}>⚡ tocá cada stat para entender qué hace ⚡</div>
-
-          {statDefs.map((st) => (
-            <div key={st.key as string}>
-              <div
-                className="cm-stat-row"
-                onClick={() => setActiveTip(activeTip === st.key ? null : st.key)}
-              >
-                <div style={s.statRowInner}>
-                  <div className={`icon-box ${st.iconClass}`} style={s.iconBox}>
-                    {st.label.split(' ')[0]}
-                  </div>
-                  <div style={s.barWrap}>
-                    <div style={s.barLabelRow}>
-                      <span style={s.statName}>{st.label}</span>
-                      <span style={{ ...s.statNums, color: st.numColor }}>
-                        {st.userVal} vs {st.rivalVal}
-                      </span>
-                    </div>
-                    <div style={s.doubleBar}>
-                      <div
-                        className={st.barClass}
-                        style={{
-                          ...s.barHalf,
-                          width: `${(st.userVal / maxStat) * 100}%`,
-                          borderRadius: '4px 0 0 4px',
-                        }}
-                      />
-                      <div
-                        className={st.rivalBarClass}
-                        style={{
-                          ...s.barHalf,
-                          width: `${(st.rivalVal / maxStat) * 100}%`,
-                          borderRadius: '0 4px 4px 0',
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tooltip desplegable */}
-              {activeTip === st.key && (
-                <div style={s.tooltip}>
-                  <div style={s.tooltipTitle}>{st.tipTitle}</div>
-                  <div style={s.tooltipText}>{st.tipText}</div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* ── BARRA DE PODER TOTAL ── */}
-        <div style={s.powerCompare}>
-          <div style={s.powerHeader}>
-            <span>⚡ TU PODER</span>
-            <span>PODER RIVAL 🔥</span>
-          </div>
-          <div style={s.powerTrack}>
-            <div style={{ ...s.powerUser, width: `${userPct}%` }}>{totalUser}</div>
-            <div style={{ ...s.powerRival, width: `${rivalPct}%` }}>{totalRival}</div>
-          </div>
-        </div>
-
-        {/* ── RECOMPENSAS ── */}
-        <div style={s.rewardsRow}>
-          <div style={s.rewardChip}>✨ +{opponent.xpBase} XP</div>
-          <div style={s.rewardChip}>🪙 +{Math.floor(opponent.xpBase * 1.5)} Pts</div>
-          <div style={s.rewardChip}>⭐ +1 Estrella</div>
-        </div>
-
-        <div style={{
-  marginTop: 16,
-  textAlign: 'center',
-  color: '#ffd700',
-  fontSize: 11,
-  letterSpacing: 1,
-  padding: '0 20px',
-  lineHeight: 1.6,
-}}>
-  📣 "¡El estadio entero contiene la respiración!
-  Este podría ser el partido que cambie la historia del club..."
-</div>
-
-        {/* ── BOTONES ── */}
-        <div style={s.btnRow}>
-          <button style={s.btnBack} onClick={onBack}>VOLVER</button>
-          <button
-            className="cm-btn-play"
-            style={s.btnPlay}
-            onClick={onStartMatch}
-          >
-            ⚽ JUGAR
-          </button>
-        </div>
-
-        <div style={s.tapHint}>tocá cada stat para aprender qué hace</div>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ESTILOS
-// ─────────────────────────────────────────────────────────────────────────────
-const RUSSO = "'Russo One', sans-serif";
-
-const s: Record<string, React.CSSProperties> = {
-  screen: {
+  overlay: {
     position: 'fixed',
     inset: 0,
-    background: 'linear-gradient(180deg, #0a0f1a 0%, #0a1525 100%)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-    zIndex: 1000,
-    overflowY: 'auto',
-  },
-  card: {
-    maxWidth: 500,
-    width: '100%',
-    backgroundColor: '#05101e',
-    borderRadius: 24,
-    border: '1px solid #ffd700',
-    boxShadow: '0 0 40px rgba(255,215,0,0.12)',
+    zIndex: 10000,
+    fontFamily: "'Press Start 2P', monospace",
     overflow: 'hidden',
-    fontFamily: RUSSO,
-    paddingBottom: 20,
+    background: '#000',
+    display: 'flex',
+    flexDirection: 'column',
   },
 
-  // ── CANCHA ──
-  pitchBg: {
-    position: 'relative',
-    background: 'radial-gradient(ellipse at center, #1a6e35 0%, #0d4220 60%, #072812 100%)',
-    paddingBottom: 16,
-    overflow: 'hidden',
-  },
-  pitchGrid: {
+  speedLines: {
     position: 'absolute',
     inset: 0,
-    backgroundImage: `
-      repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 60px),
-      repeating-linear-gradient(0deg,  rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, transparent 1px, transparent 60px)
+
+    background: `
+      repeating-linear-gradient(
+        -75deg,
+        transparent,
+        transparent 20px,
+        rgba(255,255,255,0.03) 20px,
+        rgba(255,255,255,0.03) 40px
+      )
+    `,
+
+    animation: 'speedLines 1s linear infinite',
+    pointerEvents: 'none',
+  },
+
+  backgroundImage: {
+    position: 'absolute',
+    inset: 0,
+    backgroundImage: 'url("/images/estadio.png")',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    filter: 'blur(4px) brightness(0.4)',
+  },
+
+  vignette: {
+    position: 'absolute',
+    inset: 0,
+
+    background: `
+      radial-gradient(
+        circle at center,
+        transparent 30%,
+        rgba(0,0,0,0.85) 100%
+      )
     `,
   },
-  pitchCircle: {
+
+  sfxText: {
     position: 'absolute',
-    width: 90,
-    height: 90,
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '50%',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-  },
-  leagueBanner: {
-    background: 'rgba(0,0,0,0.55)',
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '8px 20px',
-    fontSize: 11,
-    color: '#ffd700',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    borderBottom: '1px solid rgba(255,215,0,0.2)',
+    top: '15%',
+    right: '3%',
+    fontSize: '70px',
+    color: 'rgba(255,255,255,0.03)',
+    transform: 'rotate(-15deg)',
   },
 
-  // ── VS ──
-  vsArea: {
+  header: {
     position: 'relative',
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '20px 16px 0',
-    gap: 8,
-    zIndex: 1,
-  },
-  teamSide: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    gap: 4,
-  },
-  avatarRing: {
-    width: 80,
-    height: 80,
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: 44,
-    marginBottom: 4,
-  },
-  avatarUser: {
-    background: 'radial-gradient(circle, #1e3a5f, #0a1e3a)',
-    border: '3px solid #4ade80',
-    boxShadow: '0 0 20px rgba(74,222,128,0.4)',
-  },
-  avatarRival: {
-    background: 'radial-gradient(circle, #3a1e1e, #1a0a0a)',
-    border: '3px solid #ff6b6b',
-    boxShadow: '0 0 20px rgba(255,107,107,0.4)',
-  },
-  teamLabel: {
-    fontSize: 11,
-    fontWeight: 700,
-    color: '#fff',
-    textAlign: 'center',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    maxWidth: 110,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  overallPill: {
-    fontSize: 22,
-    fontWeight: 900,
-    padding: '2px 14px',
-    borderRadius: 30,
-    fontFamily: RUSSO,
-  },
-  pillUser: { background: '#4ade80', color: '#052010' },
-  pillRival: { background: '#ff6b6b', color: '#2a0000' },
-  diffBadge: {
-    fontSize: 9,
-    padding: '2px 8px',
-    borderRadius: 20,
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginTop: 4,
-  },
-  vsCenter: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 8,
-    flexShrink: 0,
-    width: 60,
-  },
-  vsText: {
-    fontSize: 26,
-    fontWeight: 900,
-    color: '#ffd700',
-    textShadow: '0 0 12px rgba(255,215,0,0.5)',
-    fontFamily: RUSSO,
+    padding: '12px 20px',
+    zIndex: 10,
   },
 
-  // ── STATS ──
-  statsSection: {
-    padding: '16px 16px 0',
-  },
-  statsTitle: {
-    fontSize: 9,
-    color: 'rgba(255,255,255,0.4)',
-    textAlign: 'center',
+  dayBadge: {
+    background: 'rgba(0,0,0,0.85)',
+    border: '2px solid #E52525',
+    padding: '6px 12px',
+    color: '#F5C518',
+    fontSize: 10,
     letterSpacing: 2,
-    textTransform: 'uppercase',
-    marginBottom: 12,
   },
-  statRowInner: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 8,
+
+  chapterBadge: {
+    background: 'rgba(0,0,0,0.85)',
+    border: '2px solid #F5C518',
+    padding: '6px 12px',
+    color: '#E52525',
+    fontSize: 10,
+    letterSpacing: 2,
   },
-  iconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+
+  characterContainer: {
+    flex: 0.7,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 18,
-    flexShrink: 0,
+    padding: '10px 20px 0 20px',
+    zIndex: 5,
   },
-  barWrap: {
-    flex: 1,
+
+  characterInner: {
     display: 'flex',
-    flexDirection: 'column',
-    gap: 3,
+    width: '100%',
+    maxWidth: 1200,
+    margin: '0 auto',
   },
-  barLabelRow: {
+
+  characterCard: {
+    position: 'relative',
+    width: '220px',
+    animation: 'fadeIn 0.5s ease-out',
+  },
+
+  characterGlow: {
+    position: 'absolute',
+    inset: '-20px',
+    borderRadius: '50%',
+    filter: 'blur(25px)',
+    animation: 'pulse 2s infinite',
+  },
+
+  characterImage: {
+    width: '100%',
+    height: 'auto',
+    display: 'block',
+
+    filter:
+      'drop-shadow(8px 8px 0px rgba(0,0,0,0.5))',
+  },
+
+  characterName: {
+    position: 'absolute',
+    bottom: -12,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    padding: '5px 12px',
+    color: '#FFF',
+    fontSize: 12,
+    letterSpacing: 1,
+    border: '2px solid #000',
+    whiteSpace: 'nowrap',
+    boxShadow: '3px 3px 0px rgba(0,0,0,0.5)',
+  },
+
+  dialogueContainer: {
+    position: 'relative',
+    padding: '0 20px 25px 20px',
+    marginTop: '-20px',
+    zIndex: 5,
+  },
+
+  dialogueWrapper: {
+    maxWidth: 900,
+    margin: '0 auto',
+    width: '100%',
+  },
+
+  dialogueBox: {
+    background:
+      'linear-gradient(135deg, rgba(20,20,30,0.98), rgba(10,10,20,0.98))',
+
+    border: '3px solid #F5C518',
+
+    borderRadius: 12,
+
+    padding: '16px',
+
+    boxShadow:
+      '8px 8px 0px rgba(0,0,0,0.5)',
+
+    animation: 'slideUp 0.4s ease-out',
+  },
+
+  dialogueHeader: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  statName: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.7)',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  statNums: {
-    fontSize: 10,
-  },
-  doubleBar: {
-    height: 8,
-    background: 'rgba(255,255,255,0.07)',
-    borderRadius: 4,
-    overflow: 'hidden',
-    display: 'flex',
-  },
-  barHalf: {
-    height: '100%',
-    transition: 'width 1.2s cubic-bezier(.17,.67,.2,1.3)',
-    boxShadow: '0 0 12px rgba(255,255,255,.15)',
-  },
-  tooltip: {
-    background: 'rgba(0,0,0,0.88)',
-    borderRadius: 10,
-    padding: '8px 12px',
-    margin: '4px 8px 8px',
-    borderLeft: '3px solid #ffd700',
-  },
-  tooltipTitle: {
-    fontWeight: 700,
-    color: '#ffd700',
-    fontSize: 12,
-    marginBottom: 2,
-    fontFamily: RUSSO,
-  },
-  tooltipText: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
-    lineHeight: 1.5,
-    fontFamily: 'system-ui, sans-serif',
-    fontWeight: 400,
+    padding: '6px 12px',
+    marginBottom: 12,
+    borderRadius: 6,
   },
 
-  // ── PODER TOTAL ──
-  powerCompare: {
-    margin: '14px 16px 0',
-    background: 'rgba(0,0,0,0.4)',
-    borderRadius: 14,
-    padding: '12px 14px',
-    border: '1px solid rgba(255,255,255,0.06)',
+  dialogueName: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 2,
   },
-  powerHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
+
+  dialogueEmotion: {
+    color: '#FFF',
     fontSize: 9,
-    color: 'rgba(255,255,255,0.4)',
-    textTransform: 'uppercase',
+    opacity: 0.8,
+  },
+
+  dialogueText: {
+    color: '#FFF',
+    fontSize: 14,
+    lineHeight: 1.8,
+    minHeight: '80px',
+    padding: '8px',
+  },
+
+  cursor: {
+    animation: 'cursorBlink 1s step-end infinite',
+    marginLeft: 2,
+  },
+
+  nextButton: {
+    width: '100%',
+
+    background:
+      'linear-gradient(135deg, #E52525, #8B0000)',
+
+    border: 'none',
+
+    padding: '12px',
+
+    color: '#FFF',
+
+    fontSize: 11,
+
+    cursor: 'pointer',
+
+    fontFamily: "'Press Start 2P', monospace",
+
     letterSpacing: 1,
+
+    marginTop: 16,
+
+    borderRadius: 6,
+  },
+
+  progressContainer: {
+    position: 'relative',
+    height: 3,
+    background: 'rgba(255,255,255,0.15)',
+    zIndex: 10,
+  },
+
+  progressBar: {
+    height: '100%',
+    background:
+      'linear-gradient(90deg, #F5C518, #E52525)',
+
+    transition: 'width 0.3s ease',
+  },
+
+  // ======================================================
+  // MATCH CARD
+  // ======================================================
+
+  matchCard: {
+    marginTop: 18,
+
+    background:
+      'rgba(255,255,255,0.04)',
+
+    border:
+      '2px solid rgba(255,255,255,0.08)',
+
+    borderRadius: 12,
+
+    padding: 16,
+  },
+
+  matchTitle: {
+    textAlign: 'center',
+    color: '#F5C518',
+    marginBottom: 16,
+    fontSize: 12,
+  },
+
+  vsRow: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+
+  teamBox: {
+    flex: 1,
+    textAlign: 'center',
+  },
+
+  teamName: {
+    color: '#FFF',
+    fontSize: 10,
     marginBottom: 8,
   },
-  powerTrack: {
-    height: 16,
-    background: 'rgba(255,255,255,0.06)',
-    borderRadius: 8,
-    overflow: 'hidden',
-    display: 'flex',
-  },
-  powerUser: {
-    background: 'linear-gradient(90deg, #4ade80, #22d3ee)',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    paddingRight: 6,
-    fontSize: 9,
-    fontWeight: 700,
+
+  teamPower: {
+    background: '#4ade80',
     color: '#052010',
-    transition: 'width 1s ease',
-  },
-  powerRival: {
-    background: 'linear-gradient(90deg, #ff6b6b, #f97316)',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingLeft: 6,
-    fontSize: 9,
-    fontWeight: 700,
-    color: '#2a0000',
-    transition: 'width 1s ease',
+
+    borderRadius: 999,
+
+    padding: '6px 12px',
+
+    fontSize: 16,
   },
 
-  // ── REWARDS ──
-  rewardsRow: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: 10,
-    margin: '14px 16px 0',
-    flexWrap: 'wrap',
-  },
-  rewardChip: {
-    background: 'rgba(255,215,0,0.1)',
-    border: '1px solid rgba(255,215,0,0.3)',
-    borderRadius: 20,
-    padding: '4px 12px',
-    fontSize: 11,
-    color: '#ffd700',
-    fontWeight: 700,
+  vsText: {
+    color: '#FFF',
+    fontSize: 20,
   },
 
-  // ── BOTONES ──
-  btnRow: {
-    display: 'flex',
-    gap: 10,
-    margin: '14px 16px 0',
-  },
-  btnBack: {
-    flex: 1,
-    background: 'rgba(255,255,255,0.08)',
-    border: '1px solid rgba(255,255,255,0.15)',
-    color: 'rgba(255,255,255,0.7)',
-    borderRadius: 40,
-    padding: '12px',
-    fontSize: 12,
-    fontWeight: 700,
-    cursor: 'pointer',
-    fontFamily: RUSSO,
-    letterSpacing: 0.5,
-  },
-  btnPlay: {
-  flex: 2,
-  background:
-    'linear-gradient(135deg,#00e1ff  0%,#0077ff  45%,#002bff  100%)',
-  border: '2px solid #fff',
-  borderRadius: 999,
-  padding: '15px',
-  fontSize: 17,
-  fontWeight: 900,
-  cursor: 'pointer',
-  color: '#fff',
-  fontFamily: RUSSO,
-  letterSpacing: 2,
-  position: 'relative',
-  overflow: 'hidden',
-  boxShadow:
-    '0 0 30px rgba(0,140,255,.45)',
-},
-  tapHint: {
-    textAlign: 'center',
-    fontSize: 9,
-    color: 'rgba(255,255,255,0.2)',
-    marginTop: 10,
-    fontFamily: 'system-ui, sans-serif',
-    fontWeight: 400,
-    letterSpacing: 0.5,
-  },
+  warningBox: {
+    marginTop: 14,
 
-  // ── HISTORIA ──
-  storyCard: {
-    maxWidth: 450,
-    width: '100%',
-    backgroundColor: '#0f172a',
-    borderRadius: 24,
-    overflow: 'hidden',
-    border: '1px solid #ffd700',
-    fontFamily: RUSSO,
-  },
-  storyHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '16px 20px',
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    borderBottom: '1px solid rgba(255,215,0,0.2)',
-    fontSize: 12,
-  },
-  skipBtn: {
-    background: 'none',
-    border: 'none',
-    color: 'rgba(255,255,255,0.5)',
-    cursor: 'pointer',
-    fontSize: 12,
-    fontFamily: RUSSO,
-  },
-  storyContent: {
-    padding: 24,
-    textAlign: 'center',
-  },
-  storyAvatar: {
-    fontSize: 80,
-    marginBottom: 12,
-  },
-  storyName: {
-    fontSize: 22,
-    fontWeight: 700,
-    color: '#ffd700',
-    marginBottom: 16,
-  },
-  storyQuote: {
-    fontSize: 15,
-    fontStyle: 'italic',
-    color: 'rgba(255,255,255,0.8)',
-    marginBottom: 20,
-    padding: 12,
-    backgroundColor: 'rgba(255,215,0,0.08)',
-    borderRadius: 16,
-    fontFamily: 'system-ui, sans-serif',
-    fontWeight: 400,
-    lineHeight: 1.5,
-  },
-  storyText: {
-    fontSize: 13,
-    lineHeight: 1.6,
-    color: 'rgba(255,255,255,0.65)',
-    marginBottom: 20,
-    fontFamily: 'system-ui, sans-serif',
-    fontWeight: 400,
-  },
-  storyTip: {
-    fontSize: 12,
-    padding: 12,
-    backgroundColor: 'rgba(61,255,160,0.08)',
-    borderRadius: 12,
-    border: '1px solid rgba(61,255,160,0.25)',
-    color: '#4ade80',
-    fontFamily: 'system-ui, sans-serif',
-    fontWeight: 400,
-  },
-  startBtn: {
-    width: '100%',
-    background: 'linear-gradient(135deg, #00e1ff,#0077ff , #002bff',
-    border: '4px solid white',
-    padding: 16,
-    fontWeight: 700,
-    fontSize: 16, 
-    cursor: 'pointer',
+    background:
+      'rgba(255,0,0,.15)',
+
+    border:
+      '1px solid rgba(255,0,0,.35)',
+
     color: '#fff',
-    fontFamily: RUSSO,
-    letterSpacing: 1,
+
+    padding: 10,
+
+    borderRadius: 10,
+
+    textAlign: 'center',
+
+    fontSize: 10,
+
+    lineHeight: 1.6,
   },
 };
-
-
-  

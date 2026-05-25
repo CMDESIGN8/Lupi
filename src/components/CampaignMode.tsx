@@ -7,7 +7,7 @@ import { League, BotConfig, CampaignProgress } from '../types/campaign';
 import { supabase } from '../lib/supabaseClient';
 import { getCardData, calcGroupValue } from '../utils/battleEngine';
 import { LEAGUE_STORIES, MatchStory } from '../data/campaignStories';
-import { CampaignMatch as CampaignMatchComponent } from './CampaignMatch';
+import CampaignMatchComponent from './CampaignMatch';
 import  StoryCinematic  from './StoryCinematic';
 import { DailyMissionsPanel } from './DailyMissionsPanel';
 import { CLUB_STORY } from '../data/campaignStoryData';
@@ -369,7 +369,7 @@ useEffect(() => {
       .from('campaign_progress')
       .select('*')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle()
 
     if (data) {
       setProgress({
@@ -570,7 +570,7 @@ useEffect(() => {
         totalMatches={3}
         leagueName={currentLeague.name}
         leagueIcon={currentLeague.icon}
-        story={currentMatch.story}
+        story={currentMatch.story}  
         onStartMatch={() => startMatch(currentMatch.opponent)}
         onBack={() => setCurrentMatch(null)}
         userTeamStats={teamStats}
