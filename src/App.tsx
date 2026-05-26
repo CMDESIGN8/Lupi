@@ -238,12 +238,12 @@
 
         /* Ajustes para el Header Lupi App */
 .app-header {
-  position: sticky;
+  position: relative;
   top: 0;
   z-index: 100;
   background: rgba(10, 10, 15, 0.85);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rga(1,6,26);
   padding: 12px 0;
 }
 

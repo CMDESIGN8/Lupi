@@ -112,13 +112,14 @@ export function AppHeader({ userId }: AppHeaderProps) {
 
       <style>{`
         .app-header {
-          background: linear-gradient(145deg, #0a0a14, #12121f);
-          border-bottom: 1px solid rgba(255,255,255,0.08);
-          padding: 12px 20px;
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
+  position: relative;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  background: rga(1,6,26);
+  padding: 12px 0;
+}
 
         .header-inner {
           max-width: 1200px;
@@ -328,9 +329,10 @@ export function AppHeader({ userId }: AppHeaderProps) {
         }
 
         .level-label {
-          font-size: 13px;
-          font-weight: 600;
+          font-size: 16px;
+          font-weight: 700;
           color: rgba(255, 255, 255, 0.7);
+          background: rgba(0, 58, 152, 0.82);
         }
 
         .xp-bar-wrapper {
@@ -389,12 +391,12 @@ export function AppHeader({ userId }: AppHeaderProps) {
         }
 
         .points-icon {
-          font-size: 14px;
+          font-size: 20px;
         }
 
         .points-value {
           font-weight: 700;
-          font-size: 14px;
+          font-size: 16px;
           color: #ffd700;
         }
 
@@ -450,10 +452,6 @@ export function AppHeader({ userId }: AppHeaderProps) {
 
           .points-pill {
             padding: 5px 12px;
-          }
-
-          .points-value {
-            font-size: 13px;
           }
         }
       `}</style>
