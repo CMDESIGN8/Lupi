@@ -32,6 +32,9 @@
   import { cardApi } from './lib/api';
   import { AdminAlbumPanel } from './components/AdminAlbumPanel';
   import { CampaignMode } from './components/CampaignMode';
+  import { HomeHero } from './components/home/HomeHero';
+  import { AppHeader } from '../src/components/home/AppHeader';
+
 
 
 
@@ -83,6 +86,100 @@
           background-image: linear-gradient(rgba(245,197,24,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,197,24,0.03) 1px, transparent 1px);
           background-size: 40px 40px; pointer-events: none; z-index: 0;
         }
+
+
+        /* Contenedor principal que da el aire necesario */
+.home-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Espaciado uniforme entre secciones */
+  padding: 16px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Fila de estadísticas (las cajitas al lado de la otra) */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-card {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat-card strong {
+  font-size: 20px;
+  color: var(--accent);
+}
+
+.section-header {
+  margin-top: 10px;
+  color: white;
+  font-weight: bold;
+}
+
+        .quick-actions{
+  display:flex;
+  gap:12px;
+  margin-top:18px;
+}
+
+.quick-btn{
+  flex:1;
+  border:none;
+  border-radius:20px;
+  padding:16px 14px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  color:white;
+  cursor:pointer;
+  transition:.25s;
+  position:relative;
+  overflow:hidden;
+}
+
+.quick-btn span{
+  font-size:24px;
+}
+
+.quick-btn strong{
+  display:block;
+  font-size:13px;
+  font-weight:900;
+}
+
+.quick-btn small{
+  opacity:.7;
+  font-size:11px;
+}
+
+.quick-btn:hover{
+  transform:translateY(-4px);
+}
+
+.quick-btn.play{
+  background:linear-gradient(135deg,#2563eb,#06b6d4);
+  box-shadow:0 10px 30px rgba(37,99,235,.35);
+}
+
+.quick-btn.pack{
+  background:linear-gradient(135deg,#f59e0b,#facc15);
+  color:black;
+  box-shadow:0 10px 30px rgba(245,158,11,.35);
+}
+
+.quick-btn.ticket{
+  background:linear-gradient(135deg,#10b981,#14b8a6);
+  box-shadow:0 10px 30px rgba(16,185,129,.35);
+}
 
         /* Contenedor principal */
   .container {
@@ -139,12 +236,110 @@
         .alert-error { background: rgba(255,77,109,0.12); border: 1px solid rgba(255,77,109,0.3); color: var(--accent2); }
         .alert-success { background: rgba(61,255,160,0.1); border: 1px solid rgba(61,255,160,0.25); color: var(--success); }
 
-        .app-header { position: sticky; top: 0; z-index: 100; background: rgba(10,10,15,0.9); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 14px 0; }
-        .header-inner { display: flex; align-items: center; justify-content: space-between; }
-        .header-logo { font-family: var(--font-display); font-size: 28px; letter-spacing: 2px; color: var(--text); }
-        .header-logo span { color: var(--accent); }
-        .header-right { display: flex; align-items: center; gap: 10px; }
-        .points-pill { display: flex; align-items: center; gap: 6px; background: rgba(245,197,24,0.12); border: 1px solid rgba(245,197,24,0.25); border-radius: 100px; padding: 6px 14px; font-family: var(--font-display); font-size: 22px; color: var(--accent); letter-spacing: 0.5px; }
+        /* Ajustes para el Header Lupi App */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px 0;
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: #0a0a0f;
+}
+
+/* Perfil: Avatar + Info */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar { width: 40px; height: 40px; border-radius: 50%; }
+
+.username { font-weight: bold; color: white; }
+.clan-name { font-size: 12px; color: #aaa; }
+
+.xp-bar-wrapper {
+  width: 60px; /* Ajusta el ancho según prefieras */
+  height: 6px;
+  background: #2a2a2a;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.xp-progress { height: 100%; background: #3b82f6; }
+
+.xp-text { font-size: 11px; color: #aaa; }
+.level-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.level-label { font-size: 13px; font-weight: bold; }
+
+/* Derecha: Monedas y Notificaciones */
+.header-right-group {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre el bloque de monedas y la campana */
+}
+
+.wallet-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #15151a;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+.coin-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #fff;
+}
+
+.coin-row button {
+  background: #333;
+  border: none;
+  color: white;
+  padding: 0 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.points-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #15151a;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.notification-btn {
+  background: #15151a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
 
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(18,18,26,0.97); backdrop-filter: blur(12px); border-top: 1px solid var(--border); display: flex; }
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; background: none; border: none; cursor: pointer; color: var(--text2); font-family: var(--font-body); font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; transition: color 0.2s; gap: 4px; }
@@ -258,23 +453,40 @@
 
   /* Botón principal */
   .btn-primary {
-    background: var(--accent);
-    color: #0a0a0f;
-    width: 100%;
-    padding: 14px 20px;
-    border: none;
-    border-radius: var(--radius);
-    font-family: var(--font-display);
-    font-size: 18px;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    box-sizing: border-box;
-  }
+  height: 58px;
+  border-radius: 18px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #fff;
+
+  background:
+    linear-gradient(
+      180deg,
+      #4da9ff 0%,
+      #0077ff 100%
+    );
+
+  box-shadow:
+    0 10px 30px rgba(255,184,0,.35);
+
+  transform: translateY(0);
+  transition: .2s;
+}
+
+.btn-primary:active {
+  transform: scale(.97);
+}
+
+  box-shadow:
+    0 10px 30px rgba(255,184,0,.35);
+
+  transform: translateY(0);
+  transition: .2s;
+}
+
+.btn-primary:active {
+  transform: scale(.97);
+}
 
 
         .ticket-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; margin-bottom: 20px; }
@@ -441,6 +653,23 @@
   100% {
     left: 120%;
   }
+}
+
+.auth-card {
+  backdrop-filter: blur(18px);
+  background: rgba(10,15,25,.75);
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  border-radius: 32px;
+
+  padding: 28px;
+
+  box-shadow:
+    0 0 40px rgba(0,150,255,.15);
+
+  width: 100%;
+  max-width: 420px;
 }
 
         .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 16px; text-align: center; }
@@ -2289,6 +2518,24 @@
   border-radius: 60px;
 }
 
+.auth-screen {
+  min-height: 100vh;
+  background:
+    linear-gradient(to bottom,
+      rgba(0,0,0,.7),
+      rgba(0,0,0,.9)),
+    url('/images/stadium-bg.jpg');
+
+  background-size: cover;
+  background-position: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
 .mode-btn {
   flex: 1;
   display: flex;
@@ -2600,6 +2847,19 @@
     width: 100%;
   }
 
+  .form-input {
+  height: 56px;
+  border-radius: 18px;
+
+  background: rgba(255,255,255,.06);
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  backdrop-filter: blur(10px);
+
+  font-size: 16px;
+}
+
   /* 11. BOTONES Y FORMULARIOS RESPONSIVE */
   @media (max-width: 480px) {
     .btn {
@@ -2608,9 +2868,24 @@
     }
     
     .form-input {
-      padding: 11px 14px;
-      font-size: 14px;
-    }
+  height: 56px;
+  border-radius: 18px;
+
+  background: rgba(255,255,255,.06);
+
+  border: 1px solid rgba(255,255,255,.08);
+
+  backdrop-filter: blur(10px);
+
+  font-size: 16px;
+}
+
+.form-input:focus {
+  border-color: #00d4ff;
+
+  box-shadow:
+    0 0 0 4px rgba(0,212,255,.15);
+}
     
     .confirmation-buttons {
       flex-direction: column;
@@ -2621,6 +2896,7 @@
       width: 100%;
     }
   }
+
 
   /* 12. PARA ORIENTACIÓN LANDSCAPE */
   @media (max-height: 600px) and (orientation: landscape) {
@@ -2769,6 +3045,30 @@
                   </div>
                   <div className="auth-tagline">Tu club, tus puntos, tus premios</div>
                 </div>
+                <div className="auth-hero">
+  <div className="hero-badge">
+    ⚽ TEMPORADA 1
+  </div>
+
+  <h1>
+    TU CLUB.
+    <br />
+    TUS CARTAS.
+  </h1>
+
+  <p>
+    Jugá partidos, conseguí jugadores y llevá a tu club a la cima.
+  </p>
+</div>
+
+<div className="login-player-preview">
+  <div className="player-avatar">⚽</div>
+
+  <div className="player-info">
+    <div className="player-name">BURRITO</div>
+    <div className="player-rank">BRONCE • OVR 10</div>
+  </div>
+</div>
 
                 <div className="auth-card fade-up">
                   <div className="auth-title">{mode === "login" ? "Iniciar sesión" : "Crear cuenta"}</div>
@@ -2826,6 +3126,15 @@
                       ? <>¿No tenés cuenta? <button onClick={() => { setMode("register"); setError(""); }}>Registrate gratis</button></>
                       : <>¿Ya tenés cuenta? <button onClick={() => { setMode("login"); setError(""); }}>Iniciá sesión</button></>}
                   </div>
+                  <div className="starter-rewards">
+
+  <div>🎁 5 cartas iniciales</div>
+
+  <div>⚡ Pack diario gratis</div>
+
+  <div>🏆 Entrá al ranking del club</div>
+
+</div>
                 </div>
               </div>
             </div>
@@ -2888,15 +3197,51 @@
         <div className="main-content">
           <div className="dashboard-container">
             {/* Carta FIFA del usuario */}
-            <UserFifaCard
-              userId={user.id}
-              username={user.username}
-              club={user.club}
-              clubRank={myClubRank}
-              onLevelUp={(newLevel, newRarity) => {
-                console.log(`🎉 ¡Subiste a Nivel ${newLevel} (${newRarity.toUpperCase()})!`);
-              }}
-            />
+
+<HomeHero
+  title="¡A POR LA VICTORIA!"
+  subtitle="Ganá 1 partido para subir a Plata"
+  buttonText="JUGAR PARTIDO"
+  image="/images/hero.png"
+  onClick={() => onNavigate('play')}
+/>
+
+<div className="quick-actions">
+
+  <button
+    className="quick-btn play"
+    onClick={() => onNavigate('play')}
+  >
+    <span>⚔️</span>
+    <div>
+      <strong>JUGAR</strong>
+      <small>Subí de división</small>
+    </div>
+  </button>
+
+  <button
+    className="quick-btn pack"
+  >
+    <span>🎁</span>
+    <div>
+      <strong>PACK GRATIS</strong>
+      <small>Reclamá recompensa</small>
+    </div>
+  </button>
+
+  <button
+    className="quick-btn ticket"
+    onClick={() => onNavigate('ticket')}
+  >
+    <span>🎟️</span>
+    <div>
+      <strong>CARGAR</strong>
+      <small>Sumá puntos</small>
+    </div>
+  </button>
+
+</div>
+            
 
               <div className="ticket-hint">
       <span className="ticket-icon">🎟️</span>
@@ -4359,16 +4704,8 @@
                     {showTour && <OnboardingTour onComplete={handleTourComplete} />}
                     {/* Componente de solicitud de notificaciones */}
                     <header className="app-header">
-                      <div className="container">
-                        <div className="header-inner">
-                          <div className="header-logo">LUPI<span>APP</span></div>
-                          <div className="header-right">
-                            <Notifications userId={user.id} />
-                            <div className="points-pill">⭐ {user.points}</div>
-                          </div>
-                        </div>
-                      </div>
-                    </header>
+                     <AppHeader userId={user.id} />
+                      </header>
 
                     {tab === "home"    && <DashboardTab user={user} onNavigate={handleNavigate} onPointsUpdate={handlePointsUpdate} onCardReceived={() => {
           loadUserCards(); 
