@@ -17,3 +17,27 @@ export function getNextThursday20h(): Date {
   
   return target;
 }
+
+// 👇 Agregar esta función
+export function calculateDaysLeft(): number {
+  const endDate = getNextThursday20h();
+  const now = new Date();
+  const diffTime = endDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return Math.max(0, diffDays);
+}
+
+// También puedes agregar esta función si la necesitas
+export function getSeasonEndDate(): Date {
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 30); // Temporada de 30 días
+  return endDate;
+}
+
+export function getDaysLeftForSeason(): number {
+  const endDate = getSeasonEndDate();
+  const now = new Date();
+  const diffTime = endDate.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return Math.max(0, diffDays);
+}

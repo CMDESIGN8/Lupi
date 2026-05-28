@@ -9,7 +9,7 @@
       import { useToast } from './hooks/useToast';
       import { Toast } from './components/Toast';
       import { CountdownTimer } from './components/CountdownTimer';
-      import { getNextThursday20h } from './lib/dateUtils';
+      import { getNextThursday20h , calculateDaysLeft  } from './lib/dateUtils';
       import { OnboardingTour } from './components/OnboardingTour';
       import { StreakBadge } from './components/StreakBadge';
       import { usePushNotifications } from './hooks/usePushNotifications';
@@ -34,6 +34,13 @@
   import { CampaignMode } from './components/CampaignMode';
   import { HomeHero } from './components/home/HomeHero';
   import { AppHeader } from '../src/components/home/AppHeader';
+  import { QuickActions, SeasonCard, RivalCard, dashboardStyles } from '../src/components/home/Dashboardcomponents ';
+  import { useUserHeroData } from './hooks/useUserHeroData';
+  import { useUserDivision } from './hooks/useUserDivision';
+  import { usePacksCount } from './hooks/usePacksCount';
+import { useActiveEvents } from './hooks/useActiveEvents';
+import { PackModal } from './components/PackModal';
+
 
 
 
@@ -87,6 +94,20 @@
           background-size: 40px 40px; pointer-events: none; z-index: 0;
         }
 
+.dashboard-container {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 14px 14px 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+ 
+  .dashboard-container > * {
+    width: 100%;
+    box-sizing: border-box;
+  }
 
         /* Contenedor principal que da el aire necesario */
 .home-dashboard {
@@ -3142,193 +3163,224 @@
         }
 
         // ============================================================
-        // DASHBOARD TAB
-        // ============================================================
-        function DashboardTab({ 
-      user, 
-      onNavigate, 
-      onPointsUpdate,
-      onCardReceived  // 👈 Nueva prop
-    }: { 
-      user: AppUser; 
-      onNavigate: (t: string) => void; 
-      onPointsUpdate: (newPoints: number) => void;
-      onCardReceived: () => void;  // 👈 Nueva prop
-    }) {
-      const [tickets, setTickets] = useState<Ticket[]>([]);
-      const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
-      const [raffleCompleted, setRaffleCompleted] = useState(false);
-      const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
-      
-      const loadTickets = useCallback(async () => {
-        try {
-          const t = await api.getUserTickets(user.id);
-          setTickets(t);
-        } catch (error) {
-          console.error('Error loading tickets:', error);
-        }
-      }, [user.id]);
-
-      const loadLeaderboard = useCallback(async () => {
-        try {
-          const l = await api.getLeaderboard();
-          setLeaderboard(l);
-        } catch (error) {
-          console.error('Error loading leaderboard:', error);
-        }
-      }, []);
-
-      useEffect(() => {
-        loadTickets();
-        loadLeaderboard();
-        api.getClubRanking().then(setClubRanking).catch(console.error);
-      }, [loadTickets, loadLeaderboard]);
-
-      const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
-      const myRank = leaderboard.findIndex((u) => u.id === user.id) + 1;
-      
-      const handleRaffleComplete = () => {
-        setRaffleCompleted(true);
-        loadLeaderboard();
-        loadTickets();
-      };
-
-      return (
-        <div className="main-content">
-          <div className="dashboard-container">
-            {/* Carta FIFA del usuario */}
-
-<HomeHero
-  title="¡A POR LA VICTORIA!"
-  subtitle="Ganá 1 partido para subir a Plata"
-  buttonText="JUGAR PARTIDO"
-  image="/images/hero.png"
-  onClick={() => onNavigate('play')}
-/>
-
-<div className="quick-actions">
-
-  <button
-    className="quick-btn play"
-    onClick={() => onNavigate('play')}
-  >
-    <span>⚔️</span>
-    <div>
-      <strong>JUGAR</strong>
-      <small>Subí de división</small>
-    </div>
-  </button>
-
-  <button
-    className="quick-btn pack"
-  >
-    <span>🎁</span>
-    <div>
-      <strong>PACK GRATIS</strong>
-      <small>Reclamá recompensa</small>
-    </div>
-  </button>
-
-  <button
-    className="quick-btn ticket"
-    onClick={() => onNavigate('ticket')}
-  >
-    <span>🎟️</span>
-    <div>
-      <strong>CARGAR</strong>
-      <small>Sumá puntos</small>
-    </div>
-  </button>
-
-</div>
-            
-
-              <div className="ticket-hint">
-      <span className="ticket-icon">🎟️</span>
-      <div className="ticket-text">
-        <strong>Cargá tu entrada de los partidos</strong>
-        <span>y acumulá puntos para ganar premios 🎁</span>
-      </div>
-    </div>  
-    <br></br>
-
-            {/* Contador regresivo */}
-            <CountdownTimer 
-              targetDate={getNextThursday20h()}
-              onComplete={handleRaffleComplete}
-            />
-    <button className="btn btn-primary" onClick={() => onNavigate("ticket")}>
-                🎟️ CARGAR ENTRADA
-              </button>
-            {/* Grid de estadísticas */}
-            <div className="stats-container">
-
-      <div className="stats-header">
-        🏆 TU PROGRESO
-      </div>
-
-      <div className="stats-grid">
-
-        <div className="stat-card highlight">
-          <div className="stat-number">{user.points}</div>
-          <div className="stat-label">PUNTOS</div>
-          <div className="stat-sub">Seguí sumando</div>
-        </div>
-
-        <div className="stat-card rank">
-          <div className="stat-number">#{myRank || "—"}</div>
-          <div className="stat-label">RANKING</div>
-          <div className="stat-sub">Top jugadores</div>
-        </div>
-
-        <div className="stat-card">
-          <div className="stat-number">{tickets.length}</div>
-          <div className="stat-label">ENTRADAS</div>
-          <div className="stat-sub">Más = más chances</div>
-        </div>
-
-        <div className="stat-card bonus">
-          <div className="stat-number">+10</div>
-          <div className="stat-label">PTS x TICKET</div>
-          <div className="stat-sub">Bonus activo</div>
-        </div>
-
-      </div>
-    </div>
-    <div className="sobre">
-      <DailyCardReward 
-        userId={user.id} 
-        onCardReceived={onCardReceived}  // 👈 Usar la prop
-      />
-    </div>
-            {/* Misiones semanales */}
-            <WeeklyMissions
-      user={user}
-      tickets={tickets}
-      leaderboard={leaderboard}
-      onPointsUpdate={onPointsUpdate}
-    />
-    {/* Top 5 */}
-            <div className="section-title">🏅 Top 5 del momento</div>
-            {leaderboard.slice(0, 5).map((u, i) => (
-              <div key={u.id} className={`leader-item${u.id === user.id ? " me" : ""}`}>
-                <div className={`leader-rank${i < 3 ? " top" : ""}`}>
-                  {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
-                </div>
-                <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
-                <div className="leader-info">
-                  <div className="leader-name">{u.username}{u.id === user.id ? " (vos)" : ""}</div>
-                  <div className="leader-club">{u.club}</div>
-                </div>
-                <div className="leader-points">{u.points}</div>
-              </div>
-            ))}
+// DASHBOARD TAB - VERSIÓN CORREGIDA
+// ============================================================
+function DashboardTab({ 
+  user, 
+  onNavigate, 
+  onPointsUpdate,
+  onCardReceived,
+}: { 
+  user: AppUser; 
+  onNavigate: (t: string) => void; 
+  onPointsUpdate: (newPoints: number) => void;
+  onCardReceived: () => void;
+}) {
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
+  const [raffleCompleted, setRaffleCompleted] = useState(false);
+  const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
+  
+  // ✅ CORRECTO: useUserHeroData recibe un solo argumento (user.id)
+  const { data: heroData, loading: heroLoading } = useUserHeroData(user.id);
+  const [timerLabel, setTimerLabel] = useState('02:45');
+  const { data: userDivision, loading: divisionLoading } = useUserDivision(user.id);
+   const { count: packCount, loading: packsLoading } = usePacksCount(user.id);
+  const { count: eventCount, loading: eventsLoading } = useActiveEvents();
+  const daysLeft = calculateDaysLeft();
+  const [showPackModal, setShowPackModal] = useState(false);
 
 
+  const loadTickets = useCallback(async () => {
+    try {
+      const t = await api.getUserTickets(user.id);
+      setTickets(t);
+    } catch (error) {
+      console.error('Error loading tickets:', error);
+    }
+  }, [user.id]);
+
+  const handlePackCardReceived = async (card: any) => {
+  // onCardReceived ya recarga las cartas (está definido en App)
+  onCardReceived();
+  
+  // Opcional: Mostrar notificación
+  // showToast(`🎉 ¡Obtuviste ${card.name || 'una nueva carta'}!`, 'success');
+};
+  
+  const loadLeaderboard = useCallback(async () => {
+    try {
+      const l = await api.getLeaderboard();
+      setLeaderboard(l);
+    } catch (error) {
+      console.error('Error loading leaderboard:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTickets();
+    loadLeaderboard();
+    api.getClubRanking().then(setClubRanking).catch(console.error);
+  }, [loadTickets, loadLeaderboard]);
+
+  const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
+  const myRank = leaderboard.findIndex((u) => u.id === user.id) + 1;
+  
+  
+  const getSubtitle = () => {
+    if (divisionLoading) return 'Cargando...';
+    
+    // Mostrar la liga actual de CAMPAÑA, no la división por puntos
+    const currentLeague = userDivision?.campaignLeagueName || 'LIGA ROOKIE';
+    const nextLeague = getNextLeagueName(userDivision?.campaignLeagueId || 'rookie');
+    
+    return `Ganá los próximos partidos para llegar a la <span>${nextLeague}</span>`;
+  };
+  // Función auxiliar para obtener la siguiente liga
+  const getNextLeagueName = (currentId: string): string => {
+    const leagueOrder: Record<string, string> = {
+      'rookie': 'LIGA BRONCE',
+      'bronze': 'LIGA PLATA', 
+      'silver': 'LIGA ORO',
+      'gold': 'LIGA PLATINO',
+      'platinum': 'LIGA LEYENDA',
+      'legend': 'CAMPEÓN'
+    };
+    return leagueOrder[currentId] || 'LIGA BRONCE';
+  };
+  
+  // Título dinámico
+  const getTitle = () => {
+    if (!heroData) return '¡A POR LA VICTORIA!';
+    return "¡A POR LA VICTORIA!";
+  };
+
+  const handleRaffleComplete = () => {
+    setRaffleCompleted(true);
+    loadLeaderboard();
+    loadTickets();
+  };
+
+  return (
+    <div className="main-content">
+      <div className="dashboard-container">
+        
+        {/* Modal del sobre diario */}
+        <PackModal
+          isOpen={showPackModal}
+          onClose={() => setShowPackModal(false)}
+          userId={user.id}
+          onCardReceived={handlePackCardReceived}
+        />
+        {/* HomeHero con datos reales */}
+{!heroLoading && (
+  <HomeHero
+    title={getTitle()}
+    subtitle={getSubtitle()}
+    buttonText="JUGAR PARTIDO"
+    image="/images/hero.png"
+    onClick={() => onNavigate('battle')}
+    timerLabel={timerLabel}
+    rewardIcon={heroData?.nextRewardIcon || '🪙'}
+    rewardCoins={heroData?.nextRewardCoins || 30}
+    rewardDescription={heroData?.nextRewardDescription}
+  />
+)}
+
+        <QuickActions 
+          onNavigate={onNavigate}
+          onOpenPack={() => setShowPackModal(true)}  // 👈 Nueva prop
+          packCount={packCount} 
+          eventCount={eventCount} 
+        />
+        
+        <SeasonCard
+          level={heroData?.level || 1}
+          exp={heroData?.exp || 0}
+          expNeeded={heroData?.expNeeded || 100}
+          division={heroData?.division || "BRONCE"}
+          divisionTier="I"
+          daysLeft={daysLeft}  // 👈 Usar la variable calculada
+        />
+
+        <div className="ticket-hint">
+          <span className="ticket-icon">🎟️</span>
+          <div className="ticket-text">
+            <strong>Cargá tu entrada de los partidos</strong>
+            <span>y acumulá puntos para ganar premios 🎁</span>
+          </div>
+        </div>  
+        <br></br>
+
+        <CountdownTimer 
+          targetDate={getNextThursday20h()}
+          onComplete={handleRaffleComplete}
+        />
+        
+        <button className="btn btn-primary" onClick={() => onNavigate("ticket")}>
+          🎟️ CARGAR ENTRADA
+        </button>
+        
+        {/* Grid de estadísticas */}
+        <div className="stats-container">
+          <div className="stats-header">🏆 TU PROGRESO</div>
+          <div className="stats-grid">
+            <div className="stat-card highlight">
+              <div className="stat-number">{user.points}</div>
+              <div className="stat-label">PUNTOS</div>
+              <div className="stat-sub">Seguí sumando</div>
+            </div>
+            <div className="stat-card rank">
+              <div className="stat-number">#{myRank || "—"}</div>
+              <div className="stat-label">RANKING</div>
+              <div className="stat-sub">Top jugadores</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-number">{tickets.length}</div>
+              <div className="stat-label">ENTRADAS</div>
+              <div className="stat-sub">Más = más chances</div>
+            </div>
+            <div className="stat-card bonus">
+              <div className="stat-number">+10</div>
+              <div className="stat-label">PTS x TICKET</div>
+              <div className="stat-sub">Bonus activo</div>
+            </div>
           </div>
         </div>
-      );
-    }
+
+        <RivalCard
+          rivalName="Nico9"
+          rivalPts={1250}
+          myPts={1130}
+          diff={120}
+          onChallenge={() => onNavigate('play')}
+        />
+
+        <WeeklyMissions
+          user={user}
+          tickets={tickets}
+          leaderboard={leaderboard}
+          onPointsUpdate={onPointsUpdate}
+        />
+
+        <div className="section-title">🏅 Top 5 del momento</div>
+        {leaderboard.slice(0, 5).map((u, i) => (
+          <div key={u.id} className={`leader-item${u.id === user.id ? " me" : ""}`}>
+            <div className={`leader-rank${i < 3 ? " top" : ""}`}>
+              {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
+            </div>
+            <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
+            <div className="leader-info">
+              <div className="leader-name">{u.username}{u.id === user.id ? " (vos)" : ""}</div>
+              <div className="leader-club">{u.club}</div>
+            </div>
+            <div className="leader-points">{u.points}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
         // ============================================================
         // TICKET TAB
@@ -3838,356 +3890,356 @@
             
           );
         }
-        // ============================================================
-        // LEADERBOARD TAB
-        // ============================================================
-        function LeaderboardTab({ user }: { user: AppUser }) {
-          const [leaders, setLeaders] = useState<LeaderEntry[]>([]);
-          const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
-          const [rival, setRival] = useState<{ rival: LeaderEntry; diff: number; isAhead: boolean } | null>(null);
-          const [loading, setLoading] = useState(true);
-          const [activeView, setActiveView] = useState<"individual" | "clubes">("individual");
-          const [prevLeaders, setPrevLeaders] = useState<LeaderEntry[]>([]);
-          const [rankChange, setRankChange] = useState<"up" | "down" | null>(null);
-        
-          useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const [l, clubs, rv] = await Promise.all([
-            api.getLeaderboard(),
-            api.getClubRanking(),
-            api.getRival(user.id, user.points),
-          ]);
+          // ============================================================
+          // LEADERBOARD TAB
+          // ============================================================
+          function LeaderboardTab({ user }: { user: AppUser }) {
+            const [leaders, setLeaders] = useState<LeaderEntry[]>([]);
+            const [clubRanking, setClubRanking] = useState<{ club: string; points: number; memberCount: number }[]>([]);
+            const [rival, setRival] = useState<{ rival: LeaderEntry; diff: number; isAhead: boolean } | null>(null);
+            const [loading, setLoading] = useState(true);
+            const [activeView, setActiveView] = useState<"individual" | "clubes">("individual");
+            const [prevLeaders, setPrevLeaders] = useState<LeaderEntry[]>([]);
+            const [rankChange, setRankChange] = useState<"up" | "down" | null>(null);
+          
+            useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const [l, clubs, rv] = await Promise.all([
+              api.getLeaderboard(),
+              api.getClubRanking(),
+              api.getRival(user.id, user.points),
+            ]);
 
-          // detectar cambio de ranking
-          if (leaders.length > 0) {
-            const oldRank = leaders.findIndex(u => u.id === user.id);
-            const newRank = l.findIndex(u => u.id === user.id);
+            // detectar cambio de ranking
+            if (leaders.length > 0) {
+              const oldRank = leaders.findIndex(u => u.id === user.id);
+              const newRank = l.findIndex(u => u.id === user.id);
 
-            if (oldRank !== -1 && newRank !== -1) {
-              if (newRank < oldRank) setRankChange("up");
-              else if (newRank > oldRank) setRankChange("down");
+              if (oldRank !== -1 && newRank !== -1) {
+                if (newRank < oldRank) setRankChange("up");
+                else if (newRank > oldRank) setRankChange("down");
 
-              setTimeout(() => setRankChange(null), 1500);
+                setTimeout(() => setRankChange(null), 1500);
+              }
             }
+
+            setPrevLeaders(leaders);
+            setLeaders(l);
+            setClubRanking(clubs);
+            setRival(rv);
+            setLoading(false);
+
+          } catch (err) {
+            console.error(err);
           }
+        };
 
-          setPrevLeaders(leaders);
-          setLeaders(l);
-          setClubRanking(clubs);
-          setRival(rv);
-          setLoading(false);
+        fetchData();
 
-        } catch (err) {
-          console.error(err);
-        }
-      };
+        const interval = setInterval(fetchData, 4000); // cada 4s
+        return () => clearInterval(interval);
 
-      fetchData();
-
-      const interval = setInterval(fetchData, 4000); // cada 4s
-      return () => clearInterval(interval);
-
-    }, [user.id, user.points]);
-        
-          const myRank = leaders.findIndex((u) => u.id === user.id) + 1;
-          const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
-        
-          // Cuántas entradas necesita para superar al rival
-          const ticketsNeeded = rival && rival.isAhead ? Math.ceil(rival.diff / 10) : 0;
-        
-          return (
-            <div className="main-content">
-              <div className="container">
-        
-                {/* ── CARD DE RIVAL ── */}
-                {rival && (
-                  <div
-                    className="fade-up"
-                    style={{
-                      background: rival.isAhead
-                        ? "linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.04))"
-                        : "linear-gradient(135deg, rgba(61,255,160,0.12), rgba(61,255,160,0.04))",
-                      border: `1px solid ${rival.isAhead ? "rgba(255,77,109,0.35)" : "rgba(61,255,160,0.35)"}`,
-                      borderRadius: 16,
-                      padding: "16px 18px",
-                      marginBottom: 20,
-                    }}
-                  >
-                    {/* Encabezado */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                      <span style={{ fontSize: 20 }}>{rival.isAhead ? "⚔️" : "🛡️"}</span>
-                      <span
-                        style={{
-                          fontFamily: "var(--font-display)",
-                          fontSize: 18,
-                          letterSpacing: 1,
-                          color: rival.isAhead ? "var(--accent2)" : "var(--success)",
-                        }}
-                      >
-                        {rival.isAhead ? "TU RIVAL MÁS CERCANO" : "¡ERES EL LÍDER!"}
-                      </span>
-                    </div>
-        
-                    {/* Info del rival */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-                      <div
-                        style={{
-                          width: 44,
-                          height: 44,
-                          borderRadius: "50%",
-                          background: "var(--surface2)",
-                          border: `2px solid ${rival.isAhead ? "var(--accent2)" : "var(--success)"}`,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontFamily: "var(--font-display)",
-                          fontSize: 20,
-                          color: rival.isAhead ? "var(--accent2)" : "var(--success)",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {rival.rival.username[0].toUpperCase()}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: 700, fontSize: 16 }}>{rival.rival.username}</div>
-                        <div style={{ fontSize: 12, color: "var(--text2)" }}>{rival.rival.club}</div>
-                      </div>
-                      <div
-                        style={{
-                          fontFamily: "var(--font-display)",
-                          fontSize: 24,
-                          color: rival.isAhead ? "var(--accent2)" : "var(--success)",
-                          letterSpacing: 0.5,
-                        }}
-                      >
-                        {rival.rival.points} pts
-                      </div>
-                    </div>
-        
-                    {/* Diferencia + CTA */}
+      }, [user.id, user.points]);
+          
+            const myRank = leaders.findIndex((u) => u.id === user.id) + 1;
+            const myClubRank = clubRanking.findIndex((c) => c.club === user.club) + 1;
+          
+            // Cuántas entradas necesita para superar al rival
+            const ticketsNeeded = rival && rival.isAhead ? Math.ceil(rival.diff / 10) : 0;
+          
+            return (
+              <div className="main-content">
+                <div className="container">
+          
+                  {/* ── CARD DE RIVAL ── */}
+                  {rival && (
                     <div
+                      className="fade-up"
                       style={{
-                        background: rival.isAhead ? "rgba(255,77,109,0.1)" : "rgba(61,255,160,0.1)",
-                        borderRadius: 10,
-                        padding: "10px 14px",
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: "var(--text)",
-                        lineHeight: 1.5,
+                        background: rival.isAhead
+                          ? "linear-gradient(135deg, rgba(255,77,109,0.12), rgba(255,77,109,0.04))"
+                          : "linear-gradient(135deg, rgba(61,255,160,0.12), rgba(61,255,160,0.04))",
+                        border: `1px solid ${rival.isAhead ? "rgba(255,77,109,0.35)" : "rgba(61,255,160,0.35)"}`,
+                        borderRadius: 16,
+                        padding: "16px 18px",
+                        marginBottom: 20,
                       }}
                     >
-                      {rival.isAhead ? (
-                        <>
-                          <span style={{ color: "var(--accent2)" }}>
-                            {rival.rival.username} te lleva {rival.diff} pts de ventaja.
-                          </span>
-                          {ticketsNeeded > 0 && (
-                            <>
-                              {" "}Cargá{" "}
-                              <strong style={{ color: "var(--accent)" }}>
-                                {ticketsNeeded} {ticketsNeeded === 1 ? "entrada más" : "entradas más"}
-                              </strong>{" "}
-                              para superarlo. 🎯
-                            </>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          <span style={{ color: "var(--success)" }}>
-                            Sos el líder 🏆
-                          </span>{" "}
-                          {rival.rival.username} te sigue por{" "}
-                          <strong style={{ color: "var(--accent)" }}>{rival.diff} pts</strong>. ¡No te durmás!
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-        
-                {/* ── SELECTOR DE VISTA ── */}
-                <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
-                  {(["individual", "clubes"] as const).map((view) => (
-                    <button
-                      key={view}
-                      onClick={() => setActiveView(view)}
-                      style={{
-                        flex: 1,
-                        padding: "10px 0",
-                        background: activeView === view ? "var(--accent)" : "transparent",
-                        color: activeView === view ? "#0a0a0f" : "var(--text2)",
-                        border: activeView === view ? "none" : "1.5px solid var(--border)",
-                        borderRadius: "var(--radius)",
-                        fontFamily: "var(--font-display)",
-                        fontSize: 16,
-                        letterSpacing: 1,
-                        cursor: "pointer",
-                        transition: "all 0.2s",
-                      }}
-                    >
-                      {view === "individual" ? "👤 Individual" : "🏟️ Por club"}
-                    </button>
-                  ))}
-                </div>
-        
-                {loading ? (
-                  <div className="empty-state">
-                    <div
-                      className="spinner"
-                      style={{
-                        margin: "0 auto",
-                        borderTopColor: "var(--accent)",
-                        borderColor: "var(--border)",
-                      }}
-                    />
-                  </div>
-                ) : activeView === "individual" ? (
-                  <>
-                    <div className="section-title fade-up">🏆 Ranking individual</div>
-                    {leaders.length === 0 ? (
-                      <div className="empty-state fade-up">
-                        <div className="empty-icon">🏟️</div>
-                        <div className="empty-text">Nadie cargó entradas todavía. ¡Sé el primero!</div>
+                      {/* Encabezado */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                        <span style={{ fontSize: 20 }}>{rival.isAhead ? "⚔️" : "🛡️"}</span>
+                        <span
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            fontSize: 18,
+                            letterSpacing: 1,
+                            color: rival.isAhead ? "var(--accent2)" : "var(--success)",
+                          }}
+                        >
+                          {rival.isAhead ? "TU RIVAL MÁS CERCANO" : "¡ERES EL LÍDER!"}
+                        </span>
                       </div>
-                    ) : (
-                      leaders.map((u, i) => (
+          
+                      {/* Info del rival */}
+                      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
                         <div
-      key={u.id}
-      className={`
-        leader-item 
-        fade-up 
-        ${u.id === user.id ? "me" : ""} 
-        ${u.id === user.id && rankChange === "up" ? "rank-up" : ""}
-        ${u.id === user.id && rankChange === "down" ? "rank-down" : ""}
-      `}
-    >
-                          <div className={`leader-rank${i < 3 ? " top" : ""}`}>
-                            {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
-                          </div>
-                          <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
-                          <div className="leader-info">
-                            <div className="leader-name">
-                              {u.username}
-                              {u.id === user.id ? " (vos)" : ""}
-                            </div>
-                            <div className="leader-club">{u.club}</div>
-                          </div>
-                          <div className="leader-points">
-      {u.points} pts
-      {u.id === user.id && rankChange === "up" && " 🔥"}
-    </div>
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: "50%",
+                            background: "var(--surface2)",
+                            border: `2px solid ${rival.isAhead ? "var(--accent2)" : "var(--success)"}`,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontFamily: "var(--font-display)",
+                            fontSize: 20,
+                            color: rival.isAhead ? "var(--accent2)" : "var(--success)",
+                            flexShrink: 0,
+                          }}
+                        >
+                          {rival.rival.username[0].toUpperCase()}
                         </div>
-                      ))
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="section-title fade-up">🏟️ Ranking por club</div>
-        
-                    {/* Badge "tu club está N°" */}
-                    {myClubRank > 0 && (
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 700, fontSize: 16 }}>{rival.rival.username}</div>
+                          <div style={{ fontSize: 12, color: "var(--text2)" }}>{rival.rival.club}</div>
+                        </div>
+                        <div
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            fontSize: 24,
+                            color: rival.isAhead ? "var(--accent2)" : "var(--success)",
+                            letterSpacing: 0.5,
+                          }}
+                        >
+                          {rival.rival.points} pts
+                        </div>
+                      </div>
+          
+                      {/* Diferencia + CTA */}
                       <div
-                        className="fade-up"
                         style={{
-                          background: "rgba(245,197,24,0.08)",
-                          border: "1px solid rgba(245,197,24,0.25)",
-                          borderRadius: 12,
-                          padding: "10px 16px",
-                          marginBottom: 16,
-                          fontSize: 14,
+                          background: rival.isAhead ? "rgba(255,77,109,0.1)" : "rgba(61,255,160,0.1)",
+                          borderRadius: 10,
+                          padding: "10px 14px",
+                          fontSize: 13,
                           fontWeight: 600,
                           color: "var(--text)",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
+                          lineHeight: 1.5,
                         }}
                       >
-                        <span style={{ fontSize: 18 }}>
-                          {myClubRank === 1 ? "🔥" : myClubRank <= 3 ? "⚡" : "📍"}
-                        </span>
-                        <span>
-                          Tu club <strong style={{ color: "var(--accent)" }}>{user.club}</strong> está{" "}
-                          <strong style={{ color: "var(--accent)" }}>
-                            {myClubRank === 1
-                              ? "¡1° en el ranking!"
-                              : myClubRank === 2
-                              ? "2° — muy cerca del top!"
-                              : `${myClubRank}° en el ranking`}
-                          </strong>
-                          {myClubRank > 1 && " 🏟️"}
-                        </span>
+                        {rival.isAhead ? (
+                          <>
+                            <span style={{ color: "var(--accent2)" }}>
+                              {rival.rival.username} te lleva {rival.diff} pts de ventaja.
+                            </span>
+                            {ticketsNeeded > 0 && (
+                              <>
+                                {" "}Cargá{" "}
+                                <strong style={{ color: "var(--accent)" }}>
+                                  {ticketsNeeded} {ticketsNeeded === 1 ? "entrada más" : "entradas más"}
+                                </strong>{" "}
+                                para superarlo. 🎯
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            <span style={{ color: "var(--success)" }}>
+                              Sos el líder 🏆
+                            </span>{" "}
+                            {rival.rival.username} te sigue por{" "}
+                            <strong style={{ color: "var(--accent)" }}>{rival.diff} pts</strong>. ¡No te durmás!
+                          </>
+                        )}
                       </div>
-                    )}
-
-                    {rankChange === "up" && (
-      <div className="rank-toast up">🚀 Subiste de posición</div>
-    )}
-
-    {rankChange === "down" && (
-      <div className="rank-toast down">⚠️ Te pasaron</div>
-    )}
-        
-                    {clubRanking.length === 0 ? (
-                      <div className="empty-state fade-up">
-                        <div className="empty-icon">🏟️</div>
-                        <div className="empty-text">No hay datos de clubes todavía.</div>
-                      </div>
-                    ) : (
-                      clubRanking.map((c, i) => {
-                        const isMyClub = c.club === user.club;
-                        return (
+                    </div>
+                  )}
+          
+                  {/* ── SELECTOR DE VISTA ── */}
+                  <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+                    {(["individual", "clubes"] as const).map((view) => (
+                      <button
+                        key={view}
+                        onClick={() => setActiveView(view)}
+                        style={{
+                          flex: 1,
+                          padding: "10px 0",
+                          background: activeView === view ? "var(--accent)" : "transparent",
+                          color: activeView === view ? "#0a0a0f" : "var(--text2)",
+                          border: activeView === view ? "none" : "1.5px solid var(--border)",
+                          borderRadius: "var(--radius)",
+                          fontFamily: "var(--font-display)",
+                          fontSize: 16,
+                          letterSpacing: 1,
+                          cursor: "pointer",
+                          transition: "all 0.2s",
+                        }}
+                      >
+                        {view === "individual" ? "👤 Individual" : "🏟️ Por club"}
+                      </button>
+                    ))}
+                  </div>
+          
+                  {loading ? (
+                    <div className="empty-state">
+                      <div
+                        className="spinner"
+                        style={{
+                          margin: "0 auto",
+                          borderTopColor: "var(--accent)",
+                          borderColor: "var(--border)",
+                        }}
+                      />
+                    </div>
+                  ) : activeView === "individual" ? (
+                    <>
+                      <div className="section-title fade-up">🏆 Ranking individual</div>
+                      {leaders.length === 0 ? (
+                        <div className="empty-state fade-up">
+                          <div className="empty-icon">🏟️</div>
+                          <div className="empty-text">Nadie cargó entradas todavía. ¡Sé el primero!</div>
+                        </div>
+                      ) : (
+                        leaders.map((u, i) => (
                           <div
-                            key={c.club}
-                            className={`leader-item fade-up${isMyClub ? " me" : ""}`}
-                            style={
-                              isMyClub
-                                ? {
-                                    borderColor: "var(--accent)",
-                                    background: "rgba(245,197,24,0.05)",
-                                  }
-                                : {}
-                            }
-                          >
-                            {/* Posición */}
+        key={u.id}
+        className={`
+          leader-item 
+          fade-up 
+          ${u.id === user.id ? "me" : ""} 
+          ${u.id === user.id && rankChange === "up" ? "rank-up" : ""}
+          ${u.id === user.id && rankChange === "down" ? "rank-down" : ""}
+        `}
+      >
                             <div className={`leader-rank${i < 3 ? " top" : ""}`}>
                               {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                             </div>
-        
-                            {/* Icono de club */}
+                            <div className="leader-avatar">{u.username[0].toUpperCase()}</div>
+                            <div className="leader-info">
+                              <div className="leader-name">
+                                {u.username}
+                                {u.id === user.id ? " (vos)" : ""}
+                              </div>
+                              <div className="leader-club">{u.club}</div>
+                            </div>
+                            <div className="leader-points">
+        {u.points} pts
+        {u.id === user.id && rankChange === "up" && " 🔥"}
+      </div>
+                          </div>
+                        ))
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <div className="section-title fade-up">🏟️ Ranking por club</div>
+          
+                      {/* Badge "tu club está N°" */}
+                      {myClubRank > 0 && (
+                        <div
+                          className="fade-up"
+                          style={{
+                            background: "rgba(245,197,24,0.08)",
+                            border: "1px solid rgba(245,197,24,0.25)",
+                            borderRadius: 12,
+                            padding: "10px 16px",
+                            marginBottom: 16,
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: "var(--text)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                          }}
+                        >
+                          <span style={{ fontSize: 18 }}>
+                            {myClubRank === 1 ? "🔥" : myClubRank <= 3 ? "⚡" : "📍"}
+                          </span>
+                          <span>
+                            Tu club <strong style={{ color: "var(--accent)" }}>{user.club}</strong> está{" "}
+                            <strong style={{ color: "var(--accent)" }}>
+                              {myClubRank === 1
+                                ? "¡1° en el ranking!"
+                                : myClubRank === 2
+                                ? "2° — muy cerca del top!"
+                                : `${myClubRank}° en el ranking`}
+                            </strong>
+                            {myClubRank > 1 && " 🏟️"}
+                          </span>
+                        </div>
+                      )}
+
+                      {rankChange === "up" && (
+        <div className="rank-toast up">🚀 Subiste de posición</div>
+      )}
+
+      {rankChange === "down" && (
+        <div className="rank-toast down">⚠️ Te pasaron</div>
+      )}
+          
+                      {clubRanking.length === 0 ? (
+                        <div className="empty-state fade-up">
+                          <div className="empty-icon">🏟️</div>
+                          <div className="empty-text">No hay datos de clubes todavía.</div>
+                        </div>
+                      ) : (
+                        clubRanking.map((c, i) => {
+                          const isMyClub = c.club === user.club;
+                          return (
                             <div
-                              className="leader-avatar"
+                              key={c.club}
+                              className={`leader-item fade-up${isMyClub ? " me" : ""}`}
                               style={
                                 isMyClub
-                                  ? { borderColor: "var(--accent)", color: "var(--accent)" }
+                                  ? {
+                                      borderColor: "var(--accent)",
+                                      background: "rgba(245,197,24,0.05)",
+                                    }
                                   : {}
                               }
                             >
-                              🏟️
-                            </div>
-        
-                            {/* Info */}
-                            <div className="leader-info">
-                              <div className="leader-name">
-                                {c.club}
-                                {isMyClub ? " (tu club)" : ""}
+                              {/* Posición */}
+                              <div className={`leader-rank${i < 3 ? " top" : ""}`}>
+                                {i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : i + 1}
                               </div>
-                              <div className="leader-club">
-                                {c.memberCount} {c.memberCount === 1 ? "miembro" : "miembros"}
+          
+                              {/* Icono de club */}
+                              <div
+                                className="leader-avatar"
+                                style={
+                                  isMyClub
+                                    ? { borderColor: "var(--accent)", color: "var(--accent)" }
+                                    : {}
+                                }
+                              >
+                                🏟️
                               </div>
+          
+                              {/* Info */}
+                              <div className="leader-info">
+                                <div className="leader-name">
+                                  {c.club}
+                                  {isMyClub ? " (tu club)" : ""}
+                                </div>
+                                <div className="leader-club">
+                                  {c.memberCount} {c.memberCount === 1 ? "miembro" : "miembros"}
+                                </div>
+                              </div>
+          
+                              {/* Puntos */}
+                              <div className="leader-points">{c.points} pts</div>
                             </div>
-        
-                            {/* Puntos */}
-                            <div className="leader-points">{c.points} pts</div>
-                          </div>
-                        );
-                      })
-                    )}
-                  </>
-                )}
+                          );
+                        })
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        }
+            );
+          }
 
         // ============================================================
         // PROFILE TAB
