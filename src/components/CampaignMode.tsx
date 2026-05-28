@@ -22,6 +22,7 @@ import { TrainingHub } from './campaign/TrainingHub';
 import { TrainingModal } from './campaign/TrainingModal';
 import { TrainingCenter } from './campaign/TrainingCenter';
 import { DailyMissionPreview } from '../components/campaign/DailyMissionPreview';
+import { api } from '../lib/api';
 
 
 
@@ -446,17 +447,91 @@ useEffect(() => {
   }
 
   async function completeMatch(leagueId: string, matchIndex: number, won: boolean) {
-    if (!won) return;
-    const matchKey = `${leagueId}_${matchIndex}`;
-    const newProgress = new Map(matchProgress);
-    newProgress.set(matchKey, true);
-    await saveMatchProgress(newProgress);
+  if (!won) return;
+  
+  const matchKey = `${leagueId}_${matchIndex}`;
+  const newProgress = new Map(matchProgress);
+  newProgress.set(matchKey, true);
+  await saveMatchProgress(newProgress);
 
-    const league = LEAGUES.find(l => l.id === leagueId);
-    if (league) {
-      const allMatchesCompleted = league.bots.every((_, idx) =>
-        newProgress.get(`${leagueId}_${idx}`) === true
-      );
+  const league = LEAGUES.find(l => l.id === leagueId);
+  
+  // ACTUALIZAR PUNTOS Y EXPERIENCIA DEL USUARIO
+  if (won && selectedOpponent) {
+    try {
+      // Obtener datos actuales del usuario
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('points, exp, level')
+        .eq('id', userId)
+        .single();
+      
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+      } else {
+        const currentPoints = profile?.points || 0;
+        const currentExp = profile?.exp || 0;
+        const currentLevel = profile?.level || 1;
+        
+        // Calcular nuevos puntos
+        const newPoints = currentPoints + selectedOpponent.xpBase;
+        
+        // Calcular nueva experiencia y nivel
+        let newExp = currentExp + selectedOpponent.xpBase;
+        let newLevel = currentLevel;
+        const expNeeded = currentLevel * 100;
+        
+        if (newExp >= expNeeded) {
+          newLevel++;
+          newExp -= expNeeded;
+        }
+        
+        // Actualizar perfil
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ 
+            points: newPoints,
+            exp: newExp,
+            level: newLevel
+          })
+          .eq('id', userId);
+        
+        if (updateError) {
+          console.error('Error updating profile:', updateError);
+        } else {
+          console.log(`✅ Usuario actualizado: +${selectedOpponent.xpBase}pts, nivel ${newLevel}`);
+        }
+      }
+    } catch (err) {
+      console.error('Error updating user progress:', err);
+    }
+  }
+  
+  // Verificar si completó la liga
+  if (league) {
+    const allMatchesCompleted = league.bots.every((_, idx) =>
+      newProgress.get(`${leagueId}_${idx}`) === true
+    );
+    
+    if (allMatchesCompleted && progress && !progress.completedLeagueIds.includes(leagueId)) {
+      const newCompleted = [...progress.completedLeagueIds, leagueId];
+      const nextLeagueIndex = LEAGUES.findIndex(l => l.id === leagueId) + 1;
+      const nextLeague = nextLeagueIndex < LEAGUES.length ? LEAGUES[nextLeagueIndex].id : leagueId;
+      
+      const updatedProgress = {
+        ...progress,
+        completedLeagueIds: newCompleted,
+        currentLeagueId: nextLeague,
+        starsEarned: progress.starsEarned + 3,
+        currentStreak: progress.currentStreak + 1,
+        bestStreak: Math.max(progress.bestStreak, progress.currentStreak + 1),
+      };
+      
+      await saveCampaignProgress(updatedProgress);
+      setLastReward({ type: 'league_complete', value: league.rewardXp });
+      setShowRewards(true);
+      setTimeout(() => setShowRewards(false), 4000);
+    };
       if (allMatchesCompleted && progress && !progress.completedLeagueIds.includes(leagueId)) {
         const newCompleted = [...progress.completedLeagueIds, leagueId];
         const nextLeagueIndex = LEAGUES.findIndex(l => l.id === leagueId) + 1;

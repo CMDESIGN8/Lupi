@@ -1,15 +1,3 @@
-/**
- * FifaCard.tsx
- * Componente visual de carta estilo FIFA para Flores Futsal.
- *
- * INSTALACIÓN:
- *   Copiá este archivo a src/components/FifaCard.tsx
- *
- * USO:
- *   <FifaCard card={playerCard} size="md" />
- *   <FifaCard card={playerCard} size="lg" showFlip />   ← con flip al hacer click
- *   <FifaCard card={playerCard} size="sm" locked />     ← carta bloqueada (álbum)
- */
 
 import { useState } from "react";
 import { PlayerCard } from "../lib/api";
