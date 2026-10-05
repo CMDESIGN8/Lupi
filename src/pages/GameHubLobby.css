@@ -1,0 +1,337 @@
+/* LUPI WORLD — lobby scene overhaul */
+.gh-world {
+  --world-green: #24e987;
+  --world-cyan: #28d9ff;
+  --world-gold: #ffc83d;
+    /* AURAS */
+  --aura-color: #00ff87;
+  --aura-color-soft: rgba(0,255,135,.16);
+  --aura-color-medium: rgba(0,255,135,.42);
+
+  position: relative;
+  width: 100%;
+  min-height: calc(100dvh - 112px);
+  height: calc(100dvh - 112px);
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(3, 12, 11, 0.712), rgba(2, 8, 7, 0.726)),
+    url('/images/stadium-bg.jpg') center center / cover no-repeat;
+}
+
+.gh-world::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(37, 233, 135, .12), transparent 30%),
+    linear-gradient(90deg, rgba(0,0,0,.56), transparent 32%, transparent 68%, rgba(0,0,0,.46));
+}
+
+.gh-world::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 45%, rgba(2,8,7,.24) 58%, rgba(2,8,7,.92) 100%);
+}
+
+.gh-world__atmosphere,
+.gh-world__atmosphere > * { position: absolute; pointer-events: none; }
+.gh-world__atmosphere { inset: 0; z-index: 0; overflow: hidden; }
+.gh-world__mist {
+  width: 48%; height: 34%; filter: blur(42px); opacity: .12;
+  background: radial-gradient(ellipse, #b9ffe4 0%, transparent 68%);
+  animation: world-mist 9s ease-in-out infinite alternate;
+}
+.gh-world__mist--1 { left: -8%; bottom: 15%; }
+.gh-world__mist--2 { right: -8%; bottom: 22%; animation-delay: -4s; }
+.gh-world__spot { width: 20%; height: 80%; top: -20%; opacity: .10; filter: blur(8px); background: linear-gradient(180deg, #fff, transparent); transform: rotate(13deg); }
+.gh-world__spot--1 { left: 12%; animation: world-spot 6s ease-in-out infinite alternate; }
+.gh-world__spot--2 { right: 10%; transform: rotate(-13deg); animation: world-spot 7s ease-in-out infinite alternate-reverse; }
+.gh-world__grain { inset: 0; opacity: .045; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E"); mix-blend-mode: overlay; }
+
+@keyframes world-mist { from { transform: translate3d(-3%, 0, 0) scale(1); } to { transform: translate3d(5%, -2%, 0) scale(1.12); } }
+@keyframes world-spot { from { opacity: .06; } to { opacity: .16; } }
+
+.gh-world__topline {
+  position: absolute;
+  z-index: 5;
+  top: 24px;
+  left: 28px;
+  right: 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  pointer-events: none;
+}
+.gh-world__eyebrow { display: block; color: var(--world-green); font: 800 10px/1 "Barlow", sans-serif; letter-spacing: .24em; }
+.gh-world__topline h1 { margin: 4px 0 4px; color: #fff; font: italic 900 clamp(27px, 3.2vw, 46px)/.92 "Barlow Condensed", sans-serif; letter-spacing: .03em; text-transform: uppercase; text-shadow: 0 6px 28px rgba(0,0,0,.55); }
+.gh-world__topline p { margin: 0; color: rgba(232,246,238,.68); font: 500 11px/1.2 "Barlow", sans-serif; }
+.gh-world__online-pill {
+  display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px;
+  border: 1px solid rgba(43,214,123,.24); border-radius: 999px;
+  color: #bfffd9; background: rgba(4,24,19,.68); backdrop-filter: blur(12px);
+  font: 800 10px/1 "Barlow", sans-serif; letter-spacing: .08em;
+  box-shadow: 0 10px 28px rgba(0,0,0,.2);
+  margin-top: 40px; pointer-events: auto;
+  margin-left: auto; margin-right: 0; transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+.gh-world__online-pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--world-green); box-shadow: 0 0 12px var(--world-green); }
+
+.gh-world__players { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.gh-world-player {
+  position: absolute; width: 118px; padding: 0; border: 0; color: #fff; background: transparent;
+  cursor: default; pointer-events: auto; transform: translate(-50%, -50%); text-align: center;
+  animation: world-player-in .55s cubic-bezier(.2,.8,.2,1) both;
+}
+.gh-world-player--0 { left: 34%; top: 47%; }
+.gh-world-player--1 { left: 52%; top: 39%; }
+.gh-world-player--2 { left: 66%; top: 51%; }
+.gh-world-player--3 { left: 44%; top: 57%; }
+.gh-world-player--4 { left: 75%; top: 36%; }
+.gh-world-player--5 { left: 22%; top: 40%; }
+.gh-world-player:hover .gh-world-avatar { transform: translateY(-7px) scale(1.04); }
+
+@keyframes world-player-in { from { opacity: 0; transform: translate(-50%, -44%) scale(.9); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+/* =========================================================
+   WORLD PLAYER / AURA
+   ========================================================= */
+
+.gh-world-avatar {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  width: 86px;
+  height: 104px;
+  margin: 0 auto 2px;
+  transition:
+    transform .22s ease,
+    filter .22s ease;
+
+  filter:
+    drop-shadow(0 0 12px var(--aura-color-medium))
+    drop-shadow(0 14px 10px rgba(0,0,0,.5));
+}
+
+/* AURA */
+.gh-world-avatar::before {
+  content: "";
+  position: absolute;
+  inset: 2px 4px 8px;
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    var(--aura-color-soft) 0%,
+    transparent 68%
+  );
+
+  filter: blur(9px);
+  opacity: .95;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* AURA EN EL PISO */
+.gh-world-avatar::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+
+  width: 76px;
+  height: 15px;
+
+  transform: translateX(-50%);
+  border-radius: 50%;
+
+  background: radial-gradient(
+    ellipse,
+    var(--aura-color-medium) 0%,
+    transparent 70%
+  );
+
+  filter: blur(6px);
+  opacity: .9;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* SKIN */
+.gh-world-avatar img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  position: relative;
+  z-index: 2;
+}
+
+.gh-world-avatar.no-skin {
+  align-items: center;
+  font-size: 48px;
+  color: var(--aura-color);
+}
+
+/* TU PERSONAJE */
+.gh-world-player.is-me .gh-world-avatar {
+  filter:
+    drop-shadow(0 0 18px var(--aura-color-medium))
+    drop-shadow(0 0 32px var(--aura-color-soft))
+    drop-shadow(0 15px 10px rgba(0,0,0,.48));
+}
+
+/* HOVER */
+.gh-world-player:hover .gh-world-avatar {
+  transform: translateY(-7px) scale(1.04);
+
+  filter:
+    drop-shadow(0 0 22px var(--aura-color-medium))
+    drop-shadow(0 0 38px var(--aura-color-soft))
+    drop-shadow(0 15px 10px rgba(0,0,0,.48));
+}
+.gh-world-level { position: absolute; right: 7px; bottom: 14px; z-index: 4; min-width: 22px; padding: 4px 5px; border: 1px solid rgba(255,255,255,.16); border-radius: 6px 2px 6px 2px; color: #10160f; background: var(--world-gold); font: 900 9px/1 "Barlow", sans-serif; box-shadow: 0 4px 12px rgba(0,0,0,.35); }
+.gh-world-name { display: block; color: #fff; font: 900 13px/1 "Barlow Condensed", sans-serif; letter-spacing: .04em; text-transform: uppercase; text-shadow: 0 2px 8px #000; }
+.gh-world-state { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 3px 6px; border-radius: 999px; color: rgba(220,255,235,.72); background: rgba(0,0,0,.36); backdrop-filter: blur(5px); font: 700 7px/1 "Barlow", sans-serif; letter-spacing: .08em; }
+.gh-world-state i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--aura-color);
+  box-shadow: 0 0 8px var(--aura-color);
+}
+.gh-world__empty-player { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; color: rgba(255,255,255,.55); text-align: center; }
+.gh-world__empty-player span { display: grid; place-items: center; width: 54px; height: 54px; margin-bottom: 8px; border: 1px dashed rgba(255,255,255,.25); border-radius: 50%; font-size: 24px; }
+.gh-world__empty-player strong { font: 900 14px/1 "Barlow Condensed", sans-serif; letter-spacing: .1em; }
+.gh-world__empty-player small { margin-top: 5px; font: 500 10px/1.3 "Barlow", sans-serif; }
+
+.gh-world__arena-label { position: absolute; z-index: 2; left: 50%; top: 71%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; pointer-events: none; opacity: .78; text-shadow: 0 3px 14px #000; }
+.gh-world__arena-label span { font-size: 22px; filter: drop-shadow(0 0 10px rgba(255,255,255,.25)); }
+.gh-world__arena-label strong { color: #fff; font: 900 15px/1 "Barlow Condensed", sans-serif; letter-spacing: .16em; }
+.gh-world__arena-label small { margin-top: 5px; color: rgba(220,255,235,.52); font: 700 8px/1 "Barlow", sans-serif; letter-spacing: .13em; }
+
+.gh-world__chat {
+  position: absolute;
+  z-index: 10;
+  top: 80px;
+  right: 24px;
+  width: min(365px, 31vw);
+  height: min(480px, calc(100vh - 120px));
+}
+.gh-world__chat .lc { height: 100%; min-height: 0; border-radius: 16px 4px 16px 4px; border-color: rgba(76,210,155,.18); background: linear-gradient(180deg, rgba(5,27,22,.78), rgba(3,16,13,.64)); backdrop-filter: blur(13px); box-shadow: 0 25px 70px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06); }
+.gh-world__chat .lc-head { padding: 12px 13px 10px; background: linear-gradient(180deg, rgba(14,63,51,.52), transparent); }
+.gh-world__chat .lc-title { font-size: 20px; }
+.gh-world__chat .lc-log {
+  height: auto;
+  min-height: 100%;
+  padding: 12px;
+  overflow: visible;
+}
+.gh-world__chat .lc-log-wrap {
+  min-height: 0;
+  overflow-y: auto;
+}
+.gh-world__chat .lc-foot { display: none; }
+.gh-world__chat .lc-composer { background: rgba(1,9,7,.58); }
+.gh-world__chat .lc-empty { min-height: 130px; }
+
+.gh-world__mission { position: absolute; z-index: 6; left: 28px; bottom: 112px; width: min(330px, 30vw); padding: 14px 16px; border-left: 3px solid var(--world-gold); background: linear-gradient(90deg, rgba(4,18,14,.8), rgba(4,18,14,.28)); backdrop-filter: blur(7px); box-shadow: 0 12px 35px rgba(0,0,0,.22); }
+.gh-world__mission-kicker { display: block; color: var(--world-gold); font: 800 8px/1 "Barlow", sans-serif; letter-spacing: .18em; }
+.gh-world__mission strong { display: block; margin-top: 5px; color: #fff; font: italic 900 25px/.9 "Barlow Condensed", sans-serif; }
+.gh-world__mission span:last-child { display: block; margin-top: 7px; color: rgba(232,246,238,.68); font: 500 10px/1.25 "Barlow", sans-serif; }
+
+.gh-world__play { position: absolute; z-index: 12; left: 50%; bottom: 50px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; min-width: 270px; padding: 12px 15px; border: 1px solid rgba(255,255,255,.24); border-radius: 9px 3px 9px 3px; cursor: pointer; color: #08130e; background: linear-gradient(135deg, #ffe05a, #f5a800); box-shadow: 0 15px 35px rgba(245,168,0,.25), 0 0 0 1px rgba(255,200,61,.1); text-align: left; transition: transform .18s ease, filter .18s ease, box-shadow .18s ease; }
+.gh-world__play:hover { transform: translateX(-50%) translateY(-3px); filter: brightness(1.06); box-shadow: 0 20px 45px rgba(245,168,0,.34), 0 0 28px rgba(255,200,61,.15); }
+.gh-world__play-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 7px 2px 7px 2px; background: rgba(0,0,0,.13); font-size: 18px; }
+.gh-world__play span:nth-child(2) { flex: 1; display: flex; flex-direction: column; }
+.gh-world__play small { font: 900 8px/1 "Barlow", sans-serif; letter-spacing: .12em; opacity: .62; }
+.gh-world__play strong { margin-top: 3px; font: italic 900 22px/.9 "Barlow Condensed", sans-serif; letter-spacing: .03em; }
+.gh-world__play-arrow { font-size: 24px; font-weight: 900; }
+
+.gh-world__actions { position: absolute; z-index: 8; left: 28px; bottom: 24px; display: flex; gap: 7px; }
+.gh-world__actions button { position: relative; min-width: 70px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.11); border-radius: 9px 3px 9px 3px; color: #dff8ea; background: rgba(4,22,17,.65); backdrop-filter: blur(8px); cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.04); transition: .18s ease; }
+.gh-world__actions button:hover { transform: translateY(-2px); border-color: rgba(43,214,123,.35); background: rgba(10,50,39,.75); }
+.gh-world__actions span { display: block; font-size: 16px; line-height: 1; }
+.gh-world__actions strong { display: block; margin-top: 5px; font: 900 8px/1 "Barlow", sans-serif; letter-spacing: .1em; }
+.gh-world__actions em { position: absolute; top: -6px; right: -5px; display: grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px; color: #12120a; background: var(--world-gold); font: 900 9px/1 "Barlow", sans-serif; font-style: normal; }
+
+.gh-world__hint { position: absolute; z-index: 7; right: 28px; bottom: 28px; width: min(310px, 25vw); display: flex; gap: 8px; align-items: flex-start; color: rgba(226,247,236,.52); }
+.gh-world__hint span { color: var(--world-green); font: 900 8px/1 "Barlow", sans-serif; letter-spacing: .13em; }
+.gh-world__hint p { margin: 0; font: 500 9px/1.25 "Barlow", sans-serif; }
+
+.gh-world__dock { display: none; }
+
+/* On a full-screen lobby the old shell chrome becomes part of the HUD instead of a boxed web page. */
+.gh-root:has(.gh-world) { width: 100%; min-height: 100dvh; height: 100dvh; padding: 0 !important; overflow: hidden; }
+.gh-root:has(.gh-world) .gh-shell { width: 100%; max-width: none; min-height: 100dvh; height: 100dvh; margin: 0; padding: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.gh-root:has(.gh-world) .gh-hud { position: absolute; z-index: 30; top: 0; left: 0; right: 0; background: linear-gradient(180deg, rgba(2,9,8,.76), transparent); border: 0; }
+.gh-root:has(.gh-world) .gh-tabs { position: absolute; z-index: 31; top:  8px; left: 50%; transform: translateX(-50%); width: min(340px, 38vw); border-radius: 999px; background: rgba(2,15,11,.58); backdrop-filter: blur(12px); }
+.gh-root:has(.gh-world) .gh-tabs__thumb { border-radius: 999px; }
+.gh-root:has(.gh-world) .gh-scene { height: 100%; margin: 0; padding: 0; }
+.gh-root:has(.gh-world) .gh-world { min-height: 100dvh; height: 100dvh; }
+
+@media (max-width: 900px) {
+  .gh-world { min-height: calc(100dvh - 92px); height: calc(100dvh - 92px); }
+  .gh-world__chat { width: min(330px, 38vw); height: min(430px, 54vh); }
+  .gh-world__mission { width: 260px; }
+  .gh-world__hint { display: none; }
+}
+
+@media (max-width: 700px) {
+  .gh-root:has(.gh-world) .gh-hud { padding: 7px 10px; }
+  .gh-root:has(.gh-world) .gh-tabs { top: 52px; width: calc(100% - 28px); max-width: 420px; }
+  .gh-world { min-height: 100dvh; height: 100dvh; background-position: center; }
+  .gh-world__topline { top: 96px; left: 15px; right: 15px; }
+  .gh-world__topline h1 { font-size: 31px; }
+  .gh-world__topline p { max-width: 220px; }
+  .gh-world__online-pill { padding: 7px 9px; font-size: 8px; }
+  .gh-world__chat { top: auto; right: 10px; left: 10px; bottom: 77px; width: auto; height: 205px; }
+  .gh-world__chat .lc-head { padding: 8px 10px; }
+  .gh-world__chat .lc-kicker { font-size: 7px; }
+  .gh-world__chat .lc-title { font-size: 16px; }
+  .gh-world__chat .lc-log { padding: 8px; }
+  .gh-world__chat .lc-avatar { width: 29px; height: 29px; flex-basis: 29px; }
+  .gh-world__chat .lc-bubble { padding: 7px 9px; font-size: 10px; }
+  .gh-world__chat .lc-meta strong { font-size: 10px; }
+  .gh-world__chat .lc-composer { padding: 7px; }
+  .gh-world__chat .lc-input-shell input, .gh-world__chat .lc-send { height: 34px; }
+  .gh-world__chat .lc-send { width: 34px; flex-basis: 34px; font-size: 15px; }
+  .gh-world__mission { left: 14px; bottom: 302px; width: 210px; padding: 9px 11px; }
+  .gh-world__mission strong { font-size: 19px; }
+  .gh-world__mission span:last-child { font-size: 8px; }
+  .gh-world__play { left: 14px; right: 14px; bottom: 265px; width: auto; min-width: 0; transform: none; }
+  .gh-world__play:hover { transform: translateY(-2px); }
+  .gh-world__play strong { font-size: 19px; }
+  .gh-world__actions { display: none; }
+  .gh-world__dock { position: absolute; z-index: 30; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px 7px max(7px, env(safe-area-inset-bottom)); border-top: 1px solid rgba(255,255,255,.08); background: rgba(2,10,8,.86); backdrop-filter: blur(16px); }
+  .gh-world__dock button { min-height: 49px; border: 0; border-radius: 8px 3px 8px 3px; color: rgba(226,247,236,.54); background: transparent; font-family: "Barlow", sans-serif; cursor: pointer; }
+  .gh-world__dock button span { display: block; font-size: 18px; line-height: 1; }
+  .gh-world__dock button strong { display: block; margin-top: 4px; font: 900 8px/1 "Barlow", sans-serif; letter-spacing: .08em; }
+  .gh-world__dock button.is-active { color: #07150f; background: linear-gradient(135deg, #ffdb4b, #f2a300); box-shadow: 0 4px 18px rgba(245,168,0,.2); }
+  .gh-world__arena-label { top: 42%; }
+  .gh-world__players { top: 180px; bottom: 300px; }
+  .gh-world-player { width: 82px; }
+  .gh-world-avatar { width: 63px; height: 78px; }
+  .gh-world-name { font-size: 10px; }
+  .gh-world-state { font-size: 6px; }
+  .gh-world-player--0 { left: 31%; top: 39%; }
+  .gh-world-player--1 { left: 61%; top: 29%; }
+  .gh-world-player--2 { left: 78%; top: 49%; }
+  .gh-world-player--3 { left: 18%; top: 54%; }
+  .gh-world-player--4 { left: 48%; top: 53%; }
+  .gh-world-player--5 { left: 84%; top: 29%; }
+}
+
+@media (max-width: 420px) {
+  .gh-root:has(.gh-world) .gh-brand { transform: scale(.88); }
+  .gh-world__topline { top: 91px; }
+  .gh-world__topline h1 { font-size: 27px; }
+  .gh-world__topline p { font-size: 9px; }
+  .gh-world__online-pill { font-size: 7px; }
+  .gh-world__chat { bottom: 75px; height: 188px; }
+  .gh-world__mission { bottom: 279px; width: 190px; }
+  .gh-world__play { bottom: 240px; }
+}

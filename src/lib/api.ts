@@ -1,6 +1,5 @@
 import { supabase } from './supabaseClient';
 import { POINTS_PER_TICKET } from './constants';
-import { updateUserProgression } from '../utils/userProgression';
 import { UnifiedCard, UserCard, Deck, Position, Category, calculateOVR } from '../types/cards';
 
 
@@ -22,11 +21,14 @@ export interface AppUser {
   username: string;
   club: string;
   points: number;
-  streak: number;              // 🔥 Días consecutivos
-  last_ticket_date: string | null;  // 📅 Última fecha
-  best_streak: number;         // 🏆 Récord personal
+  coins: number;                  // 🪙 NUEVO — LUPICOINS
+  level: number;                  // ⚡ NUEVO
+  exp: number;                    // ⚡ NUEVO
+  streak: number;
+  last_ticket_date: string | null;
+  best_streak: number;
   referral_code: string;
-   referral_count: number;
+  referral_count: number;
   created_at?: string;
   user_card_level: number;
   user_card_exp: number;
@@ -81,6 +83,22 @@ interface TicketFromDB {
   club: string;
   status: 'pendiente' | 'participando' | 'ganador' | 'invalido';
   created_at: string;
+}
+
+// ============================================================
+// TIPOS — TIENDA
+// ============================================================
+export interface ShopItem {
+  id: string;
+  title: string;
+  description: string;
+  cost: number;
+  icon: string;
+  category: "packs" | "boosts" | "cosmetics" | "specials";
+  badge: string | null;
+  stock: number | null;
+  effect_type: string;
+  effect_payload: Record<string, any>;
 }
 
 // Convertir UnifiedCard a PlayerCard
@@ -298,137 +316,115 @@ export const api = {
   },
 
   // Submit ticket
-  // En api.ts, corregir submitTicket
-submitTicket: async ({ ticketNumber }: { ticketNumber: string }): Promise<{ ticket: Ticket; newPoints: number; streakReward?: { points: number; message: string }; statUpgraded?: { stat: string; newValue: number; oldValue: number }; leveledUp?: boolean; newLevel?: number; }> => {
+  submitTicket: async ({
+  ticketNumber,
+}: {
+  ticketNumber: string;
+}): Promise<{
+  ticket: Ticket;
+  newPoints: number;
+  streakReward?: { points: number; message: string };
+  statUpgraded?: { stat: string; newValue: number; oldValue: number };
+  leveledUp?: boolean;
+  newLevel?: number;
+}> => {
   const { data: { session } } = await supabase.auth.getSession();
-  if (!session) throw new Error('No session found');
+  if (!session) throw new Error("No session found");
 
   const userId = session.user.id;
   const clean = ticketNumber.trim().replace(/\s/g, "");
-  
+
   if (!/^\d{6,12}$/.test(clean)) {
     throw new Error("El número de entrada debe tener entre 6 y 12 dígitos.");
   }
 
-  // Obtener el club del usuario
   const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('club, points')
-    .eq('id', userId)
+    .from("profiles")
+    .select("club")
+    .eq("id", userId)
     .single();
-    
+
   if (profileError) {
-    console.error('Error getting profile:', profileError);
-    throw new Error('Error al obtener perfil de usuario');
+    throw new Error("Error al obtener perfil de usuario");
   }
 
-  // Primero, verificar si el ticket ya existe y es válido
-  const { data: existingTicket, error: checkError } = await supabase
-    .from('tickets')
-    .select('id, created_at, status')
-    .eq('ticket_number', clean)
+  // Duplicados
+  const startOfWeek = new Date();
+  startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const { data: existingTicket } = await supabase
+    .from("tickets")
+    .select("id, created_at")
+    .eq("ticket_number", clean)
     .maybeSingle();
-    
-  if (checkError && checkError.code !== 'PGRST116') {
-    console.error('Error checking existing ticket:', checkError);
-  }
-  
-  // Si el ticket ya existe
+
   if (existingTicket) {
-    const startOfWeek = new Date();
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-    
     const ticketDate = new Date(existingTicket.created_at);
-    
     if (ticketDate >= startOfWeek) {
-      throw new Error('Este número de entrada ya fue cargado esta semana.');
+      throw new Error("Este número de entrada ya fue cargado esta semana.");
     } else {
-      throw new Error('Este número de entrada ya fue utilizado en una semana anterior y ya no es válido.');
+      throw new Error(
+        "Este número de entrada ya fue utilizado en una semana anterior."
+      );
     }
   }
 
-  // Insertar el ticket usando add_ticket RPC
-  const { data: ticketId, error: addError } = await supabase.rpc('add_ticket', {
+  // Insertar ticket (esto ya hace toda la progresión)
+  const { data: ticketId, error: addError } = await supabase.rpc("add_ticket", {
     p_user_id: userId,
     p_ticket_number: clean,
-    p_club: profile.club
+    p_club: profile.club,
   });
 
   if (addError) {
-    console.error('Error adding ticket:', addError);
-    throw new Error(addError.message || 'Error al cargar la entrada');
+    throw new Error(addError.message || "Error al cargar la entrada");
   }
-  
   if (!ticketId) {
-    throw new Error('No se pudo crear el ticket');
+    throw new Error("No se pudo crear el ticket");
   }
 
-  // Verificar recompensas por racha (si tienes la función)
-  let streakReward = null;
-  try {
-    const { data: rewardData, error: rewardError } = await supabase
-      .rpc('check_streak_rewards', { p_user_id: userId });
-    
-    if (!rewardError && rewardData && rewardData.length > 0 && rewardData[0].reward_given) {
-      streakReward = {
-        points: rewardData[0].points_awarded,
-        message: rewardData[0].message
-      };
-    }
-  } catch (error) {
-    console.error('Error checking streak rewards:', error);
-  }
+  // ✅ Leer el evento de progresión
+  const { data: event } = await supabase
+    .from("progression_events")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("action_type", "ticket")
+    .eq("reference_id", ticketId)
+    .maybeSingle();
 
-  
-
-  // Obtener el ticket creado
+  // ✅ Leer ticket con validación
   const { data: ticket, error: ticketError } = await supabase
-    .from('tickets')
-    .select('*')
-    .eq('id', ticketId)
+    .from("tickets")
+    .select("*")
+    .eq("id", ticketId)
     .single();
 
-  if (ticketError) {
-    console.error('Error fetching created ticket:', ticketError);
-    throw new Error('Error al obtener el ticket');
+  if (ticketError || !ticket) {
+    throw new Error("Error al recuperar el ticket creado");
   }
 
-  // Actualizar puntos del usuario
-  const pointsToAdd = (streakReward?.points || 0) + 10;
-  const newPoints = (profile.points || 0) + pointsToAdd;
-  
-  const { error: updateError } = await supabase
-    .from('profiles')
-    .update({ points: newPoints })
-    .eq('id', userId);
-    
-  if (updateError) {
-    console.error('Error updating points:', updateError);
-    throw new Error('Error al actualizar puntos');
-  }
-  try {
-  await updateUserProgression(userId, { type: 'ticket' });
-} catch (err) {
-  console.error('Error updating progression:', err);
-}
-
-let progressionResult = null;
-  try {
-    const { updateUserProgression } = await import('../utils/userProgression');
-    progressionResult = await updateUserProgression(userId, { type: 'ticket' });
-    console.log('📈 Resultado de progresión:', progressionResult);
-  } catch (err) {
-    console.error('Error updating progression:', err);
-  }
-  
-  // Obtener los stats actualizados del usuario
+  // ✅ Leer perfil actualizado
   const { data: updatedProfile } = await supabase
-    .from('profiles')
-    .select('user_card_pace, user_card_level, points')
-    .eq('id', userId)
+    .from("profiles")
+    .select("points, user_card_pace, user_card_level")
+    .eq("id", userId)
     .single();
-  
+
+  // ✅ Calcular newValue del stat subido
+  let statUpgraded: { stat: string; newValue: number; oldValue: number } | undefined;
+  if (event?.stat_upgraded && event.stat_upgraded !== "none") {
+    const currentValue =
+      event.stat_upgraded === "pace"
+        ? updatedProfile?.user_card_pace ?? 0
+        : 0;
+    statUpgraded = {
+      stat: event.stat_upgraded,
+      newValue: currentValue,
+      oldValue: currentValue - (event.stat_gain ?? 0),
+    };
+  }
+
   return {
     ticket: {
       id: ticket.id,
@@ -436,18 +432,43 @@ let progressionResult = null;
       userId: ticket.user_id,
       club: ticket.club,
       status: ticket.status,
-      createdAt: ticket.created_at
+      createdAt: ticket.created_at,
     },
-    newPoints: updatedProfile?.points || newPoints,
-    streakReward: streakReward || undefined,
-    statUpgraded: progressionResult?.stat_upgraded ? {
-      stat: progressionResult.stat_upgraded,
-      newValue: progressionResult.new_stat_value,
-      oldValue: progressionResult.old_stat_value
-    } : undefined,
-    leveledUp: progressionResult?.leveled_up || false,
-    newLevel: progressionResult?.new_level
+    newPoints: updatedProfile?.points || 0,
+    streakReward:
+      event?.streak_bonus && event.streak_bonus > 0
+        ? {
+            points: event.streak_bonus,
+            message: `Racha de ${event.streak_after} días`,
+          }
+        : undefined,
+    statUpgraded,
+    leveledUp: event?.leveled_up || false,
+    newLevel: event?.level_after,
   };
+},
+
+// src/lib/api.ts — agregar dentro del objeto api o como funciones
+
+async hasUnclaimedDailyPack(userId: string): Promise<boolean> {
+  const today = new Date().toISOString().split("T")[0]; // "2026-10-01"
+  const { data } = await supabase
+    .from("daily_packs")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("claimed_date", today)
+    .maybeSingle();
+  return !data; // si no hay registro, el sobre está sin reclamar
+},
+
+async getUnclaimedMissions(userId: string): Promise<{ id: string }[]> {
+  const { data } = await supabase
+    .from("user_missions")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("completed", true)
+    .eq("claimed", false);
+  return data || [];
 },
 
 // Función para obtener estado del sorteo
@@ -962,7 +983,82 @@ async getUserCards(userId: string): Promise<UserCard[]> {
 },
 
 
+    // ============================================================
+  // TIENDA / MARKETPLACE
+  // ============================================================
 
+  getShopItems: async (): Promise<ShopItem[]> => {
+    const { data, error } = await supabase
+      .from("shop_items")
+      .select("*")
+      .eq("active", true)
+      .eq("available", true)
+      .order("sort_order", { ascending: true });
+
+    if (error) {
+      console.error("Error fetching shop items:", error);
+      throw error;
+    }
+
+    return (data || []).map((row) => ({
+      id: row.id,
+      title: row.title,
+      description: row.description,
+      cost: row.cost,
+      icon: row.icon,
+      category: row.category,
+      badge: row.badge,
+      stock: row.stock,
+      effect_type: row.effect_type,
+      effect_payload: row.effect_payload,
+    }));
+  },
+
+  purchaseItem: async (
+    itemId: string
+  ): Promise<{
+    newCoins: number;
+    itemId: string;
+    purchaseId: string;
+    effect: { type: string; payload: Record<string, any> };
+  }> => {
+    const { data, error } = await supabase.rpc("purchase_item", {
+      item_id: itemId,
+    });
+
+    if (error) {
+      console.error("Error purchasing item:", error);
+      throw new Error(error.message || "Error al comprar");
+    }
+
+    return data as any;
+  },
+
+  getUserPurchaseHistory: async (userId: string, limit = 30) => {
+    const { data, error } = await supabase
+      .from("purchase_history")
+      .select(
+        `
+        id,
+        item_id,
+        cost_paid,
+        original_cost,
+        effect_result,
+        created_at,
+        shop_items!inner (title, icon, category)
+      `
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error("Error fetching purchase history:", error);
+      return [];
+    }
+
+    return data || [];
+  },
   // Suscribirse a notificaciones en tiempo real
   subscribeToNotifications: (userId: string, callback: (notification: Notification) => void) => {
     const subscription = supabase
@@ -986,11 +1082,13 @@ async getUserCards(userId: string): Promise<UserCard[]> {
     };
   }
   
+  
 };
 
 // ============================================================
 // TIPOS — agregar a api.ts
 // ============================================================
+
  
 export interface PlayerCard {
   id: string;
@@ -1629,4 +1727,5 @@ async getAlbumStatsByCategory(userId: string): Promise<{
         position,
       });
   },
+  
 };
