@@ -1379,20 +1379,14 @@
 }
 
 
-/* =========================================================
-   MOBILE — MAIN WORLD
-   ========================================================= */
-
 @media (max-width: 700px) {
 
   .gh-world {
     width: 100%;
     height: 100dvh;
     min-height: 100dvh;
-
     overflow: hidden;
   }
-
 
   /* -------------------------------------------------------
      HUD
@@ -1422,60 +1416,258 @@
     z-index: 60;
   }
 
-
   /* -------------------------------------------------------
-     TOPLINE
-     ------------------------------------------------------- */
-
-  .gh-world__topline {
-    top: 88px;
-    left: 50%;
-
-    width: 100%;
-
-    transform: translateX(-50%);
-
-    text-align: center;
-
-    font-size: 7px;
-
-    letter-spacing: 0.18em;
-
-    opacity: 0.45;
-
-    z-index: 10;
-  }
-
-
-  /* -------------------------------------------------------
-     MISSION
+     MISIÓN
      ------------------------------------------------------- */
 
   .gh-world__mission {
     left: 50%;
-    top: 82px;
+    top: 78px;
 
-    width: min(300px, calc(100vw - 30px));
+    width: min(280px, calc(100vw - 24px));
 
     transform: translateX(-50%);
 
     z-index: 25;
 
+    padding: 8px 10px;
+
     text-align: center;
   }
 
+  .gh-world__mission-kicker { font-size: 7px; }
+  .gh-world__mission strong { font-size: 18px; margin-top: 3px; }
+  .gh-world__mission span:last-child { font-size: 9px; margin-top: 4px; }
 
   /* -------------------------------------------------------
-     ONLINE PLAYERS
+     AVATAR PRINCIPAL — ARRIBA
+     Va desde debajo de la misión hasta el 55% del viewport
+     ------------------------------------------------------- */
+
+  .gh-locker-zone {
+    position: absolute;
+
+    left: 50%;
+
+    top: 130px;
+    bottom: 45dvh;
+    height: auto;
+
+    width: min(300px, 82vw);
+
+    transform: translateX(-50%);
+
+    z-index: 30;
+
+    overflow: visible;
+
+    pointer-events: none;
+  }
+
+  .gh-locker-zone .locker-preview {
+    width: 100%;
+    height: 100%;
+
+    min-height: 0 !important;
+    max-height: none !important;
+
+    padding: 0 !important;
+
+    overflow: visible !important;
+
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .gh-locker-zone .locker-header,
+  .gh-locker-zone .locker-footer,
+  .gh-locker-zone .locker-rarity {
+    display: none;
+  }
+
+  .gh-locker-zone .locker-character {
+    height: 100% !important;
+    width: 100%;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    overflow: visible;
+  }
+
+  .gh-locker-zone .locker-avatar {
+    position: relative !important;
+
+    width: auto !important;
+    height: 100% !important;
+
+    left: auto !important;
+    bottom: 0 !important;
+
+    transform: none !important;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .gh-locker-zone .locker-avatar img,
+  .gh-locker-zone .locker-avatar > svg,
+  .gh-locker-zone .locker-avatar > div {
+    height: 100% !important;
+    width: auto !important;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+  }
+
+  .gh-locker-zone .locker-character-glow {
+    width: 160px;
+    height: 160px;
+    bottom: 0;
+  }
+
+  .gh-locker-zone .locker-character-grid { display: none; }
+
+  .gh-locker-zone .locker-platform {
+    width: 110px;
+    height: 14px;
+    bottom: 0;
+  }
+
+  /* -------------------------------------------------------
+     SLOTS — alrededor del avatar
+     ------------------------------------------------------- */
+
+  .gh-locker-zone .locker-equipment {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 0 !important;
+
+    transform: none;
+
+    display: block !important;
+
+    z-index: 70;
+
+    pointer-events: none;
+
+    grid-template-columns: none !important;
+    gap: 0 !important;
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot {
+    position: absolute;
+
+    width: 56px;
+    height: 56px;
+
+    margin: 0;
+    padding: 0;
+
+    display: grid !important;
+    place-items: center;
+
+    pointer-events: auto;
+
+    border-radius: 14px 5px 14px 5px;
+
+    background:
+      linear-gradient(135deg, rgba(10, 40, 32, 0.94), rgba(4, 20, 16, 0.94));
+
+    border: 1px solid rgba(76, 210, 155, 0.4);
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 4px 14px rgba(0, 0, 0, 0.5);
+
+    color: #dff8ea;
+    cursor: pointer;
+    overflow: hidden;
+
+    gap: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot-info,
+  .gh-locker-zone .locker-equipment .locker-slot-arrow {
+    display: none !important;
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot-icon {
+    width: 100% !important;
+    height: 100% !important;
+
+    flex: 0 0 auto !important;
+    flex-basis: auto !important;
+
+    display: grid !important;
+    place-items: center;
+
+    border-radius: 0;
+    background: transparent !important;
+
+    font-size: 26px !important;
+    line-height: 1;
+  }
+
+  /* Posiciones de slots alrededor del avatar (que ahora está arriba) */
+  .gh-locker-zone .locker-equipment .locker-slot:nth-child(1) {
+    left: 0;
+    top: 22%;
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
+    left: 0;
+    top: 68%;
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
+    right: 0;
+    left: auto;
+    top: 82%;
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
+    right: 0;
+    left: auto;
+    top: 12%;
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot.equipped {
+    border-color: color-mix(in srgb, var(--locker-color) 60%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 16px color-mix(in srgb, var(--locker-color) 35%, transparent),
+      0 4px 14px rgba(0, 0, 0, 0.5);
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot.empty { opacity: 0.6; }
+
+  /* -------------------------------------------------------
+     JUGADORES ONLINE — ABAJO, 2 columnas x 3 filas
+     Ocupan desde el 55% del viewport hasta el botón JUGAR
      ------------------------------------------------------- */
 
   .gh-world__players {
     position: absolute;
 
-    top: 125px;
+    top: 55dvh;
     left: 0;
     right: 0;
-    bottom: 205px;
+    bottom: 130px;
 
     width: 100%;
     height: auto;
@@ -1500,298 +1692,30 @@
     pointer-events: auto;
 
     animation: world-player-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
-
-    transition:
-      left 0.4s ease,
-      top 0.4s ease,
-      transform 0.25s ease;
   }
 
-  .gh-world-player__avatar {
-    width: 46px;
-    height: 46px;
-  }
+  .gh-world-player__avatar { width: 46px; height: 46px; }
 
   .gh-world-player__name {
     max-width: 62px;
-
     margin-top: 4px;
-
     font-size: 6.5px;
     line-height: 1.1;
-
     text-align: center;
-
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .gh-world-player__level {
-    margin-top: 2px;
-
-    font-size: 5.5px;
-  }
-
-
-  /* -------------------------------------------------------
-     MOBILE PLAYER POSITIONS
-     ------------------------------------------------------- */
-
-  /* LEFT */
-  .gh-world-player--0 { left: 14%; top: 22%; }
-  .gh-world-player--2 { left: 13%; top: 50%; }
-  .gh-world-player--4 { left: 17%; top: 76%; }
-
-  /* RIGHT */
-  .gh-world-player--1 { left: 86%; top: 20%; }
-  .gh-world-player--3 { left: 87%; top: 48%; }
-  .gh-world-player--5 { left: 83%; top: 75%; }
-
-  .gh-world-player:hover {
-    transform: translate(-50%, -50%) scale(1.08);
-
-    z-index: 30;
-  }
-
-  .gh-world-player:hover .gh-world-player__avatar {
-    box-shadow:
-      0 0 18px var(--aura-color-soft, rgba(0, 255, 135, 0.35));
-  }
-
-
-  /* -------------------------------------------------------
-     MAIN AVATAR
-     ------------------------------------------------------- */
-
-   /* -------------------------------------------------------
-     MAIN AVATAR — MÁS CHICO Y CENTRADO
-     ------------------------------------------------------- */
-
-  .gh-locker-zone {
-    position: absolute;
-
-    left: 50%;
-    bottom: 130px;
-
-    width: 220px;
-    height: 340px;
-
-    transform: translateX(-50%);
-
-    z-index: 30;
-
-    overflow: visible;
-
-    pointer-events: none;
-  }
-
-  .gh-locker-zone .locker-preview {
-    width: 100%;
-    height: 100%;
-
-    min-height: 0 !important;
-    max-height: none !important;
-
-    padding: 0 !important;
-
-    overflow: visible !important;
-
-    background: transparent;
-
-    border: 0;
-
-    box-shadow: none;
-  }
-
-  .gh-locker-zone .locker-header,
-  .gh-locker-zone .locker-footer,
-  .gh-locker-zone .locker-rarity {
-    display: none;
-  }
-
-  .gh-locker-zone .locker-character {
-    height: 260px;
-    overflow: visible;
-  }
-
-  .gh-locker-zone .locker-avatar {
-    width: 180px;
-    height: 240px;
-
-    bottom: 0;
-  }
-
-  .gh-locker-zone .locker-character-glow {
-    width: 140px;
-    height: 140px;
-
-    bottom: 0;
-  }
-
-  .gh-locker-zone .locker-character-grid {
-    display: none;
-  }
-
-  .gh-locker-zone .locker-platform {
-    width: 100px;
-    height: 14px;
-
-    bottom: 0;
-  }
-
-
-  /* -------------------------------------------------------
-     SLOTS — MÁS GRANDES, ALREDEDOR DEL AVATAR
-     ------------------------------------------------------- */
-
-  /* Contenedor: cubre todo el gh-locker-zone */
-  .gh-locker-zone .locker-equipment {
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 100%;
-    height: 100%;
-
-    margin: 0;
-    padding: 0 !important;
-
-    transform: none;
-
-    display: block !important;
-
-    z-index: 70;
-
-    pointer-events: none;
-
-    grid-template-columns: none !important;
-    gap: 0 !important;
-  }
-
-  /* Botón del slot */
-  .gh-locker-zone .locker-equipment .locker-slot {
-    position: absolute;
-
-    width: 54px;
-    height: 54px;
-
-    margin: 0;
-    padding: 0;
-
-    display: grid !important;
-    place-items: center;
-
-    pointer-events: auto;
-
-    border-radius: 14px 5px 14px 5px;
-
-    background:
-      linear-gradient(
-        135deg,
-        rgba(10, 40, 32, 0.94),
-        rgba(4, 20, 16, 0.94)
-      );
-
-    border: 1px solid rgba(76, 210, 155, 0.4);
-
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 4px 14px rgba(0, 0, 0, 0.5);
-
-    color: #dff8ea;
-
-    cursor: pointer;
-
-    overflow: hidden;
-
-    transition:
-      transform .2s ease,
-      filter .2s ease,
-      border-color .2s ease;
-
-    gap: 0 !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-
-  /* Ocultar info y flecha */
-  .gh-locker-zone .locker-equipment .locker-slot-info,
-  .gh-locker-zone .locker-equipment .locker-slot-arrow {
-    display: none !important;
-  }
-
-  /* Icono a pantalla completa del slot */
-  .gh-locker-zone .locker-equipment .locker-slot-icon {
-    width: 100% !important;
-    height: 100% !important;
-
-    flex: 0 0 auto !important;
-    flex-basis: auto !important;
-
-    display: grid !important;
-    place-items: center;
-
-    border-radius: 0;
-
-    background: transparent !important;
-
-    font-size: 26px !important;
-    line-height: 1;
-  }
-
-  /* Posiciones absolutas respecto al contenedor (220x340) */
-
-  /* TOP (arriba izquierda) */
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(1) {
-    left: -12px;
-    top: 60px;
-    transform: none;
-  }
-
-  /* BOTTOM (abajo izquierda) */
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
-    left: -12px;
-    top: 190px;
-    transform: none;
-  }
-
-  /* BOOTS (abajo derecha) */
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
-    right: -12px;
-    left: auto;
-    top: 240px;
-    transform: none;
-  }
-
-  /* ACCESSORY (arriba derecha) */
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
-    right: -12px;
-    left: auto;
-    top: 60px;
-    transform: none;
-  }
-
-  /* Estado equipado: brilla con el color del item */
-  .gh-locker-zone .locker-equipment .locker-slot.equipped {
-    border-color: color-mix(in srgb, var(--locker-color) 60%, transparent);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 0 16px color-mix(in srgb, var(--locker-color) 35%, transparent),
-      0 4px 14px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Estado vacío: más apagado */
-  .gh-locker-zone .locker-equipment .locker-slot.empty {
-    opacity: 0.6;
-  }
-
-  /* Hover */
-  .gh-locker-zone .locker-equipment .locker-slot:hover {
-    filter: brightness(1.15);
-    border-color: rgba(76, 210, 155, 0.7);
-  }
+  .gh-world-player__level { margin-top: 2px; font-size: 5.5px; }
+
+  /* 2 columnas laterales, 3 filas */
+  .gh-world-player--0 { left: 14%; top: 10%; }
+  .gh-world-player--1 { left: 86%; top: 10%; }
+  .gh-world-player--2 { left: 12%; top: 48%; }
+  .gh-world-player--3 { left: 88%; top: 48%; }
+  .gh-world-player--4 { left: 14%; top: 86%; }
+  .gh-world-player--5 { left: 86%; top: 86%; }
 
   /* -------------------------------------------------------
      CHAT BUBBLE
@@ -1803,8 +1727,8 @@
     top: auto;
     left: auto;
 
-    right: 9px;
-    bottom: 157px;
+    right: 12px;
+    bottom: 132px;
 
     width: 105px;
     height: 34px;
@@ -1821,18 +1745,15 @@
     opacity: 0.92;
   }
 
-  .gh-world__chat > * {
-    max-height: 34px;
-  }
-
+  .gh-world__chat > * { max-height: 34px; }
 
   /* -------------------------------------------------------
-     PLAY
+     BOTÓN JUGAR
      ------------------------------------------------------- */
 
   .gh-world__play {
     left: 50%;
-    bottom: 68px;
+    bottom: 72px;
 
     width: 190px;
     min-width: 190px;
@@ -1843,10 +1764,8 @@
     transform: translateX(-50%);
 
     font-size: 11px;
-
     letter-spacing: 0.08em;
   }
-
 
   /* -------------------------------------------------------
      HIDE DESKTOP CONTROLS
@@ -1856,7 +1775,6 @@
   .gh-world__hint {
     display: none;
   }
-
 
   /* -------------------------------------------------------
      MOBILE DOCK
@@ -1874,17 +1792,12 @@
     height: 58px;
 
     display: grid;
-
     grid-template-columns: repeat(4, 1fr);
 
     padding-bottom: env(safe-area-inset-bottom);
 
     background:
-      linear-gradient(
-        180deg,
-        rgba(3, 10, 9, 0.76),
-        rgba(2, 6, 6, 0.98)
-      );
+      linear-gradient(180deg, rgba(3, 10, 9, 0.76), rgba(2, 6, 6, 0.98));
 
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 
@@ -1903,30 +1816,22 @@
     justify-content: center;
 
     gap: 2px;
-
     padding: 4px;
 
     border: 0;
-
     background: transparent;
 
     color: rgba(255, 255, 255, 0.42);
-
     font-size: 8px;
 
     position: relative;
-
     z-index: 201;
 
     pointer-events: auto !important;
-
     cursor: pointer;
   }
 
-  .gh-world__dock button.is-active {
-    color: #00ff87;
-  }
-
+  .gh-world__dock button.is-active { color: #00ff87; }
 
   /* -------------------------------------------------------
      WORLD EVENTS
@@ -1939,158 +1844,105 @@
     max-width: calc(100vw - 24px);
 
     transform: translateX(-50%) scale(0.82);
-
     transform-origin: top center;
 
     z-index: 90;
   }
 
-
   /* -------------------------------------------------------
      PROFILE
      ------------------------------------------------------- */
 
-  .gh-world-profile-backdrop {
-    z-index: 100;
+  .gh-world-profile-backdrop { z-index: 100; }
+}
+
+/* =========================================================
+   CHALLENGE TOASTS — MÓVIL
+   ========================================================= */
+
+@media (max-width: 700px) {
+  /* Contenedor de toasts de desafío */
+  .challenge-toasts,
+  .gh-challenge-toasts,
+  [class*="challenge-toast"] {
+    position: fixed !important;
+
+    top: auto !important;
+    bottom: 120px !important;
+    left: 12px !important;
+    right: 12px !important;
+
+    width: auto !important;
+    max-width: none !important;
+
+    z-index: 200 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+
+    pointer-events: auto !important;
+  }
+
+  .challenge-toast,
+  [class*="challenge-toast__item"] {
+    width: 100% !important;
+    max-width: none !important;
+    transform: none !important;
   }
 }
 
-
-/* =========================================================
-   SMALL PHONES
-   ========================================================= */
-
 @media (max-width: 420px) {
 
-  /* -------------------------------------------------------
-     TABS
-     ------------------------------------------------------- */
+  .gh-root:has(.gh-world) .gh-tabs { width: 195px; }
 
-  .gh-root:has(.gh-world) .gh-tabs {
-    width: 195px;
-  }
-
-
-  /* -------------------------------------------------------
-     TOPLINE
-     ------------------------------------------------------- */
-
-  .gh-world__topline {
-    top: 87px;
-  }
-
-
-  /* -------------------------------------------------------
-     MISSION
-     ------------------------------------------------------- */
+  .gh-world__topline { top: 87px; }
 
   .gh-world__mission {
     top: 80px;
-
     width: calc(100vw - 24px);
   }
 
-
-  /* -------------------------------------------------------
-     PLAYERS
-     ------------------------------------------------------- */
-
-  .gh-world__players {
-    top: 120px;
-    bottom: 202px;
-  }
-
-  .gh-world-player {
-    width: 58px;
-    min-width: 58px;
-  }
-
-  .gh-world-player__avatar {
-    width: 46px;
-    height: 46px;
-  }
-
-  .gh-world-player__name {
-    max-width: 62px;
-
-    font-size: 6.5px;
-  }
-
-  .gh-world-player__level {
-    font-size: 5.5px;
-  }
-
-  /* LEFT */
-  .gh-world-player--0 { left: 14%; top: 22%; }
-  .gh-world-player--2 { left: 13%; top: 50%; }
-  .gh-world-player--4 { left: 17%; top: 76%; }
-
-  /* RIGHT */
-  .gh-world-player--1 { left: 86%; top: 20%; }
-  .gh-world-player--3 { left: 87%; top: 48%; }
-  .gh-world-player--5 { left: 83%; top: 75%; }
-
-
-  /* -------------------------------------------------------
-     MAIN AVATAR
-     ------------------------------------------------------- */
-
+  /* Avatar arriba */
   .gh-locker-zone {
-    bottom: 136px;
-    width: 230px;
-    height: 345px;
-  }
-
-  .gh-locker-zone .locker-character {
-    height: 265px;
-  }
-
-  .gh-locker-zone .locker-avatar {
-    width: 195px;
-    height: 265px;
+    top: 125px;
+    bottom: 46dvh;
+    width: min(270px, 78vw);
   }
 
   .gh-locker-zone .locker-character-glow {
-    width: 145px;
-    height: 145px;
+    width: 140px;
+    height: 140px;
   }
 
-  .gh-locker-zone .locker-platform {
-    width: 100px;
-  }
-
-
-  /* -------------------------------------------------------
-     SLOTS — SMALL PHONES
-     ------------------------------------------------------- */
+  .gh-locker-zone .locker-platform { width: 95px; }
 
   .gh-locker-zone .locker-equipment .locker-slot {
-    width: 42px;
-    height: 42px;
+    width: 50px;
+    height: 50px;
   }
 
   .gh-locker-zone .locker-equipment .locker-slot-icon {
-    font-size: 20px !important;
+    font-size: 23px !important;
   }
 
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(1),
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
-    left: 4px;
+  /* Jugadores abajo */
+  .gh-world__players {
+    top: 56dvh;
+    bottom: 128px;
   }
 
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(3),
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
-    right: 4px;
-  }
+  .gh-world-player--0 { left: 14%; top: 10%; }
+  .gh-world-player--1 { left: 86%; top: 10%; }
+  .gh-world-player--2 { left: 12%; top: 48%; }
+  .gh-world-player--3 { left: 88%; top: 48%; }
+  .gh-world-player--4 { left: 14%; top: 86%; }
+  .gh-world-player--5 { left: 86%; top: 86%; }
 
-
-  /* -------------------------------------------------------
-     CHAT
-     ------------------------------------------------------- */
-
+  /* Chat */
   .gh-world__chat {
-    right: 7px;
-    bottom: 154px;
+    right: 10px;
+    bottom: 128px;
 
     width: 98px;
     height: 32px;
@@ -2099,82 +1951,11 @@
     max-height: 32px;
   }
 
-
-  /* -------------------------------------------------------
-     PLAY
-     ------------------------------------------------------- */
-
+  /* Jugar */
   .gh-world__play {
     bottom: 69px;
-
     width: 180px;
     min-width: 180px;
     height: 40px;
   }
-}
-
-
-/* =========================================================
-   ACCESSIBILITY / TOUCH
-   ========================================================= */
-
-@media (hover: none) {
-
-  .gh-world__play:hover {
-    transform: translateX(-50%);
-    filter: none;
-  }
-
-  .gh-world-player:hover .gh-world-avatar {
-    transform: none;
-  }
-
-  .gh-world-player:hover {
-    transform: translate(-50%, -50%);
-  }
-}
-
-
-/* =========================================================
-   REDUCED MOTION
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  .gh-world__mist,
-  .gh-world__spot,
-  .gh-world-player {
-    animation: none !important;
-  }
-
-  .gh-world-player,
-  .gh-world-avatar,
-  .gh-world__play {
-    transition: none !important;
-  }
-}
-
-
-/* =========================================================
-   LOBBY NAVIGATION — CLICK FIX
-   ========================================================= */
-
-.gh-world__dock {
-  z-index: 200 !important;
-  pointer-events: auto !important;
-}
-
-.gh-world__dock button {
-  position: relative;
-  z-index: 201;
-
-  pointer-events: auto !important;
-
-  cursor: pointer;
-}
-
-.gh-world__play,
-.gh-world__chat,
-.gh-locker-zone {
-  pointer-events: auto;
 }
