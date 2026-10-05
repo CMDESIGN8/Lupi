@@ -1131,7 +1131,7 @@
 
 
 /* =========================================================
-   MAIN AVATAR / LOCKER
+   MAIN AVATAR / LOCKER ZONE
    ========================================================= */
 
 .gh-locker-zone {
@@ -1194,6 +1194,7 @@
   bottom: 5px;
 }
 
+/* Contenedor de slots */
 .gh-locker-zone .locker-equipment {
   position: absolute;
 
@@ -1213,6 +1214,9 @@
   z-index: 60;
 
   pointer-events: none;
+
+  grid-template-columns: none !important;
+  gap: 0 !important;
 }
 
 /* Solo los controles reales del locker reciben clicks */
@@ -1225,168 +1229,123 @@
 
 
 /* =========================================================
-   LOCKER SLOTS — BASE (todos los dispositivos)
-   ========================================================= */
-
-.gh-locker-zone .locker-equipment .locker-slot {
-  position: absolute;
-
-  width: 54px;
-  height: 54px;
-
-  margin: 0;
-  padding: 0;
-
-  display: grid;
-  place-items: center;
-
-  pointer-events: auto;
-
-  border-radius: 14px 5px 14px 5px;
-
-  cursor: pointer;
-
-  transition:
-    transform .2s ease,
-    filter .2s ease,
-    box-shadow .2s ease;
-}
-
-.gh-locker-zone .locker-equipment .locker-slot-info,
-.gh-locker-zone .locker-equipment .locker-slot-arrow {
-  display: none !important;
-}
-
-.gh-locker-zone .locker-equipment .locker-slot-icon {
-  width: 100%;
-  height: 100%;
-
-  display: grid;
-  place-items: center;
-
-  font-size: 25px;
-  line-height: 1;
-}
-
-
-/* =========================================================
-   DESKTOP — ONLINE PLAYERS LEFT
+   LOCKER SLOTS — DESKTOP (flotando alrededor del avatar)
    ========================================================= */
 
 @media (min-width: 701px) {
 
-  .gh-world__players {
+  .gh-locker-zone .locker-equipment .locker-slot {
     position: absolute;
 
-    top: 105px;
-    left: 18px;
-    bottom: 95px;
+    width: 54px;
+    height: 54px;
 
-    width: 190px;
+    margin: 0;
+    padding: 0;
 
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-
-    gap: 18px;
-
-    z-index: 12;
-
-    pointer-events: none;
-  }
-
-  .gh-world-player {
-    position: relative;
-
-    width: 110px;
-    min-width: 110px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    place-items: center;
 
     pointer-events: auto;
 
-    animation: world-player-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    border-radius: 14px 5px 14px 5px;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(10, 40, 32, 0.92),
+        rgba(4, 20, 16, 0.92)
+      );
+
+    border: 1px solid rgba(76, 210, 155, 0.35);
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 4px 14px rgba(0, 0, 0, 0.45);
+
+    color: #dff8ea;
+
+    cursor: pointer;
 
     transition:
-      transform 0.25s ease,
-      opacity 0.25s ease;
-  }
+      transform .2s ease,
+      filter .2s ease,
+      box-shadow .2s ease,
+      border-color .2s ease;
 
-  .gh-world-player__avatar {
-    width: 62px;
-    height: 62px;
-  }
-
-  .gh-world-player__name {
-    max-width: 105px;
-
-    margin-top: 5px;
-
-    font-size: 8px;
-    line-height: 1.1;
-
-    text-align: center;
-
-    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
-  .gh-world-player__level {
-    margin-top: 2px;
-
-    font-size: 7px;
+  .gh-locker-zone .locker-equipment .locker-slot-info,
+  .gh-locker-zone .locker-equipment .locker-slot-arrow {
+    display: none !important;
   }
 
-  .gh-world-player:hover {
-    transform: scale(1.08);
+  .gh-locker-zone .locker-equipment .locker-slot-icon {
+    width: 100%;
+    height: 100%;
 
-    z-index: 30;
+    display: grid;
+    place-items: center;
+
+    font-size: 25px;
+    line-height: 1;
+
+    background: transparent !important;
+
+    border-radius: 0;
   }
 
-
-  /* =========================================
-     SLOTS — POSICIONES DESKTOP
-     ========================================= */
-
+  /* Posiciones desktop */
   .gh-locker-zone .locker-slot:nth-child(1) {
     left: 8px;
     top: 145px;
-
     transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-slot:nth-child(2) {
     left: 8px;
     top: 275px;
-
     transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-slot:nth-child(3) {
     right: 8px;
     top: 350px;
-
     transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-slot:nth-child(4) {
     right: 8px;
     top: 85px;
-
     transform: translateY(-50%);
   }
 
+  /* Hover */
   .gh-locker-zone .locker-slot:nth-child(1):hover,
   .gh-locker-zone .locker-slot:nth-child(2):hover,
   .gh-locker-zone .locker-slot:nth-child(3):hover,
   .gh-locker-zone .locker-slot:nth-child(4):hover {
     transform: translateY(-50%) scale(1.12);
-
     filter: brightness(1.2);
+    border-color: rgba(76, 210, 155, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 18px rgba(36, 233, 135, 0.35),
+      0 4px 14px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Items equipados brillan con su color */
+  .gh-locker-zone .locker-equipment .locker-slot.equipped {
+    border-color: color-mix(in srgb, var(--locker-color) 60%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 14px color-mix(in srgb, var(--locker-color) 30%, transparent),
+      0 4px 14px rgba(0, 0, 0, 0.45);
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot.empty {
+    opacity: 0.55;
   }
 }
 
@@ -1415,7 +1374,7 @@
   }
 
   .gh-locker-zone .locker-equipment {
-    padding: 0 8px;
+    padding: 0;
   }
 }
 
@@ -1605,14 +1564,18 @@
      MAIN AVATAR
      ------------------------------------------------------- */
 
+   /* -------------------------------------------------------
+     MAIN AVATAR — MÁS CHICO Y CENTRADO
+     ------------------------------------------------------- */
+
   .gh-locker-zone {
     position: absolute;
 
     left: 50%;
-    bottom: 136px;
+    bottom: 130px;
 
-    width: 245px;
-    height: 355px;
+    width: 220px;
+    height: 340px;
 
     transform: translateX(-50%);
 
@@ -1621,16 +1584,6 @@
     overflow: visible;
 
     pointer-events: none;
-  }
-
-  .gh-locker-zone .locker-character {
-    height: 275px;
-    overflow: visible;
-  }
-
-  .gh-locker-zone .locker-avatar {
-    width: 205px;
-    height: 275px;
   }
 
   .gh-locker-zone .locker-preview {
@@ -1657,9 +1610,21 @@
     display: none;
   }
 
+  .gh-locker-zone .locker-character {
+    height: 260px;
+    overflow: visible;
+  }
+
+  .gh-locker-zone .locker-avatar {
+    width: 180px;
+    height: 240px;
+
+    bottom: 0;
+  }
+
   .gh-locker-zone .locker-character-glow {
-    width: 155px;
-    height: 155px;
+    width: 140px;
+    height: 140px;
 
     bottom: 0;
   }
@@ -1669,56 +1634,164 @@
   }
 
   .gh-locker-zone .locker-platform {
-    width: 105px;
-    height: 16px;
+    width: 100px;
+    height: 14px;
 
-    bottom: 2px;
+    bottom: 0;
   }
 
 
   /* -------------------------------------------------------
-     SLOTS — POSICIONES MÓVIL
+     SLOTS — MÁS GRANDES, ALREDEDOR DEL AVATAR
      ------------------------------------------------------- */
 
+  /* Contenedor: cubre todo el gh-locker-zone */
+  .gh-locker-zone .locker-equipment {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    padding: 0 !important;
+
+    transform: none;
+
+    display: block !important;
+
+    z-index: 70;
+
+    pointer-events: none;
+
+    grid-template-columns: none !important;
+    gap: 0 !important;
+  }
+
+  /* Botón del slot */
+  .gh-locker-zone .locker-equipment .locker-slot {
+    position: absolute;
+
+    width: 54px;
+    height: 54px;
+
+    margin: 0;
+    padding: 0;
+
+    display: grid !important;
+    place-items: center;
+
+    pointer-events: auto;
+
+    border-radius: 14px 5px 14px 5px;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(10, 40, 32, 0.94),
+        rgba(4, 20, 16, 0.94)
+      );
+
+    border: 1px solid rgba(76, 210, 155, 0.4);
+
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 4px 14px rgba(0, 0, 0, 0.5);
+
+    color: #dff8ea;
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    transition:
+      transform .2s ease,
+      filter .2s ease,
+      border-color .2s ease;
+
+    gap: 0 !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Ocultar info y flecha */
+  .gh-locker-zone .locker-equipment .locker-slot-info,
+  .gh-locker-zone .locker-equipment .locker-slot-arrow {
+    display: none !important;
+  }
+
+  /* Icono a pantalla completa del slot */
+  .gh-locker-zone .locker-equipment .locker-slot-icon {
+    width: 100% !important;
+    height: 100% !important;
+
+    flex: 0 0 auto !important;
+    flex-basis: auto !important;
+
+    display: grid !important;
+    place-items: center;
+
+    border-radius: 0;
+
+    background: transparent !important;
+
+    font-size: 26px !important;
+    line-height: 1;
+  }
+
+  /* Posiciones absolutas respecto al contenedor (220x340) */
+
+  /* TOP (arriba izquierda) */
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(1) {
-    left: 10px;
-    top: 25%;
-
-    transform: translateY(-50%);
+    left: -12px;
+    top: 60px;
+    transform: none;
   }
 
+  /* BOTTOM (abajo izquierda) */
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
-    left: 10px;
-    top: 50%;
-
-    transform: translateY(-50%);
+    left: -12px;
+    top: 190px;
+    transform: none;
   }
 
+  /* BOOTS (abajo derecha) */
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
-    right: 10px;
-    top: 75%;
-
-    transform: translateY(-50%);
+    right: -12px;
+    left: auto;
+    top: 240px;
+    transform: none;
   }
 
+  /* ACCESSORY (arriba derecha) */
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
-    right: 10px;
-    top: 25%;
-
-    transform: translateY(-50%);
+    right: -12px;
+    left: auto;
+    top: 60px;
+    transform: none;
   }
 
+  /* Estado equipado: brilla con el color del item */
+  .gh-locker-zone .locker-equipment .locker-slot.equipped {
+    border-color: color-mix(in srgb, var(--locker-color) 60%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 0 16px color-mix(in srgb, var(--locker-color) 35%, transparent),
+      0 4px 14px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Estado vacío: más apagado */
+  .gh-locker-zone .locker-equipment .locker-slot.empty {
+    opacity: 0.6;
+  }
+
+  /* Hover */
   .gh-locker-zone .locker-equipment .locker-slot:hover {
     filter: brightness(1.15);
+    border-color: rgba(76, 210, 155, 0.7);
   }
-
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(1):hover,
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(2):hover,
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(3):hover,
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(4):hover {
-    transform: translateY(-50%) scale(1.08);
-  }
-
 
   /* -------------------------------------------------------
      CHAT BUBBLE
@@ -1986,32 +2059,28 @@
     width: 100px;
   }
 
-  .gh-locker-zone .locker-equipment {
-    width: 178px;
-  }
-
 
   /* -------------------------------------------------------
      SLOTS — SMALL PHONES
      ------------------------------------------------------- */
 
   .gh-locker-zone .locker-equipment .locker-slot {
-    width: 46px;
-    height: 46px;
+    width: 42px;
+    height: 42px;
   }
 
   .gh-locker-zone .locker-equipment .locker-slot-icon {
-    font-size: 22px;
+    font-size: 20px !important;
   }
 
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(1),
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
-    left: 6px;
+    left: 4px;
   }
 
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(3),
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
-    right: 6px;
+    right: 4px;
   }
 
 
