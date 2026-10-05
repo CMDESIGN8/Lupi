@@ -1,0 +1,121 @@
+/* src/components/VestuarioFeed.css — usa las variables de .gh-root con valores de respaldo */
+.vf {
+  padding: 18px 20px 16px;
+  border-radius: 22px 6px 22px 6px;
+  background: linear-gradient(180deg, rgba(14, 52, 43, 0.72), rgba(8, 30, 25, 0.9));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(143, 184, 167, 0.22);
+}
+
+.vf-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.vf-title {
+  margin: 0;
+  font: italic 800 24px/1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.vf-badge {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font: 700 11px "Barlow", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gh-muted, #8fb8a7);
+  box-shadow: inset 0 0 0 1px rgba(143, 184, 167, 0.35);
+}
+.vf-mute {
+  margin-left: auto;
+  background: none; border: 0;
+  color: var(--gh-muted, #8fb8a7);
+  font: 600 13px "Barlow", sans-serif;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.vf-mute:hover { color: var(--gh-text, #eaf6ee); }
+
+/* registro de mensajes */
+.vf-log {
+  list-style: none;
+  margin: 0;
+  padding: 2px 4px 2px 0;
+  max-height: 236px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(143, 184, 167, 0.35) transparent;
+}
+
+.vf-msg, .vf-typing { display: flex; align-items: flex-start; gap: 10px; }
+.vf-msg { animation: vf-in 0.3s ease-out both; }
+@keyframes vf-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.vf-avatar {
+  flex: 0 0 auto;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  font-size: 17px;
+  background: color-mix(in srgb, var(--vf-color, #8fb8a7) 22%, #07201b);
+  box-shadow: inset 0 0 0 2px var(--vf-color, #8fb8a7);
+}
+
+.vf-body { min-width: 0; }
+.vf-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+.vf-meta strong {
+  font: italic 700 16px/1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.03em;
+  color: var(--vf-color, #eaf6ee);
+}
+.vf-tag, .vf-npc {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font: 700 10px "Barlow", sans-serif;
+  letter-spacing: 0.08em;
+}
+.vf-tag { background: rgba(255, 255, 255, 0.1); color: var(--gh-text, #eaf6ee); }
+.vf-npc { box-shadow: inset 0 0 0 1px rgba(143, 184, 167, 0.5); color: var(--gh-muted, #8fb8a7); }
+
+.vf-body p {
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 4px 14px 14px 14px;
+  background: rgba(0, 0, 0, 0.32);
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--gh-text, #eaf6ee);
+}
+
+.vf-note { margin: 0; font-size: 13px; color: var(--gh-muted, #8fb8a7); list-style: none; }
+
+/* "está escribiendo..." */
+.vf-dots {
+  display: inline-flex; gap: 4px; align-items: center;
+  padding: 11px 14px;
+  border-radius: 4px 14px 14px 14px;
+  background: rgba(0, 0, 0, 0.32);
+}
+.vf-dots i {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--vf-color, #8fb8a7);
+  animation: vf-bounce 1s ease-in-out infinite;
+}
+.vf-dots i:nth-child(2) { animation-delay: 0.15s; }
+.vf-dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes vf-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30%           { transform: translateY(-4px); opacity: 1; }
+}
+
+@media (max-width: 560px) {
+  .vf { padding: 14px 14px 12px; }
+  .vf-log { max-height: 210px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vf-msg, .vf-dots i { animation: none; }
+}

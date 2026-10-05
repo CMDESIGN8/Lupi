@@ -82,7 +82,7 @@ export function DailyMissionPreview({
           <div style={styles.rewardRow}>
             ✨ +{mission.reward.xp} XP
             {mission.reward.coins &&
-              ` • 🪙 ${mission.reward.coins}`}
+              ` • 💰 ${mission.reward.coins}`}
           </div>
         </div>
 

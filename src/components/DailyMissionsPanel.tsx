@@ -321,7 +321,7 @@
                           styles.rewardChipCoins
                         }
                       >
-                        🪙 +
+                        💰 +
                         {
                           mission.reward
                             .coins

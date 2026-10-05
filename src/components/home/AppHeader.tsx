@@ -1,19 +1,33 @@
 // components/home/AppHeader.tsx
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { useUserStats } from '../../hooks/useUserStats';
+
 import { useClubRanking } from '../../hooks/useClubRanking';
 import { RARITY_CONFIG } from '../../utils/userProgression';
 import { Notifications } from '../Notifications';
+import { useHeroDataCached } from '../../hooks/useHeroData';
 
 interface AppHeaderProps {
   userId: string;
 }
 
+interface UserProfile {
+  username: string | null;
+  club: string | null;
+}
+
 export function AppHeader({ userId }: AppHeaderProps) {
-  const [user, setUser] = useState<any>(null);
-  const { stats, loading } = useUserStats(userId);
-  const { clubRanking } = useClubRanking(userId);
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  
+
+const { clubRanking } = useClubRanking(userId);
+
+const {
+  data: heroData,
+  loading: heroLoading,
+  refetch: refetchHero,
+} = useHeroDataCached(userId);
 
   useEffect(() => {
     loadUserProfile();
@@ -21,32 +35,55 @@ export function AppHeader({ userId }: AppHeaderProps) {
 
   const loadUserProfile = async () => {
     try {
-      // ✅ Selecciona solo las columnas que existen en tu tabla profiles
       const { data, error } = await supabase
-        .from('profiles')
-        .select('username, club, points') // coins y gems probablemente no existen
-        .eq('id', userId)
-        .single();
-      
+  .from('profiles')
+  .select(`
+    username,
+    club
+  `)
+  .eq('id', userId)
+  .single();
+
       if (error) {
         console.error('Error loading user profile:', error);
         return;
       }
-      
+
       if (data) {
-        setUser({
-          ...data,
-          coins: data.points || 0,     // Usar points como coins si no existe
-          gems: 0                       // Valor por defecto si no existe
-        });
-      }
+  setUser({
+    username: data.username,
+    club: data.club,
+  });
+}
     } catch (err) {
       console.error('Unexpected error:', err);
     }
   };
+  useEffect(() => {
+  const handleProgressionUpdate = (event: Event) => {
+    const customEvent = event as CustomEvent;
 
-  // Si aún hay error, mostrar algo simple mientras cargas
-  if (loading || !user || !stats) {
+    if (customEvent.detail?.userId !== userId) return;
+
+    console.log("🔄 Header: progresión actualizada");
+
+    refetchHero();
+  };
+
+  window.addEventListener(
+    "lupi:progression-updated",
+    handleProgressionUpdate
+  );
+
+  return () => {
+    window.removeEventListener(
+      "lupi:progression-updated",
+      handleProgressionUpdate
+    );
+  };
+}, [userId, refetchHero]);
+
+  if (heroLoading || !user || !heroData) {
     return (
       <header className="app-header">
         <div className="header-inner">
@@ -55,78 +92,238 @@ export function AppHeader({ userId }: AppHeaderProps) {
             <div className="skel-info" />
           </div>
         </div>
+
         <style>{headerStyles}</style>
       </header>
     );
   }
 
-  const xpPercentage = Math.min((stats.exp / stats.expNeeded) * 100, 100);
-  const rarity = RARITY_CONFIG[stats.rarity as keyof typeof RARITY_CONFIG];
+const currentLevel = heroData.level ?? 1;
+const currentExp = heroData.exp ?? 0;
+const currentExpNeeded = heroData.expNeeded ?? 100;
+
+const xpPercentage = Math.min(
+  (currentExp / Math.max(currentExpNeeded, 1)) * 100,
+  100
+);
+
+const currentRarity = heroData.rarity ?? "bronze";
+
+const rarity =
+  RARITY_CONFIG[
+    currentRarity as keyof typeof RARITY_CONFIG
+  ];
+
   const clubRank = clubRanking?.rank || 0;
 
   return (
     <header className="app-header">
       <div className="header-inner">
-        {/* LEFT: Avatar + Info */}
+
+        {/* =====================================================
+            LEFT — PLAYER
+        ====================================================== */}
+
         <div className="user-left">
-          <div className="avatar-wrap" style={{ borderColor: rarity?.color || '#189df5' }}>
-            <img src="/images/avatar.png" alt="avatar" className="avatar-img" />
-            <span className="lvl-badge" style={{ background: rarity?.color || '#189df5' }}>
-              {stats.level}
+
+          <div
+            className="avatar-wrap"
+            style={{
+              borderColor: rarity?.color || '#189df5',
+              boxShadow: rarity
+                ? `0 0 14px ${rarity.color}55`
+                : 'none',
+            }}
+          >
+            <img
+              src="/images/avatar.png"
+              alt="avatar"
+              className="avatar-img"
+            />
+
+            <span
+              className="lvl-badge"
+              style={{
+                background: rarity?.color || '#189df5',
+              }}
+            >
+              {currentLevel}
             </span>
           </div>
 
           <div className="user-info">
+
+            {/* NAME */}
             <div className="name-row">
-              <span className="username">{user.username}</span>
+
+              <span className="username">
+                {user.username || 'Jugador'}
+              </span>
+
               {rarity && (
-                <span className="rarity-pill" style={{ background: rarity.color }}>
+                <span
+                  className="rarity-pill"
+                  style={{
+                    background: rarity.color,
+                  }}
+                >
                   {rarity.icon} {rarity.name}
                 </span>
               )}
+
             </div>
 
+            {/* CLUB + STREAK */}
             <div className="club-row">
-              <span className={`club-name-text ${clubRank === 1 ? 'gold' : clubRank === 2 ? 'silver' : clubRank === 3 ? 'bronze' : ''}`}>
-                {user.club}
+
+              <span
+                className={`club-name-text ${
+                  clubRank === 1
+                    ? 'gold'
+                    : clubRank === 2
+                    ? 'silver'
+                    : clubRank === 3
+                    ? 'bronze'
+                    : ''
+                }`}
+              >
+                {user.club || 'Sin club'}
               </span>
+
               {clubRank > 0 && clubRank <= 3 && (
-                <span className={`club-rank-badge rank-${clubRank}`}>
-                  {clubRank === 1 ? '🏆 #1' : clubRank === 2 ? '🥈 #2' : '🥉 #3'}
+                <span
+                  className={`club-rank-badge rank-${clubRank}`}
+                >
+                  {clubRank === 1
+                    ? '🏆 #1'
+                    : clubRank === 2
+                    ? '🥈 #2'
+                    : '🥉 #3'}
                 </span>
               )}
+
+              {/* STREAK */}
+              {(heroData.streak ?? 0) > 0 && (
+                <span className="streak-badge">
+                  🔥 {heroData.streak}
+                </span>
+              )}
+
             </div>
 
+            {/* XP */}
             <div className="xp-wrap">
+
               <div className="xp-top-row">
-                <span className="xp-level-label">NIVEL {stats.level}</span>
-                <span className="xp-nums">{stats.exp} / {stats.expNeeded} XP</span>
+
+                <span className="xp-level-label">
+                  NIVEL {currentLevel}
+                </span>
+
+                <span className="xp-nums">
+                  {currentExp} / {currentExpNeeded} XP
+                </span>
+
               </div>
+
               <div className="xp-track">
+
                 <div
                   className="xp-fill"
                   style={{
                     width: `${xpPercentage}%`,
-                    background: rarity?.color || '#189df5',
+                    background:
+                      rarity?.color || '#189df5',
                   }}
                 />
+
               </div>
+
             </div>
+
           </div>
         </div>
 
-        {/* RIGHT: Currencies + Bell */}
+        {/* =====================================================
+            RIGHT — CURRENCIES + NOTIFICATIONS
+        ====================================================== */}
+
         <div className="header-right">
+
           <div className="currencies">
+
             <div className="currency-pill gold-pill">
-              <span className="currency-emoji">🌟</span>
-              <span className="currency-amount gold-amount">{user.points?.toLocaleString('es-AR') || 0}</span>
+              <span className="currency-emoji">
+                💰
+              </span>
+
+              <span className="currency-amount gold-amount">
+                {(heroData.coins ?? 0).toLocaleString('es-AR')}
+              </span>
             </div>
-            {/* Si no tienes gems, oculta esta sección o muestra puntos */}
+
+            <div className="currency-pill green-pill">
+              <span className="currency-emoji">
+                ⭐
+              </span>
+
+              <span className="currency-amount green-amount">
+                {(heroData.points ?? 0).toLocaleString('es-AR')}
+              </span>
+            </div>
+
           </div>
+
           <Notifications userId={userId} />
+
         </div>
+
       </div>
+
+      {/* =====================================================
+          PLAYER STATS STRIP
+      ====================================================== */}
+
+      <div className="header-stats">
+
+        <div className="stat-mini">
+          <span className="stat-icon">⚡</span>
+          <span className="stat-label">PAC</span>
+          <strong>{heroData.stats?.pace ?? 0}</strong>
+        </div>
+
+        <div className="stat-mini">
+          <span className="stat-icon">🌀</span>
+          <span className="stat-label">DRI</span>
+          <strong>{heroData.stats?.dribbling ?? 0}</strong>
+        </div>
+
+        <div className="stat-mini">
+          <span className="stat-icon">🤝</span>
+          <span className="stat-label">PAS</span>
+          <strong>{heroData?.stats?.passing ?? 0}</strong>
+        </div>
+
+        <div className="stat-mini">
+          <span className="stat-icon">🛡️</span>
+          <span className="stat-label">DEF</span>
+          <strong>{heroData.stats?.defending ?? 0}</strong>
+        </div>
+
+        <div className="stat-mini">
+          <span className="stat-icon">🎯</span>
+          <span className="stat-label">FIN</span>
+          <strong>{heroData?.stats?.finishing ?? 0}</strong>
+        </div>
+
+        <div className="stat-mini">
+          <span className="stat-icon">💪</span>
+          <span className="stat-label">PHY</span>
+          <strong>{heroData?.stats?.physical ?? 0}</strong>
+        </div>
+
+      </div>
+
       <style>{headerStyles}</style>
     </header>
   );
@@ -140,7 +337,7 @@ const headerStyles = `
     background: rgba(10, 12, 22, 0.97);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding: 10px 16px;
+    padding: 10px 16px 8px;
   }
 
   .header-inner {
@@ -152,7 +349,10 @@ const headerStyles = `
     margin: 0 auto;
   }
 
-  /* ---- LEFT ---- */
+  /* ===============================
+     PLAYER
+  =============================== */
+
   .user-left {
     display: flex;
     align-items: center;
@@ -169,6 +369,7 @@ const headerStyles = `
     border: 2.5px solid #189df5;
     flex-shrink: 0;
     overflow: visible;
+    transition: all 0.3s ease;
   }
 
   .avatar-img {
@@ -183,7 +384,6 @@ const headerStyles = `
     position: absolute;
     bottom: -5px;
     right: -8px;
-    background: #189df5;
     color: #000;
     font-size: 10px;
     font-weight: 900;
@@ -224,6 +424,10 @@ const headerStyles = `
     color: #000;
   }
 
+  /* ===============================
+     CLUB / STREAK
+  =============================== */
+
   .club-row {
     display: flex;
     align-items: center;
@@ -232,45 +436,37 @@ const headerStyles = `
     flex-wrap: wrap;
   }
 
-  .club-icon-emoji {
-    font-size: 12px;
-    line-height: 1;
-  }
-
   .club-name-text {
     font-size: 13px;
     color: rgba(255,255,255,0.65);
     font-weight: 600;
   }
 
-  .club-name-text.gold {
-    background: linear-gradient(135deg, #00ff00, #4eff6c);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+  .streak-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 20px;
+    background: rgba(255, 88, 40, 0.12);
+    border: 1px solid rgba(255, 88, 40, 0.3);
+    color: #ff7043;
+    font-size: 10px;
     font-weight: 800;
-    animation: goldPulse 2.5s ease-in-out infinite;
+  }
+
+  .club-name-text.gold {
+    color: #00ff4c;
+    font-weight: 800;
   }
 
   .club-name-text.silver {
-    background: linear-gradient(135deg, #e0e0e0, #c0c0c0);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: #c0c0c0;
     font-weight: 700;
   }
 
   .club-name-text.bronze {
-    background: linear-gradient(135deg, #cd7f32, #b87333);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: #cd7f32;
     font-weight: 700;
-  }
-
-  @keyframes goldPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
   }
 
   .club-rank-badge {
@@ -278,9 +474,6 @@ const headerStyles = `
     font-weight: 700;
     padding: 1px 7px;
     border-radius: 20px;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
   }
 
   .club-rank-badge.rank-1 {
@@ -288,16 +481,22 @@ const headerStyles = `
     color: #00ff4c;
     border: 1px solid rgba(255,215,0,0.35);
   }
+
   .club-rank-badge.rank-2 {
     background: rgba(192,192,192,0.15);
     color: #c0c0c0;
     border: 1px solid rgba(192,192,192,0.35);
   }
+
   .club-rank-badge.rank-3 {
     background: rgba(205,127,50,0.15);
     color: #cd7f32;
     border: 1px solid rgba(205,127,50,0.35);
   }
+
+  /* ===============================
+     XP
+  =============================== */
 
   .xp-wrap {
     width: 100%;
@@ -319,7 +518,7 @@ const headerStyles = `
 
   .xp-nums {
     font-size: 10px;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255,255,255,0.7);
     font-family: monospace;
   }
 
@@ -345,15 +544,25 @@ const headerStyles = `
     left: -100%;
     width: 60%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.35),
+      transparent
+    );
     animation: shine 2s infinite;
   }
 
   @keyframes shine {
-    to { left: 160%; }
+    to {
+      left: 160%;
+    }
   }
 
-  /* ---- RIGHT ---- */
+  /* ===============================
+     CURRENCIES
+  =============================== */
+
   .header-right {
     display: flex;
     align-items: center;
@@ -373,17 +582,24 @@ const headerStyles = `
     gap: 5px;
     padding: 4px 8px 4px 7px;
     border-radius: 20px;
-    cursor: pointer;
   }
 
   .gold-pill {
-    background: rgba(255, 200, 0, 0.1);
-    border: 1px solid rgba(255, 200, 0, 0.25);
+    background: rgba(255,200,0,0.1);
+    border: 1px solid rgba(255,200,0,0.25);
   }
 
   .green-pill {
-    background: rgba(0, 200, 100, 0.1);
-    border: 1px solid rgba(0, 200, 100, 0.25);
+    background: rgba(61,255,160,0.1);
+    border: 1px solid rgba(61,255,160,0.25);
+  }
+
+  .gold-amount {
+    color: #ffd700;
+  }
+
+  .green-amount {
+    color: #3dffa0;
   }
 
   .currency-emoji {
@@ -397,34 +613,51 @@ const headerStyles = `
     min-width: 36px;
   }
 
-  .gold-amount { color: #ffd700; }
-  .green-amount { color: #00e070; }
+  /* ===============================
+     STATS
+  =============================== */
 
-  .plus-btn {
-    border: none;
-    border-radius: 50%;
-    width: 18px;
-    height: 18px;
-    font-size: 13px;
-    font-weight: 900;
-    cursor: pointer;
+  .header-stats {
+    max-width: 480px;
+    margin: 8px auto 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    padding-top: 7px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .stat-mini {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    gap: 1px;
+    padding: 3px 0;
+  }
+
+  .stat-icon {
+    font-size: 11px;
     line-height: 1;
   }
 
-  .gold-plus {
-    background: rgba(255,200,0,0.2);
-    color: #ffd700;
+  .stat-label {
+    font-size: 7px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.5px;
   }
 
-  .green-plus {
-    background: rgba(0,200,100,0.2);
-    color: #00e070;
+  .stat-mini strong {
+    font-size: 12px;
+    color: #fff;
+    font-weight: 900;
+    line-height: 1;
   }
 
-  /* ---- SKELETON ---- */
+  /* ===============================
+     SKELETON
+  =============================== */
+
   .header-skeleton {
     display: flex;
     gap: 12px;
@@ -435,7 +668,11 @@ const headerStyles = `
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(90deg, #1a1a2e, #2a2a3e);
+    background: linear-gradient(
+      90deg,
+      #1a1a2e,
+      #2a2a3e
+    );
     animation: skPulse 1.5s infinite;
   }
 
@@ -443,20 +680,86 @@ const headerStyles = `
     width: 160px;
     height: 56px;
     border-radius: 10px;
-    background: linear-gradient(90deg, #1a1a2e, #2a2a3e);
+    background: linear-gradient(
+      90deg,
+      #1a1a2e,
+      #2a2a3e
+    );
     animation: skPulse 1.5s infinite;
   }
 
   @keyframes skPulse {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 0.8; }
+    0%, 100% {
+      opacity: 0.4;
+    }
+
+    50% {
+      opacity: 0.8;
+    }
   }
 
-  /* ---- RESPONSIVE ---- */
+  /* ===============================
+     RESPONSIVE
+  =============================== */
+
+  @media (max-width: 420px) {
+
+    .currencies {
+      gap: 4px;
+    }
+
+    .currency-pill {
+      padding: 3px 6px;
+    }
+
+    .currency-emoji {
+      font-size: 13px;
+    }
+
+    .currency-amount {
+      font-size: 11px;
+      min-width: 28px;
+    }
+
+    .header-stats {
+      gap: 1px;
+    }
+
+    .stat-icon {
+      font-size: 10px;
+    }
+
+    .stat-label {
+      font-size: 6px;
+    }
+
+    .stat-mini strong {
+      font-size: 11px;
+    }
+  }
+
   @media (max-width: 380px) {
-    .app-header { padding: 8px 12px; }
-    .username { font-size: 16px; }
-    .avatar-wrap { width: 48px; height: 48px; }
-    .currency-amount { min-width: 28px; font-size: 12px; }
+
+    .app-header {
+      padding: 8px 12px;
+    }
+
+    .username {
+      font-size: 16px;
+    }
+
+    .avatar-wrap {
+      width: 48px;
+      height: 48px;
+    }
+
+    .currency-amount {
+      min-width: 28px;
+      font-size: 12px;
+    }
+
+    .header-stats {
+      margin-top: 6px;
+    }
   }
 `;

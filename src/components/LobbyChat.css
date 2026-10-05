@@ -1,0 +1,478 @@
+/* src/components/LobbyChat.css */
+.lc {
+  --lc-bg: rgba(5, 19, 16, 0.9);
+  --lc-panel: rgba(10, 39, 32, 0.82);
+  --lc-line: rgba(93, 184, 147, 0.2);
+  --lc-text: #eaf6ee;
+  --lc-muted: #86aa9b;
+  --lc-green: #2bd67b;
+  --lc-gold: #ffc83d;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+  border: 1px solid var(--lc-line);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(43, 214, 123, 0.1), transparent 32%),
+    linear-gradient(180deg, rgba(14, 51, 42, 0.92), var(--lc-bg));
+  border-radius: 18px 5px 18px 5px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 45px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
+}
+
+.lc-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: linear-gradient(180deg, rgba(255,255,255,.035), transparent);
+}
+
+.lc-kicker {
+  color: var(--lc-green);
+  font: 800 9px/1 "Barlow Condensed", sans-serif;
+  letter-spacing: .18em;
+}
+
+.lc-title {
+  margin: 4px 0 0;
+  color: var(--lc-text);
+  font: italic 800 22px/1 "Barlow Condensed", sans-serif;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.lc-head-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.lc-status,
+.lc-npc-toggle {
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px;
+  padding: 6px 9px;
+  font: 700 10px/1 "Barlow", sans-serif;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+.lc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--lc-muted);
+  background: rgba(0,0,0,.16);
+}
+
+.lc-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #777;
+}
+
+.lc-status--online { color: #bfffd9; }
+.lc-status--online i {
+  background: var(--lc-green);
+  box-shadow: 0 0 10px rgba(43,214,123,.65);
+}
+
+.lc-status--offline i { background: #ff6464; }
+
+.lc-npc-toggle {
+  cursor: pointer;
+  color: var(--lc-green);
+  background: rgba(43,214,123,.08);
+}
+
+.lc-npc-toggle:hover { background: rgba(43,214,123,.15); }
+.lc-npc-toggle.is-muted { color: var(--lc-muted); background: transparent; }
+
+.lc-log-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(143,184,167,.25) transparent;
+}
+
+.lc-log {
+  list-style: none;
+  margin: 0;
+  padding: 14px 14px 18px;
+
+  min-height: 100%;
+  box-sizing: border-box;
+
+  overflow: visible;
+}
+
+.lc-log::-webkit-scrollbar { width: 5px; }
+.lc-log::-webkit-scrollbar-track { background: transparent; }
+.lc-log::-webkit-scrollbar-thumb { background: rgba(143,184,167,.25); border-radius: 99px; }
+
+.lc-message {
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+  margin: 0 0 12px;
+  animation: lc-in .24s ease-out both;
+}
+
+@keyframes lc-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.lc-message.is-me { flex-direction: row-reverse; }
+
+.lc-avatar {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 12px 4px 12px 4px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: linear-gradient(145deg, #173f34, #071814);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.lc-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lc-avatar__fallback { font-size: 19px; }
+
+.lc-avatar--npc {
+  font-size: 21px;
+  border-color: color-mix(in srgb, var(--lc-color) 55%, transparent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--lc-color) 16%, transparent), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.lc-level {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  min-width: 16px;
+  padding: 2px 3px;
+  border-radius: 5px 0 0 0;
+  background: #071713;
+  color: var(--lc-gold);
+  font: 800 8px/1 "Barlow", sans-serif;
+  text-align: center;
+}
+
+.lc-bubble-wrap {
+  min-width: 0;
+  max-width: min(78%, 440px);
+}
+
+.lc-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 5px 4px;
+  min-width: 0;
+}
+
+.lc-message.is-me .lc-meta { justify-content: flex-end; }
+
+.lc-meta strong {
+  color: var(--lc-text);
+  font: 800 12px/1 "Barlow", sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lc-badge,
+.lc-club,
+.lc-time {
+  color: var(--lc-muted);
+  font: 600 9px/1 "Barlow", sans-serif;
+}
+
+.lc-badge {
+  padding: 3px 5px;
+  border-radius: 4px;
+  background: rgba(255,255,255,.06);
+}
+
+.lc-badge--npc {
+  color: var(--lc-color, var(--lc-green));
+  background: color-mix(in srgb, var(--lc-color, var(--lc-green)) 10%, transparent);
+}
+
+.lc-bubble {
+  display: inline-block;
+  padding: 9px 11px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px 12px 12px 3px;
+  color: #e8f3ed;
+  background: rgba(255,255,255,.055);
+  font: 500 13px/1.35 "Barlow", sans-serif;
+  word-break: break-word;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+.lc-message.is-me .lc-bubble {
+  border-color: rgba(43,214,123,.2);
+  border-radius: 12px 12px 3px 12px;
+  background: linear-gradient(135deg, rgba(43,214,123,.18), rgba(14,74,56,.38));
+}
+
+.lc-message--npc .lc-bubble {
+  border-color: color-mix(in srgb, var(--lc-color, var(--lc-green)) 18%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--lc-color, var(--lc-green)) 8%, transparent), rgba(255,255,255,.035));
+}
+
+.lc-bubble--typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 40px;
+}
+
+.lc-bubble--typing i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--lc-color, var(--lc-green));
+  animation: lc-dot 1s infinite ease-in-out;
+}
+.lc-bubble--typing i:nth-child(2) { animation-delay: .12s; }
+.lc-bubble--typing i:nth-child(3) { animation-delay: .24s; }
+
+@keyframes lc-dot {
+  0%, 70%, 100% { opacity: .25; transform: translateY(0); }
+  35% { opacity: 1; transform: translateY(-3px); }
+}
+
+.lc-empty {
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: var(--lc-muted);
+  text-align: center;
+  font: 500 12px/1.35 "Barlow", sans-serif;
+}
+
+.lc-empty strong {
+  color: var(--lc-text);
+  font: 800 16px/1 "Barlow Condensed", sans-serif;
+  text-transform: uppercase;
+}
+
+.lc-empty__icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+  border: 1px solid rgba(43,214,123,.16);
+  border-radius: 14px 4px 14px 4px;
+  background: rgba(43,214,123,.07);
+  font-size: 20px;
+}
+
+.lc-composer {
+  display: flex;
+  gap: 7px;
+  padding: 10px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  background: rgba(2,12,10,.72);
+}
+
+.lc-input-shell {
+  min-width: 0;
+  flex: 1;
+  position: relative;
+}
+
+.lc-input-shell input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 42px;
+  padding: 0 50px 0 12px;
+  border: 1px solid rgba(143,184,167,.18);
+  border-radius: 10px 3px 10px 3px;
+  outline: none;
+  color: var(--lc-text);
+  background: rgba(255,255,255,.045);
+  font: 500 13px "Barlow", sans-serif;
+}
+
+.lc-input-shell input::placeholder { color: #658477; }
+.lc-input-shell input:focus {
+  border-color: rgba(43,214,123,.5);
+  box-shadow: 0 0 0 3px rgba(43,214,123,.07);
+}
+
+.lc-counter {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #57766b;
+  font: 600 9px "Barlow", sans-serif;
+}
+.lc-counter.is-warning { color: var(--lc-gold); }
+
+.lc-send {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 0;
+  border-radius: 10px 3px 10px 3px;
+  cursor: pointer;
+  color: #07150f;
+  background: linear-gradient(135deg, #51e892, #1ebf69);
+  box-shadow: 0 8px 20px rgba(43,214,123,.16);
+  font-size: 19px;
+  transition: transform .16s ease, filter .16s ease, opacity .16s ease;
+}
+
+.lc-send:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.08); }
+.lc-send:disabled { opacity: .3; cursor: not-allowed; box-shadow: none; }
+
+.lc-error {
+  margin: 0;
+  padding: 0 13px 7px;
+  color: #ffb4a7;
+  font: 600 10px/1.3 "Barlow", sans-serif;
+}
+
+.lc-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 13px 10px;
+  color: #557268;
+  font: 500 9px "Barlow", sans-serif;
+}
+
+.lc-foot__dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #557268;
+}
+
+@media (max-width: 640px) {
+  .lc { min-height: 330px; border-radius: 14px 4px 14px 4px; }
+  .lc-head { padding: 12px; }
+  .lc-title { font-size: 20px; }
+  .lc-npc-toggle { display: none; }
+  .lc-log { height: 285px; padding: 12px 10px 16px; }
+  .lc-avatar { width: 34px; height: 34px; flex-basis: 34px; }
+  .lc-bubble-wrap { max-width: 82%; }
+  .lc-bubble { font-size: 12px; }
+  .lc-foot { display: none; }
+}
+
+/* ============================================================
+   PARCHE para src/components/LobbyChat.css
+   1) Pegá todo esto al FINAL del archivo.
+   2) Dentro del @media (max-width: 640px) existente, BORRÁ la línea:
+        .lc-log { height: 285px; padding: 12px 10px 16px; }
+      y reemplazala por:
+        .lc-log { padding: 12px 10px 16px; }
+   ============================================================ */
+
+/* Altura definida: sin esto .lc-log-wrap nunca scrollea.
+   Si GameHub ya le fija alto al chat, borrá esta regla. */
+.lc { height: clamp(380px, 62vh, 580px); }
+
+
+/* El body del chat contiene el log y el pill flotante de "nuevos" */
+.lc-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.lc-body .lc-log-wrap { flex: 1 1 auto; }
+ 
+/* Líneas de sistema (entró, salió, subió de nivel, aura) */
+.lc-system {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 10px;
+  animation: lc-in .24s ease-out both;
+}
+.lc-system span {
+  max-width: 92%;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .045);
+  color: var(--lc-muted);
+  font: 600 10px/1.3 "Barlow", sans-serif;
+  text-align: center;
+}
+.lc-system--level_up span { color: var(--lc-gold); background: rgba(255, 200, 61, .08); }
+.lc-system--aura_spotted span { color: #d3b8ff; background: rgba(176, 97, 255, .1); }
+.lc-system--player_join span { color: #bfffd9; }
+ 
+/* Pill "N mensajes nuevos" */
+.lc-unread {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  padding: 7px 13px;
+  border: 1px solid rgba(43, 214, 123, .4);
+  border-radius: 999px;
+  cursor: pointer;
+  color: #07150f;
+  background: linear-gradient(135deg, #51e892, #1ebf69);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .35);
+  font: 800 11px/1 "Barlow", sans-serif;
+  animation: lc-in .2s ease-out both;
+}
+.lc-unread:hover { filter: brightness(1.08); }
+ 
+/* Borde de rareza en el avatar del chat (igual que en LobbyPlayers) */
+.lc-avatar--rarity {
+  border-color: color-mix(in srgb, var(--lc-rarity) 70%, transparent);
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--lc-rarity) 28%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+ 
+@media (max-width: 640px) {
+  .lc { height: clamp(340px, 58vh, 480px); }
+}
+ 
+@media (prefers-reduced-motion: reduce) {
+  .lc-message,
+  .lc-system,
+  .lc-unread,
+  .lc-bubble--typing i { animation: none; }
+}
+ 
+/* ---- Avatar del chat clickable (abre PlayerCard) ---- */
+button.lc-avatar { padding: 0; cursor: pointer; font: inherit; color: inherit; }
+.lc-avatar--btn:hover { filter: brightness(1.15); }
+.lc-avatar--btn:focus-visible { outline: 2px solid var(--lc-green); outline-offset: 2px; }

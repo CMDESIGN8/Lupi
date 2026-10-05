@@ -22,7 +22,7 @@ export function HomeHero({
   energy = 18,
   energyMax = 20,
   timerLabel = '02:45',
-  rewardIcon = '🪙',
+  rewardIcon = '💰',
   rewardCoins = 500,
   rewardDescription,
 }: HomeHeroProps) {
@@ -113,7 +113,7 @@ const heroStyles = `
     inset: 0;
     background: linear-gradient(
       to right,
-      rgba(4, 8, 22, 0.93) 35%,
+      rgba(4, 8, 22, 0.63) 35%,
       rgba(4, 8, 22, 0.5) 65%,
       rgba(4, 8, 22, 0.15) 100%
     );

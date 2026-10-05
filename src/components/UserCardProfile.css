@@ -1,0 +1,1328 @@
+/* =========================================================
+   LUPIAPP × AURA XP
+   USER CARD / DIGITAL IDENTITY
+   ========================================================= */
+
+.user-card-profile {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   MAIN CARD
+   ========================================================= */
+
+.aura-card {
+  position: relative;
+  
+
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 28px;
+
+  border-radius: 28px;
+
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      rgba(255, 255, 255, 0.055),
+      transparent 34%
+    ),
+    linear-gradient(
+      145deg,
+      #111116 0%,
+      #09090d 48%,
+      #050507 100%
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  color: #ffffff;
+
+  isolation: isolate;
+}
+
+/* subtle background grid */
+
+.aura-card::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    );
+
+  background-size: 28px 28px;
+
+  mask-image: linear-gradient(
+    to bottom,
+    black,
+    transparent 75%
+  );
+
+  pointer-events: none;
+
+  z-index: -2;
+}
+
+/* =========================================================
+   WORLD GLOW
+   ========================================================= */
+
+.aura-card::after {
+  content: "";
+
+  position: absolute;
+
+  width: 360px;
+  height: 360px;
+
+  top: 110px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  filter: blur(80px);
+
+  opacity: 0.10;
+
+  pointer-events: none;
+
+  z-index: -1;
+}
+
+/* URBAN */
+
+/* =========================================================
+   WORLD COLORS — AURA XP
+   ========================================================= */
+
+/* 🟢 URBAN */
+.aura-urban {
+  --aura-color: #00ff87;
+  --aura-color-soft: rgba(0, 255, 135, 0.18);
+  --aura-color-medium: rgba(0, 255, 135, 0.38);
+}
+
+.aura-urban::after {
+  background: #00ff87;
+}
+
+
+/* 🔵 SPORT */
+.aura-sport {
+  --aura-color: #00e1ff;
+  --aura-color-soft: rgba(0, 225, 255, 0.18);
+  --aura-color-medium: rgba(0, 225, 255, 0.38);
+}
+
+.aura-sport::after {
+  background: #00e1ff;
+}
+
+
+/* 🩷 GAMER */
+.aura-gamer {
+  --aura-color: #ff007f;
+  --aura-color-soft: rgba(255, 0, 127, 0.18);
+  --aura-color-medium: rgba(255, 0, 127, 0.38);
+}
+
+.aura-gamer::after {
+  background: #ff007f;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.aura-card-header {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 12px;
+}
+
+/* =========================================================
+   WORLD
+   ========================================================= */
+
+.aura-world {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.aura-world-label {
+  display: inline-flex;
+  align-items: center;
+
+  width: fit-content;
+
+  font-size: 13px;
+  font-weight: 900;
+
+  letter-spacing: 0.16em;
+
+  color: var(--aura-color);
+
+  text-shadow:
+    0 0 16px var(--aura-color-soft);
+}
+
+.aura-world-description {
+  font-size: 11px;
+  font-weight: 500;
+
+  color: rgba(255, 255, 255, 0.42);
+
+  letter-spacing: 0.03em;
+}
+
+/* =========================================================
+   LEVEL
+   ========================================================= */
+
+.aura-level {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+
+  flex-shrink: 0;
+}
+
+.aura-level span {
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.18em;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.aura-level strong {
+  font-size: 30px;
+
+  line-height: 1;
+
+  font-weight: 950;
+
+  letter-spacing: -0.06em;
+
+  color: #ffffff;
+
+  text-shadow:
+    0 0 24px var(--aura-color-soft);
+}
+
+/* =========================================================
+   CHARACTER SECTION
+   ========================================================= */
+
+.aura-character-section {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-top: 2px;
+}
+
+/* =========================================================
+   AURA LABEL
+   ========================================================= */
+
+.aura-character-label {
+  position: relative;
+  z-index: 3;
+
+  margin-top: 4px;
+  margin-bottom: -8px;
+
+  font-size: 10px;
+
+  font-weight: 950;
+
+  letter-spacing: 0.38em;
+
+  color: var(--aura-color);
+
+  text-shadow:
+    0 0 14px var(--aura-color-medium);
+}
+
+/* =========================================================
+   CHARACTER AREA
+   ========================================================= */
+
+.aura-character-area {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 310px;
+
+  margin-top: 0;
+
+  overflow: hidden;
+}
+
+/* =========================================================
+   CHARACTER GLOW
+   ========================================================= */
+
+.aura-character-glow {
+  position: absolute;
+
+  width: 220px;
+  height: 220px;
+
+  left: 50%;
+  top: 50%;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      var(--aura-color-medium) 0%,
+      var(--aura-color-soft) 30%,
+      transparent 70%
+    );
+
+  filter: blur(12px);
+
+  animation: auraPulse 3s ease-in-out infinite;
+}
+
+/* =========================================================
+   CHARACTER PLACEHOLDER
+   FUTURE 3D MODEL GOES HERE
+   ========================================================= */
+
+.aura-character {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 150px;
+  height: 220px;
+
+  animation:
+    auraCharacterFloat
+    4s ease-in-out infinite;
+}
+
+/* =========================================================
+   CHARACTER HEAD
+   ========================================================= */
+
+.aura-character-head {
+  position: relative;
+  z-index: 3;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 72px;
+  height: 72px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle at 35% 28%,
+      #ffffff 0%,
+      #d9d9df 28%,
+      #8f9098 72%,
+      #55565d 100%
+    );
+
+  border: 3px solid rgba(255, 255, 255, 0.14);
+
+  color: #111;
+
+  font-size: 22px;
+
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.025),
+    0 12px 35px rgba(0, 0, 0, 0.4),
+    0 0 35px var(--aura-color-soft);
+}
+
+/* =========================================================
+   CHARACTER BODY
+   ========================================================= */
+
+.aura-character-body {
+  position: relative;
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 105px;
+  height: 125px;
+
+  margin-top: -4px;
+
+  border-radius: 38px 38px 24px 24px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #28282f 0%,
+      #131319 55%,
+      #09090d 100%
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 25px 45px rgba(0, 0, 0, 0.4),
+    0 0 30px var(--aura-color-soft);
+}
+
+.aura-character-body::before {
+  content: "";
+
+  position: absolute;
+
+  top: 12px;
+  left: 50%;
+
+  width: 60px;
+  height: 3px;
+
+  transform: translateX(-50%);
+
+  border-radius: 999px;
+
+  background: var(--aura-color);
+
+  box-shadow:
+    0 0 14px var(--aura-color);
+}
+
+.aura-character-body span {
+  position: relative;
+
+  font-size: 28px;
+
+  color: var(--aura-color);
+
+  text-shadow:
+    0 0 16px var(--aura-color),
+    0 0 35px var(--aura-color-soft);
+}
+
+/* =========================================================
+   CHARACTER SHADOW
+   ========================================================= */
+
+.aura-character-shadow {
+  position: absolute;
+
+  left: 50%;
+  bottom: 0;
+
+  width: 125px;
+  height: 20px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.7);
+
+  filter: blur(8px);
+}
+
+/* =========================================================
+   SKIN BADGE
+   ========================================================= */
+
+.aura-skin-badge {
+  position: absolute;
+
+  z-index: 4;
+
+  bottom: 25px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  padding: 7px 13px;
+
+  border-radius: 999px;
+
+  background: rgba(5, 5, 8, 0.78);
+
+  border: 1px solid var(--aura-color-medium);
+
+  color: var(--aura-color);
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.13em;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.3),
+    0 0 18px var(--aura-color-soft);
+
+  backdrop-filter: blur(12px);
+}
+
+/* =========================================================
+   IDENTITY
+   ========================================================= */
+
+.aura-identity {
+  position: relative;
+
+  z-index: 3;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-top: -6px;
+
+  text-align: center;
+}
+
+.aura-identity h2 {
+  margin: 0;
+
+  font-size: 26px;
+
+  line-height: 1.1;
+
+  font-weight: 950;
+
+  letter-spacing: -0.04em;
+
+  color: #ffffff;
+
+  text-transform: uppercase;
+
+  text-shadow:
+    0 0 20px rgba(255, 255, 255, 0.08);
+}
+
+.aura-class {
+  display: block;
+
+  margin-top: 7px;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.25em;
+
+  color: var(--aura-color);
+
+  text-transform: uppercase;
+
+  text-shadow:
+    0 0 14px var(--aura-color-soft);
+}
+
+/* =========================================================
+   XP / AURA PROGRESS
+   ========================================================= */
+
+.aura-progress {
+  position: relative;
+
+  z-index: 2;
+
+  margin-top: 25px;
+  margin-bottom: 22px;
+
+  padding: 0 4px;
+}
+
+.aura-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 8px;
+}
+
+.aura-progress-header span:first-child {
+  font-size: 10px;
+
+  font-weight: 950;
+
+  letter-spacing: 0.22em;
+
+  color: var(--aura-color);
+}
+
+.aura-progress-header span:last-child {
+  font-size: 11px;
+
+  font-weight: 700;
+
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* =========================================================
+   XP BAR
+   ========================================================= */
+
+.aura-progress-bar {
+  position: relative;
+
+  width: 100%;
+  height: 8px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  border: 1px solid rgba(255, 255, 255, 0.05);
+
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.aura-progress-fill {
+  position: relative;
+
+  height: 100%;
+
+  min-width: 0;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--aura-color),
+      #ffffff
+    );
+
+  box-shadow:
+    0 0 12px var(--aura-color),
+    0 0 30px var(--aura-color-soft);
+
+  transition:
+    width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.aura-progress-fill::after {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  right: 0;
+
+  width: 45px;
+  height: 100%;
+
+  background: rgba(255, 255, 255, 0.7);
+
+  filter: blur(5px);
+
+  opacity: 0.5;
+}
+
+.aura-next-level {
+  margin-top: 7px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  text-align: right;
+
+  color: rgba(255, 255, 255, 0.34);
+}
+
+/* =========================================================
+   AURA XP SKIN PANEL
+   ========================================================= */
+
+.aura-skin {
+  position: relative;
+
+  z-index: 2;
+
+  padding: 18px;
+
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.055),
+      rgba(255, 255, 255, 0.018)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+/* colored left accent */
+
+.aura-skin::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+
+  width: 3px;
+
+  border-radius: 999px;
+
+  background: var(--aura-color);
+
+  box-shadow:
+    0 0 12px var(--aura-color);
+}
+
+/* =========================================================
+   SKIN TOP
+   ========================================================= */
+
+.aura-skin-top {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+}
+
+.aura-small-label {
+  display: block;
+
+  margin-bottom: 5px;
+
+  font-size: 9px;
+
+  font-weight: 950;
+
+  letter-spacing: 0.22em;
+
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.aura-skin h3 {
+  margin: 0;
+
+  font-size: 19px;
+
+  font-weight: 950;
+
+  letter-spacing: -0.03em;
+
+  color: #ffffff;
+}
+
+.aura-drop {
+  display: inline-block;
+
+  margin-top: 6px;
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.16em;
+
+  color: var(--aura-color);
+}
+
+.aura-skin-level {
+  flex-shrink: 0;
+
+  padding: 7px 9px;
+
+  border-radius: 8px;
+
+  background: var(--aura-color-soft);
+
+  border: 1px solid var(--aura-color-medium);
+
+  color: var(--aura-color);
+
+  font-size: 9px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.08em;
+}
+
+/* =========================================================
+   SKIN DESCRIPTION
+   ========================================================= */
+
+.aura-skin-description {
+  margin-top: 14px;
+
+  font-size: 11px;
+
+  line-height: 1.5;
+
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
+.aura-skin-actions {
+  margin-top: 15px;
+}
+
+.aura-button {
+  width: 100%;
+
+  min-height: 42px;
+
+  border: 0;
+
+  border-radius: 11px;
+
+  padding: 11px 14px;
+
+  font-family: inherit;
+
+  font-size: 10px;
+
+  font-weight: 950;
+
+  letter-spacing: 0.13em;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.aura-button-primary {
+  background: var(--aura-color);
+
+  color: #050507;
+
+  box-shadow:
+    0 0 20px var(--aura-color-soft);
+}
+
+.aura-button-primary:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 30px var(--aura-color-soft),
+    0 0 25px var(--aura-color-medium);
+}
+
+.aura-button-primary:active {
+  transform: translateY(0);
+}
+
+.aura-button-locked {
+  background: rgba(255, 255, 255, 0.045);
+
+  color: rgba(255, 255, 255, 0.25);
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   QUICK META
+   ========================================================= */
+
+.aura-meta {
+  position: relative;
+
+  z-index: 2;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+.aura-meta-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 70px;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  border: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.aura-meta-item span {
+  font-size: 15px;
+
+  line-height: 1;
+
+  margin-bottom: 5px;
+}
+
+.aura-meta-item strong {
+  font-size: 15px;
+
+  line-height: 1;
+
+  font-weight: 900;
+
+  color: #ffffff;
+}
+
+.aura-meta-item small {
+  margin-top: 5px;
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.12em;
+
+  color: rgba(255, 255, 255, 0.28);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.aura-card-footer {
+  position: relative;
+
+  z-index: 2;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 20px;
+  padding-top: 15px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+}
+
+.aura-card-footer span {
+  font-size: 8px;
+
+  font-weight: 800;
+
+  letter-spacing: 0.13em;
+
+  color: rgba(255, 255, 255, 0.2);
+
+  text-transform: uppercase;
+}
+
+.aura-card-footer span:first-child {
+  color: var(--aura-color);
+
+  opacity: 0.65;
+}
+
+/* =========================================================
+   LEVEL UP
+   ========================================================= */
+
+.aura-level-up {
+  position: absolute;
+
+  z-index: 50;
+
+  inset: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  background:
+    radial-gradient(
+      circle at center,
+      var(--aura-color-soft),
+      rgba(5, 5, 8, 0.94) 60%
+    );
+
+  backdrop-filter: blur(12px);
+
+  animation:
+    auraLevelUpIn
+    0.35s ease-out;
+}
+
+.aura-level-up-title {
+  font-size: 13px;
+
+  font-weight: 950;
+
+  letter-spacing: 0.35em;
+
+  color: var(--aura-color);
+
+  text-shadow:
+    0 0 20px var(--aura-color);
+}
+
+.aura-level-up-level {
+  margin-top: 8px;
+
+  font-size: 64px;
+
+  line-height: 1;
+
+  font-weight: 950;
+
+  letter-spacing: -0.07em;
+
+  color: #ffffff;
+
+  text-shadow:
+    0 0 35px var(--aura-color-medium);
+}
+
+.aura-level-up-subtitle {
+  margin-top: 10px;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.user-card-loading {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-height: 240px;
+
+  border-radius: 24px;
+
+  background: #09090d;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes auraCharacterFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes auraPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 1;
+  }
+}
+
+@keyframes auraLevelUpIn {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .aura-card {
+    padding: 22px;
+
+    border-radius: 24px;
+  }
+
+  .aura-character-area {
+    height: 285px;
+  }
+
+  .aura-character {
+    transform: scale(0.92);
+  }
+
+  .aura-level-up-level {
+    font-size: 56px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 480px) {
+  .aura-card {
+    padding: 18px;
+
+    border-radius: 20px;
+  }
+
+  .aura-card-header {
+    margin-bottom: 5px;
+  }
+
+  .aura-world-label {
+    font-size: 11px;
+
+    letter-spacing: 0.13em;
+  }
+
+  .aura-world-description {
+    font-size: 9px;
+  }
+
+  .aura-level strong {
+    font-size: 25px;
+  }
+
+  .aura-character-area {
+    height: 265px;
+  }
+
+  .aura-character {
+    transform: scale(0.84);
+  }
+
+  .aura-character-label {
+    font-size: 9px;
+  }
+
+  .aura-identity h2 {
+    font-size: 22px;
+  }
+
+  .aura-class {
+    font-size: 8px;
+
+    letter-spacing: 0.2em;
+  }
+
+  .aura-progress {
+    margin-top: 20px;
+  }
+
+  .aura-skin {
+    padding: 15px;
+  }
+
+  .aura-skin h3 {
+    font-size: 17px;
+  }
+
+  .aura-skin-level {
+    font-size: 8px;
+  }
+
+  .aura-meta-item {
+    min-height: 64px;
+  }
+
+  .aura-meta-item strong {
+    font-size: 14px;
+  }
+
+  .aura-card-footer span {
+    font-size: 7px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL SCREENS
+   ========================================================= */
+
+@media (max-width: 360px) {
+  .aura-card {
+    padding: 15px;
+  }
+
+  .aura-character-area {
+    height: 245px;
+  }
+
+  .aura-character {
+    transform: scale(0.78);
+  }
+
+  .aura-level-up-level {
+    font-size: 48px;
+  }
+
+  .aura-meta {
+    gap: 5px;
+  }
+
+  .aura-meta-item {
+    min-height: 60px;
+  }
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-character,
+  .aura-character-glow,
+  .aura-level-up {
+    animation: none;
+  }
+
+  .aura-progress-fill,
+  .aura-button {
+    transition: none;
+  }
+}
+/* =========================================================
+   3D PLAYER
+   ========================================================= */
+
+.aura-character-area {
+  position: relative;
+  width: 100%;
+  height: 720px;          /* altura del área del personaje */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.player-3d {
+  position: relative;
+  width: 100%;
+  height: 100%;           /* ocupa todo el área */
+  z-index: 1;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.player-3d:active {
+  cursor: grabbing;
+}
+
+.player-3d canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.aura-character-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.aura-skin-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}

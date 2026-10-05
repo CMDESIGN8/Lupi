@@ -598,7 +598,7 @@
                   
                   <div style={s.rewardsAnime}>
                     <div style={s.rewardChipAnime}>✨ +{league.rewardXp} EXPERIENCIA</div>
-                    <div style={s.rewardChipAnime}>🪙 +{league.rewardPoints} PUNTOS</div>
+                    <div style={s.rewardChipAnime}>💰 +{league.rewardPoints} PUNTOS</div>
                     {league.rewardTitle && <div style={s.rewardChipAnimeSpecial}>🏷️ {league.rewardTitle}</div>}
                   </div>
 

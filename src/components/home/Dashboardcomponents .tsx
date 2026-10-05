@@ -136,7 +136,7 @@ export function SeasonCard({
               <span className="reward-box-name">PACK<br/>BRONCE</span>
             </div>
             <div className="reward-box reward-box-locked">
-              <span className="reward-box-icon">🪙</span>
+              <span className="reward-box-icon">💰</span>
               <span className="reward-box-name">1.000<br/>MONEDAS</span>
               <span className="reward-lock-icon">🔒</span>
             </div>

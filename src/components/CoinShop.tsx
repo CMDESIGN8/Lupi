@@ -94,7 +94,7 @@ export function CoinShop({ userId, coins, onPurchase, onCoinsUpdate }: CoinShopP
           <span>TIENDA DE MONEDAS</span>
         </div>
         <div className="user-coins">
-          <span>🪙</span>
+          <span>💰</span>
           <span className="coins-amount">{coins}</span>
         </div>
       </div>
@@ -124,7 +124,7 @@ export function CoinShop({ userId, coins, onPurchase, onCoinsUpdate }: CoinShopP
               {purchasing === item.id ? (
                 '🔄 ...'
               ) : (
-                <>🪙 {item.cost}</>
+                <>💰 {item.cost}</>
               )}
             </button>
           </div>

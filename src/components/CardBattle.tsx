@@ -982,7 +982,7 @@ export function CardBattle({
                   <div className="rm-reward-lbl">XP</div>
                 </div>
                 <div className="rm-reward-box points-box">
-                  <div className="rm-reward-icon">🪙</div>
+                  <div className="rm-reward-icon">💰</div>
                   <div className="rm-reward-val">
                     +{matchResult.winner === 'user' ? 15 : matchResult.winner === 'draw' ? 7 : 5}
                   </div>

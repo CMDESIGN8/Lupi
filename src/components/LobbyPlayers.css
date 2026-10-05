@@ -1,0 +1,152 @@
+/* src/components/LobbyPlayers.css — usa las variables de .gh-root con valores de respaldo */
+.lp {
+  padding: 18px 20px 16px;
+  border-radius: 22px 6px 22px 6px;
+  background: linear-gradient(180deg, rgba(14, 52, 43, 0.72), rgba(8, 30, 25, 0.9));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(143, 184, 167, 0.22);
+}
+
+.lp-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+
+.lp-title {
+  margin: 0;
+  font: italic 800 24px/1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.lp-count {
+  margin-left: auto;
+  font: 600 13px "Barlow", sans-serif;
+  color: var(--gh-muted, #8fb8a7);
+}
+
+/* punto de estado */
+.lp-live { width: 10px; height: 10px; border-radius: 50%; background: #8fb8a7; }
+.lp-live--online {
+  background: #2bd67b;
+  box-shadow: 0 0 0 0 rgba(43, 214, 123, 0.6);
+  animation: lp-ping 2s ease-out infinite;
+}
+.lp-live--offline { background: #ff5d5d; }
+@keyframes lp-ping {
+  0%   { box-shadow: 0 0 0 0 rgba(43, 214, 123, 0.55); }
+  100% { box-shadow: 0 0 0 10px rgba(43, 214, 123, 0); }
+}
+
+/* fila de jugadores */
+.lp-list {
+  list-style: none;
+  margin: 0;
+  padding: 6px 4px 8px;
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+}
+
+.lp-chip {
+  flex: 0 0 auto;
+  width: 84px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  scroll-snap-align: start;
+  animation: lp-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;   /* así se nota cuando alguien entra */
+}
+@keyframes lp-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.6); }
+  to   { opacity: 1; transform: none; }
+}
+
+.lp-avatar {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 50% 30%,
+    color-mix(in srgb, var(--lp-color, #00ff88) 42%, #0b2a24),
+    #07201b 75%);
+  box-shadow:
+    inset 0 0 0 2px var(--lp-rarity, #9aa4a0),
+    0 0 18px color-mix(in srgb, var(--lp-rarity, #9aa4a0) 40%, transparent);
+}
+.lp-avatar img { width: 76%; height: 76%; object-fit: contain; }
+.lp-emoji { font-size: 30px; line-height: 1; }
+
+.lp-level {
+  position: absolute;
+  right: -5px; bottom: -3px;
+  min-width: 22px; height: 22px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--gh-gold, #ffc83d);
+  color: #3a2500;
+  font: italic 800 13px/22px "Barlow Condensed", sans-serif;
+  text-align: center;
+}
+.lp-corner {
+  position: absolute;
+  width: 22px; height: 22px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  font-size: 12px;
+  background: rgba(0, 0, 0, 0.6);
+}
+.lp-corner--boots { left: -6px; bottom: -3px; }
+.lp-corner--extra { right: -6px; top: -3px; }
+
+.lp-name {
+  max-width: 100%;
+  font: italic 700 16px/1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.03em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lp-club {
+  max-width: 100%;
+  font-size: 11px;
+  color: var(--gh-muted, #8fb8a7);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lp-chip.is-me .lp-name { color: var(--gh-gold, #ffc83d); }
+
+.lp-avatar--more {
+  font: italic 800 20px "Barlow Condensed", sans-serif;
+  color: var(--gh-muted, #8fb8a7);
+  box-shadow: inset 0 0 0 2px rgba(143, 184, 167, 0.35);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.lp-empty {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--gh-muted, #8fb8a7);
+}
+
+@media (max-width: 560px) {
+  .lp { padding: 14px 14px 12px; }
+  .lp-chip { width: 76px; }
+  .lp-avatar { width: 58px; height: 58px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-chip, .lp-live--online { animation: none; }
+}
+/* ---- Chips clickables + punto de actividad ---- */
+.lp-chip[role="button"] { cursor: pointer; }
+.lp-chip[role="button"]:hover .lp-avatar { filter: brightness(1.12); }
+.lp-chip[role="button"]:focus-visible { outline: 2px solid #2bd67b; outline-offset: 4px; border-radius: 12px; }
+
+.lp-dot {
+  position: absolute;
+  left: 1px;
+  top: 1px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid #07201b;
+  background: #2bd67b;
+}
+.lp-dot--in-match { background: #ffc83d; }
+.lp-dot--idle { background: #7a8f87; }
