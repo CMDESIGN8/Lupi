@@ -361,7 +361,12 @@ function getCurrentRarityMinLevel(rarity: string): number {
 
         {/* Badge de racha y ranking de club */}
         <div className="fifa-badges">
-          <StreakBadge userId={userId} variant="full" />
+          <StreakBadge
+  current={stats.streak ?? 0}
+  best={stats.best_streak ?? 0}
+  activeToday={false}
+  atRisk={false}
+/>
           {clubRank > 0 && (
             <div className={`club-rank-badge ${clubRank === 1 ? 'top' : clubRank <= 3 ? 'good' : ''}`}>
   <div className="rank-icon">

@@ -1,22 +1,20 @@
 import React from "react";
-import { useStreak } from "../hooks/useStreak";
-import type { AppUser } from "../lib/api";
 
 interface StreakBadgeProps {
-  user: AppUser;
+  current: number;
+  best: number;
+  activeToday: boolean;
+  atRisk: boolean;
   variant?: "compact" | "full" | "minimal";
 }
 
 export function StreakBadge({
-  user,
+  current,
+  best,
+  activeToday,
+  atRisk,
   variant = "full",
 }: StreakBadgeProps) {
-  const {
-    current,
-    best,
-    activeToday,
-    atRisk,
-  } = useStreak(user);
 
   const getStreakStyle = () => {
     if (current >= 30) return "legendary";
@@ -39,7 +37,7 @@ export function StreakBadge({
   if (variant === "minimal") {
     return (
       <div className="streak-minimal">
-        🔥 {current} {current === 1 ? "día" : "días"}
+        🔥 {current} día{current !== 1 ? "s" : ""}
       </div>
     );
   }
@@ -51,26 +49,35 @@ export function StreakBadge({
 
         <div>
           <div className="streak-current">
-            {current} {current === 1 ? "día" : "días"} consecutivos
+            {current} día{current !== 1 ? "s" : ""} consecutivo
+            {current !== 1 ? "s" : ""}
           </div>
 
           {best > 0 && (
             <div className="streak-best">
-              Récord: {best} días
+              Récord: {best} día{best !== 1 ? "s" : ""}
             </div>
           )}
         </div>
       </div>
 
-      {activeToday ? (
+      {activeToday && (
         <div className="streak-reward">
           ✅ Racha activa hoy
         </div>
-      ) : atRisk ? (
+      )}
+
+      {!activeToday && atRisk && current > 0 && (
         <div className="streak-warning">
           ⚠️ No pierdas tu racha hoy
         </div>
-      ) : null}
+      )}
+
+      {current === 0 && (
+        <div className="streak-warning">
+          🚀 Comenzá tu racha hoy
+        </div>
+      )}
     </div>
   );
 }
