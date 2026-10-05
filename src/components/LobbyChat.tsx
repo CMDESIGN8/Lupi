@@ -169,13 +169,16 @@ export function LobbyChat({
   const [error, setError] = useState<string | null>(null);
   const [mutedNpc, setMutedNpc] = useState(false);
   const [chatStatus, setChatStatus] = useState<"connecting" | "online" | "offline">("connecting");
-  const [unread, setUnread] = useState(0);
-  const [conversationMessages, setConversationMessages] = useState<NpcMessage[]>([]);
-
+ 
+const [unread, setUnread] = useState(0);
+const [mobileChatOpen, setMobileChatOpen] = useState(false);
+const [mobileUnread, setMobileUnread] = useState(0);
+const [conversationMessages, setConversationMessages] = useState<NpcMessage[]>([]);
   const logWrapRef = useRef<HTMLDivElement>(null);
   const stickRef = useRef(true);
   const prevLastKeyRef = useRef<string | undefined>(undefined);
   const lastJoinRef = useRef<string | null>(null);
+  const mobileInitializedRef = useRef(false);
 
   const { messages: npcMessages, typing: npcTyping } = useNpcFeed({
     ctx: npcCtx,
@@ -442,21 +445,60 @@ useNpcAmbient({
     : undefined;
 
   useEffect(() => {
-    const el = logWrapRef.current;
-    if (!el) return;
+  const el = logWrapRef.current;
 
-    const isNew = lastKey !== prevLastKeyRef.current;
-    prevLastKeyRef.current = lastKey;
+  const previousKey = prevLastKeyRef.current;
+  const isNew = Boolean(lastKey && previousKey && lastKey !== previousKey);
 
-    if (stickRef.current) {
-      const frame = requestAnimationFrame(() => {
+  prevLastKeyRef.current = lastKey;
+
+  /*
+   * Primera carga:
+   * no queremos mostrar "50 mensajes nuevos".
+   */
+  if (!mobileInitializedRef.current) {
+    mobileInitializedRef.current = true;
+
+    if (el) {
+      requestAnimationFrame(() => {
         el.scrollTop = el.scrollHeight;
       });
-      return () => cancelAnimationFrame(frame);
     }
 
-    if (isNew) setUnread((n) => n + 1);
-  }, [lastKey, npcTyping]);
+    return;
+  }
+
+  if (!isNew) return;
+
+  /*
+   * MOBILE:
+   * si el chat está cerrado, contamos mensajes nuevos.
+   */
+  if (!mobileChatOpen) {
+    setMobileUnread((current) => Math.min(current + 1, 99));
+  }
+
+  /*
+   * CHAT ABIERTO:
+   * comportamiento original de autoscroll.
+   */
+  if (el && stickRef.current) {
+    const frame = requestAnimationFrame(() => {
+      el.scrollTop = el.scrollHeight;
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }
+
+  /*
+   * Si estaba leyendo mensajes anteriores,
+   * mostramos el pill interno de mensajes nuevos.
+   */
+  if (!stickRef.current) {
+    setUnread((current) => current + 1);
+  }
+
+}, [lastKey, npcTyping, mobileChatOpen]);
 
   const jumpToBottom = () => {
     const el = logWrapRef.current;
@@ -466,8 +508,50 @@ useNpcAmbient({
     el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
   };
 
+  const openMobileChat = () => {
+  setMobileChatOpen(true);
+  setMobileUnread(0);
+
+  requestAnimationFrame(() => {
+    const el = logWrapRef.current;
+    if (!el) return;
+
+    el.scrollTop = el.scrollHeight;
+    stickRef.current = true;
+  });
+};
+
+const closeMobileChat = () => {
+  setMobileChatOpen(false);
+};
+
   return (
-    <section className="lc" aria-label="Chat del lobby">
+  <section
+    className={`lc ${mobileChatOpen ? "lc--mobile-open" : "lc--mobile-closed"}`}
+    aria-label="Chat del lobby"
+  >
+    <button
+  type="button"
+  className="lc-mobile-chat-trigger"
+  onClick={mobileChatOpen ? closeMobileChat : openMobileChat}
+  aria-label={
+    mobileChatOpen
+      ? "Cerrar chat"
+      : `Abrir chat${mobileUnread > 0 ? `, ${mobileUnread} mensajes nuevos` : ""}`
+  }
+>
+  <span className="lc-mobile-chat-icon">💬</span>
+
+  {mobileUnread > 0 && (
+    <span className="lc-mobile-chat-count">
+      {mobileUnread > 99 ? "99+" : mobileUnread}
+    </span>
+  )}
+
+  <span className="lc-mobile-chat-label">
+    {mobileChatOpen ? "CERRAR" : "CHAT"}
+  </span>
+</button>
       <header className="lc-head">
         <div>
           <div className="lc-kicker">LUPI WORLD</div>

@@ -13,6 +13,7 @@ import { usePacksCount } from "../hooks/usePacksCount";
 import { useAuraInventory, type InventoryItem, type ItemSlot } from "../hooks/useAuraInventory";
 import { useLobbyPresence, type LobbyLook, type LobbyPlayer } from "../hooks/useLobbyPresence";
 import { LobbyChat } from "../components/LobbyChat";
+import { LockerPreview } from "../components/LockerPreview";
 import {
   useWorldEvents,
   type WorldEvent,
@@ -545,12 +546,12 @@ const {
       <div className={`gh-shell ${(gameTab === "play" && view === "lobby") || gameTab === "deck" ? "gh-shell--wide" : ""}`}>
         <header className="gh-hud">
           <button className="gh-back" onClick={onBackHome} aria-label="Volver a la jornada">
-            <span aria-hidden>‹</span> Jornada
+            <span aria-hidden>‹</span> LUPI WORLD
           </button>
 
           <div className="gh-brand">
-            <span className="gh-brand__ball" aria-hidden>⚽</span>
-            <strong>LUPI GAME</strong>
+            
+            <strong>LOBBY PRINCIPAL</strong>
           </div>
 
           <div className="gh-hud__right">
@@ -564,15 +565,7 @@ const {
           </div>
         </header>
 
-        <nav className="gh-tabs" role="tablist" aria-label="Zona de juego">
-          <span className="gh-tabs__thumb" style={{ transform: `translateX(${activeIndex * 100}%)` }} aria-hidden />
-          {TABS.map((t) => (
-            <button key={t.id} role="tab" aria-selected={gameTab === t.id} className={gameTab === t.id ? "is-active" : ""} onClick={() => handleTab(t.id)}>
-              <span aria-hidden>{t.icon}</span>
-              <span>{t.label}</span>
-            </button>
-          ))}
-        </nav>
+        
 
         <div className="gh-scene" key={sceneKey}>
           {gameTab === "play" && view === "lobby" && (
@@ -580,6 +573,8 @@ const {
               {latestWorldEvent && (
   <WorldEventToast event={latestWorldEvent} />
 )}
+
+
 <ChallengeToasts
   incoming={incoming}
   outgoing={outgoing}
@@ -604,6 +599,7 @@ const {
     onReport={report}
   />
 )}
+
               <div className="gh-world__atmosphere" aria-hidden>
                 <span className="gh-world__mist gh-world__mist--1" />
                 <span className="gh-world__mist gh-world__mist--2" />
@@ -628,25 +624,22 @@ const {
 
 </div>
 
-              <div className="gh-world__topline">
-                <div>
-                  <span className="gh-world__eyebrow">LUPI WORLD</span>
-                  <h1>LOBBY PRINCIPAL</h1>
-                  <p>{realOthers > 0 ? "Hay jugadores en la cancha." : "Entraste a la cancha. El lobby está esperando."}</p>
-                </div>
-              </div>
+              
 
               <div className="gh-world__players" aria-label="Jugadores conectados">
-                {lobbyPlayers.slice(0, 6).map((player, index) => (
-                  <WorldPlayer
-  key={player.userId}
-  player={player}
-  index={index}
-  isMe={player.userId === user.id}
-  catalog={auraItems}
-  onSelect={setSelectedWorldPlayer}
-/>
-                ))}
+                {lobbyPlayers
+  .filter((player) => player.userId !== user.id)
+  .slice(0, 6)
+  .map((player, index) => (
+    <WorldPlayer
+      key={player.userId}
+      player={player}
+      index={index}
+      isMe={false}
+      catalog={auraItems}
+      onSelect={setSelectedWorldPlayer}
+    />
+  ))}
 
                 {lobbyPlayers.length === 0 && (
                   <div className="gh-world__empty-player">
@@ -671,6 +664,15 @@ const {
   mutedIds={muted}
 />
               </div>
+               <div className="gh-locker-zone">
+    <LockerPreview
+      userId={user.id}
+      level={level}
+      onOpenInventory={() => {
+        setGameTab("deck");
+      }}
+    />
+  </div>
 
               <div className="gh-world__mission">
                 <span className="gh-world__mission-kicker">PRÓXIMO OBJETIVO</span>
@@ -712,9 +714,17 @@ const {
                 <button className="is-active" type="button" onClick={() => setView("lobby")}>
                   <span>⚽</span><strong>LOBBY</strong>
                 </button>
-                <button type="button" onClick={() => openMatch("quick")}>
-                  <span>⚡</span><strong>JUGAR</strong>
-                </button>
+                <button
+    type="button"
+    onClick={() => setShowPackModal(true)}
+  >
+    <span>🎁</span>
+    <strong>PACK</strong>
+
+    {packCount > 0 && (
+      <em>{packCount}</em>
+    )}
+  </button>
                 <button type="button" onClick={() => handleGameNavigate("deck")}>
                   <span>👕</span><strong>EQUIPO</strong>
                 </button>

@@ -1,0 +1,1143 @@
+/* =========================================================
+   LOCKER PREVIEW
+   ========================================================= */
+
+.locker-preview {
+  --locker-color: #00ff87;
+
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  height: auto;
+
+  padding: 14px;
+
+  border-radius: 18px 5px 18px 5px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 20, 16, 0.88),
+      rgba(2, 10, 8, 0.72)
+    );
+
+  border: 1px solid rgba(0, 255, 135, 0.18);
+
+  backdrop-filter: blur(10px);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 20px 50px rgba(0, 0, 0, 0.35);
+
+  overflow: visible;
+
+  z-index: 100;
+}
+
+.locker-preview::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent 49.8%,
+      rgba(255, 255, 255, 0.025) 50%,
+      transparent 50.2%
+    );
+
+  opacity: 0.5;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.locker-header {
+  position: relative;
+  z-index: 5;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding: 22px 24px 0;
+}
+
+.locker-kicker {
+  display: block;
+
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+
+  color: var(--locker-color);
+}
+
+.locker-title {
+  margin: 3px 0 0;
+
+  font-size: 28px;
+  line-height: 1;
+
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.locker-level {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+
+  padding: 8px 11px;
+
+  border: 1px solid
+    color-mix(in srgb, var(--locker-color) 35%, transparent);
+
+  border-radius: 10px;
+
+  background:
+    color-mix(in srgb, var(--locker-color) 7%, transparent);
+}
+
+.locker-level span {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--locker-color);
+}
+
+.locker-level strong {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   CHARACTER AREA
+   ========================================================= */
+
+.locker-character {
+  position: relative;
+
+  height: 345px;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  overflow: visible;
+
+  z-index: 1;
+}
+
+.locker-character-glow {
+  position: absolute;
+
+  width: 250px;
+  height: 250px;
+
+  bottom: 25px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      color-mix(
+        in srgb,
+        var(--locker-color) 22%,
+        transparent
+      ),
+      transparent 68%
+    );
+
+  filter: blur(12px);
+
+  pointer-events: none;
+
+  z-index: 1;
+}
+
+.locker-character-grid {
+  position: absolute;
+
+  inset: 80px 0 0;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.035) 1px,
+      transparent 1px
+    );
+
+  background-size: 28px 28px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent,
+      black 35%,
+      transparent
+    );
+
+  pointer-events: none;
+
+  z-index: 2;
+}
+
+.locker-platform {
+  position: absolute;
+
+  left: 50%;
+  bottom: 18px;
+
+  width: 190px;
+  height: 34px;
+
+  transform:
+    translateX(-50%)
+    perspective(150px)
+    rotateX(55deg);
+
+  border-radius: 50%;
+
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--locker-color) 45%,
+      transparent
+    );
+
+  background:
+    radial-gradient(
+      ellipse,
+      color-mix(
+        in srgb,
+        var(--locker-color) 20%,
+        transparent
+      ),
+      transparent 65%
+    );
+
+  box-shadow:
+    0 0 35px
+    color-mix(
+      in srgb,
+      var(--locker-color) 15%,
+      transparent
+    );
+
+  pointer-events: none;
+
+  z-index: 3;
+}
+
+.locker-platform span {
+  position: absolute;
+
+  inset: 6px 30px;
+
+  border-radius: 50%;
+
+  border-top: 1px solid var(--locker-color);
+
+  opacity: 0.6;
+}
+
+
+/* =========================================================
+   AVATAR
+   ========================================================= */
+
+.locker-avatar {
+  position: absolute;
+
+  left: 50%;
+  bottom: 5px;
+
+  width: 220px;
+  height: 330px;
+
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  overflow: visible;
+
+  pointer-events: none;
+
+  z-index: 12;
+}
+
+.locker-avatar .avatar2d {
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   PLAYER 3D — FUTURO
+   ========================================================= */
+
+.locker-character > .player3d {
+  position: relative;
+  z-index: 3;
+}
+
+
+/* =========================================================
+   RARITY
+   ========================================================= */
+
+.locker-rarity {
+  position: absolute;
+
+  right: 22px;
+  bottom: 24px;
+
+  z-index: 20;
+
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  padding: 7px 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+
+  background: rgba(5, 5, 9, 0.75);
+
+  backdrop-filter: blur(8px);
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+
+  pointer-events: none;
+}
+
+.locker-rarity-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: var(--locker-color);
+
+  box-shadow:
+    0 0 10px var(--locker-color);
+}
+
+
+/* =========================================================
+   EQUIPMENT
+   ========================================================= */
+
+.locker-equipment {
+  position: relative;
+
+  z-index: 40;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 8px;
+
+  padding: 0 18px;
+
+  pointer-events: auto;
+}
+
+.locker-slot {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 9px;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  color: white;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+
+  pointer-events: auto;
+
+  touch-action: manipulation;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+.locker-slot:hover {
+  transform: translateY(-1px);
+
+  border-color: rgba(0, 255, 135, 0.32);
+
+  background: rgba(0, 255, 135, 0.06);
+}
+
+.locker-slot.selected {
+  border-color: var(--locker-color) !important;
+
+  box-shadow:
+    0 0 0 1px var(--locker-color),
+    0 0 18px
+    color-mix(
+      in srgb,
+      var(--locker-color) 25%,
+      transparent
+    ) !important;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--locker-color) 10%,
+      rgba(4, 15, 12, 0.9)
+    );
+}
+
+.locker-slot > * {
+  pointer-events: none;
+}
+
+.locker-slot-icon {
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.045);
+
+  font-size: 17px;
+}
+
+.locker-slot-info {
+  min-width: 0;
+}
+
+.locker-slot-info span {
+  display: block;
+
+  margin-bottom: 2px;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.locker-slot-info strong {
+  display: block;
+
+  overflow: hidden;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.locker-slot.empty {
+  opacity: 0.4;
+}
+
+.locker-slot-arrow {
+  position: absolute;
+
+  right: 6px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.locker-footer {
+  position: relative;
+
+  z-index: 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 16px 18px 18px;
+}
+
+.locker-equipped span {
+  display: block;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.locker-equipped strong {
+  display: block;
+
+  margin-top: 2px;
+
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.locker-inventory-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 11px 14px;
+
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--locker-color) 45%,
+      transparent
+    );
+
+  border-radius: 10px;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--locker-color) 10%,
+      transparent
+    );
+
+  color: white;
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.locker-inventory-button:hover {
+  transform: translateY(-2px);
+
+  background:
+    color-mix(
+      in srgb,
+      var(--locker-color) 17%,
+      transparent
+    );
+
+  box-shadow:
+    0 8px 30px
+    color-mix(
+      in srgb,
+      var(--locker-color) 15%,
+      transparent
+    );
+}
+
+.locker-inventory-button span {
+  color: var(--locker-color);
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   SELECTOR
+   ========================================================= */
+
+.locker-selector {
+  position: absolute;
+
+  left: 8px;
+  right: 8px;
+  bottom: 58px;
+
+  z-index: 500;
+
+  margin: 0;
+  padding: 10px;
+
+  border-radius: 12px;
+
+  border: 1px solid rgba(0, 255, 135, 0.18);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 20, 16, 0.97),
+      rgba(2, 10, 8, 0.97)
+    );
+
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  backdrop-filter: blur(15px);
+
+  pointer-events: auto;
+
+  overflow: visible;
+}
+
+.locker-selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 8px;
+}
+
+.locker-selector-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.locker-selector-header span {
+  color: rgba(255, 255, 255, 0.35);
+
+  font-size: 6px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+.locker-selector-header strong {
+  color: white;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.locker-selector-close {
+  width: 23px;
+  height: 23px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  color: rgba(255, 255, 255, 0.6);
+
+  cursor: pointer;
+
+  font-size: 15px;
+}
+
+.locker-selector-close:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* =========================================================
+   ITEMS
+   ========================================================= */
+
+.locker-items {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 6px;
+
+  pointer-events: auto;
+}
+
+.locker-item {
+  position: relative;
+
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 7px;
+
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  color: white;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  pointer-events: auto;
+}
+
+.locker-item:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  border-color: var(--locker-color);
+
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.locker-item.equipped {
+  border-color:
+    color-mix(
+      in srgb,
+      var(--locker-color) 55%,
+      transparent
+    );
+
+  background:
+    color-mix(
+      in srgb,
+      var(--locker-color) 9%,
+      transparent
+    );
+}
+
+.locker-item.locked {
+  cursor: not-allowed;
+  opacity: 0.38;
+  filter: grayscale(0.7);
+}
+
+.locker-item-icon {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  font-size: 15px;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.locker-item-info {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 1px;
+}
+
+.locker-item-info span {
+  color: var(--locker-color);
+
+  font-size: 5px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.locker-item-info strong {
+  overflow: hidden;
+
+  color: white;
+
+  font-size: 7px;
+  font-weight: 900;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.locker-item-info small {
+  color: rgba(255, 255, 255, 0.4);
+
+  font-size: 5px;
+  font-weight: 800;
+}
+
+.locker-item-check,
+.locker-item-lock {
+  position: absolute;
+
+  right: 5px;
+  top: 5px;
+
+  font-size: 8px;
+}
+
+.locker-item-check {
+  color: var(--locker-color);
+}
+
+.locker-item-lock {
+  opacity: 0.7;
+}
+
+.locker-items-empty {
+  grid-column: 1 / -1;
+
+  padding: 15px;
+
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.35);
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+}
+
+
+/* =========================================================
+   LOADING
+   ========================================================= */
+
+.locker-preview-loading {
+  min-height: 180px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.locker-loading-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: var(--locker-color);
+
+  box-shadow:
+    0 0 12px var(--locker-color);
+
+  animation: locker-pulse 1s infinite;
+}
+
+@keyframes locker-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .locker-preview {
+    padding: 0;
+
+    border-radius: 16px 4px 16px 4px;
+
+    overflow: visible;
+  }
+
+  .locker-header {
+    padding: 10px 11px 0;
+  }
+
+  .locker-kicker {
+    font-size: 7px;
+  }
+
+  .locker-title {
+    font-size: 17px;
+  }
+
+  .locker-level {
+    padding: 5px 7px;
+    border-radius: 7px;
+  }
+
+  .locker-level span {
+    font-size: 7px;
+  }
+
+  .locker-level strong {
+    font-size: 13px;
+  }
+
+  .locker-character {
+    height: 145px;
+    min-height: 0;
+
+    overflow: visible;
+  }
+
+  .locker-character-glow {
+    width: 130px;
+    height: 130px;
+    bottom: 5px;
+  }
+
+  .locker-character-grid {
+    inset: 30px 0 0;
+    background-size: 18px 18px;
+  }
+
+  .locker-platform {
+    bottom: 6px;
+
+    width: 105px;
+    height: 20px;
+  }
+
+  .locker-platform span {
+    inset: 4px 18px;
+  }
+
+  .locker-avatar {
+    width: 125px;
+    height: 175px;
+
+    left: 50%;
+    bottom: 0;
+  }
+
+  .locker-rarity {
+    right: 8px;
+    bottom: 7px;
+
+    padding: 4px 6px;
+
+    gap: 4px;
+
+    font-size: 6px;
+  }
+
+  .locker-rarity-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .locker-equipment {
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 4px;
+
+    padding: 0 7px;
+  }
+
+  .locker-slot {
+    gap: 5px;
+    padding: 5px;
+
+    border-radius: 7px;
+  }
+
+  .locker-slot-icon {
+    width: 24px;
+    height: 24px;
+
+    flex-basis: 24px;
+
+    font-size: 12px;
+
+    border-radius: 6px;
+  }
+
+  .locker-slot-info span {
+    font-size: 5px;
+  }
+
+  .locker-slot-info strong {
+    font-size: 7px;
+  }
+
+  .locker-footer {
+    padding: 8px 7px 9px;
+
+    gap: 6px;
+  }
+
+  .locker-equipped span {
+    font-size: 5px;
+  }
+
+  .locker-equipped strong {
+    font-size: 9px;
+  }
+
+  .locker-inventory-button {
+    padding: 7px 8px;
+
+    gap: 5px;
+
+    border-radius: 7px;
+
+    font-size: 6px;
+  }
+
+  .locker-inventory-button span {
+    font-size: 10px;
+  }
+
+  .locker-selector {
+    left: 6px;
+    right: 6px;
+    bottom: 50px;
+
+    max-height: 210px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .locker-items {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .locker-item {
+    gap: 4px;
+    padding: 4px;
+    border-radius: 6px;
+  }
+
+  .locker-item-icon {
+    width: 22px;
+    height: 22px;
+
+    flex-basis: 22px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+  }
+
+  .locker-item-info span {
+    font-size: 4px;
+  }
+
+  .locker-item-info strong {
+    font-size: 5px;
+  }
+
+  .locker-item-info small {
+    font-size: 4px;
+  }
+
+  .locker-item-check,
+  .locker-item-lock {
+    right: 3px;
+    top: 3px;
+
+    font-size: 6px;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+  .locker-avatar {
+    width: 110px;
+    height: 155px;
+  }
+
+  .locker-character {
+    height: 125px;
+  }
+
+  .locker-selector {
+    left: 5px;
+    right: 5px;
+    bottom: 46px;
+
+    max-height: 190px;
+  }
+
+  .locker-items {
+    grid-template-columns: 1fr;
+  }
+
+  .locker-item {
+    min-height: 28px;
+  }
+}

@@ -1,0 +1,630 @@
+/* =========================================================
+   AURA XP — AVATAR 2D
+   ========================================================= */
+
+.avatar2d {
+  --avatar-scale: 1;
+
+  position: relative;
+
+  width: 220px;
+  height: 330px;
+
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  user-select: none;
+  pointer-events: none;
+}
+
+/* =========================================================
+   AURA
+   ========================================================= */
+
+.avatar2d__aura {
+  position: absolute;
+
+  left: 50%;
+  bottom: 34px;
+
+  width: 210px;
+  height: 210px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(0, 255, 135, 0.22),
+      rgba(0, 255, 135, 0.08) 38%,
+      transparent 72%
+    );
+
+  filter: blur(4px);
+
+  animation: avatar-aura-pulse 3s ease-in-out infinite;
+
+  pointer-events: none;
+}
+
+@keyframes avatar-aura-pulse {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: translateX(-50%) scale(0.96);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.04);
+  }
+}
+
+/* =========================================================
+   SHADOW
+   ========================================================= */
+
+.avatar2d__shadow {
+  position: absolute;
+
+  left: 50%;
+  bottom: 13px;
+
+  width: 150px;
+  height: 25px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  filter: blur(8px);
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   CHARACTER
+   ========================================================= */
+
+.avatar2d__character {
+  position: absolute;
+
+  left: 50%;
+  bottom: 25px;
+
+  width: 130px;
+  height: 275px;
+
+  transform:
+    translateX(-50%)
+    scale(var(--avatar-scale));
+
+  transform-origin: center bottom;
+
+  filter:
+    drop-shadow(
+      0 14px 18px rgba(0, 0, 0, 0.32)
+    );
+
+  pointer-events: none;
+
+  /* Importante:
+     no usamos animation sobre transform porque
+     rompería el scale responsive. */
+}
+
+/* =========================================================
+   HEAD
+   ========================================================= */
+
+.avatar2d__head {
+  position: absolute;
+
+  left: 50%;
+  top: 8px;
+
+  width: 68px;
+  height: 72px;
+
+  transform: translateX(-50%);
+
+  border-radius:
+    45%
+    45%
+    48%
+    48%;
+
+  background:
+    linear-gradient(
+      145deg,
+      #d99b72,
+      #b96f4c
+    );
+
+  border: 2px solid rgba(0, 0, 0, 0.25);
+
+  z-index: 6;
+}
+
+/* =========================================================
+   HAIR
+   ========================================================= */
+
+.avatar2d__hair {
+  position: absolute;
+
+  left: -3px;
+  top: -7px;
+
+  width: 74px;
+  height: 34px;
+
+  border-radius:
+    55%
+    55%
+    30%
+    30%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #14171b,
+      #050607
+    );
+
+  transform: rotate(-2deg);
+
+  z-index: 8;
+}
+
+.avatar2d__hair::after {
+  content: "";
+
+  position: absolute;
+
+  right: 7px;
+  top: 13px;
+
+  width: 18px;
+  height: 25px;
+
+  border-radius: 50%;
+
+  background: #090b0d;
+
+  transform: rotate(-25deg);
+}
+
+/* =========================================================
+   FACE
+   ========================================================= */
+
+.avatar2d__face {
+  position: absolute;
+  inset: 0;
+}
+
+.avatar2d__eye {
+  position: absolute;
+
+  top: 35px;
+
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: #080a0c;
+}
+
+.avatar2d__eye--left {
+  left: 20px;
+}
+
+.avatar2d__eye--right {
+  right: 20px;
+}
+
+/* =========================================================
+   ACCESSORY
+   ========================================================= */
+
+.avatar2d__accessory {
+  position: absolute;
+
+  right: -19px;
+  top: 4px;
+
+  width: 28px;
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 8px;
+
+  border: 1px solid rgba(0, 255, 135, 0.5);
+
+  background: rgba(3, 15, 12, 0.88);
+
+  color: #00ff87;
+
+  font-size: 13px;
+
+  box-shadow:
+    0 0 16px rgba(0, 255, 135, 0.25);
+
+  z-index: 20;
+}
+
+/* =========================================================
+   TORSO
+   ========================================================= */
+
+.avatar2d__top {
+  position: absolute;
+
+  left: 50%;
+  top: 73px;
+
+  width: 82px;
+  height: 90px;
+
+  transform: translateX(-50%);
+
+  border-radius:
+    18px
+    18px
+    12px
+    12px;
+
+  border: 2px solid rgba(0, 0, 0, 0.3);
+
+  overflow: hidden;
+
+  z-index: 4;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.12);
+}
+
+.avatar2d__top::after {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0.15),
+      transparent 32%,
+      transparent 70%,
+      rgba(0, 0, 0, 0.14)
+    );
+
+  pointer-events: none;
+}
+
+.avatar2d__top-detail {
+  position: absolute;
+
+  left: 50%;
+  top: 12px;
+
+  transform: translateX(-50%);
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 7px;
+  font-weight: 1000;
+
+  letter-spacing: 0.1em;
+}
+
+.avatar2d__number {
+  position: absolute;
+
+  left: 50%;
+  top: 29px;
+
+  transform: translateX(-50%);
+
+  color: white;
+
+  font-size: 30px;
+  font-weight: 1000;
+
+  line-height: 1;
+
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* =========================================================
+   ARMS
+   ========================================================= */
+
+.avatar2d__arm {
+  position: absolute;
+
+  top: 78px;
+
+  width: 25px;
+  height: 90px;
+
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #d99b72,
+      #b96f4c
+    );
+
+  z-index: 3;
+}
+
+.avatar2d__arm--left {
+  left: 9px;
+  transform: rotate(9deg);
+}
+
+.avatar2d__arm--right {
+  right: 9px;
+  transform: rotate(-9deg);
+}
+
+/* =========================================================
+   BOTTOM
+   ========================================================= */
+
+.avatar2d__bottom {
+  position: absolute;
+
+  left: 50%;
+  top: 155px;
+
+  width: 76px;
+  height: 62px;
+
+  transform: translateX(-50%);
+
+  border-radius:
+    7px
+    7px
+    14px
+    14px;
+
+  border: 2px solid rgba(0, 0, 0, 0.3);
+
+  z-index: 3;
+}
+
+/* =========================================================
+   LEGS
+   ========================================================= */
+
+.avatar2d__leg {
+  position: absolute;
+
+  top: 207px;
+
+  width: 29px;
+  height: 53px;
+
+  border-radius:
+    5px
+    5px
+    12px
+    12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #d99b72,
+      #a96145
+    );
+
+  z-index: 2;
+}
+
+.avatar2d__leg--left {
+  left: 37px;
+}
+
+.avatar2d__leg--right {
+  right: 37px;
+}
+
+/* =========================================================
+   BOOTS
+   ========================================================= */
+
+.avatar2d__boot {
+  position: absolute;
+
+  top: 250px;
+
+  width: 43px;
+  height: 19px;
+
+  border-radius:
+    7px
+    9px
+    4px
+    4px;
+
+  border: 2px solid rgba(0, 0, 0, 0.35);
+
+  z-index: 4;
+}
+
+.avatar2d__boot--left {
+  left: 23px;
+  transform: rotate(-4deg);
+}
+
+.avatar2d__boot--right {
+  right: 23px;
+  transform: rotate(4deg);
+}
+
+/* =========================================================
+   EQUIPMENT INDICATORS
+   ========================================================= */
+
+.avatar2d__equipment {
+  position: absolute;
+
+  right: -2px;
+  top: 65px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+
+  z-index: 30;
+
+  pointer-events: none;
+}
+
+.avatar2d__equipment-item {
+  width: 27px;
+  height: 27px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 7px;
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  background: rgba(4, 12, 11, 0.75);
+
+  color: rgba(255, 255, 255, 0.25);
+
+  font-size: 12px;
+
+  opacity: 0.65;
+}
+
+.avatar2d__equipment-item--equipped {
+  border-color:
+    rgba(0, 255, 135, 0.3);
+
+  background:
+    rgba(0, 255, 135, 0.08);
+
+  color: #00ff87;
+
+  opacity: 1;
+
+  box-shadow:
+    0 0 12px rgba(0, 255, 135, 0.12);
+}
+
+/* =========================================================
+   COMPACT
+   ========================================================= */
+
+.avatar2d--compact {
+  width: 150px;
+  height: 210px;
+}
+
+.avatar2d--compact .avatar2d__character {
+  --avatar-scale: 0.72;
+}
+
+.avatar2d--compact .avatar2d__equipment {
+  right: -3px;
+  top: 45px;
+}
+
+.avatar2d--compact .avatar2d__equipment-item {
+  width: 22px;
+  height: 22px;
+  font-size: 9px;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .avatar2d {
+    width: 125px;
+    height: 175px;
+  }
+
+  .avatar2d__character {
+    --avatar-scale: 0.78;
+
+    left: 50%;
+    bottom: 8px;
+  }
+
+  .avatar2d__aura {
+    width: 120px;
+    height: 120px;
+    bottom: 18px;
+  }
+
+  .avatar2d__shadow {
+    width: 85px;
+    height: 14px;
+    bottom: 5px;
+  }
+
+  .avatar2d__equipment {
+    right: -3px;
+    top: 35px;
+    gap: 3px;
+  }
+
+  .avatar2d__equipment-item {
+    width: 19px;
+    height: 19px;
+    border-radius: 5px;
+    font-size: 8px;
+  }
+
+  .avatar2d--compact {
+    width: 110px;
+    height: 155px;
+  }
+
+  .avatar2d--compact .avatar2d__character {
+    --avatar-scale: 0.52;
+  }
+}
+
+@media (max-width: 420px) {
+
+  .avatar2d {
+    width: 110px;
+    height: 155px;
+  }
+
+  .avatar2d__character {
+    --avatar-scale: 1.20;
+    bottom: 8px;
+  }
+
+  .avatar2d__aura {
+    width: 105px;
+    height: 105px;
+  }
+}

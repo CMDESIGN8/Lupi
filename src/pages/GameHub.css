@@ -78,7 +78,7 @@
 
 .gh-brand {
   display: flex; align-items: center; gap: 8px;
-  font: italic 800 28px/1 "Barlow Condensed", sans-serif;
+  font: italic 900 clamp(24px, 3vw, 42px)/.92 "Barlow Condensed", sans-serif;
   letter-spacing: 0.04em;
   text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
 }
@@ -704,7 +704,7 @@
 .gh-world__light--left .gh-world__light-beam {
   left: -5px;
 
-  --beam-angle: 3deg;
+  --beam-angle: 1deg;
 
   transform-origin: 0 0;
 
@@ -730,7 +730,7 @@
 .gh-world__light--right .gh-world__light-beam {
   right: -5px;
 
-  --beam-angle: -3deg;
+  --beam-angle: -1deg;
 
   transform-origin: 100% 0;
 
