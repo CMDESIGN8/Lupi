@@ -182,3 +182,38 @@
 }
 
 .pc-toasts--top { top: 18px; bottom: auto; }
+
+/* =========================================================
+   TOASTS DE DESAFÍO — MÓVIL
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .pc-toasts {
+    position: fixed !important;
+
+    left: 12px !important;
+    right: 12px !important;
+    bottom: 128px !important;
+    top: auto !important;
+
+    width: auto !important;
+    max-width: none !important;
+
+    transform: none !important;
+
+    z-index: 150 !important;
+  }
+
+  .pc-toast {
+    width: 100%;
+    padding: 10px 12px;
+  }
+
+  .pc-toast strong {
+    font-size: 15px;
+  }
+
+  .pc-toast__row .pc-btn {
+    flex: 1;
+  }
+}
