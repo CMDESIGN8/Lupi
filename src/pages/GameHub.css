@@ -704,7 +704,7 @@
 .gh-world__light--left .gh-world__light-beam {
   left: -5px;
 
-  --beam-angle: 32deg;
+  --beam-angle: 3deg;
 
   transform-origin: 0 0;
 
@@ -730,7 +730,7 @@
 .gh-world__light--right .gh-world__light-beam {
   right: -5px;
 
-  --beam-angle: -32deg;
+  --beam-angle: -3deg;
 
   transform-origin: 100% 0;
 
