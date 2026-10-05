@@ -629,7 +629,7 @@ const {
               <div className="gh-world__players" aria-label="Jugadores conectados">
                 <span className="gh-world__players-label">
     <i aria-hidden />
-    JUGADORES EN LÍNEA
+    JUGADORES EN LÍNEA · {lobbyPlayers.filter(p => p.userId !== user.id).length}
   </span>
 
                 {lobbyPlayers
