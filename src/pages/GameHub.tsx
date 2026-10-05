@@ -645,7 +645,7 @@ const {
       onSelect={setSelectedWorldPlayer}
     />
   ))}
-
+            
                 {lobbyPlayers.length === 0 && (
                   <div className="gh-world__empty-player">
                     <span>+</span>

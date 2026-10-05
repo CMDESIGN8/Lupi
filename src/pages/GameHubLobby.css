@@ -1381,13 +1381,20 @@
 
 @media (max-width: 700px) {
 
-    .gh-world__players-label {
-    top: -20px;
+    gh-world__players-label {
+    position: absolute;
+
+    top: -18px;
+    left: 50%;
+
+    transform: translateX(-50%);
 
     padding: 4px 9px;
 
     font-size: 7px;
     letter-spacing: 0.15em;
+
+    z-index: 3;
   }
 
 
@@ -2032,4 +2039,51 @@
 @keyframes world-player-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%      { opacity: 0.55; transform: scale(0.85); }
+}
+
+/* =========================================================
+   ETIQUETA — DESKTOP (dentro del contenedor flex)
+   ========================================================= */
+
+@media (min-width: 701px) {
+
+   .gh-world__players {
+    position: absolute;
+
+    top: 105px;
+    left: 18px;
+    bottom: 95px;
+
+    width: 190px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    z-index: 12;
+
+    pointer-events: none;
+
+    /* espacio para la etiqueta */
+    padding-top: 32px;
+  }
+
+  .gh-world__players-label {
+    position: absolute;
+
+    top: 0;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    padding: 4px 10px;
+
+    font-size: 8px;
+    letter-spacing: 0.18em;
+
+    z-index: 3;
+  }
 }
