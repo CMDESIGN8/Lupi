@@ -1381,6 +1381,16 @@
 
 @media (max-width: 700px) {
 
+    .gh-world__players-label {
+    top: -20px;
+
+    padding: 4px 9px;
+
+    font-size: 7px;
+    letter-spacing: 0.15em;
+  }
+
+
   .gh-world {
     width: 100%;
     height: 100dvh;
@@ -1664,7 +1674,7 @@
   .gh-world__players {
     position: absolute;
 
-    top: 55dvh;
+    top: 65dvh;
     left: 0;
     right: 0;
     bottom: 130px;
@@ -1894,6 +1904,12 @@
 
 @media (max-width: 420px) {
 
+    .gh-world__players-label {
+    top: -18px;
+    padding: 3px 8px;
+    font-size: 6.5px;
+  }
+
   .gh-root:has(.gh-world) .gh-tabs { width: 195px; }
 
   .gh-world__topline { top: 87px; }
@@ -1958,4 +1974,62 @@
     min-width: 180px;
     height: 40px;
   }
+}
+/* =========================================================
+   ETIQUETA — JUGADORES EN LÍNEA
+   ========================================================= */
+
+.gh-world__players-label {
+  position: absolute;
+
+  top: -22px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 4px 10px;
+
+  border: 1px solid rgba(43, 214, 123, 0.28);
+  border-radius: 999px;
+
+  color: #eafff3;
+  background: rgba(2, 18, 14, 0.9);
+  border-color: rgba(43, 214, 123, 0.5);
+
+  backdrop-filter: blur(8px);
+
+  font: 800 8px/1 "Barlow", sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  pointer-events: none;
+  white-space: nowrap;
+
+  z-index: 3;
+}
+
+.gh-world__players-label i {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+
+  background: var(--world-green);
+
+  box-shadow: 0 0 10px var(--world-green);
+
+  animation: world-player-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes world-player-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
 }

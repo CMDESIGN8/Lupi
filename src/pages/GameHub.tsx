@@ -627,6 +627,11 @@ const {
               
 
               <div className="gh-world__players" aria-label="Jugadores conectados">
+                <span className="gh-world__players-label">
+    <i aria-hidden />
+    JUGADORES EN LÍNEA
+  </span>
+
                 {lobbyPlayers
   .filter((player) => player.userId !== user.id)
   .slice(0, 6)
@@ -691,7 +696,7 @@ const {
 
               <div className="gh-world__actions" aria-label="Acciones rápidas">
                 <button type="button" onClick={() => setShowPackModal(true)}>
-                  <span>▣</span>
+                  <span>🧧</span>
                   <strong>PACK</strong>
                   {packCount > 0 && <em>{packCount}</em>}
                 </button>
