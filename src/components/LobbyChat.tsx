@@ -1,6 +1,7 @@
 // src/components/LobbyChat.tsx
 import {
   useEffect,
+  useCallback,
   useMemo,
   useRef,
   useState,
@@ -22,6 +23,10 @@ import type { InventoryItem, ItemSlot } from "../hooks/useAuraInventory";
 import type { LobbyPlayer, LobbyStatus } from "../hooks/useLobbyPresence";
 import "./LobbyChat.css";
 import { useNpcConversation } from "../hooks/useNpcConversation";
+import {
+  useNpcAmbient,
+  type AmbientNpcMessage,
+} from "../hooks/useNpcAmbient";
 
 type ChatMessage = {
   id: string;
@@ -178,6 +183,25 @@ export function LobbyChat({
     enabled: !mutedNpc,
   });
   
+  const handleAmbientNpcMessage = useCallback(
+  (message: AmbientNpcMessage) => {
+    if (mutedNpc) return;
+
+    const npcMessage: NpcMessage = {
+      key: message.key,
+      who: message.who,
+      text: message.text,
+      at: message.at,
+    };
+
+    setConversationMessages((current) => [
+      ...current.slice(-19),
+      npcMessage,
+    ]);
+  },
+  [mutedNpc]
+);
+  
   const handleNpcConversation = ({
   npc,
   text,
@@ -205,6 +229,11 @@ const { respondToMessage } = useNpcConversation({
   meId,
   meName,
   onNpcMessage: handleNpcConversation,
+});
+
+useNpcAmbient({
+  enabled: !mutedNpc,
+  onMessage: handleAmbientNpcMessage,
 });
 
   const byId = useMemo(() => new Map(catalog.map((item) => [item.id, item])), [catalog]);
@@ -486,14 +515,12 @@ const { respondToMessage } = useNpcConversation({
               if (entry.kind === "npc") {
   const npc = NPCS[entry.message.who];
 
-if (!npc) {
-  return null;
-}
-
-  // Protección: un NPC nuevo/desconocido nunca debe romper todo el lobby.
   if (!npc) {
     return (
-      <li key={entry.key} className="lc-message lc-message--npc">
+      <li
+        key={entry.key}
+        className="lc-message lc-message--npc"
+      >
         <div className="lc-avatar lc-avatar--npc" aria-hidden>
           🤖
         </div>
@@ -531,6 +558,7 @@ if (!npc) {
       <div className="lc-bubble-wrap">
         <div className="lc-meta">
           <strong>{npc.name}</strong>
+
           <span className="lc-badge lc-badge--npc">
             NPC · {npc.tag}
           </span>
