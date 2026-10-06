@@ -378,6 +378,33 @@
     padding: 3px 10px;
   }
 
+  .avatar2d__layer--top {
+  left: 51%;
+  top: 215px;
+
+  width: 210px;
+  height: 195px;
+
+  transform:
+    translate(-50%, -50%)
+    scale(var(--avatar-scale));
+
+  transform-origin: center center;
+}
+
+.avatar2d__layer {
+  position: absolute;
+
+  width: 210px;
+  height: 195px;
+
+
+  pointer-events: none;
+
+  z-index: 20;
+}
+  
+
 }
 
 
@@ -422,6 +449,32 @@
     width: 46px;
     bottom: 305px;
   }
+
+  .avatar2d__layer--top {
+  left: 51%;
+  top: 215px;
+
+  width: 210px;
+  height: 195px;
+
+  transform:
+    translate(-50%, -50%)
+    scale(var(--avatar-scale));
+
+  transform-origin: center center;
+}
+
+.avatar2d__layer {
+  position: absolute;
+
+  width: 210px;
+  height: 195px;
+
+
+  pointer-events: none;
+
+  z-index: 20;
+}
 
 }
 
@@ -472,22 +525,41 @@
 ========================================================= */
 
 @media (max-width: 700px) {
-
-  .avatar2d--compact {
-    width: 180px;
-    height: 270px;
-
-    --avatar-scale: 0.70;
+  .avatar2d {
+    width: 240px;
+    height: 360px;
+    --avatar-scale: 1;
   }
 
-  .avatar2d--compact .avatar2d__character {
-    transform:
-      translateX(-50%)
-      scale(0.70);
-
+  .avatar2d__character {
+    /* Mantén la escala suave del personaje sin desfasar el contenedor top */
+    transform: translateX(-50%) scale(1);
+    top: 0;
     transform-origin: center bottom;
   }
 
+  .avatar2d__aura {
+    width: 350px;
+    height: 350px;
+    bottom: 20px;
+  }
+
+  .avatar2d__shadow {
+    width: 145px;
+    height: 23px;
+    bottom: 12px;
+  }
+
+  /* ELIMINAR el bloque que sobreescribía .avatar2d__layer de forma genérica */
+  /* Mantén las proporciones originales heredadas de Desktop */
+  .avatar2d__layer--top {
+    left: 50%;
+    top: 215px;
+    width: 210px;
+    height: 195px;
+    transform: translate(-50%, -50%) scale(var(--avatar-scale));
+    transform-origin: center center;
+  }
 }
 
 
