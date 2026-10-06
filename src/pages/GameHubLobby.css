@@ -1379,24 +1379,12 @@
 }
 
 
+
+/* =========================================================
+   MOBILE (<= 700px) — Layout apilado limpio
+   ========================================================= */
+
 @media (max-width: 700px) {
-
-    gh-world__players-label {
-    position: absolute;
-
-    top: -18px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    padding: 4px 9px;
-
-    font-size: 7px;
-    letter-spacing: 0.15em;
-
-    z-index: 3;
-  }
-
 
   .gh-world {
     width: 100%;
@@ -1406,49 +1394,38 @@
   }
 
   /* -------------------------------------------------------
-     HUD
+     HUD + TABS
      ------------------------------------------------------- */
 
   .gh-root:has(.gh-world) .gh-hud {
     top: 0;
     left: 0;
     right: 0;
-
     height: 46px;
-
     padding: 6px 10px;
-
     z-index: 60;
   }
 
   .gh-root:has(.gh-world) .gh-tabs {
     top: 49px;
     left: 50%;
-
     width: 210px;
     height: 32px;
-
     transform: translateX(-50%);
-
     z-index: 60;
   }
 
   /* -------------------------------------------------------
-     MISIÓN
+     MISIÓN — pegada arriba de todo
      ------------------------------------------------------- */
 
   .gh-world__mission {
     left: 50%;
-    top: 78px;
-
+    top: 90px;
     width: min(280px, calc(100vw - 24px));
-
     transform: translateX(-50%);
-
     z-index: 25;
-
     padding: 8px 10px;
-
     text-align: center;
   }
 
@@ -1457,30 +1434,78 @@
   .gh-world__mission span:last-child { font-size: 9px; margin-top: 4px; }
 
   /* -------------------------------------------------------
-     AVATAR PRINCIPAL — ARRIBA
-     Va desde debajo de la misión hasta el 55% del viewport
+     AVATAR PRINCIPAL — CENTRADO, MÁXIMO ESPACIO
+     Ocupa desde debajo de la misión hasta arriba del JUGAR
      ------------------------------------------------------- */
 
   .gh-locker-zone {
   position: absolute;
 
   left: 50%;
-  top: auto;                 /* ya no arriba */
-  bottom: 150px;             /* pegado abajo, encima de JUGAR */
+  top: 145px;
+  bottom: 110px;
+  
 
-  width: min(250px, 72vw);
-  height: 340px;
+  width: 100vw;
+  max-width: 100vw;
+
+  height: auto;
 
   transform: translateX(-50%);
 
-  z-index: 30;
+  z-index: 20;
 
   overflow: visible;
 
   pointer-events: none;
+
+  /* 🔧 CLAVE: alinear el avatar ABAJO, no al centro */
+  display: flex;
+  align-items: flex-end;      /* antes: center */
+  justify-content: center;
+
+  padding-bottom: 0;
 }
 
-  
+.gh-locker-zone .avatar2d {
+  position: relative;
+  flex: 0 0 auto;
+
+  width: 390px;
+  height: 520px;
+
+  transform: scale(
+    min(
+      calc(100vw / 390 * 1.15),
+      calc((100dvh - 255px) / 520 * 1.10)
+    )
+  );
+
+  /* 🔧 CLAVE: anclar al fondo del contenedor.
+     Sin translateY, el PNG se apoya abajo del todo.
+     El personaje tiene margen inferior en el PNG (~25px),
+     así que subimos un poco para que los pies toquen el piso visual. */
+  transform-origin: center bottom;
+
+  margin: 0;
+}
+  .gh-locker-zone .avatar2d__character {
+    /* escala suave para que quepa sin cortarse */
+    transform: translateX(-50%) scale(0.92);
+    transform-origin: center bottom;
+    top: 0;
+    bottom: 0;
+  }
+
+  .gh-locker-zone .avatar2d__aura {
+    width: 340px;
+    height: 340px;
+    bottom: 40px;
+  }
+
+  .gh-locker-zone .avatar2d__shadow {
+    bottom: 6px;
+  }
 
   /* -------------------------------------------------------
      SLOTS — alrededor del avatar
@@ -1564,27 +1589,31 @@
     line-height: 1;
   }
 
-  /* Posiciones de slots alrededor del avatar (que ahora está arriba) */
+  /* Posiciones: 2 a cada lado, distribuidas verticalmente */
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(1) {
-    left: 0;
-    top: 22%;
+    left: -4px;
+    top: 30%;
+    transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
-    left: 0;
+    left: -4px;
     top: 68%;
+    transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
-    right: 0;
+    right: -4px;
     left: auto;
-    top: 82%;
+    top: 68%;
+    transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
-    right: 0;
+    right: -4px;
     left: auto;
-    top: 12%;
+    top: 30%;
+    transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-equipment .locker-slot.equipped {
@@ -1595,73 +1624,349 @@
       0 4px 14px rgba(0, 0, 0, 0.5);
   }
 
-  .gh-locker-zone .locker-equipment .locker-slot.empty { opacity: 0.6; }
+  .gh-locker-zone .locker-equipment .locker-slot.empty {
+    opacity: 0.6;
+  }
 
   /* -------------------------------------------------------
-     JUGADORES ONLINE — ABAJO, 2 columnas x 3 filas
-     Ocupan desde el 55% del viewport hasta el botón JUGAR
+     JUGADORES ONLINE — ocultos, viven en el sheet
      ------------------------------------------------------- */
 
   .gh-world__players {
+    display: none !important;
+  }
+
+  /* -------------------------------------------------------
+     BOTÓN FLOTANTE JUGADORES — arriba del chat
+     ------------------------------------------------------- */
+
+  .gh-world__players-toggle {
   position: absolute;
 
-  top: 190px;                /* debajo de tabs + misión */
-  left: 0;
-  right: 0;
-  bottom: auto;              /* ya no abajo */
+  left: 12px;                 /* ← cambia right por left */
+  right: auto;
+  bottom: 132px;              /* misma altura que el chat bubble para alinearlos */
 
-  width: 100%;
-  height: auto;
+  z-index: 40;
 
-  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 
-  pointer-events: none;
+  padding: 8px 12px;
 
-  padding-top: 500px;         /* espacio para la etiqueta "EN LÍNEA" */
+  border: 1px solid rgba(43, 214, 123, 0.35);
+  border-radius: 999px;
+
+  background: rgba(2, 18, 14, 0.85);
+  backdrop-filter: blur(10px);
+
+  color: #eafff3;
+
+  font: 800 10px/1 "Barlow", sans-serif;
+  letter-spacing: 0.08em;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(43, 214, 123, 0.18);
+
+  pointer-events: auto;
 }
 
-  .gh-world-player {
-    position: absolute;
+.gh-world__players-toggle em {
+  min-width: 16px;
+  height: 16px;
 
-    width: 58px;
-    min-width: 58px;
+  padding: 0 4px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 99px;
+
+  background: var(--world-green);
+  color: #041a10;
+
+  font: 900 9px/1 "Barlow", sans-serif;
+  font-style: normal;
+}
+
+  /* -------------------------------------------------------
+     SHEET DE JUGADORES
+     ------------------------------------------------------- */
+
+  .gh-world__players-sheet {
+    position: absolute;
+    inset: 0;
+
+    z-index: 150;
+
+    display: flex;
+    align-items: flex-end;
+
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+
+    animation: gh-sheet-backdrop-in 0.22s ease both;
+  }
+
+  .gh-world__players-sheet-panel {
+    width: 100%;
+    max-height: 78dvh;
 
     display: flex;
     flex-direction: column;
+
+    padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+
+    border-radius: 22px 22px 0 0;
+
+    background:
+      linear-gradient(180deg, rgba(8, 30, 25, 0.98), rgba(4, 18, 14, 0.98));
+
+    border-top: 1px solid rgba(43, 214, 123, 0.25);
+
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
+
+    animation: gh-sheet-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .gh-world__players-sheet-head {
+    display: flex;
     align-items: center;
+    justify-content: space-between;
 
-    transform: translate(-50%, -50%);
+    padding-bottom: 12px;
+    margin-bottom: 12px;
 
-    pointer-events: auto;
-
-    animation: world-player-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    border-bottom: 1px solid rgba(43, 214, 123, 0.15);
   }
 
-  .gh-world-player__avatar { width: 46px; height: 46px; }
+  .gh-world__players-sheet-kicker {
+    display: block;
 
-  .gh-world-player__name {
-    max-width: 62px;
+    color: var(--world-green);
+
+    font: 800 8px/1 "Barlow", sans-serif;
+    letter-spacing: 0.2em;
+  }
+
+  .gh-world__players-sheet-head strong {
+    display: block;
+
     margin-top: 4px;
-    font-size: 6.5px;
-    line-height: 1.1;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
+    color: #fff;
+
+    font: italic 900 20px/1 "Barlow Condensed", sans-serif;
+    letter-spacing: 0.04em;
   }
 
-  .gh-world-player__level { margin-top: 2px; font-size: 5.5px; }
+  .gh-world__players-sheet-close {
+    width: 36px;
+    height: 36px;
 
-  /* 2 columnas laterales, 3 filas */
-  .gh-world-player--0 { left: 14%; top: 10%; }
-  .gh-world-player--1 { left: 86%; top: 10%; }
-  .gh-world-player--2 { left: 12%; top: 48%; }
-  .gh-world-player--3 { left: 88%; top: 48%; }
-  .gh-world-player--4 { left: 14%; top: 86%; }
-  .gh-world-player--5 { left: 86%; top: 86%; }
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 22px;
+    line-height: 1;
+
+    cursor: pointer;
+  }
+
+  .gh-world__players-sheet-list {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .gh-world__players-sheet-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    width: 100%;
+
+    padding: 10px 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+
+    background: rgba(255, 255, 255, 0.025);
+
+    color: #fff;
+    text-align: left;
+
+    cursor: pointer;
+
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+
+  .gh-world__players-sheet-item:hover,
+  .gh-world__players-sheet-item:active {
+    background: rgba(43, 214, 123, 0.08);
+    border-color: rgba(43, 214, 123, 0.35);
+  }
+
+  .gh-world__players-sheet-avatar {
+    position: relative;
+
+    width: 42px;
+    height: 48px;
+
+    flex: 0 0 42px;
+
+    display: grid;
+    place-items: center;
+
+    filter: drop-shadow(0 0 8px var(--aura-color-medium));
+  }
+
+  .gh-world__players-sheet-avatar img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .gh-world__players-sheet-avatar > span {
+    color: var(--aura-color);
+    font-size: 26px;
+  }
+
+  .gh-world__players-sheet-level {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+
+    min-width: 18px;
+    height: 18px;
+
+    padding: 0 4px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 5px 2px 5px 2px;
+
+    background: var(--world-gold);
+    color: #10160f;
+
+    font: 900 9px/1 "Barlow", sans-serif;
+    font-style: normal;
+  }
+
+  .gh-world__players-sheet-info {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    min-width: 0;
+  }
+
+  .gh-world__players-sheet-info strong {
+    overflow: hidden;
+
+    color: #fff;
+
+    font: 900 14px/1 "Barlow Condensed", sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .gh-world__players-sheet-info small {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    color: rgba(220, 255, 235, 0.55);
+
+    font: 600 10px/1 "Barlow", sans-serif;
+  }
+
+  .gh-world__players-sheet-info small i {
+    width: 5px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: var(--aura-color);
+
+    box-shadow: 0 0 8px var(--aura-color);
+  }
+
+  .gh-world__players-sheet-arrow {
+    color: rgba(255, 255, 255, 0.35);
+
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  .gh-world__players-sheet-empty {
+    display: grid;
+    place-items: center;
+
+    padding: 40px 20px;
+
+    text-align: center;
+
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .gh-world__players-sheet-empty span {
+    display: grid;
+    place-items: center;
+
+    width: 54px;
+    height: 54px;
+
+    margin-bottom: 10px;
+
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+
+    font-size: 24px;
+  }
+
+  .gh-world__players-sheet-empty strong {
+    font: 900 14px/1 "Barlow Condensed", sans-serif;
+    letter-spacing: 0.1em;
+  }
+
+  .gh-world__players-sheet-empty small {
+    margin-top: 5px;
+    font: 500 10px/1.3 "Barlow", sans-serif;
+  }
+
+  @keyframes gh-sheet-backdrop-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes gh-sheet-in {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
 
   /* -------------------------------------------------------
-     CHAT BUBBLE
+     CHAT — bubble compacto
      ------------------------------------------------------- */
 
   .gh-world__chat {
@@ -1691,16 +1996,16 @@
   .gh-world__chat > * { max-height: 34px; }
 
   /* -------------------------------------------------------
-     BOTÓN JUGAR
+     BOTÓN JUGAR — centrado, sobre el dock
      ------------------------------------------------------- */
 
   .gh-world__play {
     left: 50%;
     bottom: 72px;
 
-    width: 190px;
-    min-width: 190px;
-    height: 42px;
+    width: 200px;
+    min-width: 200px;
+    height: 44px;
 
     z-index: 120 !important;
 
@@ -1708,10 +2013,23 @@
 
     font-size: 11px;
     letter-spacing: 0.08em;
+
+    padding: 8px 14px;
+    gap: 8px;
   }
 
+  .gh-world__play-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+
+  .gh-world__play strong { font-size: 18px; }
+  .gh-world__play small { font-size: 7px; }
+  .gh-world__play-arrow { font-size: 18px; }
+
   /* -------------------------------------------------------
-     HIDE DESKTOP CONTROLS
+     OCULTAR CONTROLES DESKTOP
      ------------------------------------------------------- */
 
   .gh-world__actions,
@@ -1777,27 +2095,31 @@
   .gh-world__dock button.is-active { color: #00ff87; }
 
   /* -------------------------------------------------------
-     WORLD EVENTS
+     WORLD EVENTS — arriba, debajo del HUD
      ------------------------------------------------------- */
 
   .gh-world-event {
-    top: 88px;
+    top: 100px;                 /* debajo de la misión */
     left: 50%;
 
     max-width: calc(100vw - 24px);
 
-    transform: translateX(-50%) scale(0.82);
+    transform: translateX(-50%) scale(0.85);
     transform-origin: top center;
 
     z-index: 90;
   }
 
   /* -------------------------------------------------------
-     PROFILE
+     PROFILE MODAL
      ------------------------------------------------------- */
 
   .gh-world-profile-backdrop { z-index: 100; }
-  /* Contenedor de toasts de desafío */
+
+  /* -------------------------------------------------------
+     CHALLENGE TOASTS
+     ------------------------------------------------------- */
+
   .challenge-toasts,
   .gh-challenge-toasts,
   [class*="challenge-toast"] {
@@ -1828,44 +2150,38 @@
   }
 }
 
+/* =========================================================
+   MOBILE CHICO (<= 420px)
+   ========================================================= */
 
 @media (max-width: 420px) {
 
-    .gh-world__players-label {
-    top: -18px;
-    padding: 3px 8px;
-    font-size: 6.5px;
-  }
-
   .gh-root:has(.gh-world) .gh-tabs { width: 195px; }
 
-  .gh-world__topline { top: 87px; }
-
   .gh-world__mission {
-    top: 80px;
+    top: 88px;
     width: calc(100vw - 24px);
+    padding: 7px 10px;
   }
 
-  /* Avatar arriba */
- 
+  .gh-world__mission strong { font-size: 16px; }
+
+  /* Avatar un poco más chico pero igual centrado */
   .gh-locker-zone {
-    top: 118px;
-    bottom: auto;
-    width: min(240px, 72vw);
-    height: 320px;
+    top: 152px;
+    bottom: 124px;
+    width: min(340px, 96vw);
   }
 
-  .gh-locker-zone .locker-avatar {
-    width: 180px !important;
-    height: 300px !important;
+  .gh-locker-zone .avatar2d__character {
+    transform: translateX(-50%) scale(0.86);
   }
 
-  .gh-locker-zone .locker-character-glow {
-    width: 140px;
-    height: 140px;
+  .gh-locker-zone .avatar2d__aura {
+    width: 300px;
+    height: 300px;
+    bottom: 30px;
   }
-
-  .gh-locker-zone .locker-platform { width: 95px; }
 
   .gh-locker-zone .locker-equipment .locker-slot {
     width: 50px;
@@ -1876,18 +2192,14 @@
     font-size: 23px !important;
   }
 
-  /* Jugadores abajo */
-  .gh-world__players {
-    top: 56dvh;
-    bottom: 128px;
-  }
-
-  .gh-world-player--0 { left: 14%; top: 10%; }
-  .gh-world-player--1 { left: 86%; top: 10%; }
-  .gh-world-player--2 { left: 12%; top: 48%; }
-  .gh-world-player--3 { left: 88%; top: 48%; }
-  .gh-world-player--4 { left: 14%; top: 86%; }
-  .gh-world-player--5 { left: 86%; top: 86%; }
+  /* Botón jugadores un pelín más arriba */
+ .gh-world__players-toggle {
+  left: 10px;
+  right: auto;
+  bottom: 128px;
+  padding: 7px 10px;
+  font-size: 9px;
+}
 
   /* Chat */
   .gh-world__chat {
@@ -1901,14 +2213,23 @@
     max-height: 32px;
   }
 
-  /* Jugar */
+  /* JUGAR más compacto */
   .gh-world__play {
-    bottom: 69px;
+    bottom: 68px;
     width: 180px;
     min-width: 180px;
     height: 40px;
   }
+
+  .gh-world__play strong { font-size: 16px; }
+
+  /* World events arriba de la misión */
+  .gh-world-event {
+    top: 92px;
+    transform: translateX(-50%) scale(0.8);
+  }
 }
+
 /* =========================================================
    ETIQUETA — JUGADORES EN LÍNEA
    ========================================================= */
