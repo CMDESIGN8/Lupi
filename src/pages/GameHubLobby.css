@@ -1465,7 +1465,7 @@
     position: absolute;
 
     left: 50%;
-    top: 75px; /* Subido para ubicarlo sobre el aura violeta */
+    top: 150px; /* Subido para ubicarlo sobre el aura violeta */
     bottom: auto;
 
     width: min(250px, 72vw);
