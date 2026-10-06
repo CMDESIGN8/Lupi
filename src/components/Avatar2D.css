@@ -360,11 +360,7 @@
     transform-origin: center bottom;
   }
 
-  .avatar2d__aura {
-    width: 350px;
-    height: 350px;
-    bottom: 280px;
-  }
+ 
 
   .avatar2d__shadow {
     width: 145px;
@@ -429,12 +425,7 @@
     transform-origin: center bottom;
   }
 
-  .avatar2d__aura {
-    width: 350px;
-    height: 350px;
-    
-    bottom: 15px;
-  }
+ 
 
   .avatar2d__shadow {
     width: 125px;
@@ -500,12 +491,7 @@
     transform-origin: center bottom;
   }
 
-  .avatar2d__aura {
-    width: 150px;
-    height: 150px;
-
-    bottom: 13px;
-  }
+ 
 
   .avatar2d__shadow {
     width: 115px;
@@ -541,9 +527,9 @@
   }
 
   .avatar2d__aura {
-    width: 150px;
-    height: 150px;
-    bottom: 20px;
+    width: 450px;
+    height: 450px;
+    bottom: -240px;
   }
 
   .avatar2d__shadow {
