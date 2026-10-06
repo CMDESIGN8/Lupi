@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   useAuraInventory,
   DEFAULT_ITEM_COLOR,
+  type InventoryItem,
   type ItemSlot,
 } from "../hooks/useAuraInventory";
 import "./LockerPreview.css";
@@ -46,6 +47,37 @@ const colorVar = (color: string) =>
   ({
     "--locker-color": color,
   } as React.CSSProperties);
+
+function LockerItemVisual({
+  item,
+}: {
+  item: InventoryItem;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+  }, [item.imageUrl]);
+
+  if (!item.imageUrl || failed) {
+    return (
+      <span className="locker-slot-emoji">
+        {item.icon}
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={item.imageUrl}
+      alt={item.name}
+      className="locker-slot-img"
+      loading="lazy"
+      draggable={false}
+      onError={() => setFailed(true)}
+    />
+  );
+}
 
 export function LockerPreview({
   userId,
@@ -230,8 +262,14 @@ export function LockerPreview({
               }
             >
               <div className="locker-slot-icon">
-                {item?.icon ?? meta.icon}
-              </div>
+  {item ? (
+    <LockerItemVisual item={item} />
+  ) : (
+    <span className="locker-slot-emoji">
+      {meta.icon}
+    </span>
+  )}
+</div>
 
               <div className="locker-slot-info">
                 <span>{meta.label}</span>

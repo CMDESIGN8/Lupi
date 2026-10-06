@@ -637,8 +637,8 @@
 
   z-index: 10;
 
-  width: min(320px, 26vw);
-  height: min(420px, calc(100vh - 160px));
+  width: min(100%, 26vw);
+  height: min(620px, calc(100vh - 160px));
 
   pointer-events: auto;
 }
@@ -1465,12 +1465,11 @@
     position: absolute;
 
     left: 50%;
+    top: 75px; /* Subido para ubicarlo sobre el aura violeta */
+    bottom: auto;
 
-    top: 130px;
-    bottom: 45dvh;
-    height: auto;
-
-    width: min(300px, 82vw);
+    width: min(250px, 72vw);
+    height: 340px;
 
     transform: translateX(-50%);
 
@@ -1481,82 +1480,7 @@
     pointer-events: none;
   }
 
-  .gh-locker-zone .locker-preview {
-    width: 100%;
-    height: 100%;
-
-    min-height: 0 !important;
-    max-height: none !important;
-
-    padding: 0 !important;
-
-    overflow: visible !important;
-
-    background: transparent;
-    border: 0;
-    box-shadow: none;
-
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
-  .gh-locker-zone .locker-header,
-  .gh-locker-zone .locker-footer,
-  .gh-locker-zone .locker-rarity {
-    display: none;
-  }
-
-  .gh-locker-zone .locker-character {
-    height: 100% !important;
-    width: 100%;
-
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-
-    overflow: visible;
-  }
-
-  .gh-locker-zone .locker-avatar {
-    position: relative !important;
-
-    width: auto !important;
-    height: 100% !important;
-
-    left: auto !important;
-    bottom: 0 !important;
-
-    transform: none !important;
-
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-
-  .gh-locker-zone .locker-avatar img,
-  .gh-locker-zone .locker-avatar > svg,
-  .gh-locker-zone .locker-avatar > div {
-    height: 100% !important;
-    width: auto !important;
-    max-width: 100%;
-    object-fit: contain;
-    object-position: bottom center;
-  }
-
-  .gh-locker-zone .locker-character-glow {
-    width: 160px;
-    height: 160px;
-    bottom: 0;
-  }
-
-  .gh-locker-zone .locker-character-grid { display: none; }
-
-  .gh-locker-zone .locker-platform {
-    width: 110px;
-    height: 14px;
-    bottom: 0;
-  }
+  
 
   /* -------------------------------------------------------
      SLOTS — alrededor del avatar
@@ -1927,10 +1851,17 @@
   }
 
   /* Avatar arriba */
+ 
   .gh-locker-zone {
-    top: 125px;
-    bottom: 46dvh;
-    width: min(270px, 78vw);
+    top: 118px;
+    bottom: auto;
+    width: min(240px, 72vw);
+    height: 320px;
+  }
+
+  .gh-locker-zone .locker-avatar {
+    width: 180px !important;
+    height: 300px !important;
   }
 
   .gh-locker-zone .locker-character-glow {
