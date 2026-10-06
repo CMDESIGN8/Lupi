@@ -1462,23 +1462,23 @@
      ------------------------------------------------------- */
 
   .gh-locker-zone {
-    position: absolute;
+  position: absolute;
 
-    left: 50%;
-    top: 150px; /* Subido para ubicarlo sobre el aura violeta */
-    bottom: auto;
+  left: 50%;
+  top: auto;                 /* ya no arriba */
+  bottom: 150px;             /* pegado abajo, encima de JUGAR */
 
-    width: min(250px, 72vw);
-    height: 340px;
+  width: min(250px, 72vw);
+  height: 340px;
 
-    transform: translateX(-50%);
+  transform: translateX(-50%);
 
-    z-index: 30;
+  z-index: 30;
 
-    overflow: visible;
+  overflow: visible;
 
-    pointer-events: none;
-  }
+  pointer-events: none;
+}
 
   
 
@@ -1603,20 +1603,22 @@
      ------------------------------------------------------- */
 
   .gh-world__players {
-    position: absolute;
+  position: absolute;
 
-    top: 65dvh;
-    left: 0;
-    right: 0;
-    bottom: 130px;
+  top: 190px;                /* debajo de tabs + misión */
+  left: 0;
+  right: 0;
+  bottom: auto;              /* ya no abajo */
 
-    width: 100%;
-    height: auto;
+  width: 100%;
+  height: auto;
 
-    z-index: 12;
+  z-index: 12;
 
-    pointer-events: none;
-  }
+  pointer-events: none;
+
+  padding-top: 500px;         /* espacio para la etiqueta "EN LÍNEA" */
+}
 
   .gh-world-player {
     position: absolute;
@@ -1795,13 +1797,6 @@
      ------------------------------------------------------- */
 
   .gh-world-profile-backdrop { z-index: 100; }
-}
-
-/* =========================================================
-   CHALLENGE TOASTS — MÓVIL
-   ========================================================= */
-
-@media (max-width: 700px) {
   /* Contenedor de toasts de desafío */
   .challenge-toasts,
   .gh-challenge-toasts,
@@ -1832,6 +1827,7 @@
     transform: none !important;
   }
 }
+
 
 @media (max-width: 420px) {
 
@@ -2018,3 +2014,5 @@
     z-index: 3;
   }
 }
+
+
