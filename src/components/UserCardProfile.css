@@ -1287,7 +1287,7 @@
 .aura-character-area {
   position: relative;
   width: 100%;
-  height: 720px;          /* altura del área del personaje */
+  height: clamp(280px, 46vh, 520px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1297,7 +1297,7 @@
 .player-3d {
   position: relative;
   width: 100%;
-  height: 100%;           /* ocupa todo el área */
+  height: 100%;
   z-index: 1;
   touch-action: pan-y;
   cursor: grab;
@@ -1310,6 +1310,7 @@
   display: block;
   width: 100% !important;
   height: 100% !important;
+  max-width: 100%;
 }
 
 .aura-character-glow {
@@ -1325,4 +1326,16 @@
   left: 50%;
   transform: translateX(-50%);
   z-index: 2;
+}
+
+@media (max-width: 480px) {
+  .aura-character-area {
+    height: 275px;
+  }
+}
+
+@media (max-width: 360px) {
+  .aura-character-area {
+    height: 240px;
+  }
 }

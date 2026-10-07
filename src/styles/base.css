@@ -1,17 +1,43 @@
 /* src/styles/base.css */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --shell-width: 580px;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
+  width: 100%;
 }
 
-.app-wrapper { min-height: 100vh; position: relative; }
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.app-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  overflow-x: hidden;
+  width: 100%;
+}
+
 .app-wrapper::before {
   content: '';
   position: fixed;
@@ -25,10 +51,22 @@ body {
 }
 
 .main-content {
-  padding: 20px 0 100px;
+  padding: 16px 0 calc(90px + var(--safe-bottom));
   display: flex;
   flex-direction: column;
   width: 100%;
+  box-sizing: border-box;
+}
+
+.app-content-shell {
+  width: min(100%, var(--shell-width));
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .container {
@@ -38,6 +76,7 @@ body {
   position: relative;
   z-index: 1;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .container > * { width: 100%; box-sizing: border-box; }
@@ -103,6 +142,29 @@ body {
   margin-bottom: 16px;
   text-align: left;
   overflow-x: auto;
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: clamp(18px, 5vw, 22px);
+    margin: 16px 0 10px;
+  }
+  .loading-logo {
+    font-size: clamp(34px, 10vw, 48px);
+  }
+  .error-card {
+    padding: 24px 18px;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-content-shell {
+    padding: 0 10px;
+  }
+  .section-title {
+    font-size: 18px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -337,7 +337,7 @@ const headerStyles = `
     background: rgba(10, 12, 22, 0.97);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding: 10px 16px 8px;
+    padding: calc(10px + var(--safe-top, 0px)) 16px 8px;
   }
 
   .header-inner {
@@ -345,7 +345,7 @@ const headerStyles = `
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    max-width: 480px;
+    max-width: min(100%, 580px);
     margin: 0 auto;
   }
 
@@ -408,11 +408,15 @@ const headerStyles = `
   }
 
   .username {
-    font-size: 18px;
+    font-size: clamp(15px, 4.5vw, 18px);
     font-weight: 800;
     color: #fff;
     line-height: 1.1;
     letter-spacing: 0.3px;
+    max-width: clamp(100px, 32vw, 220px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .rarity-pill {
@@ -618,7 +622,7 @@ const headerStyles = `
   =============================== */
 
   .header-stats {
-    max-width: 480px;
+    max-width: min(100%, 580px);
     margin: 8px auto 0;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -745,7 +749,7 @@ const headerStyles = `
     }
 
     .username {
-      font-size: 16px;
+      font-size: 15px;
     }
 
     .avatar-wrap {
@@ -760,6 +764,68 @@ const headerStyles = `
 
     .header-stats {
       margin-top: 6px;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .app-header {
+      padding: 6px 8px;
+    }
+
+    .user-left {
+      gap: 7px;
+    }
+
+    .avatar-wrap {
+      width: 42px;
+      height: 42px;
+    }
+
+    .lvl-badge {
+      font-size: 9px;
+      padding: 1px 4px;
+      right: -5px;
+      bottom: -3px;
+    }
+
+    .username {
+      font-size: 13px;
+      max-width: 85px;
+    }
+
+    .rarity-pill {
+      font-size: 8px;
+      padding: 1px 5px;
+    }
+
+    .club-name-text {
+      font-size: 11px;
+    }
+
+    .currency-pill {
+      padding: 2px 5px;
+      gap: 3px;
+    }
+
+    .currency-emoji {
+      font-size: 11px;
+    }
+
+    .currency-amount {
+      font-size: 10px;
+      min-width: 22px;
+    }
+
+    .header-stats {
+      gap: 0;
+    }
+
+    .stat-label {
+      font-size: 6px;
+    }
+
+    .stat-mini strong {
+      font-size: 10px;
     }
   }
 `;

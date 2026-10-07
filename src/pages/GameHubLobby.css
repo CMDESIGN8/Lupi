@@ -1442,9 +1442,8 @@
   position: absolute;
 
   left: 50%;
-  top: 145px;
-  bottom: 110px;
-  
+  top: 155px;
+  bottom: 130px;
 
   width: 100vw;
   max-width: 100vw;
@@ -1456,38 +1455,64 @@
   z-index: 20;
 
   overflow: visible;
-
   pointer-events: none;
 
-  /* 🔧 CLAVE: alinear el avatar ABAJO, no al centro */
-  display: flex;
-  align-items: flex-end;      /* antes: center */
-  justify-content: center;
-
-  padding-bottom: 0;
+  display: block;
 }
 
 .gh-locker-zone .avatar2d {
-  position: relative;
-  flex: 0 0 auto;
+  position: absolute;
+
+  left: 50%;
+  /* El PNG tiene ~30px de margen inferior real.
+     Si los pies flotan, subí el número (más negativo).
+     Si se meten detrás de JUGAR, bajalo (menos negativo). */
+  bottom: -30px;
 
   width: 390px;
   height: 520px;
 
-  transform: scale(
-    min(
-      calc(100vw / 390 * 1.15),
-      calc((100dvh - 255px) / 520 * 1.10)
-    )
-  );
-
-  /* 🔧 CLAVE: anclar al fondo del contenedor.
-     Sin translateY, el PNG se apoya abajo del todo.
-     El personaje tiene margen inferior en el PNG (~25px),
-     así que subimos un poco para que los pies toquen el piso visual. */
+  transform: translateX(-50%) scale(0.85);
   transform-origin: center bottom;
 
   margin: 0;
+}
+
+/* Aura y sombra: sin overrides, se escalan con el bloque */
+
+/* Tablets y pantallas medianas (600–700px ancho) */
+@media (min-width: 600px) and (max-width: 700px) {
+  .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.95);
+  }
+}
+
+/* Pantallas normales de móvil (430–600px ancho) */
+@media (min-width: 430px) and (max-width: 599px) {
+  .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.88);
+  }
+}
+
+/* iPhone 15 / 14 / 13 / 12 (390–429px ancho) */
+@media (min-width: 390px) and (max-width: 429px) {
+  .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.82);
+  }
+}
+
+/* iPhone SE 2/3, iPhone 12 mini (375–389px ancho) */
+@media (min-width: 375px) and (max-width: 389px) {
+  .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.78);
+  }
+}
+
+/* Android chicos, iPhone SE 1 (<=374px ancho) */
+@media (max-width: 374px) {
+  .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.70);
+  }
 }
   .gh-locker-zone .avatar2d__character {
     /* escala suave para que quepa sin cortarse */
