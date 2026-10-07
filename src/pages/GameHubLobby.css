@@ -773,6 +773,102 @@
   font: 500 10px/1.25 "Barlow", sans-serif;
 }
 
+.gh-world__mission-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 9px;
+}
+
+.gh-world__mission-progress-track {
+  flex: 1;
+
+  height: 3px;
+
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.gh-world__mission-progress-fill {
+  height: 100%;
+
+  background: var(--world-gold);
+
+  box-shadow: 0 0 8px rgba(255, 204, 0, 0.35);
+
+  transition: width 0.35s ease;
+}
+
+.gh-world__mission-progress > span {
+  margin-top: 0 !important;
+
+  color: var(--world-gold) !important;
+
+  font: 700 8px/1 "Barlow", sans-serif !important;
+
+  white-space: nowrap;
+}
+
+.gh-world__mission-reward {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+
+  margin-top: 7px;
+}
+
+.gh-world__mission-reward span {
+  margin-top: 0 !important;
+
+  color: rgba(255, 255, 255, 0.72) !important;
+
+  font: 700 8px/1 "Barlow", sans-serif !important;
+}
+
+.gh-world__mission-action {
+  margin-top: 9px;
+
+  padding: 5px 10px;
+
+  border: 1px solid rgba(255, 204, 0, 0.35);
+  border-radius: 5px;
+
+  background: rgba(255, 204, 0, 0.08);
+
+  color: var(--world-gold);
+
+  font: 800 8px/1 "Barlow", sans-serif;
+
+  letter-spacing: 0.08em;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.gh-world__mission-action:hover {
+  background: rgba(255, 204, 0, 0.16);
+  border-color: rgba(255, 204, 0, 0.55);
+
+  transform: translateY(-1px);
+}
+
+.gh-world__mission-action--claim {
+  background: rgba(0, 255, 136, 0.10);
+  border-color: rgba(0, 255, 136, 0.38);
+  color: #00ff88;
+}
+
+.gh-world__mission-action--claim:hover {
+  background: rgba(0, 255, 136, 0.18);
+  border-color: rgba(0, 255, 136, 0.60);
+}
+
 
 /* =========================================================
    PLAY BUTTON

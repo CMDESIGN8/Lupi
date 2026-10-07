@@ -32,6 +32,9 @@
       ChallengeToasts,
       DuelSummary,
     } from "../components/PlayerCard";
+    import { LobbyDailyMission } from "../components/LobbyDailyMission";
+    import { useDailyMissions } from "../hooks/useDailyMissions";
+    import { processUserAction } from "../services/progressionService";
 
     type GameTab = "play" | "album" | "deck";
     type BattleMode = "quick" | "campaign";
@@ -369,6 +372,13 @@
       const { data: heroData } = useUserHeroData(user.id);
       const { data: userDivision, loading: divisionLoading } = useUserDivision(user.id);
       const { count: packCount } = usePacksCount(user.id);
+      const {
+  currentDay,
+  lobbyMission,
+  claimReward,
+  startMission,
+  updateMissionProgress,
+} = useDailyMissions(user.id);
 
       const level = heroData?.level || 1;
       const exp = heroData?.exp || 0;
@@ -429,6 +439,20 @@
         window.scrollTo({ top: 0 });
       },
     });
+
+    const handleLobbyChallenge = (
+  target: { userId: string; username: string },
+  botIndex = 1
+) => {
+  const sent = challenge(target, botIndex);
+
+  if (!sent) {
+    return;
+  }
+
+  // La misión cuenta cuando el desafío fue enviado correctamente.
+  updateMissionProgress("challenge");
+};
 
       const realOthers = lobbyPlayers.filter((p) => p.userId !== user.id).length;
       const [showPlayersSheet, setShowPlayersSheet] = useState(false);
@@ -502,6 +526,7 @@
         setView("match");
         window.scrollTo({ top: 0 });
       };
+      
 
 
       const handleGameNavigate = (target: string) => {
@@ -524,6 +549,65 @@
         }
       };
 
+      const handleLobbyMissionStart = async (mission: Parameters<typeof startMission>[0]) => {
+  switch (mission.type) {
+    case "play_match":
+      openMatch("quick");
+      break;
+
+    case "open_pack":
+      setShowPackModal(true);
+      break;
+
+    default:
+      await startMission(mission);
+      break;
+  }
+};
+
+const handleLobbyMissionClaim = async (missionId: string) => {
+  const mission = lobbyMission?.id === missionId
+    ? lobbyMission
+    : null;
+
+  if (!mission) return;
+
+  try {
+    const result = await processUserAction({
+      userId: user.id,
+      actionType: "mission",
+      actionValue: mission.reward.xp,
+      referenceId: mission.id,
+      metadata: {
+        missionId: mission.id,
+        missionTitle: mission.title,
+        xp: mission.reward.xp,
+        coins: mission.reward.coins ?? 0,
+        points: mission.reward.points ?? 0,
+      },
+    });
+
+    console.log("🎁 RECOMPENSA ACREDITADA", {
+  result,
+  mission: {
+    id: mission.id,
+    title: mission.title,
+    xp: mission.reward.xp,
+    coins: mission.reward.coins ?? 0,
+    points: mission.reward.points ?? 0,
+  },
+});
+
+    await claimReward(missionId);
+
+  } catch (error) {
+    console.error(
+      "❌ Error acreditando recompensa:",
+      error
+    );
+  }
+};
+
       const handleTab = (id: GameTab) => {
         if (id === "play" && gameTab === "play") setView("lobby");
         setGameTab(id);
@@ -532,6 +616,7 @@
 
       const activeIndex = TABS.findIndex((t) => t.id === gameTab);
       const sceneKey = gameTab === "play" ? `play-${view}` : gameTab;
+      
 
       return (
         <div className="main-content gh-root">
@@ -558,14 +643,43 @@
               </div>
 
               <div className="gh-hud__right">
-                <div className="gh-wallet" title="Tus puntos">
-                  <span className="gh-wallet__coin" aria-hidden>●</span>
-                  {user.points || 0}
-                </div>
-                <div className="gh-level" style={{ ["--xp" as string]: xpPct }} title={`Nivel ${level} · ${exp}/${expNeeded} XP`}>
-                  <div className="gh-level__core">{level}</div>
-                </div>
-              </div>
+
+  {/* PUNTOS */}
+  <div className="gh-currency gh-currency--points" title="Tus puntos">
+    <span className="gh-currency__icon" aria-hidden>
+      ⭐
+    </span>
+
+    <div className="gh-currency__info">
+      <small>PUNTOS</small>
+      <strong>{user.points ?? 0}</strong>
+    </div>
+  </div>
+
+  {/* MONEDAS */}
+  <div className="gh-currency gh-currency--coins" title="Tus monedas">
+    <span className="gh-currency__icon" aria-hidden>
+      💰
+    </span>
+
+    <div className="gh-currency__info">
+      <small>MONEDAS</small>
+      <strong>{user.coins ?? 0}</strong>
+    </div>
+  </div>
+
+  {/* NIVEL */}
+  <div
+    className="gh-level"
+    style={{ ["--xp" as string]: xpPct }}
+    title={`Nivel ${level} · ${exp}/${expNeeded} XP`}
+  >
+    <div className="gh-level__core">
+      {level}
+    </div>
+  </div>
+
+</div>
             </header>
 
             
@@ -587,20 +701,18 @@
     />
     {selectedWorldPlayer && (
       <PlayerCard
-        player={selectedWorldPlayer}
-        meId={user.id}
-        catalog={auraItems}
-        muted={isMuted(selectedWorldPlayer.userId)}
-        challengePending={
-          outgoing?.toId === selectedWorldPlayer.userId
-        }
-        onClose={() => setSelectedWorldPlayer(null)}
-        onChallenge={(player) => {
-          challenge(player);
-        }}
-        onToggleMute={toggleMute}
-        onReport={report}
-      />
+    player={selectedWorldPlayer}
+    meId={user.id}
+    catalog={auraItems}
+    muted={isMuted(selectedWorldPlayer.userId)}
+    challengePending={
+      outgoing?.toId === selectedWorldPlayer.userId
+    }
+    onClose={() => setSelectedWorldPlayer(null)}
+    onChallenge={handleLobbyChallenge}
+    onToggleMute={toggleMute}
+    onReport={report}
+  />
     )}
 
                   <div className="gh-world__atmosphere" aria-hidden>
@@ -760,17 +872,29 @@
 
                   <div className="gh-world__chat">
                     <LobbyChat
-      room="global"
-      meId={user.id}
-      meName={user.username || "Jugador"}
-      players={lobbyPlayers}
-      status={lobbyStatus}
-      catalog={auraItems}
-      npcCtx={npcCtx}
-      realOthers={realOthers}
-      events={events}
-      mutedIds={muted}
-    />
+  room="global"
+  meId={user.id}
+  meName={user.username || "Jugador"}
+  players={lobbyPlayers}
+  status={lobbyStatus}
+  catalog={auraItems}
+  npcCtx={npcCtx}
+  realOthers={realOthers}
+  events={events}
+  onSelectPlayer={(userId) => {
+    const player = lobbyPlayers.find(
+      (item) => item.userId === userId
+    );
+
+    if (player) {
+      setSelectedWorldPlayer(player);
+    }
+  }}
+  mutedIds={muted}
+  onMessageSent={() => {
+    updateMissionProgress("chat");
+  }}
+/>
                   </div>
                   <div className="gh-locker-zone">
         <LockerPreview
@@ -782,11 +906,12 @@
         />
       </div>
 
-                  <div className="gh-world__mission">
-                    <span className="gh-world__mission-kicker">PRÓXIMO OBJETIVO</span>
-                    <strong>¡A POR LA VICTORIA!</strong>
-                    <span>Ganando partidos llegás a {nextLeague}.</span>
-                  </div>
+                  <LobbyDailyMission
+  mission={lobbyMission}
+  currentDay={currentDay}
+  onClaimReward={handleLobbyMissionClaim}
+  onStartMission={handleLobbyMissionStart}
+/>
 
                   <button className="gh-world__play" type="button" onClick={() => handleGameNavigate("campaign")}>
                     <span className="gh-world__play-icon" aria-hidden>⚡</span>
@@ -798,7 +923,13 @@
                   </button>
 
                   <div className="gh-world__actions" aria-label="Acciones rápidas">
-                    <button type="button" onClick={() => setShowPackModal(true)}>
+                    <button
+  type="button"
+  onClick={() => {
+    setShowPackModal(true);
+    updateMissionProgress("open_pack");
+  }}
+>
                       <span>🧧</span>
                       <strong>PACK</strong>
                       {packCount > 0 && <em>{packCount}</em>}
@@ -823,16 +954,19 @@
                       <span>⚽</span><strong>LOBBY</strong>
                     </button>
                     <button
-        type="button"
-        onClick={() => setShowPackModal(true)}
-      >
-        <span>🎁</span>
-        <strong>PACK</strong>
+  type="button"
+  onClick={() => {
+    setShowPackModal(true);
+    updateMissionProgress("open_pack");
+  }}
+>
+  <span>🎁</span>
+  <strong>PACK</strong>
 
-        {packCount > 0 && (
-          <em>{packCount}</em>
-        )}
-      </button>
+  {packCount > 0 && (
+    <em>{packCount}</em>
+  )}
+</button>
                     <button type="button" onClick={() => handleGameNavigate("deck")}>
                       <span>👕</span><strong>EQUIPO</strong>
                     </button>
@@ -859,7 +993,28 @@
 
                   <div className="gh-panel">
                     {battleMode === "quick" ? (
-                      <CardBattle userCards={userCards} userDeck={activeDeck} userId={user.id} onBattleComplete={onBattleComplete} onNavigateToDeck={() => setGameTab("deck")} />
+                      <CardBattle
+  userCards={userCards}
+  userDeck={activeDeck}
+  userId={user.id}
+  onBattleComplete={onBattleComplete}
+  onNavigateToDeck={() => setGameTab("deck")}
+  isCampaignMode={true}
+  forcedOpponent={{
+    name: "Bot Novato",
+    overall_rating: 55,
+    category: "8va",
+    level: 1,
+    avatar: "🥉",
+    color: "#7a7a9a",
+    xpBase: 10,
+    reqWins: 0,
+  }}
+  onCampaignMatchComplete={() => {
+    updateMissionProgress("play_match");
+    setView("lobby");
+  }}
+/>
                     ) : (
                       <CampaignMode userCards={userCards} userDeck={activeDeck} userId={user.id} onBattleComplete={onBattleComplete} onNavigateToDeck={() => setGameTab("deck")} />
                     )}

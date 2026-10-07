@@ -1948,3 +1948,99 @@
     transform: translateY(0) scale(1);
   }
 }
+.gh-hud__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gh-currency {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  min-width: 92px;
+  height: 42px;
+  padding: 0 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.075),
+      rgba(255, 255, 255, 0.025)
+    );
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.gh-currency__icon {
+  width: 26px;
+  height: 26px;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 16px;
+
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.gh-currency__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  line-height: 1;
+}
+
+.gh-currency__info small {
+  margin-bottom: 4px;
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+
+  opacity: 0.55;
+}
+
+.gh-currency__info strong {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+/* PUNTOS */
+.gh-currency--points {
+  border-color: rgba(255, 200, 61, 0.18);
+}
+
+.gh-currency--points .gh-currency__icon {
+  background: rgba(255, 200, 61, 0.10);
+}
+
+.gh-currency--points strong {
+  color: #ffc83d;
+}
+
+/* MONEDAS */
+.gh-currency--coins {
+  border-color: rgba(36, 233, 135, 0.18);
+}
+
+.gh-currency--coins .gh-currency__icon {
+  background: rgba(36, 233, 135, 0.10);
+}
+
+.gh-currency--coins strong {
+  color: #24e987;
+}

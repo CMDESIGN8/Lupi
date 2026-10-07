@@ -20,6 +20,7 @@ export type InventoryItem = {
   requiredLevel: number;
   owned: boolean;
   equipped: boolean;
+  equippedImageUrl: string | null;
 };
 
 type CatalogRow = {
@@ -35,6 +36,7 @@ type CatalogRow = {
   shop_url: string | null;
   color: string | null;
   required_level: number;
+  equipped_image_url: string | null;
 };
 
 export const DEFAULT_ITEM_COLOR = "#00ff88";
@@ -54,10 +56,66 @@ const defaultImage = (id: string) => `/items/${id}.png`;
  * Catálogo local de respaldo (modo prototipo).
  */
 const FALLBACK_CATALOG: Omit<InventoryItem, "owned" | "equipped">[] = [
-  { id: "grind-tee", name: "GRIND TEE", slot: "top", rarity: "common", world: "URBAN", drop: "DROP 001", icon: "👕", imageUrl: defaultImage("grind-tee"), modelUrl: null, shopUrl: null, color: COLOR_BY_ID["grind-tee"], requiredLevel: 1 },
-  { id: "farm-tee", name: "FARM TEE", slot: "top", rarity: "rare", world: "URBAN", drop: "DROP 001", icon: "👕", imageUrl: defaultImage("farm-tee"), modelUrl: null, shopUrl: null, color: COLOR_BY_ID["farm-tee"], requiredLevel: 3 },
-  { id: "sport-aura", name: "SPORT AURA", slot: "top", rarity: "epic", world: "SPORT", drop: "DROP 001", icon: "🎽", imageUrl: defaultImage("sport-aura"), modelUrl: null, shopUrl: null, color: COLOR_BY_ID["sport-aura"], requiredLevel: 11 },
-  { id: "aura-boots", name: "AURA BOOTS", slot: "boots", rarity: "legendary", world: null, drop: "CUSTOM", icon: "👟", imageUrl: defaultImage("aura-boots"), modelUrl: null, shopUrl: null, color: COLOR_BY_ID["aura-boots"], requiredLevel: 1 },
+  {
+    id: "grind-tee",
+    name: "GRIND TEE",
+    slot: "top",
+    rarity: "common",
+    world: "URBAN",
+    drop: "DROP 001",
+    icon: "👕",
+    imageUrl: defaultImage("grind-tee"),
+    equippedImageUrl: null,
+    modelUrl: null,
+    shopUrl: null,
+    color: COLOR_BY_ID["grind-tee"],
+    requiredLevel: 1,
+  },
+  {
+    id: "farm-tee",
+    name: "FARM TEE",
+    slot: "top",
+    rarity: "rare",
+    world: "URBAN",
+    drop: "DROP 001",
+    icon: "👕",
+    imageUrl: defaultImage("farm-tee"),
+    equippedImageUrl: null,
+    modelUrl: null,
+    shopUrl: null,
+    color: COLOR_BY_ID["farm-tee"],
+    requiredLevel: 3,
+  },
+  {
+    id: "sport-aura",
+    name: "SPORT AURA",
+    slot: "top",
+    rarity: "epic",
+    world: "SPORT",
+    drop: "DROP 001",
+    icon: "🎽",
+    imageUrl: defaultImage("sport-aura"),
+    equippedImageUrl: null,
+    modelUrl: null,
+    shopUrl: null,
+    color: COLOR_BY_ID["sport-aura"],
+    requiredLevel: 11,
+  },
+  {
+    id: "aura-boots",
+    name: "AURA BOOTS",
+    slot: "boots",
+    rarity: "legendary",
+    world: null,
+    drop: "CUSTOM",
+    icon: "👟",
+    imageUrl: defaultImage("aura-boots"),
+    equippedImageUrl: "/items/equipped/aura-boots.png",
+    modelUrl: null,
+    shopUrl: null,
+    color: COLOR_BY_ID["aura-boots"],
+    requiredLevel: 1,
+  },
 ];
 
 export function useAuraInventory(userId: string, level: number) {
@@ -117,6 +175,8 @@ export function useAuraInventory(userId: string, level: number) {
         requiredLevel: row.required_level,
         owned: ownedMap.has(row.id) || level >= row.required_level,
         equipped: ownedMap.get(row.id) ?? false,
+        // Imagen específica para avatar equipado
+        equippedImageUrl: row.equipped_image_url,
       }))
     );
     setUsingFallback(false);
