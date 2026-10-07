@@ -1559,99 +1559,93 @@
   }
 
   .gh-locker-zone .locker-equipment .locker-slot {
-    position: absolute;
+  position: absolute;
 
-    width: 56px;
-    height: 56px;
+  width: 68px;                /* 🔧 antes 56 → más grandes */
+  height: 68px;
 
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 
-    display: grid !important;
-    place-items: center;
+  display: grid !important;
+  place-items: center;
 
-    pointer-events: auto;
+  pointer-events: auto;
 
-    border-radius: 14px 5px 14px 5px;
+  border-radius: 16px 6px 16px 6px;    /* esquinas un poco más marcadas */
 
-    background:
-      linear-gradient(135deg, rgba(10, 40, 32, 0.94), rgba(4, 20, 16, 0.94));
+  background:
+    linear-gradient(135deg, rgba(10, 40, 32, 0.94), rgba(4, 20, 16, 0.94));
 
-    border: 1px solid rgba(76, 210, 155, 0.4);
+  border: 1.5px solid rgba(76, 210, 155, 0.5);   /* borde un pelín más visible */
 
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 4px 14px rgba(0, 0, 0, 0.5);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 6px 18px rgba(0, 0, 0, 0.55);
 
-    color: #dff8ea;
-    cursor: pointer;
-    overflow: hidden;
+  color: #dff8ea;
+  cursor: pointer;
+  overflow: hidden;
 
-    gap: 0 !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
+  gap: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
 
-  .gh-locker-zone .locker-equipment .locker-slot-info,
-  .gh-locker-zone .locker-equipment .locker-slot-arrow {
-    display: none !important;
-  }
+.gh-locker-zone .locker-equipment .locker-slot-info,
+.gh-locker-zone .locker-equipment .locker-slot-arrow {
+  display: none !important;
+}
 
-  .gh-locker-zone .locker-equipment .locker-slot-icon {
-    width: 100% !important;
-    height: 100% !important;
+.gh-locker-zone .locker-equipment .locker-slot-icon {
+  width: 100% !important;
+  height: 100% !important;
 
-    flex: 0 0 auto !important;
-    flex-basis: auto !important;
+  flex: 0 0 auto !important;
+  flex-basis: auto !important;
 
-    display: grid !important;
-    place-items: center;
+  display: grid !important;
+  place-items: center;
 
-    border-radius: 0;
-    background: transparent !important;
+  border-radius: 0;
+  background: transparent !important;
 
-    font-size: 26px !important;
-    line-height: 1;
-  }
+  font-size: 32px !important;         /* 🔧 antes 26 → iconos más grandes */
+  line-height: 1;
+}
 
-  /* Posiciones: 2 a cada lado, distribuidas verticalmente */
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(1) {
-    left: -4px;
-    top: 30%;
-    transform: translateY(-50%);
-  }
+/* -------------------------------------------------------
+   POSICIONES — más cerca del personaje
+   ------------------------------------------------------- */
 
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
-    left: -4px;
-    top: 68%;
-    transform: translateY(-50%);
-  }
+/* Antes: left: -4px / right: -4px (pegados al borde del contenedor).
+   Ahora: dentro del contenedor, cerca del cuerpo. */
 
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
-    right: -4px;
-    left: auto;
-    top: 68%;
-    transform: translateY(-50%);
-  }
+.gh-locker-zone .locker-equipment .locker-slot:nth-child(1) {
+  left: 8px;                  /* 🔧 antes -4 → más adentro */
+  top: 28%;                   /* 🔧 un pelín más arriba (cabeza) */
+  transform: translateY(-50%);
+}
 
-  .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
-    right: -4px;
-    left: auto;
-    top: 30%;
-    transform: translateY(-50%);
-  }
+.gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
+  left: 8px;
+  top: 62%;                   /* 🔧 antes 68 → más cerca de la cadera */
+  transform: translateY(-50%);
+}
 
-  .gh-locker-zone .locker-equipment .locker-slot.equipped {
-    border-color: color-mix(in srgb, var(--locker-color) 60%, transparent);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      0 0 16px color-mix(in srgb, var(--locker-color) 35%, transparent),
-      0 4px 14px rgba(0, 0, 0, 0.5);
-  }
+.gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
+  right: 8px;                 /* 🔧 antes -4 → más adentro */
+  left: auto;
+  top: 62%;
+  transform: translateY(-50%);
+}
 
-  .gh-locker-zone .locker-equipment .locker-slot.empty {
-    opacity: 0.6;
-  }
+.gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
+  right: 8px;
+  left: auto;
+  top: 28%;
+  transform: translateY(-50%);
+}
 
   /* -------------------------------------------------------
      JUGADORES ONLINE — ocultos, viven en el sheet
@@ -2208,15 +2202,24 @@
     bottom: 30px;
   }
 
-  .gh-locker-zone .locker-equipment .locker-slot {
-    width: 50px;
-    height: 50px;
+   .gh-locker-zone .locker-equipment .locker-slot {
+    width: 60px;              /* un poco más chicos que en pantallas grandes */
+    height: 60px;
   }
 
   .gh-locker-zone .locker-equipment .locker-slot-icon {
-    font-size: 23px !important;
+    font-size: 28px !important;
   }
 
+  .gh-locker-zone .locker-equipment .locker-slot:nth-child(1),
+  .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
+    left: 4px;                /* un pelín más pegados al borde por falta de espacio */
+  }
+
+  .gh-locker-zone .locker-equipment .locker-slot:nth-child(3),
+  .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
+    right: 4px;
+  }
   /* Botón jugadores un pelín más arriba */
  .gh-world__players-toggle {
   left: 10px;
