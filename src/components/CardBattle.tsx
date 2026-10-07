@@ -29,10 +29,18 @@ interface CardBattleProps {
   userId: string;
   onBattleComplete: (updatedCards: UserCard[]) => void;
   onNavigateToDeck?: () => void;
-  // Nuevas props para modo campaña
-  forcedOpponent?: BotPlayer | null;  // Oponente forzado (no permite selección)
-  isCampaignMode?: boolean;            // Si es true, oculta el selector de bots
-  onCampaignMatchComplete?: (won: boolean, bot: BotPlayer) => void; // Callback para campaña
+  forcedOpponent?: BotPlayer | null;
+  isCampaignMode?: boolean;
+  onCampaignMatchComplete?: (won: boolean, bot: BotPlayer) => void;
+
+  onDailyChallengesUpdated?: (
+    challenges: {
+      challenge_id: string;
+      progress: number;
+      requirement: number;
+      completed: boolean;
+    }[]
+  ) => void;
 }
 
 export interface BotPlayer {
@@ -124,7 +132,8 @@ export function CardBattle({
   onNavigateToDeck,
   forcedOpponent = null,
   isCampaignMode = false,
-  onCampaignMatchComplete
+  onCampaignMatchComplete,
+  onDailyChallengesUpdated,
 }: CardBattleProps) {
 
   const [phase, setPhase] = useState<'select'|'battle'|'result'>(
@@ -464,10 +473,57 @@ export function CardBattle({
   }, [bot, userDeck]);
 
   // ── Post-partido ──────────────────────────────────────────────────────────
+  async function updateDailyChallenges(
+  won: boolean,
+  userScore: number,
+  opponent: BotPlayer
+) {
+  try {
+    console.log('🎯 DAILY CHALLENGE DEBUG', {
+      userId,
+      won,
+      userScore,
+      opponent: opponent.name,
+      opponentLevel: opponent.level,
+    });
+    const { data, error } = await supabase.rpc('update_daily_progress', {
+      p_user_id: userId,
+      p_action_type: won
+        ? 'battle_win'
+        : 'battle_lose',
+      p_metadata: {
+        score: userScore,
+        is_legend: opponent.level >= 3,
+      },
+    });
+
+    if (error) {
+      console.error('Error actualizando desafíos diarios:', error);
+      return null;
+    }
+
+    console.log('🎯 Desafíos diarios actualizados:', data);
+
+    return data;
+  } catch (err) {
+    console.error('Error inesperado actualizando desafíos:', err);
+    return null;
+  }
+}
+
 
   async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[]) {
     const won   = ug > rg;
     const tied  = ug === rg;
+    const dailyProgress = await updateDailyChallenges(
+  won,
+  ug,
+  bot
+);
+
+if (dailyProgress?.challenges) {
+  onDailyChallengesUpdated?.(dailyProgress.challenges);
+}
 
     const newStreak   = won ? Math.min(userStats.streak + 1, 10) : 0;
     const streakBonus = won ? newStreak * 5 : 0;

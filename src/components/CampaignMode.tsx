@@ -63,6 +63,15 @@ interface CampaignModeProps {
   userId: string;
   onBattleComplete: (updatedCards: UserCard[]) => void;
   onNavigateToDeck?: () => void;
+
+  onDailyChallengesUpdated?: (
+    challenges: {
+      challenge_id: string;
+      progress: number;
+      requirement: number;
+      completed: boolean;
+    }[]
+  ) => void;
 }
 
 
@@ -191,6 +200,7 @@ export function CampaignMode({
   userId,
   onBattleComplete,
   onNavigateToDeck,
+  onDailyChallengesUpdated,
 }: CampaignModeProps) {
 
   // ─────────────────────────────────────────────
@@ -1547,54 +1557,29 @@ export function CampaignMode({
 
     return (
       <CardBattle
-        userCards={
-          userCards
-        }
-
-        userDeck={
-          userDeck
-        }
-
-        userId={
-          userId
-        }
-
-        onBattleComplete={
-          handleBattleComplete
-        }
-
-        onNavigateToDeck={
-          onNavigateToDeck
-        }
-
-        forcedOpponent={
-          forcedOpponent
-        }
-
-        isCampaignMode={
-          true
-        }
-
-        onCampaignMatchComplete={(
-          won,
-          _bot
-        ) => {
-
-          if (
-            currentMatch
-          ) {
-
-            completeMatch(
-              currentLeague.id,
-
-              currentMatch.matchNumber -
-                1,
-
-              won
-            );
-          }
-        }}
-      />
+  userCards={userCards}
+  userDeck={userDeck}
+  userId={userId}
+  onBattleComplete={handleBattleComplete}
+  onNavigateToDeck={onNavigateToDeck}
+  forcedOpponent={forcedOpponent}
+  isCampaignMode={true}
+  onCampaignMatchComplete={(
+    won,
+    _bot
+  ) => {
+    if (currentMatch) {
+      completeMatch(
+        currentLeague.id,
+        currentMatch.matchNumber - 1,
+        won
+      );
+    }
+  }}
+  onDailyChallengesUpdated={
+    onDailyChallengesUpdated
+  }
+/>
     );
   }
 

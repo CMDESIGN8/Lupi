@@ -202,12 +202,22 @@ export function PlayerCard({
   );
 }
 
+export type DailyChallengeToast = {
+  id: string;
+  title: string;
+  progress: number;
+  requirement: number;
+  rewardXp?: number;
+  rewardCoins?: number;
+};
+
 type ToastsProps = {
   incoming: Challenge | null;
   outgoing: Challenge | null;
   outcome: ChallengeOutcome | null;
   respond: (accept: boolean) => void;
   cancel: () => void;
+  dailyChallenges?: DailyChallengeToast[];
 };
 
 const OUTCOME_TEXT: Record<ChallengeOutcome["kind"], (name: string) => string> = {
@@ -216,20 +226,47 @@ const OUTCOME_TEXT: Record<ChallengeOutcome["kind"], (name: string) => string> =
   expired: (name) => `${name} no respondió.`,
 };
 
+
 /** Avisos flotantes: desafío recibido, desafío enviado y resultado. */
-export function ChallengeToasts({ incoming, outgoing, outcome, respond, cancel }: ToastsProps) {
-  if (!incoming && !outgoing && !outcome) return null;
+export function ChallengeToasts({
+  incoming,
+  outgoing,
+  outcome,
+  respond,
+  cancel,
+  dailyChallenges = [],
+}: ToastsProps) {
+  console.log("🏆 UI DAILY CHALLENGES:", dailyChallenges);
+  if (
+    !incoming &&
+    !outgoing &&
+    !outcome &&
+    dailyChallenges.length === 0
+  ) {
+    return null;
+  }
 
   return (
     <div className="pc-toasts" aria-live="polite">
+
       {incoming && (
         <div className="pc-toast pc-toast--incoming" role="alert">
           <strong>⚔ {incoming.fromName} te desafía</strong>
+
           <div className="pc-toast__row">
-            <button type="button" className="pc-btn pc-btn--primary" onClick={() => respond(true)}>
+            <button
+              type="button"
+              className="pc-btn pc-btn--primary"
+              onClick={() => respond(true)}
+            >
               Aceptar
             </button>
-            <button type="button" className="pc-btn" onClick={() => respond(false)}>
+
+            <button
+              type="button"
+              className="pc-btn"
+              onClick={() => respond(false)}
+            >
               Rechazar
             </button>
           </div>
@@ -239,15 +276,53 @@ export function ChallengeToasts({ incoming, outgoing, outcome, respond, cancel }
       {outgoing && (
         <div className="pc-toast">
           <strong>Desafiaste a {outgoing.toName}…</strong>
+
           <div className="pc-toast__row">
-            <button type="button" className="pc-btn" onClick={cancel}>
+            <button
+              type="button"
+              className="pc-btn"
+              onClick={cancel}
+            >
               Cancelar
             </button>
           </div>
         </div>
       )}
 
-      {outcome && <div className="pc-toast pc-toast--info">{OUTCOME_TEXT[outcome.kind](outcome.name)}</div>}
+      {outcome && (
+        <div className="pc-toast pc-toast--info">
+          {OUTCOME_TEXT[outcome.kind](outcome.name)}
+        </div>
+      )}
+
+      {dailyChallenges.map((challenge) => (
+        <div
+          key={challenge.id}
+          className="pc-toast pc-toast--daily"
+          role="status"
+        >
+          <div className="pc-toast__daily-icon">
+            🏆
+          </div>
+
+          <div className="pc-toast__daily-content">
+            <strong>DESAFÍO COMPLETADO</strong>
+
+            <span>{challenge.title}</span>
+
+            <small>
+              {challenge.progress}/{challenge.requirement}
+              {challenge.rewardXp
+                ? ` • +${challenge.rewardXp} XP`
+                : ""}
+              {challenge.rewardCoins
+                ? ` • +${challenge.rewardCoins} 🪙`
+                : ""}
+            </small>
+          </div>
+        </div>
+      ))}
+
     </div>
   );
 }

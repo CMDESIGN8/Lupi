@@ -217,3 +217,51 @@
     flex: 1;
   }
 }
+
+.pc-toast--daily {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(255, 204, 0, 0.55);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 204, 0, 0.16),
+      rgba(20, 20, 28, 0.96)
+    );
+  box-shadow:
+    0 0 25px rgba(255, 204, 0, 0.15),
+    0 12px 35px rgba(0, 0, 0, 0.35);
+}
+
+.pc-toast__daily-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  font-size: 24px;
+  border-radius: 12px;
+  background: rgba(255, 204, 0, 0.12);
+}
+
+.pc-toast__daily-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pc-toast__daily-content strong {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.pc-toast__daily-content span {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pc-toast__daily-content small {
+  font-size: 11px;
+  opacity: 0.7;
+}
