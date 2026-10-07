@@ -171,6 +171,7 @@
     scale(var(--avatar-scale));
 
   transform-origin: center center;
+  z-index: 22;
 }
 
 
@@ -180,16 +181,17 @@
 
 .avatar2d__layer--bottom {
   left: 50%;
-  top: 300px;
+  top: 315px;
 
-  width: 150px;
-  height: 130px;
+  width: 500px;
+  height: 141px;
 
   transform:
     translate(-50%, -50%)
     scale(var(--avatar-scale));
 
   transform-origin: center center;
+   z-index: 21;
 }
 
 
@@ -197,32 +199,12 @@
    BOOTS
 ========================================================= */
 
-.avatar2d__layer--boot-left {
-  left: 36%;
-  top: 432px;
-
-  width: 82px;
-  height: 60px;
-
-  transform:
-    translate(-50%, -50%)
-    scale(var(--avatar-scale));
-
-  transform-origin: center center;
-}
-
-
-.avatar2d__layer--boot-right {
-  left: 64%;
-  top: 432px;
-
-  width: 82px;
-  height: 60px;
-
-  transform:
-    translate(-50%, -50%)
-    scale(var(--avatar-scale));
-
+.avatar2d__layer--boots {
+  left: 50%;
+  top: 455px;
+  width: 130px;
+  height: 75px;
+  transform: translate(-50%, -50%) scale(var(--avatar-scale));
   transform-origin: center center;
 }
 

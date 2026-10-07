@@ -33,32 +33,62 @@ export const CLUB_STORY: CampaignDay[] = [
       }
     ],
     dailyMissions: [
-      {
-        id: 'mission_day1_1',
-        title: '⚽ EL DEBUT',
-        description: 'Juega tu primer partido en la campaña',
-        icon: '⚽',
-        type: 'play_match',
-        requirement: 1,
-        currentProgress: 0,
-        reward: { xp: 50, coins: 100 },
-        isCompleted: false,
-        isClaimed: false
-      },
-      {
-        id: 'mission_day1_2',
-        title: '📸 COMPARTÍ EL SUEÑO',
-        description: 'Comparte tu progreso en redes sociales',
-        icon: '📱',
-        type: 'social_share',
-        requirement: 1,
-        currentProgress: 0,
-        reward: { xp: 30, coins: 50 },
-        isCompleted: false,
-        isClaimed: false,
-        storyTrigger: 'first_share'
-      }
-    ],
+  {
+    id: 'mission_day1_1',
+    title: '⚽ EL DEBUT',
+    description: 'Juega tu primer partido en la campaña',
+    icon: '⚽',
+    type: 'play_match',
+    requirement: 1,
+    currentProgress: 0,
+    reward: {
+      xp: 50,
+      coins: 100
+    },
+    isCompleted: false,
+    isClaimed: false
+  },
+
+  {
+    id: 'mission_day1_2',
+    title: '💬 CONOCÉ AL BARRIO',
+    description: 'Enviá 2 mensajes en el lobby',
+    icon: '💬',
+    type: 'chat',
+    requirement: 2,
+    currentProgress: 0,
+    reward: { xp: 40, points: 75 },
+    isCompleted: false,
+    isClaimed: false
+  },
+
+  {
+    id: 'mission_day1_3',
+    title: '⚔️ BUSCÁ UN RIVAL',
+    description: 'Desafiá a otro jugador del lobby',
+    icon: '⚔️',
+    type: 'challenge',
+    requirement: 1,
+    currentProgress: 0,
+    reward: { xp: 50, points: 100 },
+    isCompleted: false,
+    isClaimed: false
+  },
+
+  {
+    id: 'mission_day1_4',
+    title: '📸 COMPARTÍ EL SUEÑO',
+    description: 'Comparte tu progreso en redes sociales',
+    icon: '📱',
+    type: 'social_share',
+    requirement: 1,
+    currentProgress: 0,
+    reward: { xp: 30, points: 50 },
+    isCompleted: false,
+    isClaimed: false,
+    storyTrigger: 'first_share'
+  }
+],
     requiredMatches: [], // Se llenarán con los bots de rookie
     isCompleted: false,
     canAdvance: false

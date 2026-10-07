@@ -31,12 +31,17 @@ function AvatarItemImage({
   item: InventoryItem | null;
   className: string;
 }) {
-  if (!item?.imageUrl) return null;
+  if (!item) return null;
+
+  const imageUrl =
+    item.equippedImageUrl ?? item.imageUrl;
+
+  if (!imageUrl) return null;
 
   return (
     <img
       className={className}
-      src={item.imageUrl}
+      src={imageUrl}
       alt=""
       draggable={false}
     />
@@ -169,19 +174,14 @@ export function Avatar2D({
 
         {bootsItem?.imageUrl && (
           <>
-            <div className="avatar2d__layer avatar2d__layer--boot-left">
-              <AvatarItemImage
-                item={bootsItem}
-                className="avatar2d__image"
-              />
-            </div>
-
-            <div className="avatar2d__layer avatar2d__layer--boot-right">
-              <AvatarItemImage
-                item={bootsItem}
-                className="avatar2d__image"
-              />
-            </div>
+            {bootsItem?.imageUrl && (
+  <div className="avatar2d__layer avatar2d__layer--boots">
+    <AvatarItemImage
+      item={bootsItem}
+      className="avatar2d__image"
+    />
+  </div>
+)}
           </>
         )}
 

@@ -1,6 +1,5 @@
 import React from "react";
 import { DailyMission } from "../types/campaignStory";
-import "./LobbyDailyMission.css";
 
 type Props = {
   mission: DailyMission | null;
@@ -11,17 +10,21 @@ type Props = {
 
 function getMissionIcon(type: string) {
   const icons: Record<string, string> = {
-    play_match: "⚽",
-    share: "📱",
-    open_pack: "📦",
-    watch_ad: "📺",
-    complete_training: "💪",
-    social_share: "🤝",
+    play_match: '⚽',
+    share: '📱',
+    social_share: '📱',
+    chat: '💬',
+    challenge: '⚔️',
+    challenge_accept: '🤝',
+    challenge_win: '🏆',
+    open_pack: '📦',
+    watch_ad: '📺',
+    complete_training: '💪',
+    training: '💪',
   };
 
-  return icons[type] || "✦";
+  return icons[type] || '✦';
 }
-
 export function LobbyDailyMission({
   mission,
   currentDay,
@@ -30,25 +33,26 @@ export function LobbyDailyMission({
 }: Props) {
   if (!mission) {
     return (
-      <section className="lobby-daily lobby-daily--empty">
-        <div className="lobby-daily__top">
-          <span>DAILY QUEST</span>
-          <strong>DÍA {currentDay}</strong>
-        </div>
+      <div className="gh-world__mission">
+        <span className="gh-world__mission-kicker">
+          MISIÓN DEL DÍA · DÍA {currentDay}
+        </span>
 
-        <div className="lobby-daily__empty">
-          <span>✦</span>
-          <strong>PREPARANDO TU MISIÓN</strong>
-          <small>Volvé en unos segundos.</small>
-        </div>
-      </section>
+        <strong>PREPARANDO MISIÓN</strong>
+
+        <span>
+          Volvé en unos segundos.
+        </span>
+      </div>
     );
   }
 
   const progress = Math.min(
     100,
     Math.round(
-      (mission.currentProgress / Math.max(1, mission.requirement)) * 100
+      (mission.currentProgress /
+        Math.max(1, mission.requirement)) *
+        100
     )
   );
 
@@ -58,92 +62,104 @@ export function LobbyDailyMission({
   const claimed =
     mission.isCompleted && mission.isClaimed;
 
+  /*
+   * Cuando todavía está en progreso:
+   * mostramos exactamente el estilo anterior.
+   *
+   * Cuando está completa:
+   * cambiamos solamente el texto inferior.
+   */
+
+  let kicker = `MISIÓN DEL DÍA · DÍA ${currentDay}`;
+  let title = mission.title;
+  let description = mission.description;
+
+  if (completed) {
+    kicker = "MISIÓN COMPLETADA";
+    title = "¡RECOMPENSA LISTA!";
+    description = `+${mission.reward.xp} XP${
+      mission.reward.coins
+        ? ` · +${mission.reward.coins} monedas`
+        : ""
+    }`;
+  }
+
+  if (claimed) {
+    kicker = "MISIÓN COMPLETADA";
+    title = "¡OBJETIVO CUMPLIDO!";
+    description = "La recompensa ya fue reclamada.";
+  }
+
   return (
-    <section
-      className={[
-        "lobby-daily",
-        completed ? "is-ready" : "",
-        claimed ? "is-completed" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <div className="lobby-daily__glow" />
+    <div className="gh-world__mission">
+      <span className="gh-world__mission-kicker">
+        {kicker}
+      </span>
 
-      <header className="lobby-daily__header">
-        <div>
-          <span className="lobby-daily__eyebrow">
-            DAILY QUEST
+      <strong>{title}</strong>
+
+      <span>
+        {description}
+      </span>
+
+      {/* progreso */}
+      {!completed && !claimed && (
+        <div className="gh-world__mission-progress">
+          <div className="gh-world__mission-progress-track">
+            <div
+              className="gh-world__mission-progress-fill"
+              style={{
+                width: `${progress}%`,
+              }}
+            />
+          </div>
+
+          <span>
+            {getMissionIcon(mission.type)}{" "}
+            {mission.currentProgress}/
+            {mission.requirement}
+          </span>
+        </div>
+      )}
+
+      {/* recompensa */}
+      {!claimed && (
+        <div className="gh-world__mission-reward">
+          <span>
+            ✦ +{mission.reward.xp} XP
           </span>
 
-          <strong>
-            MISIÓN DEL DÍA
-          </strong>
-        </div>
-
-        <span className="lobby-daily__day">
-          ☀ DÍA {currentDay}
-        </span>
-      </header>
-
-      <div className="lobby-daily__body">
-        <div className="lobby-daily__icon">
-          {mission.icon || getMissionIcon(mission.type)}
-        </div>
-
-        <div className="lobby-daily__content">
-          <strong className="lobby-daily__title">
-            {mission.title}
-          </strong>
-
-          <span className="lobby-daily__description">
-            {mission.description}
-          </span>
-
-          <div className="lobby-daily__progress">
-            <div className="lobby-daily__track">
-              <div
-                className="lobby-daily__fill"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-
+          {mission.reward.coins && (
             <span>
-              {mission.currentProgress}/{mission.requirement}
+              🪙 +{mission.reward.coins}
             </span>
-          </div>
-
-          <div className="lobby-daily__rewards">
-            <span>✦ +{mission.reward.xp} XP</span>
-
-            {mission.reward.coins && (
-              <span>🪙 +{mission.reward.coins}</span>
-            )}
-          </div>
+          )}
+          {mission.reward.points && (
+  <span>⭐ +{mission.reward.points}</span>
+)}
         </div>
-      </div>
+      )}
 
-      <footer className="lobby-daily__footer">
-        {completed ? (
-          <button
-            type="button"
-            onClick={() => onClaimReward(mission.id)}
-          >
-            🎁 RECLAMAR
-          </button>
-        ) : claimed ? (
-          <span className="lobby-daily__claimed">
-            ✓ COMPLETADA
-          </span>
-        ) : (
-          <button
-            type="button"
-            onClick={() => onStartMission(mission)}
-          >
-            {getMissionIcon(mission.type)} VER MISIÓN
-          </button>
-        )}
-      </footer>
-    </section>
+      {/* acción */}
+      {completed && (
+        <button
+          type="button"
+          className="gh-world__mission-action gh-world__mission-action--claim"
+          onClick={() => onClaimReward(mission.id)}
+        >
+          🎁 RECLAMAR
+        </button>
+      )}
+
+      {!completed && !claimed && (
+        <button
+          type="button"
+          className="gh-world__mission-action"
+          onClick={() => onStartMission(mission)}
+        >
+          {getMissionIcon(mission.type)} VER MISIÓN
+        </button>
+      )}
+    </div>
   );
 }

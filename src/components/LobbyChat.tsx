@@ -65,6 +65,7 @@ type Props = {
   onSelectPlayer?: (userId: string) => void;
   /** Jugadores silenciados: sus mensajes no se muestran. */
   mutedIds?: Set<string>;
+  onMessageSent?: () => void;
 };
 
 const MAX_MESSAGES = 60;
@@ -163,6 +164,7 @@ export function LobbyChat({
   events,
   onSelectPlayer,
   mutedIds,
+  onMessageSent,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState<string>("");
@@ -374,15 +376,25 @@ useNpcAmbient({
       text: message.text,
     });
 
-    if (insertError) {
-      setMessages((current) => current.filter((m) => m.id !== message.id));
+        if (insertError) {
+      setMessages((current) =>
+        current.filter((m) => m.id !== message.id)
+      );
+
       setText(message.text);
+
       setError(
         insertError.message.includes("rate_limited")
           ? "Vas muy rápido. Esperá un segundo."
           : "No se pudo enviar el mensaje. Probá de nuevo."
       );
+
+      return;
     }
+
+    // El mensaje fue guardado correctamente.
+    // Esto alimenta las misiones sociales del lobby.
+    onMessageSent?.();
   };
 
   const totalOnline = players.length;
