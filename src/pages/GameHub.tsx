@@ -29,12 +29,17 @@
     import { useLobbyModeration } from "../hooks/useLobbyModeration";
     import {
       PlayerCard,
-      ChallengeToasts,
       DuelSummary,
     } from "../components/PlayerCard";
     import { LobbyDailyMission } from "../components/LobbyDailyMission";
     import { useDailyMissions } from "../hooks/useDailyMissions";
     import { processUserAction } from "../services/progressionService";
+    import {
+  ChallengeToasts,
+  type DailyChallengeToast,
+} from "../components/PlayerCard";
+import { AchievementsModal } from "../components/AchievementsModal";
+import { useAchievements } from "../hooks/useAchievements";
 
     type GameTab = "play" | "album" | "deck";
     type BattleMode = "quick" | "campaign";
@@ -368,8 +373,10 @@
       const [showPackModal, setShowPackModal] = useState(false);
       const [selectedWorldPlayer, setSelectedWorldPlayer] =
       useState<LobbyPlayer | null>(null);
+      const [dailyChallengeToasts, setDailyChallengeToasts] = useState<DailyChallengeToast[]>([]);
 
       const { data: heroData } = useUserHeroData(user.id);
+      const [showAchievements, setShowAchievements] = useState(false);
       const { data: userDivision, loading: divisionLoading } = useUserDivision(user.id);
       const { count: packCount } = usePacksCount(user.id);
       const {
@@ -379,6 +386,12 @@
   startMission,
   updateMissionProgress,
 } = useDailyMissions(user.id);
+
+const {
+  unlockedAchievements,
+  allAchievements,
+  getProgress,
+} = useAchievements(user);
 
       const level = heroData?.level || 1;
       const exp = heroData?.exp || 0;
@@ -519,6 +532,49 @@
         loadActiveDeck();
         loadAlbumProgress();
       };
+
+      const handleDailyChallengesUpdated = (
+  challenges: {
+    challenge_id: string;
+    progress: number;
+    requirement: number;
+    completed: boolean;
+  }[]
+) => {
+  console.log("🏆 GAMEHUB RECIBIÓ:", challenges);
+
+  const completed = challenges.filter(
+    (challenge) => challenge.completed
+  );
+
+  console.log("🏆 COMPLETADOS:", completed);
+
+  if (completed.length === 0) {
+    console.log("🏆 NO HAY COMPLETADOS");
+    return;
+  }
+
+  const titles: Record<string, string> = {
+    win3: "3 VICTORIAS",
+    score5: "5 GOLES",
+    beat_legend: "VENCER A LA LEYENDA",
+  };
+
+  const newToasts: DailyChallengeToast[] =
+    completed.map((challenge) => ({
+      id: `${challenge.challenge_id}-${Date.now()}`,
+      title:
+        titles[challenge.challenge_id] ??
+        challenge.challenge_id,
+      progress: challenge.progress,
+      requirement: challenge.requirement,
+      rewardXp: 50,
+    }));
+
+  console.log("🏆 CREANDO TOASTS:", newToasts);
+
+  setDailyChallengeToasts(newToasts);
+};
 
       const openMatch = (mode: BattleMode) => {
         setBattleMode(mode);
@@ -685,6 +741,14 @@ const handleLobbyMissionClaim = async (missionId: string) => {
             
 
             <div className="gh-scene" key={sceneKey}>
+              <ChallengeToasts
+    incoming={incoming}
+    outgoing={outgoing}
+    outcome={outcome}
+    respond={respond}
+    cancel={cancel}
+    dailyChallenges={dailyChallengeToasts}
+  />
               {gameTab === "play" && view === "lobby" && (
                 <div className="gh-world">
                   {latestWorldEvent && (
@@ -692,13 +756,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
     )}
 
 
-    <ChallengeToasts
-      incoming={incoming}
-      outgoing={outgoing}
-      outcome={outcome}
-      respond={respond}
-      cancel={cancel}
-    />
+    
     {selectedWorldPlayer && (
       <PlayerCard
     player={selectedWorldPlayer}
@@ -923,6 +981,25 @@ const handleLobbyMissionClaim = async (missionId: string) => {
                   </button>
 
                   <div className="gh-world__actions" aria-label="Acciones rápidas">
+
+                   <button
+  type="button"
+  className="gh-hud-achievements"
+  onClick={() => setShowAchievements(true)}
+>
+  <span className="gh-hud-achievements-icon">🏆</span>
+
+  <span className="gh-hud-achievements-text">
+    LOGROS
+  </span>
+
+  {unlockedAchievements.length > 0 && (
+    <span className="gh-hud-achievements-count">
+      {unlockedAchievements.length}
+    </span>
+  )}
+</button> 
+                    
                     <button
   type="button"
   onClick={() => {
@@ -999,6 +1076,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
   userId={user.id}
   onBattleComplete={onBattleComplete}
   onNavigateToDeck={() => setGameTab("deck")}
+  onDailyChallengesUpdated={handleDailyChallengesUpdated}
   isCampaignMode={true}
   forcedOpponent={{
     name: "Bot Novato",
@@ -1016,7 +1094,16 @@ const handleLobbyMissionClaim = async (missionId: string) => {
   }}
 />
                     ) : (
-                      <CampaignMode userCards={userCards} userDeck={activeDeck} userId={user.id} onBattleComplete={onBattleComplete} onNavigateToDeck={() => setGameTab("deck")} />
+                      <CampaignMode
+  userCards={userCards}
+  userDeck={activeDeck}
+  userId={user.id}
+  onBattleComplete={onBattleComplete}
+  onNavigateToDeck={() => setGameTab("deck")}
+  onDailyChallengesUpdated={
+    handleDailyChallengesUpdated
+  }
+/>
                     )}
                   </div>
                 </section>
@@ -1045,6 +1132,14 @@ const handleLobbyMissionClaim = async (missionId: string) => {
               loadActiveDeck();
             }}
           />
+          {showAchievements && (
+  <AchievementsModal
+    unlocked={unlockedAchievements}
+    allAchievements={allAchievements}
+    getProgress={getProgress}
+    onClose={() => setShowAchievements(false)}
+  />
+)}
         </div>
       );
     }
