@@ -7,7 +7,7 @@
   --gh-panel-hi: #123d33;
   --gh-line: #1f5f4c;
   --gh-grass: #2bd67b;
-  --gh-gold: #ffc83d;
+  --gh-gold: #3dc8ff;
   --gh-gold-deep: #e8960c;
   --gh-text: #eaf6ee;
   --gh-muted: #8fb8a7;
@@ -154,7 +154,7 @@
 }
 
 .gh-brand::before {
-  content: "LUPI WORLD";
+  
 
   margin-bottom: 4px;
 

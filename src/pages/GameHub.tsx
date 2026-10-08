@@ -689,54 +689,40 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
           <div className={`gh-shell ${(gameTab === "play" && view === "lobby") || gameTab === "deck" ? "gh-shell--wide" : ""}`}>
             <header className="gh-hud">
-              <button className="gh-back" onClick={onBackHome} aria-label="Volver a la jornada">
-                <span aria-hidden>‹</span> LUPI WORLD
-              </button>
+  <button className="gh-back" onClick={onBackHome} aria-label="Volver">
+    <span aria-hidden>‹</span> LUPI WORLD
+  </button>
 
-              <div className="gh-brand">
-                
-                <strong>LOBBY PRINCIPAL</strong>
-              </div>
-
-              <div className="gh-hud__right">
-
-  {/* PUNTOS */}
-  <div className="gh-currency gh-currency--points" title="Tus puntos">
-    <span className="gh-currency__icon" aria-hidden>
-      ⭐
+  <div className="gh-brand">
+    <strong>LOBBY PRINCIPAL</strong>
+    <span className="gh-brand__player">
+      {user.username || "Jugador"}
     </span>
+  </div>
 
-    <div className="gh-currency__info">
-      <small>PUNTOS</small>
+  <div className="gh-hud__right">
+    {/* Puntos */}
+    <div className="gh-wallet">
+      <span className="gh-wallet__icon" aria-hidden>⭐</span>
       <strong>{user.points ?? 0}</strong>
     </div>
-  </div>
 
-  {/* MONEDAS */}
-  <div className="gh-currency gh-currency--coins" title="Tus monedas">
-    <span className="gh-currency__icon" aria-hidden>
-      💰
-    </span>
-
-    <div className="gh-currency__info">
-      <small>MONEDAS</small>
+    {/* Monedas */}
+    <div className="gh-wallet gh-wallet--coins">
+      <span className="gh-wallet__icon" aria-hidden>💰</span>
       <strong>{user.coins ?? 0}</strong>
     </div>
-  </div>
 
-  {/* NIVEL */}
-  <div
-    className="gh-level"
-    style={{ ["--xp" as string]: xpPct }}
-    title={`Nivel ${level} · ${exp}/${expNeeded} XP`}
-  >
-    <div className="gh-level__core">
-      {level}
+    {/* Nivel con XP circular */}
+    <div
+      className="gh-level"
+      style={{ ["--xp" as string]: xpPct }}
+      title={`Nivel ${level} · ${exp}/${expNeeded} XP`}
+    >
+      <div className="gh-level__core">{level}</div>
     </div>
   </div>
-
-</div>
-            </header>
+</header>
 
             
 
@@ -819,13 +805,13 @@ const handleLobbyMissionClaim = async (missionId: string) => {
         />
       ))}
                 
-                    {lobbyPlayers.length === 0 && (
-                      <div className="gh-world__empty-player">
-                        <span>+</span>
-                        <strong>ESPERANDO JUGADORES</strong>
-                        <small>El próximo jugador aparecerá acá.</small>
-                      </div>
-                    )}
+                    {lobbyPlayers.filter(p => p.userId !== user.id).length === 0 && (
+  <div className="gh-world__empty-player">
+    <span>+</span>
+    <strong>ESPERANDO JUGADORES</strong>
+    <small>El próximo jugador aparecerá acá.</small>
+  </div>
+)}
                   </div>
 
                   {showPlayersSheet && (
