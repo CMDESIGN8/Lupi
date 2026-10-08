@@ -638,7 +638,13 @@
   z-index: 10;
 
   width: min(100%, 26vw);
-  height: min(620px, calc(100vh - 160px));
+
+  /* Reserva espacio real: HUD arriba + margen abajo + safe area */
+  top: 80px;
+  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+
+  height: auto;                 /* ← CLAVE: altura fluida entre top y bottom */
+  max-height: none;             /* ← sacar el límite */
 
   pointer-events: auto;
 }
@@ -646,6 +652,8 @@
 .gh-world__chat .lc {
   height: 100%;
   min-height: 0;
+    display: flex;
+  flex-direction: column;
 
   border-color: rgba(76, 210, 155, 0.18);
 
@@ -663,6 +671,22 @@
   box-shadow:
     0 25px 70px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.gh-world__chat .lc-body {
+  flex: 1 1 0;          /* ← el body toma todo el espacio disponible */
+  min-height: 0;
+  overflow: hidden;
+}
+
+.gh-world__chat .lc-log-wrap {
+  height: 100%;
+  max-height: 100%;
+
+  overflow-y: auto;
+}
+
+.gh-world__chat .lc-composer {
+  flex: 0 0 auto;       /* ← el composer NO se encoge nunca */
 }
 
 .gh-world__chat .lc-head {
@@ -989,6 +1013,8 @@
   z-index: 120 !important;
 
   display: flex;
+  flex-wrap: nowrap;              /* ← agregar */
+  align-items: center;            /* ← agregar */
 
   gap: 7px;
 
@@ -1137,6 +1163,11 @@
   cursor: pointer;
 }
 
+
+/* El toggle circular de jugadores solo se usa en mobile */
+.gh-world__players-toggle {
+  display: none;
+}
 
 /* =========================================================
    ROOT / SHELL
@@ -1586,15 +1617,19 @@
 /* Pantallas normales de móvil (430–600px ancho) */
 @media (min-width: 430px) and (max-width: 599px) {
   .gh-locker-zone .avatar2d {
-    transform: translateX(-50%) scale(0.88);
+    transform: translateX(-50%) scale(1.2);
+    bottom: -290px;
   }
+  
 }
 
 /* iPhone 15 / 14 / 13 / 12 (390–429px ancho) */
 @media (min-width: 390px) and (max-width: 429px) {
   .gh-locker-zone .avatar2d {
-    transform: translateX(-50%) scale(0.82);
+    transform: translateX(-50%) scale(1.2);
+     bottom: -200px;
   }
+  
 }
 
 /* iPhone SE 2/3, iPhone 12 mini (375–389px ancho) */
@@ -1719,14 +1754,18 @@
 
 .gh-locker-zone .locker-equipment .locker-slot:nth-child(1) {
   left: 8px;                  /* 🔧 antes -4 → más adentro */
-  top: 28%;                   /* 🔧 un pelín más arriba (cabeza) */
+  top: 40%;                   /* 🔧 un pelín más arriba (cabeza) */
   transform: translateY(-50%);
+  width: 65px;
+  height: 75px;
 }
 
 .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
   left: 8px;
   top: 62%;                   /* 🔧 antes 68 → más cerca de la cadera */
   transform: translateY(-50%);
+  width: 65px;
+  height: 75px;
 }
 
 .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
@@ -1734,13 +1773,17 @@
   left: auto;
   top: 62%;
   transform: translateY(-50%);
+  width: 65px;
+  height: 75px;
 }
 
 .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
   right: 8px;
   left: auto;
-  top: 28%;
+  top: 40%;
   transform: translateY(-50%);
+  width: 65px;
+  height: 75px;
 }
 
   /* -------------------------------------------------------
@@ -1752,62 +1795,141 @@
   }
 
   /* -------------------------------------------------------
-     BOTÓN FLOTANTE JUGADORES — arriba del chat
-     ------------------------------------------------------- */
+   BOTÓN FLOTANTE JUGADORES — estilo CHAT (círculo + badge)
+   ------------------------------------------------------- */
 
-  .gh-world__players-toggle {
+/* -------------------------------------------------------
+   BOTÓN FLOTANTE JUGADORES — mismo estilo que CHAT
+   ------------------------------------------------------- */
+
+.gh-world__players-toggle {
   position: absolute;
 
-  left: 12px;                 /* ← cambia right por left */
+  left: 10px;
   right: auto;
-  bottom: 132px;              /* misma altura que el chat bubble para alinearlos */
+  bottom: 150px;                /* misma altura que el chat */
 
-  z-index: 40;
+  z-index: 50;
 
-  display: inline-flex;
+  width: 54px;
+  height: 54px;
+
+  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
 
-  padding: 8px 12px;
+  padding: 0;
 
-  border: 1px solid rgba(43, 214, 123, 0.35);
-  border-radius: 999px;
-
-  background: rgba(2, 18, 14, 0.85);
-  backdrop-filter: blur(10px);
-
-  color: #eafff3;
-
-  font: 800 10px/1 "Barlow", sans-serif;
-  letter-spacing: 0.08em;
+  border: 1px solid rgba(0, 255, 135, 0.42);
+  border-radius: 50%;
 
   cursor: pointer;
 
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      rgba(0, 255, 135, 0.25),
+      transparent 45%
+    ),
+    rgba(3, 20, 16, 0.88);
+
   box-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.35),
-    0 0 18px rgba(43, 214, 123, 0.18);
+    0 0 0 1px rgba(0, 0, 0, 0.25),
+    0 8px 25px rgba(0, 0, 0, 0.45),
+    0 0 20px rgba(0, 255, 135, 0.16);
+
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 
   pointer-events: auto;
+
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
-.gh-world__players-toggle em {
-  min-width: 16px;
-  height: 16px;
+.gh-world__players-toggle:active {
+  transform: scale(0.92);
+}
 
-  padding: 0 4px;
+/* El emoji dentro del círculo */
+.gh-world__players-toggle > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: auto;
+  height: auto;
+
+  padding: 0;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+  box-shadow: none;
+
+  color: #eafff3;
+
+  font-size: 22px;
+  line-height: 1;
+
+  pointer-events: none;
+
+  filter: drop-shadow(0 0 6px rgba(0, 255, 135, 0.35));
+}
+
+/* Badge del contador — idéntico al .lc-mobile-chat-count */
+.gh-world__players-toggle em {
+  position: absolute;
+
+  top: -5px;
+  right: -4px;
+
+  min-width: 20px;
+  height: 20px;
+
+  padding: 0 5px;
 
   display: grid;
   place-items: center;
 
-  border-radius: 99px;
+  border: 2px solid #06100d;
+  border-radius: 999px;
 
-  background: var(--world-green);
-  color: #041a10;
+  color: #06100d;
+  background: #00ff87;
 
   font: 900 9px/1 "Barlow", sans-serif;
   font-style: normal;
+
+  box-shadow: 0 0 12px rgba(0, 255, 135, 0.55);
+
+  animation: lc-mobile-unread-pulse 1.8s ease-in-out infinite;
 }
 
+.gh-world__players-toggle::after {
+  content: "ONLINE";
+
+  position: absolute;
+
+  bottom: -17px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  color: rgba(255, 255, 255, 0.5);
+
+  font: 800 7px/1 "Barlow", sans-serif;
+  letter-spacing: 0.12em;
+
+  white-space: nowrap;
+
+  pointer-events: none;
+}
   /* -------------------------------------------------------
      SHEET DE JUGADORES
      ------------------------------------------------------- */
@@ -2084,31 +2206,9 @@
      CHAT — bubble compacto
      ------------------------------------------------------- */
 
-  .gh-world__chat {
-    position: absolute;
+  
 
-    top: auto;
-    left: auto;
 
-    right: 12px;
-    bottom: 132px;
-
-    width: 105px;
-    height: 34px;
-
-    max-width: 105px;
-    max-height: 34px;
-
-    z-index: 35;
-
-    border-radius: 18px;
-
-    overflow: hidden;
-
-    opacity: 0.92;
-  }
-
-  .gh-world__chat > * { max-height: 34px; }
 
   /* -------------------------------------------------------
      BOTÓN JUGAR — centrado, sobre el dock
@@ -2168,7 +2268,7 @@
     height: 58px;
 
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
 
     padding-bottom: env(safe-area-inset-bottom);
 
@@ -2206,6 +2306,80 @@
     pointer-events: auto !important;
     cursor: pointer;
   }
+
+  /* Ícono dentro de cada botón del dock */
+.gh-world__dock > button > span {
+  display: block;
+
+  width: auto;
+  height: auto;
+
+  margin: 0 0 2px;
+  padding: 0;
+
+  background: transparent;
+  border-radius: 0;
+
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Label debajo del ícono */
+.gh-world__dock > button > strong {
+  display: block;
+
+  margin: 0;
+  padding: 0;
+
+  color: inherit;
+
+  font: 900 8px/1 "Barlow", sans-serif;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+
+  white-space: nowrap;
+}
+
+/* Badge del contador (ya lo tenés, pero refuerzo la especificidad) */
+.gh-world__dock > button > em {
+  position: absolute;
+
+  top: 6px;
+  right: calc(50% - 16px);
+
+  min-width: 14px;
+  height: 14px;
+
+  padding: 0 3px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 99px;
+
+  background: var(--world-gold);
+  color: #12120a;
+
+  font: 900 8px/1 "Barlow", sans-serif;
+  font-style: normal;
+}
+
+  .gh-world__dock button em {
+  position: absolute;
+  top: 6px;
+  right: calc(50% - 16px);
+  min-width: 14px;
+  height: 14px;
+  padding: 0 3px;
+  display: grid;
+  place-items: center;
+  border-radius: 99px;
+  background: var(--world-gold);
+  color: #12120a;
+  font: 900 8px/1 "Barlow", sans-serif;
+  font-style: normal;
+}
+
 
   .gh-world__dock button.is-active { color: #00ff87; }
 

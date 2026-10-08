@@ -982,31 +982,31 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
                   <div className="gh-world__actions" aria-label="Acciones rápidas">
 
-                   <button
-  type="button"
-  className="gh-hud-achievements"
-  onClick={() => setShowAchievements(true)}
->
-  <span className="gh-hud-achievements-icon">🏆</span>
+                        <button
+                          type="button"
+                          
+                          onClick={() => setShowAchievements(true)}
+                        >
+                          <span>🏆</span>
 
-  <span className="gh-hud-achievements-text">
-    LOGROS
-  </span>
+                          <strong>
+                            LOGROS
+                          </strong>
 
-  {unlockedAchievements.length > 0 && (
-    <span className="gh-hud-achievements-count">
-      {unlockedAchievements.length}
-    </span>
-  )}
-</button> 
-                    
-                    <button
-  type="button"
-  onClick={() => {
-    setShowPackModal(true);
-    updateMissionProgress("open_pack");
-  }}
->
+                          {unlockedAchievements.length > 0 && (
+                            <span className="gh-hud-achievements-count">
+                              {unlockedAchievements.length}
+                            </span>
+                          )}
+                        </button> 
+                                            
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowPackModal(true);
+                            updateMissionProgress("open_pack");
+                          }}
+                        >
                       <span>🧧</span>
                       <strong>PACK</strong>
                       {packCount > 0 && <em>{packCount}</em>}
@@ -1031,19 +1031,29 @@ const handleLobbyMissionClaim = async (missionId: string) => {
                       <span>⚽</span><strong>LOBBY</strong>
                     </button>
                     <button
-  type="button"
-  onClick={() => {
-    setShowPackModal(true);
-    updateMissionProgress("open_pack");
-  }}
->
-  <span>🎁</span>
-  <strong>PACK</strong>
+                      type="button"
+                      onClick={() => setShowAchievements(true)}
+                    >
+                      <span>🏆</span>
+                      <strong>LOGROS</strong>
+                      {unlockedAchievements.length > 0 && (
+                        <em>{unlockedAchievements.length}</em>
+                      )}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => {
+                          setShowPackModal(true);
+                          updateMissionProgress("open_pack");
+                        }}
+                      >
+                        <span>🎁</span>
+                        <strong>PACK</strong>
 
-  {packCount > 0 && (
-    <em>{packCount}</em>
-  )}
-</button>
+                        {packCount > 0 && (
+                          <em>{packCount}</em>
+                        )}
+                      </button>
                     <button type="button" onClick={() => handleGameNavigate("deck")}>
                       <span>👕</span><strong>EQUIPO</strong>
                     </button>

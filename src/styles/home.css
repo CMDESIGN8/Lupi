@@ -281,7 +281,7 @@
 
 @media (max-width: 420px) {
   .journey-hero { padding: 22px 18px; min-height: 235px; }
-  .journey-level-orb { right: 16px; top: 18px; transform: scale(.88); transform-origin: top right; }
+  .journey-level-orb { right: 16px; top: 18px; transform: scale(.68); transform-origin: top right; }
   .journey-hero h1 { font-size: 39px; max-width: 280px; }
   .daily-mission-v2 { grid-template-columns: 36px 1fr 42px; padding: 14px; gap: 9px; }
   .mission-number { width: 36px; height: 36px; }
@@ -309,4 +309,101 @@
   .journey-shortcuts button { padding: 10px 8px; min-height: 78px; border-radius: 14px; }
   .journey-shortcuts span { font-size: 17px; margin-bottom: 4px; }
   .journey-shortcuts strong { font-size: 10px; }
+}
+/* ============================================================
+   BASE (mobile-first) — asegura que no se desborde
+   ============================================================ */
+.home-shell-v2,
+.journey-hero,
+.journey-progress-card,
+.daily-mission-v2,
+.game-launch-v2,
+.next-reward-v2 {
+  box-sizing: border-box;
+}
+
+.home-experience,
+.game-experience {
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   BREAKPOINT 480px — antes de que se rompa el hero
+   ============================================================ */
+@media (max-width: 480px) {
+  .journey-level-orb {
+    right: 12px;
+    top: 14px;
+    transform: scale(0.72);
+    transform-origin: top right;
+  }
+
+  .journey-hero h1 {
+    font-size: clamp(30px, 9vw, 42px);
+    max-width: 240px;
+  }
+
+  .journey-hero p {
+    font-size: 13px;
+  }
+
+  .game-launch-ball {
+    font-size: 105px;
+    right: -10px;
+    bottom: -15px;
+  }
+
+  .game-launch-v2 h2 {
+    font-size: 32px;
+  }
+}
+
+/* ============================================================
+   BREAKPOINT 400px
+   ============================================================ */
+@media (max-width: 400px) {
+  .journey-hero h1 {
+    font-size: clamp(28px, 8.5vw, 36px);
+    max-width: 200px;
+  }
+
+  .journey-level-orb {
+    transform: scale(0.62);
+  }
+
+  .game-launch-ball {
+    font-size: 90px;
+  }
+
+  .game-launch-v2 h2 {
+    font-size: 28px;
+  }
+
+  .journey-shortcuts {
+    grid-template-columns: repeat(2, 1fr); /* 3 → 2 columnas */
+  }
+
+  .journey-stats-v2 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+}
+
+/* ============================================================
+   FIX: evitar que el título del hero se salga
+   ============================================================ */
+.journey-hero h1 {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* El orb nunca debe tapar el texto */
+.journey-hero-copy {
+  max-width: calc(100% - 90px);
+}
+
+@media (max-width: 480px) {
+  .journey-hero-copy {
+    max-width: calc(100% - 70px);
+  }
 }
