@@ -201,10 +201,6 @@ export function Avatar2D({
         )}
 
       </div>
-
-      <div className="avatar2d__level">
-        LVL {Math.max(1, level)}
-      </div>
     </div>
   );
 }

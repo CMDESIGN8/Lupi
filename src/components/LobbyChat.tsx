@@ -552,7 +552,20 @@ const closeMobileChat = () => {
       : `Abrir chat${mobileUnread > 0 ? `, ${mobileUnread} mensajes nuevos` : ""}`
   }
 >
-  <span className="lc-mobile-chat-icon">💬</span>
+  <span className="lc-mobile-chat-icon">
+  {mobileChatOpen ? (
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+      <path
+        d="M2 2L12 12M12 2L2 12"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  ) : (
+    "💬"
+  )}
+</span>
 
   {mobileUnread > 0 && (
     <span className="lc-mobile-chat-count">
@@ -566,7 +579,7 @@ const closeMobileChat = () => {
 </button>
       <header className="lc-head">
         <div>
-          <div className="lc-kicker">LUPI WORLD</div>
+          
           <h2 className="lc-title">Chat del lobby</h2>
         </div>
 

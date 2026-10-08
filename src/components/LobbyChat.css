@@ -1,88 +1,17 @@
 /* src/components/LobbyChat.css */
 
-/* =========================================================
-   LOBBY CHAT — HUD Panel AAA
-   ========================================================= */
-
 .lc {
-  --lc-bg: rgba(4, 14, 12, 0.94);
-  --lc-panel: rgba(10, 39, 32, 0.82);
-  --lc-line: rgba(93, 184, 147, 0.2);
+  --lc-bg: rgba(4, 14, 22, 0.94);
+  --lc-panel: rgba(10, 39, 55, 0.82);
+  --lc-line: rgba(93, 184, 220, 0.2);
   --lc-text: #eaf6ee;
-  --lc-muted: #86aa9b;
-  --lc-green: #2bd67b;
+  --lc-muted: #86a5b8;
+  
+  /* Cian/azul eléctrico */
+  --lc-cyan: #28d9ff;
+  --lc-green: #28d9ff;    /* alias para compatibilidad */
+  
   --lc-gold: #ffc83d;
-
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-
-  min-height: 360px;
-  height: clamp(380px, 62vh, 580px);
-
-  position: relative;
-
-  border: 1px solid rgba(43, 214, 123, 0.18);
-  border-radius: 4px;
-
-  background:
-    /* noise */
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E"),
-    /* grid de líneas */
-    linear-gradient(rgba(43, 214, 123, 0.03) 1px, transparent 1px) 0 0 / 100% 4px,
-    /* panel base */
-    linear-gradient(180deg, rgba(10, 39, 32, 0.96), rgba(4, 14, 12, 0.98));
-
-  background-blend-mode: overlay, normal, normal;
-
-  box-shadow:
-    /* bisel superior */
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    /* viñeta interior */
-    inset 0 0 60px rgba(0, 0, 0, 0.55),
-    inset 0 0 0 1px rgba(43, 214, 123, 0.04),
-    /* sombra externa */
-    0 24px 60px rgba(0, 0, 0, 0.55);
-
-  overflow: hidden;
-
-  -webkit-backdrop-filter: blur(10px) saturate(130%);
-  backdrop-filter: blur(10px) saturate(130%);
-}
-
-/* Esquinas decorativas (esquinas cortadas tipo HUD) */
-.lc::before,
-.lc::after {
-  content: "";
-
-  position: absolute;
-
-  width: 10px;
-  height: 10px;
-
-  border-color: var(--lc-green);
-  border-style: solid;
-
-  opacity: 0.65;
-
-  pointer-events: none;
-
-  z-index: 5;
-}
-
-.lc::before {
-  top: 4px;
-  left: 4px;
-
-  border-width: 1px 0 0 1px;
-}
-
-.lc::after {
-  bottom: 4px;
-  right: 4px;
-
-  border-width: 0 1px 1px 0;
 }
 
 /* ---------------------------------------------------------
@@ -98,11 +27,11 @@
 
   padding: 10px 12px;
 
-  border-bottom: 1px solid rgba(43, 214, 123, 0.14);
+  border-bottom: 1px solid rgba(40, 217, 255, 0.14);
 
   background:
-    linear-gradient(180deg, rgba(43, 214, 123, 0.06), transparent),
-    rgba(2, 10, 8, 0.6);
+    linear-gradient(180deg, rgba(40, 217, 255, 0.06), transparent),
+    rgba(2, 10, 18, 0.6);
 
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.4);
 }
@@ -119,9 +48,9 @@
 
   width: 3px;
 
-  background: linear-gradient(180deg, var(--lc-green), transparent);
+  background: linear-gradient(180deg, var(--lc-cyan), transparent);
 
-  box-shadow: 0 0 12px var(--lc-green);
+  box-shadow: 0 0 12px var(--lc-cyan);
 
   border-radius: 0 3px 3px 0;
 }
@@ -146,12 +75,12 @@
 
   margin-left: 10px;
 
-  color: rgba(43, 214, 123, 0.85);
+  color: rgba(40, 217, 255, 0.85);
 
   font: 800 8px/1 "Barlow", sans-serif;
   letter-spacing: 0.22em;
 
-  text-shadow: 0 0 8px rgba(43, 214, 123, 0.35);
+  text-shadow: 0 0 8px rgba(40, 217, 255, 0.35);
 }
 
 .lc-title {
@@ -178,7 +107,7 @@
 
   padding: 4px 8px;
 
-  border: 1px solid rgba(43, 214, 123, 0.22);
+  border: 1px solid rgba(40, 217, 255, 0.22);
   border-radius: 999px;
 
   font: 800 8px/1 "Barlow", sans-serif;
@@ -205,14 +134,14 @@
 }
 
 .lc-status--online {
-  color: #bfffd9;
-  border-color: rgba(43, 214, 123, 0.42);
-  background: rgba(43, 214, 123, 0.08);
+  color: #bfeaff;
+  border-color: rgba(40, 217, 255, 0.42);
+  background: rgba(40, 217, 255, 0.08);
 }
 
 .lc-status--online i {
-  background: var(--lc-green);
-  box-shadow: 0 0 10px var(--lc-green);
+  background: var(--lc-cyan);
+  box-shadow: 0 0 10px var(--lc-cyan);
   animation: lc-pulse-dot 1.6s ease-in-out infinite;
 }
 
@@ -229,9 +158,9 @@
 .lc-npc-toggle {
   cursor: pointer;
 
-  color: var(--lc-green);
-  background: rgba(43, 214, 123, 0.08);
-  border-color: rgba(43, 214, 123, 0.28);
+  color: var(--lc-cyan);
+  background: rgba(40, 217, 255, 0.08);
+  border-color: rgba(40, 217, 255, 0.28);
 
   transition:
     background 0.18s ease,
@@ -241,9 +170,9 @@
 }
 
 .lc-npc-toggle:hover {
-  background: rgba(43, 214, 123, 0.16);
-  border-color: rgba(43, 214, 123, 0.5);
-  box-shadow: 0 0 14px rgba(43, 214, 123, 0.28);
+  background: rgba(40, 217, 255, 0.16);
+  border-color: rgba(40, 217, 255, 0.5);
+  box-shadow: 0 0 14px rgba(40, 217, 255, 0.28);
   transform: translateY(-1px);
 }
 
@@ -269,9 +198,8 @@
 
   /* lineas horizontales tipo "scanlines" */
   background-image:
-    linear-gradient(rgba(43, 214, 123, 0.025) 1px, transparent 1px);
+    linear-gradient(rgba(40, 217, 255, 0.025) 1px, transparent 1px);
   background-size: 100% 3px;
-
   background-blend-mode: normal;
 }
 
@@ -290,7 +218,7 @@
   overscroll-behavior: contain;
 
   scrollbar-width: thin;
-  scrollbar-color: rgba(43, 214, 123, 0.35) transparent;
+  scrollbar-color: rgba(40, 217, 255, 0.35) transparent;
 
   mask-image: linear-gradient(
     to bottom,
@@ -323,7 +251,7 @@
 .lc-log::-webkit-scrollbar { width: 4px; }
 .lc-log::-webkit-scrollbar-track { background: transparent; }
 .lc-log::-webkit-scrollbar-thumb {
-  background: rgba(43, 214, 123, 0.35);
+  background: rgba(40, 217, 255, 0.35);
   border-radius: 99px;
 }
 
@@ -367,13 +295,13 @@
 
   border-radius: 4px;
 
-  border: 1px solid rgba(43, 214, 123, 0.28);
+  border: 1px solid rgba(40, 217, 255, 0.28);
 
-  background: linear-gradient(145deg, #0b2a22, #04120e);
+  background: linear-gradient(145deg, #0b1f2a, #04101a);
 
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.4),
-    0 0 12px rgba(43, 214, 123, 0.1);
+    0 0 12px rgba(40, 217, 255, 0.1);
 }
 
 .lc-avatar img {
@@ -413,7 +341,7 @@
 
   border-radius: 3px 0 0 0;
 
-  background: #050d0a;
+  background: #050d12;
   color: var(--lc-gold);
 
   font: 900 8px/1 "Barlow", sans-serif;
@@ -470,8 +398,8 @@
 }
 
 .lc-badge--npc {
-  color: var(--lc-color, var(--lc-green));
-  background: color-mix(in srgb, var(--lc-color, var(--lc-green)) 12%, transparent);
+  color: var(--lc-color, var(--lc-cyan));
+  background: color-mix(in srgb, var(--lc-color, var(--lc-cyan)) 12%, transparent);
 }
 
 /* La burbuja base */
@@ -480,7 +408,7 @@
 
   padding: 8px 11px;
 
-  color: #dfece4;
+  color: #dfeaf0;
 
   background: rgba(0, 0, 0, 0.38);
 
@@ -497,30 +425,30 @@
     0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-/* Mías: acento verde a la derecha */
+/* Mías: acento cian a la derecha */
 .lc-message.is-me .lc-bubble {
   border-left: none;
-  border-right: 2px solid var(--lc-green);
+  border-right: 2px solid var(--lc-cyan);
 
   border-radius: 10px 2px 2px 10px;
 
-  color: #eaffef;
+  color: #eaffff;
 
   background:
-    linear-gradient(135deg, rgba(43, 214, 123, 0.22), rgba(14, 74, 56, 0.55));
+    linear-gradient(135deg, rgba(40, 217, 255, 0.22), rgba(14, 56, 74, 0.55));
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 12px rgba(43, 214, 123, 0.12),
+    0 0 12px rgba(40, 217, 255, 0.12),
     0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* NPCs: acento del color del NPC */
 .lc-message--npc .lc-bubble {
-  border-left-color: color-mix(in srgb, var(--lc-color, var(--lc-green)) 70%, transparent);
+  border-left-color: color-mix(in srgb, var(--lc-color, var(--lc-cyan)) 70%, transparent);
 
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--lc-color, var(--lc-green)) 12%, transparent), rgba(0, 0, 0, 0.45));
+    linear-gradient(135deg, color-mix(in srgb, var(--lc-color, var(--lc-cyan)) 12%, transparent), rgba(0, 0, 0, 0.45));
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
@@ -544,9 +472,9 @@
 
   border-radius: 50%;
 
-  background: var(--lc-color, var(--lc-green));
+  background: var(--lc-color, var(--lc-cyan));
 
-  box-shadow: 0 0 6px var(--lc-color, var(--lc-green));
+  box-shadow: 0 0 6px var(--lc-color, var(--lc-cyan));
 
   animation: lc-dot 1s infinite ease-in-out;
 }
@@ -588,7 +516,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(143, 184, 167, 0.28),
+    rgba(143, 184, 200, 0.28),
     transparent
   );
 }
@@ -623,7 +551,7 @@
   box-shadow: 0 0 12px rgba(176, 97, 255, 0.18);
 }
 
-.lc-system--player_join span { color: #bfffd9; }
+.lc-system--player_join span { color: #bfeaff; }
 
 /* ---------------------------------------------------------
    EMPTY
@@ -660,13 +588,13 @@
 
   margin-bottom: 4px;
 
-  border: 1px solid rgba(43, 214, 123, 0.22);
+  border: 1px solid rgba(40, 217, 255, 0.22);
 
-  background: rgba(43, 214, 123, 0.06);
+  background: rgba(40, 217, 255, 0.06);
 
   font-size: 20px;
 
-  box-shadow: 0 0 18px rgba(43, 214, 123, 0.12);
+  box-shadow: 0 0 18px rgba(40, 217, 255, 0.12);
 }
 
 /* ---------------------------------------------------------
@@ -680,13 +608,13 @@
 
   padding: 8px;
 
-  border-top: 1px solid rgba(43, 214, 123, 0.14);
+  border-top: 1px solid rgba(40, 217, 255, 0.14);
 
   background:
-    linear-gradient(180deg, rgba(2, 10, 8, 0.9), rgba(0, 0, 0, 0.94));
+    linear-gradient(180deg, rgba(2, 10, 18, 0.9), rgba(0, 0, 0, 0.94));
 
   box-shadow:
-    inset 0 1px 0 rgba(43, 214, 123, 0.06),
+    inset 0 1px 0 rgba(40, 217, 255, 0.06),
     inset 0 -1px 0 rgba(0, 0, 0, 0.5);
 }
 
@@ -694,13 +622,13 @@
 .lc-composer::before {
   content: "▸";
 
-  color: var(--lc-green);
+  color: var(--lc-cyan);
 
   font: 900 14px/1 "Barlow", monospace;
 
   padding: 0 2px 0 4px;
 
-  text-shadow: 0 0 10px var(--lc-green);
+  text-shadow: 0 0 10px var(--lc-cyan);
 
   opacity: 0.85;
 }
@@ -719,7 +647,7 @@
 
   padding: 0 46px 0 10px;
 
-  border: 1px solid rgba(43, 214, 123, 0.18);
+  border: 1px solid rgba(40, 217, 255, 0.18);
   border-radius: 4px;
 
   outline: none;
@@ -734,16 +662,16 @@
     inset 0 -1px 0 rgba(255, 255, 255, 0.03);
 }
 
-.lc-input-shell input::placeholder { color: #537368; }
+.lc-input-shell input::placeholder { color: #536b78; }
 
 .lc-input-shell input:focus {
-  border-color: rgba(43, 214, 123, 0.55);
+  border-color: rgba(40, 217, 255, 0.55);
   background: rgba(0, 0, 0, 0.6);
 
   box-shadow:
     inset 0 1px 0 rgba(0, 0, 0, 0.4),
-    0 0 0 2px rgba(43, 214, 123, 0.12),
-    0 0 14px rgba(43, 214, 123, 0.18);
+    0 0 0 2px rgba(40, 217, 255, 0.12),
+    0 0 14px rgba(40, 217, 255, 0.18);
 }
 
 .lc-counter {
@@ -753,7 +681,7 @@
 
   transform: translateY(-50%);
 
-  color: #4b655c;
+  color: #4b5f6c;
 
   font: 700 9px "Barlow", sans-serif;
   font-variant-numeric: tabular-nums;
@@ -770,19 +698,19 @@
   display: grid;
   place-items: center;
 
-  border: 1px solid rgba(43, 214, 123, 0.5);
+  border: 1px solid rgba(40, 217, 255, 0.5);
   border-radius: 4px;
 
   cursor: pointer;
 
-  color: #04120e;
+  color: #041018;
 
-  background: linear-gradient(135deg, #51e892, #1ebf69);
+  background: linear-gradient(135deg, #66ddff, #1eb5e8);
 
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
     inset 0 -2px 0 rgba(0, 0, 0, 0.18),
-    0 0 14px rgba(43, 214, 123, 0.28);
+    0 0 14px rgba(40, 217, 255, 0.28);
 
   font-size: 16px;
   font-weight: 900;
@@ -800,7 +728,7 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.32),
     inset 0 -2px 0 rgba(0, 0, 0, 0.18),
-    0 0 22px rgba(43, 214, 123, 0.45);
+    0 0 22px rgba(40, 217, 255, 0.45);
 }
 
 .lc-send:active:not(:disabled) {
@@ -833,7 +761,7 @@
 
   padding: 0 12px 8px;
 
-  color: #4b655c;
+  color: #4b5f6c;
 
   font: 500 9px "Barlow", sans-serif;
 
@@ -847,7 +775,7 @@
 
   border-radius: 50%;
 
-  background: #4b655c;
+  background: #4b5f6c;
 }
 
 /* ---------------------------------------------------------
@@ -864,17 +792,17 @@
 
   padding: 6px 12px;
 
-  border: 1px solid rgba(43, 214, 123, 0.6);
+  border: 1px solid rgba(40, 217, 255, 0.6);
   border-radius: 999px;
 
   cursor: pointer;
 
-  color: #04120e;
-  background: linear-gradient(135deg, #51e892, #1ebf69);
+  color: #041018;
+  background: linear-gradient(135deg, #66ddff, #1eb5e8);
 
   box-shadow:
     0 8px 22px rgba(0, 0, 0, 0.45),
-    0 0 18px rgba(43, 214, 123, 0.35);
+    0 0 18px rgba(40, 217, 255, 0.35);
 
   font: 800 10px/1 "Barlow", sans-serif;
   letter-spacing: 0.06em;
@@ -904,7 +832,7 @@ button.lc-avatar {
 }
 
 .lc-avatar--btn:focus-visible {
-  outline: 2px solid var(--lc-green);
+  outline: 2px solid var(--lc-cyan);
   outline-offset: 2px;
 }
 
@@ -953,23 +881,38 @@ button.lc-avatar {
   }
 
   .gh-world__chat .lc--mobile-closed {
-    width: 54px;
-    height: 54px;
+    width: 54px !important;
+    height: 54px !important;
+    min-height: 0 !important;
+    max-height: 54px !important;
 
-    min-height: 54px;
+    box-sizing: border-box;
 
-    border: 0;
-    border-radius: 50%;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
 
-    overflow: visible;
+    padding: 0 !important;
+    margin: 0 !important;
 
-    background: transparent;
+    /* Reset total del .lc base */
+    border: 0 !important;
+    border-radius: 50% !important;
 
-    box-shadow: none;
-  }
+    overflow: visible !important;
 
-  .lc--mobile-closed > :not(.lc-mobile-chat-trigger) {
-    display: none !important;
+    background: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+
+    position: relative;
+
+    /* Mata el ::before / ::after del .lc (las esquinitas HUD) */
+    &::before,
+    &::after {
+      display: none !important;
+      content: none !important;
+    }
   }
 
   .lc-mobile-chat-trigger {
@@ -978,13 +921,15 @@ button.lc-avatar {
     width: 54px;
     height: 54px;
 
+    box-sizing: border-box;
+
     display: flex;
     align-items: center;
     justify-content: center;
 
     padding: 0;
 
-    border: 1px solid rgba(0, 255, 135, 0.42);
+    border: 1px solid rgba(40, 217, 255, 0.42);
     border-radius: 50%;
 
     cursor: pointer;
@@ -994,15 +939,15 @@ button.lc-avatar {
     background:
       radial-gradient(
         circle at 35% 30%,
-        rgba(0, 255, 135, 0.25),
+        rgba(40, 217, 255, 0.25),
         transparent 45%
       ),
-      rgba(3, 20, 16, 0.88);
+      rgba(3, 16, 24, 0.88);
 
     box-shadow:
       0 0 0 1px rgba(0, 0, 0, 0.25),
       0 8px 25px rgba(0, 0, 0, 0.45),
-      0 0 20px rgba(0, 255, 135, 0.16);
+      0 0 20px rgba(40, 217, 255, 0.16);
 
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
@@ -1015,15 +960,38 @@ button.lc-avatar {
       box-shadow 0.18s ease;
   }
 
+  .lc--mobile-closed > :not(.lc-mobile-chat-trigger) {
+    display: none !important;
+  }
+
   .lc-mobile-chat-trigger:active {
     transform: scale(0.92);
   }
 
   .lc-mobile-chat-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    height: auto;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+    box-shadow: none;
+
+    color: #eaffff;
+
     font-size: 22px;
     line-height: 1;
 
-    filter: drop-shadow(0 0 7px rgba(0, 255, 135, 0.35));
+    pointer-events: none;
+
+    filter: drop-shadow(0 0 6px rgba(40, 217, 255, 0.35));
   }
 
   .lc-mobile-chat-count {
@@ -1040,15 +1008,16 @@ button.lc-avatar {
     display: grid;
     place-items: center;
 
-    border: 2px solid #06100d;
+    border: 2px solid #06101a;
     border-radius: 999px;
 
-    color: #06100d;
-    background: #00ff87;
+    color: #06101a;
+    background: #28d9ff;
 
     font: 900 9px/1 "Barlow", sans-serif;
+    font-style: normal;
 
-    box-shadow: 0 0 12px rgba(0, 255, 135, 0.55);
+    box-shadow: 0 0 12px rgba(40, 217, 255, 0.55);
 
     animation: lc-mobile-unread-pulse 1.8s ease-in-out infinite;
   }
@@ -1072,38 +1041,37 @@ button.lc-avatar {
     letter-spacing: 0.12em;
 
     white-space: nowrap;
+
+    pointer-events: none;
   }
 
   .gh-world__chat:has(.lc--mobile-open) {
-    position: absolute !important;
+  position: absolute !important;
 
-    top: auto !important;
-    left: auto !important;
+  top: 12.5% !important;                    /* 1/8 arriba */
+  bottom: 12.5% !important;                 /* 1/8 abajo */
 
-    right: 8px !important;
-    bottom: 145px !important;
+  left: auto !important;
+  right: 8px !important;
 
-    width: min(285px, calc(100vw - 16px)) !important;
-    height: 360px !important;
+  height: auto !important;                  /* se calcula entre top y bottom */
 
-    max-width: min(285px, calc(100vw - 16px)) !important;
-    max-height: 360px !important;
+  max-height: none !important;
 
-    z-index: 100 !important;
+  width: min(285px, calc(100vw - 16px)) !important;
+  max-width: min(285px, calc(100vw - 16px)) !important;
 
-    overflow: visible !important;
+  z-index: 100 !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
 
-    pointer-events: auto !important;
-  }
-
-  .gh-world__chat .lc--mobile-open {
-    position: relative !important;
-
-    width: 100% !important;
-    height: 360px !important;
-
-    min-height: 0 !important;
-    max-height: none !important;
+.gh-world__chat .lc--mobile-open {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: none !important;
 
     display: flex !important;
     flex-direction: column !important;
@@ -1116,7 +1084,7 @@ button.lc-avatar {
 
     box-shadow:
       0 20px 55px rgba(0, 0, 0, 0.65),
-      0 0 30px rgba(0, 255, 135, 0.08);
+      0 0 30px rgba(40, 217, 255, 0.08);
   }
 
   .lc--mobile-open .lc-head {
@@ -1286,9 +1254,6 @@ button.lc-avatar {
   .lc--mobile-open .lc-error {
     display: none;
   }
-}
-
-@media (max-width: 700px) {
   .lc--mobile-open {
     height: 360px !important;
     min-height: 0 !important;
@@ -1314,12 +1279,6 @@ button.lc-avatar {
   .gh-world__chat {
     right: 8px !important;
     bottom: 148px !important;
-  }
-
-  .gh-world__chat .lc--mobile-closed {
-    width: 50px;
-    height: 50px;
-    min-height: 50px;
   }
 
   .lc-mobile-chat-trigger {

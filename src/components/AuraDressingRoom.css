@@ -7,6 +7,9 @@
   --dr-border: rgba(255, 255, 255, 0.08);
   margin: 6px 0 10px;
   color: #fff;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .dr-loading {
@@ -29,7 +32,7 @@
   padding: 40px 10px 24px;
   border-radius: 20px;
   isolation: isolate;
-  overflow: visible;
+  overflow: hidden;
   animation: drStageIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 
   /* Borde dinámico — toma el color del item activo */
@@ -966,21 +969,30 @@
    RESPONSIVE
    ============================================================ */
 
+/* ============================================================
+   RESPONSIVE — DRESSING ROOM
+   ============================================================ */
+
+/* Tablet / mobile grande */
 @media (max-width: 520px) {
   .dr-stage {
-    grid-template-columns: 72px minmax(0, 1fr) 72px;
-    gap: 2px;
-    padding: 28px 6px 20px;
+    grid-template-columns: 68px minmax(0, 1fr) 68px;
+    gap: 4px;
+    padding: 24px 8px 18px;
   }
 
   .dr-slot {
-    max-width: 72px;
+    max-width: 68px;
   }
 
+  /* CLAVE: el frame nunca puede ser más ancho que su columna */
   .dr-slot-frame {
-    width: 100px;
-    height: 100x;
+    width: 100%;
+    max-width: 68px;
+    aspect-ratio: 1 / 1;
+    height: auto;
     border-radius: 14px;
+    padding: 4px;
   }
 
   .dr-slot-visual {
@@ -988,69 +1000,78 @@
     height: 100%;
   }
 
-  .dr-slot-empty {
-    font-size: 18px;
+  .dr-slot-empty { font-size: 16px; }
+  .dr-emoji      { font-size: 20px; }
+  .dr-slot-tag   { font-size: 6px; bottom: 2px; }
+  .dr-slot-name  { font-size: 7px; }
+
+  .dr-slot-connector { width: 8px; }
+  .dr-slot-left  .dr-slot-connector { right: -8px; }
+  .dr-slot-right .dr-slot-connector { left:  -8px; }
+
+  .dr-character { height: 360px; }
+
+  .dr-banner {
+    padding: 10px 12px;
+    gap: 10px;
   }
-
-  .dr-slot-tag {
-    font-size: 6px;
-  }
-
-  .dr-slot-name {
-    font-size: 7px;
-  }
-
-  .dr-slot-connector {
-    width: 10px;
-  }
-
-  .dr-slot-left .dr-slot-connector { right: -10px; }
-  .dr-slot-right .dr-slot-connector { left: -10px; }
-
-  .dr-character {
-    height: 380px;
-  }
-
   .dr-banner-thumb {
     flex: 0 0 40px;
     width: 40px;
     height: 40px;
   }
+  .dr-banner-info strong { font-size: 12px; }
 
-  .dr-tile {
-    flex: 0 0 84px;
-  }
-
-  .dr-tile-visual {
-    width: 46px;
-    height: 46px;
-  }
+  .dr-tile { flex: 0 0 78px; padding: 10px 6px; }
+  .dr-tile-visual { width: 42px; height: 42px; }
+  .dr-tile-visual .dr-emoji { font-size: 26px; }
+  .dr-tile strong { font-size: 8px; }
 }
 
-@media (max-width: 380px) {
+/* Mobile chico */
+@media (max-width: 400px) {
   .dr-stage {
-    grid-template-columns: 66px minmax(0, 1fr) 66px;
-    padding: 24px 4px 16px;
+    grid-template-columns: 58px minmax(0, 1fr) 58px;
+    gap: 3px;
+    padding: 20px 6px 14px;
+    border-radius: 16px;
   }
 
-  .dr-slot {
-    max-width: 66px;
-  }
+  .dr-slot { max-width: 58px; }
 
   .dr-slot-frame {
-    width: 50px;
-    height: 50px;
+    max-width: 58px;
+    border-radius: 12px;
+    padding: 3px;
   }
 
-  .dr-slot-name {
-    font-size: 6px;
-  }
+  .dr-slot-empty { font-size: 14px; }
+  .dr-emoji      { font-size: 18px; }
+  .dr-slot-tag   { font-size: 5px; }
+  .dr-slot-name  { font-size: 6px; }
 
-  .dr-character {
-    height: 340px;
-  }
+  .dr-character { height: 320px; }
+
+  .dr-banner-thumb { flex: 0 0 34px; width: 34px; height: 34px; }
+  .dr-banner-info strong { font-size: 11px; }
+  .dr-banner-info small,
+  .dr-banner-info span { font-size: 7px; }
+
+  .dr-btn { padding: 8px 10px; font-size: 8px; }
+
+  .dr-tile { flex: 0 0 70px; }
+  .dr-tile-visual { width: 38px; height: 38px; }
 }
 
+/* Mobile muy chico */
+@media (max-width: 340px) {
+  .dr-stage {
+    grid-template-columns: 52px minmax(0, 1fr) 52px;
+  }
+  .dr-slot,
+  .dr-slot-frame { max-width: 52px; }
+  .dr-character { height: 280px; }
+}
 /* ============================================================
    ACCESIBILIDAD
    ============================================================ */
