@@ -419,11 +419,7 @@
   object-fit: contain;
 }
 
-.gh-world-avatar.no-skin {
-  align-items: center;
-  color: var(--aura-color);
-  font-size: 48px;
-}
+
 
 .gh-world-player:hover .gh-world-avatar {
   transform: translateY(-7px) scale(1.04);
@@ -973,6 +969,7 @@
   align-items: center;
   color: var(--aura-color);
   font-size: 48px;
+  background: transparent !important;
 }
 
 .gh-world-player:hover .gh-world-avatar {
@@ -1215,7 +1212,12 @@
 
   color: #dff8ea;
 
-  background: rgba(4, 22, 17, 0.65);
+  background: linear-gradient(
+    135deg,
+    rgba(10, 40, 32, 0.85),
+    rgba(4, 20, 16, 0.85)
+  );
+  border-color: rgba(36, 233, 135, 0.18);
 
   backdrop-filter: blur(8px);
 
@@ -1425,7 +1427,7 @@
 
   display: inline-block;
 
-  padding: 2px 12px;
+  padding: 4px 14px;
   margin: 0;
 
   /* Gradiente cian/azul eléctrico */
@@ -1603,6 +1605,11 @@
 .gh-locker-zone .locker-selector,
 .gh-locker-zone .locker-selector button {
   pointer-events: auto;
+  border-radius: 4px 12px 12px 4px;   /* mismo que misión */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 12px rgba(36, 233, 135, 0.08),   /* ← glow interno */
+    0 4px 14px rgba(0, 0, 0, 0.45);
 }
 
 
@@ -1748,6 +1755,15 @@
 
     overflow-y: auto !important;
     overflow-x: hidden !important;
+    background: linear-gradient(
+      180deg,
+      rgba(4, 18, 14, 0.6),
+      rgba(4, 18, 14, 0.3)
+    );
+    border: 1px solid rgba(36, 233, 135, 0.15);
+    border-radius: 16px;
+    padding: 12px ;
+    backdrop-filter: blur(8px);
 
     scrollbar-width: none !important;
   }
@@ -1794,8 +1810,8 @@
   }
 
   .gh-world-player .gh-world-avatar {
-    width: 72px !important;
-    height: 88px !important;
+    width: 60px !important;
+  height: 72px !important;
     flex: 0 0 auto !important;
   }
 
@@ -2190,6 +2206,10 @@
 
     grid-template-columns: none !important;
     gap: 0 !important;
+    box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 12px rgba(36, 233, 135, 0.08),   /* ← glow interno */
+    0 4px 14px rgba(0, 0, 0, 0.45);
   }
 
   .gh-locker-zone .locker-equipment .locker-slot {

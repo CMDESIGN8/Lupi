@@ -256,31 +256,39 @@
 
   position: relative;
 
-  width: 52px; height: 52px;
+  width: 52px;
+  height: 52px;
 
   border-radius: 50%;
 
-  display: grid; place-items: center;
+  display: grid;
+  place-items: center;
 
-  background:
-    conic-gradient(
-      var(--gh-gold) calc(var(--xp) * 1%),
-      rgba(255, 255, 255, 0.06) 0
-    );
+  /* Anillo dorado que se va "llenando" según el XP */
+  background: conic-gradient(
+    #ffc83d calc(var(--xp) * 1%),
+    rgba(255, 255, 255, 0.06) 0
+  );
 
+  /* Un solo box-shadow dorado, sin capa cian */
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 0 24px rgba(255, 200, 61, 0.15);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 20px rgba(255, 200, 61, 0.25);
 
   filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+
+  /* Evita que cualquier transición pinte el anillo */
+  transition: box-shadow 0.3s ease;
 }
 
 .gh-level__core {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
 
   border-radius: 50%;
 
-  display: grid; place-items: center;
+  display: grid;
+  place-items: center;
 
   background:
     radial-gradient(
@@ -1258,11 +1266,6 @@
   object-fit: contain;
 }
 
-.gh-world-avatar.no-skin {
-  align-items: center;
-  color: var(--aura-color);
-  font-size: 48px;
-}
 
 .gh-world-player:hover .gh-world-avatar {
   transform: translateY(-7px) scale(1.04);
@@ -1504,9 +1507,10 @@
 }
 
 .gh-world-event--player_join {
+  border-color: rgba(36, 233, 135, 0.35);
   box-shadow:
-    0 14px 40px rgba(0,0,0,.35),
-    0 0 28px rgba(43,214,123,.12);
+    0 14px 40px rgba(0, 0, 0, 0.35),
+    0 0 28px rgba(36, 233, 135, 0.18);
 }
 
 .gh-world-event--player_leave {
