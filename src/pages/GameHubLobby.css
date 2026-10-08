@@ -1409,15 +1409,15 @@
 
   position: absolute;
   left: 50%;
-  bottom: -1px;
+  bottom: -10px;
 
   width: 48px;
   height: 2px;
 
   transform: translateX(-50%);
 
-  background: linear-gradient(90deg, transparent, #ffc83d 50%, transparent);
-  box-shadow: 0 0 10px rgba(255, 200, 61, 0.6);
+  background: linear-gradient(90deg, transparent, #3df9ff 50%, transparent);
+  box-shadow: 0 0 10px rgba(61, 168, 255, 0.6);
 }
 
 .gh-brand__player {
@@ -1425,16 +1425,16 @@
 
   display: inline-block;
 
-  padding: 2px 12px;       /* ← padding vertical para que el glow no se recorte */
+  padding: 2px 12px;
   margin: 0;
 
-  /* Gradiente verde */
+  /* Gradiente cian/azul eléctrico */
   background: linear-gradient(
     180deg,
-    #d4ffe4 0%,
-    #6bffab 40%,
-    #24e987 55%,
-    #067a42 100%
+    #dcfaff 0%,
+    #7ee0ff 40%,
+    #28d9ff 55%,
+    #045c8f 100%
   );
 
   -webkit-background-clip: text;
@@ -1442,14 +1442,13 @@
   color: transparent;
   -webkit-text-fill-color: transparent;
 
-  font: 900 12px/1 "Barlow Condensed", "Barlow", sans-serif;
+  font: 900 18px/1 "Barlow Condensed", "Barlow", sans-serif;
   letter-spacing: 0.22em;
   text-transform: uppercase;
 
-  /* Reduje el glow porque estaba lavando el texto */
   filter:
     drop-shadow(0 0 1px rgba(0, 0, 0, 1))
-    drop-shadow(0 0 4px rgba(36, 233, 135, 0.5));
+    drop-shadow(0 0 4px rgba(40, 217, 255, 0.6));
 }
 
 .gh-root:has(.gh-world) .gh-hud {
