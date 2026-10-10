@@ -475,3 +475,168 @@
     top: 48% !important;
   }
 }
+/* =====================================================
+   LUPI WORLD — CHALLENGE EXPERIENCE
+===================================================== */
+
+.pc-challenge-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: rgba(0, 7, 5, 0.78);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  animation: pc-fade 0.22s ease-out both;
+}
+
+.pc-challenge-modal {
+  width: min(390px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 28px 24px 24px;
+  text-align: center;
+  color: #f2f7f4;
+  border: 1px solid rgba(255, 200, 61, 0.65);
+  border-radius: 18px;
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(255, 200, 61, 0.14),
+      transparent 60%
+    ),
+    linear-gradient(180deg, #10251d, #06120e);
+  box-shadow:
+    0 0 50px rgba(255, 200, 61, 0.1),
+    0 30px 90px rgba(0, 0, 0, 0.8);
+  animation: pc-pop 0.25s ease-out both;
+}
+
+.pc-challenge-modal__icon {
+  margin-bottom: 12px;
+  font-size: 38px;
+  color: #ffc83d;
+  text-shadow: 0 0 22px rgba(255, 200, 61, 0.5);
+}
+
+.pc-challenge-modal__eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: #ffc83d;
+  font: 800 10px/1.2 "Barlow", sans-serif;
+  letter-spacing: 0.2em;
+}
+
+.pc-challenge-modal__title {
+  margin: 0;
+  font: italic 900 30px/1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.04em;
+}
+
+.pc-challenge-modal__description {
+  margin: 15px 0 22px;
+  color: #b9cfc4;
+  font: 500 14px/1.5 "Barlow", sans-serif;
+}
+
+.pc-challenge-modal__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.pc-challenge-modal__actions .pc-btn {
+  flex: 1;
+  min-width: 0;
+  min-height: 46px;
+}
+
+.pc-challenge-modal__waiting {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0 0 24px;
+}
+
+.pc-challenge-modal__waiting span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #24e987;
+  animation: pc-wait 1.2s ease-in-out infinite;
+}
+
+.pc-challenge-modal__waiting span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.pc-challenge-modal__waiting span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pc-wait {
+  0%, 60%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-5px);
+  }
+}
+
+/* Avisos informativos separados del modal */
+
+.pc-notifications,
+.pc-daily-notifications {
+  position: fixed;
+  left: 50%;
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  z-index: 950;
+  width: min(350px, calc(100vw - 28px));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.pc-daily-notifications {
+  bottom: calc(160px + env(safe-area-inset-bottom));
+}
+
+.pc-notifications .pc-toast,
+.pc-daily-notifications .pc-toast {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+@media (max-width: 700px) {
+  .pc-challenge-modal {
+    padding: 24px 18px;
+  }
+
+  .pc-challenge-modal__title {
+    font-size: 26px;
+  }
+
+  .pc-notifications {
+    bottom: calc(112px + env(safe-area-inset-bottom));
+  }
+
+  .pc-daily-notifications {
+    bottom: calc(176px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pc-challenge-overlay,
+  .pc-challenge-modal,
+  .pc-challenge-modal__waiting span {
+    animation: none;
+  }
+}

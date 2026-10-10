@@ -246,93 +246,105 @@ export function ChallengeToasts({
   }
 
   return (
-    <div
-  className={[
-    "pc-toasts",
-    incoming ? "pc-toasts--challenge" : "",
-    !incoming && outgoing ? "pc-toasts--outgoing" : "",
-  ]
-    .filter(Boolean)
-    .join(" ")}
-  aria-live="polite"
->
+  <>
+    {/* MODAL: DESAFÍO RECIBIDO O ENVIADO */}
+    {(incoming || outgoing) && (
+      <div className="pc-challenge-overlay">
+        <div className="pc-challenge-modal" role="dialog" aria-modal="true"
+          aria-label={incoming ? "Desafío recibido" : "Desafío enviado"}>
 
-      {incoming && (
-        <div className="pc-toast pc-toast--incoming" role="alert">
-          <strong>⚔ {incoming.fromName} te desafía</strong>
+          <div className="pc-challenge-modal__icon" aria-hidden="true">
+            ⚔
+          </div>
 
-          <div className="pc-toast__row">
-            <button
-              type="button"
-              className="pc-btn pc-btn--primary"
-              onClick={() => respond(true)}
-            >
-              Aceptar
-            </button>
+          <span className="pc-challenge-modal__eyebrow">
+            LUPI WORLD · 1 VS 1
+          </span>
 
-            <button
-              type="button"
-              className="pc-btn"
-              onClick={() => respond(false)}
-            >
-              Rechazar
-            </button>
+          <h2 className="pc-challenge-modal__title">
+            {incoming ? "¡TE DESAFÍAN!" : "DESAFÍO ENVIADO"}
+          </h2>
+
+          <p className="pc-challenge-modal__description">
+            {incoming
+              ? `${incoming.fromName} quiere enfrentarte en un partido.`
+              : `Esperando la respuesta de ${outgoing?.toName}...`}
+          </p>
+
+          {outgoing && !incoming && (
+            <div className="pc-challenge-modal__waiting" aria-label="Esperando respuesta">
+              <span />
+              <span />
+              <span />
+            </div>
+          )}
+
+          <div className="pc-challenge-modal__actions">
+            {incoming ? (
+              <>
+                <button
+                  type="button"
+                  className="pc-btn pc-btn--primary"
+                  onClick={() => respond(true)}
+                >
+                  ⚔ ACEPTAR
+                </button>
+                <button
+                  type="button"
+                  className="pc-btn"
+                  onClick={() => respond(false)}
+                >
+                  RECHAZAR
+                </button>
+              </>
+            ) : (
+              <button type="button" className="pc-btn" onClick={cancel}>
+                CANCELAR DESAFÍO
+              </button>
+            )}
           </div>
         </div>
-      )}
+      </div>
+    )}
 
-      {outgoing && (
-        <div className="pc-toast">
-          <strong>Desafiaste a {outgoing.toName}…</strong>
-
-          <div className="pc-toast__row">
-            <button
-              type="button"
-              className="pc-btn"
-              onClick={cancel}
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      )}
-
-      {outcome && (
+    {/* NOTIFICACIONES INFORMATIVAS */}
+    {outcome && (
+      <div className="pc-notifications" role="status" aria-live="polite">
         <div className="pc-toast pc-toast--info">
           {OUTCOME_TEXT[outcome.kind](outcome.name)}
         </div>
-      )}
+      </div>
+    )}
 
-      {dailyChallenges.map((challenge) => (
-        <div
-          key={challenge.id}
-          className="pc-toast pc-toast--daily"
-          role="status"
-        >
-          <div className="pc-toast__daily-icon">
-            🏆
+    {/* RECOMPENSAS DIARIAS */}
+    {dailyChallenges.length > 0 && (
+      <div className="pc-daily-notifications" aria-live="polite">
+        {dailyChallenges.map((challenge) => (
+          <div
+            key={challenge.id}
+            className="pc-toast pc-toast--daily"
+            role="status"
+          >
+            <div className="pc-toast__daily-icon">🏆</div>
+            <div className="pc-toast__daily-content">
+              <strong>DESAFÍO COMPLETADO</strong>
+              <span>{challenge.title}</span>
+              <small>
+                {challenge.progress}/{challenge.requirement}
+                {challenge.rewardXp
+                  ? ` · +${challenge.rewardXp} XP`
+                  : ""}
+                {challenge.rewardCoins
+                  ? ` · +${challenge.rewardCoins} 🪙`
+                  : ""}
+              </small>
+            </div>
           </div>
-
-          <div className="pc-toast__daily-content">
-            <strong>DESAFÍO COMPLETADO</strong>
-
-            <span>{challenge.title}</span>
-
-            <small>
-              {challenge.progress}/{challenge.requirement}
-              {challenge.rewardXp
-                ? ` • +${challenge.rewardXp} XP`
-                : ""}
-              {challenge.rewardCoins
-                ? ` • +${challenge.rewardCoins} 🪙`
-                : ""}
-            </small>
-          </div>
-        </div>
-      ))}
-
-    </div>
-  );
+        ))}
+      </div>
+    )}
+  </>
+);
 }
 
 type DuelSummaryProps = {
