@@ -1,0 +1,546 @@
+/* LUPI WORLD — TEMA CONSOLIDADO
+   Fuente única de los ajustes de color, luces, HUD, misión y rarezas.
+   Orden de reglas conservado para minimizar regresiones visuales.
+   Los CSS estructurales GameHub.css y GameHubLobby.css permanecen intactos.
+*/
+
+
+/* ===== INICIO: LupiWorld_AAA_Theme.css ===== */
+/* LUPI WORLD / AAA COLOR SYSTEM v1
+   Importar al FINAL de src/pages/GameHub.tsx:
+   import "./LupiWorld_AAA_Theme.css";
+   No modifica el avatar, los colores de rareza ni los reflectores.
+*/
+.gh-root {
+  --lupi-bg: #071310;
+  --lupi-surface: #0b211b;
+  --lupi-surface-raised: #103128;
+  --lupi-line: rgba(103, 189, 148, .23);
+  --lupi-primary: #24e987;
+  --lupi-primary-soft: rgba(36, 233, 135, .16);
+  --lupi-gold: #ffc83d;
+  --lupi-text: #eaf6ee;
+  --lupi-muted: #9db9aa;
+  --gh-bg: var(--lupi-bg);
+  --gh-panel: var(--lupi-surface);
+  --gh-panel-hi: var(--lupi-surface-raised);
+  --gh-line: #235746;
+  --gh-grass: var(--lupi-primary);
+  --gh-gold: var(--lupi-gold); /* anteriormente cian */
+  --gh-gold-deep: #df9318;
+  --gh-text: var(--lupi-text);
+  --gh-muted: var(--lupi-muted);
+}
+
+/* La escena usa una sola luz de interfaz: verde. Los destellos del estadio
+   y las imágenes de prendas conservan su aspecto original. */
+.gh-root .gh-world {
+  --world-green: var(--lupi-primary);
+  --world-cyan: var(--lupi-primary);
+  --world-gold: var(--lupi-gold);
+}
+
+/* Encabezado: identidad en blanco, nombre del jugador en verde. */
+.gh-root .gh-brand,
+.gh-root .gh-brand strong { color: #fff; }
+.gh-root .gh-brand__player {
+  color: var(--lupi-primary);
+  text-shadow: 0 0 14px rgba(36,233,135,.28);
+}
+.gh-root .gh-brand::after {
+  background: linear-gradient(90deg,transparent,var(--lupi-primary) 30%,var(--lupi-primary) 70%,transparent);
+  box-shadow: 0 0 12px rgba(36,233,135,.32);
+}
+
+/* Los puntos/XP pasan a verde; las monedas y el nivel quedan dorados. */
+.gh-root .gh-currency--points {
+  border-color: rgba(36,233,135,.33);
+  background: linear-gradient(180deg,rgba(36,233,135,.10),rgba(0,0,0,.46));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05),0 0 18px rgba(36,233,135,.07);
+}
+.gh-root .gh-currency--points strong { color: var(--lupi-primary); }
+.gh-root .gh-currency--coins {
+  border-color: rgba(255,200,61,.34);
+  background: linear-gradient(180deg,rgba(255,200,61,.10),rgba(0,0,0,.46));
+}
+.gh-root .gh-currency--coins strong { color: var(--lupi-gold); }
+.gh-root .gh-level {
+  background: conic-gradient(var(--lupi-gold) calc(var(--xp,0) * 1%),rgba(255,255,255,.07) 0);
+  box-shadow: inset 0 0 0 1px rgba(255,200,61,.24),0 0 15px rgba(255,200,61,.15);
+}
+
+/* El chat ya trae variables propias: corregimos su fuente cian original. */
+.gh-root .lc {
+  --lc-bg: rgba(5,20,16,.97);
+  --lc-panel: rgba(11,39,30,.90);
+  --lc-line: rgba(79,175,126,.23);
+  --lc-text: var(--lupi-text);
+  --lc-muted: var(--lupi-muted);
+  --lc-cyan: var(--lupi-primary);
+  --lc-green: var(--lupi-primary);
+  --lc-gold: var(--lupi-gold);
+}
+.gh-root .gh-world__chat .lc-head {
+  background: linear-gradient(115deg,rgba(14,60,43,.98),rgba(6,27,22,.98));
+  border-bottom: 1px solid var(--lupi-line);
+}
+.gh-root .gh-world__chat .lc-composer {
+  border-top-color: var(--lupi-line);
+  background: rgba(5,19,16,.96);
+}
+.gh-root .lc-mobile-chat-trigger {
+  border-color: rgba(36,233,135,.38);
+  background: radial-gradient(circle at 50% 20%,#164735,#071b16 75%);
+  box-shadow: inset 0 0 0 1px rgba(36,233,135,.07),0 0 18px rgba(36,233,135,.13);
+}
+.gh-root .lc-mobile-chat-count {
+  background: var(--lupi-primary);
+  color: #06170f;
+  box-shadow: 0 0 12px rgba(36,233,135,.35);
+}
+
+/* Panel online, misión y navegación: superficies consistentes. */
+.gh-root .gh-world__players-sheet-panel {
+  background: linear-gradient(160deg,#0b2a20,#061713 85%);
+  border: 1px solid var(--lupi-line);
+}
+.gh-root .gh-world__players-sheet-kicker { color: var(--lupi-primary); }
+.gh-root .gh-world__players-toggle {
+  border-color: rgba(36,233,135,.38);
+  background: radial-gradient(circle at 50% 20%,#164735,#071b16 75%);
+}
+.gh-root .gh-world__players-toggle em {
+  background: var(--lupi-primary);
+  color: #06170f;
+}
+.gh-root .gh-world__mission {
+  background: linear-gradient(150deg,rgba(5,26,20,.96),rgba(8,27,22,.93));
+}
+.gh-root .gh-world__dock button.is-active { color: var(--lupi-primary); }
+.gh-root .gh-world__dock button.is-active::after { background: var(--lupi-primary); }
+.gh-root .gh-world-event__label { color: var(--lupi-primary); }
+/* Conservar excepciones semánticas, como subir de nivel en violeta. */
+.gh-root .gh-world-event--level_up .gh-world-event__label { color: #b894ef; }
+.gh-root .gh-world-event--aura_spotted .gh-world-event__label { color: #ed8bd6; }
+
+/* Único CTA de alto contraste: JUGAR permanece dorado. */
+.gh-root .gh-world__play {
+  background: linear-gradient(135deg,#ffdc54,#ffae0a);
+  color: #171207;
+  box-shadow: 0 10px 30px rgba(255,176,14,.26),inset 0 1px 0 rgba(255,255,255,.45);
+}
+.gh-root .gh-world__play strong { color: #171207; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-root .lc-mobile-chat-trigger,
+  .gh-root .gh-world__players-toggle { transition: none; }
+}
+
+/* ===== FIN: LupiWorld_AAA_Theme.css ===== */
+
+
+/* ===== INICIO: LupiWorld_Theme_V2.css ===== */
+/* LUPI WORLD — THEME V2 / FINAL COLOR PASS
+   Importar DESPUES de GameHub.css, GameHubLobby.css, LobbyChat.css
+   y DESPUES de LupiWorld_AAA_Theme.css (si ya existe).
+   Solo afecta la interfaz dentro de .gh-root.
+   No modifica tamaños, posiciones, prendas ni rarezas.
+*/
+.gh-root {
+  --lupi-primary: #24e987;
+  --lupi-primary-dim: #147b51;
+  --lupi-gold: #ffc83d;
+  --lupi-surface: #081b16;
+  --lupi-surface-raised: #0d2921;
+  --lupi-text: #f2f7f4;
+  --lupi-muted: #9db6aa;
+  --lupi-line: rgba(78, 165, 116, .27);
+  --gh-bg: #071310;
+  --gh-panel: var(--lupi-surface);
+  --gh-panel-hi: var(--lupi-surface-raised);
+  --gh-line: #24513f;
+  --gh-grass: var(--lupi-primary);
+  --gh-gold: var(--lupi-gold);
+  --gh-text: var(--lupi-text);
+  --gh-muted: var(--lupi-muted);
+}
+.gh-root .gh-world {
+  --world-green: var(--lupi-primary);
+  --world-cyan: var(--lupi-primary);
+  --world-gold: var(--lupi-gold);
+}
+/* Identidad: titulo neutro, nombre y acento activos en verde */
+.gh-root .gh-brand__player {
+  color: var(--lupi-primary) !important;
+  text-shadow: 0 0 12px rgba(36,233,135,.20);
+}
+.gh-root .gh-brand::after {
+  background: linear-gradient(90deg,transparent,var(--lupi-primary),transparent);
+  box-shadow: 0 0 10px rgba(36,233,135,.25);
+}
+/* Los numeros del HUD son informativos, no un segundo color de accion */
+.gh-root .gh-currency--points,
+.gh-root .gh-currency--coins {
+  background: linear-gradient(180deg,rgba(18,36,28,.88),rgba(7,17,14,.93));
+  border-color: rgba(255,200,61,.28);
+}
+.gh-root .gh-currency--points .gh-currency__info strong,
+.gh-root .gh-currency--coins .gh-currency__info strong,
+.gh-root .gh-currency--points strong,
+.gh-root .gh-currency--coins strong {
+  color: var(--lupi-text) !important;
+  text-shadow: none;
+}
+.gh-root .gh-currency--points .gh-currency__icon,
+.gh-root .gh-currency--coins .gh-currency__icon {
+  background: rgba(255,200,61,.10);
+}
+/* Acciones sociales: mismo lenguaje cromatico */
+.gh-root .gh-world__players-toggle,
+.gh-root .lc-mobile-chat-trigger {
+  border-color: rgba(36,233,135,.42);
+  background: radial-gradient(circle at 45% 15%,#164735,#071b16 76%);
+  box-shadow: inset 0 0 0 1px rgba(36,233,135,.08),0 0 17px rgba(36,233,135,.10);
+}
+.gh-root .gh-world__players-toggle em,
+.gh-root .lc-mobile-chat-count {
+  background: var(--lupi-primary);
+  color: #06160e;
+  border-color: #06160e;
+}
+/* Si los iconos son SVG, no forzar emojis o imagenes de equipamiento */
+.gh-root .gh-world__players-toggle svg,
+.gh-root .lc-mobile-chat-trigger svg {
+  color: var(--lupi-primary);
+  stroke: currentColor;
+}
+/* Chat, jugadores, eventos: superficies del mismo sistema */
+.gh-root .lc {
+  --lc-cyan: var(--lupi-primary);
+  --lc-green: var(--lupi-primary);
+  --lc-gold: var(--lupi-gold);
+  --lc-text: var(--lupi-text);
+  --lc-muted: var(--lupi-muted);
+}
+.gh-root .gh-world__chat .lc-head {
+  background: linear-gradient(115deg,#10382a,#081b16);
+  border-bottom-color: var(--lupi-line);
+}
+.gh-root .gh-world__players-sheet-panel {
+  background: linear-gradient(160deg,#0b2a20,#061713 85%);
+  border-color: var(--lupi-line);
+}
+.gh-root .gh-world__players-sheet-kicker,
+.gh-root .gh-world-event__label { color: var(--lupi-primary); }
+.gh-root .gh-world__mission {
+  background: linear-gradient(150deg,rgba(5,26,20,.96),rgba(8,27,22,.93));
+}
+.gh-root .gh-world__dock button.is-active { color: var(--lupi-primary); }
+.gh-root .gh-world__dock button.is-active::after { background: var(--lupi-primary); }
+/* El boton principal y la recompensa mantienen el oro */
+.gh-root .gh-world__play {
+  background: linear-gradient(135deg,#ffdc54,#ffae0a);
+  color: #171207;
+}
+.gh-root .gh-world__play strong { color: #171207; }
+/* Rarezas y eventos especiales conservan su codigo semantico */
+.gh-root .gh-world-event--level_up .gh-world-event__label { color: #b894ef; }
+.gh-root .gh-world-event--aura_spotted .gh-world-event__label { color: #ed8bd6; }
+/* =====================================================
+   LUPI WORLD — RESTAURACIÓN DE REFLECTORES
+   Desktop + Mobile
+===================================================== */
+
+.gh-root .gh-world__lights {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.gh-root .gh-world__light {
+  animation: world-light-ignite 1.8s linear both;
+}
+
+.gh-root .gh-world__light--left {
+  animation-delay: 0.3s;
+}
+
+.gh-root .gh-world__light--right {
+  animation-delay: 0.55s;
+}
+
+/* Mantener el brillo cálido del estadio */
+
+.gh-root .gh-world__light-bloom {
+  filter: brightness(1.15);
+}
+
+.gh-root .gh-world__light-flare {
+  filter: brightness(1.2);
+}
+
+/* Recuperar los haces que estaban ocultos en móvil */
+
+@media (max-width: 760px) {
+  .gh-root .gh-world__light-beam {
+    display: block;
+    width: 65vw;
+    height: 48vh;
+    opacity: 0.45;
+    filter: blur(10px);
+  }
+
+  .gh-root .gh-world__light-bloom {
+    width: 240px;
+    height: 240px;
+  }
+
+  .gh-root .gh-world__light-flare {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+/* Respetar usuarios que prefieren menos movimiento */
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-root .gh-world__light,
+  .gh-root .gh-world__light-bloom,
+  .gh-root .gh-world__light-flare,
+  .gh-root .gh-world__light-beam {
+    animation: none;
+  }
+}
+
+/* ===== FIN: LupiWorld_Theme_V2.css ===== */
+
+
+/* ===== INICIO: LupiWorld_Lights_Cinematic_V3.css ===== */
+/* LUPI WORLD — CINEMATIC LIGHTS V3
+   Importar DESPUÉS de GameHub.css, GameHubLobby.css y Theme_V2.
+   Reutiliza las clases y keyframes existentes.
+*/
+.gh-root .gh-world {
+  --world-lx: 8%;
+  --world-ly: 22%;
+  --world-rx: 92%;
+  --world-ry: 22%;
+}
+
+.gh-root .gh-world__lights {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* Fuentes de luz blancas, sin competir con verde y oro */
+.gh-root .gh-world__light-bloom {
+  width: clamp(190px, 25vw, 360px);
+  height: clamp(190px, 25vw, 360px);
+  opacity: .8;
+}
+.gh-root .gh-world__light-flare {
+  width: clamp(170px, 23vw, 300px);
+  height: clamp(170px, 23vw, 300px);
+}
+
+/* Cono izquierdo: converge hacia el centro de la escena */
+.gh-root .gh-world__light--left .gh-world__light-beam {
+  display: block;
+  left: 0;
+  right: auto;
+  width: min(52vw, 720px);
+  height: 64vh;
+  opacity: .42;
+  filter: blur(9px);
+  transform-origin: 0 0;
+  --beam-angle: -1deg;
+  clip-path: polygon(0 0, 11% 0, 100% 100%, 55% 100%);
+}
+
+/* Cono derecho: reflejo simétrico hacia el centro */
+.gh-root .gh-world__light--right .gh-world__light-beam {
+  display: block;
+  right: 0;
+  left: auto;
+  width: min(52vw, 720px);
+  height: 64vh;
+  opacity: .42;
+  filter: blur(9px);
+  transform-origin: 100% 0;
+  --beam-angle: 1deg;
+  clip-path: polygon(89% 0, 100% 0, 45% 100%, 0 100%);
+}
+
+/* Móvil: haces visibles pero sin cubrir toda la pantalla */
+@media (max-width: 760px) {
+  .gh-root .gh-world {
+    --world-lx: 5%;
+    --world-ly: 19%;
+    --world-rx: 95%;
+    --world-ry: 19%;
+  }
+  .gh-root .gh-world__light--left .gh-world__light-beam,
+  .gh-root .gh-world__light--right .gh-world__light-beam {
+    display: block;
+    width: 58vw;
+    height: 53dvh;
+    opacity: .27;
+    filter: blur(10px);
+  }
+  .gh-root .gh-world__light-bloom {
+    width: 185px;
+    height: 185px;
+    opacity: .68;
+  }
+  .gh-root .gh-world__light-flare {
+    width: 165px;
+    height: 165px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-root .gh-world__light,
+  .gh-root .gh-world__light-bloom,
+  .gh-root .gh-world__light-flare,
+  .gh-root .gh-world__light-beam {
+    animation: none !important;
+  }
+}
+
+/* ===== FIN: LupiWorld_Lights_Cinematic_V3.css ===== */
+
+
+/* ===== INICIO: LupiWorld_HUD_Mission_V4.css ===== */
+/* LUPI WORLD — HUD + DAILY MISSION V4
+   Import AFTER GameHub.css, GameHubLobby.css, Theme_V2 and Lights_V3.
+   Visual polish only: does not move the avatar, lights or play button.
+*/
+.gh-root:has(.gh-world) {
+  --lupi-hud-line: rgba(255, 200, 61, .16);
+  --lupi-panel-edge: rgba(255, 255, 255, .08);
+}
+
+/* Crisp information hierarchy without introducing a new accent color */
+.gh-root:has(.gh-world) .gh-hud {
+  border-bottom: 1px solid var(--lupi-hud-line);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .30);
+}
+.gh-root:has(.gh-world) .gh-brand__player {
+  color: var(--lupi-primary, #24e987);
+  text-shadow: 0 0 10px rgba(36, 233, 135, .20);
+}
+.gh-root:has(.gh-world) .gh-currency--points,
+.gh-root:has(.gh-world) .gh-currency--coins {
+  font-variant-numeric: tabular-nums;
+  border: 1px solid rgba(255, 200, 61, .26);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 3px 12px rgba(0,0,0,.22);
+}
+
+/* Daily mission: quieter surface, clear rewards, consistent gold action */
+.gh-root .gh-world .gh-world__mission {
+  isolation: isolate;
+  border-left-color: var(--lupi-gold, #ffc83d);
+  background: linear-gradient(125deg, rgba(5, 23, 18, .96), rgba(7, 26, 21, .91));
+  box-shadow: 0 16px 38px rgba(0, 0, 0, .32),
+              inset 0 1px 0 var(--lupi-panel-edge),
+              -2px 0 12px rgba(255, 200, 61, .10);
+}
+.gh-root .gh-world .gh-world__mission-kicker {
+  color: var(--lupi-gold, #ffc83d);
+  letter-spacing: .12em;
+}
+.gh-root .gh-world .gh-world__mission-progress-track {
+  background: rgba(255, 255, 255, .10);
+  overflow: hidden;
+}
+.gh-root .gh-world .gh-world__mission-progress-fill {
+  background: linear-gradient(90deg, #e9a925, #ffdb67);
+}
+.gh-root .gh-world .gh-world__mission-action {
+  border-color: rgba(255, 200, 61, .42);
+  color: var(--lupi-gold, #ffc83d);
+  background: rgba(255, 200, 61, .08);
+  transition: background .18s ease, border-color .18s ease;
+}
+.gh-root .gh-world .gh-world__mission-action:hover {
+  background: rgba(255, 200, 61, .16);
+}
+.gh-root .gh-world .gh-world__mission-action:focus-visible,
+.gh-root .gh-world__play:focus-visible {
+  outline: 2px solid #fff2bd;
+  outline-offset: 3px;
+}
+
+/* Preserve existing layout; optimize readability on narrow phones */
+@media (max-width: 700px) {
+  .gh-root:has(.gh-world) .gh-hud {
+    border-bottom-color: rgba(255, 200, 61, .14);
+  }
+  .gh-root .gh-world .gh-world__mission {
+    max-width: calc(100vw - 32px);
+    box-sizing: border-box;
+  }
+  .gh-root .gh-world .gh-world__mission strong {
+    line-height: 1.1;
+    text-wrap: balance;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gh-root .gh-world .gh-world__mission-action { transition: none; }
+}
+
+/* ===== FIN: LupiWorld_HUD_Mission_V4.css ===== */
+
+
+/* ===== INICIO: Lupi_Rarity_Slots_Fix.css ===== */
+/* LUPI WORLD — Rareza consistente en desktop y móvil.
+   Importar al FINAL de los CSS de GameHub.
+   Requiere que cada .locker-slot reciba --locker-color según item.rarity.
+*/
+.gh-locker-zone .locker-equipment .locker-slot.equipped {
+  border: 1px solid color-mix(in srgb, var(--locker-color, #24e987) 76%, transparent) !important;
+  background: linear-gradient(145deg, color-mix(in srgb, var(--locker-color, #24e987) 13%, #071310), rgba(3, 12, 11, .88)) !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--locker-color, #24e987) 18%, transparent), 0 0 14px color-mix(in srgb, var(--locker-color, #24e987) 16%, transparent) !important;
+}
+.gh-locker-zone .locker-equipment .locker-slot.equipped.selected {
+  border-color: var(--locker-color, #24e987) !important;
+  box-shadow: 0 0 0 1px var(--locker-color, #24e987), 0 0 18px color-mix(in srgb, var(--locker-color, #24e987) 30%, transparent) !important;
+}
+.gh-locker-zone .locker-equipment .locker-slot.empty {
+  border: 1px solid rgba(220,235,226,.19) !important;
+  background: rgba(7,19,16,.65) !important;
+  box-shadow: none !important;
+}
+@media (hover: hover) {
+  .gh-locker-zone .locker-equipment .locker-slot.equipped:hover {
+    border-color: var(--locker-color, #24e987) !important;
+  }
+}
+
+/* ===== FIN: Lupi_Rarity_Slots_Fix.css ===== */
+
+
+/* ===========================================================
+   Rareza en TODOS los estados y dispositivos.
+   El slot equipado obtiene --locker-color de item.rarity en
+   LockerPreview.tsx. No aplicar verde global a estos bordes.
+   =========================================================== */
+.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped {
+  border-color: color-mix(in srgb, var(--locker-color, #A7B6AF) 76%, transparent) !important;
+}
+.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped:hover,
+.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped.selected {
+  border-color: var(--locker-color, #A7B6AF) !important;
+}
+.gh-root .gh-locker-zone .locker-equipment .locker-slot.empty {
+  border-color: rgba(220, 235, 226, .19) !important;
+}

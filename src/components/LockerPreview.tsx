@@ -48,6 +48,13 @@ const colorVar = (color: string) =>
     "--locker-color": color,
   } as React.CSSProperties);
 
+const RARITY_COLORS: Record<InventoryItem["rarity"], string> = {
+  common: "#A7B6AF",
+  rare: "#3D8BFF",
+  epic: "#B85CFF",
+  legendary: "#FFC83D",
+};
+
 function LockerItemVisual({
   item,
 }: {
@@ -253,10 +260,7 @@ export function LockerPreview({
               ]
                 .filter(Boolean)
                 .join(" ")}
-              style={colorVar(
-                item?.color ??
-                  DEFAULT_ITEM_COLOR
-              )}
+              style={colorVar(item ? (item.color || RARITY_COLORS[item.rarity]) : "#A7B6AF")}
               onClick={() =>
                 handleSlotClick(slot)
               }

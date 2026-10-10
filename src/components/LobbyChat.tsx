@@ -27,6 +27,7 @@ import {
   useNpcAmbient,
   type AmbientNpcMessage,
 } from "../hooks/useNpcAmbient";
+import "./LobbyChatPolish.css";
 
 type ChatMessage = {
   id: string;

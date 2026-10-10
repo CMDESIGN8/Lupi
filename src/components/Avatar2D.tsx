@@ -173,8 +173,6 @@ export function Avatar2D({
         )}
 
         {bootsItem?.imageUrl && (
-          <>
-            {bootsItem?.imageUrl && (
   <div className="avatar2d__layer avatar2d__layer--boots">
     <AvatarItemImage
       item={bootsItem}
@@ -182,8 +180,6 @@ export function Avatar2D({
     />
   </div>
 )}
-          </>
-        )}
 
         {accessoryItem?.imageUrl && (
           <div className="avatar2d__layer avatar2d__layer--accessory">

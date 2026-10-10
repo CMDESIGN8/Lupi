@@ -1,0 +1,101 @@
+/* LUPI WORLD | Chat polish 01 — presentation only.
+   Imported after LobbyChat.css; does not touch avatar, inventory or stadium lighting. */
+.gh-root .gh-world__chat .lc {
+  --lc-polish-green: #24e987;
+  --lc-polish-surface: #081b16;
+  color: #f2f7f4;
+  border-color: rgba(36,233,135,.24);
+  background: linear-gradient(155deg, rgba(12,39,31,.97), rgba(4,17,15,.98));
+  box-shadow: 0 18px 55px rgba(0,0,0,.40), inset 0 1px rgba(255,255,255,.05);
+}
+.gh-root .gh-world__chat .lc-head {
+  background: linear-gradient(95deg, rgba(24,75,54,.85), rgba(8,29,24,.96));
+  border-bottom: 1px solid rgba(36,233,135,.17);
+}
+.gh-root .gh-world__chat .lc-title { color: #f2f7f4; }
+.gh-root .gh-world__chat .lc-status { color: #bcebd0; border-color: rgba(36,233,135,.24); }
+.gh-root .gh-world__chat .lc-status i { background: var(--lc-polish-green); }
+.gh-root .gh-world__chat .lc-npc-toggle { border-color: rgba(36,233,135,.22); color: #bcebd0; }
+.gh-root .gh-world__chat .lc-log-wrap { scrollbar-color: rgba(36,233,135,.38) transparent; }
+.gh-root .gh-world__chat .lc-bubble {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  background: rgba(2,15,13,.82);
+  border-color: rgba(255,255,255,.08);
+  color: #eef7f1;
+  line-height: 1.48;
+}
+.gh-root .gh-world__chat .lc-message.is-me .lc-bubble {
+  background: rgba(21,71,48,.76);
+  border-color: rgba(36,233,135,.33);
+}
+.gh-root .gh-world__chat .lc-meta strong { color: #eef7f1; }
+.gh-root .gh-world__chat .lc-avatar--btn { cursor: pointer; }
+.gh-root .gh-world__chat .lc-avatar--btn:focus-visible,
+.gh-root .gh-world__chat .lc-mobile-chat-trigger:focus-visible,
+.gh-root .gh-world__chat .lc-send:focus-visible {
+  outline: 2px solid #24e987;
+  outline-offset: 3px;
+}
+.gh-root .gh-world__chat .lc-composer {
+  background: rgba(2,14,12,.97);
+  border-top: 1px solid rgba(36,233,135,.20);
+}
+.gh-root .gh-world__chat .lc-input-shell { min-width: 0; }
+.gh-root .gh-world__chat .lc-input-shell input {
+  min-width: 0;
+  background: rgba(0,9,8,.8);
+  border-color: rgba(36,233,135,.18);
+  color: #f2f7f4;
+}
+.gh-root .gh-world__chat .lc-input-shell input:focus { border-color: rgba(36,233,135,.7); }
+.gh-root .gh-world__chat .lc-send { background: #1c9f64; color: #05160e; }
+.gh-root .gh-world__chat .lc-send:disabled { opacity: .4; }
+/* Desktop: preserve existing dock size and placement. */
+@media (max-width: 700px) {
+  /* Keep the floating launcher at its established position. */
+  .gh-root .gh-world__chat .lc-mobile-chat-trigger {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  /* Open panel: legible messages, scrollable body and reachable composer. */
+  .gh-root .gh-world__chat .lc--mobile-open {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+  .gh-root .gh-world__chat .lc--mobile-open .lc-head {
+    flex: 0 0 auto;
+    min-height: 48px;
+    padding-right: 46px;
+  }
+  .gh-root .gh-world__chat .lc--mobile-open .lc-body,
+  .gh-root .gh-world__chat .lc--mobile-open .lc-log-wrap {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+  }
+  .gh-root .gh-world__chat .lc--mobile-open .lc-bubble {
+    font-size: 13px;
+    line-height: 1.45;
+    padding: 9px 11px;
+  }
+  .gh-root .gh-world__chat .lc--mobile-open .lc-meta strong { font-size: 11px; }
+  .gh-root .gh-world__chat .lc--mobile-open .lc-composer {
+    flex: 0 0 auto !important;
+    padding: 9px;
+    padding-bottom: max(9px, env(safe-area-inset-bottom, 0px));
+  }
+  .gh-root .gh-world__chat .lc--mobile-open .lc-input-shell input {
+    height: 42px;
+    font-size: 16px; /* prevents iOS focus zoom */
+  }
+  .gh-root .gh-world__chat .lc--mobile-open .lc-send {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gh-root .gh-world__chat .lc * { scroll-behavior: auto !important; }
+}
