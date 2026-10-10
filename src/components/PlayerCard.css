@@ -122,7 +122,10 @@
   font: 800 12px/1 "Barlow", sans-serif;
   letter-spacing: .05em;
   text-transform: uppercase;
-  transition: filter .16s ease, background .16s ease, opacity .16s ease;
+  transition:
+  filter .16s ease,
+  background .16s ease,
+  opacity .16s ease;
 }
 .pc-btn:hover:not(:disabled) { background: rgba(255, 255, 255, .1); }
 .pc-btn:disabled { opacity: .4; cursor: not-allowed; }
@@ -264,4 +267,211 @@
 .pc-toast__daily-content small {
   font-size: 11px;
   opacity: 0.7;
+}
+/* =========================================================
+   LUPI WORLD — CHALLENGE UI
+   Invitaciones centradas / responsive
+========================================================= */
+
+/* Invitación recibida */
+.pc-toasts--challenge {
+  position: fixed !important;
+
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  width: min(380px, calc(100vw - 32px)) !important;
+  max-width: 380px !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  z-index: 1000 !important;
+}
+
+/* Tarjeta de desafío */
+.pc-toasts--challenge .pc-toast--incoming {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 22px 20px;
+
+  gap: 18px;
+
+  border: 1px solid rgba(255, 193, 45, 0.65);
+  border-radius: 16px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 193, 45, 0.12),
+      transparent 65%
+    ),
+    linear-gradient(
+      180deg,
+      #10231d 0%,
+      #071410 100%
+    );
+
+  box-shadow:
+    0 0 35px rgba(255, 193, 45, 0.12),
+    0 24px 70px rgba(0, 0, 0, 0.8);
+
+  text-align: center;
+}
+
+/* Título */
+.pc-toasts--challenge .pc-toast--incoming strong {
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 23px;
+  font-weight: 900;
+  font-style: italic;
+
+  letter-spacing: 0.06em;
+  line-height: 1.15;
+
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+/* Botones */
+.pc-toasts--challenge .pc-toast__row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pc-toasts--challenge .pc-btn {
+  min-width: 0;
+  min-height: 46px;
+  border-radius: 8px;
+
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Aceptar */
+.pc-toasts--challenge .pc-btn--primary {
+  color: #04140c;
+  border-color: #27d77b;
+
+  background: linear-gradient(
+    135deg,
+    #42ed99,
+    #1ac66c
+  );
+
+  box-shadow: 0 5px 20px rgba(35, 211, 117, 0.18);
+}
+
+/* Rechazar */
+.pc-toasts--challenge .pc-toast__row .pc-btn:not(.pc-btn--primary) {
+  color: #d7e2dc;
+
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .pc-toasts--challenge {
+    top: 48% !important;
+
+    width: calc(100vw - 32px) !important;
+    max-width: 360px !important;
+  }
+
+  .pc-toasts--challenge .pc-toast--incoming {
+    padding: 20px 16px;
+    gap: 16px;
+  }
+
+  .pc-toasts--challenge .pc-toast--incoming strong {
+    font-size: 20px;
+  }
+
+  .pc-toasts--challenge .pc-btn {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  .pc-toasts--challenge .pc-toast--incoming {
+    padding: 16px 12px;
+  }
+
+  .pc-toasts--challenge .pc-toast__row {
+    gap: 7px;
+  }
+}
+
+/* =========================================================
+   LUPI WORLD — OUTGOING CHALLENGE
+========================================================= */
+
+.pc-toasts--outgoing {
+  position: fixed !important;
+
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  width: min(340px, calc(100vw - 32px)) !important;
+  max-width: 340px !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  z-index: 1001 !important;
+}
+
+.pc-toasts--outgoing .pc-toast {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 22px 18px;
+  gap: 16px;
+
+  text-align: center;
+
+  border: 1px solid rgba(255, 193, 45, 0.45);
+  border-radius: 16px;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(255, 193, 45, 0.10),
+      transparent 65%
+    ),
+    linear-gradient(
+      180deg,
+      #10231d,
+      #071410
+    );
+
+  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.75);
+}
+
+.pc-toasts--outgoing .pc-toast strong {
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.pc-toasts--outgoing .pc-toast__row {
+  width: 100%;
+}
+
+.pc-toasts--outgoing .pc-btn {
+  min-height: 44px;
+}
+
+@media (max-width: 700px) {
+  .pc-toasts--outgoing {
+    top: 48% !important;
+  }
 }

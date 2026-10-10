@@ -236,7 +236,6 @@ export function ChallengeToasts({
   cancel,
   dailyChallenges = [],
 }: ToastsProps) {
-  console.log("🏆 UI DAILY CHALLENGES:", dailyChallenges);
   if (
     !incoming &&
     !outgoing &&
@@ -247,7 +246,16 @@ export function ChallengeToasts({
   }
 
   return (
-    <div className="pc-toasts" aria-live="polite">
+    <div
+  className={[
+    "pc-toasts",
+    incoming ? "pc-toasts--challenge" : "",
+    !incoming && outgoing ? "pc-toasts--outgoing" : "",
+  ]
+    .filter(Boolean)
+    .join(" ")}
+  aria-live="polite"
+>
 
       {incoming && (
         <div className="pc-toast pc-toast--incoming" role="alert">

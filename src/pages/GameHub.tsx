@@ -729,24 +729,8 @@ const handleLobbyMissionClaim = async (missionId: string) => {
             
 
             <div className="gh-scene" key={sceneKey}>
-              <ChallengeToasts
-    incoming={incoming}
-    outgoing={outgoing}
-    outcome={outcome}
-    respond={respond}
-    cancel={cancel}
-    dailyChallenges={dailyChallengeToasts}
-  />
-              {gameTab === "play" && view === "lobby" && (
-                <div className="gh-world">
-                  {latestWorldEvent && (
-      <WorldEventToast event={latestWorldEvent} />
-    )}
-
-
-    
-    {selectedWorldPlayer && (
-      <PlayerCard
+              {selectedWorldPlayer && (
+  <PlayerCard
     player={selectedWorldPlayer}
     meId={user.id}
     catalog={auraItems}
@@ -755,10 +739,28 @@ const handleLobbyMissionClaim = async (missionId: string) => {
       outgoing?.toId === selectedWorldPlayer.userId
     }
     onClose={() => setSelectedWorldPlayer(null)}
-    onChallenge={handleLobbyChallenge}
+    onChallenge={(player) => {
+      handleLobbyChallenge(player);
+      setSelectedWorldPlayer(null);
+    }}
     onToggleMute={toggleMute}
     onReport={report}
   />
+)}
+
+<ChallengeToasts
+  incoming={incoming}
+  outgoing={outgoing}
+  outcome={outcome}
+  respond={respond}
+  cancel={cancel}
+  dailyChallenges={dailyChallengeToasts}
+/>
+
+{gameTab === "play" && view === "lobby" && (
+  <div className="gh-world">
+    {latestWorldEvent && (
+      <WorldEventToast event={latestWorldEvent} />
     )}
 
                   <div className="gh-world__atmosphere" aria-hidden>
