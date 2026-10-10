@@ -534,13 +534,146 @@
    El slot equipado obtiene --locker-color de item.rarity en
    LockerPreview.tsx. No aplicar verde global a estos bordes.
    =========================================================== */
-.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped {
-  border-color: color-mix(in srgb, var(--locker-color, #A7B6AF) 76%, transparent) !important;
+/* ==========================================
+   LUPI WORLD — RAREZA POR ITEM
+   ========================================== */
+
+.gh-root .gh-locker-zone .locker-equipment
+.locker-slot.equipped {
+  border: 1px solid var(--slot-rarity, #A7B6AF) !important;
+
+  box-shadow:
+    inset 0 0 0 1px color-mix(
+      in srgb,
+      var(--slot-rarity, #A7B6AF) 12%,
+      transparent
+    ),
+    0 0 12px color-mix(
+      in srgb,
+      var(--slot-rarity, #A7B6AF) 22%,
+      transparent
+    ) !important;
 }
-.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped:hover,
-.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped.selected {
-  border-color: var(--locker-color, #A7B6AF) !important;
+
+.gh-root .gh-locker-zone .locker-equipment
+.locker-slot.equipped .locker-slot-icon {
+  border-color: var(--slot-rarity, #A7B6AF) !important;
 }
-.gh-root .gh-locker-zone .locker-equipment .locker-slot.empty {
-  border-color: rgba(220, 235, 226, .19) !important;
+
+.gh-root .gh-locker-zone .locker-equipment
+.locker-slot.equipped:hover,
+.gh-root .gh-locker-zone .locker-equipment
+.locker-slot.equipped.selected {
+  border-color: var(--slot-rarity, #A7B6AF) !important;
+
+  box-shadow:
+    0 0 0 1px var(--slot-rarity, #A7B6AF),
+    0 0 18px color-mix(
+      in srgb,
+      var(--slot-rarity, #A7B6AF) 30%,
+      transparent
+    ) !important;
+}
+
+.gh-root .gh-locker-zone .locker-equipment
+.locker-slot.empty {
+  border: 1px solid rgba(220, 235, 226, 0.19) !important;
+  box-shadow: none !important;
+}
+
+/* =========================================
+   LUPI WORLD — ONLINE PLAYERS FIX
+========================================= */
+
+.gh-root .gh-world .gh-world__players {
+  position: absolute;
+  left: 18px;
+  top: 42%;
+  bottom: auto;
+
+  width: 310px;
+  max-width: calc(100% - 36px);
+  max-height: 290px;
+
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+
+  align-content: start;
+  justify-items: stretch;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding: 28px 10px 10px;
+  box-sizing: border-box;
+
+  transform: none;
+  scrollbar-width: thin;
+}
+
+.gh-root .gh-world .gh-world__players-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.gh-root .gh-world .gh-world__players > .gh-world-player {
+  position: relative !important;
+
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100% !important;
+  min-width: 0;
+  max-width: none;
+  height: 112px;
+
+  margin: 0 !important;
+  transform: none !important;
+  box-sizing: border-box;
+}
+
+.gh-root .gh-world__players .gh-world-avatar {
+  margin-inline: auto;
+}
+
+.gh-root .gh-world__players .gh-world-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gh-root .gh-world__players .gh-world-state {
+  white-space: nowrap;
+}
+
+/* Pantallas pequeñas */
+@media (max-width: 700px) {
+  .gh-root .gh-world .gh-world__players {
+    left: 10px;
+    top: 43%;
+    width: 175px;
+    max-height: 250px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    padding-inline: 5px;
+  }
+
+  .gh-root .gh-world .gh-world__players > .gh-world-player {
+    height: 96px;
+  }
 }

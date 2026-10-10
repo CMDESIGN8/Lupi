@@ -2781,3 +2781,22 @@
 
 /* RPS PvP fullscreen */
 .rps-screen-overlay { position:fixed; inset:0; z-index:2900; background:#06100c; overflow-y:auto; padding:16px; box-sizing:border-box; }
+
+/* =========================================
+   LUPI WORLD — SLOT RARITY FIX
+   ========================================= */
+
+.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped {
+  border: 1px solid var(--slot-rarity, #A7B6AF) !important;
+
+  box-shadow:
+    0 0 12px color-mix(
+      in srgb,
+      var(--slot-rarity, #A7B6AF) 25%,
+      transparent
+    ) !important;
+}
+
+.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped.selected {
+  border-color: var(--slot-rarity, #A7B6AF) !important;
+}

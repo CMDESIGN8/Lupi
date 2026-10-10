@@ -119,9 +119,7 @@ import { useAchievements } from "../hooks/useAchievements";
       return (
         <button
       type="button"
-      className={`gh-world-player gh-world-player--${index % 6} ${
-        isMe ? "is-me" : ""
-      }`}
+      className={`gh-world-player ${isMe ? "is-me" : ""}`}
       title={`${isMe ? "Vos" : player.username} · Nivel ${player.level}`}
       aria-label={`${isMe ? "Vos" : player.username}, nivel ${player.level}`}
       onClick={() => onSelect(player)}
@@ -880,7 +878,6 @@ const handleLobbyMissionClaim = async (missionId: string) => {
           <div className="gh-world__players-sheet-list">
             {lobbyPlayers
               .filter((p) => p.userId !== user.id)
-              .slice(0, 12)
               .map((player, index) => {
                 const skin = getPlayerSkin(player, auraItems);
                 const auraColor = skin?.color || "#00ff88";
