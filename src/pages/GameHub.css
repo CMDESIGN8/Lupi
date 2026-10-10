@@ -2645,3 +2645,136 @@
   color: #77778f;
   font-size: 10px;
 }
+/* LUPI WORLD — parche HUD mobile. Agregar al FINAL de GameHub.css */
+@media (max-width: 700px) {
+  .gh-root:has(.gh-world) {
+    width: 100%;
+    min-width: 0;
+    min-height: 100dvh;
+  }
+
+  .gh-root:has(.gh-world) .gh-hud {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px 8px;
+    width: 100%;
+    min-width: 0;
+    padding: 8px max(10px, env(safe-area-inset-right)) 8px max(10px, env(safe-area-inset-left));
+    clip-path: none;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+
+  .gh-root:has(.gh-world) .gh-back {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    padding: 4px 7px;
+    min-width: 0;
+  }
+
+  .gh-root:has(.gh-world) .gh-brand {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    align-items: flex-start;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0 0 3px;
+    font-size: clamp(18px, 5.2vw, 24px);
+    line-height: .9;
+  }
+
+  .gh-root:has(.gh-world) .gh-brand strong {
+    font-size: clamp(17px, 4.7vw, 22px);
+    line-height: .9;
+  }
+
+  .gh-root:has(.gh-world) .gh-brand::after {
+    left: 0;
+    transform: none;
+  }
+
+  .gh-root:has(.gh-world) .gh-hud__right {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 5px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .gh-root:has(.gh-world) .gh-wallet,
+  .gh-root:has(.gh-world) .gh-currency {
+    min-width: 0;
+    width: auto;
+    height: 34px;
+    padding: 4px 6px;
+    gap: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .gh-root:has(.gh-world) .gh-currency__icon {
+    width: 19px;
+    height: 19px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .gh-root:has(.gh-world) .gh-currency__info small {
+    font-size: 7px;
+    letter-spacing: 0;
+    margin-bottom: 2px;
+  }
+
+  .gh-root:has(.gh-world) .gh-currency__info strong {
+    font-size: 12px;
+  }
+
+  .gh-root:has(.gh-world) .gh-level {
+    width: 35px;
+    height: 35px;
+    flex: 0 0 35px;
+  }
+
+  .gh-root:has(.gh-world) .gh-level__core {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  /* Toast compacto, por debajo del encabezado. */
+  .gh-root:has(.gh-world) .gh-world-event {
+    top: 90px;
+    width: min(320px, calc(100% - 24px));
+    min-width: 0;
+    max-width: none;
+    padding: 7px 10px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .gh-root:has(.gh-world) .gh-world-event__icon {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+    font-size: 13px;
+  }
+
+  .gh-root:has(.gh-world) .gh-world-event__content strong {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .gh-root:has(.gh-world) .gh-hud { gap: 4px; padding-inline: 6px; }
+  .gh-root:has(.gh-world) .gh-hud__right { gap: 3px; }
+  .gh-root:has(.gh-world) .gh-currency { padding-inline: 4px; }
+  .gh-root:has(.gh-world) .gh-currency__icon { width: 16px; height: 16px; }
+  .gh-root:has(.gh-world) .gh-currency__info strong { font-size: 11px; }
+}
