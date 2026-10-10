@@ -1193,12 +1193,54 @@
     height: 20px;
   }
 }
-/* Restore rarity on each equipment tile, not only selected slot */
+
 .locker-preview .locker-slot.equipped {
-  border: 1px solid var(--locker-color) !important;
-  box-shadow: 0 0 12px color-mix(in srgb, var(--locker-color) 24%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--locker-color) 18%, transparent) !important;
-  background: color-mix(in srgb, var(--locker-color) 7%, rgba(4,15,12,.93));
+  border-color: var(--slot-rarity, #A7B6AF) !important;
+  box-shadow:
+    0 0 12px color-mix(
+      in srgb,
+      var(--slot-rarity, #A7B6AF) 25%,
+      transparent
+    ) !important;
 }
+
 .locker-preview .locker-slot.equipped .locker-slot-icon {
-  border: 1px solid color-mix(in srgb, var(--locker-color) 65%, transparent);
+  border: 1px solid var(--slot-rarity, #A7B6AF);
+}
+
+.locker-preview .locker-slot.equipped.selected {
+  border-color: var(--slot-rarity, #A7B6AF) !important;
+}
+/* Rareza real de cada slot, sin color global */
+
+.locker-preview .locker-slot.equipped {
+  border: 1px solid var(--slot-rarity) !important;
+
+  box-shadow:
+    0 0 12px color-mix(
+      in srgb,
+      var(--slot-rarity) 25%,
+      transparent
+    ) !important;
+}
+
+.locker-preview .locker-slot.equipped.selected {
+  border-color: var(--slot-rarity) !important;
+}
+/* Rareza por atributo, independiente del color global */
+
+.locker-preview .locker-equipment .locker-slot.equipped[data-rarity="common"] {
+  border: 1px solid #A7B6AF !important;
+}
+
+.locker-preview .locker-equipment .locker-slot.equipped[data-rarity="rare"] {
+  border: 1px solid #3D8BFF !important;
+}
+
+.locker-preview .locker-equipment .locker-slot.equipped[data-rarity="epic"] {
+  border: 1px solid #B85CFF !important;
+}
+
+.locker-preview .locker-equipment .locker-slot.equipped[data-rarity="legendary"] {
+  border: 1px solid #FFC83D !important;
 }

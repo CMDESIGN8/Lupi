@@ -6,6 +6,7 @@ import {
   type ItemSlot,
 } from "../hooks/useAuraInventory";
 import "./LockerPreview.css";
+import { AURA_RARITY_COLORS } from "../lib/auraRarity";
 import { Avatar2D } from "./Avatar2D";
 
 type LockerPreviewProps = {
@@ -48,12 +49,7 @@ const colorVar = (color: string) =>
     "--locker-color": color,
   } as React.CSSProperties);
 
-const RARITY_COLORS: Record<InventoryItem["rarity"], string> = {
-  common: "#A7B6AF",
-  rare: "#3D8BFF",
-  epic: "#B85CFF",
-  legendary: "#FFC83D",
-};
+
 
 function LockerItemVisual({
   item,
@@ -115,6 +111,7 @@ export function LockerPreview({
 
   const rarity =
     mainItem?.rarity?.toUpperCase() ?? "COMMON";
+  
 
   const selectedItems = useMemo(() => {
     if (!selectedSlot) return [];
@@ -260,7 +257,21 @@ export function LockerPreview({
               ]
                 .filter(Boolean)
                 .join(" ")}
-              style={colorVar(item ? RARITY_COLORS[item.rarity] : "#A7B6AF")}
+              style={
+  {
+    "--slot-rarity": item
+      ? AURA_RARITY_COLORS[item.rarity]
+      : "#A7B6AF",
+
+    borderColor: item
+      ? AURA_RARITY_COLORS[item.rarity]
+      : "rgba(220, 235, 226, 0.19)",
+
+    boxShadow: item
+      ? `0 0 12px ${AURA_RARITY_COLORS[item.rarity]}35`
+      : "none",
+  } as React.CSSProperties
+}
               onClick={() =>
                 handleSlotClick(slot)
               }
@@ -348,8 +359,8 @@ export function LockerPreview({
                       .filter(Boolean)
                       .join(" ")}
                     style={colorVar(
-                      item.color
-                    )}
+                        AURA_RARITY_COLORS[item.rarity]
+                      )}
                     onClick={() =>
                       handleItemClick(
                         item.id
@@ -360,7 +371,7 @@ export function LockerPreview({
                       className="locker-item-icon"
                       style={{
                         background:
-                          item.color,
+                            AURA_RARITY_COLORS[item.rarity],
                       }}
                     >
                       {item.icon}

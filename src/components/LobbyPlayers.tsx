@@ -7,6 +7,7 @@ import {
 } from "../hooks/useAuraInventory";
 import type { LobbyPlayer, LobbyStatus } from "../hooks/useLobbyPresence";
 import "./LobbyPlayers.css";
+import { AURA_RARITY_COLORS } from "../lib/auraRarity";
 
 type Props = {
   players: LobbyPlayer[];
@@ -23,12 +24,7 @@ type Props = {
 const SLOT_ORDER: ItemSlot[] = ["top", "bottom", "boots", "accessory"];
 
 const RARITY_RANK: Record<string, number> = { common: 0, rare: 1, epic: 2, legendary: 3 };
-const RARITY_COLOR: Record<string, string> = {
-  common: "#9aa4a0",
-  rare: "#3b9bff",
-  epic: "#b061ff",
-  legendary: "#ffb629",
-};
+
 
 function ItemVisual({ item }: { item: InventoryItem }) {
   const [failed, setFailed] = useState(false);
@@ -89,7 +85,7 @@ export function LobbyPlayers({ players, meId, catalog, status, max = 14, onSelec
           const main = bySlot.top ?? worn[0];
           const color = main?.color ?? DEFAULT_ITEM_COLOR;
           const rank = worn.reduce((m, i) => Math.max(m, RARITY_RANK[i.rarity] ?? 0), 0);
-          const rarityColor = RARITY_COLOR[Object.keys(RARITY_RANK)[rank]];
+          const rarityColor = AURA_RARITY_COLORS[(Object.keys(RARITY_RANK) as Array<keyof typeof AURA_RARITY_COLORS>)[rank]];
           const isMe = p.userId === meId;
 
           return (
