@@ -175,3 +175,10 @@ img, svg, video, canvas {
     scroll-behavior: auto !important;
   }
 }
+/* LUPI RESPONSIVE PATCH 01 — evitar scroll horizontal accidental */
+html, body, #root { max-width: 100%; }
+button, input, textarea, select { font: inherit; }
+@media (max-width: 700px) {
+  .app-content-shell, .main-content { min-width: 0; }
+  .app-content-shell > *, .main-content > * { min-width: 0; }
+}

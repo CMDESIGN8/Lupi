@@ -1306,3 +1306,54 @@ button.lc-avatar {
 
   .gh-world__chat .lc--mobile-open { height: 345px !important; }
 }
+/* ============================================================
+   LUPI RESPONSIVE PATCH 01 — chat accesible en móvil
+   El panel cerrado es un botón; el abierto ocupa el ancho útil.
+   ============================================================ */
+@media (max-width: 700px) {
+  .gh-world .gh-world__chat:not(:has(.lc--mobile-open)) {
+    position: fixed !important;
+    left: auto !important;
+    right: max(12px, env(safe-area-inset-right, 0px)) !important;
+    bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+    width: 56px !important;
+    min-width: 56px !important;
+    max-width: 56px !important;
+    height: 56px !important;
+    max-height: 56px !important;
+    z-index: 210 !important;
+  }
+
+  .gh-world .gh-world__chat:has(.lc--mobile-open) {
+    position: fixed !important;
+    left: max(10px, env(safe-area-inset-left, 0px)) !important;
+    right: max(10px, env(safe-area-inset-right, 0px)) !important;
+    bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: min(380px, 55dvh) !important;
+    max-height: min(380px, 55dvh) !important;
+    z-index: 310 !important;
+  }
+
+  .gh-world .gh-world__chat .lc--mobile-open {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  .gh-world .gh-world__chat .lc--mobile-open .lc-body,
+  .gh-world .gh-world__chat .lc--mobile-open .lc-log-wrap {
+    min-height: 0 !important;
+  }
+}
+
+@media (max-width: 700px) and (max-height: 650px) {
+  .gh-world .gh-world__chat:has(.lc--mobile-open) {
+    bottom: calc(82px + env(safe-area-inset-bottom, 0px)) !important;
+    height: min(280px, 48dvh) !important;
+    max-height: min(280px, 48dvh) !important;
+  }
+}
