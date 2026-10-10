@@ -22,6 +22,7 @@
     import "./GameHubLobby.css";
     import "./LupiWorld_AAA_Theme.css";
     import "./LupiWorld_Theme_V2.css";
+    import "./LupiWorld_Lights_Cinematic_V3.css";
     import {
       useLobbyChallenges,
       type Challenge,
