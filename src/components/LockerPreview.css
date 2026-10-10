@@ -1193,3 +1193,12 @@
     height: 20px;
   }
 }
+/* Restore rarity on each equipment tile, not only selected slot */
+.locker-preview .locker-slot.equipped {
+  border: 1px solid var(--locker-color) !important;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--locker-color) 24%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--locker-color) 18%, transparent) !important;
+  background: color-mix(in srgb, var(--locker-color) 7%, rgba(4,15,12,.93));
+}
+.locker-preview .locker-slot.equipped .locker-slot-icon {
+  border: 1px solid color-mix(in srgb, var(--locker-color) 65%, transparent);
+}

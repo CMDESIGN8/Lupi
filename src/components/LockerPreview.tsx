@@ -260,7 +260,7 @@ export function LockerPreview({
               ]
                 .filter(Boolean)
                 .join(" ")}
-              style={colorVar(item ? (item.color || RARITY_COLORS[item.rarity]) : "#A7B6AF")}
+              style={colorVar(item ? RARITY_COLORS[item.rarity] : "#A7B6AF")}
               onClick={() =>
                 handleSlotClick(slot)
               }

@@ -6,7 +6,7 @@ import {
   type ItemSlot,
 } from "../hooks/useAuraInventory";
 import type { LobbyActivity, LobbyPlayer } from "../hooks/useLobbyPresence";
-import type { Challenge, ChallengeOutcome } from "../hooks/useLobbyChallenges";
+import type { Challenge, ChallengeOutcome, ChallengeGame } from "../hooks/useLobbyChallenges";
 import type { ReportReason } from "../hooks/useLobbyModeration";
 import "./PlayerCard.css";
 
@@ -220,6 +220,8 @@ type ToastsProps = {
   dailyChallenges?: DailyChallengeToast[];
 };
 
+const GAME_NAMES: Record<ChallengeGame, string> = { futsal: "Futsal", trivia: "Preguntados", rps: "Piedra, papel o tijera", truco: "Truco", physical: "Reto físico" };
+
 const OUTCOME_TEXT: Record<ChallengeOutcome["kind"], (name: string) => string> = {
   declined: (name) => `${name} rechazó el desafío.`,
   busy: (name) => `${name} está ocupado.`,
@@ -229,122 +231,52 @@ const OUTCOME_TEXT: Record<ChallengeOutcome["kind"], (name: string) => string> =
 
 /** Avisos flotantes: desafío recibido, desafío enviado y resultado. */
 export function ChallengeToasts({
-  incoming,
-  outgoing,
-  outcome,
-  respond,
-  cancel,
-  dailyChallenges = [],
+  incoming, outgoing, outcome, respond, cancel, dailyChallenges = [],
 }: ToastsProps) {
-  if (
-    !incoming &&
-    !outgoing &&
-    !outcome &&
-    dailyChallenges.length === 0
-  ) {
-    return null;
-  }
-
+  const gameName = (type?: string) => type === "rps" ? "PIEDRA, PAPEL O TIJERA" : "FUTSAL";
+  if (!incoming && !outgoing && !outcome && dailyChallenges.length === 0) return null;
   return (
-  <>
-    {/* MODAL: DESAFÍO RECIBIDO O ENVIADO */}
-    {(incoming || outgoing) && (
-      <div className="pc-challenge-overlay">
-        <div className="pc-challenge-modal" role="dialog" aria-modal="true"
-          aria-label={incoming ? "Desafío recibido" : "Desafío enviado"}>
-
-          <div className="pc-challenge-modal__icon" aria-hidden="true">
-            ⚔
-          </div>
-
-          <span className="pc-challenge-modal__eyebrow">
-            LUPI WORLD · 1 VS 1
-          </span>
-
-          <h2 className="pc-challenge-modal__title">
-            {incoming ? "¡TE DESAFÍAN!" : "DESAFÍO ENVIADO"}
-          </h2>
-
-          <p className="pc-challenge-modal__description">
-            {incoming
-              ? `${incoming.fromName} quiere enfrentarte en un partido.`
-              : `Esperando la respuesta de ${outgoing?.toName}...`}
-          </p>
-
-          {outgoing && !incoming && (
-            <div className="pc-challenge-modal__waiting" aria-label="Esperando respuesta">
-              <span />
-              <span />
-              <span />
-            </div>
-          )}
-
-          <div className="pc-challenge-modal__actions">
-            {incoming ? (
-              <>
-                <button
-                  type="button"
-                  className="pc-btn pc-btn--primary"
-                  onClick={() => respond(true)}
-                >
-                  ⚔ ACEPTAR
-                </button>
-                <button
-                  type="button"
-                  className="pc-btn"
-                  onClick={() => respond(false)}
-                >
-                  RECHAZAR
-                </button>
-              </>
-            ) : (
-              <button type="button" className="pc-btn" onClick={cancel}>
-                CANCELAR DESAFÍO
-              </button>
+    <>
+      {(incoming || outgoing) && (
+        <div className="pc-challenge-overlay">
+          <section className="pc-challenge-modal" role="dialog" aria-modal="true" aria-label="Desafío de Lupi World">
+            <div className="pc-challenge-modal__icon" aria-hidden="true">⚔</div>
+            <span className="pc-challenge-modal__eyebrow">LUPI WORLD · {gameName((incoming ?? outgoing)?.gameType)}</span>
+            <h2 className="pc-challenge-modal__title">{incoming ? "¡TE DESAFÍAN!" : "DESAFÍO ENVIADO"}</h2>
+            <p className="pc-challenge-modal__description">
+              {incoming ? <><strong>{incoming.fromName}</strong> te desafía a {gameName(incoming.gameType)}.</> : <>Esperando la respuesta de <strong>{outgoing?.toName}</strong>...</>}
+            </p>
+            {outgoing && !incoming && (
+              <div className="pc-challenge-modal__waiting" aria-label="Esperando respuesta"><span/><span/><span/></div>
             )}
-          </div>
-        </div>
-      </div>
-    )}
-
-    {/* NOTIFICACIONES INFORMATIVAS */}
-    {outcome && (
-      <div className="pc-notifications" role="status" aria-live="polite">
-        <div className="pc-toast pc-toast--info">
-          {OUTCOME_TEXT[outcome.kind](outcome.name)}
-        </div>
-      </div>
-    )}
-
-    {/* RECOMPENSAS DIARIAS */}
-    {dailyChallenges.length > 0 && (
-      <div className="pc-daily-notifications" aria-live="polite">
-        {dailyChallenges.map((challenge) => (
-          <div
-            key={challenge.id}
-            className="pc-toast pc-toast--daily"
-            role="status"
-          >
-            <div className="pc-toast__daily-icon">🏆</div>
-            <div className="pc-toast__daily-content">
-              <strong>DESAFÍO COMPLETADO</strong>
-              <span>{challenge.title}</span>
-              <small>
-                {challenge.progress}/{challenge.requirement}
-                {challenge.rewardXp
-                  ? ` · +${challenge.rewardXp} XP`
-                  : ""}
-                {challenge.rewardCoins
-                  ? ` · +${challenge.rewardCoins} 🪙`
-                  : ""}
-              </small>
+            <div className="pc-challenge-modal__actions">
+              {incoming ? (
+                <>
+                  <button type="button" className="pc-btn pc-btn--primary" onClick={() => respond(true)}>⚔ ACEPTAR</button>
+                  <button type="button" className="pc-btn" onClick={() => respond(false)}>RECHAZAR</button>
+                </>
+              ) : (
+                <button type="button" className="pc-btn" onClick={cancel}>CANCELAR DESAFÍO</button>
+              )}
             </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </>
-);
+          </section>
+        </div>
+      )}
+      {outcome && <div className="pc-notifications" role="status" aria-live="polite"><div className="pc-toast pc-toast--info">{OUTCOME_TEXT[outcome.kind](outcome.name)}</div></div>}
+      {dailyChallenges.length > 0 && (
+        <div className="pc-daily-notifications" aria-live="polite">
+          {dailyChallenges.map((challenge) => (
+            <div key={challenge.id} className="pc-toast pc-toast--daily" role="status">
+              <div className="pc-toast__daily-icon">🏆</div>
+              <div className="pc-toast__daily-content"><strong>DESAFÍO COMPLETADO</strong><span>{challenge.title}</span>
+                <small>{challenge.progress}/{challenge.requirement}{challenge.rewardXp ? ` · +${challenge.rewardXp} XP` : ""}{challenge.rewardCoins ? ` · +${challenge.rewardCoins} 🪙` : ""}</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
 }
 
 type DuelSummaryProps = {
