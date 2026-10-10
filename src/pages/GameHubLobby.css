@@ -3113,3 +3113,191 @@
     bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+/* =========================================================
+   LUPI WORLD — MOBILE LAYOUT FIX 02
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .gh-world {
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* HUD superior */
+  .gh-world .gh-hud {
+    position: relative;
+    z-index: 30;
+    min-width: 0;
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .gh-world .gh-brand strong {
+    font-size: clamp(17px, 5vw, 22px);
+    line-height: 0.95;
+  }
+
+  .gh-world .gh-hud__right {
+    min-width: 0;
+    gap: 5px;
+  }
+
+  .gh-world .gh-wallet {
+    padding: 5px 7px;
+    gap: 4px;
+    font-size: 13px;
+  }
+
+  .gh-world .gh-level {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+  }
+
+  .gh-world .gh-level__core {
+    width: 30px;
+    height: 30px;
+    font-size: 17px;
+  }
+
+  /* Misión: reducir espacio ocupado */
+  .gh-world .gh-world__mission {
+    top: 105px;
+    left: 50%;
+    width: min(86vw, 380px);
+    max-width: 380px;
+    padding: 10px 12px;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+
+  .gh-world .gh-world__mission strong {
+    font-size: 19px;
+  }
+
+  .gh-world .gh-world__mission-progress {
+    margin-top: 6px;
+  }
+
+  .gh-world .gh-world__mission-action {
+    margin-top: 6px;
+  }
+
+  /* El chat no debe desbordar el viewport */
+  .gh-world .gh-world__chat {
+    max-width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Teléfonos de menor altura */
+
+@media (max-width: 700px) and (max-height: 740px) {
+  .gh-world .gh-world__mission {
+    top: 85px;
+    padding: 7px 10px;
+  }
+
+  .gh-world .gh-world__mission strong {
+    font-size: 17px;
+  }
+}
+/* =========================================================
+   LUPI WORLD — AVATAR RESPONSIVE FIX
+   Mantiene el personaje y sus prendas en una sola escala
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .gh-world .gh-locker-zone {
+    top: 155px;
+    bottom: 125px;
+
+    left: 50%;
+    width: 100%;
+    height: auto;
+
+    transform: translateX(-50%);
+    overflow: visible;
+  }
+
+  .gh-world .gh-locker-zone .locker-character {
+    height: 100%;
+    overflow: visible;
+  }
+
+  .gh-world .gh-locker-zone .locker-avatar {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+
+    width: 100%;
+    height: 100%;
+
+    transform: translateX(-50%);
+    overflow: visible;
+  }
+
+  .gh-world .gh-locker-zone .avatar2d {
+    position: absolute;
+
+    left: 50%;
+    bottom: 0;
+
+    width: 390px;
+    height: 520px;
+
+    margin: 0;
+
+    transform: translateX(-50%) scale(0.75);
+    transform-origin: center bottom;
+  }
+
+  .gh-world .gh-locker-zone .avatar2d__character {
+    top: 0;
+    bottom: auto;
+
+    width: 490px;
+    height: 500px;
+
+    transform: translateX(-50%);
+    transform-origin: center bottom;
+  }
+}
+
+/* Celulares medianos */
+@media (min-width: 390px) and (max-width: 700px) {
+  .gh-world .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.78);
+  }
+}
+
+/* Celulares pequeños */
+@media (max-width: 389px) {
+  .gh-world .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.68);
+  }
+}
+
+/* Pantallas de poca altura */
+@media (max-width: 700px) and (max-height: 740px) {
+  .gh-world .gh-locker-zone {
+    top: 145px;
+    bottom: 115px;
+  }
+
+  .gh-world .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.60);
+  }
+}
+
+/* Pantallas muy bajas */
+@media (max-width: 700px) and (max-height: 650px) {
+  .gh-world .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(0.48);
+  }
+}
