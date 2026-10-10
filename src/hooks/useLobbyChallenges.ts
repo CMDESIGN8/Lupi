@@ -3,7 +3,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
 
+export type ChallengeGame = "futsal" | "trivia" | "rps" | "truco" | "physical";
+
 export type Challenge = {
+  gameType: ChallengeGame;
   /** También sirve como id de la partida. */
   id: string;
   fromId: string;
@@ -70,7 +73,9 @@ function parseChallenge(raw: any): Challenge | null {
   if (!id || !fromId || !fromName || !toId) return null;
   const botRaw = Math.trunc(Number(raw?.botIndex));
   const botIndex = Number.isFinite(botRaw) ? Math.min(Math.max(botRaw, 0), MAX_BOT_INDEX) : 1;
-  return { id, fromId, fromName, toId, toName: str(raw?.toName, 24), botIndex, at: Date.now() };
+  const allowed: ChallengeGame[] = ["futsal", "trivia", "rps", "truco", "physical"];
+  const gameType: ChallengeGame = allowed.includes(raw?.gameType) ? raw.gameType : "futsal";
+  return { id, fromId, fromName, toId, toName: str(raw?.toName, 24), botIndex, gameType, at: Date.now() };
 }
 
 export function useLobbyChallenges({
@@ -193,7 +198,7 @@ export function useLobbyChallenges({
 
   /** Devuelve true si el desafío salió. */
   const challenge = useCallback(
-    (target: { userId: string; username: string }, botIndex = 1) => {
+    (target: { userId: string; username: string }, botIndex = 1, gameType: ChallengeGame = "futsal") => {
       const channel = channelRef.current;
       if (!channel || !ready || outgoingRef.current || target.userId === meId) return false;
 
@@ -204,6 +209,7 @@ export function useLobbyChallenges({
         toId: target.userId,
         toName: target.username.slice(0, 24),
         botIndex: Math.min(Math.max(Math.trunc(botIndex), 0), MAX_BOT_INDEX),
+        gameType,
         at: Date.now(),
       };
 
