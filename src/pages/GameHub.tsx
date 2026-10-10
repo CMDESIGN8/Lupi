@@ -14,13 +14,14 @@
     import { useLobbyPresence, type LobbyLook, type LobbyPlayer } from "../hooks/useLobbyPresence";
     import { LobbyChat } from "../components/LobbyChat";
     import { LockerPreview } from "../components/LockerPreview";
-    import "./LupiWorld_AAA_Theme.css";
     import {
       useWorldEvents,
       type WorldEvent,
     } from "../hooks/useWorldEvents";
     import "./GameHub.css";
     import "./GameHubLobby.css";
+    import "./LupiWorld_AAA_Theme.css";
+    import "./LupiWorld_Theme_V2.css";
     import {
       useLobbyChallenges,
       type Challenge,
