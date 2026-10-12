@@ -12,6 +12,7 @@ import { useUserCards } from "./hooks/useUserCards";
 import { useActiveDeck } from "./hooks/useActiveDeck";
 import { useAppNavigation } from "./hooks/useAppNavigation";
 import { PlayerOnboarding } from "./pages/PlayerOnboarding";
+import { SigningWelcome } from "./components/SigningWelcome";
 import { supabase } from "./lib/supabaseClient";
 import { AuthScreen } from "./pages/AuthScreen";
 import { HomeExperience } from "./pages/HomeExperience";
@@ -45,6 +46,7 @@ export default function App() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [showTour, setShowTour] = useState(false);
+  const [showSigningWelcome, setShowSigningWelcome] = useState(false);
   const [, setTourKey] = useState(0);
 
   const navigation = useAppNavigation();
@@ -111,12 +113,26 @@ export default function App() {
 
   const handleAuth = useCallback((authenticatedUser: AppUser) => {
     setUser(authenticatedUser);
+    // El tutorial se presenta luego del fichaje, cuando corresponda.
     if (!localStorage.getItem("tour_completed")) {
-      setTimeout(() => setShowTour(true), 500);
+      setShowTour(true);
     }
   }, []);
 
+  const handleOnboardingComplete = useCallback((completedUser: AppUser) => {
+    setUser(completedUser);
+    setShowTour(false);
+    setShowSigningWelcome(true);
+  }, []);
+
+  const handleSigningWelcomeContinue = useCallback(() => {
+    setShowSigningWelcome(false);
+    if (!localStorage.getItem("tour_completed")) setShowTour(true);
+  }, []);
+
   const handleLogout = useCallback(() => {
+    setShowSigningWelcome(false);
+    setShowTour(false);
     setUser(null);
     goHome();
   }, [goHome]);
@@ -174,7 +190,7 @@ if (user && needsPlayerOnboarding(user)) {
     <ToastProvider>
       <div className="app-wrapper">
         <ErrorBoundary>
-          <PlayerOnboarding onComplete={handleAuth} />
+          <PlayerOnboarding onComplete={handleOnboardingComplete} />
         </ErrorBoundary>
       </div>
     </ToastProvider>
@@ -196,7 +212,12 @@ if (user && needsPlayerOnboarding(user)) {
     <ToastProvider>
       <div className="app-wrapper">
         <ErrorBoundary>
-          {showTour && <OnboardingTour onComplete={handleTourComplete} />}
+          {showSigningWelcome && (
+            <SigningWelcome user={user} onContinue={handleSigningWelcomeContinue} />
+          )}
+          {!showSigningWelcome && showTour && (
+            <OnboardingTour onComplete={handleTourComplete} />
+          )}
 
           {appRoute === "home" && ( <header className="app-header"><AppHeader userId={user.id} /></header> )}
 
