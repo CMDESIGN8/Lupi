@@ -22,7 +22,6 @@ export function PlayerReveal({ username, club }: PlayerRevealProps) {
           className="lupi-reveal__character"
           draggable={false}
         />
-        <div className="lupi-reveal__platform" aria-hidden="true" />
         <div className="lupi-reveal__platform-core" aria-hidden="true" />
       </div>
       <div className="lupi-reveal__identity" aria-live="polite" aria-atomic="true">
