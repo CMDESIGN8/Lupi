@@ -167,3 +167,93 @@
     gap: 12px;
   }
 }
+
+/* ==========================================
+   LUPI WORLD — REGISTRO MÓVIL COMPACTO
+   ========================================== */
+
+@media (max-width: 600px) {
+
+  /* Solo registro: requiere la clase auth-register */
+  .auth-screen.auth-register .auth-card-v2 {
+    padding: 18px 16px 14px !important;
+  }
+
+  .auth-screen.auth-register .auth-card-heading {
+    margin-bottom: 12px !important;
+  }
+
+  .auth-screen.auth-register .auth-card-heading h2 {
+    margin: 4px 0 !important;
+    line-height: 1.08 !important;
+  }
+
+  .auth-screen.auth-register .auth-card-heading p {
+    margin: 4px 0 0 !important;
+  }
+
+  .auth-screen.auth-register .auth-tabs {
+    margin: 12px 0 14px !important;
+  }
+
+  .auth-screen.auth-register .auth-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 11px !important;
+  }
+
+  .auth-screen.auth-register .form-group {
+    margin: 0 !important;
+    gap: 5px !important;
+  }
+
+  .auth-screen.auth-register .form-label {
+    margin-bottom: 4px !important;
+    font-size: 10px !important;
+  }
+
+  .auth-screen.auth-register .form-input {
+    min-height: 46px !important;
+    height: 46px !important;
+    padding: 0 13px !important;
+    font-size: 14px !important;
+  }
+
+  .auth-screen.auth-register .form-hint {
+    margin-top: 4px !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+
+  .auth-screen.auth-register .auth-submit {
+    min-height: 50px !important;
+    margin-top: 3px !important;
+  }
+
+  .auth-screen.auth-register .auth-rewards {
+    margin-top: 15px !important;
+    padding-top: 12px !important;
+    gap: 7px !important;
+  }
+
+  .auth-screen.auth-register .auth-reward-item {
+    min-width: 0 !important;
+    padding: 9px 4px !important;
+  }
+
+  .auth-screen.auth-register .auth-reward-item > span {
+    font-size: 20px !important;
+  }
+
+  .auth-screen.auth-register .auth-reward-item strong {
+    font-size: 11px !important;
+  }
+
+  .auth-screen.auth-register .auth-reward-item small {
+    font-size: 10px !important;
+  }
+
+  .auth-screen.auth-register .auth-card-footer {
+    margin-top: 12px !important;
+  }
+}
