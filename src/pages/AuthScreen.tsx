@@ -1,198 +1,123 @@
-// src/pages/AuthScreen.tsx
-import { useState } from "react";
-import { api, AppUser } from "../lib/api";
+import { useState, type FormEvent, type ChangeEvent } from "react";
+import { api, type AppUser } from "../lib/api";
 import { CLUBS } from "../lib/constants";
 import { useToastContext } from "../components/ToastProvider";
+import "./Auth.css";
 
-
-function Alert({ type, msg }: { type: "error" | "success"; msg: string }) {
-  if (!msg) return null;
-  return (
-    <div className={`alert alert-${type} fade-up`}>
-      {type === "error" ? "⚠️" : "✅"} {msg}
-    </div>
-  );
-}
+type Mode = "login" | "register";
+type FormData = { email: string; password: string; username: string; club: string; referralCode: string };
 
 export function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
-  const [mode, setMode] = useState<"login" | "register">("login");
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-    username: "",
-    club: "",
-    referralCode: "",
-  });
+  const [mode, setMode] = useState<Mode>("login");
+  const [form, setForm] = useState<FormData>({ email: "", password: "", username: "", club: "", referralCode: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { showToast } = useToastContext();
 
+  const set = (key: keyof FormData) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm((prev) => ({ ...prev, [key]: e.target.value }));
 
-  const set =
-    (k: string) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-      setForm((f) => ({ ...f, [k]: e.target.value }));
+  const changeMode = (next: Mode) => {
+    if (loading) return;
+    setMode(next);
+    setError("");
+  };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (loading) return;
     setError("");
     setLoading(true);
     try {
       if (mode === "login") {
-        if (!form.email || !form.password) throw new Error("Completá todos los campos.");
-        const user = await api.login({ email: form.email, password: form.password });
+        if (!form.email.trim() || !form.password) throw new Error("Completá todos los campos.");
+        const user = await api.login({ email: form.email.trim(), password: form.password });
         onAuth(user);
       } else {
-        if (!form.email || !form.password || !form.username || !form.club)
+        if (!form.email.trim() || !form.password || !form.username.trim() || !form.club)
           throw new Error("Completá todos los campos.");
-        if (form.password.length < 6)
-          throw new Error("La contraseña debe tener al menos 6 caracteres.");
-
+        if (form.password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
+        const referralCode = form.referralCode.trim().toUpperCase();
         const user = await api.register({
-          email: form.email,
-          password: form.password,
-          username: form.username,
-          club: form.club,
-          referralCode: form.referralCode || undefined,
+          email: form.email.trim(), password: form.password,
+          username: form.username.trim(), club: form.club,
+          referralCode: referralCode || undefined,
         });
-
-        if (form.referralCode) {
-  setTimeout(() => {
-    showToast("🎉 ¡Bienvenido! Arrancás con 75 puntos (50 de bienvenida + 25 del código).", "success");
-  }, 500);
-} else {
-  setTimeout(() => {
-    showToast("🎉 ¡Bienvenido! Arrancás con 50 puntos de regalo.", "success");
-  }, 500);
-}
+        // Mantenemos el mensaje de bienvenida; los puntos los asigna el backend.
+        showToast(
+          referralCode
+            ? "🎉 ¡Bienvenido! Arrancás con 75 puntos (50 de bienvenida + 25 del código)."
+            : "🎉 ¡Bienvenido! Arrancás con 50 puntos de regalo.",
+          "success"
+        );
         onAuth(user);
       }
-    } catch (e: any) {
-      setError(e.message);
-      console.error("Error en autenticación:", e);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Ocurrió un error. Intentá nuevamente.");
+      console.error("Error en autenticación:", err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-screen">
+    <main className={`auth-screen auth-screen--${mode}`}>
+      <div className="auth-stage" aria-hidden="true">
+        <div className="auth-stage__scene" />
+        <div className="auth-stage__shade" />
+        <div className="auth-stage__spot auth-stage__spot--left" />
+        <div className="auth-stage__spot auth-stage__spot--right" />
+        <div className="auth-stage__fog" />
+        <div className="auth-stage__particles" />
+        <div className="auth-stage__light-sweep" />
+        <div className="auth-stage__vignette" />
+        <div className="auth-stage__grain" />
+      </div>
+
       <div className="auth-shell">
-        <section className="auth-hero-v2">
-          <div className="auth-hero-copy">
-            <span className="auth-kicker">LUPIAPP · TEMPORADA 1</span>
-            <h1>
-              Tu club.<br />
-              <em>Tus cartas.</em>
-            </h1>
-            <p>Jugá partidos, conseguí jugadores y llevá a tu club a la cima.</p>
-
-            <div className="auth-card-preview">
-              <div className="auth-avatar">⚽</div>
-              <div className="auth-card-info">
-                <strong>BURRITO</strong>
-                <small>BRONCE · OVR 10</small>
-              </div>
-              <div className="auth-ovr-badge">10</div>
-            </div>
+        <header className="auth-intro">
+          <span className="auth-kicker"><span className="auth-live-dot" /> LUPI WORLD · TEMPORADA 1</span>
+          <div className="auth-intro__spacer" aria-hidden="true" />
+          <h1>TU CLUB. TU MUNDO.<br /><em>TU HISTORIA.</em></h1>
+          <p>Jugá, desafiá a otros y ganá recompensas por cada victoria, dentro y fuera de la cancha.</p>
+          <div className="auth-pillars" aria-label="Qué podés hacer en Lupi World">
+            <div className="auth-pillar"><span aria-hidden="true">🎮</span><strong>COMPETÍ</strong><small>Partidos y desafíos</small></div>
+            <div className="auth-pillar"><span aria-hidden="true">👥</span><strong>CONECTÁ</strong><small>Tu comunidad</small></div>
+            <div className="auth-pillar"><span aria-hidden="true">🏆</span><strong>PROGRESÁ</strong><small>XP, cartas y premios</small></div>
           </div>
-          <div className="auth-hero-glow" />
-          <div className="auth-hero-ball">⚽</div>
-        </section>
+        </header>
 
-        <section className="auth-card-v2">
-          <div className="auth-tabs">
-            <button
-              className={mode === "login" ? "active" : ""}
-              onClick={() => { setMode("login"); setError(""); }}
-            >
-              Iniciar sesión
-            </button>
-            <button
-              className={mode === "register" ? "active" : ""}
-              onClick={() => { setMode("register"); setError(""); }}
-            >
-              Crear cuenta
-            </button>
+        <section className="auth-card-v2" aria-label="Acceso a Lupi World">
+          <div className="auth-card-heading">
+            <span className="auth-card-eyebrow">PLAYER ACCESS · S01</span>
+            <h2>{mode === "login" ? "VOLVÉ A LA CANCHA" : "CREÁ TU JUGADOR"}</h2>
+            <p>{mode === "login" ? "Tu equipo te está esperando." : "Tu historia en Lupi World empieza acá."}</p>
           </div>
 
-          <Alert type="error" msg={error} />
-
-          {mode === "register" && (
-            <div className="form-group">
-              <label className="form-label">Nombre de usuario</label>
-              <input
-                className="form-input"
-                placeholder="@LupiApp"
-                value={form.username}
-                onChange={set("username")}
-                autoComplete="username"
-              />
-            </div>
-          )}
-
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input
-              className="form-input"
-              type="email"
-              placeholder="vos@ejemplo.com"
-              value={form.email}
-              onChange={set("email")}
-              autoComplete="email"
-            />
+          <div className="auth-tabs" role="group" aria-label="Modo de acceso">
+            <button type="button" className={mode === "login" ? "active" : ""} onClick={() => changeMode("login")} disabled={loading} aria-pressed={mode === "login"}>Iniciar sesión</button>
+            <button type="button" className={mode === "register" ? "active" : ""} onClick={() => changeMode("register")} disabled={loading} aria-pressed={mode === "register"}>Crear cuenta</button>
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Contraseña</label>
-            <input
-              className="form-input"
-              type="password"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={set("password")}
-              autoComplete={mode === "login" ? "current-password" : "new-password"}
-            />
-          </div>
+          {error && <div className="auth-error" role="alert">⚠️ {error}</div>}
 
-          {mode === "register" && (
-            <>
-              <div className="form-group">
-                <label className="form-label">Club de barrio</label>
-                <select className="form-input" value={form.club} onChange={set("club")}>
-                  <option value="">Seleccioná tu club</option>
-                  {CLUBS.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Código de referido (opcional)</label>
-                <input
-                  className="form-input"
-                  placeholder="Ej: LUPIABCD12"
-                  value={form.referralCode}
-                  onChange={set("referralCode")}
-                  style={{ textTransform: "uppercase" }}
-                  autoComplete="off"
-                />
-                <small className="form-hint">
-                  ¿Te invitaron? Ingresá su código y ganá 25 puntos extra
-                </small>
-              </div>
-            </>
-          )}
-
-          <button
-            className="btn btn-primary auth-submit"
-            onClick={handleSubmit}
-            disabled={loading}
-          >
-            {loading ? (
+          <form className="auth-form" onSubmit={handleSubmit}>
+            {mode === "register" && (
+              <div className="form-group"><label className="form-label" htmlFor="auth-username">NOMBRE DE USUARIO</label><input id="auth-username" className="form-input" placeholder="@TuJugador" value={form.username} onChange={set("username")} autoComplete="username" required /></div>
+            )}
+            <div className="form-group"><label className="form-label" htmlFor="auth-email">EMAIL</label><input id="auth-email" className="form-input" type="email" placeholder="vos@ejemplo.com" value={form.email} onChange={set("email")} autoComplete="email" required /></div>
+            <div className="form-group"><label className="form-label" htmlFor="auth-password">CONTRASEÑA</label><input id="auth-password" className="form-input" type="password" placeholder="••••••••" value={form.password} onChange={set("password")} autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={mode === "register" ? 6 : undefined} required /></div>
+            {mode === "register" && (
               <>
-                <div className="spinner" />
-                {mode === "login" ? "Ingresando..." : "Registrando..."}
+                <div className="form-group"><label className="form-label" htmlFor="auth-club">CLUB DE BARRIO</label><select id="auth-club" className="form-input" value={form.club} onChange={set("club")} required><option value="">Seleccioná tu club</option>{CLUBS.map((club) => <option key={club} value={club}>{club}</option>)}</select></div>
+                <div className="form-group"><label className="form-label" htmlFor="auth-referral">CÓDIGO DE REFERIDO (OPCIONAL)</label><input id="auth-referral" className="form-input" placeholder="Ej: LUPIABCD12" value={form.referralCode} onChange={set("referralCode")} style={{ textTransform: "uppercase" }} autoComplete="off" /><small className="form-hint">¿Te invitaron? Ingresá su código y ganá 25 puntos extra.</small></div>
               </>
-            ) : mode === "login" ? "ENTRAR" : "REGISTRARME"}
-          </button>
+            )}
+            <button type="submit" className="auth-submit" disabled={loading}>
+              {loading ? (mode === "login" ? "INGRESANDO AL CLUB…" : "CREANDO TU JUGADOR…") : (mode === "login" ? "ENTRAR AL WORLD" : "CREAR MI JUGADOR")}
+              {!loading && <span aria-hidden="true">→</span>}
+            </button>
+          </form>
 
           {mode === "register" && (
             <div className="auth-rewards">
@@ -201,8 +126,9 @@ export function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
               <div className="auth-reward-item"><span>🏆</span><div><strong>Ranking</strong><small>de tu club</small></div></div>
             </div>
           )}
+          <div className="auth-card-footer">LUPI WORLD <span>✦</span> SEASON 01</div>
         </section>
       </div>
-    </div>
+    </main>
   );
 }
