@@ -509,9 +509,6 @@
   white-space: nowrap;
 }
 
-.locker-slot.empty {
-  opacity: 0.4;
-}
 
 .locker-slot-arrow {
   position: absolute;
@@ -1243,4 +1240,73 @@
 
 .locker-preview .locker-equipment .locker-slot.equipped[data-rarity="legendary"] {
   border: 1px solid #FFC83D !important;
+}
+
+/* =========================================================
+   LUPI WORLD — SLOT PENDIENTE DE EQUIPAR
+========================================================= */
+
+.locker-preview .locker-equipment
+.locker-slot.empty.locker-slot--pending {
+  opacity: 1 !important;
+
+  border: 2px dashed #22e07a !important;
+
+  background: rgba(4, 35, 25, 0.8) !important;
+
+  box-shadow:
+    0 0 12px rgba(34, 224, 122, 0.2),
+    inset 0 0 12px rgba(34, 224, 122, 0.08) !important;
+
+  animation: locker-pending-glow 2.5s ease-in-out infinite;
+}
+
+/* Ícono + */
+.locker-slot-pending-icon {
+  display: grid;
+  place-items: center;
+
+  width: 100%;
+  height: 100%;
+
+  color: #22e07a;
+
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+
+  text-shadow: 0 0 12px rgba(34, 224, 122, 0.65);
+}
+
+/* Texto del slot */
+.locker-slot--pending .locker-slot-info strong {
+  color: #22e07a;
+  font-weight: 900;
+}
+
+/* Resaltar el slot al pasar el mouse */
+.locker-preview .locker-equipment
+.locker-slot--pending:hover {
+  border-style: solid !important;
+  background: rgba(14, 65, 43, 0.9) !important;
+}
+
+/* Animación */
+@keyframes locker-pending-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 8px rgba(34, 224, 122, 0.12);
+  }
+
+  50% {
+    box-shadow:
+      0 0 20px rgba(34, 224, 122, 0.42);
+  }
+}
+
+/* Accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .locker-slot--pending {
+    animation: none !important;
+  }
 }

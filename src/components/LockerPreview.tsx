@@ -248,9 +248,7 @@ export function LockerPreview({
               type="button"
               className={[
                 "locker-slot",
-                item
-                  ? "equipped"
-                  : "empty",
+                item ? "equipped" : "empty locker-slot--pending",
                 isSelected
                   ? "selected"
                   : "",
@@ -280,8 +278,8 @@ export function LockerPreview({
   {item ? (
     <LockerItemVisual item={item} />
   ) : (
-    <span className="locker-slot-emoji">
-      {meta.icon}
+    <span className="locker-slot-pending-icon" aria-hidden="true">
+      +
     </span>
   )}
 </div>
@@ -290,7 +288,7 @@ export function LockerPreview({
                 <span>{meta.label}</span>
 
                 <strong>
-                  {item?.name ?? "VACÍO"}
+                  {item?.name ?? "EQUIPAR +"}
                 </strong>
               </div>
 

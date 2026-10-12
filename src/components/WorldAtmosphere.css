@@ -1,0 +1,115 @@
+
+.world-atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.world-atmosphere__beam {
+  position: absolute;
+  top: -12%;
+  width: 42%;
+  height: 105%;
+  transform-origin: 50% 0;
+  clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
+  filter: blur(13px);
+  opacity: .45;
+  mix-blend-mode: screen;
+  background: linear-gradient(
+    to bottom,
+    rgba(210,255,250,.65),
+    rgba(0,255,180,.2) 35%,
+    transparent 85%
+  );
+}
+
+.world-atmosphere__beam--left {
+  left: -6%;
+  animation: world-beam-left 9s ease-in-out infinite alternate;
+}
+
+.world-atmosphere__beam--right {
+  right: -6%;
+  animation: world-beam-right 10s ease-in-out infinite alternate;
+}
+
+.world-atmosphere__beam--center {
+  left: 30%;
+  width: 35%;
+  opacity: .2;
+  background: linear-gradient(
+    to bottom,
+    rgba(180,230,255,.7),
+    rgba(0,190,255,.1),
+    transparent
+  );
+  animation: world-beam-center 12s ease-in-out infinite alternate;
+}
+
+.world-atmosphere__fog {
+  position: absolute;
+  bottom: -14%;
+  left: -20%;
+  width: 140%;
+  height: 45%;
+  border-radius: 50%;
+  filter: blur(38px);
+  background: radial-gradient(
+    ellipse,
+    rgba(0,255,160,.22),
+    rgba(0,180,170,.07) 45%,
+    transparent 75%
+  );
+  animation: world-fog 11s ease-in-out infinite alternate;
+}
+
+.world-atmosphere__grain {
+  position: absolute;
+  inset: 0;
+  opacity: .13;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 3px,
+    rgba(255,255,255,.09) 4px
+  );
+}
+
+.world-atmosphere__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 30%,
+    rgba(0,0,0,.45) 100%
+  );
+}
+
+@keyframes world-beam-left {
+  from { transform: rotate(-28deg); }
+  to { transform: rotate(18deg); }
+}
+
+@keyframes world-beam-right {
+  from { transform: rotate(28deg); }
+  to { transform: rotate(-18deg); }
+}
+
+@keyframes world-beam-center {
+  from { transform: rotate(-10deg); }
+  to { transform: rotate(12deg); }
+}
+
+@keyframes world-fog {
+  from { transform: translateX(-7%) scale(1); }
+  to { transform: translateX(7%) scale(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-atmosphere * {
+    animation: none !important;
+  }
+}
