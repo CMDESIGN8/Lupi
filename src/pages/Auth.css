@@ -112,3 +112,58 @@
 @keyframes auth-kicker-in{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 @keyframes auth-pulse{50%{opacity:.5}}
 @media(prefers-reduced-motion:reduce){.auth-screen *,.auth-screen *::before,.auth-screen *::after{animation:none!important;transition:none!important}.auth-screen .auth-kicker{transform:translateX(-50%)}@media(max-width:900px){.auth-screen .auth-kicker{transform:none}}}
+
+@media (max-width: 600px) {
+  /* Compactar la introducción */
+  .auth-screen .auth-shell {
+    gap: 8px !important;
+    padding-top: 12px !important;
+    padding-bottom: 16px !important;
+    justify-content: flex-start !important;
+  }
+
+  /* Menos espacio entre temporada y título */
+  .auth-screen .auth-intro__spacer {
+    height: clamp(75px, 11dvh, 110px) !important;
+  }
+
+  /* Ajustar el encuadre del personaje */
+  .auth-screen .auth-stage__scene {
+    background-position: 28% top !important;
+  }
+
+  .auth-screen .auth-intro h1 {
+    margin-bottom: 6px !important;
+  }
+
+  .auth-screen .auth-intro > p {
+    margin-bottom: 7px !important;
+  }
+
+  .auth-screen .auth-pillars {
+    margin-top: 0 !important;
+    gap: 6px !important;
+  }
+
+  .auth-screen .auth-pillar {
+    min-height: 64px !important;
+    padding: 7px 3px !important;
+  }
+
+  /* Compactar el panel sin achicar los inputs */
+  .auth-screen .auth-card-v2 {
+    padding: 19px 16px 15px !important;
+  }
+
+  .auth-screen .auth-card-heading {
+    margin-bottom: 15px;
+  }
+
+  .auth-screen .auth-tabs {
+    margin-bottom: 15px;
+  }
+
+  .auth-screen .auth-form {
+    gap: 12px;
+  }
+}
