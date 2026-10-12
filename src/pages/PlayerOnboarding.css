@@ -1,660 +1,175 @@
-/* LUPI WORLD — Player Onboarding. Estilos aislados del login. */
+/* LUPI WORLD — Player onboarding. Hoja única, sin overrides acumulados. */
 .auth-screen.player-setup-screen {
+  position: relative;
   display: block;
   width: 100%;
   height: auto;
   min-height: 100dvh;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow-x: clip;
+  overflow-y: visible;
+  isolation: isolate;
+  background: #031322;
 }
-.player-setup-screen .player-setup-layout {
-  box-sizing: border-box;
-  position: relative;
-  z-index: 2;
-  width: min(680px, calc(100% - 40px));
+.player-setup-screen, .player-setup-screen * { box-sizing: border-box; }
+.player-setup-screen .auth-stage { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.player-setup-screen .auth-stage__scene { background-position: center center; }
+.player-setup-screen .player-setup-stadium-lights { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.player-setup-screen .player-setup-stadium-beam { position: absolute; top: -15%; width: 35vw; height: 85vh; opacity: .16; filter: blur(16px); background: linear-gradient(to bottom, rgba(175,238,255,.6), transparent 80%); }
+.player-setup-screen .player-setup-stadium-beam--left { left: -10%; transform: rotate(-22deg); }
+.player-setup-screen .player-setup-stadium-beam--right { right: -10%; transform: rotate(22deg); }
+.player-setup-screen .player-setup-stadium-flare { display: none; }
+
+.player-setup-screen .player-setup-layout.player-setup-layout--split {
+  position: relative; z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+  align-items: center;
+  gap: clamp(18px, 2.8vw, 42px);
+  width: min(1240px, calc(100% - 40px));
+  min-height: 100dvh;
   margin: 0 auto;
-  padding: 22px 0 36px;
+  padding: 16px 0 24px;
 }
-.player-setup-screen .player-setup-panel,
-.player-setup-screen .player-setup-panel * { box-sizing: border-box; }
-.player-setup-screen .player-setup-hero { text-align: center; margin: 0 0 20px; }
-.player-setup-screen .player-setup-crown {
-  display: block; color: #2effab; font-size: 38px; line-height: 1;
-  text-shadow: 0 0 24px rgba(31,255,174,.7);
+.player-setup-screen .player-setup-left {
+  position: relative; min-width: 0; width: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
 }
-.player-setup-screen .player-setup-hero h1 {
-  margin: 6px 0 8px;
-  font: italic 900 clamp(62px, 6vw, 80px)/.85 'Barlow Condensed', Impact, 'Arial Narrow', sans-serif;
-  letter-spacing: -.025em; color: #fff; text-shadow: 0 5px 20px #000;
-}
-.player-setup-screen .player-setup-hero h1 em {
-  display: block; font-style: inherit; color: #26ffa4;
-  text-shadow: 0 0 32px rgba(28,255,155,.26), 0 5px 20px #000;
-}
-.player-setup-screen .player-setup-kicker {
-  display: block; margin-top: 12px; color: #e5ecff;
-  font-size: 12px; font-weight: 800; letter-spacing: .22em;
-}
-.player-setup-screen .player-setup-hero p {
-  margin: 7px 0 0; font-size: 14px; color: #d5e3f4;
-  text-shadow: 0 2px 10px #000;
-}
+.player-setup-screen .player-setup-hero { width: 100%; margin: 0; padding: 0; text-align: center; }
+.player-setup-screen .player-setup-crown { display: block; color: #25ffb6; font-size: 32px; line-height: 1; text-shadow: 0 0 18px rgba(0,255,170,.65); }
+.player-setup-screen .player-setup-hero h1 { margin: 5px 0 0; color: white; font: italic 900 clamp(52px, 5.7vw, 84px)/.84 'Barlow Condensed', Impact, 'Arial Narrow', sans-serif; letter-spacing: -.02em; text-shadow: 0 5px 20px #000; }
+.player-setup-screen .player-setup-hero h1 em { display: block; color: #22ffad; font-style: inherit; }
+
 .player-setup-screen .player-setup-panel {
-  padding: 24px; border: 1px solid rgba(80,247,213,.85);
-  border-radius: 24px;
-  background: linear-gradient(155deg,rgba(2,18,34,.97),rgba(0,15,24,.96));
-  box-shadow: 0 22px 80px rgba(0,0,0,.72),0 0 35px rgba(0,255,189,.11);
-  backdrop-filter: blur(20px);
+  position: relative; width: 100%; min-width: 0; max-width: none;
+  height: auto; max-height: none; overflow: visible;
+  margin: 0; padding: 16px 20px;
+  border: 1px solid rgba(24,235,199,.8); border-radius: 22px;
+  background: linear-gradient(155deg, rgba(3,23,40,.97), rgba(0,14,28,.97));
+  box-shadow: 0 22px 75px rgba(0,0,0,.55), 0 0 35px rgba(0,255,191,.08);
+  backdrop-filter: blur(14px);
 }
-.player-setup-screen .player-setup-form { display: flex; flex-direction: column; gap: 16px; }
-.player-setup-screen .player-setup-field {
-  display: grid; grid-template-columns: 50px minmax(0,1fr);
-  gap: 12px; align-items: start;
-}
-.player-setup-screen .player-setup-field-icon {
-  display: grid; place-items: center; width: 50px; height: 50px;
-  margin-top: 22px; border: 1px solid rgba(0,220,192,.22);
-  border-radius: 14px;
-  background: linear-gradient(145deg,rgba(0,85,103,.32),rgba(0,25,40,.8));
-  color: #48ffce; font-size: 25px; text-shadow: 0 0 20px rgba(0,255,188,.45);
-}
+.player-setup-screen .player-setup-panel::before { content: ''; position: absolute; inset: 0 24px auto; height: 2px; background: linear-gradient(90deg, transparent, #22ffc5, transparent); }
+.player-setup-screen .player-setup-console-header { margin: 0 0 10px; }
+.player-setup-screen .player-setup-console-eyebrow { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 800; letter-spacing: .16em; color: #32ffd0; }
+.player-setup-screen .player-setup-online-dot { width: 7px; height: 7px; flex: none; border-radius: 50%; background: #23ffb5; box-shadow: 0 0 12px #23ffb5; }
+.player-setup-screen .player-setup-console-separator { opacity: .5; }
+.player-setup-screen .player-setup-console-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+.player-setup-screen .player-setup-console-heading > div { min-width: 0; }
+.player-setup-screen .player-setup-console-heading h2 { margin: 0; color: white; font: italic 900 clamp(25px, 2.6vw, 33px)/1 'Barlow Condensed', Impact, sans-serif; }
+.player-setup-screen .player-setup-console-heading h2 em { font-style: inherit; color: #22ffc3; }
+.player-setup-screen .player-setup-console-heading p { margin: 4px 0 0; color: #a9bfd0; font-size: 12px; }
+.player-setup-screen .player-setup-console-level { flex: none; display: flex; align-items: baseline; padding: 7px 9px; border: 1px solid rgba(28,255,194,.45); border-radius: 9px; color: #27ffc2; background: rgba(3,65,64,.25); font: 900 23px 'Barlow Condensed', Impact, sans-serif; }
+.player-setup-screen .player-setup-console-level span { font-size: 11px; color: #90b7bb; }
+.player-setup-screen .player-setup-console-progress { height: 2px; margin-top: 9px; background: rgba(70,180,183,.24); }
+.player-setup-screen .player-setup-console-progress span { display: block; width: 100%; height: 100%; background: #1cf7b9; }
+.player-setup-screen .player-setup-form { display: flex; flex-direction: column; gap: 9px; }
+.player-setup-screen .player-setup-field { display: grid; grid-template-columns: 43px minmax(0,1fr); align-items: start; gap: 11px; min-width: 0; }
+.player-setup-screen .player-setup-field-icon { display: grid; place-items: center; width: 43px; height: 43px; margin-top: 18px; border: 1px solid rgba(0,235,200,.35); border-radius: 11px; background: rgba(0,70,86,.28); font-size: 22px; }
 .player-setup-screen .player-setup-field-content { min-width: 0; }
-.player-setup-screen .player-setup-field-content label {
-  display: block; margin: 0 0 9px; color: #f5f7ff;
-  font-size: 12px; font-weight: 900; letter-spacing: .16em;
-}
+.player-setup-screen .player-setup-field-content label { display: flex; align-items: center; gap: 7px; margin: 0 0 5px; color: #eaf5fb; font-size: 10px; font-weight: 900; letter-spacing: .12em; }
+.player-setup-screen .player-setup-field-content label > span:first-child { color: #25ffc5; }
+.player-setup-screen .player-setup-field-check { margin-left: auto; color: #25ffc5; opacity: 0; }
+.player-setup-screen .player-setup-field.is-complete .player-setup-field-check { opacity: 1; }
+.player-setup-screen .player-setup-optional { margin-left: auto; font-size: 9px; color: #b4c7d3; }
 .player-setup-screen .player-setup-field-content input,
-.player-setup-screen .player-setup-field-content select {
-  display: block; width: 100%; height: 51px; padding: 0 18px;
-  border: 1px solid rgba(172,212,250,.85); border-radius: 12px;
-  outline: none; background: rgba(0,13,27,.85); color: #fff;
-  font: 500 16px 'Barlow', Arial, sans-serif;
-  transition: border-color .2s, box-shadow .2s;
-}
-.player-setup-screen .player-setup-field-content input::placeholder { color: #94a7bb; }
-.player-setup-screen .player-setup-field-content select { color-scheme: dark; }
+.player-setup-screen .player-setup-field-content select { display: block; width: 100%; min-width: 0; height: 44px; padding: 0 14px; border: 1px solid rgba(121,185,215,.6); border-radius: 11px; outline: none; color: #fff; background: rgba(0,12,27,.9); color-scheme: dark; font: 500 16px 'Barlow', Arial, sans-serif; }
+.player-setup-screen .player-setup-field-content input::placeholder { color: #a1b4c8; }
 .player-setup-screen .player-setup-field-content input:focus,
-.player-setup-screen .player-setup-field-content select:focus {
-  border-color: #36ffc0; box-shadow: 0 0 0 3px rgba(33,255,172,.14);
-}
-.player-setup-screen .player-setup-field-content small {
-  display: block; margin-top: 9px; color: #9bb6d0;
-  font-size: 12px; line-height: 1.5;
-}
-.player-setup-screen .player-setup-rewards {
-  display: flex; flex-direction: column; gap: 7px; margin-top: 4px;
-  padding: 16px 18px; border: 1px solid #00ed99; border-radius: 17px;
-  background: linear-gradient(140deg,rgba(1,16,30,.95),rgba(0,36,30,.8));
-  box-shadow: inset 0 0 28px rgba(0,235,149,.06),0 0 26px rgba(0,244,145,.07);
-}
-.player-setup-screen .player-setup-reward-row {
-  display: grid; grid-template-columns: 52px minmax(0,1fr) auto;
-  align-items: center; gap: 13px; min-height: 49px;
-  color: #e2e9ff; font-weight: 900;
-  font-size: clamp(11px,1.8vw,17px); letter-spacing: .035em;
-}
-.player-setup-screen .player-setup-reward-icon {
-  display: grid; place-items: center; width: 48px; height: 48px;
-  border: 1px solid currentColor; border-radius: 13px; font-size: 25px;
-}
-.player-setup-screen .player-setup-reward-icon--welcome { color: #dc66ff; background: rgba(180,40,255,.12); }
-.player-setup-screen .player-setup-reward-icon--referral { color: #41baff; background: rgba(35,130,255,.12); }
-.player-setup-screen .player-setup-reward-icon--total { color: #25ffa2; background: rgba(15,245,133,.12); }
-.player-setup-screen .player-setup-reward-row strong {
-  white-space: nowrap; color: #fff;
-  font: italic 900 clamp(23px,4.8vw,38px)/1 'Barlow Condensed', Impact, sans-serif;
-  letter-spacing: 0;
-}
-.player-setup-screen .player-setup-reward-row strong small { font-size: .65em; }
-.player-setup-screen .player-setup-reward-row--total {
-  border-top: 1px solid rgba(45,255,177,.27); padding-top: 15px; margin-top: 4px;
-}
-.player-setup-screen .player-setup-reward-row--total strong {
-  color: #26ffab; font-size: clamp(31px,5.5vw,49px);
-}
-.player-setup-screen .player-setup-submit {
-  width: 100%; min-height: 59px; border: 1px solid #ffe48d;
-  border-radius: 16px; background: linear-gradient(180deg,#ffdb52,#ffbc19);
-  box-shadow: 0 9px 28px rgba(255,190,25,.2),inset 0 1px 0 rgba(255,255,255,.55);
-  color: #10110d;
-  font: italic 900 clamp(21px,4vw,31px) 'Barlow Condensed',Impact,sans-serif;
-  cursor: pointer; transition: transform .2s, filter .2s;
-}
-.player-setup-screen .player-setup-submit:hover:not(:disabled) {
-  transform: translateY(-2px); filter: brightness(1.06);
-}
+.player-setup-screen .player-setup-field-content select:focus { border-color: #1fffc2; box-shadow: 0 0 0 2px rgba(0,255,185,.14); }
+.player-setup-screen .player-setup-field-content small { display: block; margin-top: 5px; color: #a6bbca; font-size: 11px; line-height: 1.35; }
+.player-setup-screen .player-setup-rewards { display: flex; flex-direction: column; gap: 2px; margin-top: 1px; padding: 9px 12px; border: 1px solid rgba(0,239,158,.85); border-radius: 15px; background: linear-gradient(140deg,rgba(0,40,46,.72),rgba(0,26,29,.9)); }
+.player-setup-screen .player-setup-rewards-heading { display: flex; justify-content: space-between; gap: 8px; padding-bottom: 5px; border-bottom: 1px solid rgba(28,255,184,.2); color: #b8cbd0; font-size: 9px; font-weight: 800; letter-spacing: .06em; }
+.player-setup-screen .player-setup-rewards-heading span:first-child { color: #2affbd; }
+.player-setup-screen .player-setup-reward-row { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; align-items: center; gap: 9px; min-height: 40px; color: #e9f4fc; font-size: 12px; font-weight: 900; letter-spacing: .025em; }
+.player-setup-screen .player-setup-reward-icon { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid currentColor; border-radius: 10px; font-size: 19px; }
+.player-setup-screen .player-setup-reward-icon--welcome { color: #d969ff; background: rgba(180,40,255,.12); }
+.player-setup-screen .player-setup-reward-icon--referral { color: #43baff; background: rgba(35,130,255,.12); }
+.player-setup-screen .player-setup-reward-icon--total { color: #26ffa3; background: rgba(15,245,133,.12); }
+.player-setup-screen .player-setup-reward-row strong { white-space: nowrap; color: white; font: italic 900 25px/1 'Barlow Condensed', Impact, sans-serif; }
+.player-setup-screen .player-setup-reward-row strong small { font-size: .55em; }
+.player-setup-screen .player-setup-reward-row--total { margin-top: 2px; padding-top: 5px; border-top: 1px solid rgba(45,255,177,.27); }
+.player-setup-screen .player-setup-reward-row--total strong { color: #26ffab; font-size: 31px; }
+.player-setup-screen .player-setup-submit { display: block; width: 100%; min-height: 50px; border: 1px solid #ffe48d; border-radius: 12px; background: linear-gradient(180deg,#ffdc54,#ffbd20); color: #10110d; font: italic 900 24px 'Barlow Condensed',Impact,sans-serif; cursor: pointer; }
+.player-setup-screen .player-setup-submit:hover:not(:disabled) { filter: brightness(1.06); }
 .player-setup-screen .player-setup-submit:disabled { opacity: .65; cursor: wait; }
-.player-setup-screen .player-setup-footnote {
-  margin: -11px 0 0; text-align: center; color: #9bb9b7; font-size: 12px;
+.player-setup-screen .player-setup-footnote { margin: -3px 0 0; text-align: center; color: #a4bec5; font-size: 11px; }
+.player-setup-screen .player-setup-error { margin-bottom: 10px; padding: 11px; border: 1px solid #a74d58; border-radius: 10px; color: #ffe2e2; background: rgba(100,14,25,.65); font-size: 13px; }
+
+/* En pantallas bajas permitimos scroll del documento, sin scroll interno de la tarjeta. */
+@media (min-width: 901px) and (max-height: 740px) {
+  .player-setup-screen .player-setup-layout.player-setup-layout--split { align-items: start; padding-top: 12px; }
+  .player-setup-screen .player-setup-left { padding-top: 22px; }
 }
-.player-setup-screen .player-setup-error {
-  margin-bottom: 20px; padding: 13px 16px;
-  border: 1px solid rgba(255,105,105,.55); border-radius: 10px;
-  color: #ffd3d3; background: rgba(100,14,25,.55); font-size: 13px;
+@media (max-width: 900px) {
+  .player-setup-screen .player-setup-layout.player-setup-layout--split {
+    display: flex; flex-direction: column; align-items: stretch;
+    gap: 10px; width: min(520px, calc(100% - 24px));
+    min-height: 100dvh; padding: 14px 0 32px;
+  }
+  .player-setup-screen .player-setup-left { gap: 3px; }
+  .player-setup-screen .player-setup-crown { font-size: 24px; }
+  .player-setup-screen .player-setup-hero h1 { font-size: clamp(48px, 11vw, 68px); }
+  .player-setup-screen .player-setup-panel { padding: 16px 14px; border-radius: 17px; }
+  .player-setup-screen .player-setup-console-heading h2 { font-size: clamp(24px, 6vw, 31px); }
+  .player-setup-screen .player-setup-form { gap: 12px; }
+  .player-setup-screen .player-setup-reward-row { font-size: 11px; }
+  .player-setup-screen .player-setup-reward-row strong { font-size: 23px; }
+  .player-setup-screen .player-setup-reward-row--total strong { font-size: 29px; }
+  .player-setup-screen .player-setup-submit { min-height: 53px; font-size: 23px; }
 }
 @media (max-width: 600px) {
-  .player-setup-screen .player-setup-layout {
-    width: calc(100% - 20px); padding: 18px 0 24px;
-  }
-  .player-setup-screen .player-setup-hero { margin-bottom: 14px; }
-  .player-setup-screen .player-setup-hero h1 {
-    font-size: clamp(53px,13vw,69px); line-height: .9;
-  }
-  .player-setup-screen .player-setup-kicker { letter-spacing: .18em; }
-  .player-setup-screen .player-setup-panel { padding: 16px 12px; border-radius: 18px; }
-  .player-setup-screen .player-setup-form { gap: 18px; }
-  .player-setup-screen .player-setup-field {
-    grid-template-columns: 38px minmax(0,1fr); gap: 9px;
-  }
-  .player-setup-screen .player-setup-field-icon {
-    width: 38px; height: 43px; border-radius: 11px; font-size: 20px;
-  }
-  .player-setup-screen .player-setup-field-content label {
-    font-size: 11px; letter-spacing: .08em;
-  }
+  .player-setup-screen .player-setup-layout.player-setup-layout--split { gap: 8px; }
+  .player-setup-screen .player-setup-hero h1 { font-size: clamp(44px, 12vw, 60px); }
   .player-setup-screen .player-setup-field-content input,
-  .player-setup-screen .player-setup-field-content select {
-    height: 48px; padding: 0 12px; font-size: 14px;
-  }
-  .player-setup-screen .player-setup-rewards { padding: 13px 10px; gap: 8px; }
-  .player-setup-screen .player-setup-reward-row {
-    grid-template-columns: 38px minmax(0,1fr) auto;
-    gap: 8px; min-height: 46px; font-size: 11px; letter-spacing: 0;
-  }
-  .player-setup-screen .player-setup-reward-icon {
-    width: 36px; height: 36px; font-size: 19px; border-radius: 9px;
-  }
-  .player-setup-screen .player-setup-reward-row strong { font-size: 24px; }
-  .player-setup-screen .player-setup-reward-row strong small { font-size: .55em; }
-  .player-setup-screen .player-setup-reward-row--total strong { font-size: 30px; }
-  .player-setup-screen .player-setup-submit { min-height: 56px; font-size: 21px; }
+  .player-setup-screen .player-setup-field-content select { min-height: 48px; font-size: 16px; }
+  .player-setup-screen .player-setup-reward-row { font-size: 12px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .player-setup-screen .player-setup-submit { transition: none; }
+@media (max-width: 390px) {
+  .player-setup-screen .player-setup-layout.player-setup-layout--split { width: calc(100% - 16px); }
+  .player-setup-screen .player-setup-panel { padding: 14px 11px; }
+  .player-setup-screen .player-setup-field { grid-template-columns: 35px minmax(0,1fr); gap: 8px; }
+  .player-setup-screen .player-setup-field-icon { width: 35px; height: 40px; font-size: 19px; }
+  .player-setup-screen .player-setup-rewards { padding: 9px 8px; }
+  .player-setup-screen .player-setup-reward-row { grid-template-columns: 30px minmax(0,1fr) auto; gap: 6px; font-size: 10px; }
+  .player-setup-screen .player-setup-reward-icon { width: 29px; height: 29px; font-size: 16px; }
+  .player-setup-screen .player-setup-reward-row strong { font-size: 21px; }
+  .player-setup-screen .player-setup-reward-row--total strong { font-size: 27px; }
 }
 
-/* ===============================================
-   DOS COLUMNAS — desktop sin scroll vertical
-   =============================================== */
-@media (min-width: 901px) and (min-height: 620px) {
-  .auth-screen.player-setup-screen {
-    height: 100dvh;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .player-setup-screen .player-setup-layout--split {
-    width: min(1220px, calc(100% - 64px));
-    height: 100dvh;
-    padding: 24px 0;
-    display: grid;
-    grid-template-columns: minmax(0, .9fr) minmax(0, 1fr);
-    gap: clamp(24px, 4vw, 72px);
-    align-items: center;
-  }
-  .player-setup-screen .player-setup-hero {
-    margin: 0;
-    align-self: center;
-    text-align: left;
-    padding: 20px 0 140px;
-  }
-  .player-setup-screen .player-setup-crown { font-size: 38px; }
-  .player-setup-screen .player-setup-hero h1 {
-    font-size: clamp(64px, 6.5vw, 108px);
-    line-height: .84;
-    margin: 10px 0 14px;
-  }
-  .player-setup-screen .player-setup-kicker {
-    margin-top: 14px;
-    font-size: 12px;
-    letter-spacing: .18em;
-  }
-  .player-setup-screen .player-setup-panel {
-    width: 100%;
-    max-height: calc(100dvh - 36px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    padding: clamp(16px, 2.2vh, 26px);
-    border-radius: 20px;
-    scrollbar-width: thin;
-  }
-  .player-setup-screen .player-setup-form { gap: clamp(9px, 1.5vh, 16px); }
-  .player-setup-screen .player-setup-field {
-    grid-template-columns: 42px minmax(0, 1fr);
-    gap: 12px;
-  }
-  .player-setup-screen .player-setup-field-icon {
-    width: 42px; height: 44px; margin-top: 18px;
-    font-size: 22px; border-radius: 12px;
-  }
-  .player-setup-screen .player-setup-field-content label {
-    font-size: 10px; margin-bottom: 6px;
-  }
-  .player-setup-screen .player-setup-field-content input,
-  .player-setup-screen .player-setup-field-content select {
-    height: clamp(40px, 5.7vh, 49px);
-    font-size: 14px;
-  }
-  .player-setup-screen .player-setup-field-content small {
-    margin-top: 5px; font-size: 11px;
-  }
-  .player-setup-screen .player-setup-rewards {
-    gap: 2px; padding: 9px 14px; margin-top: 0;
-  }
-  .player-setup-screen .player-setup-reward-row {
-    grid-template-columns: 34px minmax(0,1fr) auto;
-    gap: 9px; min-height: 40px; font-size: 11px;
-  }
-  .player-setup-screen .player-setup-reward-icon {
-    width: 31px; height: 31px; font-size: 17px;
-  }
-  .player-setup-screen .player-setup-reward-row strong { font-size: 23px; }
-  .player-setup-screen .player-setup-reward-row--total {
-    margin-top: 3px; padding-top: 6px;
-  }
-  .player-setup-screen .player-setup-reward-row--total strong { font-size: 30px; }
-  .player-setup-screen .player-setup-submit {
-    min-height: 50px; font-size: 23px; border-radius: 12px;
-  }
-  .player-setup-screen .player-setup-footnote {
-    margin: -5px 0 0; font-size: 11px;
-  }
-  /* El lobo queda detrás del bloque izquierdo, sin perder el estadio. */
-  .player-setup-screen .auth-stage__scene {
-    background-position: 58% center;
-  }
-}
-/* En alturas reducidas se permite scroll para no ocultar campos. */
-@media (min-width: 901px) and (max-height: 619px) {
-  .player-setup-screen .player-setup-layout--split {
-    width: min(1120px, calc(100% - 40px));
-    display: grid;
-    grid-template-columns: .85fr 1fr;
-    gap: 32px;
-    align-items: start;
-  }
-}
-/* Ajustes finales: onboarding en dos columnas */
-
+/* Desktop: una pantalla, sin achicar el formulario a niveles ilegibles. */
 @media (min-width: 901px) {
-  .player-setup-screen .player-setup-panel {
-    padding: 18px 24px;
-  }
-
-  .player-setup-screen .player-setup-form {
-    gap: 12px;
-  }
-
-  .player-setup-screen .player-setup-rewards {
-    padding: 10px 16px;
-    gap: 4px;
-    margin-top: 0;
-  }
-
-  .player-setup-screen .player-setup-reward-row {
-    min-height: 43px;
-  }
-
-  .player-setup-screen .player-setup-reward-icon {
-    width: 39px;
-    height: 39px;
-    font-size: 21px;
-  }
-
-  .player-setup-screen .player-setup-reward-row--total {
-    padding-top: 8px;
-    margin-top: 2px;
-  }
-
-  .player-setup-screen .player-setup-submit {
-    min-height: 52px;
-    font-size: 23px;
-  }
-
-  .player-setup-screen .player-setup-field-content input,
-  .player-setup-screen .player-setup-field-content select {
-    height: 46px;
-  }
-
-  .player-setup-screen .player-setup-field-icon {
-    height: 46px;
-    width: 46px;
-  }
-}
-/* ============================================================
-   LUPI WORLD / PLAYER SETUP — CINEMATIC STADIUM ATMOSPHERE
-   Reutiliza auth-stage y sus animaciones del login.
-   Los reflectores convergentes siguen la dirección del lobby.
-   ============================================================ */
-.player-setup-screen { isolation: isolate; }
-.player-setup-screen .auth-stage {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.player-setup-screen .auth-stage__scene { animation: auth-camera 32s ease-in-out infinite alternate; }
-.player-setup-screen .auth-stage__spot { z-index: 2; opacity: .16; }
-.player-setup-screen .auth-stage__particles { z-index: 5; opacity: .20; }
-.player-setup-screen .auth-stage__light-sweep { z-index: 4; opacity: .12; }
-.player-setup-screen .auth-stage__fog { z-index: 3; }
-.player-setup-screen .auth-stage__vignette { z-index: 6; }
-.player-setup-screen .auth-stage__grain { z-index: 7; }
-.player-setup-screen .player-setup-layout { position: relative; z-index: 10; }
-
-.player-setup-screen .player-setup-stadium-lights {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  overflow: hidden;
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
-.player-setup-screen .player-setup-stadium-beam {
-  position: absolute;
-  top: -5%;
-  width: min(49vw, 690px);
-  height: 78vh;
-  opacity: .29;
-  filter: blur(11px);
-  background: linear-gradient(180deg, rgba(220,249,255,.72) 0%, rgba(95,220,255,.30) 32%, rgba(0,255,198,.08) 70%, transparent 100%);
-  will-change: transform;
-}
-.player-setup-screen .player-setup-stadium-beam--left {
-  left: -4%;
-  clip-path: polygon(0 0, 13% 0, 100% 100%, 54% 100%);
-  transform-origin: 0 0;
-  animation: lupi-onboard-beam-left 12s ease-in-out infinite alternate;
-}
-.player-setup-screen .player-setup-stadium-beam--right {
-  right: -4%;
-  clip-path: polygon(87% 0, 100% 0, 46% 100%, 0 100%);
-  transform-origin: 100% 0;
-  animation: lupi-onboard-beam-right 14s ease-in-out infinite alternate;
-}
-.player-setup-screen .player-setup-stadium-flare {
-  position: absolute;
-  top: 8%;
-  width: clamp(130px, 20vw, 290px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(242,255,255,.6) 0%, rgba(103,222,255,.28) 12%, rgba(25,165,220,.08) 35%, transparent 70%);
-  filter: blur(9px);
-  opacity: .56;
-  animation: lupi-onboard-flare 5s ease-in-out infinite;
-}
-.player-setup-screen .player-setup-stadium-flare--left { left: -6%; }
-.player-setup-screen .player-setup-stadium-flare--right { right: -6%; animation-delay: -2.5s; }
-
-/* Entrada de la interfaz: una vez, sin ocultar campos mientras se escribe */
-.player-setup-screen .player-setup-left { animation: lupi-onboard-enter-left .85s cubic-bezier(.2,.7,.2,1) both; }
-.player-setup-screen .player-setup-panel { animation: lupi-onboard-enter-right .85s cubic-bezier(.2,.7,.2,1) both; }
-.player-setup-screen .player-setup-avatar-preview {
-  position: relative;
-  isolation: isolate;
-  box-shadow: 0 0 18px rgba(0,255,190,.13), 0 0 42px rgba(0,140,255,.10);
-  animation: lupi-onboard-card-breathe 5s ease-in-out infinite;
-}
-.player-setup-screen .player-setup-avatar-art::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  inset: -70% 0;
-  pointer-events: none;
-  background: linear-gradient(180deg,transparent 43%,rgba(130,255,237,.0) 47%,rgba(140,255,242,.19) 50%,rgba(130,255,237,.0) 53%,transparent 57%);
-  animation: lupi-onboard-card-scan 8s linear infinite;
-}
-.player-setup-screen .player-setup-submit {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  box-shadow: 0 0 20px rgba(255,199,52,.16);
-}
-.player-setup-screen .player-setup-submit::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  transform: translateX(-160%) skewX(-20deg);
-  background: linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);
-  animation: lupi-onboard-button-shine 6s ease-in-out infinite;
-}
-@keyframes lupi-onboard-beam-left { from { transform: rotate(-7deg); } to { transform: rotate(5deg); } }
-@keyframes lupi-onboard-beam-right { from { transform: rotate(7deg); } to { transform: rotate(-5deg); } }
-@keyframes lupi-onboard-flare { 50% { opacity: .32; transform: scale(1.12); } }
-@keyframes lupi-onboard-enter-left { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes lupi-onboard-enter-right { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes lupi-onboard-card-breathe { 50% { box-shadow: 0 0 27px rgba(0,255,190,.27),0 0 55px rgba(0,140,255,.16); } }
-@keyframes lupi-onboard-card-scan { from { transform: translateY(-65%); } to { transform: translateY(65%); } }
-@keyframes lupi-onboard-button-shine { 0%, 68% { transform: translateX(-160%) skewX(-20deg); } 85%, 100% { transform: translateX(160%) skewX(-20deg); } }
-
-@media (max-width: 900px) {
-  .player-setup-screen .player-setup-stadium-beam { width: 62vw; height: 55dvh; opacity: .16; filter: blur(14px); }
-  .player-setup-screen .player-setup-stadium-flare { opacity: .28; }
-  .player-setup-screen .auth-stage__particles { opacity: .12; }
-  .player-setup-screen .player-setup-left,
-  .player-setup-screen .player-setup-panel { animation-duration: .6s; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .player-setup-screen .auth-stage__scene,
-  .player-setup-screen .auth-stage__spot,
-  .player-setup-screen .auth-stage__fog,
-  .player-setup-screen .auth-stage__particles,
-  .player-setup-screen .auth-stage__light-sweep,
-  .player-setup-screen .player-setup-stadium-beam,
-  .player-setup-screen .player-setup-stadium-flare,
-  .player-setup-screen .player-setup-left,
-  .player-setup-screen .player-setup-panel,
-  .player-setup-screen .player-setup-avatar-preview,
-  .player-setup-screen .player-setup-avatar-art::after,
-  .player-setup-screen .player-setup-submit::after { animation: none !important; }
-}
-
-
-/* PLAYER REVEAL — reemplaza las tarjetas y video anteriores */
-.player-setup-screen .player-setup-left { min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px; }
-.player-setup-screen .player-setup-left .player-setup-hero { padding:0;margin:0;text-align:center;align-self:center;width:100%; }
-.player-setup-screen .player-setup-left .player-setup-hero h1 { font-size:clamp(52px,5.3vw,84px); }
-@media (min-width:901px) and (min-height:620px) {
- .player-setup-screen .player-setup-layout--split {grid-template-columns:minmax(0,.9fr) minmax(0,1fr);}
- .player-setup-screen .player-setup-left .player-setup-hero {padding:0;}
-}
-@media (max-width:900px) {
- .player-setup-screen .player-setup-left {gap:8px;}
- .player-setup-screen .player-setup-left .player-setup-hero {padding:0;}
-}
-/* Añadir al FINAL de PlayerOnboarding.css, después de los estilos existentes. */
-/* Evita que las reglas heredadas del antiguo video enmarquen la nueva escena. */
-.player-setup-screen .player-setup-avatar-preview {
-  width: 100%;
-  height: auto;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-  overflow: visible;
-  animation: none;
-}
-.player-setup-screen .player-setup-avatar-preview::before,
-.player-setup-screen .player-setup-avatar-preview::after { content: none; }
-.player-setup-screen .player-setup-left { position: relative; z-index: 2; }
-/* El componente nuevo ya renderiza la placa: ocultar la placa antigua si quedó en el TSX. */
-.player-setup-screen .player-setup-avatar-preview > .player-setup-avatar-caption { display: none; }
-/* Si la imagen antigua tenía filtros de póster, neutralizarlos en la escena nueva. */
-.player-setup-screen .lupi-reveal__character { opacity: 1; visibility: visible; }
-
-
-/* ==========================================================
-   PLAYER SETUP AAA / Consola de configuración
-   Mantiene el layout, el PlayerReveal y la lógica originales.
-   ========================================================== */
-.player-setup-screen .player-setup-panel {
-  position: relative;
-  isolation: isolate;
-  border: 1px solid rgba(42, 232, 203, .68);
-  background: linear-gradient(153deg, rgba(4, 23, 42, .97), rgba(1, 13, 27, .985) 58%, rgba(0, 27, 32, .96));
-  box-shadow: 0 25px 85px rgba(0, 0, 0, .65), 0 0 38px rgba(0, 255, 199, .07), inset 0 1px rgba(191, 255, 246, .10);
-}
-.player-setup-screen .player-setup-panel::before {
-  content: ""; position: absolute; inset: 0 0 auto; height: 2px;
-  background: linear-gradient(90deg, transparent, #1dfbc5 38%, #63cfff 70%, transparent);
-  opacity: .8; pointer-events: none;
-}
-.player-setup-console-header { margin-bottom: 17px; }
-.player-setup-console-eyebrow { display:flex; align-items:center; gap:9px; color:#39ffce; font:800 10px 'Barlow',sans-serif; letter-spacing:.18em; }
-.player-setup-online-dot { width:7px; height:7px; border-radius:50%; background:#25ffbc; box-shadow:0 0 11px #25ffbc; }
-.player-setup-console-separator { opacity:.5; }
-.player-setup-console-heading { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:10px; }
-.player-setup-console-heading h2 { margin:0; color:white; font:italic 900 clamp(24px,2.65vw,34px)/.95 'Barlow Condensed',Impact,sans-serif; letter-spacing:.015em; }
-.player-setup-console-heading h2 em { color:#26ffbd; font-style:inherit; }
-.player-setup-console-heading p { margin:7px 0 0; color:#9fb5ca; font-size:12px; }
-.player-setup-console-level { flex-shrink:0; display:flex; align-items:baseline; gap:2px; padding:8px 10px; border:1px solid rgba(41,255,199,.35); border-radius:10px; color:#31ffc5; background:rgba(6,63,69,.27); font:900 24px 'Barlow Condensed',sans-serif; }
-.player-setup-console-level span { font-size:12px; color:#86adba; }
-.player-setup-console-progress { height:2px; margin-top:14px; background:rgba(95,176,192,.19); overflow:hidden; }
-.player-setup-console-progress span { display:block; width:100%; height:100%; background:linear-gradient(90deg,#0cceae,#2affb7); box-shadow:0 0 12px #00ffbe; }
-.player-setup-screen .player-setup-field { position:relative; }
-.player-setup-screen .player-setup-field-icon { background:linear-gradient(155deg,rgba(0,101,116,.30),rgba(0,23,42,.94)); border-color:rgba(35,220,200,.30); box-shadow:inset 0 1px rgba(255,255,255,.06); transition:border-color .2s,box-shadow .2s,transform .2s; }
-.player-setup-screen .player-setup-field:focus-within .player-setup-field-icon { border-color:#24ffc1; box-shadow:0 0 22px rgba(20,255,195,.16); transform:translateY(-1px); }
-.player-setup-screen .player-setup-field-content label { display:flex; align-items:center; gap:8px; color:#dfeef6; }
-.player-setup-screen .player-setup-field-content label > span:first-child { color:#2df5c1; font-size:10px; letter-spacing:.08em; }
-.player-setup-field-check { margin-left:auto; color:#27ffc4; opacity:0; transform:scale(.6); transition:opacity .2s,transform .2s; }
-.player-setup-field.is-complete .player-setup-field-check { opacity:1; transform:scale(1); }
-.player-setup-optional { margin-left:auto; font-size:9px; color:#9ab2c5; letter-spacing:.05em; }
-.player-setup-screen .player-setup-field-content input,
-.player-setup-screen .player-setup-field-content select { background:rgba(0,11,25,.78); border-color:rgba(128,190,220,.55); box-shadow:inset 0 2px 10px rgba(0,0,0,.12); transition:border-color .2s,box-shadow .2s,background .2s; }
-.player-setup-screen .player-setup-field-content input:hover:not(:disabled),
-.player-setup-screen .player-setup-field-content select:hover:not(:disabled) { border-color:rgba(60,242,209,.8); }
-.player-setup-screen .player-setup-field-content input:focus-visible,
-.player-setup-screen .player-setup-field-content select:focus-visible { border-color:#21ffc3; background:rgba(0,20,33,.94); box-shadow:0 0 0 2px rgba(24,255,191,.16),0 0 22px rgba(0,255,192,.09); }
-.player-setup-screen .player-setup-rewards { position:relative; border-color:rgba(25,243,176,.75); background:linear-gradient(140deg,rgba(2,34,43,.96),rgba(0,25,29,.94)); box-shadow:inset 0 1px rgba(155,255,229,.07),0 0 26px rgba(0,244,145,.07); }
-.player-setup-rewards-heading { display:flex; justify-content:space-between; align-items:center; gap:10px; padding-bottom:7px; margin-bottom:2px; border-bottom:1px solid rgba(35,255,180,.16); color:#a4bec9; font-size:9px; font-weight:800; letter-spacing:.11em; }
-.player-setup-rewards-heading span:first-child { color:#26ffc3; }
-.player-setup-screen .player-setup-reward-row--total { background:linear-gradient(90deg,rgba(0,255,180,.04),transparent); }
-.player-setup-screen .player-setup-submit { letter-spacing:.025em; text-shadow:0 1px rgba(255,255,255,.22); box-shadow:0 9px 27px rgba(255,186,24,.20),inset 0 1px rgba(255,255,255,.6); }
-.player-setup-screen .player-setup-submit:focus-visible { outline:3px solid #fff; outline-offset:3px; }
-@media (min-width:901px) and (min-height:620px) {
- .player-setup-screen .player-setup-panel { padding:clamp(14px,2vh,21px) 23px; }
- .player-setup-console-header { margin-bottom:12px; }
- .player-setup-console-heading { margin-top:7px; }
- .player-setup-console-heading h2 { font-size:clamp(23px,2.3vw,30px); }
- .player-setup-console-heading p { margin-top:4px; }
- .player-setup-console-progress { margin-top:10px; }
- .player-setup-screen .player-setup-form { gap:clamp(8px,1.2vh,13px); }
- .player-setup-screen .player-setup-rewards { padding:9px 13px; }
- .player-setup-rewards-heading { padding-bottom:5px; }
-}
-@media (max-width:900px) {
- .player-setup-screen .player-setup-panel { width:100%; }
- .player-setup-console-header { margin-bottom:14px; }
- .player-setup-console-heading h2 { font-size:clamp(23px,6vw,31px); }
- .player-setup-console-heading p { font-size:12px; }
- .player-setup-screen .player-setup-field-content input,
- .player-setup-screen .player-setup-field-content select { font-size:16px; }
-}
-@media (max-width:400px) {
- .player-setup-console-level { font-size:20px; padding:7px; }
- .player-setup-rewards-heading { font-size:8px; letter-spacing:.04em; }
- .player-setup-screen .player-setup-panel { padding:15px 12px; }
-}
-@media (prefers-reduced-motion:reduce) {
- .player-setup-screen .player-setup-field-icon,
- .player-setup-field-check { transition:none; }
-}
-/* ============================================================
-   LUPI WORLD — RESPONSIVE LAYOUT CONSOLIDADO
-   Evita panel recortado y scroll interno en escritorio.
-   ============================================================ */
-@media (min-width: 901px) {
-  .auth-screen.player-setup-screen {
-    height: auto;
+  .player-setup-screen .player-setup-layout.player-setup-layout--split {
     min-height: 100dvh;
-    overflow-x: clip;
-    overflow-y: auto;
+    padding-block: 8px;
+    gap: clamp(14px, 2vw, 30px);
   }
-  .player-setup-screen .player-setup-layout--split {
-    width: min(1220px, calc(100% - 48px));
-    min-height: 100dvh;
-    height: auto;
-    padding: 12px 0;
-    display: grid;
-    grid-template-columns: minmax(0, .9fr) minmax(0, 1fr);
-    gap: clamp(20px, 3vw, 56px);
-    align-items: center;
-  }
-  .player-setup-screen .player-setup-panel {
-    width: 100%;
-    max-height: none;
-    overflow: visible;
-    padding: 12px 20px;
-  }
-  .player-setup-console-header { margin-bottom: 8px; }
-  .player-setup-console-heading { margin-top: 5px; }
-  .player-setup-console-heading p { margin-top: 3px; }
-  .player-setup-console-progress { margin-top: 7px; }
+  .player-setup-screen .player-setup-left { gap: 4px; }
+  .player-setup-screen .player-setup-panel { padding: 12px 18px; }
+  .player-setup-screen .player-setup-console-header { margin-bottom: 7px; }
+  .player-setup-screen .player-setup-console-heading { margin-top: 5px; }
+  .player-setup-screen .player-setup-console-progress { margin-top: 6px; }
   .player-setup-screen .player-setup-form { gap: 7px; }
-  .player-setup-screen .player-setup-field-content label { margin-bottom: 4px; }
   .player-setup-screen .player-setup-field-content input,
   .player-setup-screen .player-setup-field-content select { height: 42px; }
-  .player-setup-screen .player-setup-field-icon {
-    width: 42px; height: 42px; margin-top: 16px;
-  }
-  .player-setup-screen .player-setup-field-content small {
-    margin-top: 4px; line-height: 1.3;
-  }
-  .player-setup-screen .player-setup-rewards {
-    padding: 6px 12px; gap: 1px; margin-top: 0;
-  }
-  .player-setup-rewards-heading { padding-bottom: 4px; margin-bottom: 0; }
-  .player-setup-screen .player-setup-reward-row { min-height: 36px; gap: 8px; }
-  .player-setup-screen .player-setup-reward-icon {
-    width: 31px; height: 31px; font-size: 17px;
-  }
-  .player-setup-screen .player-setup-reward-row--total {
-    padding-top: 4px; margin-top: 1px;
-  }
+  .player-setup-screen .player-setup-field-icon { width: 42px; height: 42px; }
+  .player-setup-screen .player-setup-field-content small { margin-top: 3px; }
+  .player-setup-screen .player-setup-rewards { padding: 6px 10px; gap: 0; }
+  .player-setup-screen .player-setup-reward-row { min-height: 37px; }
+  .player-setup-screen .player-setup-reward-icon { width: 31px; height: 31px; }
+  .player-setup-screen .player-setup-reward-row--total { padding-top: 3px; }
   .player-setup-screen .player-setup-submit { min-height: 46px; }
-  .player-setup-screen .player-setup-footnote { margin: 0; }
 }
-@media (min-width: 901px) and (max-height: 720px) {
-  .player-setup-screen .player-setup-layout--split {
-    align-items: start;
-    padding-top: 10px;
-    padding-bottom: 18px;
-  }
-  .player-setup-screen .player-setup-left { padding-top: 20px; }
-  .player-setup-screen .lupi-reveal { height: 285px; min-height: 285px; }
-}
-@media (max-width: 900px) {
-  .auth-screen.player-setup-screen {
-    height: auto;
-    min-height: 100dvh;
-    overflow-x: clip;
-    overflow-y: auto;
-  }
-  .player-setup-screen .player-setup-layout--split {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    width: min(calc(100% - 24px), 540px);
-    min-height: 100dvh;
-    height: auto;
-    margin-inline: auto;
-    padding: 12px 0 24px;
-    gap: 12px;
-  }
-  .player-setup-screen .player-setup-left,
-  .player-setup-screen .player-setup-panel {
-    width: 100%; min-width: 0; max-height: none; overflow: visible;
-  }
-  .player-setup-screen .lupi-reveal { height: 175px; min-height: 175px; }
-  .player-setup-screen .player-setup-panel { padding: 16px 14px; }
-  .player-setup-screen .player-setup-form { gap: 12px; }
-  .player-setup-screen .player-setup-field-content input,
-  .player-setup-screen .player-setup-field-content select {
-    min-height: 44px; font-size: 16px;
-  }
-  .player-setup-screen .player-setup-submit { min-height: 50px; }
+@media (min-width: 901px) and (max-height: 740px) {
+  .player-setup-screen .player-setup-layout.player-setup-layout--split { align-items: center; padding-block: 6px; }
+  .player-setup-screen .player-setup-left { padding-top: 0; }
+  .player-setup-screen .player-setup-crown { font-size: 27px; }
+  .player-setup-screen .player-setup-hero h1 { font-size: clamp(48px, 5vw, 69px); }
+  .player-setup-screen .player-setup-panel { padding: 10px 16px; }
+  .player-setup-screen .player-setup-console-heading h2 { font-size: 27px; }
+  .player-setup-screen .player-setup-console-heading p { font-size: 11px; }
+  .player-setup-screen .player-setup-form { gap: 5px; }
+  .player-setup-screen .player-setup-reward-row { min-height: 34px; }
+  .player-setup-screen .player-setup-reward-row strong { font-size: 23px; }
+  .player-setup-screen .player-setup-reward-row--total strong { font-size: 27px; }
+  .player-setup-screen .player-setup-submit { min-height: 43px; }
 }

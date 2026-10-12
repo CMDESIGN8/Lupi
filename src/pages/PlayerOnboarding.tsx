@@ -80,8 +80,6 @@ export function PlayerOnboarding({ onComplete }: Props) {
           <header className="player-setup-hero">
             <span className="player-setup-crown" aria-hidden="true">♛</span>
             <h1>CREÁ TU <em>JUGADOR</em></h1>
-            <span className="player-setup-kicker">PLAYER SETUP · LUPI WORLD</span>
-            <p>Tu historia empieza en la cancha.</p>
           </header>
 
           <PlayerReveal username={username} club={club} />
