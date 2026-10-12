@@ -176,6 +176,13 @@ function npcToCard(npc: any): UnifiedCard {
   };
 }
 
+export function needsPlayerOnboarding(user: AppUser): boolean {
+  return (
+    user.username.startsWith("player_") ||
+    user.club === "SIN CLUB"
+  );
+}
+
 export const api = {
   register: async ({ email, username, club, password, referralCode }: RegisterData): Promise<AppUser> => {
     console.log('🔵 Iniciando registro con datos:', { email, username, club, referralCode });
@@ -291,6 +298,55 @@ export const api = {
 
     return profileData;
   },
+
+  completeGoogleProfile: async ({
+  username,
+  club,
+}: {
+  username: string;
+  club: string;
+}): Promise<AppUser> => {
+  const { data: { user }, error: authError } =
+    await supabase.auth.getUser();
+
+  if (authError || !user) {
+    throw new Error("Tu sesión expiró. Volvé a iniciar sesión.");
+  }
+
+  const cleanUsername = username.trim();
+
+  if (cleanUsername.length < 3) {
+    throw new Error("El nombre debe tener al menos 3 caracteres.");
+  }
+
+  if (cleanUsername.startsWith("player_")) {
+    throw new Error("Elegí otro nombre de jugador.");
+  }
+
+  if (!club || club === "SIN CLUB") {
+    throw new Error("Seleccioná tu club.");
+  }
+
+  const { data: updated, error } = await supabase
+    .from("profiles")
+    .update({
+      username: cleanUsername,
+      club,
+    })
+    .eq("id", user.id)
+    .select("*")
+    .single();
+
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error("Ese nombre de jugador ya está ocupado.");
+    }
+
+    throw new Error(error.message);
+  }
+
+  return updated as AppUser;
+},
 
   // Get current session
   getSession: async (): Promise<AppUser | null> => {
@@ -616,6 +672,19 @@ canShareToday: async (userId: string): Promise<{ canShare: boolean; nextShareDat
   } catch (error) {
     console.error('Error checking share eligibility:', error);
     return { canShare: true };
+  }
+},
+
+signInWithGoogle: async (): Promise<void> => {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: window.location.origin,
+    },
+  });
+
+  if (error) {
+    throw new Error(error.message);
   }
 },
 
