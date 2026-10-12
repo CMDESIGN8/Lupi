@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, type AppUser } from "./lib/api";
+import {
+  api,
+  needsPlayerOnboarding,
+  type AppUser,
+} from "./lib/api";
 import { ToastProvider } from "./components/ToastProvider";
 import { usePendingRewards } from "./hooks/usePendingRewards";
 import { usePushNotifications } from "./hooks/usePushNotifications";
@@ -7,7 +11,8 @@ import { useStreak } from "./hooks/useStreak";
 import { useUserCards } from "./hooks/useUserCards";
 import { useActiveDeck } from "./hooks/useActiveDeck";
 import { useAppNavigation } from "./hooks/useAppNavigation";
-
+import { PlayerOnboarding } from "./pages/PlayerOnboarding";
+import { supabase } from "./lib/supabaseClient";
 import { AuthScreen } from "./pages/AuthScreen";
 import { HomeExperience } from "./pages/HomeExperience";
 import { BenefitsTab } from "./pages/BenefitsTab";
@@ -60,11 +65,49 @@ export default function App() {
   }, [streak.atRisk, streak.current, notifyStreakAtRisk]);
 
   useEffect(() => {
-    api.getSession().then((sessionUser) => {
-      if (sessionUser) setUser(sessionUser);
-      setHydrated(true);
-    });
-  }, []);
+  let mounted = true;
+
+  const refreshSession = async () => {
+    try {
+      const sessionUser = await api.getSession();
+
+      if (mounted) {
+        setUser(sessionUser);
+      }
+    } catch (error) {
+      console.error("Error recuperando sesión:", error);
+    } finally {
+      if (mounted) {
+        setHydrated(true);
+      }
+    }
+  };
+
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event) => {
+    if (
+      event === "SIGNED_IN" ||
+      event === "SIGNED_OUT" ||
+      event === "INITIAL_SESSION"
+    ) {
+      // Evitamos consultar Supabase de forma síncrona
+      // dentro del callback de autenticación.
+      setTimeout(() => {
+        if (mounted) {
+          void refreshSession();
+        }
+      }, 0);
+    }
+  });
+
+  void refreshSession();
+
+  return () => {
+    mounted = false;
+    subscription.unsubscribe();
+  };
+}, []);
 
   const handleAuth = useCallback((authenticatedUser: AppUser) => {
     setUser(authenticatedUser);
@@ -126,7 +169,17 @@ export default function App() {
       </ToastProvider>
     );
   }
-
+if (user && needsPlayerOnboarding(user)) {
+  return (
+    <ToastProvider>
+      <div className="app-wrapper">
+        <ErrorBoundary>
+          <PlayerOnboarding onComplete={handleAuth} />
+        </ErrorBoundary>
+      </div>
+    </ToastProvider>
+  );
+}
   if (!user) {
     return (
       <ToastProvider>

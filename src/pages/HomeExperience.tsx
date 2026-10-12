@@ -132,19 +132,6 @@ const handleMissionDone = async () => {
           </div>
         </section>
 
-        {/* PLAYER RENDER */}
-
-        <UserCardProfile
-  userId={user.id}
-  onLevelUp={(newLevel, newRarity) => {
-    console.log(
-      "🎉 Player Card Level Up:",
-      newLevel,
-      newRarity
-    );
-  }}
-/>
-
         <section className="today-header">
           <div>
             <span className="journey-kicker">TU DÍA</span>
@@ -269,6 +256,18 @@ const handleMissionDone = async () => {
           </div>
           <div className="game-launch-ball">⚽</div>
         </section>
+        {/* PLAYER RENDER */}
+
+        <UserCardProfile
+  userId={user.id}
+  onLevelUp={(newLevel, newRarity) => {
+    console.log(
+      "🎉 Player Card Level Up:",
+      newLevel,
+      newRarity
+    );
+  }}
+/>
         <QuickActions
           onNavigate={onNavigate}
           onOpenPack={() => setShowPackModal(true)}

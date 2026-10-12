@@ -169,91 +169,279 @@
 }
 
 /* ==========================================
-   LUPI WORLD — REGISTRO MÓVIL COMPACTO
+   LUPI WORLD — DESKTOP LAYOUT FIX
    ========================================== */
 
-@media (max-width: 600px) {
+@media (min-width: 901px) {
 
-  /* Solo registro: requiere la clase auth-register */
-  .auth-screen.auth-register .auth-card-v2 {
-    padding: 18px 16px 14px !important;
+  .auth-screen {
+    min-height: 100svh;
+    overflow-x: hidden;
   }
 
-  .auth-screen.auth-register .auth-card-heading {
+  .auth-shell {
+    width: min(100% - 64px, 1440px);
+    min-height: 100svh;
+    margin-inline: auto;
+
+    display: grid;
+    grid-template-columns:
+      minmax(0, 1.25fr)
+      minmax(380px, 0.85fr);
+
+    align-items: center;
+    gap: clamp(24px, 3vw, 56px);
+  }
+
+  /* Presentación izquierda */
+  .auth-intro {
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 32px 0;
+    text-align: center;
+  }
+
+  .auth-intro__spacer {
+    display: none !important;
+  }
+
+  .auth-kicker {
+    margin-bottom: clamp(28px, 5vh, 56px);
+  }
+
+  .auth-intro h1 {
+    margin: 0 0 16px;
+  }
+
+  .auth-intro > p {
+    max-width: 570px;
+    margin: 0 auto 20px;
+  }
+
+  .auth-pillars {
+    width: 100%;
+    max-width: 680px;
+    margin-top: 0;
+  }
+
+  /* Formulario derecho */
+  .auth-card-v2 {
+    width: 100%;
+    max-width: 520px;
+    margin: 24px 0 24px auto;
+    padding: clamp(20px, 2.5vw, 34px);
+    align-self: center;
+  }
+
+  .auth-card-heading {
+    margin-bottom: 14px;
+  }
+
+  .auth-tabs {
+    margin: 14px 0 16px;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
+
+  .form-group {
+    margin: 0;
+  }
+
+  .form-input {
+    min-height: 46px;
+  }
+
+  .auth-submit {
+    min-height: 50px;
+  }
+
+  .auth-rewards {
+    margin-top: 14px;
+  }
+}
+
+/* Pantallas de escritorio bajas */
+@media (min-width: 901px) and (max-height: 760px) {
+
+  .auth-shell {
+    min-height: 100svh;
+  }
+
+  .auth-intro {
+    padding: 12px 0;
+  }
+
+  .auth-kicker {
+    margin-bottom: 22px;
+  }
+
+  .auth-intro h1 {
+    margin-bottom: 10px;
+  }
+
+  .auth-intro > p {
+    margin-bottom: 12px;
+  }
+
+  .auth-card-v2 {
+    padding: 20px 24px;
+    margin-block: 12px;
+  }
+
+  .auth-card-heading {
+    margin-bottom: 10px;
+  }
+
+  .auth-tabs {
+    margin: 10px 0 12px;
+  }
+
+  .auth-form {
+    gap: 9px;
+  }
+
+  .form-input {
+    min-height: 42px;
+  }
+
+  .auth-submit {
+    min-height: 46px;
+  }
+
+  .auth-rewards {
+    margin-top: 10px;
+  }
+}
+
+/* ============================================
+   LUPI WORLD — DESKTOP ESTABLE
+   Login y registro con la misma composición
+   ============================================ */
+
+@media (min-width: 901px) {
+
+  .auth-screen .auth-shell {
+    position: relative;
+    align-items: start;
+    min-height: 100dvh;
+    height: auto;
+  }
+
+  /* Columna izquierda: independiente de la altura del form */
+  .auth-screen .auth-intro {
+    position: sticky;
+    top: 0;
+    align-self: start !important;
+
+    height: 100dvh !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center !important;
+    align-items: center;
+
+    transform: none !important;
+  }
+
+  /* Temporada, título, descripción y tarjetas */
+  .auth-screen .auth-kicker {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    margin: 0 auto 30px !important;
+  }
+
+  .auth-screen .auth-intro h1 {
+    margin: 0 0 12px !important;
+  }
+
+  .auth-screen .auth-intro > p {
+    margin: 0 auto 14px !important;
+  }
+
+  .auth-screen .auth-pillars {
+    margin-top: 0 !important;
+  }
+
+  /* Columna derecha */
+  .auth-screen .auth-card-v2 {
+    align-self: center;
+    margin-block: 20px;
+  }
+}
+
+/* Pantallas bajas: compactar sin desplazar */
+@media (min-width: 901px) and (max-height: 760px) {
+
+  .auth-screen .auth-kicker {
+    margin-bottom: 22px !important;
+  }
+
+  .auth-screen .auth-intro h1 {
+    margin-bottom: 10px !important;
+  }
+
+  .auth-screen .auth-intro > p {
     margin-bottom: 12px !important;
   }
+}
+.auth-google-section {
+  margin-top: 18px;
+}
 
-  .auth-screen.auth-register .auth-card-heading h2 {
-    margin: 4px 0 !important;
-    line-height: 1.08 !important;
-  }
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  color: #91aaa6;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
 
-  .auth-screen.auth-register .auth-card-heading p {
-    margin: 4px 0 0 !important;
-  }
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 255, 190, 0.18);
+}
 
-  .auth-screen.auth-register .auth-tabs {
-    margin: 12px 0 14px !important;
-  }
+.auth-google-button {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(0, 255, 190, 0.4);
+  border-radius: 10px;
+  background: rgba(0, 25, 23, 0.85);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
 
-  .auth-screen.auth-register .auth-form {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 11px !important;
-  }
+.auth-google-button:hover:not(:disabled) {
+  border-color: #00e5b0;
+  background: rgba(0, 75, 60, 0.6);
+  transform: translateY(-1px);
+}
 
-  .auth-screen.auth-register .form-group {
-    margin: 0 !important;
-    gap: 5px !important;
-  }
-
-  .auth-screen.auth-register .form-label {
-    margin-bottom: 4px !important;
-    font-size: 10px !important;
-  }
-
-  .auth-screen.auth-register .form-input {
-    min-height: 46px !important;
-    height: 46px !important;
-    padding: 0 13px !important;
-    font-size: 14px !important;
-  }
-
-  .auth-screen.auth-register .form-hint {
-    margin-top: 4px !important;
-    font-size: 11px !important;
-    line-height: 1.35 !important;
-  }
-
-  .auth-screen.auth-register .auth-submit {
-    min-height: 50px !important;
-    margin-top: 3px !important;
-  }
-
-  .auth-screen.auth-register .auth-rewards {
-    margin-top: 15px !important;
-    padding-top: 12px !important;
-    gap: 7px !important;
-  }
-
-  .auth-screen.auth-register .auth-reward-item {
-    min-width: 0 !important;
-    padding: 9px 4px !important;
-  }
-
-  .auth-screen.auth-register .auth-reward-item > span {
-    font-size: 20px !important;
-  }
-
-  .auth-screen.auth-register .auth-reward-item strong {
-    font-size: 11px !important;
-  }
-
-  .auth-screen.auth-register .auth-reward-item small {
-    font-size: 10px !important;
-  }
-
-  .auth-screen.auth-register .auth-card-footer {
-    margin-top: 12px !important;
-  }
+.auth-google-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
