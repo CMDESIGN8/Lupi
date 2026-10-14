@@ -411,3 +411,28 @@ html:has(.signing-welcome), body:has(.signing-welcome) { overflow: hidden !impor
   .futsal-lineup__slot--2, .futsal-lineup__slot--3 { top: 61%; }
   .futsal-lineup__slot--4 { top: 85.5%; }
 }
+
+/* V7.4 · Ajuste final de legibilidad móvil; escritorio permanece intacto.
+   Se limita la altura por fila para evitar cruces en iPhone SE. */
+@media (max-width: 850px) {
+  .futsal-lineup__slot { --h: min(21.8cqh, calc(31cqw * 1.4224), 158px); }
+  .futsal-lineup__slot--0 { top: 12%; }
+  .futsal-lineup__slot--1 { top: 36.5%; }
+  .futsal-lineup__slot--2, .futsal-lineup__slot--3 { top: 61%; }
+  .futsal-lineup__slot--4 { top: 85.5%; }
+  .starter-card--lineup { padding: 5%; }
+  .starter-card--lineup .starter-card__portrait { inset: 13% 2% 17%; }
+  .starter-card--lineup .starter-card__bottom { padding: 3px 0 12px; }
+  .starter-card--lineup h3 { font-size: clamp(10px, 13.6cqw, 20px); line-height: .98; }
+  .starter-card--lineup .starter-card__rarity { margin: 2px 0 0; font-size: clamp(7px, 7.5cqw, 11px); }
+  .futsal-lineup__view-stats { font-size: clamp(8px, 7cqw, 11px); }
+  .futsal-lineup__role { font-size: clamp(9px, 1.25dvh, 11px); letter-spacing: .09em; }
+  .futsal-lineup__off-position { font-size: 7px; letter-spacing: 0; }
+}
+@media (max-width: 850px) and (max-height: 710px) {
+  .futsal-lineup__slot { --h: min(21cqh, calc(30cqw * 1.4224), 137px); }
+  .starter-card--lineup .starter-card__bottom { padding-bottom: 11px; }
+}
+@media (max-width: 850px) and (max-height: 590px) {
+  .futsal-lineup__slot { --h: min(19.5cqh, calc(29cqw * 1.4224), 125px); }
+}
