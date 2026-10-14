@@ -1,141 +1,413 @@
-/* LUPI WORLD — Starter Pack cinematic; scoped to SigningWelcome */
+/* =====================================================================
+   LUPI WORLD — SigningWelcome (bienvenida + revelación del quinteto)
+   1 Base · 2 Bienvenida · 3 Revelación · 4 Carta · 5 Ficha de jugador · 6 Movimiento
+   Un solo bloque por componente: sin capas V1…V6 ni !important (salvo el scroll lock).
+   Las cartas y la cancha se miden con container queries (cqw/cqh), por eso no se pisan.
+   ===================================================================== */
+
+/* ───────── 1 · BASE ───────── */
 html:has(.signing-welcome), body:has(.signing-welcome) { overflow: hidden !important; }
 .signing-welcome, .signing-welcome *, .signing-welcome *::before, .signing-welcome *::after { box-sizing: border-box; }
-.signing-welcome { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: safe center; padding: 14px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; isolation: isolate; color: #fff; background: radial-gradient(ellipse at 50% 80%,rgba(0,138,165,.32),transparent 58%),linear-gradient(145deg,#000b1d,#00202d); }
-.signing-welcome__light { position: fixed; top: -20%; width: 36vw; height: 105vh; opacity: .35; pointer-events: none; background: linear-gradient(to bottom,rgba(85,206,255,.35),transparent 75%); clip-path: polygon(45% 0,55% 0,100% 100%,0 100%); filter: blur(12px); }
-.signing-welcome__light--left { left: 2%; transform: rotate(-15deg); } .signing-welcome__light--right { right: 2%; transform: rotate(15deg); }
-.signing-welcome__card { position: relative; z-index: 1; width: min(100%,620px); margin-block: auto; padding: clamp(18px,3vh,34px) clamp(16px,4vw,42px); border: 1px solid #0ce9bc; border-radius: 23px; text-align: center; background: linear-gradient(155deg,rgba(0,19,34,.98),rgba(0,36,39,.96)); box-shadow: 0 0 55px #00ffd21a,0 25px 75px #0009; }
-.signing-welcome__eyebrow { display: block; color: #2fffc4; font-size: 10px; font-weight: 800; letter-spacing: .18em; }
-.signing-welcome__emblem { margin: 10px 0 6px; font-size: 45px; color: #20ffbf; text-shadow: 0 0 26px #00ffc288; }
-.signing-welcome h1 { margin: 0; font: italic 900 clamp(35px,6vw,64px)/.96 'Barlow Condensed',Impact,sans-serif; }
-.signing-welcome h1 em { display: block; color: #1ff4a8; font-style: inherit; }
-.signing-welcome__intro { margin: 14px 0 6px; color: #c6d9e6; }
-.signing-welcome__name { display: block; font: 900 clamp(32px,6vw,54px)/1.1 'Barlow Condensed',Impact,sans-serif; text-transform: uppercase; overflow-wrap: anywhere; }
-.signing-welcome__club { display: block; margin-top: 6px; color: #2fffc4; font-weight: 700; }
-.signing-welcome__message { margin: 18px 0; color: #d0e1e9; font-size: 13px; }
-.signing-welcome__button { display: block; width: 100%; min-height: 53px; border: 0; border-radius: 12px; background: linear-gradient(#ffdb56,#ffbb22); box-shadow: 0 6px 24px #ffbe2926; color: #10140e; font: italic 900 clamp(19px,3vw,24px) 'Barlow Condensed',Impact,sans-serif; cursor: pointer; }
-.signing-welcome__button:hover:not(:disabled) { filter: brightness(1.07); } .signing-welcome__button:disabled { opacity: .65; cursor: wait; } .signing-welcome button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
-.starter-pack__title { margin: 10px 0 4px !important; font-size: clamp(34px,5vw,50px) !important; } .starter-pack__progress { margin: 8px 0 0; color: #28ffcb; font-size: 12px; font-weight: 900; letter-spacing: .24em; }
-.starter-pack__arena { position: relative; display: grid; place-items: center; min-height: 345px; margin: 4px 0 10px; isolation: isolate; perspective: 850px; }
-.starter-pack__burst { position: absolute; z-index: -1; width: min(100%,420px); height: 300px; border-radius: 50%; background: repeating-conic-gradient(from 0deg,transparent 0deg 16deg,#32ffdc16 17deg 20deg,transparent 21deg 35deg); filter: blur(4px); animation: packSpin 18s linear infinite; }
-.starter-pack__reveal { animation: packReveal .72s cubic-bezier(.2,.85,.2,1) both; }
-.starter-card { --tone: #d49a65; --tone-soft: #68452e; position: relative; isolation: isolate; display: flex; flex-direction: column; width: 232px; height: 330px; overflow: hidden; padding: 13px; border: 2px solid var(--tone); border-radius: 18px; color: #fff; text-align: center; background: radial-gradient(ellipse at 50% 28%,color-mix(in srgb,var(--tone) 35%,transparent),transparent 62%),linear-gradient(150deg,#263747,#071522 75%); box-shadow: inset 0 0 0 3px #ffffff10,inset 0 -35px 65px #0008,0 0 34px color-mix(in srgb,var(--tone) 28%,transparent),0 18px 34px #0007; }
-.starter-card--silver { --tone: #d3e4f4; --tone-soft: #7d9aaf; } .starter-card--gold { --tone: #ffd65c; --tone-soft: #9e7221; } .starter-card--special { --tone: #ce84ff; --tone-soft: #713e9e; }
-.starter-card__grain { position: absolute; inset: 0; z-index: -1; opacity: .5; background: repeating-linear-gradient(120deg,transparent 0 16px,#ffffff09 17px 18px,transparent 19px 32px); pointer-events: none; }
-.starter-card__top { display: flex; justify-content: space-between; align-items: start; color: var(--tone); } .starter-card__top > div { display: flex; flex-direction: column; align-items: start; }
-.starter-card__top strong { font: 900 41px/.88 'Barlow Condensed',Impact,sans-serif; } .starter-card__position { margin-top: 5px; font: 900 12px 'Barlow Condensed',Impact,sans-serif; letter-spacing: .12em; }
-.starter-card__crest { font-size: 25px; text-shadow: 0 0 16px var(--tone); }
-.starter-card__portrait { position: absolute; inset: 35px 8px 81px; display: grid; place-items: center; overflow: hidden; }
-.starter-card__sun { position: absolute; width: 165px; height: 165px; border-radius: 50%; border: 1px solid color-mix(in srgb,var(--tone) 50%,transparent); background: radial-gradient(circle,color-mix(in srgb,var(--tone) 40%,transparent),transparent 72%); box-shadow: 0 0 28px color-mix(in srgb,var(--tone) 25%,transparent); }
-.starter-card__player { position: relative; width: 142px; height: 166px; filter: drop-shadow(0 5px 12px #000b); }
-.starter-card__bottom { position: relative; z-index: 1; margin-top: auto; padding-top: 12px; background: linear-gradient(transparent,#071521 13%,#071521 100%); }
-.starter-card h3 { margin: 0; font: 900 23px/.95 'Barlow Condensed',Impact,sans-serif; text-transform: uppercase; overflow-wrap: anywhere; }
-.starter-card__rarity { margin: 6px 0 8px; color: var(--tone); font-size: 10px; font-weight: 900; letter-spacing: .17em; }
-.starter-card__stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 4px; font-size: 11px; }
-.starter-card__stats span { display: flex; justify-content: space-between; gap: 5px; padding: 3px 6px; border-radius: 4px; background: #ffffff17; } .starter-card__stats b { color: #fff; }
-.starter-pack__skip { margin-top: 8px; padding: 7px 12px; border: 0; background: transparent; color: #bdd3dc; text-decoration: underline; font-size: 11px; cursor: pointer; }
-.starter-pack__summary { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); justify-items: center; gap: 8px; margin: 18px 0; }
-.starter-card--compact { width: 100%; max-width: 115px; height: 176px; padding: 6px; border-radius: 10px; border-width: 1px; }
-.starter-card--compact .starter-card__top strong { font-size: 24px; } .starter-card--compact .starter-card__position { font-size: 8px; margin-top: 2px; } .starter-card--compact .starter-card__crest { font-size: 15px; }
-.starter-card--compact .starter-card__portrait { inset: 22px 2px 44px; } .starter-card--compact .starter-card__sun { width: 90px; height: 90px; } .starter-card--compact .starter-card__player { width: 76px; height: 94px; }
-.starter-card--compact .starter-card__bottom { padding-top: 6px; } .starter-card--compact h3 { font-size: 13px; } .starter-card--compact .starter-card__rarity { margin: 3px 0; font-size: 7px; letter-spacing: .07em; }
-.starter-card--compact .starter-card__stats { gap: 2px; font-size: 7px; } .starter-card--compact .starter-card__stats span { padding: 1px 2px; }
-.starter-pack__error { color: #ffb6b6; }
-@keyframes packReveal { 0% { opacity: 0; transform: translateY(32px) scale(.65) rotateY(80deg); filter: brightness(3); } 65% { opacity: 1; filter: brightness(1.4); } 100% { opacity: 1; transform: none; filter: brightness(1); } }
-@keyframes packSpin { to { transform: rotate(360deg); } }
-@media (max-width: 600px) {
-  .signing-welcome { padding: 10px; } .signing-welcome__card { padding: 17px 12px; border-radius: 17px; } .signing-welcome__eyebrow { font-size: 8px; }
-  .signing-welcome__emblem { font-size: 38px; } .signing-welcome__button { min-height: 48px; font-size: 20px; }
-  .starter-pack__title { font-size: 34px !important; } .starter-pack__arena { min-height: 335px; margin: 3px 0 7px; } .starter-pack__progress { font-size: 11px; }
-  .starter-pack__summary { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; margin: 12px 0; } .starter-card--compact { max-width: 105px; height: 160px; }
-}
-@media (max-height: 710px) { .signing-welcome__card { padding-block: 14px; } .starter-pack__arena { min-height: 306px; } .starter-pack__arena .starter-card { transform: scale(.9); } }
-@media (prefers-reduced-motion: reduce) { .signing-welcome *, .signing-welcome *::before, .signing-welcome *::after { animation: none !important; } }
 
-/* LUPI WORLD — viewport-locked cinematic layout, no page/modal scroll */
 .signing-welcome {
+  --mint: #2fffc4;
+  --gold: #ffd04a;
+  --navy: #071521;
+  --display: 'Barlow Condensed', Impact, sans-serif;
+  position: fixed; inset: 0; z-index: 9999;
   height: 100vh; height: 100dvh;
-  min-height: 0; overflow: hidden;
-  padding: clamp(8px, 1.8dvh, 18px);
   display: flex; align-items: center; justify-content: center;
+  padding: clamp(8px, 1.8dvh, 18px);
+  overflow: hidden; isolation: isolate; color: #fff;
+  background:
+    radial-gradient(ellipse at 50% 80%, rgba(0,138,165,.32), transparent 58%),
+    linear-gradient(145deg, #000b1d, #00202d);
 }
+.signing-welcome--reveal {
+  padding: 0;
+  background:
+    linear-gradient(180deg, #00101d77, #00101d22 45%, #00101dbb),
+    url('/teeam.png') center / cover no-repeat #001521;
+}
+
+.signing-welcome__light {
+  position: fixed; top: -20%; width: 36vw; height: 105vh; opacity: .35; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(85,206,255,.35), transparent 75%);
+  clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%); filter: blur(12px);
+}
+.signing-welcome__light--left  { left: 2%;  transform: rotate(-15deg); }
+.signing-welcome__light--right { right: 2%; transform: rotate(15deg); }
+
+.signing-welcome h1 { margin: 0; font: italic 900 clamp(35px, 6vw, 64px)/.96 var(--display); }
+.signing-welcome h1 em { display: block; color: #1ff4a8; font-style: inherit; }
+
+.signing-welcome__eyebrow { display: block; color: var(--mint); font-size: 10px; font-weight: 800; letter-spacing: .18em; line-height: 1.4; }
+
+.signing-welcome__button {
+  display: block; width: 100%; min-height: clamp(40px, 6.8dvh, 54px);
+  border: 0; border-radius: 12px; cursor: pointer; color: #10140e;
+  background: linear-gradient(#ffdb56, #ffbb22); box-shadow: 0 6px 24px #ffbe2926;
+  font: italic 900 clamp(18px, 3dvh, 24px) var(--display);
+}
+.signing-welcome__button:hover:not(:disabled) { filter: brightness(1.07); }
+.signing-welcome__button:disabled { opacity: .65; cursor: wait; }
+.signing-welcome button:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.signing-welcome__card--reveal .signing-welcome__button:focus:not(:focus-visible) { outline: none; }
+
+.starter-pack__error { color: #ffb6b6; }
+
+/* Tarjeta contenedora común */
 .signing-welcome__card {
-  flex: 0 1 620px;
-  min-width: 0; max-height: calc(100dvh - 16px);
-  overflow: hidden; margin: 0;
-  padding: clamp(12px, 2dvh, 24px) clamp(12px, 3vw, 36px);
+  position: relative; z-index: 1;
   display: flex; flex-direction: column; align-items: stretch;
+  width: min(100%, 620px); max-height: calc(100dvh - 16px); min-width: 0; overflow: hidden;
+  padding: clamp(12px, 2dvh, 24px) clamp(12px, 3vw, 36px);
   gap: clamp(4px, .9dvh, 9px);
-  border-color: #16f5c7;
-  background: radial-gradient(ellipse at 50% 18%, #07383c 0%, transparent 53%), linear-gradient(160deg,#00121f,#001e27);
+  border: 1px solid #16f5c7; border-radius: 23px; text-align: center;
+  background: radial-gradient(ellipse at 50% 18%, #07383c 0%, transparent 53%), linear-gradient(160deg, #00121f, #001e27);
   box-shadow: 0 0 0 1px #0affbe15, 0 0 70px #00e9b51c, 0 24px 75px #000b;
 }
-.signing-welcome__card::before { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(110deg,transparent 18%,#ffffff0b 29%,transparent 41%); }
-.signing-welcome__eyebrow { flex: 0 0 auto; }
-.signing-welcome__card .starter-pack__title { flex:0 0 auto; margin: 0 !important; font-size: clamp(29px, min(5vw, 6dvh), 49px) !important; line-height: .9; }
-.signing-welcome__card .starter-pack__progress { flex:0 0 auto; margin: 0; font-size: 11px; }
-.signing-welcome__card--reveal .starter-pack__arena {
-  flex: 0 1 auto; min-height: 0; height: clamp(175px, 49dvh, 350px);
-  margin: 0; overflow: visible;
+
+/* ───────── 2 · BIENVENIDA ───────── */
+.signing-welcome__card--welcome {
+  min-height: min(78dvh, 670px);
+  justify-content: space-between; gap: clamp(5px, 1.5dvh, 14px);
+  background:
+    linear-gradient(180deg, rgba(0,12,24,.75) 0%, rgba(0,13,24,.38) 32%, rgba(0,12,24,.24) 55%, rgba(0,12,24,.88) 100%),
+    url('/images/fichaje-desktop.png') center 49% / cover no-repeat,
+    #001622;
 }
-.signing-welcome__card--reveal .starter-pack__reveal { height:100%; aspect-ratio:232/330; max-width:100%; display:grid; place-items:center; }
-.signing-welcome__card--reveal .starter-card { width:auto; height:100%; aspect-ratio:232/330; padding:clamp(7px,1.5dvh,13px); border-radius:clamp(10px,2dvh,18px); }
-.signing-welcome__card--reveal .starter-card__top strong { font-size:clamp(23px,5dvh,41px); }
-.signing-welcome__card--reveal .starter-card__portrait { inset: 11% 3% 25%; }
-.signing-welcome__card--reveal .starter-card__sun { width: min(70%, 18dvh); height:auto; aspect-ratio:1; }
-.signing-welcome__card--reveal .starter-card__player { width: min(66%, 17dvh); height: auto; max-height:100%; }
-.signing-welcome__card--reveal .starter-card h3 { font-size:clamp(16px,3.4dvh,23px); }
-.signing-welcome__card--reveal .starter-card__bottom { padding-top:clamp(3px,.9dvh,12px); }
-.signing-welcome__card--reveal .starter-card__rarity { margin:clamp(2px,.5dvh,6px) 0; font-size:clamp(7px,1.3dvh,10px); }
-.signing-welcome__card--reveal .starter-card__stats { gap:clamp(2px,.5dvh,4px); font-size:clamp(8px,1.4dvh,11px); }
-.signing-welcome__card--reveal .starter-card__stats span { padding:clamp(1px,.3dvh,3px) 5px; }
-.signing-welcome__card--reveal .starter-pack__burst { width:min(100%,45dvh); height: min(100%,38dvh); }
-.signing-welcome__card .signing-welcome__button { flex:0 0 auto; min-height:clamp(40px,6.8dvh,54px); font-size:clamp(18px,3dvh,24px); }
-.signing-welcome__card .starter-pack__skip { flex:0 0 auto; margin:0; padding:clamp(3px,.7dvh,8px); }
-.signing-welcome__card--welcome { gap:clamp(5px,1.5dvh,14px); }
-.signing-welcome__card--welcome .signing-welcome__emblem { margin:0; font-size:clamp(28px,6dvh,48px); }
-.signing-welcome__card--welcome h1 { font-size:clamp(34px,8dvh,64px); }
-.signing-welcome__card--welcome .signing-welcome__intro,
-.signing-welcome__card--welcome .signing-welcome__message { margin:0; }
-.signing-welcome__card--summary .starter-pack__summary {
-  flex:0 1 auto; min-height:0; margin:clamp(4px,1dvh,12px) 0;
-  display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:clamp(3px,.7vw,8px);
+.signing-welcome__card--welcome > * { position: relative; z-index: 1; }
+.signing-welcome__card--welcome .signing-welcome__eyebrow,
+.signing-welcome__card--welcome .signing-welcome__emblem { text-shadow: 0 2px 12px #00141e; }
+.signing-welcome__emblem { margin: 0; color: #20ffbf; font-size: clamp(28px, 6dvh, 48px); }
+.signing-welcome__card--welcome h1 { font-size: clamp(38px, 7dvh, 64px); text-shadow: 0 3px 18px rgba(0,0,0,.75); }
+.signing-welcome__intro { margin: 0; color: #c6d9e6; text-shadow: 0 2px 10px #000; }
+.signing-welcome__name {
+  display: block; margin-top: auto; overflow-wrap: anywhere; text-transform: uppercase;
+  font: 900 clamp(36px, 7dvh, 60px)/1.1 var(--display); text-shadow: 0 3px 20px #000, 0 0 28px #000;
 }
-.signing-welcome__card--summary .starter-card--compact { width:100%; max-width:115px; height:clamp(126px,26dvh,176px); }
-.signing-welcome__card--summary .signing-welcome__intro { margin:0; }
-@media (max-width:600px) {
-  .signing-welcome { padding:8px; }
-  .signing-welcome__card { flex-basis:100%; border-radius:16px; padding:clamp(10px,1.8dvh,17px) 12px; gap:clamp(4px,.85dvh,8px); }
-  .signing-welcome__card .starter-pack__title { font-size:clamp(29px,5.1dvh,40px) !important; }
-  .signing-welcome__card--reveal .starter-pack__arena { height:clamp(180px,47dvh,390px); }
-  .signing-welcome__card--summary .starter-pack__summary { grid-template-columns:repeat(3,minmax(0,1fr)); justify-items:center; gap:6px; }
-  .signing-welcome__card--summary .starter-card--compact { max-width:110px; height:clamp(110px,21dvh,160px); }
+.signing-welcome__club { display: block; margin-top: 6px; color: var(--mint); font-weight: 700; text-shadow: 0 2px 12px #000; }
+.signing-welcome__message { margin: 0; color: #d0e1e9; font-size: 13px; text-shadow: 0 2px 12px #000; }
+
+@media (max-width: 600px) {
+  .signing-welcome { padding: 8px; }
+  .signing-welcome__eyebrow { font-size: 8px; }
+  .signing-welcome__card { border-radius: 16px; }
+  .signing-welcome__card--welcome {
+    min-height: min(79dvh, 630px); padding: clamp(14px, 2.3dvh, 22px) 16px;
+    background:
+      linear-gradient(180deg, rgba(0,12,24,.74) 0%, rgba(0,14,27,.44) 28%, rgba(0,16,27,.25) 49%, rgba(0,14,24,.77) 72%, rgba(0,14,24,.97) 100%),
+      url('/images/fichaje.png') 55% center / cover no-repeat,
+      #001622;
+  }
+  .signing-welcome__card--welcome h1 { font-size: clamp(35px, 7dvh, 52px); }
+  /* El nombre y el club se leen sobre la pantalla del estadio */
+  .signing-welcome__card--welcome .signing-welcome__name {
+    position: absolute; top: 50%; left: 12px; right: 12px; margin: 0;
+    font-size: clamp(33px, 6.2dvh, 50px); line-height: 1; text-align: center;
+  }
+  .signing-welcome__card--welcome .signing-welcome__club {
+    position: absolute; top: 62%; left: 12px; right: 12px; margin: 0;
+    font-size: clamp(12px, 1.9dvh, 16px); line-height: 1.2; text-align: center;
+  }
+  .signing-welcome__card--welcome .signing-welcome__message { margin-top: auto; }
 }
-@media (max-height:600px) {
-  .signing-welcome__card { gap:3px; padding-block:9px; }
-  .signing-welcome__card--reveal .starter-pack__arena { height:43dvh; }
-  .signing-welcome__card .starter-pack__title { font-size:clamp(24px,5.5dvh,36px) !important; }
-  .signing-welcome__card--summary .starter-card--compact { height:21dvh; }
+@media (max-height: 700px) {
+  .signing-welcome__card--welcome { min-height: min(85dvh, 560px); }
+  .signing-welcome__card--welcome h1 { font-size: clamp(31px, 6dvh, 48px); }
 }
-@media (max-width:600px) and (max-height:720px) {
-  .signing-welcome__card--summary .starter-card--compact { height:18dvh; }
-  .signing-welcome__card--reveal .starter-pack__arena { height:43dvh; }
+@media (max-width: 600px) and (max-height: 700px) {
+  .signing-welcome__card--welcome .signing-welcome__name { top: 49%; }
+  .signing-welcome__card--welcome .signing-welcome__club { top: 61%; }
 }
 
-/* LUPI WORLD — artwork & rarity effects (keeps viewport layout intact) */
-.starter-card__portrait { isolation: isolate; }
-.starter-card__player { z-index: 2; width: min(84%, 18dvh) !important; height: auto !important; max-height: 100%; filter: drop-shadow(0 9px 8px #000a) drop-shadow(0 0 13px color-mix(in srgb,var(--tone) 30%,transparent)); }
-.starter-card__sun { z-index: 0; }
-.starter-card__portrait::after { content:""; position:absolute; inset: 5% 0 0; z-index:1; pointer-events:none; background:repeating-linear-gradient(160deg,transparent 0 22px,color-mix(in srgb,var(--tone) 12%,transparent) 23px 24px,transparent 25px 40px); mask-image:linear-gradient(transparent,#000 30%,transparent 90%); }
-.starter-card--gold { background:radial-gradient(ellipse at 50% 25%,#9b6a2388,transparent 70%),linear-gradient(145deg,#4e3b1e,#071522 78%); }
-.starter-card--special { background:radial-gradient(ellipse at 50% 25%,#6e33b6aa,transparent 70%),linear-gradient(145deg,#31205b,#071522 78%); }
-.starter-pack__arena--gold .starter-pack__burst { background:repeating-conic-gradient(from 0deg,transparent 0deg 14deg,#ffd65c55 16deg 19deg,transparent 21deg 35deg); filter:blur(3px) drop-shadow(0 0 14px #ffcc55); }
-.starter-pack__arena--special .starter-pack__burst { background:repeating-conic-gradient(from 0deg,transparent 0deg 11deg,#c680ff88 12deg 15deg,transparent 18deg 30deg); filter:blur(2px) drop-shadow(0 0 18px #b961ff); animation:packSpin 8s linear infinite, starterPulse 1.4s ease-in-out infinite alternate; }
-.starter-pack__arena--gold .starter-card { animation:starterGoldGlow 2s ease-in-out infinite alternate; }
-.starter-pack__arena--special .starter-card { animation:starterSpecialGlow 1.6s ease-in-out infinite alternate; }
-@keyframes starterGoldGlow { to { box-shadow:0 0 30px #ffd65c88,0 0 70px #ffd65c33,inset 0 0 24px #ffdd6633; } }
-@keyframes starterSpecialGlow { to { box-shadow:0 0 35px #ca7dffaa,0 0 85px #ab5cff66,inset 0 0 30px #e1a6ff33; } }
-@keyframes starterPulse { to { opacity:.5; transform:scale(1.13) rotate(12deg); } }
-/* Summary cards retain smaller portraits. */
-.starter-card--compact .starter-card__player { width: 80% !important; max-height:100%; }
-@media (prefers-reduced-motion:reduce) { .starter-pack__arena--gold .starter-card,.starter-pack__arena--special .starter-card,.starter-pack__arena--special .starter-pack__burst { animation:none !important; } }
+/* ───────── 3 · REVELACIÓN: eyebrow / cabecera / cancha / pie ───────── */
+.signing-welcome__card--reveal {
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto;
+  justify-items: center; align-items: stretch; gap: 0;
+  width: 100%; height: 100dvh; max-height: 100dvh;
+  padding: clamp(10px, 2dvh, 18px) clamp(10px, 2vw, 26px);
+  border: 0; border-radius: 0; background: transparent; box-shadow: none;
+}
+.signing-welcome__card--reveal > .signing-welcome__eyebrow { grid-row: 1; justify-self: center; }
+
+.futsal-lineup__header {
+  grid-row: 2; position: relative; z-index: 4;
+  display: flex; flex-direction: column; align-items: center; width: 100%; text-align: center;
+  gap: clamp(2px, .5dvh, 6px); padding: clamp(2px, .5dvh, 6px) 0;
+}
+.futsal-lineup__header .starter-pack__title {
+  margin: 0; font-size: clamp(25px, 3.7dvh, 43px); line-height: 1.02; white-space: nowrap; text-shadow: 0 4px 22px #000;
+}
+.futsal-lineup__header .starter-pack__title em { display: inline; }
+.futsal-lineup__club {
+  color: #c6f8ef; font: 800 clamp(9px, 1.15vw, 12px) var(--display); letter-spacing: .19em;
+  text-transform: uppercase; text-shadow: 0 2px 10px #001b27;
+}
+.futsal-lineup__club span { margin: 0 8px; color: #ffd15a; }
+.starter-pack__progress { margin: 0; color: #28ffcb; font-size: 11px; font-weight: 900; letter-spacing: .24em; }
+
+/* La cancha es un contenedor: cartas y posiciones comparten la misma referencia */
+.futsal-lineup {
+  grid-row: 3; position: relative; container-type: size;
+  width: min(100%, 1220px); height: 100%; min-height: 0; margin: 0 auto;
+}
+.futsal-lineup__footer {
+  grid-row: 4; position: relative; z-index: 6;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: min(100%, 390px); gap: 3px; padding: clamp(5px, 1dvh, 10px) 0;
+}
+.futsal-lineup__footer .signing-welcome__button { width: 100%; }
+.futsal-lineup__cta { opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity .4s ease, transform .4s ease, filter .2s ease; }
+.futsal-lineup__cta.is-ready { opacity: 1; transform: none; pointer-events: auto; box-shadow: 0 0 25px #ffce4450, 0 8px 26px #0008; }
+.futsal-lineup__autoplay {
+  display: grid; place-items: center; width: 100%; min-height: 48px;
+  color: #8dffe5; font-size: 11px; font-weight: 800; letter-spacing: .16em; text-align: center; text-shadow: 0 2px 12px #000;
+}
+.futsal-lineup__tagline { color: #c6efe6; font-size: 10px; font-weight: 800; letter-spacing: .17em; text-align: center; text-shadow: 0 2px 9px #000; }
+.starter-pack__skip { margin: 0; padding: 3px 8px; border: 0; background: transparent; color: #bdd3dc; font-size: 11px; text-decoration: underline; cursor: pointer; }
+
+/* Slots: el alto sale de la cancha (cqh), el ancho de la proporción de la carta (232/330) */
+.futsal-lineup__slot {
+  --h: min(38cqh, 245px);   /* deja aire para rol + aviso bajo la carta */
+  position: absolute; isolation: isolate; transform: translate(-50%, -50%);
+  width: calc(var(--h) * .703); height: var(--h);
+}
+/* Escritorio: rombo horizontal 1-2-1 (arquero → cierre → alas → pívot) */
+.futsal-lineup__slot--0 { left: 9%;  top: 50%; }
+.futsal-lineup__slot--1 { left: 31%; top: 50%; }
+.futsal-lineup__slot--2 { left: 57%; top: 26%; }
+.futsal-lineup__slot--3 { left: 57%; top: 74%; }
+.futsal-lineup__slot--4 { left: 86%; top: 50%; }
+
+.futsal-lineup__slot.is-revealed { z-index: 2; animation: lineupReveal .65s cubic-bezier(.18,.85,.22,1) both; }
+.futsal-lineup__slot.is-revealed::before {
+  content: ''; position: absolute; z-index: -2; inset: -12%; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse at center, #19ffd229 0%, #20e6c20c 48%, transparent 72%);
+  filter: blur(14px); animation: lupiAuraIn .85s ease-out both;
+}
+.futsal-lineup__ground {
+  position: absolute; z-index: -1; left: 5%; right: 5%; bottom: -10px; height: 18px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse, #00f4c277, transparent 73%); filter: blur(7px);
+}
+.futsal-lineup__role {
+  position: absolute; top: calc(100% + 3px); left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  color: #e1fff7; white-space: nowrap; font: 800 clamp(9px, .85vw, 12px) var(--display); letter-spacing: .15em;
+  text-shadow: 0 2px 10px #000, 0 0 10px #001c22;
+}
+/* LUPI DT: aviso cuando un jugador cubre un puesto que no es el suyo */
+.futsal-lineup__off-position { color: #ffcf64; font: 700 8px/1.1 var(--display); letter-spacing: .08em; text-shadow: 0 1px 6px #001; }
+.futsal-lineup__placeholder {
+  display: grid; place-content: center; width: 100%; height: 100%;
+  border: 1px dashed #8cffff66; border-radius: 13px; background: #001b2b55;
+  color: #b8faff88; font: 900 48px var(--display); text-align: center;
+}
+.futsal-lineup__placeholder small { display: block; font: 700 11px sans-serif; letter-spacing: .08em; }
+.futsal-lineup__celebration {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, #aaffd51e, transparent 65%); animation: lupiFinalFlash 1.3s ease-out both;
+}
+
+/* Botón-carta + pista "VER STATS" */
+.futsal-lineup__card-trigger { position: relative; display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; color: inherit; text-align: inherit; cursor: pointer; }
+.futsal-lineup__card-trigger:focus-visible { outline: 2px solid #ffdc6c; outline-offset: 5px; border-radius: 12px; }
+.futsal-lineup__card-trigger:hover .starter-card { box-shadow: 0 0 22px #2bffda66, 0 18px 34px #0009; }
+.futsal-lineup__slot.is-revealed .starter-card { animation: lupiCardLand .85s cubic-bezier(.17,.84,.24,1) both; }
+.futsal-lineup__view-stats {
+  position: absolute; z-index: 5; bottom: 3px; left: 50%; transform: translateX(-50%);
+  padding: 0 6px; border-radius: 99px; background: #0007; white-space: nowrap;
+  color: #ffd76d; font: 800 clamp(8px, .8vw, 10px) var(--display); letter-spacing: .12em; text-shadow: 0 2px 5px #000;
+}
+.futsal-lineup.is-complete .futsal-lineup__view-stats { animation: hintPulse 1.6s ease-in-out 3; }
+
+/* Móvil / tablet: 3 arriba (ala · pívot · ala) y 2 abajo (cierre · arquero) */
+@media (max-width: 850px) {
+  .signing-welcome__card--reveal { padding: clamp(8px, 1.3dvh, 12px) 8px; }
+  .futsal-lineup__header { gap: 2px; }
+  .futsal-lineup__header .starter-pack__title { font-size: clamp(21px, 3.7dvh, 33px); }
+  .futsal-lineup__club { font-size: clamp(8px, 1.1dvh, 10px); }
+  .starter-pack__progress { font-size: clamp(8px, 1.1dvh, 11px); }
+  .futsal-lineup__slot { --h: min(calc(29cqw * 1.4224), 41cqh); }
+  .futsal-lineup__slot--2 { left: 17%; top: 27%; }
+  .futsal-lineup__slot--4 { left: 50%; top: 21%; }
+  .futsal-lineup__slot--3 { left: 83%; top: 27%; }
+  .futsal-lineup__slot--1 { left: 30%; top: 74%; }
+  .futsal-lineup__slot--0 { left: 70%; top: 74%; }
+  .futsal-lineup__ground { bottom: -5px; }
+  .futsal-lineup__role { top: calc(100% + 2px); font-size: clamp(8px, 1.1dvh, 9px); }
+  .futsal-lineup__tagline { font-size: 8px; }
+}
+@media (max-width: 600px) { .futsal-lineup__off-position { font-size: 7px; letter-spacing: 0; } }
+@media (max-height: 650px) { .futsal-lineup__tagline { display: none; } }
+@media (max-height: 620px) { .futsal-lineup__header { gap: 1px; } .futsal-lineup__footer { padding: 3px 0; } }
+@media (max-height: 540px) {
+  .signing-welcome__card--reveal { padding-block: 6px; }
+  .futsal-lineup__footer .signing-welcome__button { min-height: 36px; }
+}
+
+/* ───────── 4 · CARTA ─────────
+   Cada carta es su propio contenedor: todo el texto escala con su ancho (cqw),
+   así la misma carta sirve para la cancha (--lineup) y para la ficha (--full). */
+.starter-card {
+  --tone: #d39a63;
+  position: relative; isolation: isolate; container-type: inline-size;
+  display: flex; flex-direction: column; width: 100%; height: 100%; overflow: hidden; padding: 5.6%;
+  border: 2px solid var(--tone); border-radius: 7.8% / 5.5%; color: #fff; text-align: center;
+  background:
+    radial-gradient(ellipse at 50% 28%, color-mix(in srgb, var(--tone) 35%, transparent), transparent 62%),
+    linear-gradient(150deg, #263747, #071522 75%);
+  box-shadow:
+    inset 0 0 0 3px #ffffff10, inset 0 -35px 65px #0008,
+    0 0 34px color-mix(in srgb, var(--tone) 28%, transparent), 0 18px 34px #0007;
+}
+.starter-card--silver {
+  --tone: #b9d9f3;
+  background: radial-gradient(ellipse at 50% 26%, #6d9eb04d, transparent 68%), linear-gradient(155deg, #273a4b, #06121f 78%);
+}
+.starter-card--gold {
+  --tone: #ffd45b; border-color: #ffe38c;
+  background: radial-gradient(ellipse at 50% 25%, #9b6a2388, transparent 70%), linear-gradient(145deg, #4e3b1e, #071522 78%);
+  box-shadow: 0 0 28px #ffd45b48, 0 12px 35px #000a, inset 0 0 24px #ffdd6620;
+}
+.starter-card--special {
+  --tone: #e2a4ff; border-color: #e4b1ff;
+  background: radial-gradient(ellipse at 50% 25%, #6e33b6aa, transparent 70%), linear-gradient(145deg, #31205b, #071522 78%);
+  box-shadow: 0 0 35px #b963ff77, 0 12px 35px #000a, inset 0 0 28px #a45cff44;
+}
+
+.starter-card__grain {
+  position: absolute; inset: 0; z-index: -1; opacity: .5; pointer-events: none;
+  background: repeating-linear-gradient(120deg, transparent 0 16px, #ffffff09 17px 18px, transparent 19px 32px);
+}
+.starter-card__foil {
+  position: absolute; z-index: 3; inset: -35%; opacity: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, #fff 48%, transparent 57%); transform: translateX(-95%) rotate(8deg);
+}
+
+.starter-card__top { position: relative; z-index: 4; display: flex; justify-content: space-between; align-items: flex-start; color: var(--tone); text-shadow: 0 2px 8px #000; }
+.starter-card__top > div { display: flex; flex-direction: column; align-items: flex-start; }
+.starter-card__top strong { font: 900 17.7cqw/.88 var(--display); }
+.starter-card__position { margin-top: 2cqw; padding: .4cqw 2.2cqw; border-radius: 3px; background: #000b; font: 900 5.2cqw var(--display); letter-spacing: .12em; }
+.starter-card__crest { font-size: 10.8cqw; text-shadow: 0 0 16px var(--tone); }
+
+.starter-card__portrait { position: absolute; inset: 10.6% 3.4% 24.5%; isolation: isolate; display: grid; place-items: center; overflow: hidden; }
+.starter-card__portrait::after {
+  content: ""; position: absolute; inset: 5% 0 0; z-index: 1; pointer-events: none;
+  background: repeating-linear-gradient(160deg, transparent 0 22px, color-mix(in srgb, var(--tone) 12%, transparent) 23px 24px, transparent 25px 40px);
+  mask-image: linear-gradient(transparent, #000 30%, transparent 90%);
+}
+.starter-card__sun {
+  position: absolute; width: 70%; aspect-ratio: 1; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--tone) 50%, transparent);
+  background: radial-gradient(circle, color-mix(in srgb, var(--tone) 40%, transparent), transparent 72%);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--tone) 25%, transparent);
+}
+.starter-card__player {
+  position: relative; z-index: 2; width: 84%; height: auto; max-height: 100%;
+  filter: drop-shadow(0 9px 8px #000a) drop-shadow(0 0 13px color-mix(in srgb, var(--tone) 30%, transparent));
+}
+.starter-card__player--image {
+  display: block; width: 100%; height: 100%; max-width: 100%; object-fit: contain; object-position: 50% 100%;
+  user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 8px 12px rgba(0,0,0,.45));
+}
+
+.starter-card__bottom { position: relative; z-index: 1; margin-top: auto; padding-top: 5.2%; background: linear-gradient(transparent, var(--navy) 13%, var(--navy)); }
+.starter-card h3 { margin: 0; font: 900 clamp(15px, 9.9cqw, 28px)/.95 var(--display); text-transform: uppercase; overflow-wrap: anywhere; }
+.starter-card__rarity { margin: 2.6% 0 3.4%; color: var(--tone); font-size: clamp(9px, 4.3cqw, 13px); font-weight: 900; letter-spacing: .17em; }
+.starter-card__stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.7cqw; font-size: clamp(10px, 4.7cqw, 14px); }
+.starter-card__stats span { display: flex; justify-content: space-between; gap: 5px; padding: 3px 6px; border-radius: 4px; background: #ffffff17; }
+.starter-card__stats b { color: #fff; font: 800 1.1em/1 system-ui, -apple-system, 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums; } /* 6 y 0 distinguibles */
+
+/* Variante cancha: arte protagonista; las stats viven en la ficha */
+.starter-card--lineup { padding: 7%; border-width: 1px; border-radius: 10% / 7.1%; }
+.starter-card--lineup .starter-card__top strong { font-size: clamp(22px, 25cqw, 39px); }
+.starter-card--lineup .starter-card__position { font-size: clamp(7px, 6.5cqw, 10px); }
+.starter-card--lineup .starter-card__crest { font-size: clamp(12px, 12cqw, 18px); }
+.starter-card--lineup .starter-card__portrait { inset: 15% 3% 17%; }
+.starter-card--lineup .starter-card__sun { display: none; }
+.starter-card--lineup .starter-card__player--image { object-position: 50% 15%; }
+.starter-card--lineup .starter-card__bottom { padding: 5px 0 13px; background: linear-gradient(transparent, var(--navy) 18%, var(--navy)); }
+.starter-card--lineup h3 { font-size: clamp(10px, 12.5cqw, 20px); }
+.starter-card--lineup .starter-card__rarity { margin: 4px 0 0; font-size: clamp(7px, 7cqw, 11px); }
+@media (max-width: 850px) { .starter-card--lineup .starter-card__portrait { inset: 17% 2% 19%; } }
+
+/* ───────── 5 · FICHA DE JUGADOR (modal) ───────── */
+.lupi-stats-overlay { position: fixed; inset: 0; z-index: 10050; display: grid; place-items: center; padding: 16px; background: #000b; backdrop-filter: blur(12px); }
+.lupi-stats-panel {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px;
+  width: min(100%, 340px); max-height: calc(100dvh - 32px); padding: 22px 18px 16px;
+  border: 1px solid #2cf6ca88; border-radius: 18px;
+  background: linear-gradient(155deg, #052b37, #06121e); box-shadow: 0 0 70px #00e6bc22, 0 20px 70px #000b;
+}
+.lupi-stats-panel__eyebrow { color: #41ffcf; font: 800 11px var(--display); letter-spacing: .18em; }
+.lupi-stats-panel__flip { height: min(61dvh, 420px); aspect-ratio: 232 / 330; max-width: 100%; animation: lupiStatsFlip .55s cubic-bezier(.2,.8,.2,1) both; }
+.lupi-stats-panel__flip .starter-card__foil { animation: foilSweep 1.3s .5s ease-out 1; }
+.lupi-stats-close { position: absolute; right: 10px; top: 5px; border: 0; background: transparent; color: #fff; font-size: 32px; cursor: pointer; }
+.lupi-stats-back { padding: 9px 15px; border: 0; border-radius: 9px; background: var(--gold); color: #071b23; font: 900 15px var(--display); cursor: pointer; }
+
+/* ───────── 6 · MOVIMIENTO ───────── */
+@keyframes lineupReveal { from { opacity: 0; scale: .55; filter: brightness(3); } to { opacity: 1; scale: 1; filter: brightness(1); } }
+@keyframes lupiCardLand {
+  0%   { opacity: 0; transform: translateY(-36px) rotateY(65deg) scale(1.22); filter: brightness(2.5); }
+  65%  { opacity: 1; transform: translateY(5px) rotateY(-4deg) scale(1.035); filter: brightness(1.4); }
+  100% { opacity: 1; transform: none; filter: brightness(1); }
+}
+@keyframes lupiAuraIn { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+@keyframes lupiFinalFlash { 0% { opacity: 0; filter: brightness(3); } 30% { opacity: 1; } 100% { opacity: .45; filter: brightness(1); } }
+@keyframes lupiStatsFlip { from { opacity: 0; transform: perspective(700px) rotateY(-80deg) scale(.85); } to { opacity: 1; transform: perspective(700px) rotateY(0) scale(1); } }
+@keyframes foilSweep { from { opacity: .5; transform: translateX(-95%) rotate(8deg); } to { opacity: 0; transform: translateX(95%) rotate(8deg); } }
+@keyframes hintPulse { 0%, 100% { opacity: .7; } 50% { opacity: 1; color: #fff; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .signing-welcome *, .signing-welcome *::before, .signing-welcome *::after { animation: none !important; transition: none !important; }
+}
+/* V7.1 · Explicaciones tácticas, sin modificar la formación ni el tamaño de cartas */
+.futsal-lineup__dt-button { border: 0; background: transparent; color: #ffda77; cursor: pointer; font: 800 12px var(--display); letter-spacing: .1em; padding: 2px 10px; text-shadow: 0 2px 8px #000; }
+.futsal-lineup__dt-button:hover { color: #fff0b7; }
+.lupi-stats-panel__dt { width: 100%; padding: 10px 12px; border: 1px solid #2fffc444; border-radius: 10px; background: #062c35; text-align: left; }
+.lupi-stats-panel__dt strong { color: #ffda77; font: 900 14px var(--display); letter-spacing: .08em; }
+.lupi-stats-panel__dt p { margin: 5px 0 0; color: #d5f5ef; font-size: 12px; line-height: 1.4; }
+.lupi-stats-panel:has(.lupi-stats-panel__dt) { overflow-y: auto; }
+.lupi-dt-panel { width: min(100%, 560px); max-height: min(90dvh, 760px); overflow-y: auto; }
+.lupi-dt-panel h2 { margin: 0; font: italic 900 28px var(--display); }
+.lupi-dt-panel__intro { margin: 0; color: #c5e4e4; font-size: 13px; text-align: center; }
+.lupi-dt-panel__list { width: 100%; display: grid; gap: 8px; }
+.lupi-dt-panel__entry { padding: 10px 12px; background: #071e2d; border: 1px solid #37eac633; border-radius: 10px; text-align: left; }
+.lupi-dt-panel__entry strong { color: #ffd26d; font: 900 15px var(--display); }
+.lupi-dt-panel__entry p { margin: 4px 0 0; font-size: 12px; color: #d8eeed; line-height: 1.4; }
+@media (max-height: 700px) { .lupi-stats-panel__flip { height: min(47dvh, 320px); } }
+
+/* V7.2 · Ayuda progresiva: CTA principal primero, análisis opcional debajo */
+.futsal-lineup__dt-button { font-size: clamp(9px, 1.35dvh, 12px); line-height: 1.2; min-height: 20px; padding: 2px 8px; }
+.futsal-lineup__dt-button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 4px; }
+.lupi-stats-panel__help { margin: 0; max-width: 280px; color: #c9e6e7; text-align: center; font-size: 11px; line-height: 1.35; }
+.lupi-stats-panel__help strong { color: #ffdc81; }
+.lupi-stats-panel:has(.lupi-stats-panel__help) { overflow-y: auto; gap: 8px; }
+.lupi-stats-panel:has(.lupi-stats-panel__help) .lupi-stats-panel__flip { flex-shrink: 0; height: min(45dvh, 335px); }
+.lupi-stats-panel:has(.lupi-stats-panel__help) .lupi-stats-panel__dt { flex-shrink: 0; }
+@media (max-height: 650px) { .futsal-lineup__dt-button { min-height: 18px; } .lupi-stats-panel:has(.lupi-stats-panel__help) .lupi-stats-panel__flip { height: min(38dvh, 275px); } }
+
+/* V7.3 — Móvil: arquero / cierre / dos alas / pívot.
+   Solo cambia la presentación: slots 0=ARQ, 1=CIERRE, 2/3=ALAS, 4=PÍVOT.
+   Se reserva espacio para etiquetas y footer incluso en iPhone SE. */
+@media (max-width: 850px) {
+  .futsal-lineup__slot {
+    --h: min(20.5cqh, calc(28cqw * 1.4224), 150px);
+  }
+  .futsal-lineup__slot--0 { left: 50%; top: 12%; }
+  .futsal-lineup__slot--1 { left: 50%; top: 36.5%; }
+  .futsal-lineup__slot--2 { left: 27%; top: 61%; }
+  .futsal-lineup__slot--3 { left: 73%; top: 61%; }
+  .futsal-lineup__slot--4 { left: 50%; top: 85.5%; }
+  .futsal-lineup__role { top: calc(100% + 2px); font-size: clamp(8px, 1.1dvh, 10px); }
+  .futsal-lineup__off-position { font-size: 7px; }
+}
+@media (max-width: 850px) and (max-height: 710px) {
+  .futsal-lineup__slot { --h: min(19.5cqh, calc(27cqw * 1.4224), 126px); }
+  .futsal-lineup__slot--0 { top: 12%; }
+  .futsal-lineup__slot--1 { top: 36.5%; }
+  .futsal-lineup__slot--2, .futsal-lineup__slot--3 { top: 61%; }
+  .futsal-lineup__slot--4 { top: 85.5%; }
+}

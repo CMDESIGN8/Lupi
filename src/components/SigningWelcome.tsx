@@ -1,15 +1,123 @@
-import { useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { api, type AppUser } from "../lib/api";
 import type { UserCard } from "../types/cards";
 import "./SigningWelcome.css";
 
 type Props = { user: AppUser; onContinue: () => void };
-type Stage = "welcome" | "reveal" | "summary";
+type Stage = "welcome" | "reveal";
 type Rarity = "bronze" | "silver" | "gold" | "special";
+type Variant = "lineup" | "full";
+
 const statLabels = [["RIT", "pace"], ["REG", "dribbling"], ["PAS", "passing"], ["DEF", "defending"], ["REM", "finishing"], ["FIS", "physical"]] as const;
+const RARITY_LABEL: Record<Rarity, string> = { bronze: "BRONCE", silver: "PLATA", gold: "ORO", special: "ESPECIAL" };
 
 function rarityFor(rating: number): Rarity {
   return rating >= 85 ? "special" : rating >= 75 ? "gold" : rating >= 65 ? "silver" : "bronze";
+}
+
+const overallOf = (item?: UserCard) => Number(item?.card?.overall_rating) || 0;
+
+/**
+ * LUPI DT: arma el mejor quinteto completo (no elige puesto por puesto).
+ * El índice del puesto es el índice del slot en cancha y en el array `cards`,
+ * así que la etiqueta bajo cada carta SIEMPRE sale de FUTSAL_ROLES.
+ */
+const FUTSAL_ROLES = ["ARQUERO", "CIERRE", "ALA IZQ.", "ALA DER.", "PÍVOT"] as const;
+type FutsalRole = typeof FUTSAL_ROLES[number];
+const WINGS: readonly FutsalRole[] = ["ALA IZQ.", "ALA DER."];
+
+const normalize = (value: unknown) =>
+  String(value ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
+
+/** Puestos naturales. Un ala puede jugar en cualquiera de las dos bandas. */
+function naturalRoles(position: string): FutsalRole[] {
+  const p = normalize(position);
+  if (/GK|POR|ARQ|GOAL/.test(p)) return ["ARQUERO"];
+  if (/CIERRE|FIXO|DEF|CB|BACK/.test(p)) return ["CIERRE"];
+  if (/PIV|\bST\b|FW|DEL|STRIKER|FORWARD/.test(p)) return ["PÍVOT"];
+  if (/ALA|WING|\bLW\b|\bRW\b|LEFT|RIGHT|IZQ|DER|MID|MED/.test(p)) return [...WINGS];
+  return [];
+}
+
+/** Banda preferida de un ala, si la posición la indica. */
+function wingSide(position: string): FutsalRole | null {
+  const p = normalize(position);
+  return /IZQ|LEFT|\bLW\b/.test(p) ? "ALA IZQ." : /DER|RIGHT|\bRW\b/.test(p) ? "ALA DER." : null;
+}
+
+function isOutOfPosition(item: UserCard, role: FutsalRole): boolean {
+  const natural = naturalRoles(String(item.card?.position ?? ""));
+  return natural.length > 0 && !natural.includes(role);
+}
+
+function fitScore(item: UserCard, role: FutsalRole): number {
+  const c = item.card!;
+  const n = (key: keyof typeof c) => Math.max(0, Math.min(100, Number(c[key]) || 0));
+  const overall = n("overall_rating");
+  const pace = n("pace"), dribble = n("dribbling"), pass = n("passing");
+  const defend = n("defending"), finish = n("finishing"), physical = n("physical");
+  const skill = role === "ARQUERO" ? .55 * defend + .30 * physical + .15 * pass
+    : role === "CIERRE" ? .47 * defend + .25 * physical + .20 * pass + .08 * pace
+    : role === "PÍVOT" ? .43 * finish + .24 * physical + .18 * dribble + .15 * pass
+    : .30 * pace + .28 * dribble + .23 * pass + .12 * physical + .07 * finish;
+  const position = String(c.position ?? "");
+  const natural = naturalRoles(position);
+  // La valoración importa, pero la compatibilidad de puesto pesa más.
+  const penalty = natural.length === 0 ? 8 : natural.includes(role) ? 0
+    : (natural.includes("ARQUERO") || role === "ARQUERO") ? 32 : 17;
+  const side = wingSide(position);
+  const sidePenalty = side && WINGS.includes(role) && side !== role ? 3 : 0; // ala en su banda contraria: casi gratis
+  return .38 * overall + .62 * skill - penalty - sidePenalty;
+}
+
+/** Programación dinámica sobre máscaras de puestos: O(cartas × 32 × 5). Devuelve [] si hay menos de cinco cartas. */
+function bestQuintet(items: UserCard[]): UserCard[] {
+  const valid = items.filter((item) => item.card);
+  if (valid.length < FUTSAL_ROLES.length) return [];
+  const FULL = (1 << FUTSAL_ROLES.length) - 1;
+  let dp = new Map<number, { score: number; picks: UserCard[] }>([[0, { score: 0, picks: [] }]]);
+  for (const item of valid) {
+    const next = new Map(dp); // incluir la opción "esta carta no juega"
+    for (const [mask, state] of dp) {
+      for (let role = 0; role < FUTSAL_ROLES.length; role++) {
+        if (mask & (1 << role)) continue;
+        const newMask = mask | (1 << role);
+        const score = state.score + fitScore(item, FUTSAL_ROLES[role]);
+        if (score > (next.get(newMask)?.score ?? -Infinity)) {
+          const picks = state.picks.slice();
+          picks[role] = item;
+          next.set(newMask, { score, picks });
+        }
+      }
+    }
+    dp = next;
+  }
+  return dp.get(FULL)?.picks ?? [];
+}
+
+/** Explicación basada en las mismas habilidades que utiliza el selector del DT. */
+function dtExplanation(item: UserCard, role: FutsalRole): string {
+  const card = item.card;
+  if (!card) return "Sin datos suficientes para analizar esta carta.";
+  const natural = naturalRoles(String(card.position ?? ""));
+  const weights: Record<FutsalRole, { key: "pace" | "dribbling" | "passing" | "defending" | "finishing" | "physical"; label: string; weight: number }[]> = {
+    "ARQUERO": [{ key: "defending", label: "defensa", weight: .55 }, { key: "physical", label: "físico", weight: .30 }, { key: "passing", label: "pase", weight: .15 }],
+    "CIERRE": [{ key: "defending", label: "defensa", weight: .47 }, { key: "physical", label: "físico", weight: .25 }, { key: "passing", label: "pase", weight: .20 }, { key: "pace", label: "ritmo", weight: .08 }],
+    "ALA IZQ.": [{ key: "pace", label: "ritmo", weight: .30 }, { key: "dribbling", label: "regate", weight: .28 }, { key: "passing", label: "pase", weight: .23 }, { key: "physical", label: "físico", weight: .12 }, { key: "finishing", label: "remate", weight: .07 }],
+    "ALA DER.": [{ key: "pace", label: "ritmo", weight: .30 }, { key: "dribbling", label: "regate", weight: .28 }, { key: "passing", label: "pase", weight: .23 }, { key: "physical", label: "físico", weight: .12 }, { key: "finishing", label: "remate", weight: .07 }],
+    "PÍVOT": [{ key: "finishing", label: "remate", weight: .43 }, { key: "physical", label: "físico", weight: .24 }, { key: "dribbling", label: "regate", weight: .18 }, { key: "passing", label: "pase", weight: .15 }],
+  };
+  const best = [...weights[role]].sort((a, b) =>
+    b.weight * (Number(card[b.key]) || 0) - a.weight * (Number(card[a.key]) || 0)
+  ).slice(0, 2);
+  const traits = best.map((stat) => `${stat.label} (${Number(card[stat.key]) || 0})`).join(" y ");
+  const intro = natural.includes(role)
+    ? `Es su posición natural. LUPI DT lo eligió como ${role.toLowerCase()}`
+    : natural.length === 0
+      ? `No tenemos una posición natural reconocida. LUPI DT lo asignó como ${role.toLowerCase()}`
+      : `Juega fuera de su posición natural (${String(card.position).toUpperCase()}). LUPI DT lo adaptó como ${role.toLowerCase()}`;
+  const warning = role === "ARQUERO" ? " La evaluación del arco es orientativa: todavía no hay atributos específicos de arquero." : "";
+  return `${intro} considerando su ${traits} y el equilibrio del quinteto.${warning}`;
 }
 
 /** Ilustración vectorial original, sin depender de fotos externas ni nuevas librerías. */
@@ -57,23 +165,116 @@ function PlayerPortrait({ position, variant }: { position: string; variant: numb
   );
 }
 
-function CardFace({ item, index, compact = false }: { item: UserCard; index: number; compact?: boolean }) {
+
+/**
+ * Identidad visual por carta (NO por orden de aparición ni por módulo de cinco).
+ * Prioridad: URL real en la carta > manifest por ID > manifest por nombre > vector.
+ * Para incorporar arte nuevo, añadir el ID real de Supabase a PLAYER_ART_BY_ID.
+ */
+const PLAYER_ART_BY_ID: Record<string, string> = {
+  "3edf556a-db0d-4336-ba29-e3195831a2c8": "/player-art/juan-perez.webp",
+  "474a5657-2391-48b7-b317-4320985f8106": "/player-art/sergio-gonzalez.webp",
+  "4756cbcd-d68d-45ad-a10c-2b9687e80add": "/player-art/martin-fernandez.webp",
+  "910449e0-eaf6-4907-b513-714cee1df2dd": "/player-art/luis-rodriguez.webp",
+  "c6ca243b-c0f6-4cc0-8113-5f993c02bbe6": "/player-art/javier-lopez.webp",
+};
+
+// Cada jugador usa su propia ilustración. Guardá los archivos en public/player-art/.
+// Estos nombres funcionan aunque las cartas se entreguen en otro orden.
+const PLAYER_ART_BY_NAME: Record<string, string> = {
+  "juan-perez": "/player-art/juan-perez.webp",
+  "sergio-gonzalez": "/player-art/sergio-gonzalez.webp",
+  "martin-fernandez": "/player-art/martin-fernandez.webp",
+  "luis-rodriguez": "/player-art/luis-rodriguez.webp",
+  "javier-lopez": "/player-art/javier-lopez.webp",
+};
+
+function playerSlug(name: string): string {
+  return name.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+function stableVariant(identity: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < identity.length; i++) {
+    hash ^= identity.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
+function playerIdentity(card: NonNullable<UserCard["card"]>): string {
+  const withId = card as typeof card & { id?: string | number };
+  return String(withId.id ?? playerSlug(String(card.name ?? "")));
+}
+
+function playerArtUrl(card: NonNullable<UserCard["card"]>): string | null {
+  const fields = card as typeof card & {
+    photo_url?: string | null;
+    image_url?: string | null;
+    imageUrl?: string | null;
+    portrait_url?: string | null;
+    portraitUrl?: string | null;
+  };
+  const fromData = fields.photo_url ?? fields.image_url ?? fields.imageUrl ?? fields.portrait_url ?? fields.portraitUrl;
+  if (typeof fromData === "string" && fromData.trim()) return fromData.trim();
+  const id = playerIdentity(card);
+  return PLAYER_ART_BY_ID[id] ?? PLAYER_ART_BY_NAME[playerSlug(String(card.name ?? ""))] ?? null;
+}
+
+function PlayerArtwork({ card }: { card: NonNullable<UserCard["card"]> }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const url = playerArtUrl(card);
+  const variant = stableVariant(playerIdentity(card));
+  if (!url || url === failedUrl) {
+    return <PlayerPortrait position={String(card.position)} variant={variant} />;
+  }
+  return (
+    <img
+      className="starter-card__player starter-card__player--image"
+      src={url}
+      alt={`Ilustración de ${card.name}`}
+      loading="eager"
+      decoding="async"
+      draggable={false}
+      onError={() => setFailedUrl(url)}
+    />
+  );
+}
+
+/** Precarga el arte para que ninguna carta "salte" al aparecer en la revelación. */
+function preloadArt(items: UserCard[]) {
+  for (const item of items) {
+    const url = item.card ? playerArtUrl(item.card) : null;
+    if (url) new Image().src = url;
+  }
+}
+
+const CardFace = memo(function CardFace({ item, index, variant = "full" }: { item: UserCard; index: number; variant?: Variant }) {
   const card = item.card;
   if (!card) return null;
   const rarity = rarityFor(Number(card.overall_rating) || 0);
+  const full = variant === "full";
   return (
-    <article className={`starter-card starter-card--${rarity}${compact ? " starter-card--compact" : ""}`} aria-label={`Carta ${index + 1}: ${card.name}`}>
+    <article className={`starter-card starter-card--${rarity} starter-card--${variant}`} aria-label={`Carta ${index + 1}: ${card.name}`}>
       <div className="starter-card__grain" aria-hidden="true" />
-      <div className="starter-card__top"><div><strong>{card.overall_rating}</strong><span className="starter-card__position">{String(card.position).toUpperCase()}</span></div><span className="starter-card__crest" aria-hidden="true">♛</span></div>
-      <div className="starter-card__portrait"><span className="starter-card__sun" aria-hidden="true"/><PlayerPortrait position={String(card.position)} variant={index} /></div>
+      {full && <div className="starter-card__foil" aria-hidden="true" />}
+      <div className="starter-card__top">
+        <div><strong>{card.overall_rating}</strong><span className="starter-card__position">{String(card.position).toUpperCase()}</span></div>
+        <span className="starter-card__crest" aria-hidden="true">♛</span>
+      </div>
+      <div className="starter-card__portrait">
+        <span className="starter-card__sun" aria-hidden="true" />
+        <PlayerArtwork key={playerIdentity(card)} card={card} />
+      </div>
       <div className="starter-card__bottom">
         <h3>{card.name}</h3>
-        <div className="starter-card__rarity">✦ {rarity === "special" ? "ESPECIAL" : rarity === "gold" ? "ORO" : rarity === "silver" ? "PLATA" : "BRONCE"} ✦</div>
-        <div className="starter-card__stats">{statLabels.map(([label, key]) => <span key={key}>{label}<b>{card[key]}</b></span>)}</div>
+        <div className="starter-card__rarity">✦ {RARITY_LABEL[rarity]} ✦</div>
+        {full && <div className="starter-card__stats">{statLabels.map(([label, key]) => <span key={key}>{label}<b>{card[key]}</b></span>)}</div>}
       </div>
     </article>
   );
-}
+});
 
 /** Solo consulta cartas existentes: no modifica inventario, puntos ni referidos. */
 export function SigningWelcome({ user, onContinue }: Props) {
@@ -82,20 +283,66 @@ export function SigningWelcome({ user, onContinue }: Props) {
   const [index, setIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [celebrated, setCelebrated] = useState(false);
+  const [detailsIndex, setDetailsIndex] = useState<number | null>(null);
+  const [incomplete, setIncomplete] = useState(false);
+  const [showDtAnalysis, setShowDtAnalysis] = useState(false);
+
+  const last = cards.length - 1;
+  const done = stage === "reveal" && cards.length > 0 && index === last;
+  const clubName = user.club || "LUPI WORLD";
+
+  /** rank[slot] = orden de aparición. Menor overall primero: la mejor carta sale última. */
+  const revealRank = useMemo(() => {
+    const order = cards.map((_, i) => i).sort((a, b) => overallOf(cards[a]) - overallOf(cards[b]) || a - b);
+    const rank = new Array<number>(cards.length);
+    order.forEach((slot, r) => { rank[slot] = r; });
+    return rank;
+  }, [cards]);
+
+  // Revelación automática (se pausa mientras hay una ficha abierta).
+  useEffect(() => {
+    if (stage !== "reveal" || cards.length === 0 || index >= last || detailsIndex !== null || showDtAnalysis) return;
+    const timer = window.setTimeout(() => setIndex((current) => Math.min(current + 1, last)), 2500);
+    return () => window.clearTimeout(timer);
+  }, [stage, cards.length, index, last, detailsIndex, showDtAnalysis]);
+
+  // Celebración final + habilita el CTA.
+  useEffect(() => {
+    if (!done) { setCelebrated(false); return; }
+    const timer = window.setTimeout(() => setCelebrated(true), 1050);
+    return () => window.clearTimeout(timer);
+  }, [done]);
+
+  // Escape cierra la ficha.
+  useEffect(() => {
+    if (detailsIndex === null && !showDtAnalysis) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") { setDetailsIndex(null); setShowDtAnalysis(false); } };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [detailsIndex, showDtAnalysis]);
 
   async function openPack() {
     if (loading) return;
     setLoading(true);
     setError("");
     try {
+      setIncomplete(false);
       const collection = await api.getUserCards(user.id);
-      const visible = collection.filter((item) => Boolean(item.card)).slice(0, 5);
-      if (!visible.length) {
-        setError("Todavía no encontramos tus cartas. Probá nuevamente en unos segundos.");
+      const available = collection.filter((item) => Boolean(item.card));
+      const visible = bestQuintet(available);
+      if (visible.length < FUTSAL_ROLES.length) {
+        setIncomplete(true);
+        setError(available.length
+          ? "Necesitás cinco cartas para armar el quinteto. Revisá tu colección e intentá nuevamente."
+          : "Todavía no encontramos tus cartas. Probá nuevamente en unos segundos.");
         return;
       }
+      preloadArt(visible);
       setCards(visible);
       setIndex(0);
+      setDetailsIndex(null);
+      setShowDtAnalysis(false);
       setStage("reveal");
     } catch (cause) {
       console.error("Error al cargar Starter Pack", cause);
@@ -105,39 +352,105 @@ export function SigningWelcome({ user, onContinue }: Props) {
     }
   }
 
+  const detail = detailsIndex !== null ? cards[detailsIndex] : undefined;
+
   return (
-    <div className="signing-welcome" role="dialog" aria-modal="true" aria-labelledby="signing-title">
+    <div className={`signing-welcome signing-welcome--${stage}`} role="dialog" aria-modal="true" aria-labelledby="signing-title">
       <div className="signing-welcome__light signing-welcome__light--left" aria-hidden="true" />
       <div className="signing-welcome__light signing-welcome__light--right" aria-hidden="true" />
-      <div className={`signing-welcome__card signing-welcome__card--pack signing-welcome__card--${stage}`}>
+      <div className={`signing-welcome__card signing-welcome__card--${stage}`}>
         <span className="signing-welcome__eyebrow">✦ LUPI WORLD · NUEVO FICHAJE ✦</span>
+
         {stage === "welcome" && <>
           <div className="signing-welcome__emblem" aria-hidden="true">♛</div>
           <h1 id="signing-title">¡FICHAJE <em>CONFIRMADO!</em></h1>
           <p className="signing-welcome__intro">Bienvenido a la cancha</p>
           <strong className="signing-welcome__name">{user.username || "JUGADOR"}</strong>
-          <span className="signing-welcome__club">{user.club || "LUPI WORLD"}</span>
+          <span className="signing-welcome__club">{clubName}</span>
           <p className="signing-welcome__message">STARTER PACK DESBLOQUEADO · 5 CARTAS</p>
           {error && <p role="alert" className="starter-pack__error">{error}</p>}
-          <button type="button" className="signing-welcome__button" onClick={openPack} disabled={loading}>{loading ? "CARGANDO CARTAS..." : "ABRIR MI PRIMER SOBRE →"}</button>
+          <button type="button" className="signing-welcome__button" onClick={openPack} disabled={loading}>
+            {loading ? "CARGANDO CARTAS..." : "ABRIR MI PRIMER SOBRE →"}
+          </button>
+          {incomplete && <button type="button" className="starter-pack__skip" onClick={onContinue}>CONTINUAR SIN QUINTETO</button>}
         </>}
+
         {stage === "reveal" && <>
-          <h1 id="signing-title" className="starter-pack__title">¡TU PRIMER <em>EQUIPO!</em></h1>
-          <div className="starter-pack__progress">CARTA {String(index + 1).padStart(2, "0")} / {String(cards.length).padStart(2, "0")}</div>
-          <div className={`starter-pack__arena starter-pack__arena--${rarityFor(Number(cards[index]?.card?.overall_rating) || 0)}`} key={cards[index]?.id ?? index}>
-            <div className="starter-pack__burst" aria-hidden="true" />
-            <div className="starter-pack__reveal"><CardFace item={cards[index]} index={index} /></div>
+          <header className="futsal-lineup__header">
+            <h1 id="signing-title" className="starter-pack__title">
+              {done ? <>¡TU EQUIPO <em>ESTÁ LISTO!</em></> : <>ARMANDO <em>TU QUINTETO</em></>}
+            </h1>
+            <div className="futsal-lineup__club">{clubName} <span aria-hidden="true">✦</span> TU PRIMER QUINTETO</div>
+            <p className="starter-pack__progress">{Math.min(index + 1, cards.length)} / {cards.length} JUGADORES REVELADOS</p>
+          </header>
+
+          <div className={`futsal-lineup${celebrated ? " is-complete" : ""}`} aria-label="Formación de futsal">
+            {celebrated && <div className="futsal-lineup__celebration" aria-hidden="true" />}
+            {cards.map((item, i) => {
+              const role = FUTSAL_ROLES[i];
+              const revealed = revealRank[i] <= index;
+              return (
+                <div key={item.id ?? i} className={`futsal-lineup__slot futsal-lineup__slot--${i} ${revealed ? "is-revealed" : "is-locked"}`}>
+                  {revealed ? <>
+                    <div className="futsal-lineup__ground" aria-hidden="true" />
+                    <button type="button" className="futsal-lineup__card-trigger" onClick={() => setDetailsIndex(i)} aria-label={`Ver estadísticas de ${item.card?.name ?? "jugador"}`}>
+                      <CardFace item={item} index={i} variant="lineup" />
+                      <span className="futsal-lineup__view-stats" aria-hidden="true">VER STATS ↗</span>
+                    </button>
+                    <span className="futsal-lineup__role">{role}{isOutOfPosition(item, role) && <small className="futsal-lineup__off-position">FUERA DE POSICIÓN</small>}</span>
+                  </> : (
+                    <div className="futsal-lineup__placeholder">?<small>{role}</small></div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-          <button type="button" className="signing-welcome__button" onClick={() => index + 1 < cards.length ? setIndex((current) => current + 1) : setStage("summary")}>{index + 1 < cards.length ? "SIGUIENTE CARTA →" : "VER MI EQUIPO →"}</button>
-          <button type="button" className="starter-pack__skip" onClick={() => setStage("summary")}>SALTAR ANIMACIÓN</button>
-        </>}
-        {stage === "summary" && <>
-          <h1 id="signing-title" className="starter-pack__title">¡EQUIPO <em>LISTO!</em></h1>
-          <p className="signing-welcome__intro">Tus {cards.length} cartas iniciales</p>
-          <div className="starter-pack__summary">{cards.map((item, i) => <CardFace key={item.id} item={item} index={i} compact />)}</div>
-          <button type="button" className="signing-welcome__button" onClick={onContinue}>IR A MI EQUIPO →</button>
+
+          <footer className="futsal-lineup__footer">
+            {done
+              ? <button type="button" className={`signing-welcome__button futsal-lineup__cta${celebrated ? " is-ready" : ""}`} onClick={onContinue} disabled={!celebrated}>ENTRAR A LUPI WORLD →</button>
+              : <div className="futsal-lineup__autoplay" role="status">REVELANDO JUGADORES AUTOMÁTICAMENTE…</div>}
+            {done && <button type="button" className="futsal-lineup__dt-button" onClick={() => setShowDtAnalysis(true)}>♟ VER ANÁLISIS DE LUPI DT ↗</button>}
+            {done && <span className="futsal-lineup__tagline">TOCÁ UN JUGADOR PARA DESCUBRIR SUS HABILIDADES</span>}
+            {!done && <button type="button" className="starter-pack__skip" onClick={() => setIndex(last)}>REVELAR EQUIPO COMPLETO</button>}
+          </footer>
         </>}
       </div>
+
+       {showDtAnalysis && (
+         <div className="lupi-stats-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowDtAnalysis(false); }}>
+           <section className="lupi-stats-panel lupi-dt-panel" role="dialog" aria-modal="true" aria-label="Análisis del director técnico">
+             <button type="button" className="lupi-stats-close" onClick={() => setShowDtAnalysis(false)} aria-label="Cerrar análisis">×</button>
+             <div className="lupi-stats-panel__eyebrow">✦ LUPI DT ✦</div>
+             <h2>ASÍ ARMÉ TU QUINTETO</h2>
+             <p className="lupi-dt-panel__intro">Busqué el mejor rendimiento conjunto, respetando las posiciones naturales cuando fue posible.</p>
+             <div className="lupi-dt-panel__list">
+               {cards.map((item, i) => (
+                 <div className="lupi-dt-panel__entry" key={item.id ?? i}>
+                   <strong>{FUTSAL_ROLES[i]} · {item.card?.name}</strong>
+                   <p>{dtExplanation(item, FUTSAL_ROLES[i])}</p>
+                 </div>
+               ))}
+             </div>
+             <button type="button" className="lupi-stats-back" onClick={() => setShowDtAnalysis(false)}>← VOLVER A MI QUINTETO</button>
+           </section>
+         </div>
+       )}
+
+      {detail?.card && detailsIndex !== null && (
+        <div className="lupi-stats-overlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setDetailsIndex(null); }}>
+          <section className="lupi-stats-panel" role="dialog" aria-modal="true" aria-label={`Estadísticas de ${detail.card.name}`}>
+            <button type="button" className="lupi-stats-close" onClick={() => setDetailsIndex(null)} aria-label="Cerrar estadísticas">×</button>
+            <div className="lupi-stats-panel__eyebrow">✦ FICHA DE JUGADOR ✦</div>
+            <p className="lupi-stats-panel__help"><strong>OVR {detail.card.overall_rating}</strong> es su valoración general. Sus atributos ayudan a definir cómo rinde en la cancha.</p>
+            <div className="lupi-stats-panel__flip" key={detailsIndex}>
+              <CardFace item={detail} index={detailsIndex} />
+            </div>
+            <div className="lupi-stats-panel__dt"><strong>♟ LUPI DT · {FUTSAL_ROLES[detailsIndex]}</strong><p>{dtExplanation(detail, FUTSAL_ROLES[detailsIndex])}</p></div>
+            <button type="button" className="lupi-stats-back" onClick={() => setDetailsIndex(null)} autoFocus>← VOLVER A MI QUINTETO</button>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
