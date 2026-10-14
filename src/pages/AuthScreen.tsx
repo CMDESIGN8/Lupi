@@ -1,18 +1,16 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { api, type AppUser } from "../lib/api";
-import { CLUBS } from "../lib/constants";
-import { useToastContext } from "../components/ToastProvider";
 import "./Auth.css";
 
 type Mode = "login" | "register";
-type FormData = { email: string; password: string; username: string; club: string; referralCode: string };
+type FormData = { email: string; password: string };
 
 export function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
   const [mode, setMode] = useState<Mode>("login");
-  const [form, setForm] = useState<FormData>({ email: "", password: "", username: "", club: "", referralCode: "" });
+  const [form, setForm] = useState<FormData>({ email: "", password: "" });
+  const [confirmationEmail, setConfirmationEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const { showToast } = useToastContext();
 
   const set = (key: keyof FormData) => (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
@@ -21,6 +19,7 @@ export function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
     if (loading) return;
     setMode(next);
     setError("");
+    setConfirmationEmail("");
   };
 
   const handleGoogleLogin = async () => {
@@ -52,23 +51,27 @@ export function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
         const user = await api.login({ email: form.email.trim(), password: form.password });
         onAuth(user);
       } else {
-        if (!form.email.trim() || !form.password || !form.username.trim() || !form.club)
+        const email = form.email.trim().toLowerCase();
+        if (!email || !form.password)
           throw new Error("Completá todos los campos.");
-        if (form.password.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
-        const referralCode = form.referralCode.trim().toUpperCase();
-        const user = await api.register({
-          email: form.email.trim(), password: form.password,
-          username: form.username.trim(), club: form.club,
-          referralCode: referralCode || undefined,
-        });
-        // Mantenemos el mensaje de bienvenida; los puntos los asigna el backend.
-        showToast(
-          referralCode
-            ? "🎉 ¡Bienvenido! Arrancás con 75 puntos (50 de bienvenida + 25 del código)."
-            : "🎉 ¡Bienvenido! Arrancás con 50 puntos de regalo.",
-          "success"
-        );
-        onAuth(user);
+        if (form.password.length < 6)
+          throw new Error("La contraseña debe tener al menos 6 caracteres.");
+
+        const result = await api.signUpWithEmail({ email, password: form.password });
+        if (result.requiresEmailConfirmation) {
+          setConfirmationEmail(email);
+        } else {
+          // El trigger de profiles puede tardar unos instantes.
+          // Evitamos mostrar de nuevo el login mientras se crea el perfil.
+          let user: AppUser | null = null;
+          for (let attempt = 0; attempt < 8; attempt++) {
+            user = await api.getSession();
+            if (user) break;
+            await new Promise((resolve) => setTimeout(resolve, 400));
+          }
+          if (!user) throw new Error("Tu cuenta se creó, pero el perfil todavía no está listo. Intentá iniciar sesión en unos segundos.");
+          onAuth(user);
+        }
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Ocurrió un error. Intentá nuevamente.");
@@ -108,7 +111,7 @@ export function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
         <section className="auth-card-v2" aria-label="Acceso a Lupi World">
           <div className="auth-card-heading">
             <span className="auth-card-eyebrow">PLAYER ACCESS · S01</span>
-            <h2>{mode === "login" ? "VOLVÉ A LA CANCHA" : "CREÁ TU JUGADOR"}</h2>
+            <h2>{mode === "login" ? "VOLVÉ A LA CANCHA" : "CREÁ TU CUENTA"}</h2>
             <p>{mode === "login" ? "Tu equipo te está esperando." : "Tu historia en Lupi World empieza acá."}</p>
           </div>
 
@@ -137,24 +140,21 @@ export function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
   </button>
 </div>
 
+          {confirmationEmail && mode === "register" && (
+            <div className="auth-confirmation" role="status">
+              <strong>✉️ REVISÁ TU CORREO</strong>
+              <p>Enviamos un enlace de confirmación a <b>{confirmationEmail}</b>.</p>
+              <p>Confirmá tu email para continuar con la creación de tu jugador.</p>
+              <button type="button" onClick={() => changeMode("login")}>YA CONFIRMÉ · INICIAR SESIÓN →</button>
+            </div>
+          )}
           {error && <div className="auth-error" role="alert">⚠️ {error}</div>}
-           <div className="auth-divider">
-    <span>O CONTINUÁ CON</span>
-  </div>
-          <form className="auth-form" onSubmit={handleSubmit}>
-            {mode === "register" && (
-              <div className="form-group"><label className="form-label" htmlFor="auth-username">NOMBRE DE USUARIO</label><input id="auth-username" className="form-input" placeholder="@TuJugador" value={form.username} onChange={set("username")} autoComplete="username" required /></div>
-            )}
+          {!confirmationEmail && <div className="auth-divider"><span>O CONTINUÁ CON EMAIL</span></div>}
+          <form className="auth-form" onSubmit={handleSubmit} style={confirmationEmail && mode === "register" ? { display: "none" } : undefined}>
             <div className="form-group"><label className="form-label" htmlFor="auth-email">EMAIL</label><input id="auth-email" className="form-input" type="email" placeholder="vos@ejemplo.com" value={form.email} onChange={set("email")} autoComplete="email" required /></div>
             <div className="form-group"><label className="form-label" htmlFor="auth-password">CONTRASEÑA</label><input id="auth-password" className="form-input" type="password" placeholder="••••••••" value={form.password} onChange={set("password")} autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={mode === "register" ? 6 : undefined} required /></div>
-            {mode === "register" && (
-              <>
-                <div className="form-group"><label className="form-label" htmlFor="auth-club">CLUB DE BARRIO</label><select id="auth-club" className="form-input" value={form.club} onChange={set("club")} required><option value="">Seleccioná tu club</option>{CLUBS.map((club) => <option key={club} value={club}>{club}</option>)}</select></div>
-                <div className="form-group"><label className="form-label" htmlFor="auth-referral">CÓDIGO DE REFERIDO (OPCIONAL)</label><input id="auth-referral" className="form-input" placeholder="Ej: LUPIABCD12" value={form.referralCode} onChange={set("referralCode")} style={{ textTransform: "uppercase" }} autoComplete="off" /><small className="form-hint">¿Te invitaron? Ingresá su código y ganá 25 puntos extra.</small></div>
-              </>
-            )}
             <button type="submit" className="auth-submit" disabled={loading}>
-              {loading ? (mode === "login" ? "INGRESANDO AL CLUB…" : "CREANDO TU JUGADOR…") : (mode === "login" ? "ENTRAR AL WORLD" : "CREAR MI JUGADOR")}
+              {loading ? (mode === "login" ? "INGRESANDO AL CLUB…" : "CREANDO TU CUENTA…") : (mode === "login" ? "ENTRAR AL WORLD" : "CREAR MI CUENTA")}
               {!loading && <span aria-hidden="true">→</span>}
             </button>
           </form>

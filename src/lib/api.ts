@@ -159,6 +159,7 @@ function npcToCard(npc: any): UnifiedCard {
   return {
     id: npc.id,
     name: npc.name,
+    photo_url: typeof npc.photo_url === "string" ? npc.photo_url : null,
     position: npc.position,
     category: npc.category,
     overall_rating: npc.overall_rating,
@@ -173,7 +174,7 @@ function npcToCard(npc: any): UnifiedCard {
     is_replaced: npc.is_replaced,
     replaces_profile_id: npc.replaces_profile_id,
     original_name: npc.original_name,
-  };
+  } as UnifiedCard & { photo_url: string | null };
 }
 
 export function needsPlayerOnboarding(user: AppUser): boolean {
@@ -184,6 +185,21 @@ export function needsPlayerOnboarding(user: AppUser): boolean {
 }
 
 export const api = {
+  // El registro tradicional solo crea la identidad de Supabase Auth.
+  // Nombre, club y referido se completan en PlayerOnboarding,
+  // exactamente igual que con Google.
+  signUpWithEmail: async ({ email, password }: { email: string; password: string }): Promise<{ requiresEmailConfirmation: boolean }> => {
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim().toLowerCase(),
+      password,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    if (error) throw new Error(error.message);
+    if (!data.user) throw new Error("No pudimos crear la cuenta. Intentá nuevamente.");
+    // Cuando Confirm Email está habilitado, Supabase no crea una sesión
+    // hasta que el usuario confirma su dirección de correo.
+    return { requiresEmailConfirmation: !data.session };
+  },
   register: async ({ email, username, club, password, referralCode }: RegisterData): Promise<AppUser> => {
     console.log('🔵 Iniciando registro con datos:', { email, username, club, referralCode });
     
