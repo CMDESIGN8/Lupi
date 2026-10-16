@@ -96,3 +96,29 @@
     inset: 18px 0 60px;
   }
 }
+
+/* Mobile: avatar y placa dentro del flujo, nunca recortados. */
+@media (max-width: 600px) {
+  .player-setup-screen .lupi-reveal {
+    width: min(100%, 350px);
+    height: 190px;
+    min-height: 190px;
+    overflow: visible;
+  }
+  .player-setup-screen .lupi-reveal__stage { inset: 0 0 47px; }
+  .player-setup-screen .lupi-reveal__character { height: 115%; max-width: 85%; }
+  .player-setup-screen .lupi-reveal__identity {
+    bottom: 0;
+    width: min(310px, 94%);
+    min-height: 43px;
+    padding: 5px 8px;
+    gap: 1px;
+  }
+  .player-setup-screen .lupi-reveal__identity span { font-size: 8px; }
+  .player-setup-screen .lupi-reveal__identity strong { font-size: 15px; line-height: 1.05; }
+  .player-setup-screen .lupi-reveal__identity small { font-size: 9px; }
+  .player-setup-screen .lupi-reveal__platform { height: 12px; }
+}
+@media (max-width: 390px) {
+  .player-setup-screen .lupi-reveal { height: 175px; min-height: 175px; }
+}
