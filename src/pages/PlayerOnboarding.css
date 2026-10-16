@@ -293,3 +293,40 @@
     min-height: 46px;
   }
 }
+/* Mobile polish: reservar espacio real para la identidad del jugador. */
+@media (max-width: 600px) {
+  .player-setup-screen .player-setup-layout.player-setup-layout--split {
+    gap: 8px;
+    padding-top: 10px;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  .player-setup-screen .player-setup-left {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+    justify-content: flex-start;
+    gap: 4px;
+  }
+  .player-setup-screen .player-setup-hero h1 { font-size: clamp(37px, 10vw, 45px); }
+  .player-setup-screen .player-setup-panel { padding: 12px 12px; }
+  .player-setup-screen .player-setup-form { gap: 7px; }
+  .player-setup-screen .player-setup-field-content input,
+  .player-setup-screen .player-setup-field-content select { height: 44px; min-height: 44px; }
+  .player-setup-screen .player-setup-rewards { padding: 7px 8px; gap: 5px; }
+  .player-setup-screen .player-setup-rewards-heading { padding-bottom: 4px; }
+  .player-setup-screen .player-setup-reward-row {
+    grid-template-columns: 25px minmax(0, 1fr) auto;
+    gap: 5px;
+    min-height: 28px;
+    font-size: 10px;
+  }
+  .player-setup-screen .player-setup-reward-icon { width: 24px; height: 24px; font-size: 14px; border-radius: 7px; }
+  .player-setup-screen .player-setup-reward-row strong { font-size: 20px; }
+  .player-setup-screen .player-setup-reward-row--total strong { font-size: 23px; }
+  .player-setup-screen .player-setup-reward-row--total { margin-top: 0; padding-top: 3px; }
+  .player-setup-screen .player-setup-submit { min-height: 46px; }
+}
+@media (max-width: 390px) {
+  .player-setup-screen .player-setup-reward-row { grid-template-columns: 24px minmax(0,1fr) auto; font-size: 9px; }
+  .player-setup-screen .player-setup-reward-row strong { font-size: 19px; }
+}
