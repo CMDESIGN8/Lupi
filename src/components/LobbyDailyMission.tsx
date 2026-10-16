@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { DailyMission } from "../types/campaignStory";
 
 type Props = {
@@ -31,6 +31,15 @@ export function LobbyDailyMission({
   onClaimReward,
   onStartMission,
 }: Props) {
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => { setCollapsed(false); }, [mission?.id]);
+  if (mission?.isClaimed) return null;
+  if (mission?.isCompleted && collapsed) {
+    return <button type="button" onClick={() => setCollapsed(false)}
+      style={{border:'1px solid #cda83d',borderRadius:10,padding:'9px 14px',background:'#101e18',color:'#fbd56b',cursor:'pointer'}}>
+      🎁 Recompensa pendiente · Ver misión
+    </button>;
+  }
   if (!mission) {
     return (
       <div className="gh-world__mission">
@@ -92,6 +101,8 @@ export function LobbyDailyMission({
 
   return (
     <div className="gh-world__mission">
+      {completed && <button type="button" aria-label="Cerrar aviso de misión" onClick={() => setCollapsed(true)}
+        style={{float:'right',background:'transparent',border:0,color:'#fff',cursor:'pointer',fontSize:18,padding:'0 4px'}}>×</button>}
       <span className="gh-world__mission-kicker">
         {kicker}
       </span>
@@ -131,7 +142,7 @@ export function LobbyDailyMission({
 
           {mission.reward.coins && (
             <span>
-              🪙 +{mission.reward.coins}
+              💰 +{mission.reward.coins}
             </span>
           )}
           {mission.reward.points && (

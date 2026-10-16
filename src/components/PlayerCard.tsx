@@ -269,7 +269,7 @@ export function ChallengeToasts({
             <div key={challenge.id} className="pc-toast pc-toast--daily" role="status">
               <div className="pc-toast__daily-icon">🏆</div>
               <div className="pc-toast__daily-content"><strong>DESAFÍO COMPLETADO</strong><span>{challenge.title}</span>
-                <small>{challenge.progress}/{challenge.requirement}{challenge.rewardXp ? ` · +${challenge.rewardXp} XP` : ""}{challenge.rewardCoins ? ` · +${challenge.rewardCoins} 🪙` : ""}</small>
+                <small>{challenge.progress}/{challenge.requirement}{challenge.rewardXp ? ` · +${challenge.rewardXp} XP` : ""}{challenge.rewardCoins ? ` · +${challenge.rewardCoins} 💰` : ""}</small>
               </div>
             </div>
           ))}

@@ -92,13 +92,16 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [autoSummary, setAutoSummary] = useState<string | null>(null);
   const prevCardCount = useRef(localDeck.cards.length);
+  const autoSaveAttempted = useRef<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => { setLocalDeck(activeDeck); }, [activeDeck]);
 
   // Mostrar onboarding la primera vez
   useEffect(() => {
     const seen = localStorage.getItem('deckbuilder_onboarding_seen');
-    if (!seen) setShowOnboarding(true);
+    // La ayuda queda disponible con el botón ❓, sin bloquear el debut.
+    if (!seen) localStorage.setItem('deckbuilder_onboarding_seen', '1');
   }, []);
 
   // Detectar equipo completo y celebrar
@@ -113,13 +116,13 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
 
   // ===== CÁLCULO DE BONIFICACIONES =====
   const cardsData = localDeck.cards.map(c => getCardData(c)).filter(Boolean);
-  const positions = cardsData.map(c => c.position);
+  const positions = localDeck.cards.map(c => getPositionNameFromSlot(c.position ?? null) === getCardData(c)?.position ? getCardData(c)?.position : null);
   const categories = cardsData.map(c => c.category);
   const isRealPlayer = cardsData.map(c => c.is_real === true || c.card_type === 'socio');
 
   const isComplete = localDeck.cards.length === 5;
-  const hasAllPositions = positions.includes('arquero') && positions.includes('cierre') &&
-    positions.includes('ala') && positions.includes('pivot');
+  const hasAllPositions = isComplete && positions.filter(p => p === 'ala').length === 2 &&
+    positions.includes('arquero') && positions.includes('cierre') && positions.includes('pivot');
   const realPlayersCount = isRealPlayer.filter(r => r === true).length;
   const hasRealPlayers = realPlayersCount >= 3;
   const categoryCount: Record<string, number> = {};
@@ -227,7 +230,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
   }
 
   const applyMove = (card: UserCard, position: number) => {
-    const newCards = [...localDeck.cards];
+    const newCards = localDeck.cards.filter(c => c.id !== card.id);
     const existingIndex = newCards.findIndex(c => c.position === position);
     if (existingIndex >= 0) newCards[existingIndex] = { ...card, position };
     else newCards.push({ ...card, position });
@@ -243,7 +246,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
 
   const selectCard = (card: UserCard) => {
     if (!selectedSlot) return;
-    const newCards = [...localDeck.cards];
+    const newCards = localDeck.cards.filter(c => c.id !== card.id);
     const existingIndex = newCards.findIndex(c => c.position === selectedSlot);
     if (existingIndex >= 0) newCards[existingIndex] = { ...card, position: selectedSlot };
     else newCards.push({ ...card, position: selectedSlot });
@@ -260,47 +263,78 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
 
   const getCardInSlot = (slot: number) => localDeck.cards.find(c => c.position === slot);
 
-  const autoBuildTeam = () => {
-    setAutoBuilding(true);
-    const sorted = [...userCards].sort((a, b) =>
-      (getCardData(b)?.overall_rating || 0) - (getCardData(a)?.overall_rating || 0)
-    );
-    const newCards: UserCard[] = [];
-    const usedIds = new Set<string>();
-    const findBest = (pos: string, slot: number) => {
-      const best = sorted.find(c => !usedIds.has(c.id) && getCardData(c)?.position === pos);
-      if (best) { usedIds.add(best.id); newCards.push({ ...best, position: slot }); return true; }
-      return false;
-    };
-    findBest('arquero', 1); findBest('cierre', 2); findBest('ala', 3);
-    const secondAla = sorted.find(c => !usedIds.has(c.id) && getCardData(c)?.position === 'ala');
-    if (secondAla) { usedIds.add(secondAla.id); newCards.push({ ...secondAla, position: 4 }); }
-    findBest('pivot', 5);
-    for (let slot = 1; slot <= 5; slot++) {
-      if (!newCards.find(c => c.position === slot)) {
-        const best = sorted.find(c => !usedIds.has(c.id));
-        if (best) { usedIds.add(best.id); newCards.push({ ...best, position: slot }); }
-      }
+  // Armado inicial: cada carta se usa una sola vez y se prioriza su puesto natural.
+  const buildBestAvailable = (): UserCard[] => {
+    const pool = [...userCards].filter(c => getCardData(c));
+    const chosen: UserCard[] = [];
+    const used = new Set<string>();
+    for (const slot of [1, 2, 3, 4, 5]) {
+      const expected = getPositionNameFromSlot(slot);
+      const best = pool.filter(c => !used.has(c.id)).sort((a, b) => {
+        const score = (c: UserCard) => (getCardData(c)?.overall_rating ?? 0) +
+          (getCardData(c)?.position === expected ? 100 : 0);
+        return score(b) - score(a);
+      })[0];
+      if (best) { used.add(best.id); chosen.push({ ...best, position: slot }); }
     }
-    setLocalDeck({ ...localDeck, cards: newCards });
-    setAutoSummary('Elegí los jugadores con los ratings más altos para cada posición 🤖✨');
-    setTimeout(() => { setAutoBuilding(false); setTimeout(() => setAutoSummary(null), 4000); }, 600);
+    return chosen;
   };
 
-  const saveDeck = async () => {
+  const persistDeck = async (deck: Deck, showSuccess = false) => {
+    if (!deck.id || deck.cards.length !== 5 || new Set(deck.cards.map(c => c.id)).size !== 5) {
+      setSaveError('Necesitás cinco cartas diferentes para guardar el equipo.');
+      return false;
+    }
     setSaving(true);
+    setSaveError(null);
     try {
-      await supabase.from('deck_cards').delete().eq('deck_id', localDeck.id);
-      for (const card of localDeck.cards) {
-        await supabase.from('deck_cards').insert({ deck_id: localDeck.id, user_card_id: card.id, position: card.position });
+      // Nota: para atomicidad real, migrar este reemplazo a una RPC transaccional.
+      const { data: previous, error: readError } = await supabase
+        .from('deck_cards').select('user_card_id, position').eq('deck_id', deck.id);
+      if (readError) throw readError;
+      const { error: deleteError } = await supabase.from('deck_cards').delete().eq('deck_id', deck.id);
+      if (deleteError) throw deleteError;
+      const rows = deck.cards.map(c => ({ deck_id: deck.id, user_card_id: c.id, position: c.position }));
+      const { error: insertError } = await supabase.from('deck_cards').insert(rows);
+      if (insertError) {
+        // Restauración de mejor esfuerzo; no reemplaza una transacción en servidor.
+        await supabase.from('deck_cards').delete().eq('deck_id', deck.id);
+        if (previous?.length) await supabase.from('deck_cards').insert(previous.map(c => ({ ...c, deck_id: deck.id })));
+        throw insertError;
       }
-      onDeckUpdate(localDeck);
-      alert('✅ ¡Equipo guardado!');
+      setLocalDeck(deck);
+      onDeckUpdate(deck);
+      if (showSuccess) setAutoSummary('¡Equipo guardado! Ya podés jugar.');
+      return true;
     } catch (error) {
-      console.error('Error saving deck:', error);
-      alert('❌ Error al guardar');
+      console.error('Error guardando equipo:', error);
+      setSaveError('No pudimos guardar el equipo. Reintentá antes de jugar.');
+      return false;
     } finally { setSaving(false); }
   };
+
+  const autoBuildTeam = async () => {
+    setAutoBuilding(true);
+    try {
+      const cards = buildBestAvailable();
+      if (cards.length < 5) { setSaveError('Todavía no tenés cinco cartas disponibles.'); return; }
+      const deck = { ...localDeck, cards };
+      await persistDeck(deck, true);
+    } finally { setAutoBuilding(false); }
+  };
+
+  // Solo se autocompleta un mazo realmente vacío; nunca se pisa uno existente.
+  useEffect(() => {
+    if (!activeDeck.id || activeDeck.cards.length !== 0 || userCards.length < 5 || saving) return;
+    const key = `${activeDeck.id}:${userCards.map(c => c.id).sort().join(',')}`;
+    if (autoSaveAttempted.current === key) return;
+    autoSaveAttempted.current = key;
+    void autoBuildTeam();
+  // Se dispara al recibir el mazo y la colección; evita bucles por estado local.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeDeck.id, activeDeck.cards.length, userCards.length]);
+
+  const saveDeck = async () => { await persistDeck(localDeck, true); };
 
   // ===== LÍNEAS DE QUÍMICA =====
   const ChemistryLines = ({ deck }: { deck: Deck }) => {
@@ -590,6 +624,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
             </button>
           </div>
 
+          {saveError && <div role="alert" className="auto-summary" style={{ color: '#ff9b9b' }}>{saveError}</div>}
           {/* RESUMEN AUTO BUILD */}
           {autoSummary && (
             <div className="auto-summary">{autoSummary}</div>
@@ -604,7 +639,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
               {benchCards.map(card => {
                 const data = getCardData(card);
                 return (
-                  <div key={card.id} className="bench-card-fifa-banco" onClick={() => selectCard(card)} title={`Usar a ${data?.name}`}>
+                  <div key={card.id} className="bench-card-fifa-banco" onClick={() => { if (selectedSlot) selectCard(card); else openCardSelector(nextEmptySlot || 1); }} title={`Usar a ${data?.name}`}>
                     <div className="bench-card-rating" style={{ background: getRarityColor(data?.overall_rating) }}>{data?.overall_rating}</div>
                     <div className="bench-card-pos-icon">{POSITION_NAMES[data?.position === 'arquero' ? 1 : data?.position === 'cierre' ? 2 : data?.position === 'ala' ? 3 : 5]?.icon}</div>
                     <div className="bench-card-name-banco">{data?.name}</div>
@@ -675,7 +710,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
               const isSocio = card.card_type === 'socio';
               const rarity = getRarityColor(data?.overall_rating);
               return (
-                <div key={card.id} className={`enhanced-card ${isSocio ? 'socio-card' : ''}`} onClick={() => selectCard(card)}>
+                <div key={card.id} className={`enhanced-card ${isSocio ? 'socio-card' : ''}`} onClick={() => { if (selectedSlot) selectCard(card); else openCardSelector(nextEmptySlot || 1); }}>
                   <div className="card-rarity-badge" style={{ background: rarity }}>{data?.overall_rating}</div>
                   {isSocio && <div className="card-type-badge">🔴 REAL</div>}
                   <div className="card-rarity-label">{getRarityLabel(data?.overall_rating)}</div>

@@ -28,6 +28,8 @@ interface CardBattleProps {
   userDeck: Deck;
   userId: string;
   onBattleComplete: (updatedCards: UserCard[]) => void;
+  onMatchRecorded?: () => void;
+  onResultClosed?: () => void;
   onNavigateToDeck?: () => void;
   forcedOpponent?: BotPlayer | null;
   isCampaignMode?: boolean;
@@ -112,11 +114,11 @@ function mirror(f: Formation): Formation {
 }
 
 const LABELS = ['ARQ','CIE','ALA','ALA','PIV'];
-const TOTAL_TURNS = 10;
-const TURN_MS     = 900;
-const GOAL_MS     = 1800;
+const TOTAL_TURNS = 6;
+const TURN_MS     = 400;
+const GOAL_MS     = 750;
 
-function delay(ms: number) { return new Promise<void>(r => setTimeout(r, ms)); }
+function delay(ms: number) { return new Promise<void>(r => setTimeout(r, Math.round(ms * 0.55))); }
 function calcOvr(cards: UserCard[]) {
   if (!cards.length) return 50;
   return Math.round(cards.reduce((s, c) => s + getCardData(c).overall_rating, 0) / cards.length);
@@ -128,7 +130,9 @@ export function CardBattle({
   userCards, 
   userDeck, 
   userId, 
-  onBattleComplete, 
+  onBattleComplete,
+  onMatchRecorded,
+  onResultClosed,
   onNavigateToDeck,
   forcedOpponent = null,
   isCampaignMode = false,
@@ -153,6 +157,7 @@ export function CardBattle({
   const [minute, setMinute] = useState(0);
 
   const [log, setLog] = useState<LogLine[]>([]);
+  const [showFullLog, setShowFullLog] = useState(false);
   const logId  = useRef(0);
   const logRef = useRef<HTMLDivElement>(null);
 
@@ -184,11 +189,15 @@ export function CardBattle({
   useEffect(() => { if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight; }, [log]);
   
   // Si cambia el oponente forzado en modo campaña, actualizar el bot seleccionado
+  const autoStarted = useRef(false);
   useEffect(() => {
-  if (isCampaignMode && forcedOpponent && phase === 'battle' && !isRunning.current) {
-    startBattle();
-  }
-}, [])
+    if (isCampaignMode && forcedOpponent && !autoStarted.current) {
+      autoStarted.current = true;
+      void startBattle();
+    }
+  // Solo una vez al montar; nunca reiniciar al cerrar un partido.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function loadStats() {
     const { data } = await supabase.from('user_stats').select('*').eq('user_id', userId).single();
@@ -334,7 +343,7 @@ export function CardBattle({
       setMoment(ctx); setDecidedId(null);
       animeRef.current?.triggerKeyMoment();
       const safe = ctx.options.find(o => o.isSafe) ?? ctx.options[ctx.options.length - 1];
-      startTimer(ctx.timeLimit, () => {
+      startTimer(Math.min(ctx.timeLimit, 3), () => {
         decisionResolve.current = null;
         setDecidedId(safe.id);
         setTimeout(() => { setMoment(null); resolve(safe); }, 500);
@@ -364,7 +373,7 @@ export function CardBattle({
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
     let ug = 0, rg = 0;
 
-    setLog([]); setUGoals(0); setRGoals(0); setMinute(0);
+    setLog([]); setShowFullLog(false); setUGoals(0); setRGoals(0); setMinute(0);
     resetAll(); setPhase('battle');
 
     addLog('⚽ ¡Silbato inicial! Arrancan los equipos.', 'event');
@@ -576,40 +585,23 @@ if (dailyProgress?.challenges) {
           .eq('id', card.id);
       }
 
-      const { data: currentProfile, error: profileError } = await supabase
-        .from('profiles')
-        .select(`id, streak, total_wins_lifetime, user_card_level, user_card_exp, ${columnToUpdate}`)
-        .eq('id', userId)
-        .single();
-
-      if (profileError) console.error('Error al recuperar perfil:', profileError);
-
-      const profileData = currentProfile as Record<string, any> | null;
-      const currentStatValue      = profileData ? (profileData[columnToUpdate] || 50) : 50;
-      const currentWinsLifetime   = profileData ? (profileData['total_wins_lifetime'] || 0) : 0;
-
-      const { error: statsError } = await supabase
-        .from('profiles')
-        .update({
-          streak:              newStreak,
-          user_card_level:     newLv,
-          user_card_exp:       newXp,
-          total_wins_lifetime: currentWinsLifetime + (won ? 1 : 0),
-          [columnToUpdate]:    currentStatValue + 1,
-        })
-        .eq('id', userId);
-
-      if (statsError) console.error('Error guardando stats:', statsError);
-      else console.log(`Skill ${columnToUpdate} subió a ${currentStatValue + 1}`);
-
-      await supabase.from('matches').insert({
-        user_id:           userId,
-        user_deck_id:      userDeck.id,
-        user_score:        ug,
-        opponent_score:    rg,
-        winner_id:         won ? userId : null,
+      // El trigger on_match_finished acredita XP/puntos/stats en una transacción.
+      // Nunca escribir esos campos directamente desde el cliente.
+      const { error: matchError } = await supabase.from('matches').insert({
+        user_id: userId,
+        user_deck_id: userDeck.id,
+        user_score: ug,
+        opponent_score: rg,
+        winner_id: won ? userId : null,
         experience_gained: xpGained,
       });
+      if (matchError) throw matchError;
+      window.dispatchEvent(new CustomEvent('lupi:progression-updated', {
+        detail: { userId, actionType: 'match_result' },
+      }));
+      onMatchRecorded?.();
+      // Comunicar resultado antes de que onBattleComplete desmonte CardBattle.
+      if (isCampaignMode) onCampaignMatchComplete?.(won, bot);
 
     } catch (err) {
       console.error('Error en persistencia:', err);
@@ -636,12 +628,8 @@ if (dailyProgress?.challenges) {
   const handleCloseResult = () => {
     setMatchResult(null);
     setPhase('select');
-    
-    // Si es modo campaña y hay callback, notificar el resultado
-    if (isCampaignMode && onCampaignMatchComplete && matchResult) {
-      const won = matchResult.winner === 'user';
-      onCampaignMatchComplete(won, bot);
-    }
+    onResultClosed?.();
+    // El resultado ya fue comunicado al persistir el partido.
   };
 
   // ─── Iniciar batalla desde el selector (modo campaña o rápido) ──────────────
@@ -687,7 +675,7 @@ if (dailyProgress?.challenges) {
       <div className="arena-header">
         <div className="arena-title">
           <span>⚽</span><span>FLORES CLUB ARENA</span>
-          <span className="arena-badge">{isCampaignMode ? 'CAMPAÑA' : 'FUTSAL'}</span>
+          <span className="arena-badge">FUTSAL</span>
         </div>
         <button className="deck-link-btn" onClick={onNavigateToDeck}>
           📋 MI EQUIPO <span className="deck-count">{deckCards.length}/5</span>
@@ -754,7 +742,7 @@ if (dailyProgress?.challenges) {
                       />
                     </svg>
                     <span className="dp-timer-num" style={{ color:timerColor }}>
-                      {Math.max(1, Math.ceil(moment.timeLimit * timerPct / 100))}
+                      {Math.max(1, Math.ceil(Math.min(moment.timeLimit, 3) * timerPct / 100))}
                     </span>
                   </div>
                 </div>
@@ -991,17 +979,22 @@ if (dailyProgress?.challenges) {
             </div>
 
             {/* Líneas de log */}
-            <div className="log-lines" ref={logRef}>
+            <div className={`log-lines${showFullLog ? ' log-expanded' : ''}`} ref={logRef}>
               {log.length === 0 && (
                 <div className="log-empty">⏳ El partido está por comenzar…</div>
               )}
-              {log.slice(-5).map((l) => (
+              {log.slice(showFullLog ? -25 : -3).map((l) => (
                 <div key={l.id} className={`log-line log-${l.type}`}>
                   {l.type === 'goal' && <span style={{ marginRight: 4 }}>⚽</span>}
                   {l.text}
                 </div>
               ))}
             </div>
+            {log.length > 3 && (
+              <button type="button" className="log-toggle" onClick={() => setShowFullLog(v => !v)}>
+                {showFullLog ? 'MOSTRAR MENOS' : `VER RELATO (${log.length})`}
+              </button>
+            )}
           </div>
         )}
 
@@ -1495,6 +1488,42 @@ if (dailyProgress?.challenges) {
     padding: 6px 2px;
   }
 }
+
+        /* LUPI Arena v7: legibilidad, controles táctiles y relato compacto */
+        .arena-container .log-toggle {
+          display:block; width:100%; margin-top:6px; padding:5px 8px;
+          color:#3dffa0; background:rgba(61,255,160,.06);
+          border:1px solid rgba(61,255,160,.18); border-radius:7px;
+          font-size:10px; font-weight:800; letter-spacing:.6px; cursor:pointer;
+        }
+        .arena-container .log-lines.log-expanded { max-height: min(34vh, 250px); overflow-y:auto; }
+        .arena-container .dp-option { min-height:44px; touch-action:manipulation; }
+        .arena-container .court-scoreboard { white-space:nowrap; }
+        @media (max-width: 640px) {
+          .arena-container .player-token { width:clamp(38px, 10.4vw, 48px); border-radius:8px; }
+          .arena-container .token-icon { min-height:23px; padding:2px; margin:2px 3px 0; }
+          .arena-container .token-icon img { width:19px!important; height:19px!important; }
+          .arena-container .token-name { font-size:8px; max-width:calc(100% - 2px); padding:2px 1px; }
+          .arena-container .token-overall { font-size:11px; padding:2px 5px; }
+          .arena-container .token-level { font-size:9px; }
+          .arena-container .pos-label { font-size:8px; padding:1px 4px; }
+          .arena-container .court-scoreboard { top:5px; gap:7px; padding:5px 11px; }
+          .arena-container .csb-score { font-size:24px; }
+          .arena-container .csb-label { font-size:9px; }
+          .arena-container .csb-min { font-size:10px; }
+          .arena-container .log-lines:not(.log-expanded) { max-height:83px; overflow:hidden; }
+          .arena-container .log-line { font-size:11px; padding:4px 7px; }
+          .arena-container .decision-panel { width:calc(100% - 18px); max-width:370px; padding:12px; max-height:calc(100% - 14px); overflow-y:auto; }
+          .arena-container .dp-option { min-height:46px; padding:8px 10px; }
+          .arena-container .dp-opt-label { white-space:normal; }
+          .arena-container .dp-opt-group { font-size:8px; }
+        }
+        @media (max-width: 390px) {
+          .arena-container .player-token { width:36px; }
+          .arena-container .token-name { font-size:7px; }
+          .arena-container .token-overall { font-size:10px; }
+          .arena-container .pos-label { font-size:7px; }
+        }
       `}</style>
     </div>
   );

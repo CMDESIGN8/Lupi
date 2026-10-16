@@ -39,17 +39,17 @@ export function PurchaseModal({
         <div className="purchase-summary">
           <div className="purchase-row">
             <span>Precio</span>
-            <strong>🪙 {item.cost}</strong>
+            <strong>💰 {item.cost}</strong>
           </div>
           <div className="purchase-row">
             <span>Tu saldo</span>
-            <span>🪙 {userCoins.toLocaleString("es-AR")}</span>
+            <span>💰 {userCoins.toLocaleString("es-AR")}</span>
           </div>
           <div className="purchase-divider" />
           <div className="purchase-row total">
             <span>Saldo después</span>
             <strong className={remaining < 0 ? "negative" : ""}>
-              🪙 {remaining.toLocaleString("es-AR")}
+              💰 {remaining.toLocaleString("es-AR")}
             </strong>
           </div>
         </div>

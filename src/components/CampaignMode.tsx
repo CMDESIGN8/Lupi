@@ -1097,131 +1097,7 @@ export function CampaignMode({
       );
 
 
-    // ─────────────────────────────
-    // USER XP / POINTS
-    // ─────────────────────────────
-
-    if (
-      won &&
-      selectedOpponent
-    ) {
-
-      try {
-
-        const {
-          data: profile,
-          error: profileError,
-        } = await supabase
-          .from("profiles")
-          .select(
-            "points, exp, level"
-          )
-          .eq(
-            "id",
-            userId
-          )
-          .single();
-
-
-        if (profileError) {
-
-          console.error(
-            "Error fetching profile:",
-            profileError
-          );
-
-        } else {
-
-          const currentPoints =
-            profile?.points ||
-            0;
-
-          const currentExp =
-            profile?.exp ||
-            0;
-
-          const currentLevel =
-            profile?.level ||
-            1;
-
-
-          // PUNTOS
-          const newPoints =
-            currentPoints +
-            selectedOpponent.xpBase;
-
-
-          // XP
-          let newExp =
-            currentExp +
-            selectedOpponent.xpBase;
-
-          let newLevel =
-            currentLevel;
-
-
-          const expNeeded =
-            currentLevel *
-            100;
-
-
-          if (
-            newExp >=
-            expNeeded
-          ) {
-
-            newLevel++;
-
-            newExp -=
-              expNeeded;
-          }
-
-
-          const {
-            error:
-              updateError,
-          } = await supabase
-            .from("profiles")
-            .update({
-              points:
-                newPoints,
-
-              exp:
-                newExp,
-
-              level:
-                newLevel,
-            })
-            .eq(
-              "id",
-              userId
-            );
-
-
-          if (updateError) {
-
-            console.error(
-              "Error updating profile:",
-              updateError
-            );
-
-          } else {
-
-            console.log(
-              `✅ Usuario actualizado: +${selectedOpponent.xpBase}pts, nivel ${newLevel}`
-            );
-          }
-        }
-
-      } catch (error) {
-
-        console.error(
-          "Error updating user progress:",
-          error
-        );
-      }
-    }
-
+    // XP y puntos del partido ya se acreditan desde matches/on_match_finished.
 
     // ─────────────────────────────
     // LEAGUE COMPLETE
@@ -1339,58 +1215,10 @@ export function CampaignMode({
     );
 
 
-    setIsBattleActive(
-      false
-    );
+    // Mantener CardBattle montado hasta que el usuario cierre el resultado.
 
-
-    if (
-      selectedOpponent &&
-      currentMatch
-    ) {
-
-      completeMatch(
-        currentLeague.id,
-
-        currentMatch.matchNumber -
-          1,
-
-        true
-      );
-    }
-
-
-    if (
-      selectedOpponent
-    ) {
-
-      setLastReward({
-        type: "win",
-
-        value:
-          selectedOpponent.xpBase,
-      });
-
-      setShowRewards(
-        true
-      );
-
-      setTimeout(() => {
-        setShowRewards(
-          false
-        );
-      }, 3000);
-    }
-
-
-    setSelectedOpponent(
-      null
-    );
-
-    setCurrentMatch(
-      null
-    );
-
+    // El resultado real se procesa SOLO en onCampaignMatchComplete.
+    // No asumir victoria ni acreditar otra recompensa al cerrar la batalla.
 
     loadCampaignProgress();
     loadMatchProgress();
@@ -1569,12 +1397,19 @@ export function CampaignMode({
     _bot
   ) => {
     if (currentMatch) {
-      completeMatch(
+      void completeMatch(
         currentLeague.id,
         currentMatch.matchNumber - 1,
         won
       );
     }
+  }}
+  onResultClosed={() => {
+    setIsBattleActive(false);
+    setSelectedOpponent(null);
+    setCurrentMatch(null);
+    loadCampaignProgress();
+    loadMatchProgress();
   }}
   onDailyChallengesUpdated={
     onDailyChallengesUpdated

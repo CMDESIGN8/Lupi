@@ -13,6 +13,8 @@ type LockerPreviewProps = {
   userId: string;
   level: number;
   onOpenInventory?: () => void;
+  onboardingEquipRequest?: number;
+  onboardingActive?: boolean;
 };
 
 const SLOT_META: Record<
@@ -86,6 +88,8 @@ export function LockerPreview({
   userId,
   level,
   onOpenInventory,
+  onboardingEquipRequest = 0,
+  onboardingActive = false,
 }: LockerPreviewProps) {
   const {
     items,
@@ -93,8 +97,20 @@ export function LockerPreview({
     toggleEquip,
   } = useAuraInventory(userId, level);
 
+  const [guideComplete, setGuideComplete] = useState(false);
   const [selectedSlot, setSelectedSlot] =
     useState<ItemSlot | null>(null);
+
+  // El CTA del tutorial abre realmente el selector de prendas.
+  useEffect(() => {
+    if (!onboardingEquipRequest || loading) return;
+    const preferred: ItemSlot[] = ["top", "bottom", "boots", "accessory"];
+    const slot = preferred.find(candidate => items.some(item => item.slot === candidate && item.owned && !item.equipped))
+      ?? preferred.find(candidate => items.some(item => item.slot === candidate && item.owned))
+      ?? "top";
+    setGuideComplete(false);
+    setSelectedSlot(slot);
+  }, [onboardingEquipRequest, loading]);
 
   const equippedItems = useMemo(
     () => items.filter((item) => item.equipped),
@@ -157,7 +173,17 @@ export function LockerPreview({
       itemId
     );
 
-    await toggleEquip(itemId);
+    const target = items.find(item => item.id === itemId);
+    if (!target?.owned || target.equipped) return;
+    try {
+      await toggleEquip(itemId);
+      if (onboardingActive) {
+        setGuideComplete(true);
+        setSelectedSlot(null);
+      }
+    } catch (error) {
+      console.error("No se pudo equipar la prenda", error);
+    }
   };
 
   if (loading) {
@@ -171,7 +197,7 @@ export function LockerPreview({
 
   return (
     <section
-      className="locker-preview"
+      className={`locker-preview ${onboardingActive ? "locker-preview--guided" : ""}`}
       style={colorVar(displayColor)}
     >
       {/* HEADER */}
@@ -270,6 +296,7 @@ export function LockerPreview({
       : "none",
   } as React.CSSProperties
 }
+              aria-label={`${meta.label}: ${item ? item.name : "elegir prenda"}`}
               onClick={() =>
                 handleSlotClick(slot)
               }
@@ -284,6 +311,7 @@ export function LockerPreview({
   )}
 </div>
 
+              <span className="locker-slot-guided-label">{meta.icon} {meta.label}</span>
               <div className="locker-slot-info">
                 <span>{meta.label}</span>
 
@@ -300,10 +328,13 @@ export function LockerPreview({
         })}
       </div>
 
-      {/* ITEM SELECTOR */}
-
+      {/* Tutorial contextual: la explicación acompaña al selector, no al HUD. */}
+      {onboardingActive && !selectedSlot && !guideComplete && (
+        <div className="locker-guide-hint" role="status">✦ Elegí una de las prendas señaladas para equipar a tu personaje.</div>
+      )}
       {selectedSlot && (
-        <div className="locker-selector">
+        <div className={`locker-selector ${onboardingActive ? "locker-selector--tutorial" : ""}`} role={onboardingActive ? "dialog" : undefined} aria-modal={onboardingActive ? true : undefined} aria-label="Elegí tu primera prenda">
+          {onboardingActive && <div className="locker-guide-step"><span>✦ LUPI TE ACOMPAÑA · PASO 1 DE 2</span><strong>¡Dale tu estilo!</strong><p>Elegí una prenda disponible y tocá <b>EQUIPAR</b>. Vas a verla puesta en tu personaje.</p></div>}
           <div className="locker-selector-header">
             <div>
               <span>
@@ -330,7 +361,7 @@ export function LockerPreview({
           <div className="locker-items">
             {selectedItems.length === 0 ? (
               <div className="locker-items-empty">
-                NO HAY ITEMS
+                Todavía no tenés prendas en esta categoría. Cerrá este panel y probá otra, o conseguí una prenda en la tienda.
               </div>
             ) : (
               selectedItems.map((item) => {
@@ -353,6 +384,7 @@ export function LockerPreview({
                       locked
                         ? "locked"
                         : "",
+                      onboardingActive && !locked && !equipped ? "locker-item--guided" : "",
                     ]
                       .filter(Boolean)
                       .join(" ")}
@@ -389,7 +421,7 @@ export function LockerPreview({
                           ? `LV ${item.requiredLevel}`
                           : equipped
                             ? "EQUIPADO"
-                            : "EQUIPAR"}
+                            : onboardingActive ? "TOCÁ PARA EQUIPAR →" : "EQUIPAR"}
                       </small>
                     </div>
 

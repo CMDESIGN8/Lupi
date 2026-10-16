@@ -1310,3 +1310,14 @@
     animation: none !important;
   }
 }
+/* Las ranuras sin equipar muestran su función sin ensuciar el avatar. */
+.locker-preview .locker-slot.empty .locker-slot-guided-label {
+  display: block !important; position: absolute; bottom: -16px; left: 50%;
+  transform: translateX(-50%); white-space: nowrap;
+  color: #d5f5e9; font-size: 9px; font-weight: 800;
+  text-shadow: 0 2px 5px #000, 0 0 10px #000;
+  pointer-events: none;
+}
+@media (max-width: 700px) {
+ .locker-preview .locker-slot.empty .locker-slot-guided-label { font-size: 8px; bottom: -14px; }
+}

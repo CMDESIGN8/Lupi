@@ -67,6 +67,7 @@ type Props = {
   /** Jugadores silenciados: sus mensajes no se muestran. */
   mutedIds?: Set<string>;
   onMessageSent?: () => void;
+  tutorialOpen?: boolean;
 };
 
 const MAX_MESSAGES = 60;
@@ -166,6 +167,7 @@ export function LobbyChat({
   onSelectPlayer,
   mutedIds,
   onMessageSent,
+  tutorialOpen = false,
 }: Props) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState<string>("");
@@ -176,6 +178,12 @@ export function LobbyChat({
 const [unread, setUnread] = useState(0);
 const [mobileChatOpen, setMobileChatOpen] = useState(false);
 const [mobileUnread, setMobileUnread] = useState(0);
+  useEffect(() => {
+    if (tutorialOpen) {
+      setMobileChatOpen(true);
+      setMobileUnread(0);
+    }
+  }, [tutorialOpen]);
 const [conversationMessages, setConversationMessages] = useState<NpcMessage[]>([]);
   const logWrapRef = useRef<HTMLDivElement>(null);
   const stickRef = useRef(true);
@@ -540,13 +548,13 @@ const closeMobileChat = () => {
 
   return (
   <section
-    className={`lc ${mobileChatOpen ? "lc--mobile-open" : "lc--mobile-closed"}`}
+    className={`lc ${mobileChatOpen || tutorialOpen ? "lc--mobile-open" : "lc--mobile-closed"}`}
     aria-label="Chat del lobby"
   >
     <button
   type="button"
   className="lc-mobile-chat-trigger"
-  onClick={mobileChatOpen ? closeMobileChat : openMobileChat}
+  onClick={mobileChatOpen || tutorialOpen ? closeMobileChat : openMobileChat}
   aria-label={
     mobileChatOpen
       ? "Cerrar chat"
