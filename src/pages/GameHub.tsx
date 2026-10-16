@@ -24,6 +24,10 @@ import { DuelVersus } from "../components/DuelVersus";
     import "./GameHub.css";
     import "./GameHubLobby.css";
     import "./LupiFirstWelcome.css";
+     import "./LupiFirstWelcomeAAA.css";
+     import "./LupiFirstWelcomeHost.css";
+     import "./LupiFirstWelcomeAnime.css";
+import "./LupiRewardAnime.css";
     import "./LupiWorld_Theme.css";
     import {
       useLobbyChallenges,
@@ -464,14 +468,46 @@ const {
         return ()=>{active=false};
       },[user.id]);
       // Bienvenida visual de primer ingreso. No acredita premios ni modifica misiones.
-      const [welcomeDismissed, setWelcomeDismissed] = useState(() =>
+      const [welcomeExiting, setWelcomeExiting] = useState(false);
+      const [lupiDialogueStep, setLupiDialogueStep] = useState(0);
+      const [lupiDialogueChars, setLupiDialogueChars] = useState(0);
+      const lupiDialogueTexts = [
+        `¡Por fin llegaste! Soy Lupi. ¡Bienvenido a mi mundo!`,
+        `Esos cinco son tu primer quinteto. Capaz hoy no sean leyendas… ¡pero eso lo vamos a cambiar juntos!`,
+        `Acá vas a jugar, mejorar y conocer a tu banda. ¿Estás listo para empezar tu historia?`,
+      ];
+      const lupiDialogueText = lupiDialogueTexts[lupiDialogueStep] ?? lupiDialogueTexts[0];
+      const lupiDialogueFinished = lupiDialogueChars >= lupiDialogueText.length;
+
+       const welcomeExitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+       useEffect(() => () => { if (welcomeExitTimer.current) clearTimeout(welcomeExitTimer.current); }, []);
+       const [welcomeDismissed, setWelcomeDismissed] = useState(() =>
         typeof window !== "undefined" && localStorage.getItem(`lupi_world_intro_v1_${user.id}`) === "1"
       );
       const showFirstWelcome = adventure.ready && rewardsLoaded && !welcomeDismissed &&
         !claimedFirst.includes("welcome") && gameTab === "play" && view === "lobby";
+      useEffect(() => {
+        setLupiDialogueChars(0);
+        if (!showFirstWelcome) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          setLupiDialogueChars(lupiDialogueText.length);
+          return;
+        }
+        const interval = window.setInterval(() => {
+          setLupiDialogueChars(n => Math.min(n + 2, lupiDialogueText.length));
+        }, 34);
+        return () => window.clearInterval(interval);
+      }, [lupiDialogueStep, showFirstWelcome]);
       const dismissFirstWelcome = () => {
-        localStorage.setItem(`lupi_world_intro_v1_${user.id}`, "1");
-        setWelcomeDismissed(true);
+        if (welcomeExiting) return;
+        setWelcomeExiting(true);
+        if (welcomeExitTimer.current) clearTimeout(welcomeExitTimer.current);
+        welcomeExitTimer.current = setTimeout(() => {
+          localStorage.setItem(`lupi_world_intro_v1_${user.id}`, "1");
+          setWelcomeDismissed(true);
+          setWelcomeExiting(false);
+          welcomeExitTimer.current = null;
+        }, 650);
       };
       const pendingFirstReward:RewardKey|null = !adventure.ready || !rewardsLoaded ? null :
         !claimedFirst.includes("welcome") ? "welcome" :
@@ -868,15 +904,30 @@ const handleLobbyMissionClaim = async (missionId: string) => {
       return (
         <div className={`main-content gh-root ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""}`}>
           {showFirstWelcome && (
-            <div className="lupi-first-welcome" role="presentation">
-              <section className="lupi-first-welcome__card" role="dialog" aria-modal="true" aria-labelledby="lupi-first-welcome-title">
-                <span className="lupi-first-welcome__eyebrow">✦ LUPI WORLD · NUEVO FICHAJE</span>
-                <div className="lupi-first-welcome__emblem" aria-hidden="true">👑</div>
-                <h2 id="lupi-first-welcome-title">¡BIENVENIDO AL CLUB!</h2>
-                <strong className="lupi-first-welcome__name">{user.username || "JUGADOR"}</strong>
-                <span className="lupi-first-welcome__club">{user.club || "TU HISTORIA EMPIEZA ACÁ"}</span>
-                <p>Tu vestuario está listo. Equipá a tu jugador, conocé a la comunidad y preparate para tu primer partido.</p>
-                <button type="button" autoFocus onClick={dismissFirstWelcome}>COMENZAR MI AVENTURA →</button>
+            <div className={`lupi-first-welcome lupi-anime-intro${welcomeExiting ? " is-exiting" : ""}`} role="presentation">
+              <section className="lupi-anime-intro__scene" role="dialog" aria-modal="true" aria-labelledby="lupi-anime-title">
+                <div className="lupi-anime-intro__art" aria-hidden="true">
+                  <div className="lupi-anime-intro__speedlines" />
+                  <img src="/images/lupi-welcome.png" alt="" draggable={false} />
+                </div>
+                <div className="lupi-anime-intro__hud" aria-hidden="true">
+                  <span>EPISODIO 01</span><strong>EL COMIENZO DE TU HISTORIA</strong>
+                </div>
+                <div className="lupi-anime-intro__dialogue" key={lupiDialogueStep}>
+                  <div className="lupi-anime-intro__speaker">LUPI <span>✦</span></div>
+                  <div className="lupi-anime-intro__lines" aria-live="polite">
+                    {lupiDialogueStep === 0 && <><h2 id="lupi-anime-title">¡EY, {user.username || "CRACK"}!</h2></>}
+                    {lupiDialogueStep === 1 && <><h2 id="lupi-anime-title">¡YA TENÉS TU EQUIPO!</h2></>}
+                    {lupiDialogueStep === 2 && <><h2 id="lupi-anime-title">¡LA CANCHA NOS ESPERA!</h2></>}
+                    <p className="lupi-anime-intro__typed">{lupiDialogueText.slice(0, lupiDialogueChars)}<span className="lupi-anime-intro__cursor" aria-hidden="true">▍</span></p>
+                  </div>
+                  <div className="lupi-anime-intro__bottom">
+                    <span className="lupi-anime-intro__progress">{lupiDialogueStep + 1} / 3</span>
+                    <button type="button" autoFocus disabled={welcomeExiting} onClick={() => { if (!lupiDialogueFinished) { setLupiDialogueChars(lupiDialogueText.length); return; } lupiDialogueStep < 2 ? setLupiDialogueStep((step) => step + 1) : dismissFirstWelcome(); }}>
+                      {!lupiDialogueFinished ? "CONTINUAR" : lupiDialogueStep < 2 ? "SIGUIENTE" : "¡VAMOS, LUPI!"} <span aria-hidden="true">▶</span>
+                    </button>
+                  </div>
+                </div>
               </section>
             </div>
           )}
@@ -1190,14 +1241,20 @@ const handleLobbyMissionClaim = async (missionId: string) => {
                   )}
                   {rewardModalPhase !== "idle" && rewardModalKey && (
                     <div className={`gh-world__reward-overlay ${rewardModalPhase === "closing" ? "gh-world__reward-overlay--closing" : ""}`} role="presentation">
-                      <div ref={rewardModalRef} style={rewardFlight} className="gh-world__reward-dialog" role="dialog" aria-modal="true" aria-labelledby="lupi-reward-title">
-                        <span className="gh-world__reward-kicker">✦ LUPI WORLD · RECOMPENSA</span>
-                        <div className="gh-world__reward-icon" aria-hidden="true">🎁</div>
-                        <h2 id="lupi-reward-title">{FIRST_REWARDS[rewardModalKey].title}</h2>
-                        <p>¡Completaste un desafío! Este premio es tuyo.</p>
-                        <div className="gh-world__reward-prizes"><span>💰 <b>+{FIRST_REWARDS[rewardModalKey].coins}</b><small>Lupi Coins</small></span><span>✨ <b>+{FIRST_REWARDS[rewardModalKey].xp}</b><small>XP</small></span></div>
-                        {rewardError && <p role="alert">{rewardError}</p>}
-                        <button type="button" autoFocus disabled={rewardBusy || rewardModalPhase === "closing"} onClick={() => void claimAdventureReward()}>{rewardBusy ? "ACREDITANDO…" : "RECLAMAR RECOMPENSA →"}</button>
+                      <div ref={rewardModalRef} style={rewardFlight} className="gh-world__reward-dialog lupi-reward-anime" role="dialog" aria-modal="true" aria-labelledby="lupi-reward-title">
+                        <div className="lupi-reward-anime__chapter">EPISODIO 01 <span>✦</span> TU PRIMERA RECOMPENSA</div>
+                        <img className="lupi-reward-anime__mascot" src="/images/lupi-welcome.png" alt="Lupi te entrega tu recompensa" draggable={false} />
+                        <div className="lupi-reward-anime__body">
+                          <div className="lupi-reward-anime__speaker">LUPI <span>✦</span></div>
+                          <h2 id="lupi-reward-title">{rewardModalKey === "welcome" ? "¡ESTO RECIÉN EMPIEZA!" : FIRST_REWARDS[rewardModalKey].title}</h2>
+                          <p>{rewardModalKey === "welcome" ? "¡Bien ahí, crack! Todo jugador necesita un primer impulso. Te traje algo para arrancar tu aventura." : "¡Otra misión superada! Tu esfuerzo merece una recompensa. ¡Seguí así!"}</p>
+                          <div className="lupi-reward-anime__loot" aria-label="Premios disponibles">
+                            <span><i aria-hidden="true">🪙</i><b>+{FIRST_REWARDS[rewardModalKey].coins}</b><small>LUPI COINS</small></span>
+                            <span><i aria-hidden="true">✦</i><b>+{FIRST_REWARDS[rewardModalKey].xp}</b><small>EXPERIENCIA</small></span>
+                          </div>
+                          {rewardError && <p className="lupi-reward-anime__error" role="alert">{rewardError}</p>}
+                          <button type="button" autoFocus disabled={rewardBusy || rewardModalPhase === "closing"} onClick={() => void claimAdventureReward()}>{rewardBusy ? "ACREDITANDO…" : "¡RECIBIR MI RECOMPENSA!"} <span aria-hidden="true">▶</span></button>
+                        </div>
                       </div>
                     </div>
                   )}
