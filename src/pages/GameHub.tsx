@@ -23,6 +23,7 @@ import { DuelVersus } from "../components/DuelVersus";
     } from "../hooks/useWorldEvents";
     import "./GameHub.css";
     import "./GameHubLobby.css";
+    import "./LupiFirstWelcome.css";
     import "./LupiWorld_Theme.css";
     import {
       useLobbyChallenges,
@@ -462,19 +463,29 @@ const {
           .catch(()=>{if(active){setRewardError("No pudimos consultar tus premios. Reintentá.");setRewardsLoaded(true);}});
         return ()=>{active=false};
       },[user.id]);
+      // Bienvenida visual de primer ingreso. No acredita premios ni modifica misiones.
+      const [welcomeDismissed, setWelcomeDismissed] = useState(() =>
+        typeof window !== "undefined" && localStorage.getItem(`lupi_world_intro_v1_${user.id}`) === "1"
+      );
+      const showFirstWelcome = adventure.ready && rewardsLoaded && !welcomeDismissed &&
+        !claimedFirst.includes("welcome") && gameTab === "play" && view === "lobby";
+      const dismissFirstWelcome = () => {
+        localStorage.setItem(`lupi_world_intro_v1_${user.id}`, "1");
+        setWelcomeDismissed(true);
+      };
       const pendingFirstReward:RewardKey|null = !adventure.ready || !rewardsLoaded ? null :
         !claimedFirst.includes("welcome") ? "welcome" :
         (["equip_avatar","social","open_pack"] as const).find(k=>adventure.progress.completed.includes(k) && !claimedFirst.includes(k)) ?? null;
       const autoOpenedRewardRef = useRef<string | null>(null);
       useEffect(() => {
-        if (!pendingFirstReward || rewardModalPhase !== "idle" || levelUp) return;
+        if (!pendingFirstReward || rewardModalPhase !== "idle" || levelUp || showFirstWelcome) return;
         const identity = `${user.id}:${pendingFirstReward}`;
         if (autoOpenedRewardRef.current === identity) return;
         autoOpenedRewardRef.current = identity;
         setRewardModalKey(pendingFirstReward);
         setRewardFlight({});
         setRewardModalPhase("open");
-      }, [pendingFirstReward, rewardModalPhase, levelUp, user.id]);
+      }, [pendingFirstReward, rewardModalPhase, levelUp, user.id, showFirstWelcome]);
       const claimAdventureReward = async () => {
         if(!pendingFirstReward || rewardBusy)return;
         setRewardBusy(true);setRewardError("");
@@ -856,6 +867,19 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
       return (
         <div className={`main-content gh-root ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""}`}>
+          {showFirstWelcome && (
+            <div className="lupi-first-welcome" role="presentation">
+              <section className="lupi-first-welcome__card" role="dialog" aria-modal="true" aria-labelledby="lupi-first-welcome-title">
+                <span className="lupi-first-welcome__eyebrow">✦ LUPI WORLD · NUEVO FICHAJE</span>
+                <div className="lupi-first-welcome__emblem" aria-hidden="true">👑</div>
+                <h2 id="lupi-first-welcome-title">¡BIENVENIDO AL CLUB!</h2>
+                <strong className="lupi-first-welcome__name">{user.username || "JUGADOR"}</strong>
+                <span className="lupi-first-welcome__club">{user.club || "TU HISTORIA EMPIEZA ACÁ"}</span>
+                <p>Tu vestuario está listo. Equipá a tu jugador, conocé a la comunidad y preparate para tu primer partido.</p>
+                <button type="button" autoFocus onClick={dismissFirstWelcome}>COMENZAR MI AVENTURA →</button>
+              </section>
+            </div>
+          )}
           <div className="gh-light gh-light--l" aria-hidden>
             <span className="gh-light__beam" />
             <span className="gh-light__bloom" />
