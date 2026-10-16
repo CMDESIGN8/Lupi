@@ -45,9 +45,23 @@ import "./styles/profile.css";
 export default function App() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [hasPlayedMatch, setHasPlayedMatch] = useState<boolean | null>(null);
   const [showTour, setShowTour] = useState(false);
   const [showSigningWelcome, setShowSigningWelcome] = useState(false);
   const [, setTourKey] = useState(0);
+
+  useEffect(() => {
+    if (!user?.id) { setHasPlayedMatch(null); return; }
+    let active = true;
+    setHasPlayedMatch(null);
+    void supabase.from("matches").select("id", { count: "exact", head: true })
+      .eq("user_id", user.id).then(({ count, error }) => {
+        if (!active) return;
+        if (error) { console.error("No se pudo consultar el debut:", error); setHasPlayedMatch(true); }
+        else setHasPlayedMatch((count ?? 0) > 0);
+      });
+    return () => { active = false; };
+  }, [user?.id]);
 
   const navigation = useAppNavigation();
   const { appRoute, tab, gameTab, setGameTab, handleTabChange, handleNavigate, enterGame, goHome } = navigation;
@@ -153,6 +167,20 @@ export default function App() {
     });
   }, [notifyNewRecord]);
 
+  // Unificar actualización de XP, puntos y monedas después de cualquier recompensa.
+  useEffect(() => {
+    if (!user?.id) return;
+    let active = true;
+    const refresh = async () => {
+      try {
+        const fresh = await api.getSession();
+        if (active && fresh?.id === user.id) setUser(fresh);
+      } catch (error) { console.warn("No se pudo refrescar la progresión", error); }
+    };
+    window.addEventListener("lupi:progression-updated", refresh);
+    return () => { active = false; window.removeEventListener("lupi:progression-updated", refresh); };
+  }, [user?.id]);
+
   const handleCoinsUpdate = useCallback((newCoins: number) => {
     setUser((current) => current ? { ...current, coins: newCoins } : current);
   }, []);
@@ -227,6 +255,7 @@ if (user && needsPlayerOnboarding(user)) {
                 <HomeExperience
                   user={user}
                   onEnterGame={() => enterGame("game")}
+                  hasPlayedMatch={hasPlayedMatch}
                   onNavigate={handleNavigate}
                   onRewardClaimed={refreshPendingRewards}
                 />
@@ -265,6 +294,8 @@ if (user && needsPlayerOnboarding(user)) {
               setActiveDeck={setActiveDeck}
               loadAlbumProgress={async () => undefined}
               onBackHome={goHome}
+               debutRequested={false}
+               onMatchRecorded={() => setHasPlayedMatch(true)}
               onNavigate={(target) => { goHome(); handleNavigate(target); }}
 
             />
@@ -285,6 +316,7 @@ if (user && needsPlayerOnboarding(user)) {
               activeTab={tab}
               onTabChange={handleTabChange}
               onEnterGame={() => enterGame("game")}
+                  hasPlayedMatch={hasPlayedMatch}
               pendingRewards={pendingRewards}
             />
           )}
