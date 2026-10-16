@@ -174,6 +174,122 @@
   .player-setup-screen .player-setup-submit { min-height: 43px; }
 }
 
-/* Sprint 14 — no mascot backdrop in player setup, locker-room atmosphere. */
-.player-setup-screen .auth-stage__scene { background-image:linear-gradient(90deg,rgba(0,8,17,.88),rgba(0,25,31,.48) 50%,rgba(0,8,17,.9)),repeating-linear-gradient(90deg,#071b21 0,#071b21 13%,#122e32 13.3%,#05141c 14%,#06171e 16.5%) !important;background-size:cover !important; }
-.player-setup-screen .auth-stage__scene::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 40% 30%,rgba(69,212,220,.24),transparent 45%),linear-gradient(180deg,transparent 55%,#020c13 100%); }
+/* LUPI WORLD — Stadium tunnel onboarding */
+
+.player-setup-screen .auth-stage__scene {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(1, 10, 20, .55) 0%,
+      rgba(1, 10, 20, .45) 40%,
+      rgba(1, 10, 20, .78) 100%
+    ),
+    url("/images/vestuario.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  transform: scale(1.035);
+  animation: stadiumEntrance 1.8s ease-out both;
+}
+
+@media (max-width: 900px) {
+  .player-setup-screen .auth-stage__scene {
+    background-position: 35% center;
+  }
+}
+
+.player-setup-screen .player-setup-panel {
+  background: linear-gradient(
+    155deg,
+    rgba(3, 23, 40, .94),
+    rgba(0, 14, 28, .96)
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.player-setup-screen .auth-stage__fog {
+  opacity: .45;
+}
+
+@keyframes stadiumEntrance {
+  from {
+    opacity: 0;
+    transform: scale(1.09);
+    filter: brightness(.45);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.035);
+    filter: brightness(1);
+  }
+}
+
+/* Mobile: estadio de fondo sin competir con el formulario */
+@media (max-width: 900px) {
+  .player-setup-screen .auth-stage__scene {
+    background-position: 35% center;
+  }
+
+  .player-setup-screen .player-setup-panel {
+    background: rgba(2, 17, 31, .96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-setup-screen .auth-stage__scene {
+    animation: none;
+    transform: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .player-setup-screen
+  .player-setup-layout.player-setup-layout--split {
+    width: calc(100% - 20px);
+    gap: 8px;
+    padding: 12px 0 28px;
+    min-height: 100dvh;
+  }
+
+  .player-setup-screen .player-setup-left {
+    height: 210px;
+    min-height: 210px;
+    justify-content: flex-start;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  .player-setup-screen .player-setup-hero {
+    position: relative;
+    z-index: 2;
+  }
+
+  .player-setup-screen .player-setup-crown {
+    font-size: 19px;
+  }
+
+  .player-setup-screen .player-setup-hero h1 {
+    font-size: clamp(38px, 10vw, 46px);
+    line-height: .82;
+  }
+
+  .player-setup-screen .player-setup-panel {
+    padding: 14px 12px;
+    border-radius: 16px;
+  }
+
+  .player-setup-screen .player-setup-form {
+    gap: 9px;
+  }
+
+  .player-setup-screen .player-setup-field-content input,
+  .player-setup-screen .player-setup-field-content select {
+    min-height: 46px;
+  }
+}
