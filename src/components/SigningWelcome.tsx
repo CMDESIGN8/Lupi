@@ -356,6 +356,7 @@ export function SigningWelcome({ user, onContinue }: Props) {
 
   return (
     <div className={`signing-welcome signing-welcome--${stage}`} role="dialog" aria-modal="true" aria-labelledby="signing-title">
+      <div className="signing-welcome__atmosphere" aria-hidden="true" />
       <div className="signing-welcome__light signing-welcome__light--left" aria-hidden="true" />
       <div className="signing-welcome__light signing-welcome__light--right" aria-hidden="true" />
       <div className={`signing-welcome__card signing-welcome__card--${stage}`}>
@@ -363,6 +364,7 @@ export function SigningWelcome({ user, onContinue }: Props) {
 
         {stage === "welcome" && <>
           <div className="signing-welcome__emblem" aria-hidden="true">♛</div>
+          <span className="signing-welcome__announcement">✦ NUEVA ESTRELLA EN LA CANCHA ✦</span>
           <h1 id="signing-title">¡FICHAJE <em>CONFIRMADO!</em></h1>
           <p className="signing-welcome__intro">Bienvenido a la cancha</p>
           <strong className="signing-welcome__name">{user.username || "JUGADOR"}</strong>
