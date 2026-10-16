@@ -62,7 +62,7 @@ export function ProfileTab({
         {/* STATS RÁPIDAS */}
         <section className="profile-stats-grid">
           <div className="profile-stat-card coins">
-            <span className="profile-stat-icon">🪙</span>
+            <span className="profile-stat-icon">💰</span>
             <strong>{(user.coins || 0).toLocaleString("es-AR")}</strong>
             <small>LUPICOINS</small>
           </div>

@@ -184,5 +184,10 @@ const stats = {
     };
   }, [userId, refreshKey]);
 
+  useEffect(() => {
+    const onProgress = () => refetch();
+    window.addEventListener("lupi:progression-updated", onProgress);
+    return () => window.removeEventListener("lupi:progression-updated", onProgress);
+  }, [refetch]);
   return { data, loading, refetch };
 }

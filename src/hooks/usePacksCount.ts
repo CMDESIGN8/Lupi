@@ -1,17 +1,13 @@
 // hooks/usePacksCount.ts - Actualizar para contar también packs diarios no reclamados
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 export function usePacksCount(userId: string | undefined) {
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!userId) return;
-
-    let isMounted = true;
-
-    const fetchPackCount = async () => {
+  const fetchPackCount = useCallback(async () => {
+    if (!userId) { setCount(0); setLoading(false); return; }
       try {
         const today = new Date().toISOString().split('T')[0];
         
@@ -39,17 +35,20 @@ export function usePacksCount(userId: string | undefined) {
         const hasDailyPack = !dailyReward?.claimed;
         const totalCount = (packsCount || 0) + (hasDailyPack ? 1 : 0);
 
-        if (isMounted) {
-          setCount(totalCount);
-        }
+        setCount(totalCount);
       } catch (err) {
         console.error('Error in usePacksCount:', err);
       } finally {
-        if (isMounted) setLoading(false);
+        setLoading(false);
       }
-    };
+  }, [userId]);
 
-    fetchPackCount();
+  useEffect(() => {
+    if (!userId) return;
+    void fetchPackCount();
+    const onRefresh = () => { void fetchPackCount(); };
+    window.addEventListener("lupi:packs-updated", onRefresh);
+    window.addEventListener("focus", onRefresh);
 
     const subscription = supabase
       .channel(`packs_${userId}`)
@@ -64,10 +63,11 @@ export function usePacksCount(userId: string | undefined) {
       .subscribe();
 
     return () => {
-      isMounted = false;
-      subscription.unsubscribe();
+      window.removeEventListener("lupi:packs-updated", onRefresh);
+      window.removeEventListener("focus", onRefresh);
+      void supabase.removeChannel(subscription);
     };
-  }, [userId]);
+  }, [userId, fetchPackCount]);
 
-  return { count, loading };
+  return { count, loading, refresh: fetchPackCount };
 }

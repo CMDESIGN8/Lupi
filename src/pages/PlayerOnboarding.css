@@ -173,3 +173,7 @@
   .player-setup-screen .player-setup-reward-row--total strong { font-size: 27px; }
   .player-setup-screen .player-setup-submit { min-height: 43px; }
 }
+
+/* Sprint 14 — no mascot backdrop in player setup, locker-room atmosphere. */
+.player-setup-screen .auth-stage__scene { background-image:linear-gradient(90deg,rgba(0,8,17,.88),rgba(0,25,31,.48) 50%,rgba(0,8,17,.9)),repeating-linear-gradient(90deg,#071b21 0,#071b21 13%,#122e32 13.3%,#05141c 14%,#06171e 16.5%) !important;background-size:cover !important; }
+.player-setup-screen .auth-stage__scene::after { content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 40% 30%,rgba(69,212,220,.24),transparent 45%),linear-gradient(180deg,transparent 55%,#020c13 100%); }

@@ -21,7 +21,7 @@ export interface AppUser {
   username: string;
   club: string;
   points: number;
-  coins: number;                  // 🪙 NUEVO — LUPICOINS
+  coins: number;                  // 💰 NUEVO — LUPICOINS
   level: number;                  // ⚡ NUEVO
   exp: number;                    // ⚡ NUEVO
   streak: number;

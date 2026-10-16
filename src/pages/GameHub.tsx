@@ -3,7 +3,7 @@
     import { AppUser } from "../lib/api";
     import { UserCard, Deck } from "../types/cards";
     import { CardBattle } from "../components/CardBattle";
-    import { CampaignMode } from "../components/CampaignMode";
+    // Campaña pausada: import retirado temporalmente.
     import { DeckBuilder } from "../components/DeckBuilder";
     import { CardAlbum } from "../components/CardAlbum";
     import { PackModal } from "../components/PackModal";
@@ -38,7 +38,10 @@ import { DuelVersus } from "../components/DuelVersus";
     } from "../components/PlayerCard";
     import { LobbyDailyMission } from "../components/LobbyDailyMission";
     import { useDailyMissions } from "../hooks/useDailyMissions";
+import { useLupiRecommendation, type LupiAction } from "../hooks/useLupiRecommendation";
+import { useFirstAdventure, type AdventureStep } from "../hooks/useFirstAdventure";
     import { processUserAction } from "../services/progressionService";
+import { FIRST_REWARDS, getClaimedFirstRewards, claimFirstReward, type RewardKey } from "../services/firstAdventureRewards";
     import {
   ChallengeToasts,
   type DailyChallengeToast,
@@ -61,6 +64,8 @@ import { useAchievements } from "../hooks/useAchievements";
       setActiveDeck: (deck: Deck) => void;
       loadAlbumProgress: () => void;
       onBackHome: () => void;
+      debutRequested?: boolean;
+      onMatchRecorded?: () => void;
     };
 
     const TABS: { id: GameTab; icon: string; label: string }[] = [
@@ -370,10 +375,16 @@ import { useAchievements } from "../hooks/useAchievements";
       setActiveDeck,
       loadAlbumProgress,
       onBackHome,
+      debutRequested = false,
+      onMatchRecorded,
     }: Props) {
       const [view, setView] = useState<"lobby" | "match">("lobby");
+      const [debutWaiting, setDebutWaiting] = useState(false);
       const [battleMode, setBattleMode] = useState<BattleMode>("quick");
+      // Sprint 06: nunca iniciar automáticamente un partido para cuentas nuevas.
+      // El partido se habilita como objetivo 7, después del equipo.
       const [showPackModal, setShowPackModal] = useState(false);
+      const [equipGuideRequest, setEquipGuideRequest] = useState(0);
       const [selectedWorldPlayer, setSelectedWorldPlayer] =
       useState<LobbyPlayer | null>(null);
       const [dailyChallengeToasts, setDailyChallengeToasts] = useState<DailyChallengeToast[]>([]);
@@ -385,10 +396,10 @@ import { useAchievements } from "../hooks/useAchievements";
     if (versusTimerRef.current) clearTimeout(versusTimerRef.current);
   }, []);
 
-      const { data: heroData } = useUserHeroData(user.id);
+      const { data: heroData, refetch: refreshHeroData } = useUserHeroData(user.id);
       const [showAchievements, setShowAchievements] = useState(false);
       const { data: userDivision, loading: divisionLoading } = useUserDivision(user.id);
-      const { count: packCount } = usePacksCount(user.id);
+      const { count: packCount, refresh: refreshPackCount } = usePacksCount(user.id);
       const {
   currentDay,
   lobbyMission,
@@ -407,8 +418,137 @@ const {
       const exp = heroData?.exp || 0;
       const expNeeded = heroData?.expNeeded || 100;
       const xpPct = Math.min(100, Math.round((exp / expNeeded) * 100));
+      const previousLevelRef = useRef<{ userId: string; level: number } | null>(null);
+      const [levelUp, setLevelUp] = useState<{ from: number; to: number } | null>(null);
+      useEffect(() => {
+        if (!heroData) return;
+        const previous = previousLevelRef.current;
+        if (previous?.userId === user.id && level > previous.level) {
+          setLevelUp({ from: previous.level, to: level });
+        }
+        previousLevelRef.current = { userId: user.id, level };
+      }, [heroData, level, user.id]);
+
 
       const { items: auraItems } = useAuraInventory(user.id, level);
+      const { recommendation: lupiRecommendation, track: trackLupiActivity, dismiss: dismissLupiRecommendation, recordMatchCompleted: recordLupiMatchCompleted } = useLupiRecommendation(user.id, {
+        rewardPending: Boolean(lobbyMission?.isCompleted && !lobbyMission?.isClaimed),
+        packsAvailable: packCount ?? 0,
+        hasDeck: (activeDeck.cards?.length ?? 0) > 0,
+        hasEquipped: auraItems.some(item => item.equipped),
+      });
+
+      const adventure = useFirstAdventure(user.id);
+      const adventureComplete = adventure.complete;
+      const [claimedFirst, setClaimedFirst] = useState<RewardKey[]>([]);
+      const [rewardBusy, setRewardBusy] = useState(false);
+      const [rewardModalPhase, setRewardModalPhase] = useState<"idle" | "open" | "closing">("idle");
+      const [rewardModalKey, setRewardModalKey] = useState<RewardKey | null>(null);
+      const [highlightNext, setHighlightNext] = useState(false);
+      const rewardCardRef = useRef<HTMLElement | null>(null);
+      const rewardModalRef = useRef<HTMLDivElement | null>(null);
+      const [rewardFlight, setRewardFlight] = useState<React.CSSProperties>({});
+      useEffect(() => {
+        const refresh = () => refreshHeroData();
+        window.addEventListener("lupi:progression-updated", refresh);
+        return () => window.removeEventListener("lupi:progression-updated", refresh);
+      }, [refreshHeroData]);
+      const [rewardError, setRewardError] = useState("");
+      const [rewardsLoaded, setRewardsLoaded] = useState(false);
+      useEffect(() => {
+        let active=true;
+        setRewardsLoaded(false);
+        getClaimedFirstRewards(user.id).then(keys=>{if(active){setClaimedFirst(keys);setRewardsLoaded(true);}})
+          .catch(()=>{if(active){setRewardError("No pudimos consultar tus premios. Reintentá.");setRewardsLoaded(true);}});
+        return ()=>{active=false};
+      },[user.id]);
+      const pendingFirstReward:RewardKey|null = !adventure.ready || !rewardsLoaded ? null :
+        !claimedFirst.includes("welcome") ? "welcome" :
+        (["equip_avatar","social","open_pack"] as const).find(k=>adventure.progress.completed.includes(k) && !claimedFirst.includes(k)) ?? null;
+      const autoOpenedRewardRef = useRef<string | null>(null);
+      useEffect(() => {
+        if (!pendingFirstReward || rewardModalPhase !== "idle" || levelUp) return;
+        const identity = `${user.id}:${pendingFirstReward}`;
+        if (autoOpenedRewardRef.current === identity) return;
+        autoOpenedRewardRef.current = identity;
+        setRewardModalKey(pendingFirstReward);
+        setRewardFlight({});
+        setRewardModalPhase("open");
+      }, [pendingFirstReward, rewardModalPhase, levelUp, user.id]);
+      const claimAdventureReward = async () => {
+        if(!pendingFirstReward || rewardBusy)return;
+        setRewardBusy(true);setRewardError("");
+        try {
+          await claimFirstReward(pendingFirstReward);
+          setClaimedFirst(prev=>prev.includes(pendingFirstReward)?prev:[...prev,pendingFirstReward]);
+          refreshHeroData();
+          const from = rewardModalRef.current?.getBoundingClientRect();
+          const to = rewardCardRef.current?.getBoundingClientRect();
+          if (from && to) {
+            setRewardFlight({
+              "--reward-dx": `${to.left + to.width/2 - (from.left + from.width/2)}px`,
+              "--reward-dy": `${to.top + to.height/2 - (from.top + from.height/2)}px`,
+              "--reward-scale": String(Math.min(.7, to.width/from.width))
+            } as React.CSSProperties);
+          }
+          setRewardModalPhase("closing");
+          window.setTimeout(() => { setRewardModalPhase("idle");setRewardModalKey(null);setHighlightNext(true);window.setTimeout(()=>setHighlightNext(false),1100); }, 620);
+        } catch(e) {setRewardError(e instanceof Error?e.message:"No pudimos acreditar la recompensa.");}
+        finally {setRewardBusy(false);}
+      };
+
+      useEffect(() => {
+        if (!adventure.ready) return;
+        // El perfil creado se reconoce por nombre existente; no se asignan recompensas.
+        if (user.username?.trim()) adventureComplete("create_avatar");
+        adventureComplete("enter_world");
+      }, [adventure.ready, adventureComplete, user.username]);
+      useEffect(() => {
+        if (adventure.ready && auraItems.some(item => item.equipped)) adventureComplete("equip_avatar");
+      }, [adventure.ready, auraItems, adventureComplete]);
+      useEffect(() => {
+        if (adventure.ready && (activeDeck.cards?.length ?? 0) >= 5) adventureComplete("build_team");
+      }, [adventure.ready, activeDeck.cards, adventureComplete]);
+      // LockerPreview mantiene otra instancia de useAuraInventory: sincronizar por evento.
+      useEffect(() => {
+        const onInventoryUpdated = (event: Event) => {
+          const detail = (event as CustomEvent<{userId?: string; equipped?: boolean}>).detail;
+          if (detail?.userId !== user.id) return;
+          if (detail.equipped && adventure.ready) adventureComplete("equip_avatar");
+        };
+        window.addEventListener("lupi:inventory-updated", onInventoryUpdated);
+        return () => window.removeEventListener("lupi:inventory-updated", onInventoryUpdated);
+      }, [user.id, adventure.ready, adventureComplete]);
+      // Los pasos de pack, chat y partido se confirman en sus callbacks de éxito.
+      const adventureCopy: Record<AdventureStep, { title: string; description: string; button: string }> = {
+        create_avatar: {title:"Creá tu identidad",description:"Elegí cómo te van a conocer en el mundo.",button:"VER PERFIL"},
+        enter_world: {title:"Entrá a tu mundo",description:"Conocé el vestuario y a Lupi.",button:"EXPLORAR"},
+        equip_avatar: {title:"Dale estilo a tu personaje",description:"Tocá PERSONALIZAR, elegí una prenda y presioná EQUIPAR.",button:"PERSONALIZAR"},
+        social: {title:"Saludá a la comunidad",description:"Mandá tu primer saludo en el chat para completar el desafío.",button:"VER SOCIAL"},
+        open_pack: {title:"Descubrí tus primeras cartas",description:"Abrí un pack disponible en tu cuenta.",button:"ABRIR PACK"},
+        build_team: {title:"Armá tu equipo",description:"Prepará cinco jugadores para tu primer partido.",button:"VER EQUIPO"},
+        first_match: {title:"Tu primer partido",description:"Jugá un encuentro rápido y descubrí la Arena.",button:"JUGAR"},
+        explore: {title:"Descubrí Lupi World",description:"Explorá las experiencias de tu mundo.",button:"EXPLORAR"}
+      };
+      const adventureAction = (step: AdventureStep) => {
+        switch(step) {
+          case "create_avatar": onNavigate("profile"); break;
+          case "enter_world": adventureComplete("enter_world"); break;
+          case "equip_avatar": {
+            setEquipGuideRequest(n => n + 1);
+            break;
+          }
+          case "social": {
+            setShowSocialChat(true);
+            window.setTimeout(() => document.querySelector<HTMLInputElement>(".gh-world__chat .lc-composer input")?.focus(), 80);
+            break;
+          }
+          case "open_pack": setShowPackModal(true); break;
+          case "build_team": handleGameNavigate("deck"); break;
+          case "first_match": handleGameNavigate("battle"); break;
+          case "explore": setShowExploreWorld(true); adventureComplete("explore"); break;
+        }
+      };
       const look = useMemo(() => {
         const l: LobbyLook = {};
         auraItems.forEach((i) => {
@@ -487,6 +627,8 @@ const {
 
       const realOthers = lobbyPlayers.filter((p) => p.userId !== user.id).length;
       const [showPlayersSheet, setShowPlayersSheet] = useState(false);
+      const [showSocialChat, setShowSocialChat] = useState(false);
+      const [showExploreWorld, setShowExploreWorld] = useState(false);
     
       const worldPlayers = lobbyPlayers.map((player) => {
       const skin = getPlayerSkin(player, auraItems);
@@ -595,6 +737,7 @@ const {
 };
 
       const openMatch = (mode: BattleMode) => {
+        trackLupiActivity("play");
         setBattleMode(mode);
         if (gameTab !== "play") setGameTab("play");
         setView("match");
@@ -606,20 +749,39 @@ const {
       const handleGameNavigate = (target: string) => {
         switch (target) {
           case "campaign":
-            openMatch("campaign");
+            openMatch("quick"); // campaña en pausa
             break;
           case "battle":
           case "play":
             openMatch("quick");
             break;
           case "deck":
+            trackLupiActivity("deck");
             setGameTab("deck");
             break;
           case "album":
+            trackLupiActivity("album");
             setGameTab("album");
             break;
           default:
             onNavigate(target);
+        }
+      };
+
+      const runLupiRecommendation = (action: LupiAction) => {
+        switch (action) {
+          case "claim":
+            if (lobbyMission?.isCompleted && !lobbyMission.isClaimed) {
+              void handleLobbyMissionClaim(lobbyMission.id);
+            }
+            break;
+          case "play": handleGameNavigate("battle"); break;
+          case "deck": handleGameNavigate("deck"); break;
+          case "album": handleGameNavigate("album"); break;
+          case "pack": trackLupiActivity("pack"); setShowPackModal(true); break;
+          case "achievements": trackLupiActivity("achievements"); setShowAchievements(true); break;
+          case "social": trackLupiActivity("social"); setShowExploreWorld(true); break;
+          case "explore": trackLupiActivity("explore"); setShowExploreWorld(true); break;
         }
       };
 
@@ -693,7 +855,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
       
 
       return (
-        <div className="main-content gh-root">
+        <div className={`main-content gh-root ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""}`}>
           <div className="gh-light gh-light--l" aria-hidden>
             <span className="gh-light__beam" />
             <span className="gh-light__bloom" />
@@ -705,7 +867,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
             <span className="gh-light__flare" />
           </div>
 
-          <div className={`gh-shell ${(gameTab === "play" && view === "lobby") || gameTab === "deck" ? "gh-shell--wide" : ""}`}>
+          <div className={`gh-shell ${(gameTab === "play" && view === "lobby") || gameTab === "deck" ? "gh-shell--wide" : ""} ${gameTab === "deck" || view === "match" ? "gh-shell--compact-hud" : ""}`}>
             <header className="gh-hud">
   <button className="gh-back" onClick={onBackHome} aria-label="Volver">
     <span aria-hidden>‹</span> LUPI WORLD
@@ -945,8 +1107,12 @@ const handleLobbyMissionClaim = async (missionId: string) => {
       <em>{lobbyPlayers.filter(p => p.userId !== user.id).length}</em>
     </button>
 
-                  <div className="gh-world__chat">
+                  {showSocialChat && <div className="gh-world__tutorial-backdrop" onClick={() => setShowSocialChat(false)} aria-hidden="true" />}
+                  <div className={`gh-world__chat ${showSocialChat ? "gh-world__chat--tutorial-open" : ""}`}>
+                    {showSocialChat && adventure.next === "social" && <div className="gh-world__chat-coach" role="status"><span>✦ MISIÓN 4 DE 8</span><strong>Tu primera conexión</strong><p>Escribí un saludo y tocá enviar. Por ejemplo: «¡Hola! Soy nuevo por acá 👋».</p><small>Al enviarlo, completás este paso de la aventura.</small></div>}
+                    {showSocialChat && <button type="button" className="gh-world__chat-tutorial-close" aria-label="Cerrar chat" onClick={() => setShowSocialChat(false)}>✕ CERRAR</button>}
                     <LobbyChat
+  tutorialOpen={showSocialChat}
   room="global"
   meId={user.id}
   meName={user.username || "Jugador"}
@@ -968,6 +1134,8 @@ const handleLobbyMissionClaim = async (missionId: string) => {
   mutedIds={muted}
   onMessageSent={() => {
     updateMissionProgress("chat");
+    adventureComplete("social");
+    setShowSocialChat(false);
   }}
 />
                   </div>
@@ -975,20 +1143,88 @@ const handleLobbyMissionClaim = async (missionId: string) => {
         <LockerPreview
           userId={user.id}
           level={level}
+          onboardingEquipRequest={equipGuideRequest}
+          onboardingActive={adventure.ready && adventure.next === "equip_avatar"}
           onOpenInventory={() => {
             setGameTab("deck");
           }}
         />
       </div>
 
-                  <LobbyDailyMission
-  mission={lobbyMission}
-  currentDay={currentDay}
-  onClaimReward={handleLobbyMissionClaim}
-  onStartMission={handleLobbyMissionStart}
-/>
+                  {levelUp && (
+                    <div className="gh-world__levelup-overlay" role="presentation">
+                      <div className="gh-world__levelup-dialog" role="dialog" aria-modal="true" aria-labelledby="lupi-levelup-title">
+                        <span>✦ LUPI WORLD · PROGRESIÓN ✦</span>
+                        <div className="gh-world__levelup-crown">👑</div>
+                        <h2 id="lupi-levelup-title">¡LEVEL UP!</h2>
+                        <div className="gh-world__levelup-numbers"><b>{levelUp.from}</b><strong>➜</strong><b>{levelUp.to}</b></div>
+                        <h3>¡SUBISTE DE NIVEL!</h3>
+                        <p>Tu jugador sigue creciendo. ¡Seguí sumando XP!</p>
+                        <button type="button" autoFocus onClick={() => setLevelUp(null)}>CONTINUAR →</button>
+                      </div>
+                    </div>
+                  )}
+                  {rewardModalPhase !== "idle" && rewardModalKey && (
+                    <div className={`gh-world__reward-overlay ${rewardModalPhase === "closing" ? "gh-world__reward-overlay--closing" : ""}`} role="presentation">
+                      <div ref={rewardModalRef} style={rewardFlight} className="gh-world__reward-dialog" role="dialog" aria-modal="true" aria-labelledby="lupi-reward-title">
+                        <span className="gh-world__reward-kicker">✦ LUPI WORLD · RECOMPENSA</span>
+                        <div className="gh-world__reward-icon" aria-hidden="true">🎁</div>
+                        <h2 id="lupi-reward-title">{FIRST_REWARDS[rewardModalKey].title}</h2>
+                        <p>¡Completaste un desafío! Este premio es tuyo.</p>
+                        <div className="gh-world__reward-prizes"><span>💰 <b>+{FIRST_REWARDS[rewardModalKey].coins}</b><small>Lupi Coins</small></span><span>✨ <b>+{FIRST_REWARDS[rewardModalKey].xp}</b><small>XP</small></span></div>
+                        {rewardError && <p role="alert">{rewardError}</p>}
+                        <button type="button" autoFocus disabled={rewardBusy || rewardModalPhase === "closing"} onClick={() => void claimAdventureReward()}>{rewardBusy ? "ACREDITANDO…" : "RECLAMAR RECOMPENSA →"}</button>
+                      </div>
+                    </div>
+                  )}
+                  <section ref={rewardCardRef} className={`gh-world__next ${highlightNext ? "gh-world__next--highlight" : ""}`} aria-label="Recomendación personalizada de Lupi">
+                    {pendingFirstReward ? (
+                      <>
+                        <span className="gh-world__next-kicker">✦ LUPI WORLD · PREMIO DESBLOQUEADO</span>
+                        <strong>{FIRST_REWARDS[pendingFirstReward].title}</strong>
+                        <p>💰 +{FIRST_REWARDS[pendingFirstReward].coins} Lupi Coins · ✨ +{FIRST_REWARDS[pendingFirstReward].xp} XP</p>
+                        <button type="button" disabled={rewardBusy} onClick={() => {setRewardModalKey(pendingFirstReward);setRewardModalPhase("open");}}>
+                          {rewardBusy ? "ACREDITANDO…" : "🎁 RECLAMAR RECOMPENSA →"}
+                        </button>
+                        {rewardError && <small role="alert">{rewardError}</small>}
+                      </>
+                    ) : lobbyMission?.isCompleted && !lobbyMission?.isClaimed ? (
+                      <>
+                        <span className="gh-world__next-kicker">✦ LUPI TE ACOMPAÑA · RECOMPENSA PENDIENTE</span>
+                        <strong>¡Tu recompensa está lista!</strong>
+                        <p>Completaste un desafío. Reclamá tu premio antes de continuar tu aventura.</p>
+                        <button type="button" onClick={() => void handleLobbyMissionClaim(lobbyMission.id)}>⚡ RECLAMAR →</button>
+                      </>
+                    ) : adventure.ready && !adventure.finished && adventure.next ? (
+                      <>
+                        <span className="gh-world__next-kicker">✦ TU PRIMERA AVENTURA · {adventure.progress.completed.length}/8</span>
+                        <strong>{adventureCopy[adventure.next].title}</strong>
+                        <p>{adventureCopy[adventure.next].description}</p>
+                        <button type="button" onClick={() => adventureAction(adventure.next!)}>
+                          ⚡ {adventureCopy[adventure.next].button} →
+                        </button>
+                        {adventure.next === "social" && <button className="gh-world__next-secondary" type="button" onClick={adventure.skipSocial}>Ahora no · Continuar aventura</button>}
+                        {adventure.next === "open_pack" && (packCount ?? 0) === 0 && <small>Si no tenés packs, comprobá tu carta diaria. No se duplican recompensas.</small>}
+                      </>
+                    ) : (
+                      <>
+                        <span className="gh-world__next-kicker">✦ LUPI TE ACOMPAÑA · {lupiRecommendation.reason}</span>
+                        <strong>{lupiRecommendation.title}</strong>
+                        <p>{lupiRecommendation.description}</p>
+                        <button type="button" onClick={() => runLupiRecommendation(lupiRecommendation.action)}>
+                          ⚡ {lupiRecommendation.button} →
+                        </button>
+                      </>
+                    )}
+                    <button className="gh-world__next-secondary" type="button" onClick={() => runLupiRecommendation("explore")}>
+                      Prefiero explorar ↗
+                    </button>
+                    {(adventure.finished || !adventure.ready) && <button className="gh-world__next-secondary" type="button" onClick={() => dismissLupiRecommendation(lupiRecommendation.action)}>
+                      Ahora no · Cambiar sugerencia
+                    </button>}
+                  </section>
 
-                  <button className="gh-world__play" type="button" onClick={() => handleGameNavigate("campaign")}>
+                  <button className="gh-world__play" type="button" onClick={() => handleGameNavigate("battle")}>
                     <span className="gh-world__play-icon" aria-hidden>⚡</span>
                     <span>
                       <small>LISTO PARA JUGAR</small>
@@ -1038,10 +1274,27 @@ const handleLobbyMissionClaim = async (missionId: string) => {
                     </button>
                   </div>
 
-                  <div className="gh-world__hint">
-                    <span>TIP</span>
-                    <p>Hablá con otros jugadores. Los NPC también pueden ayudarte a descubrir el juego.</p>
+                  <div className="gh-world__discover" aria-label="Exploración y comunidad">
+                    <button type="button" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
+                    <button type="button" onClick={() => setShowPlayersSheet(true)}>♧ SOCIAL</button>
                   </div>
+                  {showExploreWorld && (
+                    <div className="gh-world__explore-overlay" role="presentation" onClick={() => setShowExploreWorld(false)}>
+                      <section className="gh-world__explore-panel" role="dialog" aria-modal="true" aria-label="Explorar Lupi World" onClick={event => event.stopPropagation()}>
+                        <button type="button" className="gh-world__explore-close" onClick={() => setShowExploreWorld(false)} aria-label="Cerrar exploración">×</button>
+                        <span className="gh-world__next-kicker">LUPI WORLD</span>
+                        <h2>Elegí tu aventura</h2>
+                        <p>Jugá, personalizá tu personaje o descubrí tus logros.</p>
+                        <div className="gh-world__explore-options">
+                          <button type="button" onClick={() => {setShowExploreWorld(false);handleGameNavigate("battle");}}>⚡ <strong>Partida rápida</strong><small>Entrá a jugar</small></button>
+                          <button type="button" onClick={() => {setShowExploreWorld(false);handleGameNavigate("deck");}}>👕 <strong>Mi equipo</strong><small>Personalizá tu equipo</small></button>
+                          <button type="button" onClick={() => {setShowExploreWorld(false);handleGameNavigate("album");}}>▦ <strong>Álbum</strong><small>Explorá tus cartas</small></button>
+                          <button type="button" onClick={() => {setShowExploreWorld(false);setShowAchievements(true);}}>🏆 <strong>Mis logros</strong><small>Revisá tu progreso</small></button>
+                        </div>
+                        <span className="gh-world__explore-soon">Próximamente: Academy y nuevas habilidades.</span>
+                      </section>
+                    </div>
+                  )}
 
                   <div className="gh-world__dock">
                     <button className="is-active" type="button" onClick={() => setView("lobby")}>
@@ -1081,22 +1334,24 @@ const handleLobbyMissionClaim = async (missionId: string) => {
                 </div>
               )}
 
-              {gameTab === "play" && view === "match" && (
+              {debutWaiting && gameTab === "play" && (
+                <section className="gh-panel" role="status" style={{ textAlign: "center", padding: 32 }}>
+                  <h2>⚽ PREPARANDO TU QUINTETO</h2>
+                  <p>{activeDeck.cards?.length ?? 0}/5 jugadores listos</p>
+                  <button type="button" onClick={() => { loadUserCards(); loadActiveDeck(); }}>
+                    REINTENTAR SINCRONIZACIÓN
+                  </button>
+                </section>
+              )}
+              {!debutWaiting && gameTab === "play" && view === "match" && (
                 <section className="gh-match">
                   <div className="gh-match__bar">
                     <button className="gh-ghost" onClick={() => setView("lobby")}><span aria-hidden>‹</span> Lobby</button>
-                    <div className="gh-seg" role="radiogroup" aria-label="Modo de partido">
-                      <button role="radio" aria-checked={battleMode === "quick"} className={battleMode === "quick" ? "is-active" : ""} onClick={() => setBattleMode("quick")}>
-                        <span aria-hidden>⚡</span> Partido rápido
-                      </button>
-                      <button role="radio" aria-checked={battleMode === "campaign"} className={battleMode === "campaign" ? "is-active" : ""} onClick={() => setBattleMode("campaign")}>
-                        <span aria-hidden>🏆</span> Modo historia
-                      </button>
-                    </div>
+
                   </div>
 
                   <div className="gh-panel">
-                    {battleMode === "quick" ? (
+                    {(
                       <CardBattle
   userCards={userCards}
   userDeck={activeDeck}
@@ -1104,6 +1359,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
   onBattleComplete={onBattleComplete}
   onNavigateToDeck={() => setGameTab("deck")}
   onDailyChallengesUpdated={handleDailyChallengesUpdated}
+  onMatchRecorded={() => { recordLupiMatchCompleted(); adventureComplete("first_match"); onMatchRecorded?.(); }}
   isCampaignMode={true}
   forcedOpponent={{
     name: "Bot Novato",
@@ -1116,20 +1372,9 @@ const handleLobbyMissionClaim = async (missionId: string) => {
     reqWins: 0,
   }}
   onCampaignMatchComplete={() => {
-    updateMissionProgress("play_match");
-    setView("lobby");
+    void updateMissionProgress("play_match");
   }}
-/>
-                    ) : (
-                      <CampaignMode
-  userCards={userCards}
-  userDeck={activeDeck}
-  userId={user.id}
-  onBattleComplete={onBattleComplete}
-  onNavigateToDeck={() => setGameTab("deck")}
-  onDailyChallengesUpdated={
-    handleDailyChallengesUpdated
-  }
+  onResultClosed={() => setView("lobby")}
 />
                     )}
                   </div>
@@ -1152,11 +1397,13 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
           <PackModal
             isOpen={showPackModal}
-            onClose={() => setShowPackModal(false)}
+            onClose={() => { setShowPackModal(false); void refreshPackCount(); }}
             userId={user.id}
             onCardReceived={() => {
               loadUserCards();
               loadActiveDeck();
+              adventureComplete("open_pack");
+              void refreshPackCount();
             }}
           />
           {activeRps && (

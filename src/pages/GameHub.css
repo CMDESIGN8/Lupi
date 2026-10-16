@@ -2800,3 +2800,88 @@
 .gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped.selected {
   border-color: var(--slot-rarity, #A7B6AF) !important;
 }
+/* LUPI: partido en una pantalla. Sólo aplica a la vista match. */
+.gh-root--playing .gh-match {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100dvh;
+  padding: 8px clamp(8px, 2vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 0%, #153a2b, #06110d 75%);
+}
+.gh-root--playing .gh-match__bar {
+  flex: 0 0 30px;
+  min-height: 30px;
+  padding: 0;
+  margin: 0;
+}
+.gh-root--playing .gh-match > .gh-panel {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0 !important;
+  background: none;
+  box-shadow: none;
+  border: 0;
+  overflow: visible;
+}
+.gh-root--playing .arena-container {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+}
+.gh-root--playing .arena-header { flex: 0 0 auto; margin-bottom: 5px; }
+.gh-root--playing .arena-match-core {
+  flex: 1 1 0;
+  min-height: 0;
+  gap: 10px;
+  align-items: stretch;
+}
+.gh-root--playing .futsal-court {
+  height: 100% !important;
+  min-height: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+.gh-root--playing .battle-log-strip {
+  height: 100% !important;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  margin: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.gh-root--playing .log-lines {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+}
+@media (min-width: 901px) {
+  .gh-root--playing .arena-match-core {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(245px, 0.85fr);
+  }
+}
+@media (max-width: 900px) {
+  .gh-root--playing .gh-match { padding: 5px; gap: 3px; }
+  .gh-root--playing .arena-container { padding: 6px; }
+  .gh-root--playing .arena-header { margin-bottom: 3px; }
+  .gh-root--playing .arena-match-core { display: flex; flex-direction: column; gap: 5px; }
+  .gh-root--playing .futsal-court { flex: 1 1 0; min-height: 0; }
+  .gh-root--playing .battle-log-strip { flex: 0 0 clamp(90px, 19dvh, 150px); }
+}
+@media (max-height: 520px) and (min-width: 901px) {
+  .gh-root--playing .arena-header { display: none; }
+}

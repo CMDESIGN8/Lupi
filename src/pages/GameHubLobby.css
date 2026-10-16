@@ -3368,3 +3368,393 @@
     transform: translateX(-50%) scale(0.48);
   }
 }
+/* LUPI WORLD 2.0 — Guía contextual discreta (desktop).
+   Mobile conserva la misión existente, sin superponer controles. */
+.gh-world__guide {
+  display: flex; flex-direction: column; align-items: flex-start;
+  width: min(265px, 23vw); padding: 12px 14px; gap: 7px;
+  border: 1px solid rgba(104,190,232,.26); border-radius: 13px;
+  background: rgba(5,17,28,.83); backdrop-filter: blur(12px);
+  color: #eaf4ff;
+}
+.gh-world__guide .gh-world__guide-kicker { color: #6ad4f6; font-size: 9px; letter-spacing: .12em; }
+.gh-world__guide p { color: #e3eef8; font-size: 11px; line-height: 1.45; }
+.gh-world__guide button {
+  border: 0; background: transparent; color: #7fdafa; padding: 5px 0;
+  font: 800 10px/1.3 Barlow, sans-serif; cursor: pointer; letter-spacing: .06em;
+}
+.gh-world__guide button:focus-visible { outline: 2px solid #7fdafa; outline-offset: 3px; }
+@media (max-width: 900px) { .gh-world__guide { display: none; } }
+
+/* LUPI WORLD 2.0 — Sprint 01B: navegación visible y guía en todas las pantallas */
+.gh-world .gh-world__next { position:absolute;top:100px;left:24px;z-index:45;width:min(300px,calc(50vw - 48px));box-sizing:border-box;padding:16px;display:flex;flex-direction:column;align-items:flex-start;gap:9px;background:linear-gradient(135deg,rgba(7,22,31,.96),rgba(5,23,22,.9));border:1px solid rgba(92,198,226,.38);border-left:3px solid #65d7ee;border-radius:12px;color:#effaff;box-shadow:0 12px 35px #0008;backdrop-filter:blur(12px)}
+.gh-world__next-kicker{font-size:10px;font-weight:800;letter-spacing:.12em;color:#70d8f3}
+.gh-world__next strong{font-size:20px;line-height:1.15}
+.gh-world__next p{font-size:12px;line-height:1.45;margin:0;color:#d4e3ed}
+.gh-world__next button{border:0;border-radius:7px;background:#ffce38;color:#131a20;padding:10px 12px;font-weight:900;font-size:11px;cursor:pointer;width:100%;text-align:center}
+.gh-world__next button.gh-world__next-secondary{background:transparent;border:1px solid #477384;color:#bdebf6}
+.gh-world__discover{position:absolute;left:50%;bottom:104px;transform:translateX(-50%);z-index:125;display:flex;gap:9px;white-space:nowrap}
+.gh-world__discover button{background:rgba(4,20,25,.9);border:1px solid rgba(92,198,226,.4);border-radius:9px;color:#d6f6ff;padding:9px 17px;font-weight:800;letter-spacing:.08em;cursor:pointer}
+.gh-world__explore-overlay{position:absolute;inset:0;z-index:350;display:grid;place-items:center;background:#02090dcc;padding:16px}
+.gh-world__explore-panel{position:relative;width:min(460px,100%);padding:24px;border-radius:16px;background:#0a1924;border:1px solid #3b7685;color:#effaff;box-shadow:0 20px 70px #000b}
+.gh-world__explore-panel h2{margin:9px 0;font-size:25px}.gh-world__explore-panel p{font-size:13px;color:#b7cbd4}
+.gh-world__explore-close{position:absolute;right:12px;top:8px;border:0;background:transparent;color:white;font-size:27px;cursor:pointer}
+.gh-world__explore-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.gh-world__explore-options button{display:flex;flex-direction:column;gap:6px;text-align:left;border:1px solid #2c5865;border-radius:10px;background:#102b35;color:white;padding:14px;cursor:pointer;font-size:19px}
+.gh-world__explore-options strong{font-size:13px}.gh-world__explore-options small{font-size:11px;color:#abc7d2}
+.gh-world__explore-soon{font-size:11px;color:#83b9c7}
+@media(max-width:700px){
+.gh-world .gh-world__next{left:50%;top:65px;transform:translateX(-50%);width:min(290px,calc(100% - 70px));padding:9px 12px;gap:4px;border-radius:9px;z-index:45}
+.gh-world__next-kicker{font-size:8px}.gh-world__next strong{font-size:14px}.gh-world__next p{font-size:10px;line-height:1.25}
+.gh-world__next button{padding:7px;font-size:9px}.gh-world__next button.gh-world__next-secondary{display:none}
+.gh-world__discover{bottom:105px;gap:6px}.gh-world__discover button{font-size:9px;padding:7px 11px}
+.gh-world__explore-panel{max-height:80dvh;overflow:auto;padding:18px}
+}
+@media(max-width:700px) and (max-height:720px){.gh-world .gh-world__next{top:57px;padding:7px 10px}.gh-world__next p{display:none}.gh-world__discover{bottom:98px}}
+
+/* Sprint 01C: evitar duplicaciones y superposiciones.
+   Desktop ya tiene explorar en la guia y social en el chat. */
+@media (min-width: 701px) {
+  .gh-world .gh-world__discover { display: none; }
+  .gh-world .gh-world__next { gap: 10px; }
+}
+/* En móvil, explorar/social son secundarios y no tapan el CTA principal. */
+@media (max-width: 700px) {
+  .gh-world .gh-world__discover {
+    left: 50%; bottom: 128px; transform: translateX(-50%);
+    z-index: 121; gap: 8px;
+  }
+  .gh-world .gh-world__discover button {
+    min-height: 28px; padding: 6px 12px; font-size: 9px;
+  }
+  .gh-world .gh-world__next { max-width: calc(100% - 60px); }
+}
+@media (max-width: 700px) and (max-height: 720px) {
+  .gh-world .gh-world__discover { bottom: 124px; }
+}
+
+/* Sprint 06 — HUD consistente en lobby, mazo y partido */
+.gh-root .gh-shell--compact-hud .gh-hud {
+  min-height: 68px !important;
+  padding: 8px 18px !important;
+  gap: 10px !important;
+  align-items: center;
+}
+.gh-root .gh-shell--compact-hud .gh-brand {
+  font-size: 22px !important;
+  padding-bottom: 3px !important;
+  margin: 0 !important;
+}
+.gh-root .gh-shell--compact-hud .gh-brand strong {
+  font-size: clamp(18px, 2vw, 24px) !important;
+  line-height: 1 !important;
+}
+.gh-root .gh-shell--compact-hud .gh-brand__player {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+}
+.gh-root .gh-shell--compact-hud .gh-hud__right { gap: 8px !important; }
+@media (max-width: 600px) {
+  .gh-root .gh-shell--compact-hud .gh-hud { padding: 8px !important; gap: 4px !important; }
+  .gh-root .gh-shell--compact-hud .gh-brand strong { font-size: 17px !important; }
+}
+
+/* Sprint 08 — guía visual para el primer equipamiento */
+.gh-world .gh-locker-zone:has(.locker-preview--guided) { z-index: 55; }
+.gh-world .gh-locker-zone .locker-slot-guided-label { display:none; }
+.gh-world .gh-locker-zone .locker-preview--guided .locker-slot-guided-label {
+  display:block; position:absolute; bottom:-19px; left:50%; transform:translateX(-50%);
+  padding:3px 5px; border-radius:5px; background:#061a1a; border:1px solid #3c877c;
+  color:#e6fff5; font-size:9px; font-weight:800; white-space:nowrap; pointer-events:none;
+}
+.gh-world .gh-locker-zone .locker-preview--guided .locker-slot.empty { border-color:#ffd03e !important; box-shadow:0 0 0 2px #ffcf3444,0 0 20px #ffd03e44 !important; }
+.gh-world .gh-locker-zone .locker-selector { z-index:180; pointer-events:auto; }
+@media(max-width:700px){
+ .gh-world .gh-world__next { width:min(310px,calc(100% - 40px)); max-width:calc(100% - 40px); padding:10px 12px; gap:5px; }
+ .gh-world .gh-world__next p { font-size:10px; }
+ .gh-world .gh-locker-zone .locker-preview--guided .locker-slot-guided-label { font-size:8px; bottom:-17px; }
+ .gh-world .gh-locker-zone .locker-selector { position:absolute; left:50%; right:auto; width:min(335px,calc(100vw - 24px)); transform:translateX(-50%); bottom:90px; max-height:260px; overflow:auto; padding:12px; border:1px solid #55bca8; border-radius:14px; background:#071c1d; box-shadow:0 20px 70px #000c; }
+}
+
+/* Sprint 09 — selector de equipamiento guiado, visible en móvil y escritorio */
+.gh-world .gh-locker-zone:has(.locker-selector--tutorial) { z-index: 250 !important; }
+.gh-world .locker-selector--tutorial {
+ position:fixed !important; top:50% !important; left:50% !important;
+ right:auto !important; bottom:auto !important; transform:translate(-50%,-50%) !important;
+ width:min(420px,calc(100vw - 28px)) !important; max-height:min(78dvh,620px) !important;
+ overflow-y:auto !important; padding:18px !important; box-sizing:border-box;
+ z-index:800 !important; background:linear-gradient(145deg,#071d22,#07130f) !important;
+ border:1px solid #4ecab7 !important; border-radius:16px !important;
+ box-shadow:0 0 0 200vmax rgba(0,6,10,.75),0 24px 65px #000e,0 0 30px #23f2c22b !important;
+}
+.gh-world .locker-selector--tutorial .locker-guide-step {display:flex;flex-direction:column;gap:6px;margin-bottom:14px;color:#f2fff9}
+.gh-world .locker-selector--tutorial .locker-guide-step span {color:#6de8e1;font-size:10px;font-weight:900;letter-spacing:.08em}
+.gh-world .locker-selector--tutorial .locker-guide-step strong {font-size:22px;line-height:1.15}
+.gh-world .locker-selector--tutorial .locker-guide-step p {font-size:13px;line-height:1.5;color:#d3e6e0;margin:0}
+.gh-world .locker-selector--tutorial .locker-items {grid-template-columns:1fr !important;gap:10px}
+.gh-world .locker-selector--tutorial .locker-item {padding:12px !important;min-height:62px !important;font-size:12px}
+.gh-world .locker-selector--tutorial .locker-item--guided {border:2px solid #ffcd37 !important;background:#ffcd3712 !important;animation:lupi-equip-pulse 1.8s ease-in-out infinite}
+.gh-world .locker-selector--tutorial .locker-item-info small {color:#ffdb6e;font-size:11px;font-weight:900}
+.gh-world .locker-guide-hint {position:absolute;left:50%;bottom:12%;transform:translateX(-50%);width:min(280px,75%);padding:9px 12px;text-align:center;border-radius:9px;background:#061a20eb;color:#c7fff1;font-size:11px;font-weight:800;border:1px solid #54bba3;pointer-events:none;z-index:150}
+@keyframes lupi-equip-pulse {0%,100%{box-shadow:0 0 0 0 #ffd03e22}50%{box-shadow:0 0 0 5px #ffd03e22,0 0 22px #ffd03e55}}
+@media (prefers-reduced-motion:reduce){.gh-world .locker-selector--tutorial .locker-item--guided{animation:none}}
+@media(max-width:700px){
+ .gh-world .locker-selector--tutorial {top:48% !important;max-height:75dvh !important;padding:14px !important;bottom:auto !important;}
+ .gh-world .locker-selector--tutorial .locker-guide-step strong{font-size:19px}
+ .gh-world .locker-selector--tutorial .locker-guide-step p{font-size:12px}
+ .gh-world .gh-world__next {top:62px !important;width:min(310px,calc(100% - 32px)) !important;max-width:calc(100% - 32px) !important;}
+ .gh-world .locker-guide-hint {bottom:16%;font-size:10px}
+}
+
+/* Sprint 10: layout onboarding sin solapamiento + chat social mobile */
+@media (min-width: 901px) {
+ .gh-world .gh-world__next { top: 96px; left: 20px; width: min(300px, 22vw); max-height: 245px; overflow-y: auto; }
+ .gh-world .gh-world__players { top: 355px; bottom: 150px; height: auto; }
+ .gh-world .gh-world__empty-player { max-height: 125px; }
+}
+.gh-world__chat-tutorial-close {position:absolute;right:8px;top:-32px;z-index:20;border:1px solid #5a9e9b;background:#061a1b;color:#e2fffb;border-radius:8px;padding:7px 12px;font-weight:800;cursor:pointer}
+@media (max-width: 700px) {
+ .gh-world .gh-world__chat--tutorial-open {position:fixed !important;inset:calc(70px + env(safe-area-inset-top, 0px)) 8px calc(70px + env(safe-area-inset-bottom, 0px)) 8px !important;width:auto !important;height:auto !important;max-width:none !important;max-height:none !important;z-index:900 !important;background:#061c1b;box-shadow:0 0 0 100vmax #000b;border:1px solid #45a9a2;border-radius:12px}
+ .gh-world .gh-world__chat--tutorial-open .lc {display:flex !important;height:100% !important;max-height:none !important;width:100% !important}
+ .gh-world .gh-world__chat--tutorial-open .lc-body,.gh-world .gh-world__chat--tutorial-open .lc-log-wrap {display:flex !important;flex:1;min-height:0}
+ .gh-world .gh-world__chat--tutorial-open .lc-composer {display:flex !important}
+ .gh-world .gh-world__next {max-height:132px;overflow-y:auto}
+}
+
+/* Sprint 11 — corrección de paneles y chat contextual */
+@media (min-width: 901px) {
+  .gh-world .gh-world__next {
+    top: 98px !important; left: 20px !important; transform: none !important;
+    width: min(300px, calc(100% - 40px)) !important;
+    max-height: none !important; overflow: visible !important;
+    gap: 8px !important; padding: 15px !important;
+  }
+  .gh-world .gh-world__players {
+    top: 365px !important; bottom: 150px !important;
+    height: auto !important; overflow: visible !important;
+  }
+  .gh-world .gh-world__chat--tutorial-open { z-index: 80 !important; }
+}
+.gh-world .gh-world__next { scrollbar-width: none; }
+.gh-world .gh-world__next::-webkit-scrollbar { display: none; }
+.gh-world__chat-coach {
+  position: absolute; z-index: 85; right: 12px; bottom: 72px;
+  width: min(320px, calc(100% - 24px)); box-sizing: border-box;
+  padding: 14px 16px; border-radius: 12px;
+  border: 1px solid #51c9bd; border-left: 3px solid #ffce38;
+  background: #061c20f5; color: #f2fffb; box-shadow: 0 12px 36px #000a;
+  pointer-events: none;
+}
+.gh-world__chat-coach span { display: block; color: #66dce2; font-size: 10px; font-weight: 900; letter-spacing: .1em; margin-bottom: 6px; }
+.gh-world__chat-coach strong { font-size: 17px; display: block; }
+.gh-world__chat-coach p { font-size: 12px; line-height: 1.45; margin: 6px 0; }
+.gh-world__chat-coach small { color: #ffdb74; font-size: 10px; }
+@media (max-width: 900px) {
+  .gh-world .gh-world__next {
+    overflow: visible !important; max-height: none !important;
+    top: 66px !important; padding: 10px 12px !important;
+    gap: 5px !important; z-index: 45 !important;
+  }
+  .gh-world .gh-world__next strong { line-height: 1.15; }
+  .gh-world .gh-world__next p { line-height: 1.35; }
+  .gh-world__chat-coach { bottom: 78px; right: 10px; }
+  .gh-world .gh-world__chat--tutorial-open .gh-world__chat-tutorial-close {
+    top: 8px !important; right: 8px !important; z-index: 95;
+  }
+  .gh-world .gh-world__chat--tutorial-open { overflow: visible !important; }
+}
+@media (max-width: 700px) {
+  .gh-world .gh-world__next { width: min(310px, calc(100% - 32px)) !important; }
+  .gh-world__chat-coach { bottom: 68px; }
+}
+
+/* Sprint 13: reward fly-to-mission and focused chat tutorial */
+.gh-world__reward-overlay{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:20px;background:rgba(0,5,10,.79);backdrop-filter:blur(9px);animation:lupiOverlayIn .2s ease both}
+.gh-world__reward-dialog{width:min(410px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow-y:auto;box-sizing:border-box;text-align:center;background:linear-gradient(155deg,#082b2c,#041315 75%);border:1px solid #20dfbd;border-radius:20px;padding:25px;box-shadow:0 0 75px #05bba638,0 24px 80px #000c;color:#f5fffc;transform-origin:center}
+.gh-world__reward-kicker{color:#56e9dc;font-size:11px;letter-spacing:.15em;font-weight:900}
+.gh-world__reward-icon{font-size:54px;margin:16px 0 8px;filter:drop-shadow(0 0 15px #ffc93388)}
+.gh-world__reward-dialog h2{font-size:25px;line-height:1.12;margin:10px 0}.gh-world__reward-dialog p{font-size:13px;color:#b8d4d0}
+.gh-world__reward-prizes{display:flex;justify-content:center;gap:12px;margin:22px 0}.gh-world__reward-prizes span{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:110px;padding:14px;border:1px solid #35645b;border-radius:12px;background:#10312c}.gh-world__reward-prizes b{font-size:27px;color:#ffda49}.gh-world__reward-prizes small{font-size:11px;color:#b6d7d0}
+.gh-world__reward-dialog>button{width:100%;border:0;border-radius:10px;background:#ffce38;color:#071513;font-weight:900;padding:14px;cursor:pointer}
+.gh-world__reward-overlay--closing{background:transparent;backdrop-filter:none;pointer-events:none;transition:background .55s,backdrop-filter .55s}
+.gh-world__reward-overlay--closing .gh-world__reward-dialog{animation:lupiRewardFly .6s cubic-bezier(.3,.05,.2,1) forwards}
+.gh-world__next--highlight{animation:lupiMissionPulse 1s ease both}
+@keyframes lupiOverlayIn{from{opacity:0}to{opacity:1}}
+@keyframes lupiRewardFly{to{transform:translate(var(--reward-dx,0px),var(--reward-dy,0px)) scale(var(--reward-scale,.5));opacity:0}}
+@keyframes lupiMissionPulse{0%,100%{box-shadow:0 12px 35px #0008}50%{box-shadow:0 0 0 4px #ffce38,0 0 36px #ffce3888}}
+.gh-world__tutorial-backdrop{position:fixed;inset:0;z-index:800;background:rgba(0,6,10,.78);backdrop-filter:blur(7px)}
+.gh-world .gh-world__chat--tutorial-open{z-index:810 !important;box-shadow:0 0 0 2px #42e5c1,0 18px 80px #000b !important}
+@media(min-width:901px){.gh-world .gh-world__chat--tutorial-open{position:relative !important;z-index:810 !important}}
+@media(max-width:900px){.gh-world .gh-world__chat--tutorial-open{position:fixed !important;inset:calc(55px + env(safe-area-inset-top,0px)) 10px calc(20px + env(safe-area-inset-bottom,0px)) !important;width:auto !important;height:auto !important;max-height:none !important;z-index:810 !important;background:#061c1b;border-radius:14px;overflow:hidden !important}.gh-world__chat-coach{bottom:75px !important;max-width:calc(100% - 24px)}}
+@media(prefers-reduced-motion:reduce){.gh-world__reward-overlay,.gh-world__reward-overlay--closing .gh-world__reward-dialog,.gh-world__next--highlight{animation:none !important}}
+
+/* Sprint 14 — social focus: preserve chat grid placement on desktop. */
+@media (min-width:901px) {
+ .gh-world .gh-world__chat--tutorial-open { position:relative !important; inset:auto !important; grid-column:auto !important; grid-row:auto !important; transform:none !important; margin:0 !important; width:100% !important; height:100% !important; min-height:0 !important; }
+ .gh-world__chat-coach { right:12px !important; left:auto !important; bottom:76px !important; top:auto !important; }
+}
+.gh-world__chat-tutorial-close { top:8px !important; right:8px !important; z-index:100 !important; }
+.gh-world__tutorial-backdrop { z-index:800 !important; }
+.gh-world .gh-world__chat--tutorial-open { z-index:810 !important; isolation:isolate; }
+.gh-world__levelup-overlay { position:fixed;inset:0;z-index:10050;display:grid;place-items:center;padding:18px;background:rgba(0,5,12,.88);backdrop-filter:blur(12px); }
+.gh-world__levelup-dialog { width:min(420px,100%);padding:30px 24px;text-align:center;border:1px solid #eac04c;border-radius:22px;background:radial-gradient(circle at 50% 22%,#174339,#07161b 70%);box-shadow:0 0 85px #e3b52b44,0 20px 70px #000c;color:#fff;animation:lupiLevelReveal .5s cubic-bezier(.2,1.4,.3,1) both; }
+.gh-world__levelup-dialog>span { color:#3ef0c2;font-size:11px;font-weight:900;letter-spacing:.12em; }
+.gh-world__levelup-crown { font-size:52px;margin:12px;filter:drop-shadow(0 0 18px #ffcd37); }
+.gh-world__levelup-dialog h2 { font-size:clamp(35px,7vw,55px);margin:0;color:#ffce38;font-weight:1000; }
+.gh-world__levelup-numbers { display:flex;align-items:center;justify-content:center;gap:22px;margin:18px 0; }
+.gh-world__levelup-numbers b { width:76px;height:76px;display:grid;place-items:center;border-radius:50%;background:#12342e;border:2px solid #32f4b3;font-size:39px; }
+.gh-world__levelup-numbers b:first-child { border-color:#677c82;color:#a5b4b8; }
+.gh-world__levelup-numbers strong { color:#ffd33d;font-size:26px; }
+.gh-world__levelup-dialog h3 { font-size:20px;margin:12px 0 4px; }
+.gh-world__levelup-dialog p { color:#b8d4d0;font-size:13px; }
+.gh-world__levelup-dialog button { margin-top:18px;width:100%;padding:14px;border:0;border-radius:10px;background:#ffce38;color:#101713;font-weight:900;cursor:pointer; }
+@keyframes lupiLevelReveal { from { transform:scale(.6);opacity:0; } to { transform:scale(1);opacity:1; } }
+@media (prefers-reduced-motion:reduce) { .gh-world__levelup-dialog { animation:none; } }
+
+/* Sprint 14 hotfix — Social en escritorio: conservar la posición del chat.
+   El chat base es absolute; position:relative lo sacaba de su columna. */
+@media (min-width: 901px) {
+  .gh-world .gh-world__chat.gh-world__chat--tutorial-open {
+    position: absolute !important;
+    top: 80px !important;
+    right: 24px !important;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    left: auto !important;
+    inset-block: 80px calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    width: min(100%, 26vw) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    transform: none !important;
+    margin: 0 !important;
+    z-index: 810 !important;
+  }
+  .gh-world .gh-world__chat--tutorial-open .gh-world__chat-coach {
+    position: absolute;
+    top: auto !important;
+    bottom: 76px !important;
+    right: 12px !important;
+    left: auto !important;
+    width: calc(100% - 24px);
+    max-width: 320px;
+  }
+}
+
+/* Sprint 15 — chat tutorial responsive: anchored mobile sheet, no offscreen content */
+@media (max-width: 900px) {
+ .gh-world .gh-world__chat.gh-world__chat--tutorial-open {
+   position: fixed !important;
+   inset: auto 10px calc(12px + env(safe-area-inset-bottom, 0px)) 10px !important;
+   top: auto !important; right: 10px !important; left: 10px !important;
+   bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+   width: auto !important; max-width: none !important;
+   height: min(610px, calc(100dvh - 85px)) !important;
+   max-height: calc(100dvh - 85px) !important;
+   display: flex !important; flex-direction: column !important;
+   overflow: hidden !important; pointer-events: auto !important;
+   z-index: 810 !important; border-radius: 16px !important;
+ }
+ .gh-world .gh-world__chat--tutorial-open .lc.lc--mobile-open {
+   display: flex !important; flex-direction: column !important;
+   flex: 1 1 auto !important; min-height: 0 !important;
+   width: 100% !important; height: 100% !important;
+   max-height: none !important; overflow: hidden !important;
+ }
+ .gh-world .gh-world__chat--tutorial-open .gh-world__chat-coach {
+   position: relative !important; inset: auto !important;
+   order: -1; flex: 0 0 auto; width: auto !important;
+   max-width: none !important; margin: 44px 12px 10px !important;
+   z-index: 5 !important;
+ }
+ .gh-world .gh-world__chat--tutorial-open .gh-world__chat-tutorial-close {
+   position: absolute !important; top: 10px !important; right: 12px !important;
+   z-index: 30 !important;
+ }
+ .gh-world .gh-world__chat--tutorial-open .lc-body,
+ .gh-world .gh-world__chat--tutorial-open .lc-log-wrap {
+   min-height: 0 !important; flex: 1 1 0 !important;
+ }
+ .gh-world .gh-world__chat--tutorial-open .lc-composer {
+   flex: 0 0 auto !important; padding-bottom: max(10px, env(safe-area-inset-bottom, 0px)) !important;
+ }
+ .gh-world .gh-world__chat--tutorial-open .lc-mobile-chat-trigger { display: none !important; }
+}
+@media (max-width: 420px) and (max-height: 700px) {
+ .gh-world .gh-world__chat.gh-world__chat--tutorial-open {
+   height: calc(100dvh - 72px) !important; max-height: calc(100dvh - 72px) !important;
+   bottom: 6px !important;
+ }
+ .gh-world .gh-world__chat--tutorial-open .gh-world__chat-coach { margin-top: 32px !important; padding: 9px !important; }
+}
+
+/* Sprint 15B — mobile: separar la tarjeta de misión del HUD.
+   Debe ir al final: reglas anteriores usan top con !important. */
+@media (max-width: 700px) {
+  .gh-world .gh-world__next {
+    position: absolute !important;
+    top: calc(118px + env(safe-area-inset-top, 0px)) !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(310px, calc(100% - 32px)) !important;
+    max-width: calc(100% - 32px) !important;
+    box-sizing: border-box !important;
+    max-height: min(175px, 24dvh) !important;
+    overflow-y: auto !important;
+    z-index: 45 !important;
+  }
+}
+@media (max-width: 700px) and (max-height: 720px) {
+  .gh-world .gh-world__next {
+    top: calc(106px + env(safe-area-inset-top, 0px)) !important;
+    max-height: 130px !important;
+  }
+}
+
+/* Sprint 15C — Mobile vertical layout: CTA always above bottom navigation.
+   Overrides the legacy max-height:650px rule that placed PLAY at bottom:18px
+   underneath the 58px dock. Keep mission positioning from Sprint 15B. */
+@media (max-width: 700px) {
+  .gh-world .gh-world__play {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    transform: translateX(-50%) !important;
+    width: min(200px, calc(100% - 120px)) !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    z-index: 205 !important;
+    visibility: visible !important;
+  }
+  .gh-world .gh-world__discover {
+    bottom: calc(124px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .gh-world .gh-world__dock {
+    bottom: 0 !important;
+    min-height: 58px;
+  }
+}
+@media (max-width: 700px) and (max-height: 740px) {
+  .gh-world .gh-world__play {
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important;
+    height: 39px !important;
+  }
+  .gh-world .gh-world__discover {
+    bottom: calc(116px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .gh-world .gh-locker-zone {
+    bottom: 126px !important;
+  }
+}
+@media (max-width: 700px) and (max-height: 650px) {
+  .gh-world .gh-world__play {
+    bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
+    height: 38px !important;
+  }
+  .gh-world .gh-world__discover {
+    bottom: calc(112px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .gh-world .gh-locker-zone {
+    bottom: 126px !important;
+  }
+}

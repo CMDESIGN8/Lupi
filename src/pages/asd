@@ -2793,3 +2793,815 @@
     transform: translateX(-50%) scale(0.8);
   }
 }
+
+## Table `rewards`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `name` | `text` |  |
+| `description` | `text` |  Nullable |
+| `points_cost` | `int4` |  |
+| `stock` | `int4` |  Nullable |
+| `image_url` | `text` |  Nullable |
+| `created_at` | `timestamp` |  Nullable |
+
+## Table `redemptions`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `reward_id` | `uuid` |  Nullable |
+| `points_spent` | `int4` |  |
+| `status` | `text` |  Nullable |
+| `created_at` | `timestamp` |  Nullable |
+
+## Table `profiles`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `email` | `text` |  Unique |
+| `username` | `text` |  Unique |
+| `club` | `text` |  |
+| `points` | `int4` |  Nullable |
+| `referral_code` | `text` |  Nullable Unique |
+| `referred_by` | `uuid` |  Nullable |
+| `referral_count` | `int4` |  Nullable |
+| `referral_points` | `int4` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `streak` | `int4` |  Nullable |
+| `last_ticket_date` | `date` |  Nullable |
+| `best_streak` | `int4` |  Nullable |
+| `user_card_level` | `int4` |  Nullable |
+| `user_card_exp` | `int4` |  Nullable |
+| `user_card_rarity` | `text` |  Nullable |
+| `user_card_pace` | `int4` |  Nullable |
+| `user_card_dribbling` | `int4` |  Nullable |
+| `user_card_passing` | `int4` |  Nullable |
+| `user_card_defending` | `int4` |  Nullable |
+| `user_card_finishing` | `int4` |  Nullable |
+| `user_card_physical` | `int4` |  Nullable |
+| `total_tickets_lifetime` | `int4` |  Nullable |
+| `total_battles_lifetime` | `int4` |  Nullable |
+| `total_wins_lifetime` | `int4` |  Nullable |
+| `total_shares_lifetime` | `int4` |  Nullable |
+| `total_referrals_lifetime` | `int4` |  Nullable |
+| `total_daily_cards` | `int4` |  Nullable |
+| `total_missions_completed` | `int4` |  Nullable |
+| `position` | `text` |  Nullable |
+| `category` | `text` |  Nullable |
+| `replaces_npc_id` | `uuid` |  Nullable |
+| `coins` | `int4` |  Nullable |
+| `level` | `int4` |  Nullable |
+| `exp` | `int4` |  Nullable |
+| `updated_at` | `timestamptz` |  |
+| `last_activity_date` | `date` |  Nullable |
+
+## Table `tickets`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `ticket_number` | `text` |  |
+| `club` | `text` |  |
+| `status` | `text` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `updated_at` | `timestamptz` |  Nullable |
+
+## Table `notifications`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `title` | `text` |  |
+| `message` | `text` |  |
+| `type` | `text` |  |
+| `read` | `bool` |  Nullable |
+| `ticket_id` | `uuid` |  Nullable |
+| `ticket_number` | `text` |  Nullable |
+| `club` | `text` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `metadata` | `jsonb` |  Nullable |
+
+## Table `referrals`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `referrer_id` | `uuid` |  Nullable |
+| `referred_id` | `uuid` |  Nullable Unique |
+| `points_awarded` | `int4` |  Nullable |
+| `status` | `text` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+
+## Table `shares`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `shared_at` | `timestamptz` |  Nullable |
+| `points_awarded` | `int4` |  Nullable |
+| `share_type` | `text` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+
+## Table `tickets_history`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `ticket_id` | `uuid` |  Nullable |
+| `ticket_number` | `text` |  Nullable |
+| `user_id` | `uuid` |  Nullable |
+| `club` | `text` |  Nullable |
+| `status` | `text` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `week_number` | `int4` |  Nullable |
+| `year` | `int4` |  Nullable |
+| `archived_at` | `timestamptz` |  Nullable |
+
+## Table `winners_history`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `username` | `text` |  Nullable |
+| `club` | `text` |  Nullable |
+| `ticket_id` | `uuid` |  Nullable |
+| `ticket_number` | `text` |  Nullable |
+| `week_start` | `date` |  Nullable |
+| `week_end` | `date` |  Nullable |
+| `points_at_time` | `int4` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+
+## Table `email_queue`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `to_email` | `text` |  |
+| `subject` | `text` |  |
+| `content` | `text` |  |
+| `sent` | `bool` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `sent_at` | `timestamptz` |  Nullable |
+
+## Table `missions_completed`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `mission_id` | `text` |  |
+| `week_number` | `int4` |  |
+| `year` | `int4` |  |
+| `points_awarded` | `int4` |  |
+| `completed_at` | `timestamptz` |  Nullable |
+
+## Table `achievements_unlocked`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `achievement_id` | `text` |  |
+| `unlocked_at` | `timestamptz` |  Nullable |
+
+## Table `achievements`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `text` | Primary |
+| `name` | `text` |  |
+| `description` | `text` |  |
+| `icon` | `text` |  |
+| `points_reward` | `int4` |  Nullable |
+| `requirement_type` | `text` |  |
+| `requirement_value` | `int4` |  |
+| `created_at` | `timestamptz` |  Nullable |
+
+## Table `players`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `name` | `text` |  |
+| `position` | `text` |  |
+| `category` | `text` |  |
+| `photo_url` | `text` |  Nullable |
+| `overall_rating` | `int4` |  Nullable |
+| `pace` | `int4` |  Nullable |
+| `dribbling` | `int4` |  Nullable |
+| `passing` | `int4` |  Nullable |
+| `defending` | `int4` |  Nullable |
+| `finishing` | `int4` |  Nullable |
+| `physical` | `int4` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `can_be_replaced` | `bool` |  Nullable |
+| `is_replaced` | `bool` |  Nullable |
+| `replaces_profile_id` | `uuid` |  Nullable |
+| `original_name` | `text` |  Nullable |
+
+## Table `user_cards`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `player_id` | `uuid` |  Nullable |
+| `level` | `int4` |  Nullable |
+| `experience` | `int4` |  Nullable |
+| `is_favorite` | `bool` |  Nullable |
+| `obtained_at` | `timestamptz` |  Nullable |
+| `card_type` | `text` |  Nullable |
+| `socio_id` | `uuid` |  Nullable |
+| `duplicates` | `int4` |  Nullable |
+
+## Table `decks`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `name` | `text` |  Nullable |
+| `is_active` | `bool` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+
+## Table `deck_cards`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `deck_id` | `uuid` | Primary |
+| `user_card_id` | `uuid` |  Nullable |
+| `position` | `int4` | Primary |
+
+## Table `matches`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `opponent_type` | `text` |  Nullable |
+| `opponent_id` | `uuid` |  Nullable |
+| `user_deck_id` | `uuid` |  Nullable |
+| `user_score` | `int4` |  Nullable |
+| `opponent_score` | `int4` |  Nullable |
+| `winner_id` | `uuid` |  Nullable |
+| `experience_gained` | `int4` |  Nullable |
+| `played_at` | `timestamptz` |  Nullable |
+
+## Table `daily_rewards`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `reward_date` | `date` |  Nullable |
+| `claimed` | `bool` |  Nullable |
+| `player_id` | `uuid` |  Nullable |
+| `claimed_at` | `timestamptz` |  Nullable |
+
+## Table `seasons`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `name` | `text` |  |
+| `start_date` | `timestamptz` |  |
+| `end_date` | `timestamptz` |  |
+| `is_active` | `bool` |  Nullable |
+| `boss_name` | `text` |  |
+| `boss_icon` | `text` |  |
+| `boss_ovr` | `int4` |  |
+| `reward_card_id` | `uuid` |  Nullable |
+| `reward_card_name` | `text` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+
+## Table `season_progress`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `season_id` | `uuid` |  |
+| `wins` | `int4` |  Nullable |
+| `boss_defeated` | `bool` |  Nullable |
+| `rewards_claimed` | `_text` |  Nullable |
+| `updated_at` | `timestamptz` |  Nullable |
+
+## Table `user_stats`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Unique |
+| `level` | `int4` |  Nullable |
+| `xp` | `int4` |  Nullable |
+| `xp_needed` | `int4` |  Nullable |
+| `total_wins` | `int4` |  Nullable |
+| `streak` | `int4` |  Nullable |
+| `coins` | `int4` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `updated_at` | `timestamptz` |  Nullable |
+
+## Table `daily_challenges`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `date` | `date` |  |
+| `challenge_id` | `text` |  |
+| `progress` | `int4` |  Nullable |
+| `completed` | `bool` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `updated_at` | `timestamptz` |  Nullable |
+
+## Table `user_campaign_progress`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `stage_id` | `text` |  |
+| `completed_at` | `timestamptz` |  |
+
+## Table `campaign_progress`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable Unique |
+| `current_league_id` | `text` |  |
+| `completed_league_ids` | `_text` |  Nullable |
+| `stars_earned` | `int4` |  Nullable |
+| `unlocked_badges` | `_text` |  Nullable |
+| `current_streak` | `int4` |  Nullable |
+| `best_streak` | `int4` |  Nullable |
+| `created_at` | `timestamptz` |  Nullable |
+| `updated_at` | `timestamptz` |  Nullable |
+
+## Table `user_packs`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `pack_type` | `varchar` |  Nullable |
+| `opened` | `bool` |  Nullable |
+| `obtained_at` | `timestamp` |  Nullable |
+| `expires_at` | `timestamp` |  Nullable |
+
+## Table `events`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `name` | `varchar` |  |
+| `description` | `text` |  Nullable |
+| `start_date` | `timestamp` |  |
+| `end_date` | `timestamp` |  |
+| `is_active` | `bool` |  Nullable |
+| `reward_points` | `int4` |  Nullable |
+| `icon` | `varchar` |  Nullable |
+| `created_at` | `timestamp` |  Nullable |
+
+## Table `daily_missions`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  Nullable |
+| `date` | `date` |  |
+| `title` | `varchar` |  Nullable |
+| `type` | `varchar` |  |
+| `requirement` | `int4` |  Nullable |
+| `current_progress` | `int4` |  Nullable |
+| `is_completed` | `bool` |  Nullable |
+| `is_claimed` | `bool` |  Nullable |
+| `reward_xp` | `int4` |  Nullable |
+| `reward_coins` | `int4` |  Nullable |
+| `created_at` | `timestamp` |  Nullable |
+
+## Table `daily_packs`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `claimed_date` | `date` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `user_missions`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `mission_id` | `text` |  |
+| `completed` | `bool` |  |
+| `claimed` | `bool` |  |
+| `completed_at` | `timestamptz` |  Nullable |
+| `claimed_at` | `timestamptz` |  Nullable |
+| `created_at` | `timestamptz` |  |
+
+## Table `benefits`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `text` | Primary |
+| `title` | `text` |  |
+| `description` | `text` |  |
+| `cost` | `int4` |  |
+| `icon` | `text` |  |
+| `available` | `bool` |  |
+| `active` | `bool` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `shop_items`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `text` | Primary |
+| `title` | `text` |  |
+| `description` | `text` |  |
+| `cost` | `int4` |  |
+| `icon` | `text` |  |
+| `category` | `text` |  |
+| `badge` | `text` |  Nullable |
+| `stock` | `int4` |  Nullable |
+| `effect_type` | `text` |  |
+| `effect_payload` | `jsonb` |  |
+| `available` | `bool` |  |
+| `active` | `bool` |  |
+| `sort_order` | `int4` |  Nullable |
+| `created_at` | `timestamptz` |  |
+
+## Table `purchase_history`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `item_id` | `text` |  |
+| `cost_paid` | `int4` |  |
+| `original_cost` | `int4` |  |
+| `discount_applied` | `jsonb` |  Nullable |
+| `effect_result` | `jsonb` |  Nullable |
+| `created_at` | `timestamptz` |  |
+
+## Table `progression_events`
+
+Historial inmutable de acciones de progresión de usuarios.
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `action_type` | `text` |  |
+| `reference_id` | `text` |  Nullable |
+| `points_awarded` | `int4` |  |
+| `exp_awarded` | `int4` |  |
+| `level_before` | `int4` |  Nullable |
+| `level_after` | `int4` |  Nullable |
+| `leveled_up` | `bool` |  |
+| `stat_upgraded` | `text` |  Nullable |
+| `stat_gain` | `int4` |  |
+| `streak_before` | `int4` |  Nullable |
+| `streak_after` | `int4` |  Nullable |
+| `streak_bonus` | `int4` |  |
+| `metadata` | `jsonb` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `daily_activity`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `user_id` | `uuid` |  |
+| `activity_date` | `date` |  |
+| `action_type` | `text` |  |
+| `reference_id` | `text` |  Nullable |
+| `metadata` | `jsonb` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `aura_items`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `text` | Primary |
+| `name` | `text` |  |
+| `slot` | `text` |  |
+| `rarity` | `text` |  |
+| `world` | `text` |  Nullable |
+| `drop_code` | `text` |  |
+| `icon` | `text` |  |
+| `image_url` | `text` |  Nullable |
+| `required_level` | `int4` |  |
+| `model_url` | `text` |  Nullable |
+| `shop_url` | `text` |  Nullable |
+| `equipped_image_url` | `text` |  Nullable |
+| `color` | `text` |  Nullable |
+
+## Table `user_items`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `user_id` | `uuid` | Primary |
+| `item_id` | `text` | Primary |
+| `equipped` | `bool` |  |
+| `acquired_at` | `timestamptz` |  |
+
+## Table `lobby_messages`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `room` | `text` |  |
+| `user_id` | `uuid` |  |
+| `author` | `text` |  |
+| `text` | `text` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `lobby_reports`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `reporter_id` | `uuid` |  |
+| `reported_id` | `uuid` |  |
+| `message_id` | `uuid` |  Nullable |
+| `reason` | `text` |  |
+| `created_at` | `timestamptz` |  |
+
+## Table `rps_matches`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `host_id` | `uuid` |  |
+| `guest_id` | `uuid` |  |
+| `round_no` | `int4` |  |
+| `host_wins` | `int4` |  |
+| `guest_wins` | `int4` |  |
+| `status` | `text` |  |
+| `winner_id` | `uuid` |  Nullable |
+| `updated_at` | `timestamptz` |  |
+
+## Table `rps_moves`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `match_id` | `uuid` | Primary |
+| `round_no` | `int4` | Primary |
+| `player_id` | `uuid` | Primary |
+| `choice` | `text` |  |
+
+## RLS Policies
+
+### `tickets`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Users can view their own tickets` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Users can insert their own tickets` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+
+### `notifications`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Users can view their own notifications` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Users can update their own notifications` | UPDATE | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+
+### `profiles`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Users can view own profile` | SELECT | public | PERMISSIVE | `(auth.uid() = id)` | — |
+| `Users can update own profile` | UPDATE | public | PERMISSIVE | `(auth.uid() = id)` | — |
+| `Users can insert own profile` | INSERT | public | PERMISSIVE | — | `(auth.uid() = id)` |
+| `Authenticated users can view all profiles` | SELECT | public | PERMISSIVE | `(auth.role() = 'authenticated'::text)` | — |
+| `Anyone can view profiles` | SELECT | public | PERMISSIVE | `true` | — |
+
+### `achievements_unlocked`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Users can view own unlocked achievements` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `System can insert unlocked achievements` | INSERT | public | PERMISSIVE | — | `true` |
+
+### `user_cards`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `user_cards_select_own` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `user_cards_insert_own` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+
+### `daily_rewards`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `daily_rewards_select_own` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `daily_rewards_insert_own` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+| `daily_rewards_update_own` | UPDATE | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+
+### `players`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `players_select_all` | SELECT | public | PERMISSIVE | `true` | — |
+| `Allow admins to update players` | UPDATE | public | PERMISSIVE | `(auth.role() = 'authenticated'::text)` | — |
+| `Allow authenticated to update players` | UPDATE | authenticated | PERMISSIVE | `true` | — |
+| `Allow authenticated to delete players` | DELETE | authenticated | PERMISSIVE | `true` | — |
+
+### `decks`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `decks_all_own` | ALL | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+
+### `deck_cards`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `deck_cards_all` | ALL | public | PERMISSIVE | `(deck_id IN ( SELECT decks.id    FROM decks   WHERE (decks.user_id = auth.uid())))` | — |
+
+### `matches`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `matches_select_own` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `matches_insert_own` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+| `Usuarios pueden ver sus partidos` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Usuarios pueden insertar partidos` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+
+### `user_stats`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Usuarios pueden ver sus stats` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Usuarios pueden insertar sus stats` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+| `Usuarios pueden actualizar sus stats` | UPDATE | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Users can read own stats` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Users can update own stats` | UPDATE | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Users can insert own stats` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+
+### `daily_challenges`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Usuarios pueden ver sus desafíos` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Usuarios pueden insertar/actualizar sus desafíos` | ALL | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+
+### `user_campaign_progress`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Usuarios pueden ver su propio progreso` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Usuarios pueden insertar su propio progreso` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+
+### `benefits`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Anyone can read active benefits` | SELECT | public | PERMISSIVE | `(active = true)` | — |
+
+### `daily_packs`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Users can read own daily packs` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Users can insert own daily packs` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+
+### `user_missions`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Users can read own missions` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Users can update own missions` | UPDATE | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+
+### `shop_items`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Anyone can read active shop items` | SELECT | public | PERMISSIVE | `((active = true) AND (available = true))` | — |
+
+### `purchase_history`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Users read own purchases` | SELECT | public | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `Users insert own purchases` | INSERT | public | PERMISSIVE | — | `(auth.uid() = user_id)` |
+
+### `aura_items`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `catalogo visible` | SELECT | authenticated | PERMISSIVE | `true` | — |
+
+### `user_items`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `ver mis items` | SELECT | authenticated | PERMISSIVE | `(user_id = auth.uid())` | — |
+
+### `lobby_messages`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `lobby read` | SELECT | authenticated | PERMISSIVE | `true` | — |
+| `lobby insert own` | INSERT | authenticated | PERMISSIVE | — | `(user_id = auth.uid())` |
+
+### `lobby_reports`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `report insert own` | INSERT | authenticated | PERMISSIVE | — | `(reporter_id = auth.uid())` |
+

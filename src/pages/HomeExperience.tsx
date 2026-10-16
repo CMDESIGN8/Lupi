@@ -1,5 +1,6 @@
 // src/pages/HomeExperience.tsx
 import { useState } from "react";
+import "./HomeExperienceOnboarding.css";
 import { AppUser } from "../lib/api";
 import { useHeroDataCached } from "../hooks/useHeroData";
 import { usePullToRefresh } from "../hooks/usePullToRefresh";
@@ -15,6 +16,7 @@ type Props = {
   onNavigate: (t: string) => void;
   onRewardClaimed?: () => void;
   onCardReceived?: () => void;
+  hasPlayedMatch?: boolean | null;
 };
 
 export function HomeExperience({
@@ -23,10 +25,22 @@ export function HomeExperience({
   onNavigate,
   onRewardClaimed,
   onCardReceived,
+  hasPlayedMatch = null,
 }: Props) {
   const { data: heroData, loading, refetch } = useHeroDataCached(user.id);
   const { count: packCount } = usePacksCount(user.id);
   const [showPackModal, setShowPackModal] = useState(false);
+  // Solo se muestra una vez por usuario y dispositivo. No bloquea la navegación.
+  const welcomeKey = `lupi-first-home-${user.id}`;
+  const [showFirstHint, setShowFirstHint] = useState(() => {
+    try { return window.localStorage.getItem(welcomeKey) !== "seen"; }
+    catch { return false; }
+  });
+  const dismissFirstHint = () => {
+    setShowFirstHint(false);
+    try { window.localStorage.setItem(welcomeKey, "seen"); } catch { /* storage unavailable */ }
+  };
+  const enterGame = () => { dismissFirstHint(); onEnterGame(); };
 
   const level = heroData?.level || 1;
   const exp = heroData?.exp || 0;
@@ -119,6 +133,22 @@ const handleMissionDone = async () => {
           onCardReceived={handlePackCardReceived}
         />
 
+        <section className="lupi-first-play" aria-label="Tu equipo está listo">
+          <div className="lupi-first-play__copy">
+            <span className="lupi-first-play__eyebrow">✦ LUPI WORLD · TU CLUB</span>
+            <h1>{hasPlayedMatch ? <>TU MUNDO <em>TE ESPERA.</em></> : <>TU AVENTURA <em>EMPIEZA ACÁ.</em></>}</h1>
+            <p>{hasPlayedMatch ? "Tu personaje, tus amigos y nuevas experiencias están en Lupi World." : "Entrá a tu mundo. Podés jugar, explorar y descubrir qué te gusta."}</p>
+            <div className="lupi-first-play__actions">
+              <button type="button" className="lupi-first-play__cta" onClick={enterGame}>{hasPlayedMatch ? "⚡ ENTRAR A MI MUNDO" : "⚡ DESCUBRIR LUPI WORLD"} <span aria-hidden="true">→</span></button>
+              <span className="lupi-first-play__sub">Jugá · Explorá · Conectá</span>
+            </div>
+          </div>
+          <div className="lupi-first-play__pitch" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+          {showFirstHint && hasPlayedMatch === false && <div className="lupi-first-play__hint" role="status">
+            <span>Tu primer objetivo: probá tu equipo en un partido.</span>
+            <button type="button" onClick={dismissFirstHint} aria-label="Cerrar consejo">×</button>
+          </div>}
+        </section>
         <section className="journey-hero">
           <div className="journey-hero-copy">
             <span className="journey-kicker">LUPIAPP · TU JORNADA</span>
@@ -237,19 +267,19 @@ const handleMissionDone = async () => {
 
         <section
           className="game-launch-v2"
-          onClick={onEnterGame}
+          onClick={enterGame}
           role="button"
           tabIndex={0}
-          onKeyDown={(e) => { if (e.key === "Enter") onEnterGame(); }}
+          onKeyDown={(e) => { if (e.key === "Enter") enterGame(); }}
         >
           <div className="game-launch-bg" />
           <div className="game-launch-copy">
             <span className="journey-kicker">🎮 LUPI GAME</span>
             <h2>Tu progreso<br />también se juega.</h2>
-            <p>Cartas · Equipo · Partidos · Campaña</p>
+            <p>Jugá · Explorá · Conectá · Campaña</p>
             <button
               className="game-launch-button"
-              onClick={(e) => { e.stopPropagation(); onEnterGame(); }}
+              onClick={(e) => { e.stopPropagation(); enterGame(); }}
             >
               ENTRAR AL JUEGO <span>→</span>
             </button>

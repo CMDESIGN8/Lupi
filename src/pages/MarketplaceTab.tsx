@@ -170,7 +170,7 @@ export function MarketplaceTab({
                     {outOfStock
                       ? "AGOTADO"
                       : canAfford
-                      ? `🪙 ${item.cost}`
+                      ? `💰 ${item.cost}`
                       : `FALTAN ${item.cost - (user.coins || 0)}`}
                   </div>
                 </button>

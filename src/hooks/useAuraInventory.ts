@@ -202,7 +202,10 @@ export function useAuraInventory(userId: string, level: number) {
         })
       );
 
-      if (usingFallback) return;
+      if (usingFallback) {
+        window.dispatchEvent(new CustomEvent("lupi:inventory-updated", { detail: { userId, itemId, equipped: willEquip } }));
+        return;
+      }
 
       const { error } = await supabase.rpc("equip_aura_item", {
         p_item_id: itemId,
@@ -216,7 +219,7 @@ export function useAuraInventory(userId: string, level: number) {
       }
 
       window.dispatchEvent(
-        new CustomEvent("lupi:inventory-updated", { detail: { userId } })
+        new CustomEvent("lupi:inventory-updated", { detail: { userId, itemId, equipped: willEquip } })
       );
     },
     [items, usingFallback, load, userId]
