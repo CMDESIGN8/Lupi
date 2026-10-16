@@ -122,3 +122,27 @@
 @media (max-width: 390px) {
   .player-setup-screen .lupi-reveal { height: 175px; min-height: 175px; }
 }
+
+/* Sprint final — proportionate avatar, visible identity, no overlap. */
+@media (max-width: 600px) {
+  .player-setup-screen .lupi-reveal {
+    width: min(100%, 360px);
+    height: clamp(204px, 27dvh, 258px);
+    min-height: 0;
+    overflow: visible;
+  }
+  .player-setup-screen .lupi-reveal__stage { inset: 0 0 46px; }
+  .player-setup-screen .lupi-reveal__character {
+    height: 115%; max-width: 90%; object-fit: contain;
+    object-position: center bottom;
+  }
+  .player-setup-screen .lupi-reveal__identity {
+    width: min(330px, 96%); min-height: 44px;
+    padding: 5px 9px; bottom: 0;
+  }
+  .player-setup-screen .lupi-reveal__identity strong { font-size: clamp(15px, 4.2vw, 19px); }
+}
+@media (max-width: 380px) and (max-height: 720px) {
+  .player-setup-screen .lupi-reveal { height: 190px; }
+  .player-setup-screen .lupi-reveal__stage { inset: 0 0 43px; }
+}
