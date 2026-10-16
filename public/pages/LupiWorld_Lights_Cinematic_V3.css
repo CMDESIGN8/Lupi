@@ -1,0 +1,95 @@
+/* LUPI WORLD — CINEMATIC LIGHTS V3
+   Importar DESPUÉS de GameHub.css, GameHubLobby.css y Theme_V2.
+   Reutiliza las clases y keyframes existentes.
+*/
+.gh-root .gh-world {
+  --world-lx: 8%;
+  --world-ly: 22%;
+  --world-rx: 92%;
+  --world-ry: 22%;
+}
+
+.gh-root .gh-world__lights {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* Fuentes de luz blancas, sin competir con verde y oro */
+.gh-root .gh-world__light-bloom {
+  width: clamp(190px, 25vw, 360px);
+  height: clamp(190px, 25vw, 360px);
+  opacity: .8;
+}
+.gh-root .gh-world__light-flare {
+  width: clamp(170px, 23vw, 300px);
+  height: clamp(170px, 23vw, 300px);
+}
+
+/* Cono izquierdo: converge hacia el centro de la escena */
+.gh-root .gh-world__light--left .gh-world__light-beam {
+  display: block;
+  left: 0;
+  right: auto;
+  width: min(52vw, 720px);
+  height: 64vh;
+  opacity: .42;
+  filter: blur(9px);
+  transform-origin: 0 0;
+  --beam-angle: -1deg;
+  clip-path: polygon(0 0, 11% 0, 100% 100%, 55% 100%);
+}
+
+/* Cono derecho: reflejo simétrico hacia el centro */
+.gh-root .gh-world__light--right .gh-world__light-beam {
+  display: block;
+  right: 0;
+  left: auto;
+  width: min(52vw, 720px);
+  height: 64vh;
+  opacity: .42;
+  filter: blur(9px);
+  transform-origin: 100% 0;
+  --beam-angle: 1deg;
+  clip-path: polygon(89% 0, 100% 0, 45% 100%, 0 100%);
+}
+
+/* Móvil: haces visibles pero sin cubrir toda la pantalla */
+@media (max-width: 760px) {
+  .gh-root .gh-world {
+    --world-lx: 5%;
+    --world-ly: 19%;
+    --world-rx: 95%;
+    --world-ry: 19%;
+  }
+  .gh-root .gh-world__light--left .gh-world__light-beam,
+  .gh-root .gh-world__light--right .gh-world__light-beam {
+    display: block;
+    width: 58vw;
+    height: 53dvh;
+    opacity: .27;
+    filter: blur(10px);
+  }
+  .gh-root .gh-world__light-bloom {
+    width: 185px;
+    height: 185px;
+    opacity: .68;
+  }
+  .gh-root .gh-world__light-flare {
+    width: 165px;
+    height: 165px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-root .gh-world__light,
+  .gh-root .gh-world__light-bloom,
+  .gh-root .gh-world__light-flare,
+  .gh-root .gh-world__light-beam {
+    animation: none !important;
+  }
+}
