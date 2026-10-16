@@ -141,8 +141,8 @@ export default function App() {
 
   const handleSigningWelcomeContinue = useCallback(() => {
     setShowSigningWelcome(false);
-    if (!localStorage.getItem("tour_completed")) setShowTour(true);
-  }, []);
+    enterGame("game");
+  }, [enterGame]);
 
   const handleLogout = useCallback(() => {
     setShowSigningWelcome(false);
@@ -236,14 +236,23 @@ if (user && needsPlayerOnboarding(user)) {
     );
   }
 
+  if (showSigningWelcome) {
+    return (
+      <ToastProvider>
+        <div className="app-wrapper signing-welcome-screen">
+          <ErrorBoundary>
+            <SigningWelcome user={user} onContinue={handleSigningWelcomeContinue} />
+          </ErrorBoundary>
+        </div>
+      </ToastProvider>
+    );
+  }
+
   return (
     <ToastProvider>
       <div className="app-wrapper">
         <ErrorBoundary>
-          {showSigningWelcome && (
-            <SigningWelcome user={user} onContinue={handleSigningWelcomeContinue} />
-          )}
-          {!showSigningWelcome && showTour && (
+          {showTour && (
             <OnboardingTour onComplete={handleTourComplete} />
           )}
 
