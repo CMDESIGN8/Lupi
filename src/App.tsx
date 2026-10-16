@@ -313,12 +313,11 @@ if (user && needsPlayerOnboarding(user)) {
 
           {appRoute === "home" && (
             <BottomNav
-              activeTab={tab}
-              onTabChange={handleTabChange}
-              onEnterGame={() => enterGame("game")}
-                  hasPlayedMatch={hasPlayedMatch}
-              pendingRewards={pendingRewards}
-            />
+  activeTab={tab}
+  onTabChange={handleTabChange}
+  onEnterGame={() => enterGame("game")}
+  pendingRewards={pendingRewards}
+/>
           )}
         </ErrorBoundary>
       </div>
