@@ -1,6 +1,7 @@
 import { AvatarFace } from "./AvatarFace";
 import type { AvatarAppearance } from "../lib/avatarAppearance";
 import { useMemo } from "react";
+import { getItemVisual, type AvatarVisualSlot } from "../lib/avatarVisualRig";
 import type { InventoryItem } from "../hooks/useAuraInventory";
 import "./Avatar2D.css";
 
@@ -20,12 +21,7 @@ const SLOT_ICONS: Record<string, string> = {
   accessory: "✦",
 };
 
-const SLOT_ORDER = [
-  "top",
-  "bottom",
-  "boots",
-  "accessory",
-];
+const SLOT_ORDER: AvatarVisualSlot[] = ["top", "bottom", "boots", "accessory"];
 
 function AvatarItemImage({
   item,
@@ -116,6 +112,8 @@ export function Avatar2D({
     0.08
   );
 
+  const visual = useMemo(() => Object.fromEntries(SLOT_ORDER.map(slot => [slot, getItemVisual(slot, layers.find(layer => layer.slot === slot)?.item ?? null)])), [layers]);
+
   return (
     <div
       className={[
@@ -159,7 +157,7 @@ export function Avatar2D({
         ========================= */}
 
         {topItem?.imageUrl && (
-          <div className="avatar2d__layer avatar2d__layer--top">
+          <div className="avatar2d__layer avatar2d__layer--top" style={visual["top"]}>
             <AvatarItemImage
               item={topItem}
               className="avatar2d__image"
@@ -168,7 +166,7 @@ export function Avatar2D({
         )}
 
         {bottomItem?.imageUrl && (
-          <div className="avatar2d__layer avatar2d__layer--bottom">
+          <div className="avatar2d__layer avatar2d__layer--bottom" style={visual["bottom"]}>
             <AvatarItemImage
               item={bottomItem}
               className="avatar2d__image"
@@ -177,7 +175,7 @@ export function Avatar2D({
         )}
 
         {bootsItem?.imageUrl && (
-  <div className="avatar2d__layer avatar2d__layer--boots">
+  <div className="avatar2d__layer avatar2d__layer--boots" style={visual["boots"]}>
     <AvatarItemImage
       item={bootsItem}
       className="avatar2d__image"
@@ -186,7 +184,7 @@ export function Avatar2D({
 )}
 
         {accessoryItem?.imageUrl && (
-          <div className="avatar2d__layer avatar2d__layer--accessory">
+          <div className="avatar2d__layer avatar2d__layer--accessory" style={visual["accessory"]}>
             <AvatarItemImage
               item={accessoryItem}
               className="avatar2d__image"

@@ -322,3 +322,11 @@
 .avatar2d__layer--accessory,.avatar2d__accessory-fallback{top:var(--rig-accessory-y)}
 /* Los accesorios deben quedar sobre el cabello; las prendas debajo de la cara. */
 .avatar2d__layer--accessory{z-index:35}
+
+/* V3: transformaciones de ítems parametrizadas, compatibles con las prendas existentes. */
+.avatar2d__layer--top,.avatar2d__layer--bottom,.avatar2d__layer--boots,.avatar2d__layer--accessory{
+ left:var(--item-x,50%);top:var(--item-y);width:var(--item-w);height:var(--item-h);
+ transform:translate(-50%,-50%) scale(calc(var(--avatar-scale,1) * var(--item-scale,1))) rotate(var(--item-rotation,0deg));
+ transform-origin:center center;z-index:var(--item-z,22);
+}
+.avatar2d__custom-head{width:var(--rig-head-width,59px);height:var(--rig-head-height,79px);top:var(--rig-head-y,112px)}
