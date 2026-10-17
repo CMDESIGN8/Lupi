@@ -1,3 +1,0 @@
-Parche puntual v18: corrige Cannot access showFirstWelcome before initialization.
-Reemplazar src/pages/GameHub.tsx. No se modifican otros archivos.
-No se ejecutó build completo porque no se proporcionó el proyecto completo.
