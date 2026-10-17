@@ -1321,3 +1321,45 @@
 @media (max-width: 700px) {
  .locker-preview .locker-slot.empty .locker-slot-guided-label { font-size: 8px; bottom: -14px; }
 }
+
+/* V3.2 — Portal real: evita stacking contexts del HUD y del vestuario */
+.locker-selector-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)) !important;
+  background: rgba(0, 9, 9, .74) !important;
+  backdrop-filter: blur(5px);
+  pointer-events: auto !important;
+}
+.locker-selector-overlay .locker-selector--portal {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+  display: block !important;
+  width: min(430px, 100%) !important;
+  max-width: 100% !important;
+  max-height: min(78dvh, 620px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  box-sizing: border-box !important;
+  border: 1px solid rgba(91, 232, 174, .5) !important;
+  background: linear-gradient(165deg, #12372e, #061c18 80%) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,.75) !important;
+  border-radius: 16px !important;
+  pointer-events: auto !important;
+}
+.locker-selector-overlay .locker-items {overflow: visible;}
+@media(max-width:430px){
+ .locker-selector-overlay .locker-selector--portal {padding: 12px !important;max-height: 85dvh !important;}
+ .locker-selector-overlay .locker-items {grid-template-columns: 1fr 1fr;}
+}

@@ -1,4 +1,4 @@
-import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
+import { createPortal } from "react-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
   useAuraInventory,
@@ -9,6 +9,7 @@ import {
 import "./LockerPreview.css";
 import { AURA_RARITY_COLORS } from "../lib/auraRarity";
 import { Avatar2D } from "./Avatar2D";
+import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 
 type LockerPreviewProps = {
   userId: string;
@@ -335,8 +336,9 @@ export function LockerPreview({
       {onboardingActive && !selectedSlot && !guideComplete && (
         <div className="locker-guide-hint" role="status">✦ Elegí una de las prendas señaladas para equipar a tu personaje.</div>
       )}
-      {selectedSlot && (
-        <div className={`locker-selector ${onboardingActive ? "locker-selector--tutorial" : ""}`} role={onboardingActive ? "dialog" : undefined} aria-modal={onboardingActive ? true : undefined} aria-label="Elegí tu primera prenda">
+      {selectedSlot && createPortal(
+        <div className="locker-selector-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedSlot(null); }}>
+        <div className={`locker-selector locker-selector--portal ${onboardingActive ? "locker-selector--tutorial" : ""}`} role="dialog" aria-modal="true" aria-label={`Elegir ${SLOT_META[selectedSlot].label}`} >
           {onboardingActive && <div className="locker-guide-step"><span>✦ LUPI TE ACOMPAÑA · PASO 1 DE 2</span><strong>¡Dale tu estilo!</strong><p>Elegí una prenda disponible y tocá <b>EQUIPAR</b>. Vas a verla puesta en tu personaje.</p></div>}
           <div className="locker-selector-header">
             <div>
@@ -445,6 +447,8 @@ export function LockerPreview({
             )}
           </div>
         </div>
+        </div>,
+        document.body
       )}
 
       {/* FOOTER */}
