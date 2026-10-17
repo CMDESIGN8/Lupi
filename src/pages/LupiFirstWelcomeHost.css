@@ -1,0 +1,41 @@
+/* Lupi World — bienvenida interactiva con mascota, sobre los estilos previos */
+.lupi-first-welcome { padding: clamp(12px,3vw,32px); overflow-y:auto; }
+.lupi-first-welcome__scene { position:relative; width:min(1120px,100%); min-height:min(650px,88dvh); display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); align-items:center; gap:clamp(8px,3vw,44px); isolation:isolate; }
+.lupi-first-welcome__character { position:relative; align-self:end; display:flex; justify-content:center; align-items:end; min-width:0; height:min(660px,84dvh); animation:lupi-host-enter .9s cubic-bezier(.17,.85,.23,1) both; }
+.lupi-first-welcome__character img { position:relative; z-index:2; width:min(100%,570px); max-height:100%; object-fit:contain; object-position:bottom; filter:drop-shadow(0 25px 32px rgba(0,0,0,.6)) drop-shadow(0 0 32px rgba(0,199,255,.2)); animation:lupi-host-idle 4s 1s ease-in-out infinite alternate; }
+.lupi-first-welcome__character-glow { position:absolute; bottom:5%; left:10%; width:80%; height:65%; border-radius:50%; background:radial-gradient(ellipse,rgba(10,164,250,.24),transparent 70%); filter:blur(28px); }
+.lupi-first-welcome__dialogue { position:relative; z-index:3; padding:clamp(24px,3vw,44px); border:1px solid rgba(73,221,243,.33); border-radius:22px 22px 22px 5px; background:linear-gradient(145deg,rgba(7,37,55,.94),rgba(2,13,27,.97)); box-shadow:0 28px 90px rgba(0,0,0,.64),inset 0 1px rgba(255,255,255,.13),0 0 60px rgba(8,176,239,.08); animation:lupi-host-dialogue .8s .2s both; }
+.lupi-first-welcome__dialogue::before { content:''; position:absolute; left:-16px; bottom:32%; border-top:15px solid transparent; border-bottom:15px solid transparent; border-right:16px solid rgba(7,37,55,.94); }
+.lupi-first-welcome__speaker { display:flex; align-items:center; flex-wrap:wrap; gap:7px; width:fit-content; padding:8px 12px; margin-bottom:24px; border:1px solid rgba(50,236,215,.3); border-radius:7px; background:rgba(19,133,143,.16); color:#6cfbe8; font:900 15px 'Barlow',sans-serif; letter-spacing:.12em; }
+.lupi-first-welcome__speaker small { font:700 9px 'Barlow',sans-serif; letter-spacing:.1em; color:#a2c5ce; }
+.lupi-first-welcome__speaker-dot { width:7px; height:7px; border-radius:50%; background:#49ffe0; box-shadow:0 0 12px #49ffe0; }
+.lupi-first-welcome__dialogue .lupi-first-welcome__eyebrow { display:block; margin-bottom:12px; font-size:9px; }
+.lupi-first-welcome__dialogue h2 { margin:0; font:italic 900 clamp(36px,4.5vw,66px)/.94 'Barlow Condensed',Impact,sans-serif; text-transform:uppercase; color:#fff; text-shadow:0 5px 22px #0008; overflow-wrap:anywhere; }
+.lupi-first-welcome__dialogue h2 em { color:#ffd15a; font-style:inherit; }
+.lupi-first-welcome__dialogue .lupi-first-welcome__lead { margin:18px 0 8px; font:italic 900 clamp(22px,2.8vw,35px)/1.1 'Barlow Condensed',sans-serif; color:#69f4e6; }
+.lupi-first-welcome__dialogue p:not(.lupi-first-welcome__lead) { margin:0 0 18px; color:#d4e5ed; font:500 clamp(14px,1.4vw,17px)/1.6 'Barlow',sans-serif; }
+.lupi-first-welcome__dialogue .lupi-first-welcome__club { display:block; margin-bottom:22px; color:#ffd15a; font:800 11px 'Barlow',sans-serif; letter-spacing:.12em; }
+.lupi-first-welcome__dialogue button { display:flex; align-items:center; justify-content:center; gap:14px; width:100%; min-height:58px; border:0; border-radius:9px; cursor:pointer; color:#112031; background:linear-gradient(110deg,#ffe38b,#ffc43d 75%,#eda521); font:900 20px 'Barlow Condensed',sans-serif; letter-spacing:.09em; box-shadow:0 10px 30px rgba(255,188,51,.22); transition:transform .2s,filter .2s; }
+.lupi-first-welcome__dialogue button:hover { transform:translateY(-2px); filter:brightness(1.07); }
+.lupi-first-welcome__dialogue button:focus-visible { outline:3px solid #5dfce9; outline-offset:4px; }
+.lupi-first-welcome.is-exiting .lupi-first-welcome__scene { animation:lupi-host-exit .65s ease-in both; }
+@keyframes lupi-host-enter { from {opacity:0;transform:translateX(-55px) scale(.94)} to {opacity:1;transform:none} }
+@keyframes lupi-host-dialogue { from {opacity:0;transform:translateX(40px);filter:blur(7px)} to {opacity:1;transform:none;filter:none} }
+@keyframes lupi-host-idle {to {transform:translateY(-8px)} }
+@keyframes lupi-host-exit {to {opacity:0;transform:scale(1.045);filter:blur(9px)} }
+@media(max-width:700px) {
+ .lupi-first-welcome { align-items:center; padding:12px 12px max(16px,env(safe-area-inset-bottom)); }
+ .lupi-first-welcome__scene { width:min(480px,100%); min-height:0; grid-template-columns:1fr; gap:0; padding-top:4px; }
+ .lupi-first-welcome__character { height:clamp(190px,36dvh,330px); align-self:center; z-index:1; }
+ .lupi-first-welcome__character img { width:auto; max-width:100%; height:100%; }
+ .lupi-first-welcome__dialogue { margin-top:-16px; padding:20px 22px 22px; border-radius:18px; }
+ .lupi-first-welcome__dialogue::before { display:none; }
+ .lupi-first-welcome__speaker { margin-bottom:12px; padding:6px 9px; }
+ .lupi-first-welcome__dialogue h2 { font-size:clamp(32px,9vw,46px); }
+ .lupi-first-welcome__dialogue .lupi-first-welcome__lead { margin:12px 0 7px; font-size:26px; }
+ .lupi-first-welcome__dialogue p:not(.lupi-first-welcome__lead) { font-size:13px; line-height:1.42; margin-bottom:12px; }
+ .lupi-first-welcome__dialogue .lupi-first-welcome__club { margin-bottom:14px; }
+ .lupi-first-welcome__dialogue button { min-height:48px; font-size:17px; }
+}
+@media(max-height:660px) and (max-width:700px) { .lupi-first-welcome__character {height:160px} .lupi-first-welcome__dialogue {padding:14px 18px} .lupi-first-welcome__speaker {margin-bottom:7px} .lupi-first-welcome__dialogue .lupi-first-welcome__lead {margin:7px 0 4px} }
+@media(prefers-reduced-motion:reduce) { .lupi-first-welcome__character,.lupi-first-welcome__character img,.lupi-first-welcome__dialogue,.lupi-first-welcome.is-exiting .lupi-first-welcome__scene {animation:none!important} }

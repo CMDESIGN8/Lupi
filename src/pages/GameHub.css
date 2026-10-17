@@ -1,0 +1,2887 @@
+/* src/pages/GameHub.css — todas las clases llevan prefijo gh- para no pisar tus estilos actuales */
+@import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@1,700;1,800;0,600&family=Barlow:wght@400;500;600&display=swap");
+
+.gh-root {
+  --gh-bg: #061a17;
+  --gh-panel: #0c2b25;
+  --gh-panel-hi: #123d33;
+  --gh-line: #1f5f4c;
+  --gh-grass: #2bd67b;
+  --gh-gold: #3dc8ff;
+  --gh-gold-deep: #e8960c;
+  --gh-text: #eaf6ee;
+  --gh-muted: #8fb8a7;
+  --gh-cut: 14px;
+
+  position: relative;
+  min-height: 100vh;
+  color: var(--gh-text);
+  font-family: "Barlow", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Pisa el layout heredado de .main-content */
+.gh-root.main-content {
+  display: block;
+  padding: 0 0 48px;
+  width: 100%;
+}
+
+.gh-shell {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 20px 20px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.gh-shell--wide { max-width: 1240px; }
+
+/* Esquinas cortadas + borde interno.
+   (.gh-panel NO lleva clip-path: recortaría los modales position:fixed de CardBattle y DeckBuilder) */
+.gh-hud,
+.gh-tabs,
+.gh-block,
+.gh-stage {
+  clip-path: polygon(
+    var(--gh-cut) 0, 100% 0,
+    100% calc(100% - var(--gh-cut)),
+    calc(100% - var(--gh-cut)) 100%,
+    0 100%, 0 var(--gh-cut)
+  );
+}
+
+/* ---------- HUD ---------- */
+.gh-hud {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+
+  padding: 12px 28px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2, 9, 8, 0.88) 0%,
+      rgba(2, 9, 8, 0.55) 60%,
+      transparent 100%
+    );
+
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+
+  clip-path: polygon(20px 0, 100% 0, calc(100% - 20px) 100%, 0 100%);
+
+  box-shadow:
+    inset 0 -1px 0 rgba(255, 200, 61, 0.08),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.25),
+    0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.gh-back {
+  justify-self: start;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 14px 8px 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.02);
+
+  color: rgba(232, 246, 238, 0.72);
+
+  font: 800 11px/1 "Barlow", sans-serif;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.12s ease;
+}
+
+.gh-back span {
+  font-size: 22px;
+  line-height: 0;
+  margin-right: 2px;
+}
+
+.gh-back:hover {
+  color: #fff;
+  border-color: rgba(43, 214, 123, 0.4);
+  background: rgba(43, 214, 123, 0.06);
+  transform: translateX(-2px);
+}
+
+.gh-brand {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-bottom: 8px;
+
+  font: italic 900 clamp(24px, 3vw, 42px)/.92 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.04em;
+
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.gh-brand strong {
+  margin: 0;
+
+  color: #fff;
+
+  font: italic 900 clamp(20px, 2.4vw, 30px)/0.9 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.6),
+    0 0 24px rgba(255, 200, 61, 0.15);
+}
+
+.gh-brand::before {
+  
+
+  margin-bottom: 4px;
+
+  color: #24e987;
+
+  font: 900 8px/1 "Barlow", sans-serif;
+  letter-spacing: 0.28em;
+
+  text-shadow: 0 0 12px rgba(36, 233, 135, 0.5);
+}
+
+.gh-brand::after {
+  content: "";
+
+  position: absolute;
+  left: 50%; bottom: 0;
+
+  width: 44px;
+  height: 2px;
+
+  transform: translateX(-50%);
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ffc83d 30%,
+    #ffc83d 70%,
+    transparent
+  );
+
+  box-shadow: 0 0 12px rgba(255, 200, 61, 0.5);
+}
+
+.gh-brand__ball { font-size: 22px; }
+
+.gh-hud__right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ---------- Wallet AAA ---------- */
+
+.gh-wallet {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px 8px 8px;
+
+  border: 1px solid rgba(255, 200, 61, 0.3);
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 200, 61, 0.08),
+      rgba(0, 0, 0, 0.4)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 6px 20px rgba(255, 200, 61, 0.08);
+
+  font: 700 18px "Barlow Condensed", sans-serif;
+  color: var(--gh-gold);
+  font-variant-numeric: tabular-nums;
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.gh-wallet:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 8px 24px rgba(255, 200, 61, 0.2);
+}
+
+.gh-wallet__coin {
+  width: 18px; height: 18px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  font-size: 9px; color: #6b4400;
+  background: radial-gradient(circle at 35% 30%, #ffe89a, var(--gh-gold-deep));
+  box-shadow:
+    inset 0 -2px 4px rgba(0, 0, 0, 0.25),
+    0 0 8px rgba(255, 200, 61, 0.5);
+}
+
+/* ---------- Nivel AAA ---------- */
+
+.gh-level {
+  --xp: 0;
+
+  position: relative;
+
+  width: 52px;
+  height: 52px;
+
+  border-radius: 50%;
+
+  display: grid;
+  place-items: center;
+
+  /* Anillo dorado que se va "llenando" según el XP */
+  background: conic-gradient(
+    #ffc83d calc(var(--xp) * 1%),
+    rgba(255, 255, 255, 0.06) 0
+  );
+
+  /* Un solo box-shadow dorado, sin capa cian */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 20px rgba(255, 200, 61, 0.25);
+
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+
+  /* Evita que cualquier transición pinte el anillo */
+  transition: box-shadow 0.3s ease;
+}
+
+.gh-level__core {
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+
+  display: grid;
+  place-items: center;
+
+  background:
+    radial-gradient(
+      circle at 30% 25%,
+      rgba(255, 255, 255, 0.12),
+      rgba(2, 9, 8, 0.98) 60%
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6);
+
+  color: #fff;
+
+  font: italic 900 22px/1 "Barlow Condensed", sans-serif;
+  font-variant-numeric: tabular-nums;
+
+  text-shadow: 0 0 12px rgba(255, 200, 61, 0.4);
+}
+
+/* ---------- Tabs ---------- */
+/* ---------- Tabs ---------- */
+
+.gh-tabs {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--gh-panel);
+  box-shadow: inset 0 0 0 1px var(--gh-line);
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+}
+
+.gh-tabs__thumb {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: calc(100% / 3);
+  background: linear-gradient(180deg, var(--gh-gold), var(--gh-gold-deep));
+  transition: transform 0.28s cubic-bezier(0.3, 1.3, 0.5, 1);
+}
+
+.gh-tabs button {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 16px 8px;
+  background: none; border: 0;
+  color: var(--gh-muted);
+  font: italic 700 20px "Barlow Condensed", sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.gh-tabs button.is-active { color: #3a2500; }
+
+/* ---------- Escena: transición al cambiar de pestaña o vista ---------- */
+.gh-scene { animation: gh-enter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes gh-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Lobby ---------- */
+.gh-lobby { display: grid; grid-template-columns: 1fr; gap: 20px; }
+
+.gh-stage {
+  position: relative;
+  background: var(--gh-panel);
+  box-shadow: inset 0 0 0 1px var(--gh-line);
+}
+.gh-stage::before {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none; z-index: 0;
+  background: radial-gradient(70% 90% at 50% 0%, rgba(255, 244, 205, 0.12), transparent 70%);
+}
+.gh-stage > * { position: relative; z-index: 1; }
+
+.gh-block {
+  padding: 22px 22px 24px;
+  background: linear-gradient(180deg, rgba(18, 61, 51, 0.75), rgba(12, 43, 37, 0.95));
+  box-shadow: inset 0 0 0 1px var(--gh-line);
+}
+
+/* ---------- Escena de partido ---------- */
+.gh-match { display: flex; flex-direction: column; gap: 16px; }
+.gh-match__bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  flex-wrap: wrap;
+}
+.gh-ghost {
+  background: none; border: 0;
+  color: var(--gh-muted);
+  font: italic 700 20px "Barlow Condensed", sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 8px 4px;
+}
+.gh-ghost span { font-size: 26px; line-height: 0; margin-right: 4px; }
+.gh-ghost:hover { color: var(--gh-text); }
+
+.gh-seg {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: inset 0 0 0 1px var(--gh-line);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+.gh-seg button {
+  background: none; border: 0;
+  padding: 10px 18px;
+  color: var(--gh-muted);
+  font: italic 700 18px "Barlow Condensed", sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.gh-seg button.is-active {
+  background: linear-gradient(180deg, var(--gh-gold), var(--gh-gold-deep));
+  color: #3a2500;
+}
+.gh-seg button:not(.is-active):hover { color: var(--gh-text); }
+
+/* ---------- Paneles de contenido ---------- */
+.gh-panel {
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(18, 61, 51, 0.7), rgba(12, 43, 37, 0.9));
+  box-shadow: inset 0 0 0 1px var(--gh-line);
+  border-radius: 22px 6px 22px 6px;
+}
+.gh-panel > * { max-width: 100%; }
+
+/* Equipo: el DeckBuilder ya trae sus propias superficies, así que el panel no suma otra caja */
+.gh-panel--bare { padding: 0; background: none; box-shadow: none; border-radius: 0; }
+
+/* ---------- Equipo (DeckBuilder) ----------
+   DeckBuilder trae su CSS embebido y fija .fifa-layout en "1fr 500px". En un contenedor
+   angosto la cancha se queda en ~160px y las cartas (110px) se pisan y se cortan.
+   Estos overrides (más específicos que los suyos) lo arreglan sin tocar el componente. */
+.gh-root .deck-builder-fifa { background: none; padding: 0; margin: 0; border-radius: 0; }
+.gh-root .fifa-header,
+.gh-root .progress-bar-container { border-radius: 14px 4px 14px 4px; }
+.gh-root .fifa-layout {
+  grid-template-columns: minmax(380px, 460px) minmax(0, 1fr);
+  gap: 24px;
+  padding: 24px;
+  border-radius: 22px 6px 22px 6px;
+  background: linear-gradient(180deg, rgba(18, 61, 51, 0.75), rgba(12, 43, 37, 0.95));
+  box-shadow: inset 0 0 0 1px var(--gh-line), 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+.gh-root .futsal-pitch-fifa { border-radius: 20px; }
+
+@media (max-width: 1000px) {
+  .gh-root .fifa-layout { grid-template-columns: 1fr; padding: 16px; }
+  .gh-root .futsal-pitch-fifa { width: 100%; max-width: 460px; margin-inline: auto; }
+}
+
+.gh-root button:focus-visible { outline: 3px solid var(--gh-gold); outline-offset: 2px; }
+
+/* ---------- Escritorio ---------- */
+@media (min-width: 980px) {
+  .gh-shell { padding-top: 28px; gap: 28px; }
+  .gh-lobby {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: stretch;
+  }
+  .gh-lobby .gh-stage { grid-row: 1 / span 2; }
+  .gh-panel { padding: 28px; }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 560px) {
+  .gh-root { --gh-cut: 10px; }
+  .gh-shell { padding: 14px 14px 28px; gap: 18px; }
+  .gh-brand { font-size: 22px; }
+  .gh-back { font-size: 0; }
+  .gh-back span { font-size: 28px; }
+  .gh-tabs button { font-size: 17px; padding: 14px 4px; }
+  .gh-seg { width: 100%; }
+  .gh-seg button { flex: 1; padding: 10px 6px; font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-scene { animation: none; }
+  .gh-tabs__thumb { transition: none; }
+}
+
+/* =====================================================================
+   SKIN "JUEGO" — profundidad, formas con velocidad, luz y respuesta al toque
+   ===================================================================== */
+
+/* Escena: SOLO la imagen del estadio oscurecida, con viñeta. Sin líneas ni cancha.
+   /images/stadium-bg.jpg ya lo usa tu pantalla de login; si no existe, queda el degradé.
+   El último valor del degradé (0.5) controla cuánto se ve la imagen abajo: más bajo = más imagen. */
+.gh-root {
+  /* Hace que ocupe todo el ancho y alto de la pantalla visible */
+  width: 100vw;
+  min-height: 100vh; 
+  margin: 0; /* Asegura que no haya márgenes heredados del body */
+
+  background:
+    radial-gradient(120% 90% at 50% 35%, transparent 50%, rgba(7, 0, 0, 0.6) 100%),
+    radial-gradient(60% 40% at 8% 0%, rgba(0, 0, 0, 0.18), transparent 70%),
+    radial-gradient(60% 40% at 92% 0%, rgba(0, 0, 0, 0.14), transparent 70%),
+    linear-gradient(180deg, rgb(0, 0, 0) 0%, rgba(0, 0, 0, 0.72) 55%, rgba(0, 0, 0, 0.5) 100%),
+    url("/images/stadium-bg.jpg") center center / cover no-repeat, /* Cambiado a center center */
+    #061a17;
+}
+@media (min-width: 980px) {
+  .gh-root { background-attachment: fixed; }   /* el fondo queda quieto, el contenido se desliza */
+}
+
+/* Formas con velocidad: paralelogramos en vez de rectángulos con esquinas cortadas */
+/* Formas con velocidad */
+.gh-hud  { clip-path: polygon(20px 0, 100% 0, calc(100% - 20px) 100%, 0 100%); }
+.gh-tabs { clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%); }
+.gh-seg  { clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+
+/* Superficies de vidrio */
+.gh-stage {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(143, 184, 167, 0.22),
+              0 24px 50px rgba(0, 0, 0, 0.35);
+}
+
+.gh-panel { background: linear-gradient(180deg, rgba(14, 52, 43, 0.7), rgba(8, 30, 25, 0.88)); }
+
+/* Entrada escalonada del lobby */
+.gh-lobby > * { animation: gh-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.gh-lobby > :nth-child(2) { animation-delay: 0.1s; }
+.gh-lobby > :nth-child(3) { animation-delay: 0.2s; }
+@keyframes gh-rise {
+  from { opacity: 0; transform: translateY(22px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Respuesta al toque */
+.gh-root button { transition: transform 0.12s ease, filter 0.2s ease; }
+.gh-root button:not(:disabled):hover { filter: brightness(1.1); }
+.gh-root button:not(:disabled):active { transform: scale(0.97); }
+
+/* Equipo: cancha de pasto con franjas y luz (esta es la cancha del DeckBuilder, no la del fondo) */
+.gh-root .futsal-pitch-fifa {
+  background:
+    radial-gradient(120% 80% at 50% 45%, transparent 50%, rgba(0, 0, 0, 0.5) 100%),
+    repeating-linear-gradient(180deg, #1f7a43 0 64px, #1b6e3b 64px 128px);
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  box-shadow: inset 0 0 0 6px rgba(0, 0, 0, 0.18), 0 22px 36px rgba(0, 0, 0, 0.5);
+}
+.gh-root .fifa-card { box-shadow: 0 14px 20px rgba(0, 0, 0, 0.45); }
+.gh-root .fifa-card:not(.empty):hover {
+  transform: translateY(-6px) scale(1.07) rotate(-1.5deg);
+  box-shadow: 0 22px 28px rgba(0, 0, 0, 0.55), 0 0 22px rgba(255, 200, 61, 0.35);
+}
+.gh-root .team-name {
+  font: italic 800 22px "Barlow Condensed", sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.gh-root .power-value {
+  font: italic 800 38px/1 "Barlow Condensed", sans-serif;
+  color: var(--gh-gold);
+  text-shadow: 0 0 18px rgba(255, 200, 61, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-lobby > * { animation: none; }
+}
+
+/* =====================================================================
+   AJUSTES del lobby: cada componente ya es su propia tarjeta,
+   así que el contenedor no agrega otro marco (evita "caja dentro de caja")
+   ===================================================================== */
+.gh-stage {
+  display: flex;
+  background: none;
+  box-shadow: none;
+  clip-path: none;
+}
+.gh-stage::before { display: none; }
+.gh-stage > * { flex: 1; min-width: 0; }
+
+.gh-block {
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  clip-path: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* La tarjeta de temporada (era azul marino) toma la paleta verde del resto */
+.gh-lobby > .gh-block:nth-child(3) { display: flex; }
+.gh-lobby > .gh-block:nth-child(3) > * {
+  flex: 1;
+  background: linear-gradient(180deg, rgba(14, 52, 43, 0.72), rgba(8, 30, 25, 0.9));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 0 0 1px rgba(143, 184, 167, 0.22);
+  border-radius: 20px 6px 20px 6px;
+}
+
+/* =====================================================================
+   REFLECTORES — encendido al entrar, brillo que respira, destello, haces de luz
+   Se dibujan encima de los focos de /images/stadium-bg.jpg.
+   Si no coinciden con tu imagen, mové estos 4 valores (% del ancho / alto de la pantalla).
+   ===================================================================== */
+.gh-root {
+  --gh-lx: 6.5%;  --gh-ly: 21%;    /* foco izquierdo */
+  --gh-rx: 91.5%; --gh-ry: 21%;    /* foco derecho */
+}
+
+/* Cada reflector es un punto fijo (0x0): sus capas se dibujan alrededor de ese punto.
+   mix-blend-mode: screen suma luz sobre la imagen en vez de taparla. */
+.gh-light {
+  position: fixed;
+  z-index: 0;
+  width: 0; height: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: filter 0.4s ease;
+  animation: gh-ignite 1.8s linear both;      /* el momento orquestado: se encienden al cargar */
+}
+.gh-light--l { left: var(--gh-lx); top: var(--gh-ly); animation-delay: 0.3s; }
+.gh-light--r { left: var(--gh-rx); top: var(--gh-ry); animation-delay: 0.55s; }
+
+@keyframes gh-ignite {      /* parpadeo de reflector que arranca en frío */
+  0%   { opacity: 0; }
+  10%  { opacity: 0.95; }
+  16%  { opacity: 0.12; }
+  28%  { opacity: 0.85; }
+  34%  { opacity: 0.2; }
+  52%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+.gh-light__bloom {
+  position: absolute; left: 0; top: 0;
+  width: 420px; height: 420px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 248, 224, 0.75) 0%,
+    rgba(255, 232, 160, 0.28) 28%,
+    rgba(255, 220, 130, 0.08) 52%,
+    transparent 70%);
+  animation: gh-breathe 5.5s ease-in-out infinite alternate;
+}
+.gh-light--r .gh-light__bloom { animation-duration: 6.8s; }   /* desfasados: no respiran a la vez */
+@keyframes gh-breathe {
+  from { opacity: 0.8; transform: translate(-50%, -50%) scale(0.96); }
+  to   { opacity: 1;   transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* destello en cruz, como el de una lente */
+.gh-light__flare {
+  position: absolute; left: 0; top: 0;
+  width: 340px; height: 340px;
+  transform: translate(-50%, -50%);
+  background:
+    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85) 50%, transparent) center / 100% 2px no-repeat,
+    linear-gradient(0deg,  transparent, rgba(255, 255, 255, 0.6) 50%, transparent) center / 2px 100% no-repeat;
+  filter: blur(0.6px);
+  animation: gh-twinkle 3.2s ease-in-out infinite;
+}
+.gh-light--r .gh-light__flare { animation-duration: 4.1s; animation-delay: -1.2s; }
+@keyframes gh-twinkle {
+  0%, 100% { opacity: 0.35; transform: translate(-50%, -50%) rotate(0deg) scale(0.9); }
+  50%      { opacity: 0.9;  transform: translate(-50%, -50%) rotate(8deg) scale(1.05); }
+}
+
+/* haz de luz que cae hacia la cancha y se mece apenas */
+.gh-light__beam {
+  position: absolute; top: 0;
+  width: 78vh; height: 36vh;
+  filter: blur(5px);
+  animation: gh-sway 9s ease-in-out infinite alternate;
+}
+.gh-light--l .gh-light__beam {
+  left: 0; --a: 26deg;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgba(255, 244, 205, 0.34), rgba(255, 244, 205, 0.12) 45%, transparent 90%);
+  clip-path: polygon(0 47%, 100% 0, 100% 100%, 0 53%);
+}
+.gh-light--r .gh-light__beam {
+  right: 0; --a: -26deg;
+  transform-origin: 100% 50%;
+  background: linear-gradient(270deg, rgba(255, 244, 205, 0.34), rgba(255, 244, 205, 0.12) 45%, transparent 90%);
+  clip-path: polygon(100% 47%, 0 0, 0 100%, 100% 53%);
+  animation-duration: 11s;
+}
+@keyframes gh-sway {
+  from { transform: translateY(-50%) rotate(calc(var(--a) - 3deg)); }
+  to   { transform: translateY(-50%) rotate(calc(var(--a) + 3deg)); }
+}
+
+/* Interacción: al pasar el mouse por JUGAR PARTIDO, el estadio se prende más */
+.gh-root:has(.gh-stage button:hover) .gh-light { filter: brightness(1.5) saturate(1.1); }
+
+@media (max-width: 760px) {
+  .gh-light__beam { display: none; }
+  .gh-light__bloom { width: 240px; height: 240px; }
+  .gh-light__flare { width: 200px; height: 200px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gh-light, .gh-light__bloom, .gh-light__flare, .gh-light__beam { animation: none; }
+}
+
+/* ---------- Lobby online: la fila de jugadores conectados ocupa todo el ancho ---------- */
+.gh-lobby > .gh-online {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));   /* 2 columnas si entra, 1 si el Vestuario se retira */
+  gap: 20px;
+  align-items: start;
+}
+.gh-lobby > :nth-child(4) { animation-delay: 0.3s; }
+
+/* =========================================================
+   LUPI WORLD — REFLECTORES DEL ESTADIO
+   ========================================================= */
+
+.gh-world {
+  --world-lx: 6.5%;
+  --world-ly: 21%;
+  --world-rx: 91.5%;
+  --world-ry: 21%;
+}
+
+/* Contenedor de luces */
+.gh-world__lights {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+
+/* Reflector */
+.gh-world__light {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  animation: world-light-ignite 1.8s linear both;
+}
+
+.gh-world__light--left {
+  left: var(--world-lx);
+  top: var(--world-ly);
+  animation-delay: .3s;
+}
+
+.gh-world__light--right {
+  left: var(--world-rx);
+  top: var(--world-ry);
+  animation-delay: .55s;
+}
+
+/* Encendido inicial */
+@keyframes world-light-ignite {
+  0% {
+    opacity: 0;
+  }
+
+  10% {
+    opacity: .95;
+  }
+
+  16% {
+    opacity: .12;
+  }
+
+  28% {
+    opacity: .85;
+  }
+
+  34% {
+    opacity: .2;
+  }
+
+  52% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------
+   HALO
+   --------------------------------------------------------- */
+
+.gh-world__light-bloom {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  width: 420px;
+  height: 420px;
+
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 248, 224, .75) 0%,
+      rgba(255, 232, 160, .28) 28%,
+      rgba(255, 220, 130, .08) 52%,
+      transparent 70%
+    );
+
+  animation: world-light-breathe 5.5s ease-in-out infinite alternate;
+}
+
+.gh-world__light--right .gh-world__light-bloom {
+  animation-duration: 6.8s;
+}
+
+@keyframes world-light-breathe {
+  from {
+    opacity: .8;
+    transform: translate(-50%, -50%) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.06);
+  }
+}
+
+/* ---------------------------------------------------------
+   DESTELLO
+   --------------------------------------------------------- */
+
+.gh-world__light-flare {
+  position: absolute;
+  left: 0;
+  top: 0;
+
+  width: 340px;
+  height: 340px;
+
+  transform: translate(-50%, -50%);
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.85) 50%,
+      transparent
+    ) center / 100% 2px no-repeat,
+
+    linear-gradient(
+      0deg,
+      transparent,
+      rgba(255,255,255,.6) 50%,
+      transparent
+    ) center / 2px 100% no-repeat;
+
+  filter: blur(.6px);
+
+  animation: world-light-twinkle 3.2s ease-in-out infinite;
+}
+
+.gh-world__light--right .gh-world__light-flare {
+  animation-duration: 4.1s;
+  animation-delay: -1.2s;
+}
+
+@keyframes world-light-twinkle {
+  0%,
+  100% {
+    opacity: .35;
+    transform: translate(-50%, -50%) rotate(0deg) scale(.9);
+  }
+
+  50% {
+    opacity: .9;
+    transform: translate(-50%, -50%) rotate(8deg) scale(1.05);
+  }
+}
+
+/* ---------------------------------------------------------
+   HACES DE LUZ
+   --------------------------------------------------------- */
+
+.gh-world__light-beam {
+  position: absolute;
+  top: 0;
+
+  width: 85vh;
+  height: 75vh;
+
+  filter: blur(7px);
+  opacity: .72;
+
+  animation: world-light-sway 9s ease-in-out infinite alternate;
+}
+
+/* REFLECTOR IZQUIERDO
+   baja desde arriba-izquierda hacia centro-inferior */
+.gh-world__light--left .gh-world__light-beam {
+  left: -5px;
+
+  --beam-angle: 1deg;
+
+  transform-origin: 0 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 250, 220, .38) 0%,
+      rgba(255, 244, 205, .20) 28%,
+      rgba(255, 244, 205, .08) 55%,
+      transparent 85%
+    );
+
+  clip-path: polygon(
+    0 0,
+    12% 0,
+    100% 100%,
+    45% 100%
+  );
+}
+
+/* REFLECTOR DERECHO
+   baja desde arriba-derecha hacia centro-inferior */
+.gh-world__light--right .gh-world__light-beam {
+  right: -5px;
+
+  --beam-angle: -1deg;
+
+  transform-origin: 100% 0;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 250, 220, .38) 0%,
+      rgba(255, 244, 205, .20) 28%,
+      rgba(255, 244, 205, .08) 55%,
+      transparent 85%
+    );
+
+  clip-path: polygon(
+    88% 0,
+    100% 0,
+    55% 100%,
+    0 100%
+  );
+
+  animation-duration: 11s;
+}
+
+@keyframes world-light-sway {
+  from {
+    transform:
+      translateY(0)
+      rotate(calc(var(--beam-angle) - 2deg));
+  }
+
+  to {
+    transform:
+      translateY(0)
+      rotate(calc(var(--beam-angle) + 2deg));
+  }
+}
+
+/* ---------------------------------------------------------
+   REFUERZO DE LUZ SOBRE EL ESTADIO
+   --------------------------------------------------------- */
+
+.gh-world::before {
+  background:
+    radial-gradient(
+      circle at var(--world-lx) var(--world-ly),
+      rgba(255,244,205,.16),
+      transparent 18%
+    ),
+
+    radial-gradient(
+      circle at var(--world-rx) var(--world-ry),
+      rgba(255,244,205,.16),
+      transparent 18%
+    ),
+
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(37,233,135,.12),
+      transparent 30%
+    ),
+
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.56),
+      transparent 32%,
+      transparent 68%,
+      rgba(0,0,0,.46)
+    );
+}
+
+.gh-world::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  z-index: -1;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent 45%,
+      rgba(2, 8, 7, 0.24) 58%,
+      rgba(2, 8, 7, 0.92) 100%
+    );
+}
+
+.gh-world__atmosphere {
+  position: absolute;
+  inset: 0;
+
+  z-index: 0;
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+.gh-world__atmosphere > * {
+  position: absolute;
+  pointer-events: none;
+}
+
+.gh-world__mist {
+  width: 48%;
+  height: 34%;
+
+  filter: blur(42px);
+  opacity: 0.12;
+
+  background:
+    radial-gradient(
+      ellipse,
+      #b9ffe4 0%,
+      transparent 68%
+    );
+
+  animation: world-mist 9s ease-in-out infinite alternate;
+}
+
+.gh-world__mist--1 { left: -8%; bottom: 15%; }
+.gh-world__mist--2 { right: -8%; bottom: 22%; animation-delay: -4s; }
+
+.gh-world__spot {
+  width: 20%;
+  height: 80%;
+
+  top: -20%;
+
+  opacity: 0.1;
+  filter: blur(8px);
+
+  background:
+    linear-gradient(180deg, #fff, transparent);
+
+  transform: rotate(13deg);
+}
+
+.gh-world__spot--1 {
+  left: 12%;
+  animation: world-spot 6s ease-in-out infinite alternate;
+}
+
+.gh-world__spot--2 {
+  right: 10%;
+  transform: rotate(-13deg);
+  animation: world-spot 7s ease-in-out infinite alternate-reverse;
+}
+
+.gh-world__grain {
+  inset: 0;
+  opacity: 0.045;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+@keyframes world-mist {
+  from { transform: translate3d(-3%, 0, 0) scale(1); }
+  to   { transform: translate3d(5%, -2%, 0) scale(1.12); }
+}
+
+@keyframes world-spot {
+  from { opacity: 0.06; }
+  to   { opacity: 0.16; }
+}
+
+/* ---------- Topline ---------- */
+
+.gh-world__topline {
+  position: absolute;
+  top: 24px;
+  left: 28px;
+  right: 28px;
+
+  z-index: 5;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  pointer-events: none;
+}
+
+.gh-world__eyebrow {
+  display: block;
+  margin-top: 30px;
+  color: var(--world-green);
+  font: 800 10px/1 "Barlow", sans-serif;
+  letter-spacing: 0.24em;
+}
+
+.gh-world__topline h1 {
+  margin: 4px 0;
+  color: #fff;
+  font: italic 900 clamp(24px, 3vw, 42px) / 0.92 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-shadow: 0 6px 28px rgba(0, 0, 0, 0.55);
+}
+
+.gh-world__topline p {
+  margin: 0;
+  color: rgba(232, 246, 238, 0.68);
+  font: 500 11px/1.2 "Barlow", sans-serif;
+}
+
+.gh-world__online-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 40px;
+  margin-left: auto;
+  margin-right: 0;
+
+  padding: 9px 12px;
+
+  border: 1px solid rgba(43, 214, 123, 0.24);
+  border-radius: 999px;
+
+  color: #bfffd9;
+  background: rgba(4, 24, 19, 0.68);
+
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+
+  font: 800 10px/1 "Barlow", sans-serif;
+  letter-spacing: 0.08em;
+
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+
+  pointer-events: auto;
+
+  transition:
+    transform 0.18s ease,
+    filter 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.gh-world__online-pill i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--world-green);
+  box-shadow: 0 0 12px var(--world-green);
+}
+
+/* ---------- Online Players — BASE ---------- */
+
+.gh-world__players {
+  position: absolute;
+  inset: 0;
+
+  z-index: 3;
+
+  pointer-events: none;
+}
+
+.gh-world-player {
+  position: absolute;
+  width: 118px;
+  padding: 0;
+  border: 0;
+
+  color: #fff;
+  background: transparent;
+
+  cursor: default;
+  pointer-events: auto;
+
+  transform: translate(-50%, -50%);
+
+  text-align: center;
+
+  animation: world-player-in 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes world-player-in {
+  from { opacity: 0; transform: translate(-50%, -44%) scale(0.9); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ---------- Player Avatar ---------- */
+
+.gh-world-avatar {
+  position: relative;
+
+  display: grid;
+  place-items: end center;
+
+  width: 86px;
+  height: 104px;
+
+  margin: 0 auto 2px;
+
+  transition:
+    transform 0.22s ease,
+    filter 0.22s ease;
+
+  filter:
+    drop-shadow(0 0 12px var(--aura-color-medium))
+    drop-shadow(0 14px 10px rgba(0, 0, 0, 0.5));
+}
+
+.gh-world-avatar::before {
+  content: "";
+  position: absolute;
+  inset: 2px 4px 8px;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--aura-color-soft) 0%, transparent 68%);
+  filter: blur(9px);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.gh-world-avatar::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  width: 76px;
+  height: 15px;
+  z-index: 0;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse, var(--aura-color-medium) 0%, transparent 70%);
+  filter: blur(6px);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.gh-world-avatar img {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+
+.gh-world-player:hover .gh-world-avatar {
+  transform: translateY(-7px) scale(1.04);
+  filter:
+    drop-shadow(0 0 22px var(--aura-color-medium))
+    drop-shadow(0 0 38px var(--aura-color-soft))
+    drop-shadow(0 15px 10px rgba(0, 0, 0, 0.48));
+}
+
+.gh-world-player.is-me .gh-world-avatar {
+  filter:
+    drop-shadow(0 0 18px var(--aura-color-medium))
+    drop-shadow(0 0 32px var(--aura-color-soft))
+    drop-shadow(0 15px 10px rgba(0, 0, 0, 0.48));
+}
+
+/* ---------- Player Info ---------- */
+
+.gh-world-level {
+  position: absolute;
+  right: 7px;
+  bottom: 14px;
+  z-index: 4;
+  min-width: 22px;
+  padding: 4px 5px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px 2px 6px 2px;
+  color: #10160f;
+  background: var(--world-gold);
+  font: 900 9px/1 "Barlow", sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.gh-world-name {
+  display: block;
+  color: #fff;
+  font: 900 13px/1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px #000;
+}
+
+.gh-world-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  color: rgba(220, 255, 235, 0.72);
+  background: rgba(0, 0, 0, 0.36);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  font: 700 7px/1 "Barlow", sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.gh-world-state i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--aura-color);
+  box-shadow: 0 0 8px var(--aura-color);
+}
+
+/* ---------- Etiqueta "Jugadores en línea" ---------- */
+
+.gh-world__players-label {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 4px 10px;
+
+  border: 1px solid rgba(43, 214, 123, 0.5);
+  border-radius: 999px;
+
+  color: #eafff3;
+  background: rgba(2, 18, 14, 0.9);
+
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+
+  font: 800 8px/1 "Barlow", sans-serif;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  pointer-events: none;
+  white-space: nowrap;
+
+  z-index: 3;
+}
+
+.gh-world__players-label i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--world-green);
+  box-shadow: 0 0 10px var(--world-green);
+  animation: world-player-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes world-player-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(0.85); }
+}
+
+/* Al pasar por jugar, aumenta la iluminación */
+.gh-root:has(.gh-world__play:hover)
+.gh-world__light {
+  filter:
+    brightness(1.5)
+    saturate(1.1);
+}
+
+@media (max-width: 760px) {
+
+  .gh-world__light-beam {
+    display: none;
+  }
+
+  .gh-world__light-bloom {
+    width: 240px;
+    height: 240px;
+  }
+
+  .gh-world__light-flare {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .gh-world__light,
+  .gh-world__light-bloom,
+  .gh-world__light-flare,
+  .gh-world__light-beam {
+    animation: none;
+  }
+}
+
+/* =========================================================
+   WORLD EVENTS
+   ========================================================= */
+
+.gh-world-event {
+  position: absolute;
+  top: 76px;
+  left: 50%;
+  z-index: 40;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 260px;
+  max-width: min(420px, calc(100vw - 32px));
+
+  padding: 10px 14px;
+
+  transform: translateX(-50%);
+
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(8,12,15,.92),
+      rgba(8,12,15,.76)
+    );
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.35),
+    0 0 24px rgba(43,214,123,.08);
+
+  animation:
+    world-event-in .35s cubic-bezier(.2,.8,.2,1) both,
+    world-event-out .4s ease 3s forwards;
+
+  pointer-events: none;
+}
+
+.gh-world-event__icon {
+  display: grid;
+  place-items: center;
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
+  border-radius: 10px;
+
+  background: rgba(255,255,255,.05);
+
+  font-size: 16px;
+}
+
+.gh-world-event__content {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gh-world-event__label {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: var(--world-green);
+}
+
+.gh-world-event__content strong {
+  overflow: hidden;
+
+  color: rgba(255,255,255,.92);
+
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gh-world-event--player_join {
+  border-color: rgba(36, 233, 135, 0.35);
+  box-shadow:
+    0 14px 40px rgba(0, 0, 0, 0.35),
+    0 0 28px rgba(36, 233, 135, 0.18);
+}
+
+.gh-world-event--player_leave {
+  opacity: .9;
+}
+
+.gh-world-event--level_up {
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.35),
+    0 0 30px rgba(176,97,255,.18);
+}
+
+.gh-world-event--level_up .gh-world-event__label {
+  color: #b061ff;
+}
+
+.gh-world-event--aura_spotted .gh-world-event__label {
+  color: #ff2bd6;
+}
+
+@keyframes world-event-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-12px) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes world-event-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .gh-world-event {
+    top: 64px;
+    min-width: 0;
+    width: calc(100vw - 32px);
+  }
+}
+
+.gh-world-event--aura_spotted {
+  border-color: var(--event-aura-medium);
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.35),
+    0 0 32px var(--event-aura-soft);
+}
+
+.gh-world-event--aura_spotted .gh-world-event__icon {
+  color: var(--event-aura);
+  background: var(--event-aura-soft);
+  box-shadow:
+    inset 0 0 0 1px var(--event-aura-medium),
+    0 0 18px var(--event-aura-soft);
+}
+
+.gh-world-event--aura_spotted .gh-world-event__label {
+  color: var(--event-aura);
+}
+.gh-world-event--aura_spotted .gh-world-event__icon {
+  animation: aura-event-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes aura-event-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.gh-world-profile-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 80;
+
+  display: grid;
+  place-items: center;
+
+  padding: 24px;
+
+  background: rgba(0, 0, 0, .42);
+  backdrop-filter: blur(8px);
+
+  animation: world-profile-backdrop-in .2s ease both;
+}
+
+.gh-world-profile {
+  position: relative;
+
+  width: min(360px, calc(100vw - 32px));
+
+  overflow: hidden;
+
+  padding: 28px 24px 22px;
+
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(12,17,19,.98),
+      rgba(7,10,12,.96)
+    );
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.60),
+    0 0 60px var(--profile-aura-soft);
+
+  animation: world-profile-in .28s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.gh-world-profile__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+
+  z-index: 5;
+
+  width: 32px;
+  height: 32px;
+
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+
+  background: rgba(255,255,255,.04);
+
+  color: rgba(255,255,255,.70);
+
+  font-size: 22px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.gh-world-profile__close:hover {
+  background: rgba(255,255,255,.08);
+  color: white;
+}
+
+.gh-world-profile__aura {
+  position: absolute;
+
+  top: -100px;
+  left: 50%;
+
+  width: 240px;
+  height: 240px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    var(--profile-aura-soft) 0%,
+    transparent 68%
+  );
+
+  filter: blur(14px);
+
+  pointer-events: none;
+}
+
+.gh-world-profile__avatar {
+  position: relative;
+
+  display: grid;
+  place-items: center;
+
+  width: 125px;
+  height: 145px;
+
+  margin: 4px auto 8px;
+
+  filter:
+    drop-shadow(0 0 18px var(--profile-aura-medium))
+    drop-shadow(0 20px 14px rgba(0,0,0,.45));
+}
+
+.gh-world-profile__avatar img {
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+
+  position: relative;
+  z-index: 2;
+}
+
+.gh-world-profile__avatar > span:not(.gh-world-profile__level) {
+  font-size: 60px;
+}
+
+.gh-world-profile__level {
+  position: absolute;
+
+  right: 4px;
+  bottom: 4px;
+
+  z-index: 4;
+
+  display: grid;
+  place-items: center;
+
+  min-width: 30px;
+  height: 30px;
+
+  padding: 0 7px;
+
+  border: 2px solid rgba(255,255,255,.85);
+  border-radius: 10px;
+
+  background: #090d0e;
+
+  color: white;
+
+  font-size: 12px;
+  font-weight: 900;
+
+  box-shadow:
+    0 0 16px var(--profile-aura-medium);
+}
+
+.gh-world-profile__identity {
+  text-align: center;
+}
+
+.gh-world-profile__eyebrow {
+  display: block;
+
+  margin-bottom: 4px;
+
+  color: var(--profile-aura);
+
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1.8px;
+}
+
+.gh-world-profile__identity h2 {
+  margin: 0;
+
+  color: white;
+
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.gh-world-profile__online {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 7px;
+
+  color: rgba(255,255,255,.48);
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+}
+
+.gh-world-profile__online i {
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background: var(--profile-aura);
+
+  box-shadow: 0 0 8px var(--profile-aura);
+}
+
+.gh-world-profile__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  margin-top: 22px;
+
+  border-top: 1px solid rgba(255,255,255,.07);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+
+.gh-world-profile__stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+
+  padding: 13px 6px;
+}
+
+.gh-world-profile__stats > div + div {
+  border-left: 1px solid rgba(255,255,255,.07);
+}
+
+.gh-world-profile__stats small {
+  color: rgba(255,255,255,.34);
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 1.3px;
+}
+
+.gh-world-profile__stats strong {
+  color: rgba(255,255,255,.88);
+
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.gh-world-profile__skin {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin-top: 16px;
+  padding: 12px;
+
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
+
+  background: rgba(255,255,255,.025);
+}
+
+.gh-world-profile__skin > div {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.gh-world-profile__skin span:first-child {
+  color: rgba(255,255,255,.32);
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+
+.gh-world-profile__skin strong {
+  overflow: hidden;
+
+  color: rgba(255,255,255,.88);
+
+  font-size: 11px;
+  font-weight: 800;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gh-world-profile__rarity {
+  flex: 0 0 auto;
+
+  padding: 5px 7px;
+
+  border: 1px solid;
+  border-radius: 7px;
+
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: .8px;
+}
+
+.gh-world-profile__actions {
+  display: grid;
+  gap: 8px;
+
+  margin-top: 16px;
+}
+
+.gh-world-profile__action {
+  width: 100%;
+  min-height: 42px;
+
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 11px;
+
+  background: rgba(255,255,255,.04);
+
+  color: rgba(255,255,255,.72);
+
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .8px;
+
+  cursor: pointer;
+}
+
+.gh-world-profile__action:hover {
+  background: rgba(255,255,255,.08);
+  color: white;
+}
+
+.gh-world-profile__action--primary {
+  border-color: var(--profile-aura-medium);
+
+  background: var(--profile-aura-soft);
+
+  color: var(--profile-aura);
+
+  box-shadow: 0 0 22px var(--profile-aura-soft);
+}
+
+@keyframes world-profile-backdrop-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes world-profile-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.gh-hud__right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gh-currency {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  min-width: 92px;
+  height: 42px;
+  padding: 0 11px;
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.075),
+      rgba(255, 255, 255, 0.025)
+    );
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-shadow:
+    0 8px 25px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.gh-currency__icon {
+  width: 26px;
+  height: 26px;
+
+  display: grid;
+  place-items: center;
+
+  font-size: 16px;
+
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.gh-currency__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  line-height: 1;
+}
+
+.gh-currency__info small {
+  margin-bottom: 4px;
+
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+
+  opacity: 0.55;
+}
+
+.gh-currency__info strong {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+/* PUNTOS */
+.gh-currency--points {
+  border-color: rgba(255, 200, 61, 0.18);
+}
+
+.gh-currency--points .gh-currency__icon {
+  background: rgba(255, 200, 61, 0.10);
+}
+
+.gh-currency--points strong {
+  color: #ffc83d;
+}
+
+/* MONEDAS */
+.gh-currency--coins {
+  border-color: rgba(36, 233, 135, 0.18);
+}
+
+.gh-currency--coins .gh-currency__icon {
+  background: rgba(36, 233, 135, 0.10);
+}
+
+.gh-currency--coins strong {
+  color: #24e987;
+}
+/* =========================================================
+   LUPI WORLD — ACHIEVEMENTS MODAL
+   ========================================================= */
+
+.achievements-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: rgba(3, 5, 10, 0.78);
+
+  backdrop-filter: blur(10px);
+
+  animation: achievementsOverlayIn 0.2s ease-out;
+}
+
+.achievements-modal {
+  width: min(760px, 100%);
+  max-height: min(820px, 90vh);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(15, 19, 29, 0.99),
+      rgba(7, 10, 17, 0.99)
+    );
+
+  border: 1px solid rgba(255, 255, 255, 0.09);
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 30px 90px rgba(0, 0, 0, 0.65),
+    0 0 50px rgba(40, 217, 255, 0.05);
+
+  animation: achievementsModalIn 0.3s
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* HEADER */
+
+.achievements-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  padding: 26px 28px 20px;
+
+  border-bottom: 1px solid
+    rgba(255, 255, 255, 0.07);
+}
+
+.achievements-modal-kicker {
+  margin-bottom: 4px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  color: #28d9ff;
+}
+
+.achievements-modal-header h2 {
+  margin: 0;
+
+  font-size: 30px;
+  font-weight: 900;
+
+  letter-spacing: 0.5px;
+
+  color: #ffffff;
+}
+
+.achievements-modal-header p {
+  margin: 5px 0 0;
+
+  font-size: 12px;
+
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.achievements-modal-close {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  color: rgba(255, 255, 255, 0.65);
+
+  cursor: pointer;
+
+  font-size: 15px;
+
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.2s;
+}
+
+.achievements-modal-close:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* PROGRESO */
+
+.achievements-progress-card {
+  margin: 18px 28px 8px;
+
+  padding: 16px 18px;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(40, 217, 255, 0.07),
+      rgba(36, 233, 135, 0.04)
+    );
+
+  border: 1px solid
+    rgba(40, 217, 255, 0.12);
+}
+
+.achievements-progress-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 11px;
+}
+
+.achievements-progress-label {
+  display: block;
+
+  margin-bottom: 3px;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.achievements-progress-top strong {
+  font-size: 22px;
+  font-weight: 900;
+
+  color: #ffffff;
+}
+
+.achievements-progress-top strong span {
+  font-size: 13px;
+  font-weight: 600;
+
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.achievements-progress-percent {
+  font-size: 20px;
+  font-weight: 900;
+
+  color: #28d9ff;
+}
+
+.achievements-progress-bar {
+  height: 7px;
+
+  overflow: hidden;
+
+  border-radius: 99px;
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.achievements-progress-fill {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #28d9ff,
+      #24e987
+    );
+
+  box-shadow:
+    0 0 12px rgba(40, 217, 255, 0.35);
+
+  transition: width 0.5s
+    cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* BODY */
+
+.achievements-modal-body {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 12px 28px 18px;
+
+  scrollbar-width: thin;
+  scrollbar-color:
+    rgba(255, 255, 255, 0.15)
+    transparent;
+}
+
+/* CARD */
+
+.achievement-card {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+
+  min-height: 78px;
+
+  margin-bottom: 10px;
+
+  padding: 12px 14px;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.06);
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  transition:
+    transform 0.2s,
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.achievement-card:hover {
+  transform: translateY(-2px);
+
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.achievement-card--locked {
+  opacity: 0.58;
+
+  filter: grayscale(0.35);
+}
+
+.achievement-card--unlocked {
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0.045),
+      rgba(255, 255, 255, 0.018)
+    );
+}
+
+/* ICON */
+
+.achievement-card-icon {
+  width: 52px;
+  height: 52px;
+
+  flex: 0 0 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid
+    rgba(255, 255, 255, 0.07);
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  font-size: 26px;
+}
+
+.achievement-lock {
+  font-size: 19px;
+  opacity: 0.55;
+}
+
+/* INFO */
+
+.achievement-card-info {
+  min-width: 0;
+
+  flex: 1;
+}
+
+.achievement-card-title-row {
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+}
+
+.achievement-card-title-row h3 {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  color: rgba(255, 255, 255, 0.68);
+}
+
+.achievement-check {
+  width: 17px;
+  height: 17px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #24e987;
+
+  color: #06100b;
+
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.achievement-card-info p {
+  margin: 4px 0 3px;
+
+  font-size: 11px;
+  line-height: 1.35;
+
+  color: rgba(255, 255, 255, 0.43);
+}
+
+.achievement-date {
+  font-size: 9px;
+
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.achievement-locked-text {
+  font-size: 9px;
+
+  color: rgba(255, 255, 255, 0.28);
+}
+
+/* RAREZA */
+
+.achievement-rarity {
+  flex-shrink: 0;
+
+  padding: 5px 8px;
+
+  border: 1px solid;
+
+  border-radius: 7px;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: 0.7px;
+
+  text-transform: uppercase;
+}
+
+/* FOOTER */
+
+.achievements-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 14px 28px;
+
+  border-top: 1px solid
+    rgba(255, 255, 255, 0.07);
+
+  font-size: 10px;
+
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.achievements-modal-footer button {
+  padding: 8px 13px;
+
+  border: 1px solid
+    rgba(40, 217, 255, 0.25);
+
+  border-radius: 8px;
+
+  background: rgba(40, 217, 255, 0.06);
+
+  color: #28d9ff;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 1px;
+
+  cursor: pointer;
+}
+
+/* ANIMACIONES */
+
+@keyframes achievementsOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes achievementsModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .achievements-modal-overlay {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .achievements-modal {
+    max-height: 94vh;
+    border-radius: 20px 20px 14px 14px;
+  }
+
+  .achievements-modal-header {
+    padding: 20px 18px 16px;
+  }
+
+  .achievements-modal-header h2 {
+    font-size: 25px;
+  }
+
+  .achievements-progress-card {
+    margin-left: 18px;
+    margin-right: 18px;
+  }
+
+  .achievements-modal-body {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .achievement-rarity {
+    display: none;
+  }
+
+  .achievement-card {
+    padding: 10px;
+  }
+
+  .achievements-modal-footer {
+    padding: 12px 18px;
+  }
+
+  .achievements-modal-footer span {
+    display: none;
+  }
+
+  .achievements-modal-footer button {
+    width: 100%;
+  }
+}
+.achievement-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  min-width: 90px;
+}
+
+.achievement-reward {
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  opacity: 0.75;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .achievement-card-right {
+    min-width: auto;
+  }
+
+  .achievement-reward {
+    font-size: 10px;
+  }
+}
+
+
+.achievement-progress {
+  margin-top: 12px;
+  width: 100%;
+}
+
+.achievement-progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.achievement-progress-header span {
+  color: #77778f;
+}
+
+.achievement-progress-header strong {
+  color: #ffffff;
+  font-size: 11px;
+}
+
+.achievement-progress-bar {
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+}
+
+.achievement-progress-fill {
+  height: 100%;
+  min-width: 0;
+
+  background: linear-gradient(
+    90deg,
+    #00ff87,
+    #00e1ff
+  );
+
+  border-radius: 999px;
+
+  box-shadow:
+    0 0 8px rgba(0, 255, 135, 0.4);
+
+  transition:
+    width 0.5s ease;
+}
+
+.achievement-date {
+  display: block;
+  margin-top: 7px;
+
+  color: #00ff87;
+  font-size: 10px;
+}
+
+.achievement-locked-text {
+  display: block;
+  margin-top: 7px;
+
+  color: #77778f;
+  font-size: 10px;
+}
+/* LUPI WORLD — parche HUD mobile. Agregar al FINAL de GameHub.css */
+@media (max-width: 700px) {
+  .gh-root:has(.gh-world) {
+    width: 100%;
+    min-width: 0;
+    min-height: 100dvh;
+  }
+
+  .gh-root:has(.gh-world) .gh-hud {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px 8px;
+    width: 100%;
+    min-width: 0;
+    padding: 8px max(10px, env(safe-area-inset-right)) 8px max(10px, env(safe-area-inset-left));
+    clip-path: none;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+
+  .gh-root:has(.gh-world) .gh-back {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    padding: 4px 7px;
+    min-width: 0;
+  }
+
+  .gh-root:has(.gh-world) .gh-brand {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    align-items: flex-start;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0 0 3px;
+    font-size: clamp(18px, 5.2vw, 24px);
+    line-height: .9;
+  }
+
+  .gh-root:has(.gh-world) .gh-brand strong {
+    font-size: clamp(17px, 4.7vw, 22px);
+    line-height: .9;
+  }
+
+  .gh-root:has(.gh-world) .gh-brand::after {
+    left: 0;
+    transform: none;
+  }
+
+  .gh-root:has(.gh-world) .gh-hud__right {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 5px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .gh-root:has(.gh-world) .gh-wallet,
+  .gh-root:has(.gh-world) .gh-currency {
+    min-width: 0;
+    width: auto;
+    height: 34px;
+    padding: 4px 6px;
+    gap: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .gh-root:has(.gh-world) .gh-currency__icon {
+    width: 19px;
+    height: 19px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .gh-root:has(.gh-world) .gh-currency__info small {
+    font-size: 7px;
+    letter-spacing: 0;
+    margin-bottom: 2px;
+  }
+
+  .gh-root:has(.gh-world) .gh-currency__info strong {
+    font-size: 12px;
+  }
+
+  .gh-root:has(.gh-world) .gh-level {
+    width: 35px;
+    height: 35px;
+    flex: 0 0 35px;
+  }
+
+  .gh-root:has(.gh-world) .gh-level__core {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+
+  /* Toast compacto, por debajo del encabezado. */
+  .gh-root:has(.gh-world) .gh-world-event {
+    top: 90px;
+    width: min(320px, calc(100% - 24px));
+    min-width: 0;
+    max-width: none;
+    padding: 7px 10px;
+    gap: 8px;
+    border-radius: 10px;
+  }
+
+  .gh-root:has(.gh-world) .gh-world-event__icon {
+    width: 26px;
+    height: 26px;
+    flex-basis: 26px;
+    font-size: 13px;
+  }
+
+  .gh-root:has(.gh-world) .gh-world-event__content strong {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .gh-root:has(.gh-world) .gh-hud { gap: 4px; padding-inline: 6px; }
+  .gh-root:has(.gh-world) .gh-hud__right { gap: 3px; }
+  .gh-root:has(.gh-world) .gh-currency { padding-inline: 4px; }
+  .gh-root:has(.gh-world) .gh-currency__icon { width: 16px; height: 16px; }
+  .gh-root:has(.gh-world) .gh-currency__info strong { font-size: 11px; }
+}
+
+/* RPS PvP fullscreen */
+.rps-screen-overlay { position:fixed; inset:0; z-index:2900; background:#06100c; overflow-y:auto; padding:16px; box-sizing:border-box; }
+
+/* =========================================
+   LUPI WORLD — SLOT RARITY FIX
+   ========================================= */
+
+.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped {
+  border: 1px solid var(--slot-rarity, #A7B6AF) !important;
+
+  box-shadow:
+    0 0 12px color-mix(
+      in srgb,
+      var(--slot-rarity, #A7B6AF) 25%,
+      transparent
+    ) !important;
+}
+
+.gh-root .gh-locker-zone .locker-equipment .locker-slot.equipped.selected {
+  border-color: var(--slot-rarity, #A7B6AF) !important;
+}
+/* LUPI: partido en una pantalla. Sólo aplica a la vista match. */
+.gh-root--playing .gh-match {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  box-sizing: border-box;
+  width: 100vw;
+  height: 100dvh;
+  padding: 8px clamp(8px, 2vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 0%, #153a2b, #06110d 75%);
+}
+.gh-root--playing .gh-match__bar {
+  flex: 0 0 30px;
+  min-height: 30px;
+  padding: 0;
+  margin: 0;
+}
+.gh-root--playing .gh-match > .gh-panel {
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 0 !important;
+  background: none;
+  box-shadow: none;
+  border: 0;
+  overflow: visible;
+}
+.gh-root--playing .arena-container {
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+}
+.gh-root--playing .arena-header { flex: 0 0 auto; margin-bottom: 5px; }
+.gh-root--playing .arena-match-core {
+  flex: 1 1 0;
+  min-height: 0;
+  gap: 10px;
+  align-items: stretch;
+}
+.gh-root--playing .futsal-court {
+  height: 100% !important;
+  min-height: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+.gh-root--playing .battle-log-strip {
+  height: 100% !important;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  margin: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.gh-root--playing .log-lines {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+}
+@media (min-width: 901px) {
+  .gh-root--playing .arena-match-core {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(245px, 0.85fr);
+  }
+}
+@media (max-width: 900px) {
+  .gh-root--playing .gh-match { padding: 5px; gap: 3px; }
+  .gh-root--playing .arena-container { padding: 6px; }
+  .gh-root--playing .arena-header { margin-bottom: 3px; }
+  .gh-root--playing .arena-match-core { display: flex; flex-direction: column; gap: 5px; }
+  .gh-root--playing .futsal-court { flex: 1 1 0; min-height: 0; }
+  .gh-root--playing .battle-log-strip { flex: 0 0 clamp(90px, 19dvh, 150px); }
+}
+@media (max-height: 520px) and (min-width: 901px) {
+  .gh-root--playing .arena-header { display: none; }
+}

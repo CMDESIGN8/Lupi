@@ -1,0 +1,175 @@
+/* LUPI WORLD — THEME V2 / FINAL COLOR PASS
+   Importar DESPUES de GameHub.css, GameHubLobby.css, LobbyChat.css
+   y DESPUES de LupiWorld_AAA_Theme.css (si ya existe).
+   Solo afecta la interfaz dentro de .gh-root.
+   No modifica tamaños, posiciones, prendas ni rarezas.
+*/
+.gh-root {
+  --lupi-primary: #24e987;
+  --lupi-primary-dim: #147b51;
+  --lupi-gold: #ffc83d;
+  --lupi-surface: #081b16;
+  --lupi-surface-raised: #0d2921;
+  --lupi-text: #f2f7f4;
+  --lupi-muted: #9db6aa;
+  --lupi-line: rgba(78, 165, 116, .27);
+  --gh-bg: #071310;
+  --gh-panel: var(--lupi-surface);
+  --gh-panel-hi: var(--lupi-surface-raised);
+  --gh-line: #24513f;
+  --gh-grass: var(--lupi-primary);
+  --gh-gold: var(--lupi-gold);
+  --gh-text: var(--lupi-text);
+  --gh-muted: var(--lupi-muted);
+}
+.gh-root .gh-world {
+  --world-green: var(--lupi-primary);
+  --world-cyan: var(--lupi-primary);
+  --world-gold: var(--lupi-gold);
+}
+/* Identidad: titulo neutro, nombre y acento activos en verde */
+.gh-root .gh-brand__player {
+  color: var(--lupi-primary) !important;
+  text-shadow: 0 0 12px rgba(36,233,135,.20);
+}
+.gh-root .gh-brand::after {
+  background: linear-gradient(90deg,transparent,var(--lupi-primary),transparent);
+  box-shadow: 0 0 10px rgba(36,233,135,.25);
+}
+/* Los numeros del HUD son informativos, no un segundo color de accion */
+.gh-root .gh-currency--points,
+.gh-root .gh-currency--coins {
+  background: linear-gradient(180deg,rgba(18,36,28,.88),rgba(7,17,14,.93));
+  border-color: rgba(255,200,61,.28);
+}
+.gh-root .gh-currency--points .gh-currency__info strong,
+.gh-root .gh-currency--coins .gh-currency__info strong,
+.gh-root .gh-currency--points strong,
+.gh-root .gh-currency--coins strong {
+  color: var(--lupi-text) !important;
+  text-shadow: none;
+}
+.gh-root .gh-currency--points .gh-currency__icon,
+.gh-root .gh-currency--coins .gh-currency__icon {
+  background: rgba(255,200,61,.10);
+}
+/* Acciones sociales: mismo lenguaje cromatico */
+.gh-root .gh-world__players-toggle,
+.gh-root .lc-mobile-chat-trigger {
+  border-color: rgba(36,233,135,.42);
+  background: radial-gradient(circle at 45% 15%,#164735,#071b16 76%);
+  box-shadow: inset 0 0 0 1px rgba(36,233,135,.08),0 0 17px rgba(36,233,135,.10);
+}
+.gh-root .gh-world__players-toggle em,
+.gh-root .lc-mobile-chat-count {
+  background: var(--lupi-primary);
+  color: #06160e;
+  border-color: #06160e;
+}
+/* Si los iconos son SVG, no forzar emojis o imagenes de equipamiento */
+.gh-root .gh-world__players-toggle svg,
+.gh-root .lc-mobile-chat-trigger svg {
+  color: var(--lupi-primary);
+  stroke: currentColor;
+}
+/* Chat, jugadores, eventos: superficies del mismo sistema */
+.gh-root .lc {
+  --lc-cyan: var(--lupi-primary);
+  --lc-green: var(--lupi-primary);
+  --lc-gold: var(--lupi-gold);
+  --lc-text: var(--lupi-text);
+  --lc-muted: var(--lupi-muted);
+}
+.gh-root .gh-world__chat .lc-head {
+  background: linear-gradient(115deg,#10382a,#081b16);
+  border-bottom-color: var(--lupi-line);
+}
+.gh-root .gh-world__players-sheet-panel {
+  background: linear-gradient(160deg,#0b2a20,#061713 85%);
+  border-color: var(--lupi-line);
+}
+.gh-root .gh-world__players-sheet-kicker,
+.gh-root .gh-world-event__label { color: var(--lupi-primary); }
+.gh-root .gh-world__mission {
+  background: linear-gradient(150deg,rgba(5,26,20,.96),rgba(8,27,22,.93));
+}
+.gh-root .gh-world__dock button.is-active { color: var(--lupi-primary); }
+.gh-root .gh-world__dock button.is-active::after { background: var(--lupi-primary); }
+/* El boton principal y la recompensa mantienen el oro */
+.gh-root .gh-world__play {
+  background: linear-gradient(135deg,#ffdc54,#ffae0a);
+  color: #171207;
+}
+.gh-root .gh-world__play strong { color: #171207; }
+/* Rarezas y eventos especiales conservan su codigo semantico */
+.gh-root .gh-world-event--level_up .gh-world-event__label { color: #b894ef; }
+.gh-root .gh-world-event--aura_spotted .gh-world-event__label { color: #ed8bd6; }
+/* =====================================================
+   LUPI WORLD — RESTAURACIÓN DE REFLECTORES
+   Desktop + Mobile
+===================================================== */
+
+.gh-root .gh-world__lights {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.gh-root .gh-world__light {
+  animation: world-light-ignite 1.8s linear both;
+}
+
+.gh-root .gh-world__light--left {
+  animation-delay: 0.3s;
+}
+
+.gh-root .gh-world__light--right {
+  animation-delay: 0.55s;
+}
+
+/* Mantener el brillo cálido del estadio */
+
+.gh-root .gh-world__light-bloom {
+  filter: brightness(1.15);
+}
+
+.gh-root .gh-world__light-flare {
+  filter: brightness(1.2);
+}
+
+/* Recuperar los haces que estaban ocultos en móvil */
+
+@media (max-width: 760px) {
+  .gh-root .gh-world__light-beam {
+    display: block;
+    width: 65vw;
+    height: 48vh;
+    opacity: 0.45;
+    filter: blur(10px);
+  }
+
+  .gh-root .gh-world__light-bloom {
+    width: 240px;
+    height: 240px;
+  }
+
+  .gh-root .gh-world__light-flare {
+    width: 200px;
+    height: 200px;
+  }
+}
+
+/* Respetar usuarios que prefieren menos movimiento */
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-root .gh-world__light,
+  .gh-root .gh-world__light-bloom,
+  .gh-root .gh-world__light-flare,
+  .gh-root .gh-world__light-beam {
+    animation: none;
+  }
+}

@@ -1,0 +1,19 @@
+/* LUPI HOME V8: scoped styling; no existing dashboard styles overridden. */
+.home-experience .lupi-first-play{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:24px;min-height:260px;margin:20px 0 22px;padding:clamp(22px,4vw,38px);border:1px solid rgba(23,222,195,.36);border-radius:24px;background:radial-gradient(ellipse at 85% 80%,rgba(0,221,180,.22),transparent 48%),linear-gradient(135deg,#071727 0%,#092d38 62%,#071422 100%);color:#fff;box-shadow:0 20px 45px rgba(0,0,0,.25)}
+.home-experience .lupi-first-play__copy{position:relative;z-index:2;max-width:510px}
+.home-experience .lupi-first-play__eyebrow{font-size:11px;font-weight:800;letter-spacing:.2em;color:#36eac4}
+.home-experience .lupi-first-play h1{margin:12px 0 8px;font-size:clamp(27px,4vw,45px);line-height:1.04;font-weight:950;letter-spacing:-.025em}
+.home-experience .lupi-first-play h1 em{font-style:normal;color:#29e4bd}
+.home-experience .lupi-first-play p{margin:0 0 20px;color:#d0e3e9;font-size:14px;line-height:1.5}
+.home-experience .lupi-first-play__actions{display:flex;flex-direction:column;align-items:flex-start;gap:9px}
+.home-experience .lupi-first-play__cta{display:flex;align-items:center;justify-content:center;gap:14px;min-height:49px;padding:12px 23px;border:0;border-radius:12px;background:#ffca39;color:#15191d;font:900 15px/1.1 inherit;letter-spacing:.015em;cursor:pointer;box-shadow:0 6px 23px rgba(255,191,34,.15)}
+.home-experience .lupi-first-play__cta:hover{filter:brightness(1.07);transform:translateY(-1px)}
+.home-experience .lupi-first-play__cta:focus-visible{outline:3px solid white;outline-offset:3px}
+.home-experience .lupi-first-play__sub{font-size:11px;letter-spacing:.14em;color:#a6c4cd}
+.home-experience .lupi-first-play__pitch{position:relative;flex:0 0 160px;height:160px;opacity:.75;border:2px solid rgba(75,230,203,.35);border-radius:50%;transform:rotate(-18deg)}
+.home-experience .lupi-first-play__pitch span{position:absolute;display:grid;place-items:center;width:30px;height:30px;border:1px solid #d6b164;border-radius:8px;background:#102735;color:#ffcc63;font-weight:900;font-size:13px}
+.home-experience .lupi-first-play__pitch span:nth-child(1){left:0;top:65px}.home-experience .lupi-first-play__pitch span:nth-child(2){left:55px;top:65px}.home-experience .lupi-first-play__pitch span:nth-child(3){left:100px;top:10px}.home-experience .lupi-first-play__pitch span:nth-child(4){left:100px;top:110px}.home-experience .lupi-first-play__pitch span:nth-child(5){left:148px;top:65px}
+.home-experience .lupi-first-play__hint{position:absolute;right:12px;bottom:10px;z-index:3;display:flex;align-items:center;gap:8px;max-width:290px;padding:8px 10px;border:1px solid rgba(79,226,202,.3);border-radius:9px;background:rgba(3,20,27,.94);font-size:11px;color:#d7f5f0}
+.home-experience .lupi-first-play__hint button{border:0;background:none;color:#fff;font-size:20px;cursor:pointer}
+@media(max-width:650px){.home-experience .lupi-first-play{margin:12px 0 18px;min-height:0;padding:22px 18px 26px;border-radius:18px}.home-experience .lupi-first-play h1{font-size:clamp(26px,8vw,38px)}.home-experience .lupi-first-play__pitch{display:none}.home-experience .lupi-first-play__cta{width:100%;font-size:13px;padding:12px 8px}.home-experience .lupi-first-play__actions{align-items:stretch}.home-experience .lupi-first-play__sub{text-align:center}.home-experience .lupi-first-play__hint{position:static;margin-top:14px;max-width:none}}
+@media(prefers-reduced-motion:reduce){.home-experience .lupi-first-play__cta{transition:none;transform:none}}

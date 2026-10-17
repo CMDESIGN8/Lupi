@@ -1,0 +1,57 @@
+/* Lupi World · primer encuentro estilo anime deportivo (sin panel tipo formulario) */
+.lupi-anime-intro { position:fixed; inset:0; z-index:10000; display:grid; place-items:center; padding:0; overflow:hidden; background:linear-gradient(180deg,#00101a44,#000b),url('/images/vestuario.png') center/cover no-repeat #03121f; }
+.lupi-anime-intro__scene { position:relative; isolation:isolate; width:min(1320px,100%); height:100dvh; min-height:0; overflow:hidden; }
+.lupi-anime-intro__scene::before { content:""; position:absolute; inset:0; background:radial-gradient(ellipse at 27% 48%,#00dfff2b,transparent 48%),linear-gradient(90deg,#00121c33,#00121c18 48%,#00121c88); pointer-events:none; }
+.lupi-anime-intro__art { position:absolute; left:3%; bottom:clamp(110px,23dvh,215px); width:min(48%,540px); height:min(68dvh,650px); display:flex; align-items:flex-end; justify-content:center; animation:lupiAnimeEnter .65s ease-out both; }
+.lupi-anime-intro__art img { position:relative; z-index:2; max-width:100%; max-height:100%; width:auto; object-fit:contain; filter:drop-shadow(0 15px 24px #000b) drop-shadow(0 0 30px #02cfff44); animation:lupiAnimeIdle 3s ease-in-out infinite alternate; }
+.lupi-anime-intro__speedlines { position:absolute; inset:-20%; background:repeating-conic-gradient(from 12deg at 50% 55%,transparent 0deg 9deg,#60e9ff13 10deg 11deg,transparent 12deg 20deg); mask-image:radial-gradient(ellipse,#0008,transparent 65%); opacity:.8; }
+.lupi-anime-intro__hud { position:absolute; top:clamp(24px,5dvh,60px); left:clamp(20px,5vw,70px); display:flex; flex-direction:column; gap:4px; color:#8affee; font:800 12px 'Barlow Condensed',Impact,sans-serif; letter-spacing:.19em; text-shadow:0 2px 10px #000; }
+.lupi-anime-intro__hud strong { color:#fff; font-size:clamp(16px,2.2vw,28px); letter-spacing:.06em; }
+.lupi-anime-intro__dialogue { position:absolute; z-index:4; left:4%; right:4%; bottom:clamp(18px,4dvh,45px); min-height:clamp(170px,25dvh,230px); padding:30px clamp(20px,3vw,46px) 16px; background:linear-gradient(120deg,#041321f7,#08283ef2); border:2px solid #b6faffbb; border-radius:7px; box-shadow:0 12px 0 #0009,0 0 0 5px #051723a8,0 30px 75px #000c; animation:lupiAnimeDialogue .25s ease-out both; }
+.lupi-anime-intro__speaker { position:absolute; left:20px; top:-22px; padding:8px 32px; background:linear-gradient(100deg,#00b6df,#12517b); border:2px solid #a4faff; transform:skewX(-10deg); color:#fff; font:900 20px 'Barlow Condensed',Impact,sans-serif; letter-spacing:.1em; box-shadow:5px 5px 0 #00121c; }
+.lupi-anime-intro__speaker span { color:#ffcf47; }
+.lupi-anime-intro__lines { max-width:100%; padding-right:130px; }
+.lupi-anime-intro__lines h2 { margin:0 0 7px; color:#ffce48; font:italic 900 clamp(22px,3vw,38px)/1.06 'Barlow Condensed',Impact,sans-serif; text-transform:uppercase; text-shadow:2px 3px 0 #000; }
+.lupi-anime-intro__lines p { margin:0; color:#fff; font:600 clamp(16px,1.65vw,22px)/1.4 'Barlow',sans-serif; text-shadow:0 2px 8px #000; }
+.lupi-anime-intro__lines p strong { color:#77ffed; }
+.lupi-anime-intro__bottom { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; }
+.lupi-anime-intro__progress { color:#9bc3d1; font:800 12px 'Barlow',sans-serif; letter-spacing:.16em; }
+.lupi-anime-intro__bottom button { margin-left:auto; border:0; border-radius:4px; padding:12px 26px; min-height:44px; cursor:pointer; color:#101923; background:linear-gradient(120deg,#ffe48a,#ffbd2d); font:900 19px 'Barlow Condensed',Impact,sans-serif; letter-spacing:.08em; box-shadow:4px 4px 0 #0008; }
+.lupi-anime-intro__bottom button:hover { filter:brightness(1.08); }
+.lupi-anime-intro__bottom button:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+.lupi-anime-intro.is-exiting .lupi-anime-intro__scene { animation:lupiAnimeExit .65s ease-in both; }
+@keyframes lupiAnimeEnter { from {opacity:0;transform:translateX(-35px) scale(.95)} to {opacity:1;transform:none} }
+@keyframes lupiAnimeDialogue { from {opacity:0;transform:translateY(14px)} to {opacity:1;transform:none} }
+@keyframes lupiAnimeIdle { to {transform:translateY(-7px)} }
+@keyframes lupiAnimeExit { to {opacity:0;transform:scale(1.04);filter:blur(8px)} }
+@media (max-width:700px) {
+ .lupi-anime-intro__hud {top:max(18px,env(safe-area-inset-top));left:18px;}
+ .lupi-anime-intro__art {left:0;bottom:clamp(200px,31dvh,300px);width:100%;height:min(49dvh,440px);}
+ .lupi-anime-intro__art img {max-width:85%;}
+ .lupi-anime-intro__dialogue {left:12px;right:12px;bottom:max(18px,env(safe-area-inset-bottom));min-height:190px;padding:29px 16px 12px;}
+ .lupi-anime-intro__speaker {left:12px;top:-19px;font-size:17px;padding:6px 24px;}
+ .lupi-anime-intro__lines {padding-right:0;}
+ .lupi-anime-intro__lines h2 {font-size:clamp(24px,6.2vw,32px);}
+ .lupi-anime-intro__lines p {font-size:clamp(15px,3.8vw,18px);line-height:1.35;}
+ .lupi-anime-intro__bottom button {font-size:17px;padding:10px 20px;}
+}
+@media (max-width:700px) and (max-height:690px) { .lupi-anime-intro__art {height:39dvh;bottom:220px;} .lupi-anime-intro__dialogue {min-height:170px;} }
+@media (prefers-reduced-motion:reduce) { .lupi-anime-intro__art,.lupi-anime-intro__art img,.lupi-anime-intro__dialogue,.lupi-anime-intro.is-exiting .lupi-anime-intro__scene {animation:none;} }
+
+/* v18: lectura cinematográfica y texto progresivo */
+.lupi-anime-intro__typed { min-height: 3em; }
+.lupi-anime-intro__cursor { color:#50ffe1; animation:lupiAnimeCursor .7s steps(2) infinite; }
+@keyframes lupiAnimeCursor { 50% {opacity:0;} }
+@media (min-width:701px) {
+ .lupi-anime-intro__art { bottom:clamp(145px,26dvh,240px); height:min(62dvh,580px); }
+ .lupi-anime-intro__dialogue { min-height:190px; }
+ .lupi-anime-intro__lines {padding-right:0;}
+ .lupi-anime-intro__lines p {max-width:75ch;}
+}
+@media (max-width:700px) {
+ .lupi-anime-intro__art { bottom:clamp(195px,28dvh,265px);height:min(53dvh,450px); }
+ .lupi-anime-intro__dialogue {min-height:185px;}
+ .lupi-anime-intro__lines p {font-size:clamp(16px,4.2vw,19px);line-height:1.4;}
+ .lupi-anime-intro__hud strong {font-size:clamp(19px,5vw,24px);}
+}
+@media (prefers-reduced-motion:reduce) {.lupi-anime-intro__cursor {animation:none;}}

@@ -1,0 +1,54 @@
+/* Lupi World — First lobby welcome, cinematic overlay */
+.lupi-first-welcome {
+  position: fixed; inset: 0; z-index: 9999;
+  display: grid; place-items: center; padding: max(20px, env(safe-area-inset-top)) 18px max(20px, env(safe-area-inset-bottom));
+  isolation: isolate; overflow: auto; color: #f4fbff;
+  background: radial-gradient(ellipse at 50% 36%, rgba(13,91,110,.36), transparent 57%), rgba(1,7,17,.92);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  animation: lw-overlay-in .65s ease both;
+}
+.lupi-first-welcome::before {
+  content:""; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background: linear-gradient(180deg, rgba(1,8,18,.40), rgba(1,8,18,.87)), url('/images/stadium-bg.jpg') center/cover no-repeat;
+  opacity: .55; animation: lw-stadium-in 1.5s ease-out both;
+}
+.lupi-first-welcome::after {
+  content:""; position: fixed; inset: -35% -20%; z-index: -1; pointer-events: none;
+  background: conic-gradient(from 195deg at 50% 0%, transparent 0deg, rgba(31,229,198,.17) 12deg, transparent 23deg, transparent 43deg, rgba(66,178,255,.14) 55deg, transparent 66deg);
+  filter: blur(20px); transform-origin: center top; animation: lw-lights 8s ease-in-out infinite alternate;
+}
+.lupi-first-welcome__card {
+  position: relative; width: min(100%, 570px); padding: clamp(26px, 5vw, 48px) clamp(22px, 5vw, 52px);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  text-align: center; border: 1px solid rgba(87,228,217,.30); border-radius: 20px;
+  background: linear-gradient(155deg, rgba(13,45,62,.95), rgba(2,13,28,.97) 66%);
+  box-shadow: 0 30px 110px rgba(0,0,0,.75), inset 0 1px rgba(255,255,255,.14), 0 0 65px rgba(0,229,198,.10);
+  overflow: hidden; animation: lw-card-in .85s cubic-bezier(.18,.8,.2,1) both;
+}
+.lupi-first-welcome__card::before {
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background: linear-gradient(115deg,transparent 26%,rgba(255,255,255,.09) 45%,transparent 60%);
+  transform: translateX(-150%); animation: lw-sheen 1.2s .55s ease-out both;
+}
+.lupi-first-welcome__eyebrow { font: 800 10px/1.4 'Barlow',sans-serif; letter-spacing:.22em; color:#52efd3; text-transform:uppercase; }
+.lupi-first-welcome__emblem { display:grid;place-items:center;width:76px;height:76px;margin:10px 0 4px;border:1px solid rgba(255,207,84,.44);border-radius:50%;font-size:38px;background:radial-gradient(circle,rgba(255,206,64,.18),rgba(255,206,64,.02) 68%);box-shadow:0 0 42px rgba(255,206,64,.18);animation:lw-emblem 3s ease-in-out infinite alternate; }
+.lupi-first-welcome__card h2 { margin: 2px 0 0; font: italic 900 clamp(34px,7vw,60px)/.95 'Barlow Condensed',Impact,sans-serif; letter-spacing:.025em; text-transform:uppercase; text-shadow:0 5px 25px rgba(0,0,0,.5); }
+.lupi-first-welcome__name { display:block; max-width:100%; overflow-wrap:anywhere; font:italic 900 clamp(32px,8vw,68px)/1 'Barlow Condensed',Impact,sans-serif; text-transform:uppercase; color:#ffcf51; text-shadow:0 0 30px rgba(255,202,66,.22); }
+.lupi-first-welcome__club { color:#62e7d3; font:800 12px/1.4 'Barlow',sans-serif; letter-spacing:.14em; text-transform:uppercase; }
+.lupi-first-welcome__card p { max-width:410px; margin:10px 0 16px; color:#c1d5df; font:500 15px/1.55 'Barlow',sans-serif; }
+.lupi-first-welcome__card button { width:100%; min-height:54px; padding:13px 18px; border:0; border-radius:9px; cursor:pointer; background:linear-gradient(135deg,#ffe080,#ffc338 70%,#e99c20);color:#16202b;font:900 17px/1.1 'Barlow Condensed',sans-serif;letter-spacing:.08em; box-shadow:0 9px 32px rgba(255,185,44,.23); transition:transform .18s,filter .18s; }
+.lupi-first-welcome__card button:hover { transform:translateY(-2px);filter:brightness(1.08); }
+.lupi-first-welcome__card button:focus-visible { outline:3px solid #62e7d3;outline-offset:4px; }
+.lupi-first-welcome.is-exiting { animation:lw-overlay-out .7s ease-in both; pointer-events:none; }
+.lupi-first-welcome.is-exiting .lupi-first-welcome__card { animation:lw-card-out .7s cubic-bezier(.4,0,1,1) both; }
+@keyframes lw-overlay-in {from{opacity:0}to{opacity:1}}
+@keyframes lw-overlay-out {to{opacity:0}}
+@keyframes lw-stadium-in {from{transform:scale(1.1);filter:brightness(.2)}to{transform:scale(1);filter:brightness(1)}}
+@keyframes lw-card-in {from{opacity:0;transform:translateY(38px) scale(.91);filter:blur(12px)}to{opacity:1;transform:none;filter:none}}
+@keyframes lw-card-out {to{opacity:0;transform:scale(1.12);filter:blur(12px)}}
+@keyframes lw-lights {to{transform:rotate(9deg)}}
+@keyframes lw-emblem {to{box-shadow:0 0 56px rgba(255,206,64,.35);transform:scale(1.035)}}
+@keyframes lw-sheen {to{transform:translateX(150%)}}
+@media(max-width:600px) { .lupi-first-welcome__card {padding:28px 20px;gap:9px} .lupi-first-welcome__emblem{width:62px;height:62px;font-size:30px;margin:4px 0} .lupi-first-welcome__card p{font-size:13px;margin:6px 0 12px} .lupi-first-welcome__card button{font-size:16px} }
+@media(max-height:680px) { .lupi-first-welcome__card {padding-block:18px;gap:6px} .lupi-first-welcome__emblem {width:48px;height:48px;font-size:24px;margin:0} .lupi-first-welcome__card p{margin:4px 0 8px} }
+@media(prefers-reduced-motion:reduce) { .lupi-first-welcome,.lupi-first-welcome::before,.lupi-first-welcome::after,.lupi-first-welcome__card,.lupi-first-welcome__card::before,.lupi-first-welcome__emblem,.lupi-first-welcome.is-exiting,.lupi-first-welcome.is-exiting .lupi-first-welcome__card {animation:none!important;transition:none!important} }

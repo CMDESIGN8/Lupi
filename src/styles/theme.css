@@ -1,0 +1,19 @@
+/* src/styles/theme.css */
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1c1c28;
+  --border: #2a2a3a;
+  --accent: #189df5;
+  --accent2: #ff4d6d;
+  --text: #f0f0f8;
+  --text2: #8888aa;
+  --text3: #5a5f75;
+  --success: #3dffa0;
+  --warning: #ffcc4d;
+  --radius: 12px;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+}

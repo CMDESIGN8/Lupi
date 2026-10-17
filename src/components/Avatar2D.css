@@ -1,0 +1,296 @@
+.avatar2d {
+  --avatar-scale: 1;
+
+  position: relative;
+  width: 390px;
+  height: 520px;
+
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+
+/* =========================================================
+   AURA & SHADOW
+========================================================= */
+
+.avatar2d__aura {
+  position: absolute;
+
+  left: 50%;
+  bottom: 15px;
+
+  width: 405px;
+  height: 405px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    var(--avatar-aura),
+    var(--avatar-aura-soft) 45%,
+    transparent 72%
+  );
+
+  filter: blur(14px);
+
+  pointer-events: none;
+}
+
+
+.avatar2d__shadow {
+  position: absolute;
+
+  left: 50%;
+  bottom: 5px;
+
+  width: 180px;
+  height: 28px;
+
+  transform: translateX(-50%);
+
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  filter: blur(8px);
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   CHARACTER CONTAINER
+========================================================= */
+
+.avatar2d__character {
+  position: absolute;
+
+  top: 10%;
+  left: 50%;
+  bottom: 25px;
+
+  width: 490px;
+  height: 500px;
+
+  transform: translateX(-50%);
+
+  transform-origin: center bottom;
+
+  z-index: 5;
+}
+
+
+/* =========================================================
+   BASE AVATAR
+========================================================= */
+
+.avatar2d__base-image {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  pointer-events: none;
+  user-select: none;
+
+  z-index: 5;
+}
+
+
+/* =========================================================
+   HEAD PNG (Definida 1 sola vez fija proporcional al personaje)
+========================================================= */
+
+.avatar2d__base-head {
+  position: absolute;
+
+  left: 50%;
+  top: 120px;
+
+  width: 80px;
+  height: 145px;
+
+  transform: translate(-50%, -50%);
+
+  object-fit: contain;
+
+  pointer-events: none;
+  user-select: none;
+
+  z-index: 25;
+}
+
+
+/* =========================================================
+   REAL CLOTHING LAYERS
+========================================================= */
+
+.avatar2d__layer {
+  position: absolute;
+
+  pointer-events: none;
+
+  z-index: 20;
+}
+
+
+.avatar2d__image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =========================================================
+   TOP
+========================================================= */
+
+.avatar2d__layer--top {
+  left: 51%;
+  top: 215px;
+
+  width: 210px;
+  height: 195px;
+
+  transform:
+    translate(-50%, -50%)
+    scale(var(--avatar-scale));
+
+  transform-origin: center center;
+  z-index: 22;
+}
+
+
+/* =========================================================
+   BOTTOM
+========================================================= */
+
+.avatar2d__layer--bottom {
+  left: 50%;
+  top: 315px;
+
+  width: 500px;
+  height: 141px;
+
+  transform:
+    translate(-50%, -50%)
+    scale(var(--avatar-scale));
+
+  transform-origin: center center;
+   z-index: 21;
+}
+
+
+/* =========================================================
+   BOOTS
+========================================================= */
+
+.avatar2d__layer--boots {
+  left: 50%;
+  top: 455px;
+  width: 130px;
+  height: 75px;
+  transform: translate(-50%, -50%) scale(var(--avatar-scale));
+  transform-origin: center center;
+}
+
+
+/* =========================================================
+   ACCESSORY
+========================================================= */
+
+.avatar2d__layer--accessory {
+  left: 50%;
+  top: 60px;
+
+  width: 110px;
+  height: 110px;
+
+  transform:
+    translate(-50%, -50%)
+    scale(var(--avatar-scale));
+
+  transform-origin: center center;
+
+  z-index: 30;
+}
+
+
+.avatar2d__accessory-fallback {
+  position: absolute;
+
+  left: 50%;
+  top: 60px;
+
+  transform: translate(-50%, -50%);
+
+  font-size: 32px;
+
+  z-index: 30;
+}
+
+
+/* =========================================================
+   LEVEL BADGE
+========================================================= */
+
+.avatar2d__level {
+  position: absolute;
+
+  left: 85%;
+  bottom: 332px;
+
+  transform: translateX(-50%);
+
+  padding: 4px 12px;
+
+  border-radius: 999px;
+
+  background: rgba(0, 0, 0, 0.75);
+
+  border: 1px solid var(--avatar-color);
+
+  color: white;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: 0.08em;
+
+  z-index: 50;
+}
+
+
+/* =========================================================
+   COMPACT
+========================================================= */
+
+.avatar2d--compact {
+  width: 220px;
+  height: 320px;
+
+  --avatar-scale: 0.75;
+}
+
+
+.avatar2d--compact .avatar2d__character {
+  transform:
+    translateX(-50%)
+    scale(0.75);
+
+  transform-origin: center bottom;
+}

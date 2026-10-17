@@ -1,0 +1,129 @@
+/* LUPI WORLD / AAA COLOR SYSTEM v1
+   Importar al FINAL de src/pages/GameHub.tsx:
+   import "./LupiWorld_AAA_Theme.css";
+   No modifica el avatar, los colores de rareza ni los reflectores.
+*/
+.gh-root {
+  --lupi-bg: #071310;
+  --lupi-surface: #0b211b;
+  --lupi-surface-raised: #103128;
+  --lupi-line: rgba(103, 189, 148, .23);
+  --lupi-primary: #24e987;
+  --lupi-primary-soft: rgba(36, 233, 135, .16);
+  --lupi-gold: #ffc83d;
+  --lupi-text: #eaf6ee;
+  --lupi-muted: #9db9aa;
+  --gh-bg: var(--lupi-bg);
+  --gh-panel: var(--lupi-surface);
+  --gh-panel-hi: var(--lupi-surface-raised);
+  --gh-line: #235746;
+  --gh-grass: var(--lupi-primary);
+  --gh-gold: var(--lupi-gold); /* anteriormente cian */
+  --gh-gold-deep: #df9318;
+  --gh-text: var(--lupi-text);
+  --gh-muted: var(--lupi-muted);
+}
+
+/* La escena usa una sola luz de interfaz: verde. Los destellos del estadio
+   y las imágenes de prendas conservan su aspecto original. */
+.gh-root .gh-world {
+  --world-green: var(--lupi-primary);
+  --world-cyan: var(--lupi-primary);
+  --world-gold: var(--lupi-gold);
+}
+
+/* Encabezado: identidad en blanco, nombre del jugador en verde. */
+.gh-root .gh-brand,
+.gh-root .gh-brand strong { color: #fff; }
+.gh-root .gh-brand__player {
+  color: var(--lupi-primary);
+  text-shadow: 0 0 14px rgba(36,233,135,.28);
+}
+.gh-root .gh-brand::after {
+  background: linear-gradient(90deg,transparent,var(--lupi-primary) 30%,var(--lupi-primary) 70%,transparent);
+  box-shadow: 0 0 12px rgba(36,233,135,.32);
+}
+
+/* Los puntos/XP pasan a verde; las monedas y el nivel quedan dorados. */
+.gh-root .gh-currency--points {
+  border-color: rgba(36,233,135,.33);
+  background: linear-gradient(180deg,rgba(36,233,135,.10),rgba(0,0,0,.46));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.05),0 0 18px rgba(36,233,135,.07);
+}
+.gh-root .gh-currency--points strong { color: var(--lupi-primary); }
+.gh-root .gh-currency--coins {
+  border-color: rgba(255,200,61,.34);
+  background: linear-gradient(180deg,rgba(255,200,61,.10),rgba(0,0,0,.46));
+}
+.gh-root .gh-currency--coins strong { color: var(--lupi-gold); }
+.gh-root .gh-level {
+  background: conic-gradient(var(--lupi-gold) calc(var(--xp,0) * 1%),rgba(255,255,255,.07) 0);
+  box-shadow: inset 0 0 0 1px rgba(255,200,61,.24),0 0 15px rgba(255,200,61,.15);
+}
+
+/* El chat ya trae variables propias: corregimos su fuente cian original. */
+.gh-root .lc {
+  --lc-bg: rgba(5,20,16,.97);
+  --lc-panel: rgba(11,39,30,.90);
+  --lc-line: rgba(79,175,126,.23);
+  --lc-text: var(--lupi-text);
+  --lc-muted: var(--lupi-muted);
+  --lc-cyan: var(--lupi-primary);
+  --lc-green: var(--lupi-primary);
+  --lc-gold: var(--lupi-gold);
+}
+.gh-root .gh-world__chat .lc-head {
+  background: linear-gradient(115deg,rgba(14,60,43,.98),rgba(6,27,22,.98));
+  border-bottom: 1px solid var(--lupi-line);
+}
+.gh-root .gh-world__chat .lc-composer {
+  border-top-color: var(--lupi-line);
+  background: rgba(5,19,16,.96);
+}
+.gh-root .lc-mobile-chat-trigger {
+  border-color: rgba(36,233,135,.38);
+  background: radial-gradient(circle at 50% 20%,#164735,#071b16 75%);
+  box-shadow: inset 0 0 0 1px rgba(36,233,135,.07),0 0 18px rgba(36,233,135,.13);
+}
+.gh-root .lc-mobile-chat-count {
+  background: var(--lupi-primary);
+  color: #06170f;
+  box-shadow: 0 0 12px rgba(36,233,135,.35);
+}
+
+/* Panel online, misión y navegación: superficies consistentes. */
+.gh-root .gh-world__players-sheet-panel {
+  background: linear-gradient(160deg,#0b2a20,#061713 85%);
+  border: 1px solid var(--lupi-line);
+}
+.gh-root .gh-world__players-sheet-kicker { color: var(--lupi-primary); }
+.gh-root .gh-world__players-toggle {
+  border-color: rgba(36,233,135,.38);
+  background: radial-gradient(circle at 50% 20%,#164735,#071b16 75%);
+}
+.gh-root .gh-world__players-toggle em {
+  background: var(--lupi-primary);
+  color: #06170f;
+}
+.gh-root .gh-world__mission {
+  background: linear-gradient(150deg,rgba(5,26,20,.96),rgba(8,27,22,.93));
+}
+.gh-root .gh-world__dock button.is-active { color: var(--lupi-primary); }
+.gh-root .gh-world__dock button.is-active::after { background: var(--lupi-primary); }
+.gh-root .gh-world-event__label { color: var(--lupi-primary); }
+/* Conservar excepciones semánticas, como subir de nivel en violeta. */
+.gh-root .gh-world-event--level_up .gh-world-event__label { color: #b894ef; }
+.gh-root .gh-world-event--aura_spotted .gh-world-event__label { color: #ed8bd6; }
+
+/* Único CTA de alto contraste: JUGAR permanece dorado. */
+.gh-root .gh-world__play {
+  background: linear-gradient(135deg,#ffdc54,#ffae0a);
+  color: #171207;
+  box-shadow: 0 10px 30px rgba(255,176,14,.26),inset 0 1px 0 rgba(255,255,255,.45);
+}
+.gh-root .gh-world__play strong { color: #171207; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gh-root .lc-mobile-chat-trigger,
+  .gh-root .gh-world__players-toggle { transition: none; }
+}

@@ -1,0 +1,23 @@
+/* Recompensa narrativa: usa la lógica y animación de cierre existentes */
+.gh-world__reward-dialog.lupi-reward-anime{position:relative;isolation:isolate;width:min(780px,calc(100vw - 28px));min-height:400px;max-height:calc(100dvh - 24px);overflow:hidden;display:grid;grid-template-columns:minmax(180px,.9fr) minmax(290px,1.1fr);align-items:end;padding:0;text-align:left;border:1px solid #3ca9c5;border-radius:14px;background:radial-gradient(ellipse at 27% 38%,#08657d65,transparent 48%),linear-gradient(120deg,#071a2c,#02101d 70%);box-shadow:0 0 60px #09b9c22b,0 28px 90px #000e}
+.lupi-reward-anime::before{content:"";position:absolute;inset:0;z-index:-1;background:repeating-linear-gradient(125deg,transparent 0 34px,#7be9ff09 35px 36px);pointer-events:none}
+.lupi-reward-anime__chapter{position:absolute;top:20px;left:24px;z-index:2;font-size:11px;letter-spacing:.18em;color:#80f5f1;font-weight:800}
+.lupi-reward-anime__chapter span{color:#ffcf45;margin:0 6px}
+.lupi-reward-anime__mascot{display:block;width:100%;max-height:370px;object-fit:contain;object-position:center bottom;align-self:end;filter:drop-shadow(0 0 24px #00baff44);animation:lupiRewardMascot .7s ease-out both}
+.lupi-reward-anime__body{padding:60px 26px 26px 0;min-width:0;z-index:1}
+.lupi-reward-anime__speaker{display:inline-block;background:#008aaf;border:1px solid #9eeaff;color:white;font-size:12px;letter-spacing:.16em;font-weight:900;padding:7px 20px;transform:skew(-8deg)}
+.lupi-reward-anime__speaker span{color:#ffdc61}
+.gh-world__reward-dialog.lupi-reward-anime h2{font-size:clamp(25px,3vw,36px);line-height:1.05;margin:16px 0 12px;color:#ffd447;text-transform:uppercase;text-shadow:2px 3px 0 #000}
+.gh-world__reward-dialog.lupi-reward-anime p{font-size:clamp(14px,1.4vw,17px);line-height:1.45;color:#e9faff;margin:0}
+.lupi-reward-anime__loot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.lupi-reward-anime__loot>span{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;padding:12px 6px;background:#0a3443c9;border:1px solid #278aa0;border-radius:8px}
+.lupi-reward-anime__loot i{font-style:normal;font-size:24px;color:#ffd348}
+.lupi-reward-anime__loot b{font-size:clamp(23px,3vw,31px);color:#ffdb57}
+.lupi-reward-anime__loot small{font-size:10px;letter-spacing:.1em;color:#c8eff4}
+.gh-world__reward-dialog.lupi-reward-anime .lupi-reward-anime__body>button{width:100%;border:0;border-radius:7px;padding:15px 12px;background:linear-gradient(100deg,#ffe37d,#ffb924);color:#121a20;font-weight:950;letter-spacing:.05em;cursor:pointer;box-shadow:0 6px 0 #9b620a}
+.gh-world__reward-dialog.lupi-reward-anime .lupi-reward-anime__body>button:disabled{opacity:.65;cursor:wait}
+.lupi-reward-anime__error{color:#ff9d9d!important;margin-bottom:10px!important}
+@keyframes lupiRewardMascot{from{opacity:0;transform:translateX(-22px) scale(.94)}to{opacity:1;transform:none}}
+@media(max-width:600px){.gh-world__reward-dialog.lupi-reward-anime{width:min(420px,calc(100vw - 20px));max-height:calc(100dvh - 16px);min-height:0;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end;padding:0}.lupi-reward-anime__chapter{top:13px;left:15px;font-size:9px}.lupi-reward-anime__mascot{align-self:center;height:clamp(140px,29dvh,250px);width:85%;object-fit:contain;margin-top:32px;margin-bottom:-10px}.lupi-reward-anime__body{padding:12px 15px 18px}.gh-world__reward-dialog.lupi-reward-anime h2{font-size:24px;margin:12px 0 8px}.gh-world__reward-dialog.lupi-reward-anime p{font-size:14px}.lupi-reward-anime__loot{margin:12px 0;gap:8px}.lupi-reward-anime__loot>span{padding:7px 4px}.lupi-reward-anime__loot i{font-size:18px}.lupi-reward-anime__loot b{font-size:24px}.gh-world__reward-dialog.lupi-reward-anime .lupi-reward-anime__body>button{padding:13px 8px}}
+@media(max-height:620px) and (max-width:600px){.lupi-reward-anime__mascot{height:110px}.lupi-reward-anime__body{padding:8px 14px 12px}.lupi-reward-anime__loot{margin:8px 0}.gh-world__reward-dialog.lupi-reward-anime h2{font-size:21px}}
+@media(prefers-reduced-motion:reduce){.lupi-reward-anime__mascot{animation:none}}
