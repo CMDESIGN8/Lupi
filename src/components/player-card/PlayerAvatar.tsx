@@ -1,3 +1,4 @@
+import { AvatarFace } from "../AvatarFace";
 // src/components/player-card/PlayerAvatar.tsx
 import type { InventoryItem } from "../../hooks/useAuraInventory";
 import type { LobbyPlayer } from "../../hooks/useLobbyPresence";
@@ -23,7 +24,7 @@ export function PlayerAvatar({ player, worn, bodySrc }: Props) {
             <img className="lw-avatar__base" src={bodySrc} alt="" draggable={false} />
           ) : (
             <>
-              <div className="lw-avatar__head" />
+              {player.appearance ? <div className="lw-avatar__head" style={{background:"transparent"}}><AvatarFace appearance={player.appearance} /></div> : <div className="lw-avatar__head" />}
               <div className="lw-avatar__torso" />
               <div className="lw-avatar__legs" />
             </>

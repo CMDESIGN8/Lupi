@@ -13,13 +13,21 @@ export function useAvatarAppearance(userId: string) {
    if (data?.appearance) setAppearance(sanitizeAppearance(data.appearance));
   }); return () => { alive = false; };
  }, [userId]);
+ useEffect(() => {
+  const onUpdated = (event: Event) => {
+   const detail = (event as CustomEvent<{userId:string;appearance:AvatarAppearance}>).detail;
+   if (detail?.userId === userId) setAppearance(sanitizeAppearance(detail.appearance));
+  };
+  window.addEventListener("lupi:avatar-appearance-updated", onUpdated);
+  return () => window.removeEventListener("lupi:avatar-appearance-updated", onUpdated);
+ }, [userId]);
  const save = useCallback(async (next: AvatarAppearance) => {
   if (!userId) return false;
   const clean = sanitizeAppearance(next); setSaving(true); setError(null);
   const {error} = await supabase.from("avatar_appearances").upsert({user_id:userId, appearance:clean}, {onConflict:"user_id"});
   setSaving(false);
   if (error) {setError(error.message); return false;}
-  setAppearance(clean); return true;
+  setAppearance(clean); window.dispatchEvent(new CustomEvent("lupi:avatar-appearance-updated", { detail: { userId, appearance: clean } })); return true;
  },[userId]);
  return {appearance, save, saving, error};
 }

@@ -1,3 +1,4 @@
+import { AvatarFace } from "../components/AvatarFace";
 import { AvatarEditor } from "../components/AvatarEditor";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
     // src/pages/GameHub.tsx
@@ -144,7 +145,7 @@ import { useAchievements } from "../hooks/useAchievements";
       }
     >
           <span className={`gh-world-avatar ${skinClass}`}>
-            {skin?.imageUrl ? (
+            {player.appearance ? <AvatarFace appearance={player.appearance} /> : skin?.imageUrl ? (
               <img
                 src={skin.imageUrl}
                 alt=""
@@ -265,7 +266,7 @@ import { useAchievements } from "../hooks/useAchievements";
             <div className="gh-world-profile__aura" />
 
             <div className="gh-world-profile__avatar">
-              {skin?.imageUrl ? (
+              {player.appearance ? <AvatarFace appearance={player.appearance} /> : skin?.imageUrl ? (
                 <img
                   src={skin.imageUrl}
                   alt=""

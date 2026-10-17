@@ -1,3 +1,5 @@
+import { AvatarFace } from "./AvatarFace";
+import type { AvatarAppearance } from "../lib/avatarAppearance";
 import { useMemo } from "react";
 import type { InventoryItem } from "../hooks/useAuraInventory";
 import "./Avatar2D.css";
@@ -6,6 +8,7 @@ type Avatar2DProps = {
   items: InventoryItem[];
   level?: number;
   compact?: boolean;
+  appearance?: AvatarAppearance;
 };
 
 type AvatarLayer = {
@@ -66,6 +69,7 @@ export function Avatar2D({
   items,
   level = 1,
   compact = false,
+  appearance,
 }: Avatar2DProps) {
   const equippedItems = useMemo(
     () => items.filter((item) => item.equipped),

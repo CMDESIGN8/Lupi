@@ -1,3 +1,4 @@
+import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { useEffect, useMemo, useState } from "react";
 import {
   useAuraInventory,
@@ -91,6 +92,7 @@ export function LockerPreview({
   onboardingEquipRequest = 0,
   onboardingActive = false,
 }: LockerPreviewProps) {
+  const { appearance } = useAvatarAppearance(userId);
   const {
     items,
     loading,
@@ -240,6 +242,7 @@ export function LockerPreview({
           <Avatar2D
             items={items}
             level={level}
+            appearance={appearance}
           />
         </div>
 
