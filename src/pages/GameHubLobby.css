@@ -3858,3 +3858,74 @@
     max-height: min(260px, 44dvh) !important;
   }
 }
+
+
+/* =============================================================
+   LUPI WORLD — MOBILE LAYOUT V4.6
+   Solo lobby mobile. No modifica portal de equipamiento ni editor.
+   ============================================================= */
+@media (max-width: 700px) {
+  /* Evitar el botón de personalización detrás de la tarjeta Lupi. */
+  .gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+    position: fixed !important;
+    top: calc(74px + env(safe-area-inset-top, 0px)) !important;
+    right: 12px !important;
+    left: auto !important;
+    bottom: auto !important;
+    width: min(170px, 43vw) !important;
+    height: 33px !important;
+    min-height: 33px !important;
+    margin: 0 !important;
+    padding: 6px 8px !important;
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+    z-index: 320 !important;
+    pointer-events: auto !important;
+    transform: none !important;
+  }
+  /* El avatar sube para ocupar el vacío entre misión y navegación. */
+  .gh-world .gh-locker-zone .avatar2d {
+    bottom: clamp(45px, 8dvh, 90px) !important;
+    transform: translateX(-50%) scale(clamp(.70, calc(100dvh / 1120px), .88)) !important;
+    transform-origin: center bottom !important;
+  }
+  /* Los slots acompañan al cuerpo; quedan fuera del área JUGAR/dock. */
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(1),
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
+    top: 23% !important;
+  }
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(2),
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
+    top: 43% !important;
+  }
+  /* La misión mantiene su espacio pero no tapa el CTA. */
+  .gh-world .gh-world__next {
+    left: 12px !important;
+    right: auto !important;
+    transform: none !important;
+    width: min(265px, calc(100vw - 132px)) !important;
+    max-width: min(265px, calc(100vw - 132px)) !important;
+    top: calc(120px + env(safe-area-inset-top, 0px)) !important;
+    max-height: min(150px, 19dvh) !important;
+  }
+  .gh-world .gh-world__next strong { font-size: clamp(11px, 3.1vw, 14px) !important; }
+  .gh-world .gh-world__next p { font-size: 10px !important; }
+  /* CTA accesible y fuera del dock. */
+  .gh-world .gh-world__play {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    width: min(225px, calc(100vw - 100px)) !important;
+    min-height: 44px !important;
+    z-index: 205 !important;
+  }
+  .gh-world .gh-world__discover {
+    bottom: calc(123px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+@media (max-width: 700px) and (max-height: 760px) {
+  .gh-world .gh-locker-zone .avatar2d {
+    bottom: 42px !important;
+    transform: translateX(-50%) scale(.66) !important;
+  }
+  .gh-world .gh-world__next { top: 115px !important; max-height: 110px !important; }
+  .gh-world .gh-world__next p { display: none !important; }
+}

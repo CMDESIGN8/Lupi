@@ -80,3 +80,47 @@
 .lw-editor__empty-state button{background:#0c7650;border:1px solid #49e7a0;border-radius:7px;color:white;padding:9px 12px;font-size:11px}
 @media(max-width:1050px){.lw-editor__center{--editor-avatar-scale:.84}}
 @media(max-width:740px){.lw-editor__center{--editor-avatar-scale:.74}.lw-editor__categories{grid-template-columns:repeat(5,minmax(0,1fr))}}
+
+/* V4.2 — Móvil: preview persistente y UNA sección editable a la vez. */
+.lw-editor__mobile-tabs{display:none}
+@media(max-width:740px){
+ .lw-editor--aaa{height:100dvh;max-height:100dvh;overflow:hidden}
+ .lw-editor__header{padding:10px 14px 8px}
+ .lw-editor__header h2{font-size:22px}
+ .lw-editor__mobile-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:7px 10px;flex:none;background:#061b16;border-bottom:1px solid #28503f}
+ .lw-editor__mobile-tabs button{font-size:10px;font-weight:900;letter-spacing:.02em;border:1px solid #2c624d;color:#c6ddce;background:#08271d;border-radius:6px;padding:10px 2px;min-width:0}
+ .lw-editor__mobile-tabs button.active{color:white;background:#0a8555;border-color:#56e9a2}
+ .lw-editor__layout{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(215px,38dvh) minmax(0,1fr);gap:7px;overflow:hidden;flex:1;min-height:0;padding:7px 10px 10px}
+ .lw-editor__center{grid-row:1;order:0;min-height:0;height:auto;padding:7px;overflow:hidden}
+ .lw-editor__arena{height:auto;min-height:0;flex:1}
+ .lw-editor__avatar-scaled{--editor-avatar-scale:.53;top:-6px}
+ .lw-editor__slot-rail{top:9%;left:2px;gap:4px}
+ .lw-editor__slot-rail button{width:43px;min-height:43px;padding:2px}
+ .lw-editor__slot-rail span{height:24px;font-size:16px}
+ .lw-editor__slot-rail img{max-height:24px;max-width:30px}
+ .lw-editor__slot-rail small{font-size:7px}
+ .lw-editor__arena-foot{font-size:9px;margin:3px 0 5px}
+ .lw-editor__save{padding:10px 6px;font-size:11px}
+ .lw-editor__identity,.lw-editor__wardrobe{grid-row:2;order:0;min-height:0;height:100%;overflow-y:auto;overscroll-behavior:contain;padding:12px}
+ .lw-editor__layout[data-mobile-tab="character"] .lw-editor__wardrobe{display:none}
+ .lw-editor__layout[data-mobile-tab="wardrobe"] .lw-editor__identity{display:none}
+ .lw-editor__items{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:740px) and (max-height:700px){
+ .lw-editor__layout{grid-template-rows:minmax(175px,33dvh) minmax(0,1fr)}
+ .lw-editor__avatar-scaled{--editor-avatar-scale:.41}
+ .lw-editor__header p{display:none}
+}
+
+/* V4.5: vista previa de mayor presencia sin recortar los pies. */
+@media (min-width:1051px) and (min-height:720px){
+ .lw-editor__center{--editor-avatar-scale:1.12}
+ .lw-editor__avatar-scaled{top:-5px}
+}
+@media (min-width:741px) and (max-width:1050px) and (min-height:720px){
+ .lw-editor__center{--editor-avatar-scale:.96}
+}
+@media (max-width:740px) and (min-height:750px){
+ .lw-editor__layout{grid-template-rows:minmax(235px,41dvh) minmax(0,1fr)}
+ .lw-editor__avatar-scaled{--editor-avatar-scale:.62;top:-8px}
+}

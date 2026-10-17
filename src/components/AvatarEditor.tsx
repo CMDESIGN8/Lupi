@@ -24,6 +24,7 @@ export function AvatarEditor({userId,onClose}:{userId:string;onClose:()=>void}) 
   const [draft,setDraft] = useState(appearance);
   const [done,setDone] = useState(false);
   const [previewMode,setPreviewMode] = useState<"full"|"face">("full");
+  const [mobileTab,setMobileTab] = useState<"character"|"wardrobe">("character");
   const [wardrobeTab,setWardrobeTab] = useState<WardrobeTab>("wardrobe");
   const [slot,setSlot] = useState<ItemSlot | "all">("all");
   const [rarity,setRarity] = useState<"all"|ItemRarity>("all");
@@ -45,7 +46,12 @@ export function AvatarEditor({userId,onClose}:{userId:string;onClose:()=>void}) 
           <div><small>✦ LUPI WORLD</small><h2>MI IDENTIDAD</h2><p>CREÁ TU ESTILO. JUGÁ TU HISTORIA.</p></div>
           <button type="button" onClick={onClose} aria-label="Cerrar editor">✕</button>
         </header>
-        <div className="lw-editor__layout">
+        <nav className="lw-editor__mobile-tabs" aria-label="Secciones del editor">
+          <button type="button" className={mobileTab==="character"?"active":""} onClick={()=>setMobileTab("character")}>✦ PERSONAJE</button>
+          <button type="button" className={mobileTab==="wardrobe"?"active":""} onClick={()=>{setMobileTab("wardrobe");setWardrobeTab("wardrobe");}}>▣ ARMARIO</button>
+          <button type="button" className={mobileTab==="wardrobe"&&wardrobeTab==="inventory"?"active":""} onClick={()=>{setMobileTab("wardrobe");setWardrobeTab("inventory");}}>◈ INVENTARIO</button>
+        </nav>
+        <div className="lw-editor__layout" data-mobile-tab={mobileTab}>
           <aside className="lw-editor__panel lw-editor__identity">
             <div className="lw-editor__section-heading">PERSONALIZACIÓN</div>
             <div className="lw-editor__mode">
@@ -75,7 +81,7 @@ export function AvatarEditor({userId,onClose}:{userId:string;onClose:()=>void}) 
               <div className="lw-editor__floor"/>
               <div className="lw-editor__slot-rail">{SLOTS.map(s=>{
                 const item=equipped.find(i=>i.slot===s.key);
-                return <button type="button" key={s.key} className={slot===s.key?"active":""} onClick={()=>{setSlot(s.key);setWardrobeTab("wardrobe");}} title={s.label}>
+                return <button type="button" key={s.key} className={slot===s.key?"active":""} onClick={()=>{setSlot(s.key);setWardrobeTab("wardrobe");setMobileTab("wardrobe");}} title={s.label}>
                   <span>{item?.imageUrl?<img src={item.imageUrl} alt=""/>:s.icon}</span><small>{s.label}</small>
                 </button>;
               })}</div>

@@ -1,0 +1,1 @@
+V4.4: Instalar los dos archivos de src/components y la máscara PNG en public/images. Conservá tu avatar-base.png original. Tinte limitado a manos y piernas visibles de la imagen original. Los brazos cubiertos por mangas NO se tiñen. Los pantalones y botines equipados siguen encima. No se modificó Supabase ni LockerPreview. Probar npm run build y revisar las distintas prendas.

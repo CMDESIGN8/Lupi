@@ -330,3 +330,24 @@
  transform-origin:center center;z-index:var(--item-z,22);
 }
 .avatar2d__custom-head{width:var(--rig-head-width,59px);height:var(--rig-head-height,79px);top:var(--rig-head-y,112px)}
+
+/* V4.2: tintes de extremidades debajo de las prendas equipadas.
+   Calibración inicial para avatar-base.png de 490×500; revisar con cada skin. */
+.avatar2d__skin-limbs{position:absolute;inset:0;z-index:8;pointer-events:none;isolation:isolate}
+.avatar2d__skin-limb{position:absolute;display:block;background:linear-gradient(90deg,rgba(10,8,8,.22),transparent 28%,rgba(255,255,255,.08) 57%,rgba(0,0,0,.26)),var(--rig-skin);mix-blend-mode:color;opacity:.92;filter:blur(.6px)}
+.avatar2d__skin-limb--arm-left{left:33.5%;top:32%;width:6%;height:32%;clip-path:polygon(30% 0,83% 0,100% 42%,78% 96%,53% 100%,14% 93%,0 45%)}
+.avatar2d__skin-limb--arm-right{right:33.5%;top:32%;width:6%;height:32%;clip-path:polygon(17% 0,70% 0,100% 45%,86% 93%,47% 100%,22% 96%,0 42%)}
+.avatar2d__skin-limb--leg-left{left:42%;top:61%;width:7.5%;height:30%;clip-path:polygon(0 0,95% 0,90% 100%,30% 100%)}
+.avatar2d__skin-limb--leg-right{right:42%;top:61%;width:7.5%;height:30%;clip-path:polygon(5% 0,100% 0,70% 100%,10% 100%)}
+
+
+
+/* V4.5: las imágenes base precalculadas mantienen las sombras originales.
+   No se utiliza mix-blend-mode ni máscara CSS: evita diferencias entre navegadores. */
+
+/* V4.7 — Manga corta: recortar ambos antebrazos del PNG base.
+   La imagen base ya incluye el tono de piel elegido y sombras naturales. */
+.avatar2d__short-sleeve-arms { position:absolute; inset:0; z-index:23; pointer-events:none; }
+.avatar2d__forearms-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; pointer-events:none; user-select:none; }
+.avatar2d__forearms-image--left { clip-path:polygon(32.5% 43%,39% 43%,40% 62%,34% 65%); }
+.avatar2d__forearms-image--right { clip-path:polygon(61% 43%,67.5% 43%,66% 65%,60% 62%); }

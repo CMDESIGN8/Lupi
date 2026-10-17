@@ -61,6 +61,16 @@ function hexToRgba(hex: string, alpha: number) {
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
+
+/** Las mangas se determinan por la prenda equipada, no por el color de piel. */
+function isShortSleeveTop(item: InventoryItem | null): boolean {
+  if (!item) return false;
+  const label = String(item.name ?? "").toLowerCase();
+  // GRIND TEE utiliza una campera/hoodie de manga larga en este inventario.
+  if (/hoodie|campera|jacket|sweatshirt|buzo|long sleeve|manga larga|grind\s*tee/.test(label)) return false;
+  return /farm\s*tee|remera|camiseta|t-shirt|tshirt|short sleeve|manga corta|\btee\b/.test(label);
+}
+
 export function Avatar2D({
   items,
   level = 1,
@@ -95,6 +105,11 @@ export function Avatar2D({
 
   const accessoryItem =
     layers.find((x) => x.slot === "accessory")?.item ?? null;
+
+  const shortSleeves = isShortSleeveTop(topItem);
+  const baseImage = appearance
+    ? `/images/avatar-skin-${appearance.skin.replace("#", "").toLowerCase()}.png`
+    : "/images/avatar-base.png";
 
   const avatarColor =
     topItem?.color ??
@@ -139,7 +154,7 @@ export function Avatar2D({
             BASE CHARACTER (PNG REAL)
         ========================= */}
         <img
-          src="/images/avatar-base.png"
+          src={baseImage}
           alt="Avatar Base"
           className="avatar2d__base-image"
           draggable={false}
@@ -162,6 +177,15 @@ export function Avatar2D({
               item={topItem}
               className="avatar2d__image"
             />
+          </div>
+        )}
+
+        {/* Manga corta: restaurar los antebrazos originales del PNG base
+            por encima de la remera. No crea rectángulos ni cambia el tono. */}
+        {shortSleeves && (
+          <div className="avatar2d__short-sleeve-arms" aria-hidden="true">
+            <img src={baseImage} className="avatar2d__forearms-image avatar2d__forearms-image--left" alt="" draggable={false} />
+            <img src={baseImage} className="avatar2d__forearms-image avatar2d__forearms-image--right" alt="" draggable={false} />
           </div>
         )}
 
