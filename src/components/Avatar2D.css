@@ -345,9 +345,4 @@
 /* V4.5: las imágenes base precalculadas mantienen las sombras originales.
    No se utiliza mix-blend-mode ni máscara CSS: evita diferencias entre navegadores. */
 
-/* V4.7 — Manga corta: recortar ambos antebrazos del PNG base.
-   La imagen base ya incluye el tono de piel elegido y sombras naturales. */
-.avatar2d__short-sleeve-arms { position:absolute; inset:0; z-index:23; pointer-events:none; }
-.avatar2d__forearms-image { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; pointer-events:none; user-select:none; }
-.avatar2d__forearms-image--left { clip-path:polygon(32.5% 43%,39% 43%,40% 62%,34% 65%); }
-.avatar2d__forearms-image--right { clip-path:polygon(61% 43%,67.5% 43%,66% 65%,60% 62%); }
+/* V4.8: mangas cortas integradas en la imagen base; no se superponen brazos. */
