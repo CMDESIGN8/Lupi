@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
 import type { ItemSlot } from "./useAuraInventory";
+import { sanitizeAppearance, type AvatarAppearance } from "../lib/avatarAppearance";
 
 /** slot -> id del item que tiene puesto. Solo ids: la imagen la resuelve cada cliente con su catálogo. */
 export type LobbyLook = Partial<Record<ItemSlot, string>>;
@@ -16,6 +17,7 @@ export type LobbyPlayer = {
   club: string | null;
   level: number;
   look: LobbyLook;
+  appearance?: AvatarAppearance;
   activity: LobbyActivity;
   joinedAt: number;
 };
@@ -56,6 +58,7 @@ function sanitize(raw: any): LobbyPlayer | null {
     club: typeof raw.club === "string" ? raw.club.slice(0, 40) : null,
     level: Number.isFinite(level) ? Math.min(Math.max(Math.trunc(level), 1), 999) : 1,
     look,
+    appearance: raw.appearance ? sanitizeAppearance(raw.appearance) : undefined,
     activity: raw.activity === "in-match" ? "in-match" : "lobby",
     joinedAt: Number(raw.joinedAt) || 0,
   };
@@ -84,6 +87,7 @@ export function useLobbyPresence({ room, me, activity = "lobby", enabled = true 
     me.club,
     me.level,
     me.look,
+    me.appearance,
     effectiveActivity,
   ]);
 

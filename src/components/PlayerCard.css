@@ -1,838 +1,1236 @@
-/* src/components/PlayerCard.css */
-.pc-backdrop {
+/* src/components/player-card/player-card.css
+   Perfil de jugador · Lupi World.
+   Reemplaza las capas V2–V5 del PlayerCard.css anterior: un solo bloque por sección,
+   sin !important y sin selectores duplicados. Botones, toasts y modal de desafío
+   siguen en challenge-toasts.css.
+
+   Lo memorable: el dorsal gigante y el personaje que rompe el marco del escenario.
+   El resto es deliberadamente quieto. */
+
+/* ---------- Capa y contenedor ---------- */
+
+.lw-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 80;
-  display: grid;
-  place-items: center;
-  padding: 16px;
-  background: rgba(2, 10, 8, 0.66);
-  backdrop-filter: blur(4px);
-  animation: pc-fade .18s ease-out both;
+  z-index: 4500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  /* El encabezado fijo del juego ocupa ~80px: el perfil se centra por debajo. */
+  padding: calc(80px + env(safe-area-inset-top, 0px)) 16px 16px;
+  background: rgba(1, 8, 9, 0.82);
+  backdrop-filter: blur(9px) saturate(0.8);
+  animation: lw-fade 0.18s ease-out both;
 }
 
-.pc {
-  --pc-text: #eaf6ee;
-  --pc-muted: #86aa9b;
+.lw-card {
+  --lw-text: #eaf6ee;
+  --lw-muted: #8fb3a3;
+  --lw-line: rgba(120, 210, 165, 0.16);
+  --lw-accent: #24e987;
+  --lw-gold: #ffc83d;
+  --lw-ink: #04110f;
+  --lw-rarity: #9aa4a0; /* lo pisa el componente según la prenda más rara */
+
   position: relative;
-  width: min(340px, 100%);
-  max-height: calc(100vh - 32px);
-  overflow-y: auto;
-  box-sizing: border-box;
-  padding: 26px 22px 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  color: var(--pc-text);
-  text-align: center;
-  border: 1px solid rgba(93, 184, 147, 0.25);
-  border-radius: 22px 6px 22px 6px;
+  gap: 10px;
+  width: min(480px, 100%);
+  max-height: min(800px, calc(100dvh - 96px - env(safe-area-inset-top, 0px)));
+  box-sizing: border-box;
+  padding: 12px 16px 14px;
+  color: var(--lw-text);
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 60%, #2a5a47);
+  border-radius: 20px 5px 20px 5px;
   background:
-    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--pc-rarity, #9aa4a0) 22%, transparent), transparent 55%),
-    linear-gradient(180deg, rgba(14, 51, 42, 0.97), rgba(5, 19, 16, 0.98));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 24px 60px rgba(0, 0, 0, .5);
-  animation: pc-pop .22s cubic-bezier(.2, 1.3, .4, 1) both;
+    radial-gradient(120% 55% at 50% 0%, color-mix(in srgb, var(--lw-rarity) 22%, transparent), transparent 62%),
+    linear-gradient(160deg, #18332b 0%, #071714 58%, #04100f 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 0 48px color-mix(in srgb, var(--lw-rarity) 16%, transparent),
+    0 28px 80px rgba(0, 0, 0, 0.72);
+  animation: lw-card-in 0.26s cubic-bezier(0.2, 1.2, 0.4, 1) both;
 }
 
-.pc-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
-  border: 0;
-  border-radius: 50%;
-  cursor: pointer;
-  color: var(--pc-muted);
-  background: rgba(255, 255, 255, .06);
-  font-size: 13px;
+.lw-card :focus-visible {
+  outline: 2px solid var(--lw-accent);
+  outline-offset: 2px;
 }
-.pc-close:hover { color: var(--pc-text); background: rgba(255, 255, 255, .12); }
 
-.pc-avatar {
-  position: relative;
-  width: 104px;
-  height: 104px;
+/* ---------- Barra superior ---------- */
+
+.lw-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  color: #9ed9c1;
+  font: 800 10px/1.3 "Barlow", sans-serif;
+  letter-spacing: 0.16em;
+}
+
+.lw-top__tag {
+  margin-left: auto;
+  color: var(--lw-rarity);
+}
+
+.lw-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  border-radius: 50%;
-  font-size: 48px;
-  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--pc-color, #00ff88) 42%, #0b2a24), #07201b 75%);
-  box-shadow:
-    inset 0 0 0 3px var(--pc-rarity, #9aa4a0),
-    0 0 28px color-mix(in srgb, var(--pc-rarity, #9aa4a0) 45%, transparent);
+  padding: 0;
+  color: var(--lw-text);
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--lw-line);
+  border-radius: 9px 3px 9px 3px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.15s;
 }
-.pc-avatar img { width: 76%; height: 76%; object-fit: contain; }
 
-.pc-level {
+.lw-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---------- Hero: escenario + personaje ---------- */
+
+.lw-hero {
+  --lw-hero-h: 288px;
+  --lw-avatar-s: 1.34;
+  --lw-dorsal-size: 170px;
+  --lw-px: 0;
+  --lw-py: 0;
+
+  position: relative;
+  flex: none;
+  height: var(--lw-hero-h);
+  transition: height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* El escenario deja 18px arriba: ahí asoma la cabeza del personaje. */
+.lw-hero__stage {
   position: absolute;
-  right: -4px;
-  bottom: -2px;
-  min-width: 30px;
-  height: 30px;
-  padding: 0 7px;
+  inset: 18px 0 0;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 45%, #1c3f33);
+  border-radius: 16px 4px 16px 4px;
+  background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--lw-rarity) 20%, #132d27), #071916 70%);
+}
+
+/* Viñeta para asentar los bordes. */
+.lw-hero__stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(5, 20, 17, 0.55), transparent 30%, transparent 72%, rgba(6, 22, 19, 0.7));
+}
+
+/* Brillo que cruza una vez al abrir, solo en rarezas altas. */
+.lw-hero__stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(105deg, transparent 36%, rgba(255, 255, 255, 0.28) 48%, rgba(255, 255, 255, 0.06) 54%, transparent 62%);
+  background-size: 260% 100%;
+}
+
+.lw-card[data-rarity="epic"] .lw-hero__stage::before,
+.lw-card[data-rarity="legendary"] .lw-hero__stage::before {
+  animation: lw-sheen 1.5s 0.55s ease-out both;
+}
+
+/* Reflectores (luces que se mueven despacio). */
+.lw-hero__beams {
+  position: absolute;
+  inset: -50% -30%;
+  z-index: 0;
+  background: conic-gradient(
+    from 180deg at 50% 0%,
+    transparent 0deg,
+    rgba(232, 255, 240, 0.09) 16deg,
+    transparent 32deg,
+    transparent 52deg,
+    rgba(232, 255, 240, 0.08) 69deg,
+    transparent 84deg
+  );
+  animation: lw-beams 9s ease-in-out infinite alternate;
+}
+
+/* Cancha en perspectiva: círculo central, línea de medio y guías. */
+.lw-hero__court {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: 0;
+  z-index: 1;
+  height: 60%;
+  transform: perspective(420px) rotateX(64deg);
+  transform-origin: 50% 100%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 38px, rgba(255, 255, 255, 0.24) 39px 41px, transparent 42px),
+    linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.24)) 50% 50% / 100% 2px no-repeat,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 36px 100%,
+    linear-gradient(180deg, #0e2b22, #061511);
+  -webkit-mask-image: linear-gradient(to top, #000 40%, transparent);
+  mask-image: linear-gradient(to top, #000 40%, transparent);
+  translate: calc(var(--lw-px) * -4px) 0;
+  transition: translate 0.15s ease-out;
+}
+
+/* El dorsal: número gigante en contorno detrás del personaje. */
+.lw-hero__dorsal {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: center;
+  font: italic 900 var(--lw-dorsal-size) / 1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.02em;
+  color: transparent;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lw-rarity) 30%, transparent), transparent 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 2px color-mix(in srgb, var(--lw-rarity) 55%, transparent);
+  user-select: none;
+  translate: calc(var(--lw-px) * -9px) calc(var(--lw-py) * -4px);
+  transition: translate 0.15s ease-out, font-size 0.35s;
+  animation: lw-dorsal-in 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.lw-hero__halo {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  z-index: 3;
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 55%, transparent);
+  box-shadow:
+    0 0 38px color-mix(in srgb, var(--lw-rarity) 22%, transparent),
+    inset 0 0 45px color-mix(in srgb, var(--lw-rarity) 10%, transparent);
+}
+
+.lw-hero__floor {
+  position: absolute;
+  bottom: 14px;
+  left: 23%;
+  z-index: 3;
+  width: 54%;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid var(--lw-rarity);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--lw-rarity) 65%, transparent);
+}
+
+/* ---------- Personaje ---------- */
+
+/* Caja de diseño 135×190. El hero la escala con --lw-avatar-s. */
+.lw-avatar {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 4;
+  width: 135px;
+  height: 190px;
+  margin-left: -67.5px;
+  transform: scale(var(--lw-avatar-s));
+  transform-origin: 50% 0;
+  translate: calc(var(--lw-px) * 6px) calc(var(--lw-py) * 2px);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), translate 0.15s ease-out;
+  filter: drop-shadow(0 4px 13px rgba(0, 0, 0, 0.6));
+}
+
+.lw-avatar__rise {
+  position: absolute;
+  inset: 0;
+  animation: lw-rise 0.5s 0.12s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.lw-avatar__body {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+  animation: lw-breathe 3.8s 0.7s ease-in-out infinite;
+}
+
+.lw-avatar__base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.lw-avatar__head {
+  position: absolute;
+  left: 51px;
+  top: 4px;
+  width: 33px;
+  height: 37px;
+  border-radius: 43% 43% 46% 46%;
+  background: linear-gradient(115deg, #946b54, #d6aa88 52%, #73503e);
+  box-shadow: inset 0 7px 0 #292722;
+}
+
+.lw-avatar__torso {
+  position: absolute;
+  left: 28px;
+  top: 39px;
+  width: 79px;
+  height: 86px;
+  border-radius: 23px 23px 11px 11px;
+  background: linear-gradient(90deg, #162b2b, #425c59 50%, #142b2b);
+  box-shadow: -24px 10px 0 -15px #344a46, 24px 10px 0 -15px #344a46;
+}
+
+.lw-avatar__legs {
+  position: absolute;
+  left: 41px;
+  top: 120px;
+  width: 54px;
+  height: 61px;
+  border-radius: 0 0 7px 7px;
+  background: linear-gradient(90deg, #6d897f 0 40%, transparent 40% 60%, #6d897f 60%);
+}
+
+.lw-avatar__wear {
+  position: absolute;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.lw-avatar__wear--top {
+  width: 112px;
+  height: 106px;
+  left: 11px;
+  top: 35px;
+  z-index: 2;
+}
+
+.lw-avatar__wear--bottom {
+  width: 79px;
+  height: 72px;
+  left: 28px;
+  top: 107px;
+  z-index: 2;
+}
+
+/* Imagen oficial del par AURA XP: sin deformarla. */
+.lw-avatar__wear--boots {
+  width: 132px;
+  height: 48px;
+  left: 1px;
+  top: 151px;
+  z-index: 3;
+  object-position: center bottom;
+}
+
+/* ---------- Insignias sobre el hero ---------- */
+
+.lw-ovr {
+  position: absolute;
+  top: 32px;
+  left: 12px;
+  z-index: 5;
+  box-sizing: border-box;
+  width: 56px;
+  padding: 7px 0 13px;
+  text-align: center;
+  color: var(--lw-ink);
+  background: linear-gradient(
+    170deg,
+    color-mix(in srgb, var(--lw-rarity) 88%, #fff),
+    color-mix(in srgb, var(--lw-rarity) 60%, #000)
+  );
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+  animation: lw-pop 0.45s 0.3s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+.lw-ovr strong {
+  display: block;
+  font: italic 900 30px / 1 "Barlow Condensed", sans-serif;
+}
+
+.lw-ovr span {
+  display: block;
+  margin-top: 1px;
+  font: 800 9px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.14em;
+}
+
+.lw-pos {
+  position: absolute;
+  top: 106px;
+  left: 12px;
+  z-index: 5;
+  box-sizing: border-box;
+  width: 56px;
+  padding: 4px 0;
+  text-align: center;
+  color: #e9fff2;
+  font: 900 12px / 1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.1em;
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 60%, transparent);
+  border-radius: 5px 1px 5px 1px;
+  background: rgba(4, 17, 15, 0.7);
+}
+
+.lw-crest {
+  position: absolute;
+  top: 32px;
+  right: 12px;
+  z-index: 5;
+  min-width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  color: #d6efe1;
+  font: italic 900 15px / 1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.04em;
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 70%, transparent);
   border-radius: 999px;
-  background: #ffc83d;
-  color: #3a2500;
-  font: italic 800 17px/30px "Barlow Condensed", sans-serif;
+  background: rgba(4, 17, 15, 0.65);
 }
 
-.pc-name {
-  margin: 8px 0 0;
-  font: italic 800 26px/1 "Barlow Condensed", sans-serif;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-  max-width: 100%;
+.lw-hero__rarity {
+  position: absolute;
+  right: 13px;
+  bottom: 12px;
+  z-index: 5;
+  color: var(--lw-rarity);
+  font: 900 10px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 12px #000;
+}
+
+/* Hero reducido (pestaña Desafiar y reporte): el contenido manda.
+   Sus medidas se declaran al final del archivo, después de los media queries. */
+.lw-hero[data-compact="true"] .lw-pos,
+.lw-hero[data-compact="true"] .lw-hero__rarity,
+.lw-hero[data-compact="true"] .lw-hero__halo {
+  display: none;
+}
+
+.lw-hero[data-compact="true"] .lw-hero__floor {
+  bottom: 8px;
+}
+
+/* ---------- Identidad ---------- */
+
+.lw-identity {
+  flex: none;
+  display: grid;
+  gap: 3px;
+  animation: lw-fade 0.3s 0.3s ease-out both;
+}
+
+.lw-identity__name {
+  margin: 0;
+  font: italic 900 clamp(30px, 7vw, 40px) / 1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.05em;
+  color: #f5fff6;
   overflow-wrap: anywhere;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
 }
-.pc-club { margin: 0; color: var(--pc-muted); font: 600 12px "Barlow", sans-serif; }
 
-.pc-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 6px 0 4px; }
-.pc-tag {
+.lw-identity__club {
+  margin: 0 0 3px;
+  color: #b7d1c1;
+  font: 600 12px / 1.3 "Barlow", sans-serif;
+}
+
+.lw-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.lw-chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 9px;
-  border: 1px solid rgba(255, 255, 255, .1);
+  padding: 4px 10px;
+  color: #c3f5d8;
+  font: 700 10px / 1 "Barlow", sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
-  color: var(--pc-muted);
-  background: rgba(0, 0, 0, .18);
-  font: 700 10px/1 "Barlow", sans-serif;
-  letter-spacing: .04em;
-}
-.pc-tag i { width: 7px; height: 7px; border-radius: 50%; background: #7a8f87; }
-.pc-tag--lobby { color: #bfffd9; }
-.pc-tag--lobby i { background: #2bd67b; box-shadow: 0 0 8px rgba(43, 214, 123, .6); }
-.pc-tag--in-match { color: #ffe29a; }
-.pc-tag--in-match i { background: #ffc83d; }
-.pc-tag--rarity { color: var(--pc-rarity); border-color: color-mix(in srgb, var(--pc-rarity) 40%, transparent); }
-
-.pc-actions, .pc-report { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-
-.pc-btn {
-  width: 100%;
-  min-height: 40px;
-  padding: 0 14px;
-  border: 1px solid rgba(143, 184, 167, .22);
-  border-radius: 10px 3px 10px 3px;
-  cursor: pointer;
-  color: var(--pc-text, #eaf6ee);
-  background: rgba(255, 255, 255, .05);
-  font: 800 12px/1 "Barlow", sans-serif;
-  letter-spacing: .05em;
-  text-transform: uppercase;
-  transition:
-  filter .16s ease,
-  background .16s ease,
-  opacity .16s ease;
-}
-.pc-btn:hover:not(:disabled) { background: rgba(255, 255, 255, .1); }
-.pc-btn:disabled { opacity: .4; cursor: not-allowed; }
-.pc-btn:focus-visible, .pc-close:focus-visible { outline: 2px solid #2bd67b; outline-offset: 2px; }
-
-.pc-btn--primary {
-  border-color: transparent;
-  color: #07150f;
-  background: linear-gradient(135deg, #51e892, #1ebf69);
-}
-.pc-btn--primary:hover:not(:disabled) { background: linear-gradient(135deg, #51e892, #1ebf69); filter: brightness(1.08); }
-.pc-btn--danger { color: #ffb4a7; border-color: rgba(255, 120, 100, .25); }
-.pc-btn--ghost { background: transparent; color: var(--pc-muted, #86aa9b); }
-
-.pc-report__title, .pc-report__msg { margin: 0; font: 600 13px/1.35 "Barlow", sans-serif; }
-.pc-report__msg--error { color: #ffb4a7; font-size: 11px; }
-
-/* Avisos de desafío */
-.pc-toasts {
-  position: fixed;
-  left: 50%;
-  bottom: 18px;
-  z-index: 90;
-  transform: translateX(-50%);
-  width: min(340px, calc(100vw - 24px));
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.pc-toast {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid rgba(93, 184, 147, .3);
-  border-radius: 14px 4px 14px 4px;
-  color: #eaf6ee;
-  background: linear-gradient(180deg, rgba(14, 51, 42, .97), rgba(5, 19, 16, .98));
-  box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
-  font: 600 13px/1.3 "Barlow", sans-serif;
-  animation: pc-pop .22s cubic-bezier(.2, 1.3, .4, 1) both;
-}
-.pc-toast strong { font: italic 800 17px/1.1 "Barlow Condensed", sans-serif; letter-spacing: .04em; text-transform: uppercase; }
-.pc-toast--incoming { border-color: rgba(255, 200, 61, .5); }
-.pc-toast--info { color: #86aa9b; }
-.pc-toast__row { display: flex; gap: 8px; }
-
-@keyframes pc-fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pc-pop {
-  from { opacity: 0; transform: translateY(10px) scale(.94); }
-  to { opacity: 1; transform: none; }
-}
-.pc-toasts .pc-toast { transform-origin: bottom center; }
-
-@media (prefers-reduced-motion: reduce) {
-  .pc-backdrop, .pc, .pc-toast { animation: none; }
 }
 
-.pc-toasts--top { top: 18px; bottom: auto; }
-
-/* =========================================================
-   TOASTS DE DESAFÍO — MÓVIL
-   ========================================================= */
-
-@media (max-width: 700px) {
-  .pc-toasts {
-    position: fixed !important;
-
-    left: 12px !important;
-    right: 12px !important;
-    bottom: 128px !important;
-    top: auto !important;
-
-    width: auto !important;
-    max-width: none !important;
-
-    transform: none !important;
-
-    z-index: 150 !important;
-  }
-
-  .pc-toast {
-    width: 100%;
-    padding: 10px 12px;
-  }
-
-  .pc-toast strong {
-    font-size: 15px;
-  }
-
-  .pc-toast__row .pc-btn {
-    flex: 1;
-  }
+.lw-chip i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7a8f87;
 }
 
-.pc-toast--daily {
-  display: flex;
+.lw-chip[data-activity="lobby"] i {
+  background: #28dd84;
+  box-shadow: 0 0 8px #28dd84;
+}
+
+.lw-chip[data-activity="in-match"] {
+  color: #ffe29a;
+}
+
+.lw-chip[data-activity="in-match"] i {
+  background: #f7c34b;
+  box-shadow: 0 0 8px #f7c34b;
+}
+
+.lw-chip--streak {
+  color: #ffd78a;
+  border-color: rgba(255, 200, 61, 0.35);
+  background: rgba(255, 200, 61, 0.08);
+}
+
+/* Forma: G ganó, E empató, P perdió. La letra evita depender solo del color. */
+.lw-form {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  border: 1px solid rgba(255, 204, 0, 0.55);
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255, 204, 0, 0.16),
-      rgba(20, 20, 28, 0.96)
-    );
-  box-shadow:
-    0 0 25px rgba(255, 204, 0, 0.15),
-    0 12px 35px rgba(0, 0, 0, 0.35);
+  gap: 3px;
+  margin-left: auto;
 }
 
-.pc-toast__daily-icon {
-  width: 42px;
-  height: 42px;
+.lw-form__label {
+  margin-right: 4px;
+  color: var(--lw-muted);
+  font: 700 10px / 1 "Barlow", sans-serif;
+}
+
+.lw-form b {
+  width: 18px;
+  height: 18px;
   display: grid;
   place-items: center;
-  flex: 0 0 auto;
-  font-size: 24px;
-  border-radius: 12px;
-  background: rgba(255, 204, 0, 0.12);
+  color: var(--lw-ink);
+  font: 900 11px / 1 "Barlow Condensed", sans-serif;
+  border-radius: 4px 1px 4px 1px;
 }
 
-.pc-toast__daily-content {
+.lw-form b[data-r="G"] {
+  background: #28dd84;
+}
+
+.lw-form b[data-r="E"] {
+  background: #d8c46a;
+}
+
+.lw-form b[data-r="P"] {
+  background: #e0715f;
+}
+
+/* ---------- Barra de XP ---------- */
+
+.lw-xp {
+  flex: none;
+  display: grid;
+  gap: 5px;
+  animation: lw-fade 0.3s 0.38s ease-out both;
+}
+
+.lw-xp__row {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  justify-content: space-between;
+  color: #d9f5e7;
+  font: 800 11px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.06em;
 }
 
-.pc-toast__daily-content strong {
-  font-size: 11px;
-  letter-spacing: 0.12em;
-}
-
-.pc-toast__daily-content span {
-  font-size: 15px;
+.lw-xp__row span:last-child {
+  color: var(--lw-muted);
   font-weight: 700;
 }
 
-.pc-toast__daily-content small {
-  font-size: 11px;
-  opacity: 0.7;
-}
-/* =========================================================
-   LUPI WORLD — CHALLENGE UI
-   Invitaciones centradas / responsive
-========================================================= */
-
-/* Invitación recibida */
-.pc-toasts--challenge {
-  position: fixed !important;
-
-  top: 50% !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: auto !important;
-
-  width: min(380px, calc(100vw - 32px)) !important;
-  max-width: 380px !important;
-
-  transform: translate(-50%, -50%) !important;
-
-  z-index: 1000 !important;
+.lw-xp__track {
+  height: 8px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  /* Segmentos: 10 tramos separados por 3px. */
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 calc(10% - 3px), transparent calc(10% - 3px) 10%);
+  mask: repeating-linear-gradient(90deg, #000 0 calc(10% - 3px), transparent calc(10% - 3px) 10%);
 }
 
-/* Tarjeta de desafío */
-.pc-toasts--challenge .pc-toast--incoming {
+.lw-xp__fill {
+  width: calc(var(--lw-xp) * 100%);
+  height: 100%;
+  background: linear-gradient(90deg, var(--lw-accent), #8cffc2);
+  box-shadow: 0 0 12px rgba(36, 233, 135, 0.6);
+  transform-origin: left;
+  animation: lw-fill 0.9s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ---------- Pestañas ---------- */
+
+.lw-tabs {
+  flex: none;
+  display: flex;
+  gap: 6px;
+}
+
+.lw-tab {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 4px;
+  color: #accbb9;
+  font: 800 10px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border: 1px solid #2b5847;
+  border-radius: 6px 2px 6px 2px;
+  background: #071d17;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.lw-tab:hover {
+  color: #fff;
+  border-color: #3f7c63;
+}
+
+.lw-tab[aria-selected="true"] {
+  color: #f6fff7;
+  border-color: #60c991;
+  background: #235d42;
+  box-shadow: inset 0 -2px 0 var(--lw-accent);
+}
+
+/* ---------- Panel (única zona con scroll) ---------- */
+
+.lw-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 2px 2px 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #3f7c63 transparent;
+  animation: lw-panel-in 0.22s ease-out both;
+}
+
+.lw-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lw-panel::-webkit-scrollbar-button {
+  display: none;
+}
+
+.lw-panel::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: #3f7c63;
+}
+
+.lw-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.lw-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  color: #d9f5e7;
+  font: 800 12px / 1.2 "Barlow", sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.lw-heading span {
+  color: #e7c56e;
+  font-weight: 700;
+}
+
+.lw-note {
+  margin: 0;
+  color: #9cbdac;
+  font: 500 11px / 1.4 "Barlow", sans-serif;
+}
+
+.lw-note--status {
+  color: #ffe29a;
+}
+
+/* ---------- Pestaña Perfil ---------- */
+
+.lw-attrs {
+  display: grid;
+  grid-template-columns: minmax(0, 176px) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px 8px 4px;
+  border: 1px solid var(--lw-line);
+  border-radius: 12px;
+  background: rgba(4, 18, 15, 0.6);
+}
+
+.lw-radar {
+  display: block;
   width: 100%;
-  box-sizing: border-box;
-
-  padding: 22px 20px;
-
-  gap: 18px;
-
-  border: 1px solid rgba(255, 193, 45, 0.65);
-  border-radius: 16px;
-
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(255, 193, 45, 0.12),
-      transparent 65%
-    ),
-    linear-gradient(
-      180deg,
-      #10231d 0%,
-      #071410 100%
-    );
-
-  box-shadow:
-    0 0 35px rgba(255, 193, 45, 0.12),
-    0 24px 70px rgba(0, 0, 0, 0.8);
-
-  text-align: center;
+  height: auto;
+  overflow: visible;
 }
 
-/* Título */
-.pc-toasts--challenge .pc-toast--incoming strong {
-  font-family: "Barlow Condensed", sans-serif;
-  font-size: 23px;
-  font-weight: 900;
-  font-style: italic;
+.lw-radar__ring {
+  fill: none;
+  stroke: rgba(127, 211, 169, 0.2);
+  stroke-width: 1;
+}
 
+.lw-radar__axis {
+  stroke: rgba(127, 211, 169, 0.12);
+  stroke-width: 1;
+}
+
+.lw-radar__shape {
+  fill: color-mix(in srgb, var(--lw-rarity) 28%, transparent);
+  stroke: var(--lw-rarity);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transform-origin: 100px 100px;
+  animation: lw-radar-in 0.7s 0.4s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+
+.lw-radar__dot {
+  fill: var(--lw-rarity);
+}
+
+.lw-radar__code {
+  fill: #9ed9c1;
+  font: 800 8.5px "Barlow", sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.lw-radar__val {
+  fill: #f6e8bb;
+  font: italic 900 12px "Barlow Condensed", sans-serif;
+}
+
+.lw-attr-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lw-attr {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 3px 8px;
+  font: 700 11px / 1.1 "Barlow", sans-serif;
+}
+
+.lw-attr small {
+  color: var(--lw-muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.lw-attr strong {
+  color: #f6e8bb;
+  font: italic 900 15px / 1 "Barlow Condensed", sans-serif;
+}
+
+.lw-attr__bar {
+  grid-column: 1 / -1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lw-attr__bar::after {
+  content: "";
+  display: block;
+  width: calc(var(--v) * 100%);
+  height: 100%;
+  background: var(--lw-rarity);
+  transform-origin: left;
+  animation: lw-fill 0.7s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.lw-stats {
+  display: flex;
+  margin: 0;
+  border-block: 1px solid var(--lw-line);
+  background: rgba(9, 37, 30, 0.6);
+}
+
+.lw-stats > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 4px;
+}
+
+.lw-stats > div + div {
+  border-left: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.lw-stats dd {
+  margin: 0;
+  color: #f6e8bb;
+  font: italic 900 22px / 1 "Barlow Condensed", sans-serif;
+}
+
+.lw-stats dt {
+  color: #9bbbad;
+  font: 800 9px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.1em;
+}
+
+/* ---------- Pestaña Vestuario ---------- */
+
+.lw-slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lw-slot {
+  --slot-rarity: #9aa4a0;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.lw-slot__frame {
+  width: 100%;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-size: 24px;
+  border: 1px solid rgba(132, 170, 149, 0.18);
+  border-radius: 9px 3px 9px 3px;
+  background: rgba(8, 36, 27, 0.8);
+}
+
+.lw-slot[data-filled="true"] .lw-slot__frame {
+  border-color: color-mix(in srgb, var(--slot-rarity) 60%, transparent);
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--slot-rarity) 20%, #0a2b21), #061712);
+}
+
+.lw-slot__frame img {
+  max-width: 84%;
+  max-height: 84%;
+  object-fit: contain;
+}
+
+.lw-slot__label {
+  color: #9cbcae;
+  font: 800 9px / 1 "Barlow", sans-serif;
   letter-spacing: 0.06em;
-  line-height: 1.15;
-
-  color: #ffffff;
-  text-transform: uppercase;
 }
 
-/* Botones */
-.pc-toasts--challenge .pc-toast__row {
+.lw-slot__name {
+  max-width: 100%;
+  overflow: hidden;
+  color: #d4eadd;
+  font: 600 10px / 1.15 "Barlow", sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Pestaña Vitrina ---------- */
+
+.lw-trophies {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lw-trophy {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  min-height: 86px;
+  padding: 12px 6px 10px;
+  text-align: center;
+  border: 1px solid rgba(255, 190, 65, 0.32);
+  border-radius: 10px 3px 10px 3px;
+  background: linear-gradient(180deg, rgba(75, 55, 12, 0.32), rgba(20, 16, 6, 0.4));
+}
+
+.lw-trophy__icon {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(255, 190, 65, 0.4));
+}
+
+.lw-trophy__title {
+  color: #f6e3ac;
+  font: 700 10px / 1.25 "Barlow", sans-serif;
+}
+
+.lw-trophy[data-locked="true"] {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.lw-trophy[data-locked="true"] .lw-trophy__icon {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.lw-trophy[data-locked="true"] .lw-trophy__title {
+  color: #7f9d8f;
+}
+
+/* ---------- Pestaña Desafiar ---------- */
+
+.lw-games {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
-.pc-toasts--challenge .pc-btn {
-  min-width: 0;
-  min-height: 46px;
-  border-radius: 8px;
-
-  font-size: 12px;
-  font-weight: 800;
+.lw-game {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-height: 88px;
+  padding: 10px;
+  text-align: left;
+  color: #f4fff6;
+  cursor: pointer;
+  border: 1px solid #3e9e69;
+  border-radius: 8px 3px 8px 3px;
+  background: linear-gradient(130deg, #174c36, #0b2a22);
+  transition: transform 0.15s, border-color 0.15s;
 }
 
-/* Aceptar */
-.pc-toasts--challenge .pc-btn--primary {
-  color: #04140c;
-  border-color: #27d77b;
-
-  background: linear-gradient(
-    135deg,
-    #42ed99,
-    #1ac66c
-  );
-
-  box-shadow: 0 5px 20px rgba(35, 211, 117, 0.18);
+.lw-game:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--lw-accent);
 }
 
-/* Rechazar */
-.pc-toasts--challenge .pc-toast__row .pc-btn:not(.pc-btn--primary) {
-  color: #d7e2dc;
-
-  background: rgba(255, 255, 255, 0.055);
-  border-color: rgba(255, 255, 255, 0.14);
+.lw-game:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #37564a;
 }
 
-/* =========================================================
-   MOBILE
-========================================================= */
+.lw-game__icon {
+  font-size: 22px;
+  line-height: 1;
+}
 
-@media (max-width: 700px) {
+.lw-game__title {
+  font: 800 11px / 1.2 "Barlow", sans-serif;
+}
 
-  .pc-toasts--challenge {
-    top: 48% !important;
+.lw-game__desc {
+  color: #b7d5c2;
+  font: 500 10px / 1.3 "Barlow", sans-serif;
+}
 
-    width: calc(100vw - 32px) !important;
-    max-width: 360px !important;
+.lw-game__state {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+/* ---------- Moderación y reporte ---------- */
+
+.lw-moderation {
+  flex: none;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.lw-more {
+  padding: 5px;
+  color: #7da495;
+  font: 700 10px / 1 "Barlow", sans-serif;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+}
+
+.lw-more:hover {
+  color: #fff;
+}
+
+.lw-moderation__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.lw-moderation__options .pc-btn {
+  min-height: 35px;
+  font-size: 10px;
+}
+
+.lw-report {
+  display: grid;
+  gap: 8px;
+}
+
+.lw-report__title,
+.lw-report__msg {
+  margin: 0;
+  font: 600 13px / 1.35 "Barlow", sans-serif;
+}
+
+.lw-report__msg--error {
+  color: #ffb4a7;
+  font-size: 11px;
+}
+
+/* ---------- Animaciones ---------- */
+
+@keyframes lw-fade {
+  from { opacity: 0; }
+}
+
+@keyframes lw-card-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+}
+
+@keyframes lw-sheet-in {
+  from { transform: translateY(100%); }
+}
+
+@keyframes lw-panel-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes lw-beams {
+  from { transform: rotate(-8deg); }
+  to { transform: rotate(8deg); }
+}
+
+@keyframes lw-dorsal-in {
+  from { opacity: 0; transform: scale(1.18); }
+}
+
+@keyframes lw-rise {
+  from { opacity: 0; transform: translateY(16px); }
+}
+
+@keyframes lw-breathe {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-2px) scaleY(1.012); }
+}
+
+@keyframes lw-pop {
+  from { opacity: 0; transform: scale(0.55); }
+}
+
+@keyframes lw-sheen {
+  0% { opacity: 0; background-position: 120% 0; }
+  15% { opacity: 1; }
+  100% { opacity: 0; background-position: -40% 0; }
+}
+
+@keyframes lw-fill {
+  from { transform: scaleX(0); }
+}
+
+@keyframes lw-radar-in {
+  from { opacity: 0; transform: scale(0.2); }
+}
+
+/* ---------- Responsive ---------- */
+
+/* Alto reducido (notebooks chicas, teléfonos apaisados). */
+@media (max-height: 700px) {
+  .lw-hero {
+    --lw-hero-h: 232px;
+    --lw-avatar-s: 1.08;
+    --lw-dorsal-size: 140px;
+  }
+}
+
+@media (max-height: 600px) {
+  .lw-hero {
+    --lw-hero-h: 176px;
+    --lw-avatar-s: 0.82;
+    --lw-dorsal-size: 100px;
   }
 
-  .pc-toasts--challenge .pc-toast--incoming {
-    padding: 20px 16px;
-    gap: 16px;
+  .lw-tab {
+    min-height: 32px;
+  }
+}
+
+@media (max-height: 560px) {
+  .lw-backdrop {
+    padding-top: calc(60px + env(safe-area-inset-top, 0px));
+    padding-bottom: 8px;
   }
 
-  .pc-toasts--challenge .pc-toast--incoming strong {
-    font-size: 20px;
+  .lw-card {
+    max-height: calc(100dvh - 68px - env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Celular: el perfil sube como hoja desde abajo. */
+@media (max-width: 560px) {
+  .lw-backdrop {
+    align-items: flex-end;
+    padding: 0;
   }
 
-  .pc-toasts--challenge .pc-btn {
-    min-height: 44px;
+  .lw-card {
+    width: 100%;
+    max-height: calc(100dvh - 44px - env(safe-area-inset-top, 0px));
+    padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+    border-bottom: 0;
+    border-radius: 22px 22px 0 0;
+    animation-name: lw-sheet-in;
+  }
+
+  /* Manija de la hoja. */
+  .lw-card::before {
+    content: "";
+    align-self: center;
+    flex: none;
+    width: 38px;
+    height: 4px;
+    margin-bottom: -2px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .lw-hero {
+    --lw-hero-h: 262px;
+    --lw-avatar-s: 1.22;
+    --lw-dorsal-size: 150px;
+  }
+
+  .lw-attrs {
+    grid-template-columns: minmax(0, 150px) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .lw-tab {
+    font-size: 9px;
+    letter-spacing: 0.05em;
+  }
+
+  .lw-slot__frame {
+    height: 62px;
+  }
+}
+
+@media (max-width: 560px) and (max-height: 700px) {
+  .lw-hero {
+    --lw-hero-h: 214px;
+    --lw-avatar-s: 0.98;
+    --lw-dorsal-size: 124px;
+  }
+}
+
+@media (max-width: 560px) and (max-height: 600px) {
+  .lw-hero {
+    --lw-hero-h: 168px;
+    --lw-avatar-s: 0.78;
+    --lw-dorsal-size: 96px;
   }
 }
 
 @media (max-width: 360px) {
-  .pc-toasts--challenge .pc-toast--incoming {
-    padding: 16px 12px;
+  .lw-attrs {
+    grid-template-columns: 1fr;
   }
 
-  .pc-toasts--challenge .pc-toast__row {
-    gap: 7px;
+  .lw-games {
+    grid-template-columns: 1fr;
   }
 }
 
-/* =========================================================
-   LUPI WORLD — OUTGOING CHALLENGE
-========================================================= */
-
-.pc-toasts--outgoing {
-  position: fixed !important;
-
-  top: 50% !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: auto !important;
-
-  width: min(340px, calc(100vw - 32px)) !important;
-  max-width: 340px !important;
-
-  transform: translate(-50%, -50%) !important;
-
-  z-index: 1001 !important;
+/* El modo compacto va último: mismo peso que los anteriores pero gana por orden. */
+.lw-hero[data-compact="true"] {
+  --lw-hero-h: 132px;
+  --lw-avatar-s: 0.62;
+  --lw-dorsal-size: 84px;
 }
 
-.pc-toasts--outgoing .pc-toast {
-  width: 100%;
-  box-sizing: border-box;
-
-  padding: 22px 18px;
-  gap: 16px;
-
-  text-align: center;
-
-  border: 1px solid rgba(255, 193, 45, 0.45);
-  border-radius: 16px;
-
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(255, 193, 45, 0.10),
-      transparent 65%
-    ),
-    linear-gradient(
-      180deg,
-      #10231d,
-      #071410
-    );
-
-  box-shadow: 0 24px 65px rgba(0, 0, 0, 0.75);
-}
-
-.pc-toasts--outgoing .pc-toast strong {
-  font-size: 20px;
-  line-height: 1.2;
-}
-
-.pc-toasts--outgoing .pc-toast__row {
-  width: 100%;
-}
-
-.pc-toasts--outgoing .pc-btn {
-  min-height: 44px;
-}
-
-@media (max-width: 700px) {
-  .pc-toasts--outgoing {
-    top: 48% !important;
-  }
-}
-/* =====================================================
-   LUPI WORLD — CHALLENGE EXPERIENCE
-===================================================== */
-
-.pc-challenge-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  padding-bottom: max(20px, env(safe-area-inset-bottom));
-  box-sizing: border-box;
-  background: rgba(0, 7, 5, 0.78);
-  backdrop-filter: blur(9px);
-  -webkit-backdrop-filter: blur(9px);
-  animation: pc-fade 0.22s ease-out both;
-}
-
-.pc-challenge-modal {
-  width: min(390px, 100%);
-  max-height: calc(100dvh - 40px);
-  overflow-y: auto;
-  box-sizing: border-box;
-  padding: 28px 24px 24px;
-  text-align: center;
-  color: #f2f7f4;
-  border: 1px solid rgba(255, 200, 61, 0.65);
-  border-radius: 18px;
-  background:
-    radial-gradient(
-      ellipse at 50% 0%,
-      rgba(255, 200, 61, 0.14),
-      transparent 60%
-    ),
-    linear-gradient(180deg, #10251d, #06120e);
-  box-shadow:
-    0 0 50px rgba(255, 200, 61, 0.1),
-    0 30px 90px rgba(0, 0, 0, 0.8);
-  animation: pc-pop 0.25s ease-out both;
-}
-
-.pc-challenge-modal__icon {
-  margin-bottom: 12px;
-  font-size: 38px;
-  color: #ffc83d;
-  text-shadow: 0 0 22px rgba(255, 200, 61, 0.5);
-}
-
-.pc-challenge-modal__eyebrow {
-  display: block;
-  margin-bottom: 9px;
-  color: #ffc83d;
-  font: 800 10px/1.2 "Barlow", sans-serif;
-  letter-spacing: 0.2em;
-}
-
-.pc-challenge-modal__title {
-  margin: 0;
-  font: italic 900 30px/1 "Barlow Condensed", sans-serif;
-  letter-spacing: 0.04em;
-}
-
-.pc-challenge-modal__description {
-  margin: 15px 0 22px;
-  color: #b9cfc4;
-  font: 500 14px/1.5 "Barlow", sans-serif;
-}
-
-.pc-challenge-modal__actions {
-  display: flex;
-  gap: 10px;
-}
-
-.pc-challenge-modal__actions .pc-btn {
-  flex: 1;
-  min-width: 0;
-  min-height: 46px;
-}
-
-.pc-challenge-modal__waiting {
-  display: flex;
-  justify-content: center;
+/* Compacto: más lugar para el contenido de la pestaña. */
+.lw-card[data-compact="true"] {
   gap: 8px;
-  margin: 0 0 24px;
 }
 
-.pc-challenge-modal__waiting span {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #24e987;
-  animation: pc-wait 1.2s ease-in-out infinite;
+.lw-card[data-compact="true"] .lw-identity__name {
+  font-size: 30px;
 }
 
-.pc-challenge-modal__waiting span:nth-child(2) {
-  animation-delay: 0.2s;
+.lw-card[data-compact="true"] .lw-game {
+  min-height: 72px;
+  padding: 8px 10px;
 }
 
-.pc-challenge-modal__waiting span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes pc-wait {
-  0%, 60%, 100% {
-    opacity: 0.3;
-    transform: translateY(0);
-  }
-  30% {
-    opacity: 1;
-    transform: translateY(-5px);
-  }
-}
-
-/* Avisos informativos separados del modal */
-
-.pc-notifications,
-.pc-daily-notifications {
-  position: fixed;
-  left: 50%;
-  bottom: calc(96px + env(safe-area-inset-bottom));
-  z-index: 950;
-  width: min(350px, calc(100vw - 28px));
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
-}
-
-.pc-daily-notifications {
-  bottom: calc(160px + env(safe-area-inset-bottom));
-}
-
-.pc-notifications .pc-toast,
-.pc-daily-notifications .pc-toast {
-  box-sizing: border-box;
-  width: 100%;
-}
-
-@media (max-width: 700px) {
-  .pc-challenge-modal {
-    padding: 24px 18px;
+@media (max-height: 640px) {
+  .lw-hero[data-compact="true"] {
+    --lw-hero-h: 100px;
+    --lw-avatar-s: 0.46;
+    --lw-dorsal-size: 64px;
   }
 
-  .pc-challenge-modal__title {
+  .lw-hero[data-compact="true"] .lw-ovr {
+    top: 26px;
+    transform: scale(0.8);
+    transform-origin: top left;
+  }
+
+  .lw-hero[data-compact="true"] .lw-crest {
+    top: 26px;
+    transform: scale(0.8);
+    transform-origin: top right;
+  }
+
+  .lw-card[data-compact="true"] .lw-identity__name {
     font-size: 26px;
   }
-
-  .pc-notifications {
-    bottom: calc(112px + env(safe-area-inset-bottom));
-  }
-
-  .pc-daily-notifications {
-    bottom: calc(176px + env(safe-area-inset-bottom));
-  }
 }
+
+/* ---------- Movimiento reducido ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .pc-challenge-overlay,
-  .pc-challenge-modal,
-  .pc-challenge-modal__waiting span {
+  .lw-backdrop,
+  .lw-card,
+  .lw-card *,
+  .lw-card *::before,
+  .lw-card *::after {
     animation: none;
+    transition: none;
   }
 }
-/* Restored challenge presentation: center screen, above HUD and navigation */
-.pc-challenge-overlay {position:fixed;inset:0;z-index:3000;display:grid;place-items:center;padding:20px;box-sizing:border-box;background:rgba(0,7,5,.78);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);animation:pc-fade .22s ease-out both}
-.pc-challenge-modal {width:min(390px,100%);max-height:calc(100dvh - 40px);overflow-y:auto;box-sizing:border-box;padding:28px 24px 24px;text-align:center;color:#f2f7f4;border:1px solid rgba(255,200,61,.65);border-radius:18px;background:radial-gradient(ellipse at 50% 0%,rgba(255,200,61,.14),transparent 60%),linear-gradient(180deg,#10251d,#06120e);box-shadow:0 0 50px rgba(255,200,61,.1),0 30px 90px rgba(0,0,0,.8);animation:pc-pop .25s ease-out both}
-.pc-challenge-modal__icon {margin-bottom:12px;font-size:38px;color:#ffc83d;text-shadow:0 0 22px rgba(255,200,61,.5)}
-.pc-challenge-modal__eyebrow {display:block;margin-bottom:9px;color:#ffc83d;font:800 10px/1.2 "Barlow",sans-serif;letter-spacing:.2em}
-.pc-challenge-modal__title {margin:0;font:italic 900 30px/1 "Barlow Condensed",sans-serif;letter-spacing:.04em}
-.pc-challenge-modal__description {margin:15px 0 22px;color:#b9cfc4;font:500 14px/1.5 "Barlow",sans-serif}
-.pc-challenge-modal__description strong {color:#fff}
-.pc-challenge-modal__actions {display:flex;gap:10px}
-.pc-challenge-modal__actions .pc-btn {flex:1;min-width:0;min-height:46px}
-.pc-challenge-modal__waiting {display:flex;justify-content:center;gap:8px;margin:0 0 24px}
-.pc-challenge-modal__waiting span {width:7px;height:7px;border-radius:50%;background:#24e987;animation:pc-wait 1.2s ease-in-out infinite}
-.pc-challenge-modal__waiting span:nth-child(2){animation-delay:.2s}.pc-challenge-modal__waiting span:nth-child(3){animation-delay:.4s}
-@keyframes pc-wait {0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-5px)}}
-.pc-notifications,.pc-daily-notifications {position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));z-index:950;width:min(350px,calc(100vw - 28px));transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.pc-daily-notifications {bottom:calc(160px + env(safe-area-inset-bottom))}
-.pc-notifications .pc-toast,.pc-daily-notifications .pc-toast {box-sizing:border-box;width:100%}
-@media(max-width:700px){.pc-challenge-modal{padding:24px 18px}.pc-challenge-modal__title{font-size:26px}.pc-notifications{bottom:calc(112px + env(safe-area-inset-bottom))}.pc-daily-notifications{bottom:calc(176px + env(safe-area-inset-bottom))}}
-@media(prefers-reduced-motion:reduce){.pc-challenge-overlay,.pc-challenge-modal,.pc-challenge-modal__waiting span{animation:none}}
-
-/* UX: logros no bloqueantes, cierre manual y ubicación fuera del avatar */
-.pc-daily-notifications { left: auto !important; right: 18px !important; top: 90px !important; bottom: auto !important; transform: none !important; width: min(280px, calc(100vw - 36px)) !important; z-index: 120 !important; pointer-events: none !important; }
-.pc-daily-notifications .pc-toast { position: relative; padding-right: 30px; pointer-events: auto; }
-.pc-toast__daily-close { position: absolute; top: 5px; right: 7px; border: 0; background: transparent; color: #fff; font-size: 21px; cursor: pointer; padding: 2px 6px; }
-@media (max-width: 900px) { .pc-daily-notifications { top: 75px !important; right: 10px !important; width: min(260px, calc(100vw - 20px)) !important; } }
-
-
-/* LUPI WORLD — PERFIL SOCIAL V2. Overrides scoped to PlayerCard only. */
-.pc-backdrop { z-index: 4500; padding: 16px; }
-.pc.pc--profile { width: min(460px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; align-items: stretch; text-align: left; gap: 14px; padding: 20px; border-radius: 18px; scrollbar-width: thin; border-color: color-mix(in srgb,var(--pc-rarity) 45%,#21513f); }
-.pc-profile__eyebrow { color:#80bda6; font:800 10px/1.2 "Barlow",sans-serif; letter-spacing:.14em; padding-right:35px; }
-.pc-profile__eyebrow span { color:#d1f3df; }
-.pc-profile__identity { display:flex; align-items:center; gap:18px; min-width:0; padding:9px 0 3px; }
-.pc-avatar.pc-avatar--profile { flex:0 0 100px; width:100px; height:100px; font-size:43px; }
-.pc-profile__details { flex:1; min-width:0; }
-.pc-profile__kicker { color:#ffc83d; font:800 10px "Barlow",sans-serif; letter-spacing:.11em; }
-.pc--profile .pc-name { font-size:28px; line-height:1.05; margin:6px 0; }
-.pc--profile .pc-club { font-size:12px; }
-.pc--profile .pc-tags { justify-content:flex-start; margin:9px 0 0; }
-.pc-profile__stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
-.pc-profile__stats>div { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; min-height:62px; padding:5px; border:1px solid rgba(100,183,144,.18); border-radius:10px; background:rgba(3,18,14,.58); }
-.pc-profile__stats strong { font:800 21px/1 "Barlow Condensed",sans-serif; color:#f4fbf6; overflow-wrap:anywhere; text-align:center; }
-.pc-profile__stats span { font:800 9px "Barlow",sans-serif; letter-spacing:.08em; color:#92b9a6; }
-.pc-profile__loadout { padding:12px; background:rgba(3,18,14,.42); border:1px solid rgba(100,183,144,.14); border-radius:12px; }
-.pc-profile__section-title { display:flex; justify-content:space-between; color:#d9f5e7; font:800 10px "Barlow",sans-serif; letter-spacing:.1em; margin-bottom:10px; }
-.pc-profile__section-title span { color:#93b9a5; }
-.pc-profile__slots { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
-.pc-profile__slot { display:flex; flex-direction:column; align-items:center; gap:5px; min-width:0; font:700 9px "Barlow",sans-serif; color:#9cbcae; }
-.pc-profile__slot-image { display:grid; place-items:center; width:100%; height:54px; border-radius:8px; border:1px solid rgba(132,170,149,.16); background:rgba(8,36,27,.8); font-size:23px; }
-.pc-profile__slot--equipped .pc-profile__slot-image { border-color:color-mix(in srgb,var(--pc-rarity) 45%,transparent); }
-.pc-profile__slot-image img { max-width:85%; max-height:90%; object-fit:contain; }
-.pc-actions.pc-actions--profile { margin:0; gap:8px; }
-.pc-actions--profile>.pc-btn { min-height:45px; font-size:13px; }
-.pc-profile__secondary { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.pc-profile__secondary .pc-btn { min-height:35px; font-size:10px; }
-.pc-profile__own-note { color:#a4c5b4; font:600 12px/1.4 "Barlow",sans-serif; text-align:center; margin:0; }
-@media(max-width:480px) { .pc.pc--profile { padding:16px; gap:12px; } .pc-profile__identity { gap:12px; } .pc-avatar.pc-avatar--profile { flex-basis:78px; width:78px; height:78px; font-size:34px; } .pc--profile .pc-name { font-size:23px; } .pc-profile__slot-image { height:44px; } }
-@media(max-height:650px) { .pc.pc--profile { gap:9px; padding:14px 18px; } .pc-avatar.pc-avatar--profile { flex-basis:76px; width:76px; height:76px; font-size:34px; } .pc-profile__stats>div { min-height:49px; } .pc-profile__slot-image { height:40px; } .pc-profile__loadout { padding:9px; } }
-
-/* Player Card V3: imágenes siempre contenidas, incluso con CSS global de inventario */
-.pc--profile .pc-profile__slot { min-width:0; overflow:hidden; }
-.pc--profile .pc-profile__slot-image {
-  position:relative; display:flex; align-items:center; justify-content:center;
-  min-width:0; width:100%; overflow:hidden; isolation:isolate;
-}
-.pc--profile .pc-profile__slot-image img {
-  display:block; position:static; inset:auto; transform:none;
-  flex:none; width:auto; height:auto; max-width:82%; max-height:82%;
-  min-width:0; min-height:0; object-fit:contain; object-position:center;
-  margin:0; padding:0; filter:none;
-}
-.pc--profile .pc-profile__slot > span { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.pc-profile__achievements { padding:10px 12px; border:1px solid rgba(100,183,144,.14); border-radius:12px; background:rgba(3,18,14,.42); }
-.pc-profile__achievements .pc-profile__section-title { margin-bottom:6px; }
-.pc-profile__achievements-empty { margin:0; color:#9bbcac; font:600 11px/1.4 "Barlow",sans-serif; }
-.pc-profile__achievement-list { display:flex; gap:6px; flex-wrap:wrap; }
-.pc-profile__achievement { display:inline-flex; align-items:center; gap:5px; max-width:100%; padding:5px 7px; border:1px solid rgba(255,190,65,.3); border-radius:7px; color:#f6e3ac; background:rgba(75,55,12,.25); font:700 10px "Barlow",sans-serif; }
-@media(max-height:650px) { .pc-profile__achievements { padding:7px 9px; } }
-
-/* V3.1: el perfil se monta en document.body, fuera del stacking context del lobby.
-   Se centra únicamente en el espacio por debajo del encabezado fijo. */
-.pc-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 10000;
-  box-sizing: border-box;
-  padding: calc(80px + env(safe-area-inset-top, 0px)) 16px 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.pc-backdrop .pc.pc--profile {
-  flex: 0 1 460px;
-  max-height: calc(100dvh - 96px - env(safe-area-inset-top, 0px));
-  overscroll-behavior: contain;
-}
-@media (max-height: 560px) {
-  .pc-backdrop { padding-top: 68px; padding-bottom: 8px; }
-  .pc-backdrop .pc.pc--profile { max-height: calc(100dvh - 76px); }
-}
-
-/* LUPI WORLD — RIVAL CARD: cinematic profile, isolated from challenge toasts */
-.pc-backdrop { z-index: 4500; background: rgba(1,8,9,.82); backdrop-filter: blur(9px) saturate(.8); }
-.pc-backdrop .pc.pc--profile { width:min(410px,calc(100vw - 24px)); max-height:calc(100dvh - 36px); padding:14px 15px 12px; gap:7px; overflow-y:auto; overflow-x:hidden; border-radius:18px 5px 18px 5px; border:1px solid color-mix(in srgb,var(--pc-rarity) 70%,#365a48); background:linear-gradient(160deg,#18332b 0%,#071714 58%,#04100f 100%); box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 45px color-mix(in srgb,var(--pc-rarity) 17%,transparent),0 28px 80px #000b; }
-.pc-rival__topline { display:flex; justify-content:space-between; padding:2px 34px 2px 3px; gap:10px; color:#9ed9c1; font:800 9px/1.3 "Barlow",sans-serif; letter-spacing:.18em; }
-.pc-rival__topline span:last-child {color:var(--pc-rarity);}
-.pc-rival__arena { position:relative; height:214px; isolation:isolate; overflow:hidden; border-radius:12px 3px 12px 3px; border:1px solid color-mix(in srgb,var(--pc-rarity) 38%,transparent); background:radial-gradient(ellipse at 50% 48%,color-mix(in srgb,var(--pc-rarity) 22%,#132d27),#071916 68%),repeating-linear-gradient(90deg,transparent 0 32px,#ffffff06 33px 34px); }
-.pc-rival__arena:after { content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(180deg,#05141165,transparent 32%,transparent 75%,#061613aa); }
-.pc-rival__beams { position:absolute;inset:-50% -30%;background:conic-gradient(from 180deg at 50% 0%,transparent 0deg,#e8fff018 16deg,transparent 32deg,transparent 52deg,#e8fff014 69deg,transparent 84deg);animation:pc-rival-lights 9s ease-in-out infinite alternate; }
-.pc-rival__halo { position:absolute;width:180px;height:180px;left:50%;top:7px;transform:translateX(-50%);border-radius:50%;border:1px solid color-mix(in srgb,var(--pc-rarity) 55%,transparent);box-shadow:0 0 38px color-mix(in srgb,var(--pc-rarity) 22%,transparent),inset 0 0 45px color-mix(in srgb,var(--pc-rarity) 10%,transparent); }
-.pc-rival__crest {position:absolute;top:14px;left:14px;color:#b8d9c5;opacity:.42;font:italic 900 22px "Barlow Condensed",sans-serif;letter-spacing:.04em;}
-.pc-rival__character {position:absolute;left:50%;top:11px;transform:translateX(-50%);width:135px;height:190px;filter:drop-shadow(0 4px 13px #0009);}
-.pc-rival__head {position:absolute;left:51px;top:4px;width:33px;height:37px;border-radius:43% 43% 46% 46%;background:linear-gradient(115deg,#946b54,#d6aa88 52%,#73503e);box-shadow:inset 0 7px 0 #292722;}
-.pc-rival__torso {position:absolute;left:28px;top:39px;width:79px;height:86px;border-radius:23px 23px 11px 11px;background:linear-gradient(90deg,#162b2b,#425c59 50%,#142b2b);box-shadow:-24px 10px 0 -15px #344a46,24px 10px 0 -15px #344a46;}
-.pc-rival__legs {position:absolute;left:41px;top:120px;width:54px;height:61px;background:linear-gradient(90deg,#6d897f 0 40%,transparent 40% 60%,#6d897f 60%);border-radius:0 0 7px 7px;}
-.pc-rival__wear {position:absolute;display:block;object-fit:contain;pointer-events:none;}
-.pc-rival__wear--top {width:112px;height:106px;left:11px;top:35px;z-index:2;}
-.pc-rival__wear--bottom {width:79px;height:72px;left:28px;top:107px;z-index:2;}
-.pc-rival__wear--boots {width:112px;height:39px;left:12px;top:158px;z-index:2;}
-.pc-rival__floor {position:absolute;bottom:9px;left:23%;width:54%;height:15px;border-radius:50%;border:1px solid var(--pc-rarity);box-shadow:0 0 22px color-mix(in srgb,var(--pc-rarity) 65%,transparent);}
-.pc-rival__rarity {position:absolute;z-index:4;right:11px;top:12px;color:var(--pc-rarity);font:900 10px "Barlow",sans-serif;letter-spacing:.09em;text-shadow:0 0 12px #000;}
-.pc-rival__number {position:absolute;z-index:4;bottom:11px;left:12px;color:#e9fff2;font:800 11px "Barlow",sans-serif;letter-spacing:.12em;}.pc-rival__number strong{font:italic 900 28px "Barlow Condensed",sans-serif;color:var(--pc-rarity);}
-.pc-rival__identity {text-align:center;padding:1px 0 0;}.pc-rival__eyebrow{color:var(--pc-rarity);font:800 9px "Barlow",sans-serif;letter-spacing:.14em;}.pc-rival__name{font:italic 900 clamp(27px,6vw,38px)/1 "Barlow Condensed",sans-serif;letter-spacing:.06em;margin:4px 0 1px;color:#f5fff6;text-shadow:0 2px 14px #0009;overflow-wrap:anywhere;}.pc-rival__club{font:600 11px "Barlow",sans-serif;color:#b7d1c1;margin:3px 0 6px;}.pc-rival__status{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:30px;border:1px solid #ffffff22;color:#c3f5d8;font:700 10px "Barlow",sans-serif;}.pc-rival__status i{width:7px;height:7px;border-radius:50%;background:#28dd84;box-shadow:0 0 8px #28dd84;}.pc-rival__status.pc-tag--in-match i{background:#f7c34b;box-shadow:0 0 8px #f7c34b;}
-.pc-rival__record{display:flex;align-items:center;justify-content:space-around;padding:7px 5px;border-top:1px solid #a2e7bf22;border-bottom:1px solid #a2e7bf22;}.pc-rival__record>div{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0;flex:1;}.pc-rival__record strong{font:900 19px/1 "Barlow Condensed",sans-serif;color:#f6e8bb;}.pc-rival__record span:not(.pc-rival__record-divider){font:800 8px "Barlow",sans-serif;letter-spacing:.11em;color:#9bbbad;}.pc-rival__record-divider{height:24px;width:1px;background:#ffffff22;}
-.pc-rival__actions{margin:3px 0 0;}.pc-rival__challenge{min-height:46px;font:900 15px "Barlow Condensed",sans-serif;letter-spacing:.12em;display:flex;align-items:center;justify-content:space-around;border-radius:6px 2px 6px 2px;box-shadow:0 0 20px #22dc7940;}.pc-rival__expand{border:0;background:transparent;color:#c3e3d0;cursor:pointer;padding:7px 5px;font:800 10px "Barlow",sans-serif;letter-spacing:.1em;}.pc-rival__expand span{margin-left:8px;color:var(--pc-rarity);}.pc-rival__details{background:#061914;border:1px solid #ffffff1b;border-radius:9px;padding:10px;}.pc-rival__ach-title{margin-top:12px;}.pc-rival__more{align-self:center;border:0;background:transparent;color:#7da495;font:700 10px "Barlow",sans-serif;cursor:pointer;padding:5px;}.pc-rival__moderation{width:100%;}.pc-rival__more:hover,.pc-rival__expand:hover{color:white;}
-@keyframes pc-rival-lights{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
-@media(max-height:740px){.pc-backdrop .pc.pc--profile{gap:5px;padding:10px 14px;}.pc-rival__arena{height:185px;}.pc-rival__character{transform:translateX(-50%) scale(.89);transform-origin:top center;}.pc-rival__halo{width:155px;height:155px;}.pc-rival__name{font-size:29px;}.pc-rival__record{padding:5px;}.pc-rival__challenge{min-height:40px;}}
-@media(max-height:590px){.pc-rival__arena{height:150px;}.pc-rival__character{transform:translateX(-50%) scale(.72);}.pc-rival__halo{width:130px;height:130px;}.pc-rival__topline{font-size:8px;}}
-@media(prefers-reduced-motion:reduce){.pc-rival__beams{animation:none;}}
-
-/* Lupi World: imagen oficial del par AURA XP, sin duplicarla ni deformarla. */
-.pc-rival__wear--boots {
-  width: 132px; height: 48px; left: 1px; top: 151px;
-  object-fit: contain; object-position: center bottom; z-index: 3;
-}
-.pc--profile .pc-profile__slot-image img[src="/items/equipped/aura-boots.png"] {
-  max-width: 94%; max-height: 78%; object-fit: contain;
-}
-
-/* Scouting card: sports dossier with integrated challenge selection */
-.pc-backdrop .pc.pc--scouting {width:min(520px,calc(100vw - 24px)); border-radius:12px; padding:16px 18px; gap:8px; background:linear-gradient(150deg,#16352c,#071b17 55%,#04110f);}
-.pc--scouting .pc-rival__arena{height:170px;}
-.pc--scouting .pc-rival__character{transform:translateX(-50%) scale(.82);transform-origin:top center;}
-.pc--scouting .pc-rival__halo{width:145px;height:145px;}
-.pc--scouting .pc-rival__identity{text-align:left; padding:0 4px;}
-.pc--scouting .pc-rival__name{font-size:clamp(26px,5vw,36px);}
-.pc--scouting .pc-rival__status{margin-top:4px;}
-.pc-scout__section-head{display:flex;justify-content:space-between;gap:8px;align-items:center;color:#a8e5c6;font:800 9px/1.4 "Barlow",sans-serif;letter-spacing:.13em;}
-.pc-scout__section-head span:last-child{color:#e7c56e;}
-.pc--scouting .pc-rival__record{background:#09251e;border:1px solid #36745466;border-radius:7px;padding:10px 2px;}
-.pc-scout__tabs{display:flex;gap:6px;}
-.pc-scout__tab{flex:1;min-height:32px;background:#071d17;color:#accbb9;border:1px solid #2b5847;border-radius:5px;font:800 10px "Barlow",sans-serif;letter-spacing:.12em;cursor:pointer;}
-.pc-scout__tab--active{background:#235d42;color:#f6fff7;border-color:#60c991;}
-.pc-scout__challenges{display:grid;gap:9px;padding:9px;background:#071b16;border:1px solid #2b654c;border-radius:8px;}
-.pc-scout__game-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.pc-scout__game{display:flex;align-items:center;gap:8px;text-align:left;min-height:65px;padding:8px;background:linear-gradient(130deg,#174c36,#0b2a22);border:1px solid #3e9e69;border-radius:7px;color:#f4fff6;cursor:pointer;}
-.pc-scout__game:disabled{opacity:.48;cursor:not-allowed;border-color:#37564a;}
-.pc-scout__game-icon{font-size:22px;flex-shrink:0;}.pc-scout__game>span:nth-child(2){flex:1;min-width:0;display:grid;gap:3px;}.pc-scout__game strong{font:800 10px/1.2 "Barlow",sans-serif;}.pc-scout__game small{font:500 10px/1.25 "Barlow",sans-serif;color:#b7d5c2;}.pc-scout__game-note{margin:0;color:#9cbdac;font:500 10px/1.4 "Barlow",sans-serif;}
-@media(max-height:740px){.pc--scouting .pc-rival__arena{height:145px;}.pc--scouting .pc-rival__character{transform:translateX(-50%) scale(.7);}}
-@media(max-width:450px){.pc-backdrop .pc.pc--scouting{padding:12px;}.pc-scout__game-grid{grid-template-columns:1fr;}}
-
-/* Rival Card V4: avatar protagonista y selector de desafíos integrado. */
-.pc-backdrop .pc.pc--scouting { max-height: min(740px, calc(100dvh - 32px)); overflow-y: auto; overscroll-behavior: contain; }
-.pc--scouting .pc-rival__arena { height: 245px; flex: none; }
-.pc--scouting .pc-rival__character { top: 15px; transform: translateX(-50%) scale(1.14); transform-origin: top center; }
-.pc--scouting .pc-rival__halo { width: 205px; height: 205px; }
-.pc--scouting .pc-rival__record { min-height: 42px; }
-.pc--scouting .pc-scout__tabs { margin-top: 4px; }
-.pc--scouting .pc-scout__challenges { margin-top: 2px; }
-.pc--scouting .pc-scout__game { min-height: 76px; }
-@media (max-height: 740px) {
-  .pc--scouting .pc-rival__arena { height: 200px; }
-  .pc--scouting .pc-rival__character { transform: translateX(-50%) scale(.98); }
-}
-@media (max-height: 590px) {
-  .pc--scouting .pc-rival__arena { height: 170px; }
-  .pc--scouting .pc-rival__character { transform: translateX(-50%) scale(.81); }
-}
-
-/* V5: vistas diferenciadas, desafío completo sin scroll en escritorio */
-.pc-backdrop .pc.pc--scouting.pc--challenge-view {width:min(450px,calc(100vw - 24px));max-height:calc(100dvh - 32px);gap:10px;padding:16px;overflow-y:auto;}
-.pc-scout__compact{display:flex;align-items:center;gap:12px;padding:9px 10px;border:1px solid #3a7958;border-radius:10px;background:radial-gradient(circle at 10% 50%,#28533a,#0b241b 75%);min-width:0;}
-.pc-scout__compact-avatar{width:60px;height:60px;flex:none;display:grid;place-items:center;border-radius:50%;border:1px solid var(--pc-rarity);background:#071b15;font-size:28px;overflow:hidden;}
-.pc-scout__compact-avatar img{width:85%;height:85%;object-fit:contain;}
-.pc-scout__compact>div:last-child{min-width:0;display:grid;gap:3px;}
-.pc-scout__compact-kicker{font:800 9px 'Barlow',sans-serif;letter-spacing:.12em;color:#e7c56e;}
-.pc-scout__compact strong{font:italic 900 27px/1 'Barlow Condensed',sans-serif;color:#fff;overflow-wrap:anywhere;}
-.pc-scout__compact small{font:600 11px 'Barlow',sans-serif;color:#a9cdb8;}
-.pc--challenge-view .pc-scout__challenges{gap:8px;padding:10px;}
-.pc--challenge-view .pc-scout__game{min-height:88px;padding:10px;align-items:flex-start;flex-direction:column;gap:5px;position:relative;}
-.pc--challenge-view .pc-scout__game>span:last-child{position:absolute;right:10px;top:12px;}
-.pc--challenge-view .pc-scout__game-icon{font-size:22px;}
-.pc--challenge-view .pc-scout__game strong{font-size:11px;}
-.pc--challenge-view .pc-scout__game-note{font-size:10px;}
-@media(max-width:450px){.pc--challenge-view .pc-scout__game-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.pc--challenge-view .pc-scout__game{min-height:100px;}}
-@media(max-height:560px){.pc-backdrop .pc.pc--scouting.pc--challenge-view{gap:6px;padding:10px;}.pc--challenge-view .pc-scout__game{min-height:68px;padding:7px;}.pc-scout__compact-avatar{height:44px;width:44px;}.pc-scout__compact strong{font-size:21px;}}

@@ -3780,3 +3780,11 @@
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
+
+/* Botón de personalización: el locker desactiva eventos por defecto. */
+.gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+  position: relative;
+  z-index: 100;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+}

@@ -1,3 +1,5 @@
+import { AvatarEditor } from "../components/AvatarEditor";
+import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
     // src/pages/GameHub.tsx
     import { useEffect, useMemo, useRef, useState } from "react";
     import { AppUser } from "../lib/api";
@@ -443,6 +445,8 @@ const {
 
 
       const { items: auraItems } = useAuraInventory(user.id, level);
+      const { appearance: myAppearance } = useAvatarAppearance(user.id);
+      const [showAvatarEditor, setShowAvatarEditor] = useState(false);
       const { recommendation: lupiRecommendation, track: trackLupiActivity, dismiss: dismissLupiRecommendation, recordMatchCompleted: recordLupiMatchCompleted } = useLupiRecommendation(user.id, {
         rewardPending: Boolean(lobbyMission?.isCompleted && !lobbyMission?.isClaimed),
         packsAvailable: packCount ?? 0,
@@ -620,6 +624,7 @@ const {
         club: user.club ?? null,
         level,
         look,
+        appearance: myAppearance,
       },
     });
 
@@ -900,6 +905,8 @@ const handleLobbyMissionClaim = async (missionId: string) => {
       
 
       return (
+        <>
+        {showAvatarEditor && <AvatarEditor userId={user.id} onClose={() => setShowAvatarEditor(false)} />}
         <div className={`main-content gh-root ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""}`}>
           {showFirstWelcome && (
             <div className={`lupi-first-welcome lupi-anime-intro${welcomeExiting ? " is-exiting" : ""}`} role="presentation">
@@ -1190,6 +1197,7 @@ onChallengeGame={(player, game) => {
 />
                   </div>
                   <div className="gh-locker-zone">
+        <button type="button" onClick={() => setShowAvatarEditor(true)} className="gh-avatar-customize-trigger" style={{width:"100%",marginBottom:8,background:"#173e30",color:"#e4cf72",border:"1px solid #8d793c",borderRadius:8,padding:"9px",cursor:"pointer",fontWeight:800}}>✦ PERSONALIZAR MI PERSONAJE</button>
         <LockerPreview
           userId={user.id}
           level={level}
@@ -1527,5 +1535,6 @@ onChallengeGame={(player, game) => {
   />
 )}
         </div>
+        </>
       );
     }
