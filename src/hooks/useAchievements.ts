@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { AppUser } from '../lib/api';
 
@@ -64,6 +64,11 @@ export function useAchievements(user: AppUser | null) {
   const [loading, setLoading] = useState(true);
 
   const [userStats, setUserStats] = useState<UserStats>({});
+  const userId = user?.id ?? null;
+  const userRef = useRef(user);
+  userRef.current = user;
+  const statsRequest = useRef(0);
+  const unlockedRequest = useRef(0);
 
   // =========================================================
   // TODAS LAS DEFINICIONES DE LOGROS
@@ -90,11 +95,12 @@ export function useAchievements(user: AppUser | null) {
   // =========================================================
 
   const loadUserStats = useCallback(async () => {
-    if (!user) return;
+    if (!userId) return;
+    const request = ++statsRequest.current;
 
     try {
       const { data, error } = await supabase.rpc('get_user_stats', {
-        p_user_id: user.id,
+        p_user_id: userId,
       });
 
       if (error) {
@@ -105,19 +111,20 @@ export function useAchievements(user: AppUser | null) {
       console.log('🏆 USER STATS:', data);
 
       if (data && typeof data === 'object') {
-        setUserStats(data as UserStats);
+        if (request === statsRequest.current) setUserStats(data as UserStats);
       }
     } catch (error) {
       console.error('🏆 Error inesperado cargando user stats:', error);
     }
-  }, [user]);
+  }, [userId]);
 
   // =========================================================
   // LOGROS DESBLOQUEADOS
   // =========================================================
 
   const loadUnlockedAchievements = useCallback(async () => {
-    if (!user) return;
+    if (!userId) return;
+    const request = ++unlockedRequest.current;
 
     setLoading(true);
 
@@ -125,7 +132,7 @@ export function useAchievements(user: AppUser | null) {
       const { data: unlockedData, error: unlockedError } = await supabase
         .from('achievements_unlocked')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('unlocked_at', { ascending: false });
 
       if (unlockedError) {
@@ -134,14 +141,14 @@ export function useAchievements(user: AppUser | null) {
           unlockedError
         );
 
-        setUnlockedAchievements([]);
+        if (request === unlockedRequest.current) setUnlockedAchievements([]);
         return;
       }
 
       if (!unlockedData || unlockedData.length === 0) {
         console.log('🏆 Usuario sin logros desbloqueados');
 
-        setUnlockedAchievements([]);
+        if (request === unlockedRequest.current) setUnlockedAchievements([]);
         return;
       }
 
@@ -161,7 +168,7 @@ export function useAchievements(user: AppUser | null) {
           achievementsError
         );
 
-        setUnlockedAchievements([]);
+        if (request === unlockedRequest.current) setUnlockedAchievements([]);
         return;
       }
 
@@ -179,18 +186,18 @@ export function useAchievements(user: AppUser | null) {
 
       console.log('🏆 ACHIEVEMENTS UNLOCKED:', merged);
 
-      setUnlockedAchievements(merged);
+      if (request === unlockedRequest.current) setUnlockedAchievements(merged);
     } catch (error) {
       console.error(
         '🏆 Error inesperado cargando achievements:',
         error
       );
 
-      setUnlockedAchievements([]);
+      if (request === unlockedRequest.current) setUnlockedAchievements([]);
     } finally {
-      setLoading(false);
+      if (request === unlockedRequest.current) setLoading(false);
     }
-  }, [user]);
+  }, [userId]);
 
   // =========================================================
   // PROGRESO REAL
@@ -198,7 +205,8 @@ export function useAchievements(user: AppUser | null) {
 
   const getProgress = useCallback(
     (conditionType: string, target: number): number => {
-      if (!user) return 0;
+      const currentUser = userRef.current;
+      if (!currentUser) return 0;
 
       switch (conditionType) {
         // -----------------------------------------
@@ -218,7 +226,7 @@ export function useAchievements(user: AppUser | null) {
         // -----------------------------------------
 
         case 'points': {
-          return Number(user.points ?? 0);
+          return Number(currentUser.points ?? 0);
         }
 
         // -----------------------------------------
@@ -308,7 +316,7 @@ export function useAchievements(user: AppUser | null) {
           return 0;
       }
     },
-    [user, userStats]
+    [userStats]
   );
 
   // =========================================================
@@ -317,13 +325,13 @@ export function useAchievements(user: AppUser | null) {
 
   const checkAndUnlock = useCallback(
     async (ctx: AchievementContext) => {
-      if (!user) return;
+      if (!userId) return;
 
       try {
         const { data, error } = await supabase.rpc(
           'check_and_unlock_achievements',
           {
-            p_user_id: user.id,
+            p_user_id: userId,
           }
         );
 
@@ -366,7 +374,7 @@ export function useAchievements(user: AppUser | null) {
       }
     },
     [
-      user,
+      userId,
       allAchievements,
       loadUnlockedAchievements,
       loadUserStats,
@@ -378,13 +386,20 @@ export function useAchievements(user: AppUser | null) {
   // =========================================================
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) {
+      statsRequest.current++;
+      unlockedRequest.current++;
+      setUnlockedAchievements([]);
+      setUserStats({});
+      setLoading(false);
+      return;
+    }
 
     loadAllAchievements();
     loadUnlockedAchievements();
     loadUserStats();
   }, [
-    user,
+    userId,
     loadAllAchievements,
     loadUnlockedAchievements,
     loadUserStats,

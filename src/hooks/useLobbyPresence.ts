@@ -7,7 +7,7 @@ import type { ItemSlot } from "./useAuraInventory";
 /** slot -> id del item que tiene puesto. Solo ids: la imagen la resuelve cada cliente con su catálogo. */
 export type LobbyLook = Partial<Record<ItemSlot, string>>;
 
-/** lobby = disponible · in-match = jugando · idle = ausente (sin input o pestaña oculta) */
+/** lobby = conectado en lobby · in-match = jugando · idle = compatibilidad con clientes antiguos */
 export type LobbyActivity = "lobby" | "in-match" | "idle";
 
 export type LobbyPlayer = {
@@ -26,14 +26,13 @@ type Options = {
   /** "global" por ahora; más adelante `club:${clubId}` para la sala de cada club */
   room: string;
   me: Omit<LobbyPlayer, "joinedAt" | "activity">;
-  /** Lo que sabe el juego: pasá "in-match" mientras la persona juega. "idle" se detecta solo. */
+  /** Estado explícito: en lobby o jugando. No se infiere ausencia por inactividad. */
   activity?: "lobby" | "in-match";
   enabled?: boolean;
 };
 
 const SLOTS: ItemSlot[] = ["top", "bottom", "boots", "accessory"];
 const ACTIVITIES: LobbyActivity[] = ["lobby", "in-match", "idle"];
-const IDLE_MS = 2 * 60_000;
 
 /**
  * Todo lo que llega por presence lo manda otro cliente, o sea que NO es de fiar.
@@ -57,46 +56,13 @@ function sanitize(raw: any): LobbyPlayer | null {
     club: typeof raw.club === "string" ? raw.club.slice(0, 40) : null,
     level: Number.isFinite(level) ? Math.min(Math.max(Math.trunc(level), 1), 999) : 1,
     look,
-    activity: ACTIVITIES.includes(raw.activity) ? raw.activity : "lobby",
+    activity: raw.activity === "in-match" ? "in-match" : "lobby",
     joinedAt: Number(raw.joinedAt) || 0,
   };
 }
 
-/** true cuando no hubo input durante IDLE_MS o la pestaña está oculta. */
-function useIdle(enabled: boolean) {
-  const [idle, setIdle] = useState(false);
-
-  useEffect(() => {
-    if (!enabled) {
-      setIdle(false);
-      return;
-    }
-
-    let timer = 0;
-    const arm = () => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(() => setIdle(true), IDLE_MS);
-    };
-    const wake = () => {
-      setIdle(false);
-      arm();
-    };
-    const onVisibility = () => (document.hidden ? setIdle(true) : wake());
-
-    const events = ["pointerdown", "keydown", "touchstart", "wheel"];
-    events.forEach((name) => window.addEventListener(name, wake, { passive: true }));
-    document.addEventListener("visibilitychange", onVisibility);
-    arm();
-
-    return () => {
-      window.clearTimeout(timer);
-      events.forEach((name) => window.removeEventListener(name, wake));
-      document.removeEventListener("visibilitychange", onVisibility);
-    };
-  }, [enabled]);
-
-  return idle;
-}
+// La presencia indica conexión real al canal. No inferimos "ausente" por inactividad
+// o pestaña oculta: el usuario no dispone de un modo ausente manual.
 
 export function useLobbyPresence({ room, me, activity = "lobby", enabled = true }: Options) {
   const [players, setPlayers] = useState<LobbyPlayer[]>([]);
@@ -105,9 +71,7 @@ export function useLobbyPresence({ room, me, activity = "lobby", enabled = true 
   const channelRef = useRef<RealtimeChannel | null>(null);
   const joinedAt = useRef(Date.now());
 
-  const idle = useIdle(enabled);
-  const effectiveActivity: LobbyActivity =
-    activity === "in-match" ? "in-match" : idle ? "idle" : "lobby";
+  const effectiveActivity: LobbyActivity = activity === "in-match" ? "in-match" : "lobby";
 
   // Siempre el último "me", sin tener que reconectar el canal cuando cambia.
   const meRef = useRef({ ...me, activity: effectiveActivity });

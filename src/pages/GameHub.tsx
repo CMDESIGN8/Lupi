@@ -393,6 +393,13 @@ import { useAchievements } from "../hooks/useAchievements";
       const [selectedWorldPlayer, setSelectedWorldPlayer] =
       useState<LobbyPlayer | null>(null);
       const [dailyChallengeToasts, setDailyChallengeToasts] = useState<DailyChallengeToast[]>([]);
+      // Los logros se muestran una sola vez por sesión y desaparecen automáticamente.
+      const announcedChallengesRef = useRef<Set<string>>(new Set());
+      useEffect(() => {
+        if (dailyChallengeToasts.length === 0) return;
+        const timer = window.setTimeout(() => setDailyChallengeToasts([]), 4200);
+        return () => window.clearTimeout(timer);
+      }, [dailyChallengeToasts]);
   const [challengeTarget, setChallengeTarget] = useState<LobbyPlayer | null>(null);
   const [activeRps, setActiveRps] = useState<Challenge | null>(null);
   const [versusChallenge, setVersusChallenge] = useState<Challenge | null>(null);
@@ -606,6 +613,7 @@ const {
 
       const { players: lobbyPlayers, status: lobbyStatus } = useLobbyPresence({
       room: "global",
+      activity: view === "match" ? "in-match" : "lobby",
       me: {
         userId: user.id,
         username: user.username,
@@ -673,6 +681,10 @@ const {
 };
 
       const realOthers = lobbyPlayers.filter((p) => p.userId !== user.id).length;
+      // Priorizar jugadores disponibles sin alterar la presencia ni el flujo de desafíos.
+      const otherOnlinePlayers = lobbyPlayers
+        .filter((player) => player.userId !== user.id)
+        .sort((a, b) => Number(b.activity === "lobby") - Number(a.activity === "lobby"));
       const [showPlayersSheet, setShowPlayersSheet] = useState(false);
       const [showSocialChat, setShowSocialChat] = useState(false);
       const [showExploreWorld, setShowExploreWorld] = useState(false);
@@ -748,39 +760,25 @@ const {
     completed: boolean;
   }[]
 ) => {
-  console.log("🏆 GAMEHUB RECIBIÓ:", challenges);
-
-  const completed = challenges.filter(
-    (challenge) => challenge.completed
-  );
-
-  console.log("🏆 COMPLETADOS:", completed);
-
-  if (completed.length === 0) {
-    console.log("🏆 NO HAY COMPLETADOS");
-    return;
-  }
-
+  const completed = challenges.filter((challenge) => challenge.completed);
   const titles: Record<string, string> = {
     win3: "3 VICTORIAS",
     score5: "5 GOLES",
     beat_legend: "VENCER A LA LEYENDA",
   };
-
-  const newToasts: DailyChallengeToast[] =
-    completed.map((challenge) => ({
-      id: `${challenge.challenge_id}-${Date.now()}`,
-      title:
-        titles[challenge.challenge_id] ??
-        challenge.challenge_id,
-      progress: challenge.progress,
-      requirement: challenge.requirement,
-      rewardXp: 50,
-    }));
-
-  console.log("🏆 CREANDO TOASTS:", newToasts);
-
-  setDailyChallengeToasts(newToasts);
+  const newToasts: DailyChallengeToast[] = completed
+    .filter((challenge) => !announcedChallengesRef.current.has(challenge.challenge_id))
+    .map((challenge) => {
+      announcedChallengesRef.current.add(challenge.challenge_id);
+      return {
+        id: challenge.challenge_id,
+        title: titles[challenge.challenge_id] ?? challenge.challenge_id,
+        progress: challenge.progress,
+        requirement: challenge.requirement,
+        rewardXp: 50,
+      };
+    });
+  if (newToasts.length > 0) setDailyChallengeToasts(newToasts);
 };
 
       const openMatch = (mode: BattleMode) => {
@@ -1000,6 +998,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
     respond={respond}
     cancel={cancel}
     dailyChallenges={dailyChallengeToasts}
+    onDismissDaily={(id) => setDailyChallengeToasts((prev) => prev.filter((item) => item.id !== id))}
   />
               {gameTab === "play" && view === "lobby" && (
                 <div className="gh-world">
@@ -1022,6 +1021,10 @@ const handleLobbyMissionClaim = async (missionId: string) => {
     onChallenge={(player) => {
   setSelectedWorldPlayer(null);
   setChallengeTarget(player);
+}}
+onChallengeGame={(player, game) => {
+  handleLobbyChallenge(player, 1, game);
+  setSelectedWorldPlayer(null);
 }}
     onToggleMute={toggleMute}
     onReport={report}
@@ -1054,34 +1057,6 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
                   
 
-                  <div className="gh-world__players" aria-label="Jugadores conectados">
-                    <span className="gh-world__players-label">
-        <i aria-hidden />
-        JUGADORES EN LÍNEA · {lobbyPlayers.filter(p => p.userId !== user.id).length}
-      </span>
-
-                    {lobbyPlayers
-      .filter((player) => player.userId !== user.id)
-      .slice(0, 6)
-      .map((player, index) => (
-        <WorldPlayer
-          key={player.userId}
-          player={player}
-          index={index}
-          isMe={false}
-          catalog={auraItems}
-          onSelect={setSelectedWorldPlayer}
-        />
-      ))}
-                
-                    {lobbyPlayers.filter(p => p.userId !== user.id).length === 0 && (
-  <div className="gh-world__empty-player">
-    <span>+</span>
-    <strong>ESPERANDO JUGADORES</strong>
-    <small>El próximo jugador aparecerá acá.</small>
-  </div>
-)}
-                  </div>
 
                   {showPlayersSheet && (
       <div
@@ -1258,6 +1233,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
                       </div>
                     </div>
                   )}
+                  <aside className="gh-world__left-rail" aria-label="Lupi y comunidad">
                   <section ref={rewardCardRef} className={`gh-world__next ${highlightNext ? "gh-world__next--highlight" : ""}`} aria-label="Recomendación personalizada de Lupi">
                     {pendingFirstReward ? (
                       <>
@@ -1305,6 +1281,48 @@ const handleLobbyMissionClaim = async (missionId: string) => {
                     </button>}
                   </section>
 
+                  <section className="gh-world__players gh-online" aria-label="Jugadores conectados">
+                    <div className="gh-online__header">
+                      <span className="gh-online__title"><i aria-hidden="true" /> JUGADORES EN LÍNEA</span>
+                      <span className="gh-online__count">{lobbyStatus === "offline" ? "SIN CONEXIÓN" : `${lobbyPlayers.length} CONECTADOS`}</span>
+                    </div>
+                    <div className="gh-online__list">
+                      <div className="gh-online__self">
+                        <span className="gh-online__self-dot" aria-hidden="true" />
+                        <span>{lobbyStatus === "online" ? "Vos estás en el lobby" : lobbyStatus === "connecting" ? "Conectando al lobby…" : "Conexión interrumpida"}</span>
+                        <span className="gh-online__self-tag">TÚ</span>
+                      </div>
+                      {otherOnlinePlayers.slice(0, 4).map((player) => {
+                        const skin = getPlayerSkin(player, auraItems);
+                        const activityLabel = player.activity === "in-match" ? "EN PARTIDA" : "EN LOBBY";
+                        return (
+                          <button type="button" key={player.userId} className="gh-online__player"
+                            onClick={() => setSelectedWorldPlayer(player)}
+                            title={player.activity === "lobby" ? `Ver perfil y desafiar a ${player.username}` : `Ver perfil de ${player.username}`}
+                            aria-label={`Ver perfil de ${player.username}, nivel ${player.level}, ${activityLabel}`}>
+                            <span className="gh-online__avatar">
+                              {skin?.imageUrl ? <img src={skin.imageUrl} alt="" loading="lazy" /> : <span aria-hidden="true">👤</span>}
+                            </span>
+                            <span className="gh-online__details">
+                              <strong>{player.username}</strong>
+                              <small><i className={`gh-online__activity gh-online__activity--${player.activity}`} aria-hidden="true" /> {activityLabel} · NIV. {player.level}</small>
+                            </span>
+                            <span className="gh-online__action" aria-hidden="true">{player.activity === "lobby" ? "⚔" : "›"}</span>
+                          </button>
+                        );
+                      })}
+                      {otherOnlinePlayers.length === 0 && (
+                        <p className="gh-online__empty">Todavía no hay otros jugadores. Cuando alguien entre, aparecerá acá.</p>
+                      )}
+                      {otherOnlinePlayers.length > 4 && (
+                        <button type="button" className="gh-online__more" onClick={() => setShowPlayersSheet(true)}>
+                          Ver todos los jugadores →
+                        </button>
+                      )}
+                    </div>
+                  </section>
+
+                  </aside>
                   <button className="gh-world__play" type="button" onClick={() => handleGameNavigate("battle")}>
                     <span className="gh-world__play-icon" aria-hidden>⚡</span>
                     <span>
@@ -1428,6 +1446,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
                 <section className="gh-match">
                   <div className="gh-match__bar">
                     <button className="gh-ghost" onClick={() => setView("lobby")}><span aria-hidden>‹</span> Lobby</button>
+                    <span style={{fontSize:12,opacity:.8}}>⚽ Partido rápido · Tomá decisiones para ganar XP</span>
 
                   </div>
 

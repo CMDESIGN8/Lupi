@@ -3758,3 +3758,25 @@
     bottom: 126px !important;
   }
 }
+
+/* UX: panel de jugadores compacto en escritorio, sin caja vacía gigante */
+@media (min-width: 901px) {
+  .gh-world .gh-world__players {
+    top: 365px !important; bottom: auto !important; height: auto !important;
+    max-height: min(245px, calc(100dvh - 460px)) !important;
+    min-height: 0 !important; width: min(310px, 25vw) !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    padding: 32px 8px 8px !important; gap: 6px !important;
+    overflow-y: auto !important;
+  }
+  .gh-world .gh-world__players > .gh-world-player {
+    min-height: 112px !important; padding: 7px 3px !important;
+  }
+  .gh-world .gh-world-player .gh-world-avatar {
+    width: 55px !important; height: 58px !important; flex-basis: 58px !important;
+  }
+  .gh-world .gh-world-player .gh-world-name { font-size: 10px !important; }
+  .gh-world .gh-world__players:has(> .gh-world-player:only-of-type) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}

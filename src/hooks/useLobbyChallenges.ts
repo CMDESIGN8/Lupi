@@ -99,6 +99,8 @@ export function useLobbyChallenges({
   const inTimer = useRef(0);
   const outTimer = useRef(0);
   const lastFrom = useRef(new Map<string, number>());
+  const acceptedIds = useRef(new Set<string>());
+  const activeDuelIds = useRef(new Set<string>());
 
   // Siempre los últimos callbacks, sin reconectar el canal.
   const availableRef = useRef(available);
@@ -161,15 +163,26 @@ export function useLobbyChallenges({
         setOutgoing(null);
 
         if (payload?.accept === true) {
+          if (acceptedIds.current.has(out.id)) return;
+          acceptedIds.current.add(out.id);
+          activeDuelIds.current.add(out.id);
           onAcceptedRef.current(out, "host");
         } else {
           setOutcome({ kind: payload?.busy === true ? "busy" : "declined", name: out.toName });
+        }
+      })
+      .on("broadcast", { event: "cancel" }, ({ payload }) => {
+        const current = incomingRef.current;
+        if (current && payload?.id === current.id && payload?.fromId === current.fromId && payload?.toId === meId) {
+          window.clearTimeout(inTimer.current);
+          setIncoming(null);
         }
       })
       .on("broadcast", { event: "duel-result" }, ({ payload }) => {
         const id = str(payload?.id, 64);
         const fromId = str(payload?.fromId, 128);
         if (!id || !fromId || str(payload?.toId, 128) !== meId) return;
+        if (!activeDuelIds.current.has(id)) return;
         setResults((current) => ({
           ...current,
           [id]: { fromId, userScore: score(payload?.userScore), rivalScore: score(payload?.rivalScore) },
@@ -185,6 +198,8 @@ export function useLobbyChallenges({
       setIncoming(null);
       setOutgoing(null);
       setResults({});
+      acceptedIds.current.clear();
+      activeDuelIds.current.clear();
       supabase.removeChannel(channel);
     };
   }, [room, meId, enabled, setIncoming, setOutgoing]);
@@ -262,9 +277,16 @@ export function useLobbyChallenges({
   );
 
   const cancel = useCallback(() => {
+    const pending = outgoingRef.current;
     window.clearTimeout(outTimer.current);
     setOutgoing(null);
-  }, [setOutgoing]);
+    if (pending) {
+      void channelRef.current?.send({
+        type: "broadcast", event: "cancel",
+        payload: { id: pending.id, fromId: meId, toId: pending.toId },
+      });
+    }
+  }, [meId, setOutgoing]);
 
   return { incoming, outgoing, outcome, ready, results, challenge, respond, cancel, sendResult };
 }
