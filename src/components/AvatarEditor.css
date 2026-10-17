@@ -124,3 +124,21 @@
  .lw-editor__layout{grid-template-rows:minmax(235px,41dvh) minmax(0,1fr)}
  .lw-editor__avatar-scaled{--editor-avatar-scale:.62;top:-8px}
 }
+
+/* V4.9 — Vista previa: escala fluida en desktop sin recortar pies.
+   El avatar conserva su rig 490x500; solo se modifica su presentación. */
+@media (min-width: 1051px) and (min-height: 720px) {
+  .lw-editor__center { --editor-avatar-scale: clamp(.96, 1.12, 1.12); }
+  .lw-editor__avatar-scaled { top: -5px; }
+}
+@media (min-width: 741px) and (max-height: 719px) {
+  .lw-editor__center { --editor-avatar-scale: .84; }
+  .lw-editor__avatar-scaled { top: -5px; }
+}
+/* Móvil: preview proporcionada y controles del inventario accesibles. */
+@media (max-width: 740px) {
+  .lw-editor__arena { overflow: hidden; }
+  .lw-editor__slot-rail { z-index: 5; }
+  .lw-editor__avatar-scaled { z-index: 2; }
+  .lw-editor__floor { z-index: 1; }
+}

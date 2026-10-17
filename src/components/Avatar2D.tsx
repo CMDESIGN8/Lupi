@@ -154,6 +154,13 @@ export function Avatar2D({
           src={baseImage}
           alt="Avatar Base"
           className="avatar2d__base-image"
+          onError={(event) => {
+            const img = event.currentTarget;
+            const fallback = shortSleeves
+              ? "/images/avatar-base-short.png"
+              : "/images/avatar-base.png";
+            if (!img.src.endsWith(fallback)) img.src = fallback;
+          }}
           draggable={false}
         />
 

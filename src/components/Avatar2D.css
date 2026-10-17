@@ -346,3 +346,8 @@
    No se utiliza mix-blend-mode ni máscara CSS: evita diferencias entre navegadores. */
 
 /* V4.8: mangas cortas integradas en la imagen base; no se superponen brazos. */
+
+/* V4.9: evita que las capas generen bordes de selección o arrastre. */
+.avatar2d__character,
+.avatar2d__base-image,
+.avatar2d__image { -webkit-user-drag: none; }
