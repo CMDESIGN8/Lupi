@@ -16,3 +16,16 @@
 .lw-editor__face-stage .lw-face{width:116px;height:148px}
 .lw-editor__preview--identity p{margin:2px 0 0;font-size:10px;text-align:center}
 @media(max-width:390px){.lw-editor__avatar-scaled{transform:translateX(-50%) scale(.46)}.lw-editor{padding:14px}.lw-editor__preview-bar>span{font-size:8px}}
+
+/* Editor V2: más presencia del personaje sin alterar el modal ni el scroll */
+.lw-editor__preview--identity{min-height:390px}
+.lw-editor__avatar-stage{height:350px}
+.lw-editor__avatar-scaled{transform:translateX(-50%) scale(.68)}
+.lw-editor__face-stage{height:350px}
+.lw-editor__face-stage .lw-face{width:135px;height:175px}
+@media(max-width:440px){
+ .lw-editor__preview--identity{min-height:350px}
+ .lw-editor__avatar-stage{height:310px}
+ .lw-editor__avatar-scaled{transform:translateX(-50%) scale(.59)}
+ .lw-editor__face-stage{height:310px}
+}

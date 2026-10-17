@@ -1,1 +1,21 @@
 .lw-face{position:relative;width:100%;height:100%;border-radius:45% 45% 47% 47%;background:var(--lw-skin);box-shadow:inset -5px -3px 9px #24140c40;overflow:visible}.lw-face--round{border-radius:50%}.lw-face--angular,.lw-face--square{border-radius:35% 35% 26% 26%}.lw-face--long{border-radius:44% 44% 40% 40%;transform:scaleX(.85)}.lw-face--soft{border-radius:48% 48% 50% 50%}.lw-face__hair{position:absolute;top:-7%;left:-4%;width:108%;height:33%;border-radius:55% 55% 28% 20%;background:var(--lw-hair);z-index:2}.lw-face--fade .lw-face__hair{height:20%;border-radius:40% 50% 10% 10%}.lw-face--curly .lw-face__hair,.lw-face--afro .lw-face__hair{height:39%;top:-13%;border-radius:50%;box-shadow:-5px 2px 0 var(--lw-hair),5px 1px 0 var(--lw-hair)}.lw-face--afro .lw-face__hair{height:49%;top:-22%}.lw-face--buzz .lw-face__hair{height:14%;top:0}.lw-face--long .lw-face__hair{height:48%;top:-8%;border-radius:45% 45% 12% 12%}.lw-face--side .lw-face__hair{height:28%;transform:rotate(-12deg);transform-origin:left}.lw-face--spiky .lw-face__hair{height:29%;clip-path:polygon(0 100%,4% 0,26% 40%,38% 0,57% 38%,80% 0,100% 100%)}.lw-face__eyes{position:absolute;top:48%;left:21%;width:58%;display:flex;justify-content:space-between}.lw-face__eyes i{width:13%;aspect-ratio:1;border-radius:50%;background:#25201d}.lw-face__mouth{position:absolute;top:75%;left:39%;width:22%;height:3%;background:#633c37;border-radius:50%}.lw-face__mouth--smile{height:9%;border:0;border-bottom:2px solid #633c37;background:transparent;border-radius:0 0 50% 50%}.lw-face__mouth--focused{height:2%;width:28%;left:36%}
+
+/* Estilo deportivo semi-realista: mismo dato de identidad, más volumen.
+   No modifica ni inventa opciones de Supabase. */
+.lw-face--game, .lw-editor .lw-face {
+  background:
+    radial-gradient(ellipse at 28% 33%,rgba(255,240,213,.24),transparent 37%),
+    radial-gradient(ellipse at 80% 66%,rgba(58,27,18,.18),transparent 49%),
+    linear-gradient(102deg,rgba(40,20,10,.18),transparent 29%,rgba(255,240,220,.1) 52%,rgba(34,16,12,.25)),
+    var(--lw-skin);
+  box-shadow:inset 4px 0 7px rgba(255,226,200,.13),inset -7px -4px 11px rgba(35,17,13,.25),0 3px 7px rgba(0,0,0,.2);
+}
+.lw-face__ear{position:absolute;top:46%;width:11%;height:20%;background:var(--lw-skin);border-radius:60%;box-shadow:inset -2px -1px 3px #2d17152b}
+.lw-face__ear--left{left:-6%}.lw-face__ear--right{right:-6%}
+.lw-face__brows{position:absolute;top:42%;left:20%;width:60%;display:flex;justify-content:space-between;z-index:2}
+.lw-face__brows i{width:25%;height:3px;border-radius:60%;background:var(--lw-hair);opacity:.72}
+.lw-face__nose{position:absolute;left:48%;top:55%;width:7%;height:13%;border-radius:50%;box-shadow:1px 1px 1px rgba(64,31,23,.25)}
+.lw-face__eyes{top:51%;z-index:2}
+.lw-face__eyes i{width:15%;background:radial-gradient(circle at 65% 25%,#ffffff 0 12%,#261a17 18% 100%);box-shadow:0 -1px 0 rgba(40,22,18,.25)}
+.lw-face__hair{box-shadow:inset -5px -4px 8px rgba(0,0,0,.24),inset 3px 2px 5px rgba(255,255,255,.1)}
+.lw-face__mouth{top:79%;height:2%;opacity:.8}

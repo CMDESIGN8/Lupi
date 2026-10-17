@@ -135,7 +135,7 @@ export function Avatar2D({
       <div className="avatar2d__aura" />
       <div className="avatar2d__shadow" />
 
-      <div className="avatar2d__character">
+      <div className="avatar2d__character" data-avatar-rig="v2">
 
         {/* =========================
             BASE CHARACTER (PNG REAL)
@@ -148,7 +148,7 @@ export function Avatar2D({
         />
 
         {appearance ? (
-          <div className="avatar2d__custom-head"><AvatarFace appearance={appearance} /></div>
+          <div className="avatar2d__custom-head"><AvatarFace appearance={appearance} className="lw-face--game" /></div>
         ) : (
           <img src="/images/head.png" className="avatar2d__base-head" alt="Cabeza del personaje" draggable={false} />
         )}
