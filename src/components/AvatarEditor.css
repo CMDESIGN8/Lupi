@@ -3,3 +3,16 @@
 /* Modal por encima de todas las capas del estadio y del HUD */
 .lw-editor-backdrop{z-index:2147483000;isolation:isolate;overflow-y:auto;overscroll-behavior:contain}
 .lw-editor{position:relative;z-index:1}
+
+.lw-editor__preview--identity{height:auto;min-height:300px;padding:10px 10px 6px;display:flex;gap:4px}
+.lw-editor__preview-bar{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lw-editor__preview-bar>span{font-size:9px;font-weight:900;letter-spacing:.12em;color:#e8ca69}
+.lw-editor__preview-toggle{display:flex;gap:3px}
+.lw-editor__preview-toggle button{cursor:pointer;background:#071d18;color:#b7d4c7;border:1px solid #32654e;border-radius:5px;padding:6px 8px;font-size:9px;font-weight:800}
+.lw-editor__preview-toggle button.active{background:#236c4e;color:white;border-color:#57df9b}
+.lw-editor__avatar-stage{position:relative;height:275px;width:100%;overflow:hidden;display:flex;justify-content:center;align-items:flex-start}
+.lw-editor__avatar-scaled{position:absolute;top:0;left:50%;width:390px;height:520px;transform:translateX(-50%) scale(.52);transform-origin:top center;pointer-events:none}
+.lw-editor__face-stage{height:275px;width:100%;display:flex;align-items:center;justify-content:center}
+.lw-editor__face-stage .lw-face{width:116px;height:148px}
+.lw-editor__preview--identity p{margin:2px 0 0;font-size:10px;text-align:center}
+@media(max-width:390px){.lw-editor__avatar-scaled{transform:translateX(-50%) scale(.46)}.lw-editor{padding:14px}.lw-editor__preview-bar>span{font-size:8px}}

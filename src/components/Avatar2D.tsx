@@ -147,11 +147,11 @@ export function Avatar2D({
           draggable={false}
         />
 
-        <img
-          src="/images/head.png"
-          className="avatar2d__base-head" alt="Base Head"
-          draggable={false}
-        />
+        {appearance ? (
+          <div className="avatar2d__custom-head"><AvatarFace appearance={appearance} /></div>
+        ) : (
+          <img src="/images/head.png" className="avatar2d__base-head" alt="Cabeza del personaje" draggable={false} />
+        )}
 
 
         {/* =========================
