@@ -1,0 +1,1180 @@
+/* src/components/player-card/player-card.css
+   Perfil de jugador · Lupi World.
+   Reemplaza las capas V2–V5 del PlayerCard.css anterior: un solo bloque por sección,
+   sin !important y sin selectores duplicados. Botones, toasts y modal de desafío
+   siguen en challenge-toasts.css.
+
+   Lo memorable: el dorsal gigante y el personaje que rompe el marco del escenario.
+   El resto es deliberadamente quieto. */
+
+/* ---------- Capa y contenedor ---------- */
+
+.lw-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  /* El encabezado fijo del juego ocupa ~80px: el perfil se centra por debajo. */
+  padding: calc(80px + env(safe-area-inset-top, 0px)) 16px 16px;
+  background: rgba(1, 8, 9, 0.82);
+  backdrop-filter: blur(9px) saturate(0.8);
+  animation: lw-fade 0.18s ease-out both;
+}
+
+.lw-card {
+  --lw-text: #eaf6ee;
+  --lw-muted: #8fb3a3;
+  --lw-line: rgba(120, 210, 165, 0.16);
+  --lw-accent: #24e987;
+  --lw-gold: #ffc83d;
+  --lw-ink: #04110f;
+  --lw-rarity: #9aa4a0; /* lo pisa el componente según la prenda más rara */
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(480px, 100%);
+  max-height: min(800px, calc(100dvh - 96px - env(safe-area-inset-top, 0px)));
+  box-sizing: border-box;
+  padding: 12px 16px 14px;
+  color: var(--lw-text);
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 60%, #2a5a47);
+  border-radius: 20px 5px 20px 5px;
+  background:
+    radial-gradient(120% 55% at 50% 0%, color-mix(in srgb, var(--lw-rarity) 22%, transparent), transparent 62%),
+    linear-gradient(160deg, #18332b 0%, #071714 58%, #04100f 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 0 48px color-mix(in srgb, var(--lw-rarity) 16%, transparent),
+    0 28px 80px rgba(0, 0, 0, 0.72);
+  animation: lw-card-in 0.26s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+
+.lw-card :focus-visible {
+  outline: 2px solid var(--lw-accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Barra superior ---------- */
+
+.lw-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+  color: #9ed9c1;
+  font: 800 10px/1.3 "Barlow", sans-serif;
+  letter-spacing: 0.16em;
+}
+
+.lw-top__tag {
+  margin-left: auto;
+  color: var(--lw-rarity);
+}
+
+.lw-close {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: var(--lw-text);
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--lw-line);
+  border-radius: 9px 3px 9px 3px;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 0.15s;
+}
+
+.lw-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ---------- Hero: escenario + personaje ---------- */
+
+.lw-hero {
+  --lw-hero-h: 288px;
+  --lw-avatar-s: 1.34;
+  --lw-dorsal-size: 170px;
+  --lw-px: 0;
+  --lw-py: 0;
+
+  position: relative;
+  flex: none;
+  height: var(--lw-hero-h);
+  transition: height 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* El escenario deja 18px arriba: ahí asoma la cabeza del personaje. */
+.lw-hero__stage {
+  position: absolute;
+  inset: 18px 0 0;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 45%, #1c3f33);
+  border-radius: 16px 4px 16px 4px;
+  background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--lw-rarity) 20%, #132d27), #071916 70%);
+}
+
+/* Viñeta para asentar los bordes. */
+.lw-hero__stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(5, 20, 17, 0.55), transparent 30%, transparent 72%, rgba(6, 22, 19, 0.7));
+}
+
+/* Brillo que cruza una vez al abrir, solo en rarezas altas. */
+.lw-hero__stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(105deg, transparent 36%, rgba(255, 255, 255, 0.28) 48%, rgba(255, 255, 255, 0.06) 54%, transparent 62%);
+  background-size: 260% 100%;
+}
+
+.lw-card[data-rarity="epic"] .lw-hero__stage::before,
+.lw-card[data-rarity="legendary"] .lw-hero__stage::before {
+  animation: lw-sheen 1.5s 0.55s ease-out both;
+}
+
+/* Reflectores (luces que se mueven despacio). */
+.lw-hero__beams {
+  position: absolute;
+  inset: -50% -30%;
+  z-index: 0;
+  background: conic-gradient(
+    from 180deg at 50% 0%,
+    transparent 0deg,
+    rgba(232, 255, 240, 0.09) 16deg,
+    transparent 32deg,
+    transparent 52deg,
+    rgba(232, 255, 240, 0.08) 69deg,
+    transparent 84deg
+  );
+  animation: lw-beams 9s ease-in-out infinite alternate;
+}
+
+/* Cancha en perspectiva: círculo central, línea de medio y guías. */
+.lw-hero__court {
+  position: absolute;
+  left: -15%;
+  right: -15%;
+  bottom: 0;
+  z-index: 1;
+  height: 60%;
+  transform: perspective(420px) rotateX(64deg);
+  transform-origin: 50% 100%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 38px, rgba(255, 255, 255, 0.24) 39px 41px, transparent 42px),
+    linear-gradient(rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.24)) 50% 50% / 100% 2px no-repeat,
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px) 0 0 / 36px 100%,
+    linear-gradient(180deg, #0e2b22, #061511);
+  -webkit-mask-image: linear-gradient(to top, #000 40%, transparent);
+  mask-image: linear-gradient(to top, #000 40%, transparent);
+  translate: calc(var(--lw-px) * -4px) 0;
+  transition: translate 0.15s ease-out;
+}
+
+/* El dorsal: número gigante en contorno detrás del personaje. */
+.lw-hero__dorsal {
+  position: absolute;
+  top: 6px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: center;
+  font: italic 900 var(--lw-dorsal-size) / 1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.02em;
+  color: transparent;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--lw-rarity) 30%, transparent), transparent 85%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 2px color-mix(in srgb, var(--lw-rarity) 55%, transparent);
+  user-select: none;
+  translate: calc(var(--lw-px) * -9px) calc(var(--lw-py) * -4px);
+  transition: translate 0.15s ease-out, font-size 0.35s;
+  animation: lw-dorsal-in 0.55s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.lw-hero__halo {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  z-index: 3;
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 55%, transparent);
+  box-shadow:
+    0 0 38px color-mix(in srgb, var(--lw-rarity) 22%, transparent),
+    inset 0 0 45px color-mix(in srgb, var(--lw-rarity) 10%, transparent);
+}
+
+.lw-hero__floor {
+  position: absolute;
+  bottom: 14px;
+  left: 23%;
+  z-index: 3;
+  width: 54%;
+  height: 15px;
+  border-radius: 50%;
+  border: 1px solid var(--lw-rarity);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--lw-rarity) 65%, transparent);
+}
+
+/* ---------- Personaje ---------- */
+
+/* Caja de diseño 135×190. El hero la escala con --lw-avatar-s. */
+.lw-avatar {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 4;
+  width: 135px;
+  height: 190px;
+  margin-left: -67.5px;
+  transform: scale(var(--lw-avatar-s));
+  transform-origin: 50% 0;
+  translate: calc(var(--lw-px) * 6px) calc(var(--lw-py) * 2px);
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), translate 0.15s ease-out;
+  filter: drop-shadow(0 4px 13px rgba(0, 0, 0, 0.6));
+}
+
+.lw-avatar__rise {
+  position: absolute;
+  inset: 0;
+  animation: lw-rise 0.5s 0.12s cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.lw-avatar__body {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+  animation: lw-breathe 3.8s 0.7s ease-in-out infinite;
+}
+
+.lw-avatar__base {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.lw-avatar__head {
+  position: absolute;
+  left: 51px;
+  top: 4px;
+  width: 33px;
+  height: 37px;
+  border-radius: 43% 43% 46% 46%;
+  background: linear-gradient(115deg, #946b54, #d6aa88 52%, #73503e);
+  box-shadow: inset 0 7px 0 #292722;
+}
+
+.lw-avatar__torso {
+  position: absolute;
+  left: 28px;
+  top: 39px;
+  width: 79px;
+  height: 86px;
+  border-radius: 23px 23px 11px 11px;
+  background: linear-gradient(90deg, #162b2b, #425c59 50%, #142b2b);
+  box-shadow: -24px 10px 0 -15px #344a46, 24px 10px 0 -15px #344a46;
+}
+
+.lw-avatar__legs {
+  position: absolute;
+  left: 41px;
+  top: 120px;
+  width: 54px;
+  height: 61px;
+  border-radius: 0 0 7px 7px;
+  background: linear-gradient(90deg, #6d897f 0 40%, transparent 40% 60%, #6d897f 60%);
+}
+
+.lw-avatar__wear {
+  position: absolute;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.lw-avatar__wear--top {
+  width: 112px;
+  height: 106px;
+  left: 11px;
+  top: 35px;
+  z-index: 2;
+}
+
+.lw-avatar__wear--bottom {
+  width: 79px;
+  height: 72px;
+  left: 28px;
+  top: 107px;
+  z-index: 2;
+}
+
+/* Imagen oficial del par AURA XP: sin deformarla. */
+.lw-avatar__wear--boots {
+  width: 132px;
+  height: 48px;
+  left: 1px;
+  top: 151px;
+  z-index: 3;
+  object-position: center bottom;
+}
+
+/* ---------- Insignias sobre el hero ---------- */
+
+.lw-ovr {
+  position: absolute;
+  top: 32px;
+  left: 12px;
+  z-index: 5;
+  box-sizing: border-box;
+  width: 56px;
+  padding: 7px 0 13px;
+  text-align: center;
+  color: var(--lw-ink);
+  background: linear-gradient(
+    170deg,
+    color-mix(in srgb, var(--lw-rarity) 88%, #fff),
+    color-mix(in srgb, var(--lw-rarity) 60%, #000)
+  );
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+  animation: lw-pop 0.45s 0.3s cubic-bezier(0.2, 1.5, 0.4, 1) both;
+}
+
+.lw-ovr strong {
+  display: block;
+  font: italic 900 30px / 1 "Barlow Condensed", sans-serif;
+}
+
+.lw-ovr span {
+  display: block;
+  margin-top: 1px;
+  font: 800 9px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.14em;
+}
+
+.lw-pos {
+  position: absolute;
+  top: 106px;
+  left: 12px;
+  z-index: 5;
+  box-sizing: border-box;
+  width: 56px;
+  padding: 4px 0;
+  text-align: center;
+  color: #e9fff2;
+  font: 900 12px / 1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.1em;
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 60%, transparent);
+  border-radius: 5px 1px 5px 1px;
+  background: rgba(4, 17, 15, 0.7);
+}
+
+.lw-crest {
+  position: absolute;
+  top: 32px;
+  right: 12px;
+  z-index: 5;
+  min-width: 40px;
+  height: 40px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  color: #d6efe1;
+  font: italic 900 15px / 1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.04em;
+  border: 1px solid color-mix(in srgb, var(--lw-rarity) 70%, transparent);
+  border-radius: 999px;
+  background: rgba(4, 17, 15, 0.65);
+}
+
+.lw-hero__rarity {
+  position: absolute;
+  right: 13px;
+  bottom: 12px;
+  z-index: 5;
+  color: var(--lw-rarity);
+  font: 900 10px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 12px #000;
+}
+
+/* Hero reducido (pestaña Desafiar y reporte): el contenido manda.
+   Sus medidas se declaran al final del archivo, después de los media queries. */
+.lw-hero[data-compact="true"] .lw-pos,
+.lw-hero[data-compact="true"] .lw-hero__rarity,
+.lw-hero[data-compact="true"] .lw-hero__halo {
+  display: none;
+}
+
+.lw-hero[data-compact="true"] .lw-hero__floor {
+  bottom: 8px;
+}
+
+/* ---------- Identidad ---------- */
+
+.lw-identity {
+  flex: none;
+  display: grid;
+  gap: 3px;
+  animation: lw-fade 0.3s 0.3s ease-out both;
+}
+
+.lw-identity__name {
+  margin: 0;
+  font: italic 900 clamp(30px, 7vw, 40px) / 1 "Barlow Condensed", sans-serif;
+  letter-spacing: 0.05em;
+  color: #f5fff6;
+  overflow-wrap: anywhere;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+}
+
+.lw-identity__club {
+  margin: 0 0 3px;
+  color: #b7d1c1;
+  font: 600 12px / 1.3 "Barlow", sans-serif;
+}
+
+.lw-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.lw-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  color: #c3f5d8;
+  font: 700 10px / 1 "Barlow", sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+}
+
+.lw-chip i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7a8f87;
+}
+
+.lw-chip[data-activity="lobby"] i {
+  background: #28dd84;
+  box-shadow: 0 0 8px #28dd84;
+}
+
+.lw-chip[data-activity="in-match"] {
+  color: #ffe29a;
+}
+
+.lw-chip[data-activity="in-match"] i {
+  background: #f7c34b;
+  box-shadow: 0 0 8px #f7c34b;
+}
+
+.lw-chip--streak {
+  color: #ffd78a;
+  border-color: rgba(255, 200, 61, 0.35);
+  background: rgba(255, 200, 61, 0.08);
+}
+
+/* Forma: G ganó, E empató, P perdió. La letra evita depender solo del color. */
+.lw-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+}
+
+.lw-form__label {
+  margin-right: 4px;
+  color: var(--lw-muted);
+  font: 700 10px / 1 "Barlow", sans-serif;
+}
+
+.lw-form b {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  color: var(--lw-ink);
+  font: 900 11px / 1 "Barlow Condensed", sans-serif;
+  border-radius: 4px 1px 4px 1px;
+}
+
+.lw-form b[data-r="G"] {
+  background: #28dd84;
+}
+
+.lw-form b[data-r="E"] {
+  background: #d8c46a;
+}
+
+.lw-form b[data-r="P"] {
+  background: #e0715f;
+}
+
+/* ---------- Barra de XP ---------- */
+
+.lw-xp {
+  flex: none;
+  display: grid;
+  gap: 5px;
+  animation: lw-fade 0.3s 0.38s ease-out both;
+}
+
+.lw-xp__row {
+  display: flex;
+  justify-content: space-between;
+  color: #d9f5e7;
+  font: 800 11px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.06em;
+}
+
+.lw-xp__row span:last-child {
+  color: var(--lw-muted);
+  font-weight: 700;
+}
+
+.lw-xp__track {
+  height: 8px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+  /* Segmentos: 10 tramos separados por 3px. */
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 calc(10% - 3px), transparent calc(10% - 3px) 10%);
+  mask: repeating-linear-gradient(90deg, #000 0 calc(10% - 3px), transparent calc(10% - 3px) 10%);
+}
+
+.lw-xp__fill {
+  width: calc(var(--lw-xp) * 100%);
+  height: 100%;
+  background: linear-gradient(90deg, var(--lw-accent), #8cffc2);
+  box-shadow: 0 0 12px rgba(36, 233, 135, 0.6);
+  transform-origin: left;
+  animation: lw-fill 0.9s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* ---------- Pestañas ---------- */
+
+.lw-tabs {
+  flex: none;
+  display: flex;
+  gap: 6px;
+}
+
+.lw-tab {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 4px;
+  color: #accbb9;
+  font: 800 10px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  border: 1px solid #2b5847;
+  border-radius: 6px 2px 6px 2px;
+  background: #071d17;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.lw-tab:hover {
+  color: #fff;
+  border-color: #3f7c63;
+}
+
+.lw-tab[aria-selected="true"] {
+  color: #f6fff7;
+  border-color: #60c991;
+  background: #235d42;
+  box-shadow: inset 0 -2px 0 var(--lw-accent);
+}
+
+/* ---------- Panel (única zona con scroll) ---------- */
+
+.lw-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 2px 2px 4px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  animation: lw-panel-in 0.22s ease-out both;
+}
+
+.lw-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  color: #d9f5e7;
+  font: 800 12px / 1.2 "Barlow", sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.lw-heading span {
+  color: #e7c56e;
+  font-weight: 700;
+}
+
+.lw-note {
+  margin: 0;
+  color: #9cbdac;
+  font: 500 11px / 1.4 "Barlow", sans-serif;
+}
+
+.lw-note--status {
+  color: #ffe29a;
+}
+
+/* ---------- Pestaña Perfil ---------- */
+
+.lw-attrs {
+  display: grid;
+  grid-template-columns: minmax(0, 176px) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px 8px 4px;
+  border: 1px solid var(--lw-line);
+  border-radius: 12px;
+  background: rgba(4, 18, 15, 0.6);
+}
+
+.lw-radar {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.lw-radar__ring {
+  fill: none;
+  stroke: rgba(127, 211, 169, 0.2);
+  stroke-width: 1;
+}
+
+.lw-radar__axis {
+  stroke: rgba(127, 211, 169, 0.12);
+  stroke-width: 1;
+}
+
+.lw-radar__shape {
+  fill: color-mix(in srgb, var(--lw-rarity) 28%, transparent);
+  stroke: var(--lw-rarity);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transform-origin: 100px 100px;
+  animation: lw-radar-in 0.7s 0.4s cubic-bezier(0.2, 1.2, 0.4, 1) both;
+}
+
+.lw-radar__dot {
+  fill: var(--lw-rarity);
+}
+
+.lw-radar__code {
+  fill: #9ed9c1;
+  font: 800 8.5px "Barlow", sans-serif;
+  letter-spacing: 0.08em;
+}
+
+.lw-radar__val {
+  fill: #f6e8bb;
+  font: italic 900 12px "Barlow Condensed", sans-serif;
+}
+
+.lw-attr-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lw-attr {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 3px 8px;
+  font: 700 11px / 1.1 "Barlow", sans-serif;
+}
+
+.lw-attr small {
+  color: var(--lw-muted);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.lw-attr strong {
+  color: #f6e8bb;
+  font: italic 900 15px / 1 "Barlow Condensed", sans-serif;
+}
+
+.lw-attr__bar {
+  grid-column: 1 / -1;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lw-attr__bar::after {
+  content: "";
+  display: block;
+  width: calc(var(--v) * 100%);
+  height: 100%;
+  background: var(--lw-rarity);
+  transform-origin: left;
+  animation: lw-fill 0.7s 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.lw-stats {
+  display: flex;
+  margin: 0;
+  border-block: 1px solid var(--lw-line);
+  background: rgba(9, 37, 30, 0.6);
+}
+
+.lw-stats > div {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 4px;
+}
+
+.lw-stats > div + div {
+  border-left: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.lw-stats dd {
+  margin: 0;
+  color: #f6e8bb;
+  font: italic 900 22px / 1 "Barlow Condensed", sans-serif;
+}
+
+.lw-stats dt {
+  color: #9bbbad;
+  font: 800 9px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.1em;
+}
+
+/* ---------- Pestaña Vestuario ---------- */
+
+.lw-slots {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lw-slot {
+  --slot-rarity: #9aa4a0;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.lw-slot__frame {
+  width: 100%;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-size: 24px;
+  border: 1px solid rgba(132, 170, 149, 0.18);
+  border-radius: 9px 3px 9px 3px;
+  background: rgba(8, 36, 27, 0.8);
+}
+
+.lw-slot[data-filled="true"] .lw-slot__frame {
+  border-color: color-mix(in srgb, var(--slot-rarity) 60%, transparent);
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--slot-rarity) 20%, #0a2b21), #061712);
+}
+
+.lw-slot__frame img {
+  max-width: 84%;
+  max-height: 84%;
+  object-fit: contain;
+}
+
+.lw-slot__label {
+  color: #9cbcae;
+  font: 800 9px / 1 "Barlow", sans-serif;
+  letter-spacing: 0.06em;
+}
+
+.lw-slot__name {
+  max-width: 100%;
+  overflow: hidden;
+  color: #d4eadd;
+  font: 600 10px / 1.15 "Barlow", sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Pestaña Vitrina ---------- */
+
+.lw-trophies {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lw-trophy {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  min-height: 86px;
+  padding: 12px 6px 10px;
+  text-align: center;
+  border: 1px solid rgba(255, 190, 65, 0.32);
+  border-radius: 10px 3px 10px 3px;
+  background: linear-gradient(180deg, rgba(75, 55, 12, 0.32), rgba(20, 16, 6, 0.4));
+}
+
+.lw-trophy__icon {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(255, 190, 65, 0.4));
+}
+
+.lw-trophy__title {
+  color: #f6e3ac;
+  font: 700 10px / 1.25 "Barlow", sans-serif;
+}
+
+.lw-trophy[data-locked="true"] {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.lw-trophy[data-locked="true"] .lw-trophy__icon {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+.lw-trophy[data-locked="true"] .lw-trophy__title {
+  color: #7f9d8f;
+}
+
+/* ---------- Pestaña Desafiar ---------- */
+
+.lw-games {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.lw-game {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-height: 88px;
+  padding: 10px;
+  text-align: left;
+  color: #f4fff6;
+  cursor: pointer;
+  border: 1px solid #3e9e69;
+  border-radius: 8px 3px 8px 3px;
+  background: linear-gradient(130deg, #174c36, #0b2a22);
+  transition: transform 0.15s, border-color 0.15s;
+}
+
+.lw-game:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: var(--lw-accent);
+}
+
+.lw-game:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #37564a;
+}
+
+.lw-game__icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.lw-game__title {
+  font: 800 11px / 1.2 "Barlow", sans-serif;
+}
+
+.lw-game__desc {
+  color: #b7d5c2;
+  font: 500 10px / 1.3 "Barlow", sans-serif;
+}
+
+.lw-game__state {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+/* ---------- Moderación y reporte ---------- */
+
+.lw-moderation {
+  flex: none;
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.lw-more {
+  padding: 5px;
+  color: #7da495;
+  font: 700 10px / 1 "Barlow", sans-serif;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+}
+
+.lw-more:hover {
+  color: #fff;
+}
+
+.lw-moderation__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+}
+
+.lw-moderation__options .pc-btn {
+  min-height: 35px;
+  font-size: 10px;
+}
+
+.lw-report {
+  display: grid;
+  gap: 8px;
+}
+
+.lw-report__title,
+.lw-report__msg {
+  margin: 0;
+  font: 600 13px / 1.35 "Barlow", sans-serif;
+}
+
+.lw-report__msg--error {
+  color: #ffb4a7;
+  font-size: 11px;
+}
+
+/* ---------- Animaciones ---------- */
+
+@keyframes lw-fade {
+  from { opacity: 0; }
+}
+
+@keyframes lw-card-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+}
+
+@keyframes lw-sheet-in {
+  from { transform: translateY(100%); }
+}
+
+@keyframes lw-panel-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+@keyframes lw-beams {
+  from { transform: rotate(-8deg); }
+  to { transform: rotate(8deg); }
+}
+
+@keyframes lw-dorsal-in {
+  from { opacity: 0; transform: scale(1.18); }
+}
+
+@keyframes lw-rise {
+  from { opacity: 0; transform: translateY(16px); }
+}
+
+@keyframes lw-breathe {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-2px) scaleY(1.012); }
+}
+
+@keyframes lw-pop {
+  from { opacity: 0; transform: scale(0.55); }
+}
+
+@keyframes lw-sheen {
+  0% { opacity: 0; background-position: 120% 0; }
+  15% { opacity: 1; }
+  100% { opacity: 0; background-position: -40% 0; }
+}
+
+@keyframes lw-fill {
+  from { transform: scaleX(0); }
+}
+
+@keyframes lw-radar-in {
+  from { opacity: 0; transform: scale(0.2); }
+}
+
+/* ---------- Responsive ---------- */
+
+/* Alto reducido (notebooks chicas, teléfonos apaisados). */
+@media (max-height: 700px) {
+  .lw-hero {
+    --lw-hero-h: 232px;
+    --lw-avatar-s: 1.08;
+    --lw-dorsal-size: 140px;
+  }
+}
+
+@media (max-height: 600px) {
+  .lw-hero {
+    --lw-hero-h: 176px;
+    --lw-avatar-s: 0.82;
+    --lw-dorsal-size: 100px;
+  }
+
+  .lw-tab {
+    min-height: 32px;
+  }
+}
+
+@media (max-height: 560px) {
+  .lw-backdrop {
+    padding-top: calc(60px + env(safe-area-inset-top, 0px));
+    padding-bottom: 8px;
+  }
+
+  .lw-card {
+    max-height: calc(100dvh - 68px - env(safe-area-inset-top, 0px));
+  }
+}
+
+/* Celular: el perfil sube como hoja desde abajo. */
+@media (max-width: 560px) {
+  .lw-backdrop {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .lw-card {
+    width: 100%;
+    max-height: calc(100dvh - 44px - env(safe-area-inset-top, 0px));
+    padding: 10px 14px calc(14px + env(safe-area-inset-bottom, 0px));
+    border-bottom: 0;
+    border-radius: 22px 22px 0 0;
+    animation-name: lw-sheet-in;
+  }
+
+  /* Manija de la hoja. */
+  .lw-card::before {
+    content: "";
+    align-self: center;
+    flex: none;
+    width: 38px;
+    height: 4px;
+    margin-bottom: -2px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .lw-hero {
+    --lw-hero-h: 262px;
+    --lw-avatar-s: 1.22;
+    --lw-dorsal-size: 150px;
+  }
+
+  .lw-attrs {
+    grid-template-columns: minmax(0, 150px) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .lw-tab {
+    font-size: 9px;
+    letter-spacing: 0.05em;
+  }
+
+  .lw-slot__frame {
+    height: 62px;
+  }
+}
+
+@media (max-width: 560px) and (max-height: 700px) {
+  .lw-hero {
+    --lw-hero-h: 214px;
+    --lw-avatar-s: 0.98;
+    --lw-dorsal-size: 124px;
+  }
+}
+
+@media (max-width: 560px) and (max-height: 600px) {
+  .lw-hero {
+    --lw-hero-h: 168px;
+    --lw-avatar-s: 0.78;
+    --lw-dorsal-size: 96px;
+  }
+}
+
+@media (max-width: 360px) {
+  .lw-attrs {
+    grid-template-columns: 1fr;
+  }
+
+  .lw-games {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* El modo compacto va último: mismo peso que los anteriores pero gana por orden. */
+.lw-hero[data-compact="true"] {
+  --lw-hero-h: 132px;
+  --lw-avatar-s: 0.62;
+  --lw-dorsal-size: 84px;
+}
+
+/* ---------- Movimiento reducido ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .lw-backdrop,
+  .lw-card,
+  .lw-card *,
+  .lw-card *::before,
+  .lw-card *::after {
+    animation: none;
+    transition: none;
+  }
+}
