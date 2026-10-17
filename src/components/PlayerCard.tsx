@@ -1,5 +1,6 @@
 // src/components/PlayerCard.tsx
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import {
   DEFAULT_ITEM_COLOR,
   type InventoryItem,
@@ -36,7 +37,15 @@ const REPORT_REASONS: { id: ReportReason; label: string }[] = [
   { id: "otro", label: "Otro" },
 ];
 
+export type PlayerCompetitiveStats = {
+  matchesPlayed?: number | null;
+  wins?: number | null;
+  achievements?: { id: string; title: string; icon?: string }[];
+};
+
 type Props = {
+  /** Datos competitivos verificados, opcionales hasta conectar Supabase. */
+  competitiveStats?: PlayerCompetitiveStats | null;
   /** Jugador seleccionado; null = tarjeta cerrada. */
   player: LobbyPlayer | null;
   meId: string;
@@ -46,22 +55,29 @@ type Props = {
   challengePending: boolean;
   onClose: () => void;
   onChallenge: (player: LobbyPlayer) => void;
+  /** Envía directamente un desafío de la modalidad elegida, sin abrir otro modal. */
+  onChallengeGame?: (player: LobbyPlayer, game: ChallengeGame) => void;
   onToggleMute: (userId: string) => void;
   onReport: (userId: string, reason: ReportReason) => Promise<boolean>;
 };
 
 export function PlayerCard({
   player,
+  competitiveStats,
   meId,
   catalog,
   muted,
   challengePending,
   onClose,
   onChallenge,
+  onChallengeGame,
   onToggleMute,
   onReport,
 }: Props) {
   const [reporting, setReporting] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [showChallengeGames, setShowChallengeGames] = useState(true);
   const [reportState, setReportState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -70,6 +86,9 @@ export function PlayerCard({
 
   useEffect(() => {
     setReporting(false);
+    setShowDetails(false);
+    setShowOptions(false);
+    setShowChallengeGames(userId !== meId);
     setReportState("idle");
     if (userId) closeRef.current?.focus();
   }, [userId]);
@@ -110,95 +129,89 @@ export function PlayerCard({
     setReportState(ok ? "sent" : "error");
   };
 
-  return (
+  return createPortal(
     <div className="pc-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <section
-        className="pc"
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Perfil de ${player.username}`}
-        style={
-          {
-            "--pc-color": main?.color ?? DEFAULT_ITEM_COLOR,
-            "--pc-rarity": RARITY_COLOR[rarityKey],
-          } as CSSProperties
+      <section className={`pc pc--profile pc--scouting ${showChallengeGames ? "pc--challenge-view" : ""}`} role="dialog" aria-modal="true" aria-label={`Perfil de ${player.username}`}
+        style={{ "--pc-color": main?.color ?? DEFAULT_ITEM_COLOR, "--pc-rarity": RARITY_COLOR[rarityKey] } as CSSProperties}>
+        <button ref={closeRef} type="button" className="pc-close" onClick={onClose} aria-label="Cerrar perfil">✕</button>
+        <div className="pc-rival__topline"><span>✦ LUPI WORLD</span><span>{isMe ? "TU IDENTIDAD" : "INFORME DE RIVAL"}</span></div>
+        {!showChallengeGames && <div className="pc-rival__arena">
+          <div className="pc-rival__beams" aria-hidden="true" />
+          <div className="pc-rival__halo" aria-hidden="true" />
+          <div className="pc-rival__crest" aria-hidden="true">LW</div>
+          <div className="pc-rival__character" aria-label={`Equipamiento de ${player.username}`}>
+            <div className="pc-rival__head" aria-hidden="true" />
+            <div className="pc-rival__torso" aria-hidden="true" />
+            <div className="pc-rival__legs" aria-hidden="true" />
+            {worn.filter(item => item.slot !== "accessory").map(item => (
+              <img key={item.id} className={`pc-rival__wear pc-rival__wear--${item.slot}`} src={item.slot === "boots" ? "/items/equipped/aura-boots.png" : (item.imageUrl || undefined)} alt={item.name} draggable={false} style={{display:item.imageUrl ? undefined : "none"}} />
+            ))}
+          </div>
+          <div className="pc-rival__floor" aria-hidden="true" />
+          <div className="pc-rival__rarity">✦ {worn.length ? RARITY_LABEL[rarityKey].toUpperCase() : "JUGADOR"}</div>
+          <div className="pc-rival__number">LVL <strong>{player.level}</strong></div>
+        </div>}
+        {!showChallengeGames && <div className="pc-rival__identity">
+          <div className="pc-rival__eyebrow">{isMe ? "TU HISTORIA COMIENZA ACÁ" : "FICHA OFICIAL · LUPI WORLD"}</div>
+          <h3 className="pc-rival__name">{player.username}</h3>
+          <p className="pc-rival__club">{player.club || "Jugador de Lupi World"}</p>
+          <span className={`pc-rival__status pc-tag--${player.activity}`}><i aria-hidden="true" /> {ACTIVITY_LABEL[player.activity]}</span>
+        </div>}
+        {!showChallengeGames && <div className="pc-scout__section-head"><span>✦ TRAYECTORIA</span><span>SCOUTING · LW</span></div>}
+        {!showChallengeGames && <div className="pc-rival__record" aria-label="Trayectoria del jugador">
+          <div><strong>{player.level}</strong><span>NIVEL</span></div>
+          {competitiveStats?.matchesPlayed != null && <><span className="pc-rival__record-divider" aria-hidden="true" /><div><strong>{competitiveStats.matchesPlayed}</strong><span>PARTIDOS</span></div></>}
+          {competitiveStats?.wins != null && <><span className="pc-rival__record-divider" aria-hidden="true" /><div><strong>{competitiveStats.wins}</strong><span>VICTORIAS</span></div></>}
+          {competitiveStats?.achievements != null && <><span className="pc-rival__record-divider" aria-hidden="true" /><div><strong>{competitiveStats.achievements.length}</strong><span>LOGROS</span></div></>}
+        </div>
         }
-      >
-        <button ref={closeRef} type="button" className="pc-close" onClick={onClose} aria-label="Cerrar">
-          ✕
-        </button>
-
-        <div className="pc-avatar">
-          {main?.imageUrl ? (
-            <img src={main.imageUrl} alt="" draggable={false} />
-          ) : (
-            <span aria-hidden>{main?.icon || "👤"}</span>
-          )}
-          <span className="pc-level">{player.level}</span>
+        {showChallengeGames && <div className="pc-scout__compact"><div className="pc-scout__compact-avatar">{main?.imageUrl ? <img src={main.imageUrl} alt="" /> : "⚔"}</div><div><span className="pc-scout__compact-kicker">RIVAL EN LA ARENA · NIVEL {player.level}</span><strong>{player.username}</strong><small>{player.club || "Lupi World"} · {ACTIVITY_LABEL[player.activity]}</small></div></div>}
+        <div className="pc-scout__tabs" aria-label="Secciones del jugador">
+          <button type="button" className={!showChallengeGames ? "pc-scout__tab pc-scout__tab--active" : "pc-scout__tab"} onClick={() => setShowChallengeGames(false)}>PERFIL · INFO</button>
+          {!isMe && <button type="button" className={showChallengeGames ? "pc-scout__tab pc-scout__tab--active" : "pc-scout__tab"} onClick={() => setShowChallengeGames(true)}>⚔ DESAFÍOS</button>}
         </div>
-
-        <h3 className="pc-name">{isMe ? `${player.username} (vos)` : player.username}</h3>
-        {player.club && <p className="pc-club">{player.club}</p>}
-
-        <div className="pc-tags">
-          <span className={`pc-tag pc-tag--${player.activity}`}>
-            <i aria-hidden /> {ACTIVITY_LABEL[player.activity]}
-          </span>
-          <span className="pc-tag">Nivel {player.level}</span>
-          {worn.length > 0 && <span className="pc-tag pc-tag--rarity">{RARITY_LABEL[rarityKey]}</span>}
-        </div>
-
-        {!isMe && !reporting && (
-          <div className="pc-actions">
-            <button
-              type="button"
-              className="pc-btn pc-btn--primary"
-              disabled={!canChallenge}
-              onClick={() => onChallenge(player)}
-            >
-              {challengeLabel}
-            </button>
-            <button type="button" className="pc-btn" onClick={() => onToggleMute(player.userId)}>
-              {muted ? "Dejar de silenciar" : "Silenciar"}
-            </button>
-            <button type="button" className="pc-btn pc-btn--danger" onClick={() => setReporting(true)}>
-              Reportar
-            </button>
+        {!isMe && !reporting && showChallengeGames && <div className="pc-scout__challenges">
+          <div className="pc-scout__section-head"><span>⚔ ELEGÍ LA MODALIDAD</span><span>{player.username}</span></div>
+          <div className="pc-scout__game-grid">
+            {([
+              { game: "rps" as ChallengeGame, icon: "✊", title: "PIEDRA, PAPEL O TIJERA", description: "Duelo por rondas", available: true },
+              { game: "futsal" as ChallengeGame, icon: "⚽", title: "FUTSAL", description: "Partido competitivo · PvP en desarrollo", available: false },
+              { game: "trivia" as ChallengeGame, icon: "🧠", title: "PREGUNTADOS", description: "Próximamente", available: false },
+              { game: "truco" as ChallengeGame, icon: "🃏", title: "TRUCO", description: "Próximamente", available: false },
+            ]).map(option => <button key={option.game} type="button" className="pc-scout__game" disabled={!canChallenge || !option.available || !onChallengeGame} onClick={() => onChallengeGame?.(player, option.game)}>
+              <span className="pc-scout__game-icon" aria-hidden="true">{option.icon}</span><span><strong>{option.title}</strong><small>{option.description}</small></span><span aria-hidden="true">{option.available ? "→" : "🔒"}</span>
+            </button>)}
           </div>
-        )}
-
-        {!isMe && reporting && (
-          <div className="pc-report">
-            {reportState === "sent" ? (
-              <p className="pc-report__msg">Gracias. Vamos a revisar este reporte.</p>
-            ) : (
-              <>
-                <p className="pc-report__title">¿Qué pasó?</p>
-                {REPORT_REASONS.map((reason) => (
-                  <button
-                    key={reason.id}
-                    type="button"
-                    className="pc-btn"
-                    disabled={reportState === "sending"}
-                    onClick={() => sendReport(reason.id)}
-                  >
-                    {reason.label}
-                  </button>
-                ))}
-                {reportState === "error" && (
-                  <p className="pc-report__msg pc-report__msg--error">
-                    No se pudo enviar el reporte. Probá de nuevo en un rato.
-                  </p>
-                )}
-              </>
-            )}
-            <button type="button" className="pc-btn pc-btn--ghost" onClick={() => setReporting(false)}>
-              Volver
-            </button>
-          </div>
-        )}
+          {!onChallengeGame && <p className="pc-scout__game-note">Conectá onChallengeGame en GameHub para enviar desafíos desde esta ficha.</p>}
+          <p className="pc-scout__game-note">Elegí tu próximo duelo. Tu rival recibirá una invitación.</p>
+        </div>}
+        {isMe && <p className="pc-profile__own-note">Este es tu jugador. Personalizalo desde el vestuario.</p>}
+        {!showChallengeGames && <button type="button" className="pc-rival__expand" aria-expanded={showDetails} onClick={() => setShowDetails(value => !value)}>{showDetails ? "OCULTAR EQUIPAMIENTO Y LOGROS" : "VER EQUIPAMIENTO Y LOGROS"} <span>{showDetails ? "⌃" : "⌄"}</span></button>}
+        {!showChallengeGames && showDetails && <div className="pc-rival__details">
+          <div className="pc-profile__section-title">✦ EQUIPAMIENTO <span>{worn.length}/4</span></div>
+          <div className="pc-profile__slots">{SLOT_ORDER.map(slot => {
+            const item = worn.find(entry => entry.slot === slot);
+            const slotName = {top:"REMERA",bottom:"SHORT",boots:"BOTINES",accessory:"ACCESORIO"}[slot];
+            return <div key={slot} className={`pc-profile__slot ${item ? "pc-profile__slot--equipped" : ""}`} title={item?.name || `${slotName} sin equipar`}><div className="pc-profile__slot-image">{item?.imageUrl ? <img src={slot === "boots" ? "/items/equipped/aura-boots.png" : item.imageUrl} alt="" draggable={false}/> : <span>{item?.icon || "＋"}</span>}</div><span>{slotName}</span></div>;
+          })}</div>
+          <div className="pc-profile__section-title pc-rival__ach-title">✦ LOGROS DESTACADOS</div>
+          {competitiveStats?.achievements?.length ? <div className="pc-profile__achievement-list">{competitiveStats.achievements.slice(0,3).map(achievement => <span className="pc-profile__achievement" key={achievement.id}>{achievement.icon || "🏆"} {achievement.title}</span>)}</div> : <p className="pc-profile__achievements-empty">Todavía no hay logros públicos disponibles.</p>}
+        </div>}
+        {!isMe && !reporting && <>
+          <button type="button" className="pc-rival__more" aria-expanded={showOptions} onClick={() => setShowOptions(value => !value)}>⋯ Opciones de jugador</button>
+          {showOptions && <div className="pc-profile__secondary pc-rival__moderation"><button type="button" className="pc-btn pc-btn--ghost" onClick={() => onToggleMute(player.userId)}>{muted ? "Dejar de silenciar" : "Silenciar"}</button><button type="button" className="pc-btn pc-btn--ghost pc-btn--danger" onClick={() => setReporting(true)}>Reportar</button></div>}
+        </>}
+        {!isMe && reporting && <div className="pc-report">
+          {reportState === "sent" ? <p className="pc-report__msg">Gracias. Vamos a revisar este reporte.</p> : <>
+            <p className="pc-report__title">¿Qué pasó?</p>
+            {REPORT_REASONS.map((reason) => <button key={reason.id} type="button" className="pc-btn" disabled={reportState === "sending"} onClick={() => sendReport(reason.id)}>{reason.label}</button>)}
+            {reportState === "error" && <p className="pc-report__msg pc-report__msg--error">No se pudo enviar el reporte. Probá de nuevo en un rato.</p>}
+          </>}
+          <button type="button" className="pc-btn pc-btn--ghost" onClick={() => setReporting(false)}>Volver</button>
+        </div>}
       </section>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -218,6 +231,7 @@ type ToastsProps = {
   respond: (accept: boolean) => void;
   cancel: () => void;
   dailyChallenges?: DailyChallengeToast[];
+  onDismissDaily?: (id: string) => void;
 };
 
 const GAME_NAMES: Record<ChallengeGame, string> = { futsal: "Futsal", trivia: "Preguntados", rps: "Piedra, papel o tijera", truco: "Truco", physical: "Reto físico" };
@@ -231,7 +245,7 @@ const OUTCOME_TEXT: Record<ChallengeOutcome["kind"], (name: string) => string> =
 
 /** Avisos flotantes: desafío recibido, desafío enviado y resultado. */
 export function ChallengeToasts({
-  incoming, outgoing, outcome, respond, cancel, dailyChallenges = [],
+  incoming, outgoing, outcome, respond, cancel, dailyChallenges = [], onDismissDaily,
 }: ToastsProps) {
   const gameName = (type?: string) => type === "rps" ? "PIEDRA, PAPEL O TIJERA" : "FUTSAL";
   if (!incoming && !outgoing && !outcome && dailyChallenges.length === 0) return null;
@@ -268,6 +282,7 @@ export function ChallengeToasts({
           {dailyChallenges.map((challenge) => (
             <div key={challenge.id} className="pc-toast pc-toast--daily" role="status">
               <div className="pc-toast__daily-icon">🏆</div>
+              <button type="button" className="pc-toast__daily-close" onClick={() => onDismissDaily?.(challenge.id)} aria-label={`Cerrar logro ${challenge.title}`}>×</button>
               <div className="pc-toast__daily-content"><strong>DESAFÍO COMPLETADO</strong><span>{challenge.title}</span>
                 <small>{challenge.progress}/{challenge.requirement}{challenge.rewardXp ? ` · +${challenge.rewardXp} XP` : ""}{challenge.rewardCoins ? ` · +${challenge.rewardCoins} 💰` : ""}</small>
               </div>
