@@ -142,6 +142,8 @@ function PlayerCardView({
   };
 
   const compact = tab === "desafiar" || reporting;
+  // En tu propio perfil el hero se achica: el tablero de progreso manda.
+  const heroCompact = compact || isMe;
 
   return createPortal(
     <div className="lw-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
@@ -149,6 +151,7 @@ function PlayerCardView({
         className="lw-card"
         data-rarity={rarityKey}
         data-compact={compact}
+        data-self={isMe}
         role="dialog"
         aria-modal="true"
         aria-label={`Perfil de ${player.username}`}
@@ -162,17 +165,26 @@ function PlayerCardView({
       >
         <header className="lw-top">
           <span>✦ LUPI WORLD</span>
-          <span className="lw-top__tag">{isMe ? "TU IDENTIDAD" : "INFORME DE RIVAL"}</span>
+          <span className="lw-top__tag">{isMe ? "TU PROGRESO" : "FICHA DEL JUGADOR"}</span>
           <button ref={closeRef} type="button" className="lw-close" onClick={onClose} aria-label="Cerrar perfil">
             ✕
           </button>
         </header>
 
-        <PlayerHero player={player} worn={worn} rarityKey={rarityKey} profile={profile} compact={compact} />
+        {/* Tu XP arriba, como tablero de progreso. Para otros, queda debajo. */}
+        {isMe && profile && (
+          <XpBar level={player.level} xp={profile.xp} xpToNext={profile.xpToNext} showNumbers />
+        )}
+
+        <PlayerHero player={player} worn={worn} rarityKey={rarityKey} profile={profile} compact={heroCompact} />
 
         <div className="lw-identity">
           <h3 className="lw-identity__name">{player.username}</h3>
-          <p className="lw-identity__club">{player.club || "Jugador de Lupi World"}</p>
+          <p className="lw-identity__club">
+            {isMe
+              ? `Nivel ${player.level}${profile && profile.streakDays > 0 ? ` · ${profile.streakDays} ${profile.streakDays === 1 ? "día" : "días"} de racha` : ""}`
+              : player.club || "Jugador de Lupi World"}
+          </p>
           <div className="lw-chips">
             <span className="lw-chip" data-activity={player.activity}>
               <i aria-hidden="true" /> {ACTIVITY_LABEL[player.activity]}
@@ -203,7 +215,10 @@ function PlayerCardView({
           </div>
         </div>
 
-        {profile && <XpBar level={player.level} xp={profile.xp} xpToNext={profile.xpToNext} showNumbers={isMe} />}
+        {/* Para otros jugadores, la XP queda debajo de la identidad (como antes). */}
+        {!isMe && profile && (
+          <XpBar level={player.level} xp={profile.xp} xpToNext={profile.xpToNext} showNumbers={false} />
+        )}
 
         <div className="lw-tabs" role="tablist" aria-label="Secciones del jugador" onKeyDown={onTabKey}>
           {tabs.map((entry) => (
@@ -236,7 +251,12 @@ function PlayerCardView({
           {reporting ? (
             <ReportPanel state={reportState} onPick={sendReport} onBack={() => setReporting(false)} />
           ) : tab === "perfil" ? (
-            <ProfilePanel player={player} profile={profile} stats={competitiveStats} />
+            <ProfilePanel
+              player={player}
+              profile={profile}
+              stats={competitiveStats}
+              showDailyMission={isMe}
+            />
           ) : tab === "vestuario" ? (
             <LockerPanel worn={worn} isMe={isMe} onOpenLocker={onOpenLocker} />
           ) : tab === "vitrina" ? (

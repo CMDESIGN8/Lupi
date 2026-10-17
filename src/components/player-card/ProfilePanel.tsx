@@ -3,15 +3,21 @@ import type { CSSProperties } from "react";
 import type { LobbyPlayer } from "../../hooks/useLobbyPresence";
 import { AttributeRadar } from "./AttributeRadar";
 import { ATTRIBUTE_META } from "./constants";
+import { DailyMission } from "./DailyMission";
 import type { PlayerCompetitiveStats, PlayerProfile } from "./types";
+import { useDailyMission } from "./useDailyMission";
 
 type Props = {
   player: LobbyPlayer;
   profile: PlayerProfile | null;
   stats?: PlayerCompetitiveStats | null;
+  /** Solo en tu propio perfil: muestra la misión del día arriba de todo. */
+  showDailyMission?: boolean;
 };
 
-export function ProfilePanel({ player, profile, stats }: Props) {
+export function ProfilePanel({ player, profile, stats, showDailyMission }: Props) {
+  const mission = useDailyMission(player.userId);
+
   const entries: { label: string; value: number }[] = [{ label: "NIVEL", value: player.level }];
   if (stats?.matchesPlayed != null) entries.push({ label: "PARTIDOS", value: stats.matchesPlayed });
   if (stats?.wins != null) entries.push({ label: "VICTORIAS", value: stats.wins });
@@ -19,6 +25,8 @@ export function ProfilePanel({ player, profile, stats }: Props) {
 
   return (
     <>
+      {showDailyMission && mission && <DailyMission mission={mission} />}
+
       {profile ? (
         <section className="lw-attrs" aria-label="Atributos del jugador">
           <AttributeRadar attributes={profile.attributes} />
