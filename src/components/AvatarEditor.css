@@ -1096,3 +1096,87 @@
 @media (max-width: 380px) {
   .lw-id__layout { grid-template-rows: minmax(200px, 37dvh) auto minmax(0, 1fr) auto; }
 }
+
+/* ============================================================
+   LUPI WORLD V6.0 — Mobile adaptive editor
+   Overrides appended last to supersede legacy V5.x breakpoints.
+   Fixed header/nav/save, independent scroll in active panel.
+   ============================================================ */
+@media (max-width: 860px) {
+  .lw-id {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+  .lw-id__header { flex: 0 0 auto; padding: 8px 12px; }
+  .lw-id__title h2 { font-size: clamp(24px, 6vw, 31px); }
+  .lw-id__title p { font-size: 9px; }
+  .lw-id__close { min-width: 40px; min-height: 40px; }
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="wardrobe"] {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(200px, 37%) 44px minmax(0, 1fr) auto;
+    grid-template-areas: "stage" "nav" "panel" "save";
+    gap: 7px;
+    padding: 0 9px max(7px, env(safe-area-inset-bottom, 0px));
+    overflow: hidden;
+  }
+  .lw-id__stage { min-height: 0; overflow: hidden; }
+  .lw-id__character { min-height: 0; }
+  .lw-id__nav { min-height: 0; align-self: stretch; }
+  .lw-id__nav button { min-height: 42px; font-size: clamp(13px, 3.5vw, 16px); }
+  .lw-id__panel--identity,
+  .lw-id__panel--wardrobe {
+    min-height: 0;
+    overflow: hidden;
+    padding: 9px;
+    gap: 7px;
+  }
+  .lw-id__scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    padding-bottom: 22px;
+  }
+  .lw-id__seg { flex: 0 0 auto; }
+  .lw-id__seg button { min-height: 39px; }
+  .lw-id__opts { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .lw-id__opts--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lw-id__opt { min-height: 78px; padding: 7px 2px 5px; gap: 4px; }
+  .lw-id__opt-face { width: 36px; height: 43px; }
+  .lw-id__opt-label { font-size: 11px; }
+  .lw-id__swatches button { min-width: 32px; min-height: 32px; }
+  .lw-id__cats { flex: 0 0 auto; }
+  .lw-id__cats button { min-height: 48px; }
+  .lw-id__rarities { flex: 0 0 auto; }
+  .lw-id__items { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+  .lw-id__item { min-width: 0; }
+  .lw-id__item-art { height: clamp(62px, 10dvh, 86px); }
+  .lw-id__item strong { font-size: 13px; line-height: 1.15; overflow-wrap: anywhere; }
+  .lw-id__item small { font-size: 10px; }
+  .lw-id__savebar { min-height: 0; padding: 0; }
+  .lw-id__save { height: 44px; min-height: 44px; font-size: 17px; }
+}
+@media (max-width: 860px) and (min-height: 840px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="wardrobe"] {
+    grid-template-rows: minmax(245px, 40%) 44px minmax(0, 1fr) auto;
+  }
+}
+@media (max-width: 860px) and (max-height: 700px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="wardrobe"] {
+    grid-template-rows: minmax(165px, 34%) 42px minmax(0, 1fr) auto;
+  }
+  .lw-id__title p { display: none; }
+}
+@media (max-width: 380px) {
+  .lw-id__opts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .lw-id__items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
