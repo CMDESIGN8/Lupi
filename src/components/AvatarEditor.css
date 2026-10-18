@@ -142,3 +142,12 @@
   .lw-editor__avatar-scaled { z-index: 2; }
   .lw-editor__floor { z-index: 1; }
 }
+
+/* V5.1: la escala del avatar se mide contra el espacio REAL disponible.
+   ResizeObserver aplica el transform inline, por encima de los media queries antiguos. */
+.lw-editor__arena { position: relative; min-height: 0; }
+.lw-editor__avatar-scaled { top: 0; transform-origin: top center; }
+@media (max-width:740px) {
+  .lw-editor__avatar-scaled { top:0; }
+  .lw-editor__arena { min-height:0; }
+}

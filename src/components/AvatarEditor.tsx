@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { useAuraInventory, type ItemRarity, type ItemSlot } from "../hooks/useAuraInventory";
 import { HAIRS, HAIR_COLORS, SKINS, type AvatarAppearance } from "../lib/avatarAppearance";
@@ -22,6 +22,23 @@ export function AvatarEditor({userId,onClose}:{userId:string;onClose:()=>void}) 
   const {appearance,save,saving,error} = useAvatarAppearance(userId);
   const {items,loading,toggleEquip,usingFallback} = useAuraInventory(userId,1);
   const [draft,setDraft] = useState(appearance);
+  const arenaRef = useRef<HTMLDivElement>(null);
+  const [previewScale, setPreviewScale] = useState(0.7);
+  useEffect(() => {
+    const arena = arenaRef.current;
+    if (!arena) return;
+    const measure = () => {
+      const { width, height } = arena.getBoundingClientRect();
+      // El rig mantiene 390 × 520; reservar 85px para los slots laterales.
+      const availableWidth = Math.max(120, width - (width < 550 ? 100 : 135));
+      const availableHeight = Math.max(100, height - 14);
+      setPreviewScale(Math.max(0.25, Math.min(1.12, availableWidth / 390, availableHeight / 520)));
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(arena);
+    measure();
+    return () => observer.disconnect();
+  }, []);
   const [done,setDone] = useState(false);
   const [previewMode,setPreviewMode] = useState<"full"|"face">("full");
   const [mobileTab,setMobileTab] = useState<"character"|"wardrobe">("character");
@@ -71,10 +88,10 @@ export function AvatarEditor({userId,onClose}:{userId:string;onClose:()=>void}) 
           </aside>
           <main className="lw-editor__center">
             <div className="lw-editor__arena-head"><span>✦ VISTA PREVIA EN VIVO</span><span>PERSONAJE</span></div>
-            <div className="lw-editor__arena">
+            <div className="lw-editor__arena" ref={arenaRef}>
               <div className="lw-editor__light lw-editor__light--left"/><div className="lw-editor__light lw-editor__light--right"/>
               {previewMode==="full"?(
-                <div className="lw-editor__avatar-scaled"><Avatar2D items={items} appearance={draft}/></div>
+                <div className="lw-editor__avatar-scaled" style={{transform:`translateX(-50%) scale(${previewScale})`}}><Avatar2D items={items} appearance={draft}/></div>
               ):(
                 <div className="lw-editor__face-zoom"><AvatarFace appearance={draft}/></div>
               )}

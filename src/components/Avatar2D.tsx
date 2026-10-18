@@ -156,10 +156,9 @@ export function Avatar2D({
           className="avatar2d__base-image"
           onError={(event) => {
             const img = event.currentTarget;
-            const fallback = shortSleeves
-              ? "/images/avatar-base-short.png"
-              : "/images/avatar-base.png";
-            if (!img.src.endsWith(fallback)) img.src = fallback;
+            // No reemplazar una piel elegida por una base de otro color.
+            // Registrar el recurso faltante para corregir public/images.
+            console.error("Lupi World: sprite de piel no encontrado", img.src);
           }}
           draggable={false}
         />
