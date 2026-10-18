@@ -1,26 +1,26 @@
-// src/components/player-card/PlayerCard.tsx
+// src/components/PlayerCard.tsx
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import { createPortal } from "react-dom";
 import { DEFAULT_ITEM_COLOR, type InventoryItem } from "../hooks/useAuraInventory";
 import type { ChallengeGame } from "../hooks/useLobbyChallenges";
 import type { ReportReason } from "../hooks/useLobbyModeration";
 import type { LobbyPlayer } from "../hooks/useLobbyPresence";
-import { ChallengeSelector } from "../components/player-card/ChallengeSelector";
-import { ACTIVITY_LABEL, RARITY_COLOR, RARITY_ORDER, RARITY_RANK, SLOT_ORDER } from "../components/player-card/constants";
-import { trapTabKey } from "../components/player-card/hooks";
-import { LockerPanel } from "../components/player-card/LockerPanel";
-import { ModerationBar, ReportPanel } from "../components/player-card/Moderation";
-import { PlayerHero } from "../components/player-card/PlayerHero";
-import { ProfilePanel } from "../components/player-card/ProfilePanel";
-import { mockProfileFor } from "../components/player-card/profile-utils";
-import { TrophyCase } from "../components/player-card/TrophyCase";
-import type { PlayerCardTab, PlayerCompetitiveStats, PlayerProfile } from "../components/player-card/types";
-import { XpBar } from "../components/player-card/XpBar";
-import "../components/player-card/challenge-toasts.css";
-import "../components/player-card/player-card.css";
+import { ChallengeSelector } from "./player-card/ChallengeSelector";
+import { ACTIVITY_LABEL, RARITY_COLOR, RARITY_ORDER, RARITY_RANK, SLOT_ORDER } from "./player-card/constants";
+import { trapTabKey } from "./player-card/hooks";
+import { LockerPanel } from "./player-card/LockerPanel";
+import { ModerationBar, ReportPanel } from "./player-card/Moderation";
+import { PlayerHero } from "./player-card/PlayerHero";
+import { ProfilePanel } from "./player-card/ProfilePanel";
+import { mockProfileFor } from "./player-card/profile-utils";
+import { TrophyCase } from "./player-card/TrophyCase";
+import type { PlayerCardTab, PlayerCompetitiveStats, PlayerProfile } from "./player-card/types";
+import { XpBar } from "./player-card/XpBar";
+import "./player-card/challenge-toasts.css";
+import "./player-card/player-card.css";
 
 export type PlayerCardProps = {
-  /** Jugador seleccionado; null = tarjeta cerrada. */
+  /** Jugador seleccionado; null = pantalla cerrada. */
   player: LobbyPlayer | null;
   meId: string;
   catalog: InventoryItem[];
@@ -33,6 +33,8 @@ export type PlayerCardProps = {
   profile?: PlayerProfile | null;
   /** Rellena un perfil de ejemplo si no llega `profile`. Solo para desarrollo. */
   previewMock?: boolean;
+  /** Imagen de fondo del escenario: pasá la misma que usa el estadio de GameHub. */
+  sceneImage?: string;
   /** Pestaña inicial. Por defecto: "perfil" para vos y "desafiar" para otros jugadores. */
   defaultTab?: PlayerCardTab;
   onClose: () => void;
@@ -61,6 +63,7 @@ function PlayerCardView({
   competitiveStats,
   profile: profileProp,
   previewMock = false,
+  sceneImage,
   defaultTab,
   meId,
   catalog,
@@ -79,10 +82,10 @@ function PlayerCardView({
   });
   const [reporting, setReporting] = useState(false);
   const [reportState, setReportState] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const backRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    closeRef.current?.focus();
+    backRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -141,84 +144,87 @@ function PlayerCardView({
     setReportState(ok ? "sent" : "error");
   };
 
+  // En celular, Desafiar y Reporte achican el escenario para dar lugar al contenido.
   const compact = tab === "desafiar" || reporting;
-  // En tu propio perfil el hero se achica: el tablero de progreso manda.
-  const heroCompact = compact || isMe;
+
+  const style = {
+    "--pc-color": main?.color ?? DEFAULT_ITEM_COLOR,
+    "--lw-rarity": RARITY_COLOR[rarityKey],
+    ...(sceneImage ? { "--lw-scene-image": `url(${JSON.stringify(sceneImage)})` } : {}),
+  } as CSSProperties;
 
   return createPortal(
-    <div className="lw-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <section
-        className="lw-card"
-        data-rarity={rarityKey}
-        data-compact={compact}
-        data-self={isMe}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Perfil de ${player.username}`}
-        onKeyDown={trapTabKey}
-        style={
-          {
-            "--pc-color": main?.color ?? DEFAULT_ITEM_COLOR,
-            "--lw-rarity": RARITY_COLOR[rarityKey],
-          } as CSSProperties
-        }
-      >
-        <header className="lw-top">
-          <span>✦ LUPI WORLD</span>
-          <span className="lw-top__tag">{isMe ? "TU PROGRESO" : "FICHA DEL JUGADOR"}</span>
-          <button ref={closeRef} type="button" className="lw-close" onClick={onClose} aria-label="Cerrar perfil">
-            ✕
-          </button>
-        </header>
+    <div
+      className="lw-scene"
+      data-rarity={rarityKey}
+      data-compact={compact}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Perfil de ${player.username}`}
+      onKeyDown={trapTabKey}
+      style={style}
+    >
+      <div className="lw-scene__bg" aria-hidden="true" />
+      <div className="lw-scene__beams" aria-hidden="true" />
 
-        {/* Tu XP arriba, como tablero de progreso. Para otros, queda debajo. */}
-        {isMe && profile && (
-          <XpBar level={player.level} xp={profile.xp} xpToNext={profile.xpToNext} showNumbers />
-        )}
-
-        <PlayerHero player={player} worn={worn} rarityKey={rarityKey} profile={profile} compact={heroCompact} />
-
-        <div className="lw-identity">
-          <h3 className="lw-identity__name">{player.username}</h3>
-          <p className="lw-identity__club">
-            {isMe
-              ? `Nivel ${player.level}${profile && profile.streakDays > 0 ? ` · ${profile.streakDays} ${profile.streakDays === 1 ? "día" : "días"} de racha` : ""}`
-              : player.club || "Jugador de Lupi World"}
-          </p>
-          <div className="lw-chips">
-            <span className="lw-chip" data-activity={player.activity}>
-              <i aria-hidden="true" /> {ACTIVITY_LABEL[player.activity]}
+      <PlayerHero
+        player={player}
+        worn={worn}
+        rarityKey={rarityKey}
+        profile={profile}
+        top={
+          <div className="lw-top">
+            <button ref={backRef} type="button" className="lw-back" onClick={onClose} aria-label="Cerrar perfil">
+              <span aria-hidden="true">‹</span> VOLVER
+            </button>
+            <span className="lw-top__tag">
+              <span className="lw-top__brand">✦ LUPI WORLD · </span>
+              <b>{isMe ? "TU IDENTIDAD" : "INFORME DE RIVAL"}</b>
             </span>
-            {profile && profile.streakDays > 0 && (
-              <span className="lw-chip lw-chip--streak" title="Racha de días seguidos">
-                🔥 {profile.streakDays} {profile.streakDays === 1 ? "día" : "días"}
-              </span>
-            )}
-            {profile && profile.form.length > 0 && (
-              <span
-                className="lw-form"
-                role="img"
-                aria-label={`Últimos ${profile.form.length}: ${profile.form
-                  .map((r) => (r === "G" ? "ganó" : r === "E" ? "empató" : "perdió"))
-                  .join(", ")}`}
-              >
-                <span className="lw-form__label" aria-hidden="true">
-                  Forma
-                </span>
-                {profile.form.map((result, i) => (
-                  <b key={i} data-r={result} aria-hidden="true">
-                    {result}
-                  </b>
-                ))}
-              </span>
-            )}
           </div>
-        </div>
+        }
+        plate={
+          <>
+            <h3 className="lw-plate__name">{player.username}</h3>
+            <p className="lw-plate__club">{player.club || "Jugador de Lupi World"}</p>
+            <div className="lw-chips">
+              <span className="lw-chip" data-activity={player.activity}>
+                <i aria-hidden="true" /> {ACTIVITY_LABEL[player.activity]}
+              </span>
+              {profile && profile.streakDays > 0 && (
+                <span className="lw-chip lw-chip--streak" title="Racha de días seguidos">
+                  🔥 {profile.streakDays} {profile.streakDays === 1 ? "día" : "días"}
+                </span>
+              )}
+              {profile && profile.form.length > 0 && (
+                <span
+                  className="lw-form"
+                  role="img"
+                  aria-label={`Últimos ${profile.form.length}: ${profile.form
+                    .map((r) => (r === "G" ? "ganó" : r === "E" ? "empató" : "perdió"))
+                    .join(", ")}`}
+                >
+                  <span className="lw-form__label" aria-hidden="true">
+                    Forma
+                  </span>
+                  {profile.form.map((result, i) => (
+                    <b key={i} data-r={result} aria-hidden="true">
+                      {result}
+                    </b>
+                  ))}
+                </span>
+              )}
+            </div>
+          </>
+        }
+      />
 
-        {/* Para otros jugadores, la XP queda debajo de la identidad (como antes). */}
-        {!isMe && profile && (
-          <XpBar level={player.level} xp={profile.xp} xpToNext={profile.xpToNext} showNumbers={false} />
-        )}
+      <section className="lw-menu" aria-label="Detalle del jugador">
+        <svg className="lw-menu__edge" viewBox="0 0 46 100" preserveAspectRatio="none" aria-hidden="true">
+          <line x1="46" y1="0" x2="0" y2="100" />
+        </svg>
+
+        {profile && <XpBar level={player.level} xp={profile.xp} xpToNext={profile.xpToNext} showNumbers={isMe} />}
 
         <div className="lw-tabs" role="tablist" aria-label="Secciones del jugador" onKeyDown={onTabKey}>
           {tabs.map((entry) => (
@@ -251,12 +257,7 @@ function PlayerCardView({
           {reporting ? (
             <ReportPanel state={reportState} onPick={sendReport} onBack={() => setReporting(false)} />
           ) : tab === "perfil" ? (
-            <ProfilePanel
-              player={player}
-              profile={profile}
-              stats={competitiveStats}
-              showDailyMission={isMe}
-            />
+            <ProfilePanel player={player} profile={profile} stats={competitiveStats} />
           ) : tab === "vestuario" ? (
             <LockerPanel worn={worn} isMe={isMe} onOpenLocker={onOpenLocker} />
           ) : tab === "vitrina" ? (
@@ -286,6 +287,8 @@ function PlayerCardView({
     document.body,
   );
 }
+
+/* Re-exports: GameHub sigue importando todo desde "./PlayerCard". */
 export { ChallengeToasts } from "./player-card/ChallengeToasts";
 export { DuelSummary } from "./player-card/DuelSummary";
 export { computeOvr, derivePosition, mockProfileFor } from "./player-card/profile-utils";
