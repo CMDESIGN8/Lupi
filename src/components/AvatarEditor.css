@@ -1180,3 +1180,31 @@
   .lw-id__opts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .lw-id__items { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* V6.1 — Mobile: escenario compacto, scroll independiente intacto. */
+@media (max-width: 860px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="wardrobe"] {
+    grid-template-rows: minmax(190px, 33%) 44px minmax(0, 1fr) auto;
+  }
+  .lw-id__slots { gap: 5px; padding-top: 2px; }
+  .lw-id__slot { width: 58px; height: 62px; }
+  .lw-id__slot-art img { max-height: 34px; }
+  .lw-id__ring { bottom: 2%; }
+  .lw-id__panel--identity, .lw-id__panel--wardrobe { padding: 9px; }
+  .lw-id__label { margin: 13px 0 8px; }
+  .lw-id__opt { min-height: 73px; }
+  .lw-id__scroll { overscroll-behavior: contain; touch-action: pan-y; }
+}
+@media (max-width: 860px) and (min-height: 840px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="wardrobe"] {
+    grid-template-rows: minmax(215px, 35%) 44px minmax(0, 1fr) auto;
+  }
+}
+@media (max-width: 860px) and (max-height: 700px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="wardrobe"] {
+    grid-template-rows: minmax(160px, 31%) 42px minmax(0, 1fr) auto;
+  }
+}

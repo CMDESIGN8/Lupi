@@ -56,3 +56,14 @@
 .lw-face__eyes i {position:relative}
 .lw-face__eyes i::after {content:"";position:absolute;left:12%;top:6%;width:34%;height:34%;border-radius:50%;background:rgba(255,255,255,.75)}
 .lw-face__ear {box-shadow:inset -2px -1px 4px rgba(30,14,12,.22),inset 2px 2px 3px rgba(255,255,255,.13)}
+
+/* V6.1 — detalles expresivos escalables, sin cambiar los datos de apariencia. */
+.lw-face__brows { top: 40%; }
+.lw-face__brows i { height: clamp(1px, .7cqw, 3px); transform: rotate(-5deg); }
+.lw-face__brows i:last-child { transform: rotate(5deg); }
+.lw-face__eyes i { box-shadow: 0 -1px 0 rgba(32,20,16,.34), 0 1px 1px rgba(255,240,219,.22); }
+.lw-face__nose { border-radius: 45% 45% 55% 55%; }
+.lw-face__mouth--smile { top: 76%; height: 8%; border-bottom-width: 2px; }
+.lw-face__mouth--focused { top: 78%; height: 2%; }
+.lw-face--long .lw-face__hair { border-radius: 43% 45% 28% 24%; }
+.lw-face--curly .lw-face__hair { box-shadow: -4px 1px 0 var(--lw-hair), 4px 2px 0 var(--lw-hair), inset -5px -4px 8px rgba(0,0,0,.18); }
