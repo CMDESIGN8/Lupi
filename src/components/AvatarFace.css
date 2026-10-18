@@ -81,3 +81,222 @@
 .lw-face--spiky .lw-face__hair::after {left:17%;top:28%;width:65%;height:38%;border-radius:45% 45% 15% 15%;opacity:.5;}
 /* No tapar ojos y cejas; mantener legibilidad en miniaturas pequeñas. */
 .lw-face__brows,.lw-face__eyes,.lw-face__nose,.lw-face__mouth {z-index:5;}
+
+
+/* V6.3: PNG transparentes de silueta, coloreados dinámicamente por --lw-hair.
+   No usar repeating-radial-gradient: causaba círculos de madera en Afro. */
+.lw-face .lw-face__hair {
+  position:absolute;top:-28%;left:-20%;width:140%;height:100%;
+  transform:none;clip-path:none;border-radius:0;box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.28));
+  background:none;overflow:visible;z-index:4;pointer-events:none;
+}
+.lw-face .lw-face__hair::before {
+  content:"";display:block;position:absolute;inset:0;
+  border-radius:0;box-shadow:none;clip-path:none;transform:none;opacity:1;
+  background:linear-gradient(115deg,rgba(255,255,255,.19),transparent 43%,rgba(0,0,0,.28) 96%),var(--lw-hair);
+  -webkit-mask-image:var(--lw-hair-mask);mask-image:var(--lw-hair-mask);
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+}
+.lw-face .lw-face__hair::after {content:none!important;display:none!important;}
+.lw-face--short { --lw-hair-mask:url("/images/avatar/hair/short.png"); }
+.lw-face--fade { --lw-hair-mask:url("/images/avatar/hair/fade.png"); }
+.lw-face--long { --lw-hair-mask:url("/images/avatar/hair/long.png"); }
+.lw-face--buzz { --lw-hair-mask:url("/images/avatar/hair/buzz.png"); }
+.lw-face--side { --lw-hair-mask:url("/images/avatar/hair/side.png"); }
+.lw-face--spiky { --lw-hair-mask:url("/images/avatar/hair/spiky.png"); }
+.lw-face--curly { --lw-hair-mask:url("/images/avatar/hair/curly.png"); }
+.lw-face--afro { --lw-hair-mask:url("/images/avatar/hair/afro.png"); }
+
+
+/* V6.4 — corrección de anclaje. Cada máscara conserva su proporción original.
+   La máscara blanca es un recorte, no una textura 3D. */
+.lw-face .lw-face__hair {
+  position:absolute;
+  left:50%; top:-19%;
+  width:124%; height:64%;
+  transform:translateX(-50%);
+  z-index:4; pointer-events:none;
+  border:0; border-radius:0; clip-path:none;
+  background:transparent!important; box-shadow:none!important;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.3));
+}
+.lw-face .lw-face__hair::before {
+  content:""; display:block!important; position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 26% 22%,rgba(255,255,255,.25),transparent 44%),
+    repeating-linear-gradient(108deg,transparent 0 7px,rgba(0,0,0,.055) 8px 10px,transparent 11px 16px),
+    linear-gradient(110deg,rgba(255,255,255,.12),transparent 42%,rgba(0,0,0,.32)),
+    var(--lw-hair)!important;
+  -webkit-mask:var(--lw-hair-mask) center / 100% 100% no-repeat;
+  mask:var(--lw-hair-mask) center / 100% 100% no-repeat;
+  border-radius:0!important; clip-path:none!important; box-shadow:none!important;
+  transform:none!important; opacity:1!important;
+}
+.lw-face .lw-face__hair::after {content:none!important;display:none!important}
+/* Los PNG contienen mucho espacio transparente. Estos tamaños evitan
+   que el Afro tape ojos y que Puntas parezca una corona gigante. */
+.lw-face.lw-face--short .lw-face__hair {top:-20%;width:121%;height:69%}
+.lw-face.lw-face--fade .lw-face__hair {top:-18%;width:121%;height:65%}
+.lw-face.lw-face--curly .lw-face__hair {top:-23%;width:127%;height:69%}
+.lw-face.lw-face--long .lw-face__hair {top:-21%;width:124%;height:83%}
+.lw-face.lw-face--buzz .lw-face__hair {top:-14%;width:117%;height:59%}
+.lw-face.lw-face--side .lw-face__hair {top:-19%;width:123%;height:67%}
+.lw-face.lw-face--spiky .lw-face__hair {top:-25%;width:123%;height:65%}
+.lw-face.lw-face--afro .lw-face__hair {top:-25%;width:132%;height:53%}
+/* Mantener la cara por delante del cabello donde se cruzan. */
+.lw-face .lw-face__brows,.lw-face .lw-face__eyes,
+.lw-face .lw-face__nose,.lw-face .lw-face__mouth {z-index:5}
+
+/* V6.5 — detalle de mechones sobre máscara coloreable; misma geometría V6.4.
+   La capa ::after es una textura transparente, no otra silueta. */
+.lw-face .lw-face__hair::after {
+  content:""!important;display:block!important;position:absolute;inset:0;
+  background-image:var(--lw-hair-detail)!important;
+  background-size:100% 100%;background-repeat:no-repeat;
+  mix-blend-mode:soft-light;opacity:.9;pointer-events:none;
+  border:0!important;border-radius:0!important;box-shadow:none!important;
+}
+.lw-face--short {--lw-hair-detail:url("/images/avatar/hair/short-detail.png")}
+.lw-face--fade {--lw-hair-detail:url("/images/avatar/hair/fade-detail.png")}
+.lw-face--curly {--lw-hair-detail:url("/images/avatar/hair/curly-detail.png")}
+.lw-face--long {--lw-hair-detail:url("/images/avatar/hair/long-detail.png")}
+.lw-face--buzz {--lw-hair-detail:url("/images/avatar/hair/buzz-detail.png")}
+.lw-face--side {--lw-hair-detail:url("/images/avatar/hair/side-detail.png")}
+.lw-face--afro {--lw-hair-detail:url("/images/avatar/hair/afro-detail.png")}
+.lw-face--spiky {--lw-hair-detail:url("/images/avatar/hair/spiky-detail.png")}
+
+/* V6.7: sprites neutrales, recoloración conservando textura.
+   La capa color usa el alpha del PNG, y blend color sobre el gris. */
+.lw-face .lw-face__hair::after {
+  background:var(--lw-hair)!important;
+  mix-blend-mode:color!important;
+  opacity:1!important;
+  -webkit-mask-image:var(--hair-sprite)!important;mask-image:var(--hair-sprite)!important;
+  -webkit-mask-position:center!important;mask-position:center!important;
+  -webkit-mask-size:100% 100%!important;mask-size:100% 100%!important;
+  -webkit-mask-repeat:no-repeat!important;mask-repeat:no-repeat!important;
+}
+.lw-face--short{--hair-sprite:url("/images/avatar/hair/v67/short.png")}
+.lw-face--fade{--hair-sprite:url("/images/avatar/hair/v67/fade.png")}
+.lw-face--curly{--hair-sprite:url("/images/avatar/hair/v67/curly.png")}
+.lw-face--long{--hair-sprite:url("/images/avatar/hair/v67/long.png")}
+.lw-face--buzz{--hair-sprite:url("/images/avatar/hair/v67/buzz.png")}
+.lw-face--side{--hair-sprite:url("/images/avatar/hair/v67/side.png")}
+.lw-face--afro{--hair-sprite:url("/images/avatar/hair/v67/afro.png")}
+.lw-face--spiky{--hair-sprite:url("/images/avatar/hair/v67/spiky.png")}
+
+/* V6.8 — peinados adicionales, PNG transparentes neutros */
+.lw-face--melena { --lw-hair-mask:url("/images/avatar/hair/v68/melena.png"); --hair-sprite:url("/images/avatar/hair/v68/melena.png"); }
+.lw-face--coleta { --lw-hair-mask:url("/images/avatar/hair/v68/coleta.png"); --hair-sprite:url("/images/avatar/hair/v68/coleta.png"); }
+.lw-face.lw-face--melena .lw-face__hair {top:-21%;width:132%;height:115%;}
+.lw-face.lw-face--coleta .lw-face__hair {top:-22%;width:139%;height:98%;}
+
+/* V6.10: rutas reales del paquete, máscara + detalle, sin imágenes HTML rotas */
+.lw-face .lw-face__hair {
+  position:absolute!important;left:50%!important;top:-20%!important;
+  width:124%!important;height:69%!important;transform:translateX(-50%)!important;
+  background:none!important;clip-path:none!important;box-shadow:none!important;
+  border-radius:0!important;z-index:4;pointer-events:none;isolation:isolate;
+}
+.lw-face .lw-face__hair::before {
+  content:""!important;display:block!important;position:absolute!important;inset:0!important;
+  background:linear-gradient(110deg,rgba(255,255,255,.18),transparent 43%,rgba(0,0,0,.28)),var(--lw-hair)!important;
+  -webkit-mask:var(--lw-hair-mask) center / 100% 100% no-repeat!important;
+  mask:var(--lw-hair-mask) center / 100% 100% no-repeat!important;
+  opacity:1!important;clip-path:none!important;box-shadow:none!important;transform:none!important;
+}
+.lw-face .lw-face__hair::after {
+  content:""!important;display:block!important;position:absolute!important;inset:0!important;
+  background:var(--lw-hair-detail) center / 100% 100% no-repeat!important;
+  -webkit-mask:var(--lw-hair-mask) center / 100% 100% no-repeat!important;
+  mask:var(--lw-hair-mask) center / 100% 100% no-repeat!important;
+  mix-blend-mode:multiply!important;opacity:.5!important;pointer-events:none!important;
+  border:0!important;box-shadow:none!important;
+}
+.lw-face--short{--lw-hair-mask:url("/images/avatar/hair/short.png");--lw-hair-detail:url("/images/avatar/hair/short-detail.png");}
+.lw-face--fade{--lw-hair-mask:url("/images/avatar/hair/fade.png");--lw-hair-detail:url("/images/avatar/hair/fade-detail.png");}
+.lw-face--curly{--lw-hair-mask:url("/images/avatar/hair/curly.png");--lw-hair-detail:url("/images/avatar/hair/curly-detail.png");}
+.lw-face--long{--lw-hair-mask:url("/images/avatar/hair/long.png");--lw-hair-detail:url("/images/avatar/hair/long-detail.png");}
+.lw-face--buzz{--lw-hair-mask:url("/images/avatar/hair/buzz.png");--lw-hair-detail:url("/images/avatar/hair/buzz-detail.png");}
+.lw-face--side{--lw-hair-mask:url("/images/avatar/hair/side.png");--lw-hair-detail:url("/images/avatar/hair/side-detail.png");}
+.lw-face--afro{--lw-hair-mask:url("/images/avatar/hair/afro.png");--lw-hair-detail:url("/images/avatar/hair/afro-detail.png");}
+.lw-face--spiky{--lw-hair-mask:url("/images/avatar/hair/spiky.png");--lw-hair-detail:url("/images/avatar/hair/spiky-detail.png");}
+.lw-face--melena{--lw-hair-mask:url("/images/avatar/hair/melena.png");--lw-hair-detail:url("/images/avatar/hair/melena-detail.png");}
+.lw-face--coleta{--lw-hair-mask:url("/images/avatar/hair/coleta.png");--lw-hair-detail:url("/images/avatar/hair/coleta-detail.png");}
+.lw-face--melena .lw-face__hair::after,.lw-face--coleta .lw-face__hair::after {display:none!important;}
+.lw-face.lw-face--short .lw-face__hair{top:-20%!important;width:121%!important;height:69%!important;}
+.lw-face.lw-face--fade .lw-face__hair{top:-18%!important;width:121%!important;height:65%!important;}
+.lw-face.lw-face--curly .lw-face__hair{top:-23%!important;width:127%!important;height:69%!important;}
+.lw-face.lw-face--long .lw-face__hair{top:-21%!important;width:124%!important;height:83%!important;}
+.lw-face.lw-face--buzz .lw-face__hair{top:-14%!important;width:117%!important;height:59%!important;}
+.lw-face.lw-face--side .lw-face__hair{top:-19%!important;width:123%!important;height:67%!important;}
+.lw-face.lw-face--spiky .lw-face__hair{top:-25%!important;width:123%!important;height:65%!important;}
+.lw-face.lw-face--afro .lw-face__hair{top:-25%!important;width:132%!important;height:65%!important;}
+.lw-face.lw-face--melena .lw-face__hair{top:-21%!important;width:132%!important;height:115%!important;}
+.lw-face.lw-face--coleta .lw-face__hair{top:-22%!important;width:139%!important;height:98%!important;}
+
+/* V7 — un solo sprite detallado, recoloreado de manera determinista por variante.
+   Neutraliza todas las máscaras, capas y !important heredados de V6. */
+.lw-face .lw-face__hair,
+.lw-face.lw-face--short .lw-face__hair,
+.lw-face.lw-face--fade .lw-face__hair,
+.lw-face.lw-face--curly .lw-face__hair,
+.lw-face.lw-face--long .lw-face__hair,
+.lw-face.lw-face--buzz .lw-face__hair,
+.lw-face.lw-face--side .lw-face__hair,
+.lw-face.lw-face--afro .lw-face__hair,
+.lw-face.lw-face--spiky .lw-face__hair,
+.lw-face.lw-face--melena .lw-face__hair,
+.lw-face.lw-face--coleta .lw-face__hair {
+  position:absolute!important;left:50%!important;top:var(--hair-top,-20%)!important;
+  width:var(--hair-width,120%)!important;height:var(--hair-height,65%)!important;
+  transform:translateX(-50%)!important; background-image:var(--lw-hair-sprite)!important;
+  background-position:center!important;background-size:100% 100%!important;
+  background-repeat:no-repeat!important;clip-path:none!important;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.24))!important;
+  border-radius:0!important;box-shadow:none!important;overflow:visible!important;
+}
+.lw-face .lw-face__hair::before,.lw-face .lw-face__hair::after {content:none!important;display:none!important;}
+.lw-face--short {--hair-top:-20%;--hair-width:121%;--hair-height:69%;}
+.lw-face--fade {--hair-top:-18%;--hair-width:121%;--hair-height:65%;}
+.lw-face--curly {--hair-top:-23%;--hair-width:127%;--hair-height:69%;}
+.lw-face--long {--hair-top:-21%;--hair-width:124%;--hair-height:83%;}
+.lw-face--buzz {--hair-top:-14%;--hair-width:117%;--hair-height:59%;}
+.lw-face--side {--hair-top:-19%;--hair-width:123%;--hair-height:67%;}
+.lw-face--spiky {--hair-top:-25%;--hair-width:123%;--hair-height:65%;}
+.lw-face--afro {--hair-top:-25%;--hair-width:132%;--hair-height:65%;}
+.lw-face--melena {--hair-top:-21%;--hair-width:132%;--hair-height:115%;}
+.lw-face--coleta {--hair-top:-22%;--hair-width:139%;--hair-height:98%;}
+
+/* V7.1: ajustes de silueta para evitar deformaciones y cabello invadiendo el rostro.
+   Mantener la proporción de los PNG; cada estilo usa su propia geometría. */
+.lw-face.lw-face--afro {--hair-top:-31%;--hair-width:139%;--hair-height:77%;}
+.lw-face.lw-face--melena {--hair-top:-23%;--hair-width:126%;--hair-height:108%;}
+.lw-face.lw-face--coleta {--hair-top:-23%;--hair-width:132%;--hair-height:93%;}
+.lw-face.lw-face--buzz {--hair-top:-11%;--hair-width:108%;--hair-height:38%;}
+.lw-face.lw-face--spiky {--hair-top:-25%;--hair-width:121%;--hair-height:65%;}
+.lw-face .lw-face__hair {
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,.18))!important;
+}
+
+/* V8 — grayscale sprite + dynamic tint. Overrides legacy V6/V7 layers. */
+.lw-face .lw-face__hair {
+  position:absolute!important;left:50%!important;top:var(--hair-top,-20%)!important;
+  width:var(--hair-width,120%)!important;height:var(--hair-height,65%)!important;
+  transform:translateX(-50%)!important;
+  background:var(--lw-hair-sprite) center / contain no-repeat!important;
+  border:0!important;border-radius:0!important;clip-path:none!important;box-shadow:none!important;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))!important;
+  isolation:isolate;overflow:visible!important;pointer-events:none;z-index:4;
+}
+.lw-face .lw-face__hair::before {content:none!important;display:none!important;}
+.lw-face .lw-face__hair::after {
+  content:""!important;display:block!important;position:absolute!important;inset:0!important;
+  background:var(--lw-hair)!important;opacity:1!important;
+  mix-blend-mode:color!important;
+  -webkit-mask:var(--lw-hair-sprite) center / contain no-repeat!important;
+  mask:var(--lw-hair-sprite) center / contain no-repeat!important;
+  border:0!important;box-shadow:none!important;pointer-events:none!important;
+}
+/* The original per-style geometry remains adjustable above. */
