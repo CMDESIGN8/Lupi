@@ -57,13 +57,27 @@
 .lw-face__eyes i::after {content:"";position:absolute;left:12%;top:6%;width:34%;height:34%;border-radius:50%;background:rgba(255,255,255,.75)}
 .lw-face__ear {box-shadow:inset -2px -1px 4px rgba(30,14,12,.22),inset 2px 2px 3px rgba(255,255,255,.13)}
 
-/* V6.1 — detalles expresivos escalables, sin cambiar los datos de apariencia. */
-.lw-face__brows { top: 40%; }
-.lw-face__brows i { height: clamp(1px, .7cqw, 3px); transform: rotate(-5deg); }
-.lw-face__brows i:last-child { transform: rotate(5deg); }
-.lw-face__eyes i { box-shadow: 0 -1px 0 rgba(32,20,16,.34), 0 1px 1px rgba(255,240,219,.22); }
-.lw-face__nose { border-radius: 45% 45% 55% 55%; }
-.lw-face__mouth--smile { top: 76%; height: 8%; border-bottom-width: 2px; }
-.lw-face__mouth--focused { top: 78%; height: 2%; }
-.lw-face--long .lw-face__hair { border-radius: 43% 45% 28% 24%; }
-.lw-face--curly .lw-face__hair { box-shadow: -4px 1px 0 var(--lw-hair), 4px 2px 0 var(--lw-hair), inset -5px -4px 8px rgba(0,0,0,.18); }
+
+/* LUPI WORLD V6.2 — cabello con capas, volumen y mechones.
+   Compatible con AvatarFace existente, todos los tonos de piel y miniaturas. */
+.lw-face__hair { z-index: 4; isolation: isolate; overflow: visible; border-radius: 0; filter: drop-shadow(0 2px 1px rgba(0,0,0,.28)); box-shadow: none; background: none; clip-path: none; }
+.lw-face__hair::before,.lw-face__hair::after { content:""; position:absolute; display:block; background:linear-gradient(115deg,rgba(255,255,255,.21),transparent 38%,rgba(0,0,0,.28) 92%),var(--lw-hair); box-shadow:inset -2px -2px 3px rgba(0,0,0,.19); }
+.lw-face--short .lw-face__hair,.lw-face--fade .lw-face__hair,.lw-face--curly .lw-face__hair,.lw-face--long .lw-face__hair,.lw-face--buzz .lw-face__hair,.lw-face--side .lw-face__hair,.lw-face--afro .lw-face__hair,.lw-face--spiky .lw-face__hair { top:-13%;left:-10%;width:120%;height:43%;background:none;clip-path:none;transform:none;border-radius:0;box-shadow:none; }
+.lw-face--short .lw-face__hair::before { inset:5% 3% 13%;border-radius:48% 49% 24% 22%;clip-path:polygon(0 38%,12% 13%,36% 1%,62% 7%,82% 0,100% 30%,100% 100%,0 100%); }
+.lw-face--short .lw-face__hair::after { left:12%;top:13%;width:72%;height:37%;border-radius:55% 50% 25% 20%;transform:rotate(-5deg);opacity:.7; }
+.lw-face--fade .lw-face__hair::before { inset:4% 8% 24%;border-radius:48% 48% 18% 18%;clip-path:polygon(0 44%,12% 15%,38% 0,70% 3%,95% 24%,100% 78%,77% 91%,19% 100%,0 80%); }
+.lw-face--fade .lw-face__hair::after {left:12%;top:50%;width:76%;height:35%;border-radius:12% 12% 45% 45%;background:linear-gradient(to bottom,var(--lw-hair),transparent);opacity:.35;}
+.lw-face--curly .lw-face__hair::before {inset:0 0 10%;border-radius:46% 49% 30% 32%;background:radial-gradient(circle at 12% 43%,var(--lw-hair) 0 17%,transparent 18%),radial-gradient(circle at 30% 20%,var(--lw-hair) 0 22%,transparent 23%),radial-gradient(circle at 55% 18%,var(--lw-hair) 0 24%,transparent 25%),radial-gradient(circle at 82% 33%,var(--lw-hair) 0 23%,transparent 24%),radial-gradient(circle at 51% 61%,var(--lw-hair) 0 37%,transparent 38%);filter:drop-shadow(1px 2px 1px rgba(0,0,0,.3));}
+.lw-face--curly .lw-face__hair::after {inset:10% 8% 24%;border-radius:48%;background:repeating-radial-gradient(circle at 35% 30%,rgba(255,255,255,.14) 0 2px,transparent 3px 11px),var(--lw-hair);opacity:.72;}
+.lw-face--long .lw-face__hair::before {left:3%;top:0;width:94%;height:145%;border-radius:46% 48% 20% 20%;clip-path:polygon(0 28%,9% 9%,35% 0,72% 3%,93% 17%,100% 43%,93% 100%,76% 100%,72% 46%,56% 34%,30% 35%,23% 50%,21% 100%,3% 100%);}
+.lw-face--long .lw-face__hair::after {left:23%;top:4%;width:61%;height:52%;border-radius:55% 48% 25% 10%;transform:rotate(-9deg);opacity:.65;}
+.lw-face--buzz .lw-face__hair::before {left:9%;top:25%;width:82%;height:43%;border-radius:52% 52% 18% 18%;background:repeating-linear-gradient(105deg,rgba(0,0,0,.17) 0 1px,transparent 1px 4px),var(--lw-hair);}
+.lw-face--buzz .lw-face__hair::after {display:none;}
+.lw-face--side .lw-face__hair::before {inset:5% 0 12%;border-radius:49% 45% 22% 24%;clip-path:polygon(0 51%,13% 20%,45% 0,82% 4%,100% 32%,96% 78%,68% 69%,44% 84%,15% 100%,0 89%);}
+.lw-face--side .lw-face__hair::after {left:12%;top:8%;width:79%;height:47%;border-radius:65% 30% 48% 16%;transform:rotate(-15deg);opacity:.75;}
+.lw-face--afro .lw-face__hair::before {left:-5%;top:-22%;width:110%;height:130%;border-radius:50% 50% 43% 43%;background:radial-gradient(circle at 18% 32%,rgba(255,255,255,.12),transparent 25%),radial-gradient(circle at 72% 70%,rgba(0,0,0,.18),transparent 35%),var(--lw-hair);}
+.lw-face--afro .lw-face__hair::after {inset:-8% 2% 0;border-radius:50%;background:repeating-radial-gradient(circle at 35% 36%,rgba(0,0,0,.13) 0 2px,transparent 3px 10px);opacity:.65;}
+.lw-face--spiky .lw-face__hair::before {left:0;top:-14%;width:100%;height:117%;clip-path:polygon(0 85%,6% 32%,20% 52%,25% 0,40% 38%,53% 0,63% 39%,82% 6%,86% 51%,100% 28%,100% 100%,77% 90%,56% 98%,31% 91%,12% 100%);}
+.lw-face--spiky .lw-face__hair::after {left:17%;top:28%;width:65%;height:38%;border-radius:45% 45% 15% 15%;opacity:.5;}
+/* No tapar ojos y cejas; mantener legibilidad en miniaturas pequeñas. */
+.lw-face__brows,.lw-face__eyes,.lw-face__nose,.lw-face__mouth {z-index:5;}
