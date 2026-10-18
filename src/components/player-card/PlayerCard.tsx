@@ -22,6 +22,7 @@ import "./player-card.css";
 export type PlayerCardProps = {
   /** Jugador seleccionado; null = tarjeta cerrada. */
   player: LobbyPlayer | null;
+  compact?: boolean;
   meId: string;
   catalog: InventoryItem[];
   muted: boolean;

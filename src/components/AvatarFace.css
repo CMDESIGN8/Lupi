@@ -24,3 +24,35 @@
 .lw-face--game{isolation:isolate;filter:saturate(.88) contrast(.98)}
 .lw-face--game::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse at 50% 72%,transparent 34%,rgba(43,22,15,.16) 100%);z-index:1}
 .lw-face--game .lw-face__brows,.lw-face--game .lw-face__eyes,.lw-face--game .lw-face__nose,.lw-face--game .lw-face__mouth{z-index:3}
+
+/* V5.7 — volumen facial y cabello con capas CSS, compatible con las seis pieles. */
+.lw-face { isolation:isolate; }
+.lw-face::before {content:"";position:absolute;inset:5% 5% 4%;border-radius:inherit;pointer-events:none;z-index:1;background:radial-gradient(ellipse 48% 32% at 29% 37%,rgba(255,255,255,.17),transparent 100%),radial-gradient(ellipse 30% 36% at 75% 63%,rgba(40,18,12,.13),transparent 100%);}
+.lw-face__hair { background:linear-gradient(110deg,rgba(255,255,255,.17),transparent 33%,rgba(0,0,0,.25) 85%),var(--lw-hair);filter:drop-shadow(0 2px 1px rgba(0,0,0,.24)); }
+.lw-face--spiky .lw-face__hair {top:-16%;height:42%;left:-8%;width:116%;clip-path:polygon(0 93%,3% 37%,16% 51%,20% 3%,36% 39%,48% 0,61% 35%,76% 5%,83% 47%,97% 26%,100% 100%,80% 88%,59% 96%,34% 88%,15% 98%);}
+.lw-face--short .lw-face__hair {top:-9%;height:31%;clip-path:polygon(0 50%,12% 17%,35% 7%,66% 13%,87% 0,100% 34%,100% 100%,0 100%);}
+.lw-face--curly .lw-face__hair {background:radial-gradient(circle at 13% 35%,rgba(255,255,255,.12) 0 13%,transparent 14%),radial-gradient(circle at 52% 15%,rgba(0,0,0,.15) 0 17%,transparent 18%),var(--lw-hair);}
+.lw-face__brows i {box-shadow:0 1px 1px rgba(0,0,0,.16);}
+.lw-face__nose {background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),rgba(49,22,15,.11));box-shadow:1px 1px 2px rgba(45,22,15,.2);}
+.lw-face__mouth {box-shadow:0 1px 1px rgba(255,235,217,.16);}
+@media (prefers-reduced-motion:reduce){.lw-face,.lw-face *{animation:none!important;transition:none!important}}
+
+/* V5.9: cabello con volumen y silueta orgánica. No cambia coordenadas del rostro. */
+.lw-face--long .lw-face__hair {
+  top:-10%;left:-8%;width:116%;height:55%;
+  border-radius:46% 49% 23% 28% / 34% 37% 38% 40%;
+  clip-path:polygon(0 32%,9% 11%,29% 0,56% 3%,78% 0,96% 17%,100% 44%,94% 100%,79% 90%,73% 47%,60% 35%,43% 37%,26% 31%,18% 54%,12% 100%,2% 94%);
+  background:radial-gradient(ellipse at 27% 16%,rgba(255,255,255,.22),transparent 47%),repeating-linear-gradient(112deg,transparent 0 9px,rgba(0,0,0,.07) 10px 12px),var(--lw-hair);
+}
+.lw-face--side .lw-face__hair {
+  top:-10%;left:-8%;width:118%;height:37%;
+  transform:rotate(-6deg);border-radius:52% 42% 32% 14%;
+  clip-path:polygon(0 51%,9% 22%,30% 5%,62% 0,89% 18%,100% 50%,100% 96%,79% 80%,58% 74%,36% 94%,0 100%);
+}
+.lw-face--fade .lw-face__hair {top:-7%;height:26%;border-radius:50% 50% 17% 18%;clip-path:polygon(4% 48%,15% 12%,40% 0,73% 5%,96% 38%,100% 100%,0 100%)}
+.lw-face--buzz .lw-face__hair {top:-2%;height:18%;border-radius:52% 52% 20% 20%;background:repeating-linear-gradient(95deg,rgba(0,0,0,.1) 0 1px,transparent 1px 4px),var(--lw-hair)}
+.lw-face--afro .lw-face__hair {top:-23%;height:54%;left:-14%;width:128%;border-radius:48% 51% 38% 42%;background:radial-gradient(circle at 20% 22%,rgba(255,255,255,.14),transparent 34%),radial-gradient(circle at 75% 77%,rgba(0,0,0,.18),transparent 46%),var(--lw-hair)}
+.lw-face--curly .lw-face__hair {top:-15%;height:44%;left:-9%;width:118%;border-radius:46% 51% 35% 38%;background:radial-gradient(circle at 22% 27%,rgba(255,255,255,.16),transparent 21%),radial-gradient(circle at 71% 45%,rgba(0,0,0,.2),transparent 28%),var(--lw-hair)}
+.lw-face__eyes i {position:relative}
+.lw-face__eyes i::after {content:"";position:absolute;left:12%;top:6%;width:34%;height:34%;border-radius:50%;background:rgba(255,255,255,.75)}
+.lw-face__ear {box-shadow:inset -2px -1px 4px rgba(30,14,12,.22),inset 2px 2px 3px rgba(255,255,255,.13)}
