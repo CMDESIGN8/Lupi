@@ -12,10 +12,12 @@ type Props = {
   worn: InventoryItem[];
   rarityKey: string;
   profile: PlayerProfile | null;
+  /** Vista reducida en la tarjeta de jugador. */
+  compact?: boolean;
   /** Fila superior del escenario (botón volver + etiqueta). */
-  top: ReactNode;
+  top?: ReactNode;
   /** Placa de nombre, abajo a la izquierda. */
-  plate: ReactNode;
+  plate?: ReactNode;
 };
 
 function crestText(club?: string | null): string {
@@ -36,7 +38,7 @@ const AVATAR_WIDTH = 135;
  * Escenario a pantalla completa: dorsal gigante, cancha en perspectiva y el personaje
  * escalado según el alto disponible (así siempre es el protagonista).
  */
-export function PlayerHero({ player, worn, rarityKey, profile, top, plate }: Props) {
+export function PlayerHero({ player, worn, rarityKey, profile, top, plate, compact = false }: Props) {
   const stageRef = useRef<HTMLElement>(null);
   const reduced = usePrefersReducedMotion();
   const shown = useCountUp(profile?.ovr ?? player.level);
@@ -75,7 +77,7 @@ export function PlayerHero({ player, worn, rarityKey, profile, top, plate }: Pro
   const onLeave = (event: PointerEvent<HTMLElement>) => setParallax(event.currentTarget, 0, 0);
 
   return (
-    <section ref={stageRef} className="lw-stage" onPointerMove={onMove} onPointerLeave={onLeave}>
+    <section ref={stageRef} className={`lw-stage${compact ? " lw-stage--compact" : ""}`} onPointerMove={onMove} onPointerLeave={onLeave}>
       <div className="lw-stage__court" aria-hidden="true" />
       <div className="lw-stage__dorsal" aria-hidden="true">
         {profile ? profile.shirtNumber : "LW"}
@@ -99,7 +101,7 @@ export function PlayerHero({ player, worn, rarityKey, profile, top, plate }: Pro
       </div>
       <div className="lw-stage__rarity">✦ {worn.length ? RARITY_LABEL[rarityKey].toUpperCase() : "JUGADOR"}</div>
 
-      <div className="lw-plate">{plate}</div>
+      {plate != null && <div className="lw-plate">{plate}</div>}
     </section>
   );
 }
