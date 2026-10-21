@@ -669,3 +669,31 @@
   .auth-screen .auth-card-v2,
   .auth-screen .auth-card-v2::before {animation:none!important;transform:none!important;filter:none}
 }
+
+/* V4.1 — FIX: soft cinematic spotlights, no solid triangles */
+.auth-screen .auth-stage__spot {
+  top:-12%;
+  width:34%;
+  height:85%;
+  clip-path:none;
+  background:radial-gradient(ellipse 42% 85% at 50% 0%, rgba(110,222,255,.24) 0%, rgba(24,153,228,.09) 36%, rgba(0,145,255,.025) 64%, transparent 82%);
+  filter:blur(42px);
+  mix-blend-mode:screen;
+  opacity:.085;
+  will-change:opacity,transform;
+}
+.auth-screen .auth-stage__spot--left {left:-10%;animation:lupi-v41-spot-left 1600ms ease-out both}
+.auth-screen .auth-stage__spot--right {right:-10%;animation:lupi-v41-spot-right 1600ms ease-out both}
+@keyframes lupi-v41-spot-left {
+  0% {opacity:0;transform:translateY(-18px) rotate(-5deg)}
+  55% {opacity:.16;transform:translateY(0) rotate(0)}
+  100% {opacity:.085;transform:none}
+}
+@keyframes lupi-v41-spot-right {
+  0% {opacity:0;transform:translateY(-18px) rotate(5deg)}
+  55% {opacity:.16;transform:translateY(0) rotate(0)}
+  100% {opacity:.085;transform:none}
+}
+@media (prefers-reduced-motion:reduce){
+ .auth-screen .auth-stage__spot--left,.auth-screen .auth-stage__spot--right{animation:none!important;opacity:.085;transform:none!important}
+}
