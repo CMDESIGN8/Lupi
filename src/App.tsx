@@ -54,7 +54,7 @@ export default function App() {
     const timer = window.setTimeout(() => {
       setIntroComplete(true);
       setLoadingPhase((phase) => phase === "intro" ? "waiting" : phase);
-    }, 1400);
+    }, 2600);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -225,6 +225,10 @@ export default function App() {
       <ToastProvider>
         <div className="app-wrapper">
           <div className={`loading-screen lupi-cinematic-loading lupi-loading-finale${loadingPhase === "exiting" ? " is-exiting" : ""}`} role="status" aria-live="polite" aria-label="Cargando Lupi World">
+            <div className="lupi-stadium-blackout" aria-hidden="true" />
+            <div className="lupi-stadium-beam lupi-stadium-beam--left" aria-hidden="true" />
+            <div className="lupi-stadium-beam lupi-stadium-beam--right" aria-hidden="true" />
+            <div className="lupi-stadium-flash" aria-hidden="true" />
             <div className="lupi-cinematic-content">
               <svg className="lupi-loading-crown" viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M12 26 23 46 31 20 40 43 49 20 57 46 68 26 61 58H19L12 26Z" stroke="currentColor" strokeWidth="3.5" strokeLinejoin="round"/><path d="M20 63H60M22 69H58" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"/><circle cx="12" cy="22" r="3" fill="currentColor"/><circle cx="31" cy="16" r="3" fill="currentColor"/><circle cx="49" cy="16" r="3" fill="currentColor"/><circle cx="68" cy="22" r="3" fill="currentColor"/></svg>
               <div className="lupi-cinematic-wordmark">LUPI <span>WORLD</span></div>
