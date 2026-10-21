@@ -697,3 +697,61 @@
 @media (prefers-reduced-motion:reduce){
  .auth-screen .auth-stage__spot--left,.auth-screen .auth-stage__spot--right{animation:none!important;opacity:.085;transform:none!important}
 }
+
+/* LUPI WORLD — Mobile Stadium Spotlights */
+
+@media (max-width: 768px) {
+  .auth-container {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .auth-container::before,
+  .auth-container::after {
+    content: "";
+    position: absolute;
+    top: -35px;
+    width: 190px;
+    height: 390px;
+    pointer-events: none;
+    z-index: 1;
+
+    background: linear-gradient(
+      to bottom,
+      rgba(135, 235, 255, 0.30) 0%,
+      rgba(0, 195, 255, 0.13) 38%,
+      rgba(0, 170, 255, 0.04) 75%,
+      transparent 100%
+    );
+
+    clip-path: polygon(
+      46% 0%,
+      54% 0%,
+      100% 100%,
+      0% 100%
+    );
+
+    filter: blur(17px);
+    opacity: 0.65;
+    transform-origin: 50% 0%;
+  }
+
+  /* Reflector izquierdo: hacia el centro */
+  .auth-container::before {
+    left: 0;
+    transform: rotate(-45deg);
+  }
+
+  /* Reflector derecho: hacia el centro */
+  .auth-container::after {
+    right: 0;
+    transform: rotate(45deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-container::before,
+  .auth-container::after {
+    animation: none;
+  }
+}
