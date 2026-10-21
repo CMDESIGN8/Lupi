@@ -1336,81 +1336,65 @@ to {transform:translateX(130%)}
 
 .auth-screen .auth-card-v2::before {animation:none!important;transform:none!important;filter:none}
 
-}/* V4.2 — Directional stadium beams, desktop preserved, mobile diagonal */
+}/* V4.3 — Visible stadium spotlights. Keeps original layout and auth UI. */
 .auth-screen .auth-stage__spot {
-  top:-12%;
-  width:34%;
-  height:85%;
-  clip-path:none;
-  background:radial-gradient(ellipse 42% 85% at 50% 0%,rgba(110,222,255,.24) 0%,rgba(24,153,228,.09) 36%,rgba(0,145,255,.025) 64%,transparent 82%);
-  filter:blur(42px);
+  top:-9%;
+  width:38%;
+  height:105%;
+  clip-path:polygon(47% 0,53% 0,100% 100%,0 100%);
+  background:linear-gradient(180deg,
+    rgba(195,244,255,.83) 0%,
+    rgba(75,195,255,.53) 20%,
+    rgba(20,144,244,.28) 53%,
+    rgba(0,132,255,.04) 95%);
+  filter:blur(15px);
   mix-blend-mode:screen;
-  opacity:.085;
-  transform-origin:50% 0%;
+  opacity:.42;
+  transform-origin:50% 0;
   pointer-events:none;
 }
 .auth-screen .auth-stage__spot--left {
-  left:-10%;
-  animation:lupi-v42-left 1600ms ease-out both;
+  left:-8%;
+  animation:lupi-v43-left 1700ms ease-out both;
 }
 .auth-screen .auth-stage__spot--right {
-  right:-10%;
-  animation:lupi-v42-right 1600ms ease-out both;
+  right:-8%;
+  animation:lupi-v43-right 1700ms ease-out both;
 }
-@keyframes lupi-v42-left {
-  0% {opacity:0;transform:translateY(-18px) rotate(-5deg)}
-  55% {opacity:.16;transform:translateY(0) rotate(0deg)}
-  100% {opacity:.085;transform:rotate(0deg)}
+@keyframes lupi-v43-left {
+  0% {opacity:0;transform:rotate(-49deg) translateY(-12px)}
+  65% {opacity:.65;transform:rotate(-32deg)}
+  100% {opacity:.42;transform:rotate(-35deg)}
 }
-@keyframes lupi-v42-right {
-  0% {opacity:0;transform:translateY(-18px) rotate(5deg)}
-  55% {opacity:.16;transform:translateY(0) rotate(0deg)}
-  100% {opacity:.085;transform:rotate(0deg)}
+@keyframes lupi-v43-right {
+  0% {opacity:0;transform:rotate(49deg) translateY(-12px)}
+  65% {opacity:.65;transform:rotate(32deg)}
+  100% {opacity:.42;transform:rotate(35deg)}
 }
-/* Both lights originate near the upper corners and point inward. */
 @media (max-width:900px) {
   .auth-screen .auth-stage__spot {
-    top:-4%;
-    width:clamp(145px,35vw,260px);
-    height:clamp(310px,65dvh,560px);
-    clip-path:none;
-    filter:blur(22px);
-    background:radial-gradient(ellipse 65% 85% at 50% 0%,rgba(143,231,255,.35) 0%,rgba(29,161,244,.14) 35%,rgba(0,139,255,.035) 66%,transparent 88%);
+    top:-3%;
+    width:clamp(180px,52vw,330px);
+    height:clamp(390px,72dvh,680px);
+    filter:blur(11px);
+    background:linear-gradient(180deg,
+      rgba(202,247,255,.95),rgba(74,195,255,.65) 24%,
+      rgba(15,136,255,.32) 60%,transparent 100%);
   }
-  .auth-screen .auth-stage__spot--left {
-    left:-5%;
-    animation:lupi-v42-mobile-left 1450ms cubic-bezier(.2,.7,.2,1) both;
-  }
-  .auth-screen .auth-stage__spot--right {
-    right:-5%;
-    animation:lupi-v42-mobile-right 1450ms cubic-bezier(.2,.7,.2,1) both;
-  }
+  .auth-screen .auth-stage__spot--left {left:-22%;}
+  .auth-screen .auth-stage__spot--right {right:-22%;}
 }
 @media (max-width:600px) {
   .auth-screen .auth-stage__spot {
-    top:-2%;
-    width:clamp(125px,38vw,180px);
-    height:clamp(240px,48dvh,420px);
-    filter:blur(20px);
+    top:-1%;
+    width:clamp(155px,52vw,240px);
+    height:clamp(340px,65dvh,590px);
+    filter:blur(9px);
   }
-  .auth-screen .auth-stage__spot--left {left:-12%}
-  .auth-screen .auth-stage__spot--right {right:-12%}
-}
-@keyframes lupi-v42-mobile-left {
-  0% {opacity:0;transform:translateY(-22px) rotate(-20deg)}
-  60% {opacity:.24;transform:rotate(-48deg)}
-  100% {opacity:.13;transform:rotate(-45deg)}
-}
-@keyframes lupi-v42-mobile-right {
-  0% {opacity:0;transform:translateY(-22px) rotate(20deg)}
-  60% {opacity:.24;transform:rotate(48deg)}
-  100% {opacity:.13;transform:rotate(45deg)}
+  .auth-screen .auth-stage__spot--left {left:-26%;}
+  .auth-screen .auth-stage__spot--right {right:-26%;}
 }
 @media (prefers-reduced-motion:reduce) {
-  .auth-screen .auth-stage__spot--left,
-  .auth-screen .auth-stage__spot--right {animation:none!important;opacity:.085}
-  @media (max-width:900px) {
-    .auth-screen .auth-stage__spot--left {transform:rotate(-45deg)!important;opacity:.13}
-    .auth-screen .auth-stage__spot--right {transform:rotate(45deg)!important;opacity:.13}
-  }
+  .auth-screen .auth-stage__spot--left {animation:none!important;opacity:.42;transform:rotate(-35deg)!important;}
+  .auth-screen .auth-stage__spot--right {animation:none!important;opacity:.42;transform:rotate(35deg)!important;}
 }
