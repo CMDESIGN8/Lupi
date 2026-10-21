@@ -475,3 +475,40 @@
 .auth-screen .auth-divider::before,
 .auth-screen .auth-divider::after { min-width: 0; }
 .auth-screen .auth-google-button svg { flex: 0 0 20px; }
+
+
+/* =============================================================
+   LUPI WORLD — V2 CINEMATIC LOGIN | Visual enhancement layer
+   Preserves existing class names and authentication behavior.
+   ============================================================= */
+.auth-screen { --neon:#00f3c0; --gold:#ffca38; }
+.auth-screen .auth-stage__scene { filter:saturate(1.1) contrast(1.045); }
+.auth-screen .auth-stage__shade { background:linear-gradient(90deg,rgba(0,6,14,.42),rgba(0,10,20,.07) 44%,rgba(0,7,17,.57)),linear-gradient(180deg,rgba(0,5,13,.16),transparent 35%,rgba(0,5,12,.7)); }
+.auth-screen .auth-stage__fog { opacity:.58; }
+.auth-screen .auth-intro h1 { text-wrap:balance; text-shadow:0 4px 12px rgba(0,0,0,.95),0 12px 36px rgba(0,0,0,.8); }
+.auth-screen .auth-intro h1 em { text-shadow:0 4px 15px #00120e,0 0 28px rgba(0,243,192,.45); }
+.auth-screen .auth-pillar { position:relative; overflow:hidden; border:1px solid rgba(49,238,208,.36); background:linear-gradient(150deg,rgba(4,35,42,.76),rgba(0,12,21,.78)); box-shadow:0 12px 30px rgba(0,0,0,.34),inset 0 1px 0 rgba(225,255,255,.1); -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); }
+.auth-screen .auth-pillar::before { content:''; position:absolute; inset:0 0 auto; height:1px; background:linear-gradient(90deg,transparent,rgba(202,255,245,.46),transparent); pointer-events:none; }
+.auth-screen .auth-pillar:hover { transform:translateY(-4px); border-color:rgba(0,243,192,.8); background:linear-gradient(150deg,rgba(4,49,53,.86),rgba(0,18,29,.85)); box-shadow:0 16px 34px rgba(0,0,0,.46),0 0 22px rgba(0,243,192,.13); }
+.auth-screen .auth-card-v2 { overflow:hidden; border:1px solid rgba(67,239,209,.52); background:linear-gradient(155deg,rgba(2,32,37,.89),rgba(0,13,24,.93) 58%,rgba(0,16,23,.94)); box-shadow:0 30px 90px rgba(0,0,0,.7),0 0 45px rgba(0,243,192,.065),inset 0 1px 0 rgba(255,255,255,.13); -webkit-backdrop-filter:blur(28px) saturate(125%); backdrop-filter:blur(28px) saturate(125%); }
+.auth-screen .auth-card-v2::after { content:''; position:absolute; width:55%; height:160px; right:-24%; top:-90px; border-radius:50%; background:rgba(0,243,192,.11); filter:blur(50px); pointer-events:none; z-index:-1; }
+.auth-screen .auth-card-heading h2 { letter-spacing:.005em; text-shadow:0 4px 18px rgba(0,0,0,.5); }
+.auth-screen .auth-card-heading p { color:#bddad5; }
+.auth-screen .auth-tabs { background:rgba(0,7,16,.62); border-color:rgba(132,235,225,.17); }
+.auth-screen .auth-tabs button { transition:background .22s,border-color .22s,color .22s,box-shadow .22s; }
+.auth-screen .auth-tabs button.active { color:#4fffe0; background:linear-gradient(180deg,rgba(0,243,192,.16),rgba(0,243,192,.06)); border-color:rgba(0,243,192,.62); box-shadow:0 0 16px rgba(0,243,192,.07),inset 0 1px 0 rgba(255,255,255,.08); }
+.auth-screen .form-input { border:1px solid rgba(151,216,217,.48); background:rgba(0,10,19,.72); box-shadow:inset 0 1px 2px rgba(0,0,0,.22); }
+.auth-screen .form-input:hover:not(:focus) { border-color:rgba(190,247,238,.7); }
+.auth-screen .form-input:focus { border-color:#00f3c0; background:rgba(0,18,25,.9); box-shadow:0 0 0 3px rgba(0,243,192,.13),0 0 24px rgba(0,243,192,.08); }
+.auth-screen .auth-google-button { border:1px solid rgba(136,229,217,.36); background:linear-gradient(135deg,rgba(0,27,35,.83),rgba(0,15,24,.82)); box-shadow:inset 0 1px 0 rgba(255,255,255,.06); }
+.auth-screen .auth-google-button:hover:not(:disabled) { border-color:rgba(0,243,192,.8); background:rgba(0,58,61,.74); box-shadow:0 0 22px rgba(0,243,192,.1); }
+.auth-screen .auth-submit { background:linear-gradient(100deg,#ffc12e,#ffe078 52%,#ffbf2b); box-shadow:0 8px 25px rgba(255,193,46,.22),inset 0 1px 0 rgba(255,255,255,.5); }
+.auth-screen .auth-submit:hover:not(:disabled) { box-shadow:0 13px 32px rgba(255,193,46,.38),0 0 20px rgba(255,193,46,.12); }
+.auth-screen .auth-submit:active:not(:disabled) { transform:translateY(1px) scale(.995); }
+.auth-screen .auth-submit:disabled { cursor:wait; }
+.auth-screen .auth-error { border-color:rgba(255,126,126,.65); background:rgba(87,20,32,.6); box-shadow:inset 0 1px 0 rgba(255,255,255,.06); overflow-wrap:anywhere; }
+.auth-screen .auth-google-button:focus-visible,.auth-screen .auth-confirmation button:focus-visible { outline:2px solid #00f3c0; outline-offset:3px; }
+@media (min-width:901px) { .auth-screen .auth-shell { gap:clamp(28px,4vw,68px); } .auth-screen .auth-card-v2 { border-radius:22px; } }
+@media (max-width:900px) { .auth-screen .auth-card-v2 { background:linear-gradient(160deg,rgba(2,29,36,.94),rgba(0,12,22,.96)); } .auth-screen .auth-stage__scene { filter:saturate(1.05) brightness(.86); } }
+@media (max-width:600px) { .auth-screen .auth-shell { max-width:540px; } .auth-screen .auth-card-v2 { border-radius:16px; } .auth-screen .auth-pillar { border-radius:9px; } .auth-screen .auth-tabs button,.auth-screen .auth-google-button,.auth-screen .auth-submit { touch-action:manipulation; } .auth-screen .auth-stage__shade { background:linear-gradient(180deg,rgba(0,6,13,.2),rgba(0,7,15,.34) 24%,rgba(0,8,17,.82) 60%,#020b10 100%); } }
+@media (prefers-reduced-motion:reduce) { .auth-screen .auth-pillar,.auth-screen .auth-submit,.auth-screen .auth-google-button { transition:none!important; } }
