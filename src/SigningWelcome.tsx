@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { api, type AppUser } from "../lib/api";
-import type { UserCard } from "../types/cards";
+import { api, type AppUser } from "./lib/api";
+import type { UserCard } from "./types/cards";
 import "./SigningWelcome.css";
 
 type Props = { user: AppUser; onContinue: () => void };
