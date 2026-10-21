@@ -1,0 +1,56 @@
+/* LUPI WORLD — Cinematic finale. Se carga después de los estilos existentes. */
+.lupi-loading-finale { overflow: hidden; }
+.lupi-loading-finale::after { pointer-events: none; }
+.lupi-loading-finale .lupi-cinematic-content { animation: lupi-intro-reveal 950ms cubic-bezier(.16,1,.3,1) both; }
+.lupi-loading-finale .lupi-loading-crown { transform-origin: 50% 50%; }
+.lupi-loading-finale .lupi-cinematic-wordmark { filter: drop-shadow(0 0 18px rgba(0,229,255,.14)); }
+.lupi-loading-finale .lupi-loading-status {
+  display: block; margin-top: 3px; color: #b8edfa;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: clamp(10px, 1.1vw, 12px); font-weight: 800;
+  letter-spacing: .24em; text-transform: uppercase;
+  text-shadow: 0 0 12px rgba(0,229,255,.35);
+  animation: lupi-status-breathe 2s ease-in-out infinite;
+}
+.lupi-loading-finale .lupi-loading-dots { display: inline-block; width: 1.4em; overflow: hidden; vertical-align: bottom; animation: lupi-status-breathe 1s ease-in-out infinite alternate; }
+.lupi-loading-finale.is-exiting { animation: lupi-stadium-out 950ms ease-in forwards; }
+.lupi-loading-finale.is-exiting .lupi-cinematic-content { animation: lupi-logo-out 900ms cubic-bezier(.55,.06,.68,.19) forwards; }
+.lupi-loading-finale.is-exiting .lupi-cinematic-lightline { animation: lupi-line-flash 700ms ease-out forwards; }
+.lupi-loading-finale .lupi-loading-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+@keyframes lupi-intro-reveal { from { opacity: 0; transform: translateY(18px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes lupi-status-breathe { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes lupi-logo-out { 0% { opacity: 1; transform: scale(1); filter: blur(0); } 55% { opacity: 1; transform: scale(1.075); filter: blur(0); } 100% { opacity: 0; transform: scale(1.22); filter: blur(9px); } }
+@keyframes lupi-stadium-out { 0%,50% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes lupi-line-flash { 0% { opacity: 1; transform: scaleX(1); } 45% { opacity: 1; transform: scaleX(1.5); } 100% { opacity: 0; transform: scaleX(2); } }
+@media (max-width: 480px) { .lupi-loading-finale .lupi-loading-status { font-size: 10px; letter-spacing: .14em; } }
+@media (prefers-reduced-motion: reduce) {
+  .lupi-loading-finale, .lupi-loading-finale .lupi-cinematic-content,
+  .lupi-loading-finale .lupi-loading-status, .lupi-loading-finale .lupi-loading-dots,
+  .lupi-loading-finale.is-exiting .lupi-cinematic-lightline { animation: none !important; }
+}
+
+/* Entrada visible: corona y logo aparecen escalonados */
+.lupi-loading-finale:not(.is-exiting) .lupi-loading-crown {
+  animation: lupi-crown-entrance 850ms cubic-bezier(.16,1,.3,1) both, lupi-crown-float 3s ease-in-out 850ms infinite;
+}
+.lupi-loading-finale:not(.is-exiting) .lupi-cinematic-wordmark {
+  animation: lupi-wordmark-entrance 1050ms cubic-bezier(.16,1,.3,1) 180ms both;
+}
+.lupi-loading-finale:not(.is-exiting) .lupi-cinematic-tagline,
+.lupi-loading-finale:not(.is-exiting) .lupi-cinematic-lightline {
+  animation: lupi-wordmark-entrance 800ms ease-out 600ms both;
+}
+@keyframes lupi-crown-entrance {
+  from {opacity:0; transform:translateY(-28px) scale(.65);}
+  to {opacity:1; transform:translateY(0) scale(1);}
+}
+@keyframes lupi-wordmark-entrance {
+  from {opacity:0; transform:translateY(28px) scale(.86); filter:blur(10px);}
+  to {opacity:1; transform:translateY(0) scale(1); filter:blur(0);}
+}
+@media (prefers-reduced-motion: reduce) {
+  .lupi-loading-finale:not(.is-exiting) .lupi-loading-crown,
+  .lupi-loading-finale:not(.is-exiting) .lupi-cinematic-wordmark,
+  .lupi-loading-finale:not(.is-exiting) .lupi-cinematic-tagline,
+  .lupi-loading-finale:not(.is-exiting) .lupi-cinematic-lightline { animation:none !important; }
+}

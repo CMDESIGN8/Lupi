@@ -183,17 +183,501 @@ button, input, textarea, select { font: inherit; }
   .app-content-shell > *, .main-content > * { min-width: 0; }
 }
 
-/* Pantalla de carga Lupi World — identidad cinematográfica */
-.lupi-cinematic-loading{position:fixed;inset:0;z-index:99999;min-height:100dvh;width:100%;overflow:hidden;background:radial-gradient(ellipse 42% 50% at 52% 47%,rgba(0,175,151,.25),transparent 82%),radial-gradient(ellipse 60% 65% at 55% 80%,rgba(0,72,100,.3),transparent 80%),linear-gradient(155deg,#000808 8%,#00121a 55%,#001018 100%);color:#fff;isolation:isolate;padding:20px;box-sizing:border-box}
-.lupi-cinematic-loading::before{content:"";position:absolute;inset:-20%;background:conic-gradient(from 20deg at 50% 48%,transparent 0deg,rgba(25,235,191,.06) 26deg,transparent 60deg,transparent 150deg,rgba(18,170,201,.08) 190deg,transparent 230deg);animation:lupi-light-sweep 8s ease-in-out infinite alternate;pointer-events:none}
-.lupi-cinematic-content{position:relative;display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;max-width:100%}
-.lupi-loading-crown{width:76px;height:76px;color:#31f5c2;filter:drop-shadow(0 0 14px rgba(35,245,191,.65))}
-.lupi-cinematic-wordmark{font-family:var(--font-display),Impact,'Arial Narrow',sans-serif;font-size:clamp(46px,8vw,108px);font-weight:1000;font-style:italic;letter-spacing:-.025em;line-height:1.05;white-space:nowrap;text-shadow:0 0 12px rgba(255,255,255,.08)}
-.lupi-cinematic-wordmark span{color:#38f2bf;text-shadow:0 0 26px rgba(28,248,184,.35)}
-.lupi-cinematic-tagline{font-size:clamp(11px,1.45vw,17px);font-weight:900;letter-spacing:.34em;color:#c5f8ef}
-.lupi-cinematic-lightline{margin-top:10px;width:min(270px,65vw);height:2px;background:linear-gradient(90deg,transparent,#24f5c2,transparent);box-shadow:0 0 18px #24f5c2;animation:lupi-light-pulse 1.8s ease-in-out infinite}
-.lupi-loading-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
-@keyframes lupi-light-pulse{50%{opacity:.45;transform:scaleX(.7)}}
-@keyframes lupi-light-sweep{to{transform:rotate(18deg)}}
-@media(max-width:480px){.lupi-cinematic-loading{padding:12px}.lupi-loading-crown{width:62px;height:62px}.lupi-cinematic-wordmark{font-size:clamp(43px,12vw,60px)}.lupi-cinematic-tagline{letter-spacing:.23em}}
-@media(prefers-reduced-motion:reduce){.lupi-cinematic-loading::before,.lupi-cinematic-lightline{animation:none}}
+/* =========================================================
+   Pantalla de carga Lupi World — V2 Cinematic Next-Gen
+   ========================================================= */
+
+.lupi-cinematic-loading{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  min-height:100dvh;
+  width:100%;
+  overflow:hidden;
+  padding:20px;
+  box-sizing:border-box;
+  isolation:isolate;
+  color:#eafcff;
+  /* Fondo más profundo y contrastado */
+  background:
+    radial-gradient(ellipse 40% 50% at 50% 45%, rgba(0,229,255,.22), transparent 65%),
+    radial-gradient(ellipse 70% 70% at 50% 85%, rgba(0,100,255,.25), transparent 75%),
+    linear-gradient(160deg, #000308 0%, #001126 45%, #00040a 100%);
+  animation: lupi-bg-breathe 4s ease-in-out infinite alternate;
+}
+
+/* Viñeta cinematográfica */
+.lupi-cinematic-loading::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, transparent 40%, rgba(0,0,0,.85) 100%);
+  z-index:0;
+}
+
+/* Scanlines sutiles + Barrido de luz */
+.lupi-cinematic-loading::before{
+  content:"";
+  position:absolute;
+  inset:-25%;
+  background:conic-gradient(
+    from 20deg at 50% 48%,
+    transparent 0deg,
+    rgba(0,229,255,.12) 26deg,
+    transparent 60deg,
+    transparent 150deg,
+    rgba(0,140,255,.12) 190deg,
+    transparent 230deg
+  );
+  animation:lupi-light-sweep 8s ease-in-out infinite alternate;
+  pointer-events:none;
+  z-index:0;
+  /* Máscara para simular líneas de escaneo de TV/Arcade */
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent), 
+              repeating-linear-gradient(to bottom, transparent 0, transparent 2px, rgba(0,0,0,0.3) 3px, transparent 4px);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+
+/* Contenido */
+.lupi-cinematic-content{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap: 16px; /* Un poco más de aire */
+  text-align:center;
+  height:100%;
+}
+
+/* Corona: Levitación + Glow Dinámico */
+.lupi-loading-crown{
+  width:76px;
+  height:76px;
+  color:#ffe64a;
+  filter:
+    drop-shadow(0 0 10px rgba(255,230,74,.9))
+    drop-shadow(0 0 25px rgba(0,229,255,.5))
+    drop-shadow(0 0 50px rgba(0,140,255,.3));
+  animation: lupi-crown-float 3s ease-in-out infinite;
+}
+
+/* Wordmark: Blanco Neón y Cyan Eléctrico */
+.lupi-cinematic-wordmark{
+  font-family:var(--font-display), Impact, 'Arial Narrow', sans-serif;
+  font-size:clamp(46px,8vw,108px);
+  font-weight:1000;
+  font-style:italic;
+  letter-spacing:-.02em;
+  line-height:1.05;
+  white-space:nowrap;
+  color:#ffffff;
+  text-shadow:
+    0 0 10px rgba(255,255,255,.5),
+    0 0 30px rgba(0,229,255,.2);
+}
+
+.lupi-cinematic-wordmark span{
+  color:#3ef0ff;
+  text-shadow:
+    0 0 4px rgba(255,255,255,.8), /* Núcleo blanco del neón */
+    0 0 15px rgba(62,240,255,.9),
+    0 0 35px rgba(0,200,255,.6),
+    0 0 60px rgba(0,100,255,.4);
+}
+
+/* Tagline */
+.lupi-cinematic-tagline{
+  font-size:clamp(11px,1.45vw,16px);
+  font-weight:900;
+  letter-spacing:.4em; /* Un poco más de espacio */
+  color:#a8ebff;
+  text-shadow:0 0 15px rgba(0,229,255,.5);
+}
+
+/* Línea de luz conectada */
+.lupi-cinematic-lightline{
+  margin-top: 4px; /* Más cerca del texto */
+  width:min(320px,70vw); /* Un poco más ancha */
+  height:2px;
+  border-radius:2px;
+  background:linear-gradient(90deg, transparent, #00e5ff 30%, #ffffff 50%, #00e5ff 70%, transparent);
+  box-shadow:
+    0 0 15px #00e5ff,
+    0 0 30px rgba(0,140,255,.8);
+  animation:lupi-light-pulse 2s ease-in-out infinite;
+}
+
+/* ===================== Animaciones ===================== */
+
+@keyframes lupi-bg-breathe {
+  0% { opacity: .9; }
+  100% { opacity: 1; }
+}
+
+@keyframes lupi-light-pulse{
+  0%,100%{ opacity:1; transform:scaleX(1); }
+  50%{ opacity:.6; transform:scaleX(.85); }
+}
+
+@keyframes lupi-light-sweep{
+  0%   { transform:rotate(0deg) scale(1); }
+  100% { transform:rotate(20deg) scale(1.05); }
+}
+
+@keyframes lupi-crown-float {
+  0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 10px rgba(255,230,74,.9)) drop-shadow(0 0 25px rgba(0,229,255,.5)); }
+  50% { transform: translateY(-8px); filter: drop-shadow(0 0 20px rgba(255,230,74,1)) drop-shadow(0 0 45px rgba(0,229,255,.8)); }
+}
+
+/* ===================== Responsive ===================== */
+
+@media(max-width:480px){
+  .lupi-cinematic-loading{ padding:12px; }
+  .lupi-loading-crown{ width:62px; height:62px; }
+  .lupi-cinematic-wordmark{ font-size:clamp(40px,12vw,60px); }
+  .lupi-cinematic-tagline{ letter-spacing:.25em; font-size: 10px; }
+  .lupi-cinematic-lightline { width: 80vw; }
+}
+
+/* Accesibilidad */
+@media(prefers-reduced-motion:reduce){
+  .lupi-cinematic-loading,
+  .lupi-cinematic-loading::before,
+  .lupi-cinematic-lightline,
+  .lupi-loading-crown{
+    animation:none;
+  }
+}
+/* =========================================
+   1. TEXTO DE CARGA ESTILIZADO Y ANIMADO
+   ========================================= */
+/* Busca o añade la clase del texto "Cargando aplicación..." */
+.lupi-loading-text {
+  margin-top: 10px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #7ae5ff;
+  opacity: 0.8;
+  animation: lupi-text-pulse 2s ease-in-out infinite;
+}
+
+/* Animación de pulso sutil para el texto */
+@keyframes lupi-text-pulse {
+  0%, 100% { opacity: 0.5; text-shadow: none; }
+  50% { opacity: 1; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+}
+
+/* =========================================
+   2. SUAVIZAR LA LÍNEA DE LUZ (LIGHTLINE)
+   ========================================= */
+.lupi-cinematic-lightline {
+  margin-top: 4px;
+  width: min(320px, 70vw);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #00e5ff 30%, #b3f8ff 50%, #00e5ff 70%, transparent);
+  box-shadow:
+    0 0 10px rgba(0, 229, 255, 0.6), /* Brillo más suave */
+    0 0 25px rgba(0, 140, 255, 0.4);
+  animation: lupi-light-pulse 2s ease-in-out infinite;
+}
+
+/* =========================================
+   3. PARTÍCULAS FLOTANTES EN EL FONDO
+   ========================================= */
+/* Añadimos un contenedor extra para las partículas */
+.lupi-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* Justo debajo del contenido */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Partículas (puedes añadir varias en tu HTML) */
+.lupi-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #00e5ff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00e5ff, 0 0 15px #0088ff;
+  opacity: 0;
+  animation: lupi-particle-float 6s linear infinite;
+}
+
+/* Diferentes posiciones y tiempos para cada partícula */
+.lupi-particle:nth-child(1) { left: 20%; bottom: -10px; animation-duration: 5s; animation-delay: 0s; }
+.lupi-particle:nth-child(2) { left: 35%; bottom: -10px; animation-duration: 7s; animation-delay: 1s; width: 2px; height: 2px; }
+.lupi-particle:nth-child(3) { left: 65%; bottom: -10px; animation-duration: 6s; animation-delay: 2s; }
+.lupi-particle:nth-child(4) { left: 80%; bottom: -10px; animation-duration: 8s; animation-delay: 0.5s; width: 4px; height: 4px; }
+.lupi-particle:nth-child(5) { left: 50%; bottom: -10px; animation-duration: 4s; animation-delay: 3s; width: 2px; height: 2px; }
+
+@keyframes lupi-particle-float {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+}
+/* LUPI WORLD — LOADING V3 VISUAL POLISH */
+
+
+/* LUPI WORLD — LOADING V4: ESTADIO VISIBLE */
+
+.lupi-cinematic-loading {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 5, 12, 0.40) 0%,
+      rgba(0, 12, 24, 0.52) 50%,
+      rgba(0, 5, 12, 0.70) 100%
+    ),
+    url('/images/teeam.png')
+      center center / cover no-repeat,
+    #010711 !important;
+}
+
+/* Viñeta menos agresiva */
+.lupi-cinematic-loading::after {
+  background:
+    radial-gradient(
+      ellipse 85% 85% at 50% 50%,
+      transparent 45%,
+      rgba(0, 0, 0, 0.45) 100%
+    );
+}
+
+/* Mantener logo y corona por encima */
+.lupi-cinematic-content {
+  position: relative;
+  z-index: 2;
+}
+
+
+.lupi-cinematic-content {
+  gap: 11px;
+  transform: translateY(-2%);
+}
+
+.lupi-loading-crown {
+  width: 58px;
+  height: 58px;
+  margin-bottom: 1px;
+  animation: lupi-crown-float 3.5s ease-in-out infinite;
+}
+
+.lupi-cinematic-wordmark {
+  font-size: clamp(48px, 7.5vw, 100px);
+  letter-spacing: -.035em;
+  line-height: .98;
+  filter: drop-shadow(0 5px 18px rgba(0,0,0,.55));
+}
+
+.lupi-cinematic-wordmark span {
+  color: #35eaff;
+  text-shadow:
+    0 0 12px rgba(53,234,255,.55),
+    0 0 32px rgba(0,180,255,.30);
+}
+
+.lupi-cinematic-tagline {
+  margin-top: 10px;
+  font-size: clamp(10px, 1.2vw, 13px);
+  letter-spacing: .32em;
+  color: #c5eaf3;
+}
+
+.lupi-cinematic-lightline {
+  position: relative;
+  width: min(260px, 65vw);
+  height: 2px;
+  margin-top: 3px;
+  background: rgba(0, 204, 255, .18);
+  box-shadow: none;
+  overflow: hidden;
+  animation: none;
+}
+
+.lupi-cinematic-lightline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 38%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #28eaff,
+    #ffffff,
+    #28eaff,
+    transparent
+  );
+  box-shadow: 0 0 12px #00dfff;
+  animation: lupi-loading-scan 1.8s ease-in-out infinite;
+}
+
+@keyframes lupi-loading-scan {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(290%); }
+}
+
+.lupi-loading-text {
+  margin-top: 3px;
+  font-size: 10px;
+  letter-spacing: .16em;
+  color: #9dcbd8;
+}
+
+@media (max-width: 480px) {
+  .lupi-cinematic-content {
+    gap: 10px;
+  }
+
+  .lupi-loading-crown {
+    width: 50px;
+    height: 50px;
+  }
+
+  .lupi-cinematic-wordmark {
+    font-size: clamp(42px, 11vw, 58px);
+  }
+
+  .lupi-cinematic-tagline {
+    font-size: 9px;
+    letter-spacing: .22em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lupi-loading-crown,
+  .lupi-cinematic-lightline::after,
+  .lupi-loading-text {
+    animation: none !important;
+  }
+}
+
+/* =========================================
+   1. TEXTO DE CARGA ESTILIZADO Y ANIMADO
+   ========================================= */
+/* Busca o añade la clase del texto "Cargando aplicación..." */
+.lupi-loading-text {
+  margin-top: 10px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #7ae5ff;
+  opacity: 0.8;
+  animation: lupi-text-pulse 2s ease-in-out infinite;
+}
+
+/* Animación de pulso sutil para el texto */
+@keyframes lupi-text-pulse {
+  0%, 100% { opacity: 0.5; text-shadow: none; }
+  50% { opacity: 1; text-shadow: 0 0 10px rgba(0, 229, 255, 0.5); }
+}
+
+/* =========================================
+   2. SUAVIZAR LA LÍNEA DE LUZ (LIGHTLINE)
+   ========================================= */
+.lupi-cinematic-lightline {
+  margin-top: 4px;
+  width: min(320px, 70vw);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #00e5ff 30%, #b3f8ff 50%, #00e5ff 70%, transparent);
+  box-shadow:
+    0 0 10px rgba(0, 229, 255, 0.6), /* Brillo más suave */
+    0 0 25px rgba(0, 140, 255, 0.4);
+  animation: lupi-light-pulse 2s ease-in-out infinite;
+}
+
+/* =========================================
+   3. PARTÍCULAS FLOTANTES EN EL FONDO
+   ========================================= */
+/* Añadimos un contenedor extra para las partículas */
+.lupi-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 1; /* Justo debajo del contenido */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Partículas (puedes añadir varias en tu HTML) */
+.lupi-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #00e5ff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00e5ff, 0 0 15px #0088ff;
+  opacity: 0;
+  animation: lupi-particle-float 6s linear infinite;
+}
+
+/* Diferentes posiciones y tiempos para cada partícula */
+.lupi-particle:nth-child(1) { left: 20%; bottom: -10px; animation-duration: 5s; animation-delay: 0s; }
+.lupi-particle:nth-child(2) { left: 35%; bottom: -10px; animation-duration: 7s; animation-delay: 1s; width: 2px; height: 2px; }
+.lupi-particle:nth-child(3) { left: 65%; bottom: -10px; animation-duration: 6s; animation-delay: 2s; }
+.lupi-particle:nth-child(4) { left: 80%; bottom: -10px; animation-duration: 8s; animation-delay: 0.5s; width: 4px; height: 4px; }
+.lupi-particle:nth-child(5) { left: 50%; bottom: -10px; animation-duration: 4s; animation-delay: 3s; width: 2px; height: 2px; }
+
+@keyframes lupi-particle-float {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+}
+
+/* LUPI WORLD — CINEMATIC FINAL POLISH */
+
+.lupi-cinematic-content {
+  animation: lupi-content-reveal 1.1s ease-out both;
+}
+
+.lupi-cinematic-wordmark {
+  font-size: clamp(54px, 8.5vw, 116px);
+  filter: drop-shadow(0 5px 24px rgba(0, 0, 0, .65));
+}
+
+.lupi-loading-crown {
+  filter:
+    drop-shadow(0 0 12px rgba(255, 225, 60, .95))
+    drop-shadow(0 0 30px rgba(255, 200, 0, .45));
+}
+
+.lupi-cinematic-loading {
+  background-position: center;
+  background-size: cover;
+}
+
+@keyframes lupi-content-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-2%) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .lupi-cinematic-wordmark {
+    font-size: clamp(42px, 11vw, 62px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lupi-cinematic-content {
+    animation: none;
+  }
+}

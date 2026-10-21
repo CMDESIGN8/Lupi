@@ -41,10 +41,29 @@ import "./styles/game.css";
 import "./styles/animations.css";
 import "./styles/shop.css";
 import "./styles/profile.css";
+import "./styles/lupi-loading-finale.css";
 
 export default function App() {
   const [user, setUser] = useState<AppUser | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [loadingPhase, setLoadingPhase] = useState<"intro" | "waiting" | "exiting" | "done">("intro");
+  const [introComplete, setIntroComplete] = useState(false);
+
+  // La entrada se reproduce completa aunque la sesión responda inmediatamente.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setIntroComplete(true);
+      setLoadingPhase((phase) => phase === "intro" ? "waiting" : phase);
+    }, 1400);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated || !introComplete) return;
+    setLoadingPhase("exiting");
+    const timer = window.setTimeout(() => setLoadingPhase("done"), 1050);
+    return () => window.clearTimeout(timer);
+  }, [hydrated, introComplete]);
   const [hasPlayedMatch, setHasPlayedMatch] = useState<boolean | null>(null);
   const [showTour, setShowTour] = useState(false);
   const [showSigningWelcome, setShowSigningWelcome] = useState(false);
@@ -201,17 +220,25 @@ export default function App() {
     scrollTop();
   }, [setGameTab]);
 
-  if (!hydrated) {
+  if (loadingPhase !== "done") {
     return (
       <ToastProvider>
         <div className="app-wrapper">
-          <div className="loading-screen lupi-cinematic-loading" role="status" aria-live="polite" aria-label="Cargando Lupi World">
+          <div className={`loading-screen lupi-cinematic-loading lupi-loading-finale${loadingPhase === "exiting" ? " is-exiting" : ""}`} role="status" aria-live="polite" aria-label="Cargando Lupi World">
             <div className="lupi-cinematic-content">
               <svg className="lupi-loading-crown" viewBox="0 0 80 80" fill="none" aria-hidden="true"><path d="M12 26 23 46 31 20 40 43 49 20 57 46 68 26 61 58H19L12 26Z" stroke="currentColor" strokeWidth="3.5" strokeLinejoin="round"/><path d="M20 63H60M22 69H58" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"/><circle cx="12" cy="22" r="3" fill="currentColor"/><circle cx="31" cy="16" r="3" fill="currentColor"/><circle cx="49" cy="16" r="3" fill="currentColor"/><circle cx="68" cy="22" r="3" fill="currentColor"/></svg>
               <div className="lupi-cinematic-wordmark">LUPI <span>WORLD</span></div>
               <div className="lupi-cinematic-tagline">LA CANCHA TE ESPERA</div>
               <div className="lupi-cinematic-lightline" aria-hidden="true" />
-              <span className="lupi-loading-sr-only">Cargando aplicación…</span>
+                <div className="lupi-particles">
+                <div className="lupi-particle"></div>
+                <div className="lupi-particle"></div>
+                <div className="lupi-particle"></div>
+                <div className="lupi-particle"></div>
+                <div className="lupi-particle"></div>
+              </div>
+              <span className="lupi-loading-status">{loadingPhase === "exiting" ? "ENTRANDO A LA CANCHA" : "PREPARANDO LA CANCHA"}<span className="lupi-loading-dots" aria-hidden="true">...</span></span>
+              <span className="lupi-loading-sr-only">{hydrated ? "Abriendo Lupi World" : "Cargando aplicación"}</span>
             </div>
           </div>
         </div>
