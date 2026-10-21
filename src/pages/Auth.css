@@ -1398,3 +1398,65 @@ to {transform:translateX(130%)}
   .auth-screen .auth-stage__spot--left {animation:none!important;opacity:.42;transform:rotate(-35deg)!important;}
   .auth-screen .auth-stage__spot--right {animation:none!important;opacity:.42;transform:rotate(35deg)!important;}
 }
+
+/* V4.4 — Reflectores atmosféricos. Solo modifica la capa de luz. */
+.auth-screen .auth-stage__spot {
+  top:-12%;
+  width:clamp(260px,34vw,520px);
+  height:100%;
+  pointer-events:none;
+  transform-origin:50% 0%;
+  mix-blend-mode:screen;
+  /* Bordes suaves sin recortes geométricos */
+  clip-path:none;
+  -webkit-clip-path:none;
+  background:radial-gradient(ellipse 66% 92% at 50% 0%,
+    rgba(204,248,255,.68) 0%,
+    rgba(79,204,255,.38) 17%,
+    rgba(18,140,238,.18) 43%,
+    rgba(4,100,190,.055) 67%,
+    transparent 86%);
+  filter:blur(23px);
+  opacity:.62;
+  will-change:transform,opacity;
+}
+.auth-screen .auth-stage__spot--left {
+  left:-13%;right:auto;
+  animation:lupi-v44-light-left 1.8s ease-out both;
+}
+.auth-screen .auth-stage__spot--right {
+  right:-13%;left:auto;
+  animation:lupi-v44-light-right 1.8s ease-out both;
+}
+@keyframes lupi-v44-light-left {
+  from {opacity:0;transform:rotate(-45deg) scaleY(.8)}
+  65% {opacity:.75;transform:rotate(-39deg) scaleY(1.02)}
+  to {opacity:.62;transform:rotate(-40deg) scaleY(1)}
+}
+@keyframes lupi-v44-light-right {
+  from {opacity:0;transform:rotate(45deg) scaleY(.8)}
+  65% {opacity:.75;transform:rotate(39deg) scaleY(1.02)}
+  to {opacity:.62;transform:rotate(40deg) scaleY(1)}
+}
+@media(max-width:900px){
+  .auth-screen .auth-stage__spot {
+    top:-7%;width:clamp(170px,44vw,320px);
+    height:clamp(290px,55dvh,550px);
+    filter:blur(18px);
+  }
+  .auth-screen .auth-stage__spot--left{left:-20%;}
+  .auth-screen .auth-stage__spot--right{right:-20%;}
+}
+@media(max-width:600px){
+  .auth-screen .auth-stage__spot {
+    top:-4%;width:48vw;height:38dvh;
+    min-height:250px;max-height:400px;
+    filter:blur(15px);
+  }
+  .auth-screen .auth-stage__spot--left{left:-23%;}
+  .auth-screen .auth-stage__spot--right{right:-23%;}
+}
+@media(prefers-reduced-motion:reduce){
+  .auth-screen .auth-stage__spot--left{animation:none!important;opacity:.62;transform:rotate(-40deg)!important;}
+  .auth-screen .auth-stage__spot--right{animation:none!important;opacity:.62;transform:rotate(40deg)!important;}
+}
