@@ -166,27 +166,6 @@
   text-shadow: 0 0 12px rgba(36, 233, 135, 0.5);
 }
 
-.gh-brand::after {
-  content: "";
-
-  position: absolute;
-  left: 50%; bottom: 0;
-
-  width: 44px;
-  height: 2px;
-
-  transform: translateX(-50%);
-
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #ffc83d 30%,
-    #ffc83d 70%,
-    transparent
-  );
-
-  box-shadow: 0 0 12px rgba(255, 200, 61, 0.5);
-}
 
 .gh-brand__ball { font-size: 22px; }
 
@@ -2884,4 +2863,22 @@
 }
 @media (max-height: 520px) and (min-width: 901px) {
   .gh-root--playing .arena-header { display: none; }
+}
+
+/* Comunidades: acceso integrado al lobby */
+.gh-communities-trigger{display:block;width:100%;margin-bottom:8px;padding:10px;border:1px solid #28d9ff;border-radius:8px;background:#082737;color:#e6faff;font-weight:800;cursor:pointer;letter-spacing:.06em}
+.gh-communities-trigger:hover{box-shadow:0 0 16px #28d9ff44}
+
+/* Comunidades fase 1: acceso por navegación, sin botones sobre el avatar */
+.gh-world__actions > button:first-child { border-color: rgba(40,217,255,.45); }
+.gh-world__dock > button:nth-child(2) { color: #45d9f6; }
+@media (max-width: 700px) {
+  .gh-world__dock { grid-template-columns: repeat(6,minmax(0,1fr)) !important; }
+  .gh-world__dock > button { min-width:0; padding-left:1px; padding-right:1px; }
+  .gh-world__dock > button > strong { font-size: clamp(7px,1.8vw,10px); }
+}
+
+/* Fase 9 — evitar marco y scroll doble en Arena PvP móvil */
+@media(max-width:600px) {
+ .rps-screen-overlay { padding:0; overflow-x:hidden; overflow-y:auto; }
 }

@@ -9,13 +9,13 @@
    ========================================================= */
 
 .gh-world {
-  --world-green: #24e987;
+  --world-green: #24e987; /* Estado online: conservar verde */
   --world-cyan: #28d9ff;
   --world-gold: #ffc83d;
 
-  --aura-color: #00ff87;
-  --aura-color-soft: rgba(0, 255, 135, 0.16);
-  --aura-color-medium: rgba(0, 255, 135, 0.42);
+  --aura-color: #28d9ff;
+  --aura-color-soft: rgba(40, 217, 255, 0.16);
+  --aura-color-medium: rgba(40, 217, 255, 0.42);
 
   position: relative;
   width: 100%;
@@ -2020,26 +2020,34 @@
 
   /* Posiciones desktop */
   .gh-locker-zone .locker-slot:nth-child(1) {
-    left: 8px;
-    top: 145px;
+    left: -40px;
+    top: 100px;
+    width: 80px;
+    height: auto;
     transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-slot:nth-child(2) {
-    left: 8px;
-    top: 275px;
+    left: -40px;
+    top: 230px;
+    width: 70px;
+    height: auto;
     transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-slot:nth-child(3) {
-    right: 8px;
-    top: 350px;
+    right: -20px;
+    top: 290px;
+     width: 100px;
+    height: 65px;
     transform: translateY(-50%);
   }
 
   .gh-locker-zone .locker-slot:nth-child(4) {
-    right: 8px;
+    right: -20px;
     top: 85px;
+    width: 80px;
+    height: 65px;
     transform: translateY(-50%);
   }
 
@@ -3928,4 +3936,207 @@
   }
   .gh-world .gh-world__next { top: 115px !important; max-height: 110px !important; }
   .gh-world .gh-world__next p { display: none !important; }
+}
+
+/* V4.7 — CTA de personalización despejado sobre el avatar (desktop). */
+@media (min-width: 701px) {
+  .gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+    position: relative !important;
+    top: -76px !important;
+    z-index: 500 !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* V4.8 — Mobile: personalización centrada y slots más bajos. */
+@media (max-width: 700px) {
+  .gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(210px, 58vw) !important;
+    max-width: calc(100vw - 24px) !important;
+    text-align: center !important;
+  }
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(1),
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
+    top: 32% !important;
+  }
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(2),
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
+    top: 52% !important;
+  }
+}
+/* V4.9 — Ajuste real mobile: CTA + slots */
+@media (max-width: 700px) {
+  .gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+    top: calc(110px + env(safe-area-inset-top, 0px)) !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+  }
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(1),
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
+    top: calc(32% + 45px) !important;
+  }
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(2),
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
+    top: calc(52% + 45px) !important;
+  }
+}
+/* LUPI WORLD — Separación de slots en escritorio */
+@media (min-width: 701px) {
+
+  /* Subir los iconos inferiores 45px */
+  .locker-equipment .locker-slot:nth-child(3),
+  .locker-equipment .locker-slot:nth-child(4) {
+    transform: translateY(-45px);
+  }
+
+}
+/* Ajuste del personaje: solo escritorio */
+@media (min-width: 901px) {
+  .gh-world .gh-locker-zone .avatar2d {
+    bottom: 32px !important;
+  }
+}
+/* =========================================================
+   V5.0 — Plataforma solidaria al avatar
+   La plataforma comparte el mismo sistema de escala y posición
+   que el personaje; no depende de la altura del teléfono.
+   ========================================================= */
+.gh-world .gh-locker-zone .locker-platform {
+  display: none !important;
+}
+.gh-world .gh-locker-zone .avatar2d::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 8px;
+  width: 255px;
+  height: 46px;
+  border-radius: 50%;
+  transform: translateX(-50%) perspective(180px) rotateX(58deg);
+  border: 2px solid rgba(37, 217, 255, .76);
+  background: radial-gradient(ellipse, rgba(25, 216, 255, .24), rgba(20, 170, 225, .07) 55%, transparent 75%);
+  box-shadow: 0 0 20px rgba(27, 213, 255, .35), inset 0 0 16px rgba(27, 213, 255, .18);
+  pointer-events: none;
+  z-index: 3;
+}
+/* Plataforma y sombra quedan al nivel de los pies, sin interferir con las prendas. */
+.gh-world .gh-locker-zone .avatar2d__shadow {
+  bottom: 17px;
+}
+@media (max-width: 700px) {
+  .gh-world .gh-locker-zone .avatar2d::after {
+    bottom: 9px;
+    width: 245px;
+  }
+  /* No ocultar la plataforma bajo la barra inferior. */
+  .gh-world .gh-locker-zone .locker-avatar,
+  .gh-world .gh-locker-zone .locker-character {
+    overflow: visible !important;
+  }
+}
+
+/* =========================================================
+   V5.1 — Consolidación de encuadre y punto de apoyo
+   Mantener plataforma solidaria al avatar (V5), y reservar
+   espacio independiente para misión / personalización.
+   ========================================================= */
+/* Escritorio: el aro debe quedar por debajo de las suelas, no en los tobillos. */
+@media (min-width: 901px) {
+  .gh-world .gh-locker-zone .avatar2d::after {
+    bottom: -21px !important;
+    width: 270px;
+    height: 48px;
+  }
+  .gh-world .gh-locker-zone .avatar2d__shadow {
+    bottom: -14px;
+  }
+}
+/* Teléfonos compactos: separar misión, CTA y cabeza.
+   El aro sigue al avatar porque ambos comparten la transformación. */
+@media (max-width: 700px) and (max-height: 700px) {
+  .gh-world .gh-world__next {
+    top: calc(76px + env(safe-area-inset-top, 0px)) !important;
+    max-height: 96px !important;
+    overflow: hidden;
+  }
+  .gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+    top: calc(77px + env(safe-area-inset-top, 0px)) !important;
+  }
+  .gh-world .gh-locker-zone .avatar2d {
+    bottom: 30px !important;
+    transform: translateX(-50%) scale(.60) !important;
+    transform-origin: center bottom !important;
+  }
+}
+/* Móviles altos: permitir que el personaje aproveche la altura,
+   sin modificar el punto de apoyo de la plataforma. */
+@media (max-width: 700px) and (min-height: 850px) {
+  .gh-world .gh-locker-zone .avatar2d {
+    transform: translateX(-50%) scale(clamp(.72, calc(100dvh / 1100px), .86)) !important;
+  }
+}
+
+/* ============================================================
+   V5.3 — Identidad cian / puntos de interacción
+   Verde reservado para indicadores reales de presencia online.
+   ============================================================ */
+.gh-world .gh-locker-zone .locker-equipment .locker-slot.empty:not([data-rarity]),
+.gh-world .gh-locker-zone .locker-equipment .locker-slot--pending {
+  --locker-color: #28d9ff;
+  border-color: rgba(40,217,255,.55) !important;
+  background: linear-gradient(145deg,rgba(6,43,57,.92),rgba(4,23,33,.90)) !important;
+  box-shadow: inset 0 0 12px rgba(40,217,255,.07), 0 0 14px rgba(40,217,255,.12) !important;
+}
+.gh-world .gh-locker-zone .locker-slot.empty .locker-slot-pending-icon,
+.gh-world .gh-locker-zone .locker-slot--pending .locker-slot-info strong,
+.gh-world .gh-locker-zone .locker-slot.empty .locker-slot-icon {
+  color: #28d9ff !important;
+  text-shadow: 0 0 12px rgba(40,217,255,.35);
+}
+.gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+  background: linear-gradient(180deg,#0b3545,#09232f) !important;
+  border: 1px solid #28d9ff !important;
+  color: #ffd23f !important;
+  box-shadow: 0 0 14px rgba(40,217,255,.14) !important;
+}
+/* Compactos: el CTA debe terminar ANTES del cabello, sin tapar el rostro.
+   Se ancla al escenario y no al viewport; preserva avatar y plataforma. */
+@media (max-width: 390px) and (max-height: 720px) {
+  .gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+    top: 0 !important;
+    margin-top: 0 !important;
+    transform: translate(-50%, -34px) !important;
+  }
+}
+
+
+/* V5.4 — Consolidación cyan: no modificar avatar/plataforma */
+.gh-world .gh-world__players-toggle {
+  border-color: rgba(40,217,255,.55) !important;
+  background: radial-gradient(circle at 35% 30%,rgba(40,217,255,.22),transparent 48%),rgba(4,24,35,.92) !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,.45),0 0 18px rgba(40,217,255,.17) !important;
+}
+.gh-world .gh-world__players-sheet-panel {
+  background: linear-gradient(180deg,rgba(8,34,48,.98),rgba(4,16,28,.98)) !important;
+  border: 1px solid rgba(40,217,255,.35) !important;
+  box-shadow: 0 0 25px rgba(40,217,255,.1),0 20px 60px rgba(0,0,0,.5) !important;
+}
+.gh-world .gh-world__players-sheet-head { border-bottom-color: rgba(40,217,255,.22) !important; }
+.gh-world .gh-world__players-sheet-kicker { color: #28d9ff !important; }
+.gh-world .gh-world__players-sheet-close { border-color: rgba(40,217,255,.28) !important; background: rgba(40,217,255,.06) !important; }
+.gh-world .gh-world__chat--tutorial-open { border-color: rgba(40,217,255,.55) !important; }
+/* Compactos: CTA entre la tarjeta de bienvenida y el cabello, no detrás de la tarjeta. */
+@media (max-width:390px) and (max-height:720px) {
+  .gh-world .gh-locker-zone > .gh-avatar-customize-trigger {
+    top: 0 !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, 22px) !important;
+    z-index: 520 !important;
+  }
+
 }

@@ -182,3 +182,18 @@ button, input, textarea, select { font: inherit; }
   .app-content-shell, .main-content { min-width: 0; }
   .app-content-shell > *, .main-content > * { min-width: 0; }
 }
+
+/* Pantalla de carga Lupi World — identidad cinematográfica */
+.lupi-cinematic-loading{position:fixed;inset:0;z-index:99999;min-height:100dvh;width:100%;overflow:hidden;background:radial-gradient(ellipse 42% 50% at 52% 47%,rgba(0,175,151,.25),transparent 82%),radial-gradient(ellipse 60% 65% at 55% 80%,rgba(0,72,100,.3),transparent 80%),linear-gradient(155deg,#000808 8%,#00121a 55%,#001018 100%);color:#fff;isolation:isolate;padding:20px;box-sizing:border-box}
+.lupi-cinematic-loading::before{content:"";position:absolute;inset:-20%;background:conic-gradient(from 20deg at 50% 48%,transparent 0deg,rgba(25,235,191,.06) 26deg,transparent 60deg,transparent 150deg,rgba(18,170,201,.08) 190deg,transparent 230deg);animation:lupi-light-sweep 8s ease-in-out infinite alternate;pointer-events:none}
+.lupi-cinematic-content{position:relative;display:flex;flex-direction:column;align-items:center;gap:13px;text-align:center;max-width:100%}
+.lupi-loading-crown{width:76px;height:76px;color:#31f5c2;filter:drop-shadow(0 0 14px rgba(35,245,191,.65))}
+.lupi-cinematic-wordmark{font-family:var(--font-display),Impact,'Arial Narrow',sans-serif;font-size:clamp(46px,8vw,108px);font-weight:1000;font-style:italic;letter-spacing:-.025em;line-height:1.05;white-space:nowrap;text-shadow:0 0 12px rgba(255,255,255,.08)}
+.lupi-cinematic-wordmark span{color:#38f2bf;text-shadow:0 0 26px rgba(28,248,184,.35)}
+.lupi-cinematic-tagline{font-size:clamp(11px,1.45vw,17px);font-weight:900;letter-spacing:.34em;color:#c5f8ef}
+.lupi-cinematic-lightline{margin-top:10px;width:min(270px,65vw);height:2px;background:linear-gradient(90deg,transparent,#24f5c2,transparent);box-shadow:0 0 18px #24f5c2;animation:lupi-light-pulse 1.8s ease-in-out infinite}
+.lupi-loading-sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+@keyframes lupi-light-pulse{50%{opacity:.45;transform:scaleX(.7)}}
+@keyframes lupi-light-sweep{to{transform:rotate(18deg)}}
+@media(max-width:480px){.lupi-cinematic-loading{padding:12px}.lupi-loading-crown{width:62px;height:62px}.lupi-cinematic-wordmark{font-size:clamp(43px,12vw,60px)}.lupi-cinematic-tagline{letter-spacing:.23em}}
+@media(prefers-reduced-motion:reduce){.lupi-cinematic-loading::before,.lupi-cinematic-lightline{animation:none}}

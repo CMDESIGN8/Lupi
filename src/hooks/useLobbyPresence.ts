@@ -107,7 +107,8 @@ export function useLobbyPresence({ room, me, activity = "lobby", enabled = true 
 
       for (const key of Object.keys(state)) {
         // Un usuario con varias pestañas tiene varias entradas bajo la misma key: usamos la primera.
-        const player = sanitize(state[key]?.[0]);
+        const entries = state[key] ?? [];
+        const player = entries.map(sanitize).filter((p): p is LobbyPlayer => p !== null).at(-1) ?? null;
         if (player) list.push(player);
       }
 

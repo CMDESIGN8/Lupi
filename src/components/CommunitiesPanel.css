@@ -1,0 +1,1359 @@
+.lupi-community-overlay{position:fixed;inset:0;z-index:9999;background:#010a11d9;display:grid;place-items:center;padding:16px}.lupi-community-panel{width:min(460px,100%);max-height:90dvh;overflow:auto;background:linear-gradient(150deg,#092e40,#04131f);border:1px solid #28d9ff;border-radius:16px;box-shadow:0 20px 70px #000b;color:#eefaff;padding:20px;font-family:inherit}.lupi-community-panel header{display:flex;justify-content:space-between;align-items:start}.lupi-community-panel header small{color:#ffd23f;letter-spacing:.15em}.lupi-community-panel h2{margin:3px 0 14px;font-size:24px}.lupi-community-panel header button{background:#092b3b;color:white;border:1px solid #29758c;border-radius:8px;padding:9px 12px;cursor:pointer}.lupi-community-content{text-align:center}.lupi-community-crest{font-size:58px;margin:10px}.lupi-community-content h3{font-size:23px;margin:4px}.lupi-community-content p{color:#afcbd6}.lupi-community-stats{display:flex;justify-content:space-around;gap:10px;margin:20px 0;flex-wrap:wrap}.lupi-community-stats span{background:#0b3445;padding:10px;border-radius:8px}.lupi-community-join{width:100%;background:#ffd23f;border:0;color:#10151a;font-weight:900;padding:14px;border-radius:9px;cursor:pointer}.lupi-community-join:disabled{opacity:.75;cursor:default}.lupi-community-success{color:#71e3ef!important}.lupi-community-error{color:#ffb2a8!important;font-size:13px}.lupi-community-panel{width:min(560px,100%)}.lupi-community-tabs{display:flex;gap:8px;margin:6px 0 16px}.lupi-community-tabs button,.lupi-community-back{border:1px solid #296a82;background:#0a2838;color:#d9f6ff;padding:10px 14px;border-radius:9px;cursor:pointer}.lupi-community-tabs button.active{border-color:#2bd7ff;background:#124358;color:white}.lupi-community-back{margin-bottom:12px}.lupi-community-list{display:grid;gap:10px}.lupi-community-card{display:flex;align-items:center;text-align:left;gap:12px;background:#0b2b3a;border:1px solid #21627a;border-radius:12px;padding:14px;color:white;cursor:pointer}.lupi-community-card>span:first-child{font-size:26px}.lupi-community-card>span:nth-child(2){flex:1;min-width:0}.lupi-community-card small,.lupi-community-club small{display:block;color:#a5c4cf;margin-top:5px;font-size:12px;line-height:1.4}.lupi-community-card b{color:#ffd23f}.lupi-community-search-label{font-size:13px;color:#bbdce5}.lupi-community-search{width:100%;box-sizing:border-box;background:#061a27;color:#fff;border:1px solid #2a8097;border-radius:9px;padding:12px;font:inherit}.lupi-community-club{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0a2c3d;border:1px solid #1f6178;border-radius:10px;padding:12px}.lupi-community-club button{background:#ffd23f;color:#10202a;border:0;border-radius:8px;padding:10px;font-weight:800;cursor:pointer;white-space:nowrap}.lupi-community-club button:disabled{opacity:.65;cursor:default}.lupi-community-disclaimer{font-size:12px;color:#a5bdc8;line-height:1.5}.lupi-community-member-status{background:#123e4e;border:1px solid #26d2f1;border-radius:10px;padding:12px;color:#8ce7f5;font-weight:800}.lupi-community-section{text-align:left;margin-top:20px;border-top:1px solid #235367;padding-top:10px}.lupi-community-section h4{margin:12px 0 4px;color:#ffd23f}.lupi-community-crest img{width:72px;height:72px;object-fit:contain}
+@media(max-width:420px){.lupi-community-panel{padding:15px}.lupi-community-panel h2{font-size:20px}.lupi-community-club{align-items:flex-start}.lupi-community-club button{font-size:12px}}
+
+.lupi-community-inner-tabs{flex-wrap:wrap}.lupi-community-inner-tabs button{flex:1;min-width:95px}.lupi-community-inside-head{display:flex;gap:14px;align-items:center;background:#0b3445;border:1px solid #26758a;padding:16px;border-radius:12px;margin:8px 0 16px}.lupi-community-inside-head>span{font-size:34px}.lupi-community-inside-head strong,.lupi-community-inside-head small{display:block}.lupi-community-inside-head small,.lupi-community-muted{color:#9dbdc9;font-size:12px;margin-top:5px}.lupi-community-inside-body{min-height:170px}.lupi-community-inside-body h3,.lupi-community-list h3{color:#ffd23f;margin:10px 0}.lupi-community-inside-body p{color:#c3dbe4;line-height:1.55}.lupi-community-info-tile{padding:12px;border:1px solid #23576a;background:#092a3a;border-radius:9px;margin:8px 0}.lupi-community-tabs{flex-wrap:wrap}@media(max-width:420px){.lupi-community-tabs button{flex:1;font-size:12px;padding:9px 7px}}
+
+/* Fase 3.1: modal responsive, scroll independiente y controles siempre accesibles */
+.lupi-community-overlay { box-sizing:border-box; padding: max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom)); overflow:hidden; }
+.lupi-community-panel { box-sizing:border-box; display:flex; flex-direction:column; width:min(560px,100%); max-height:min(92dvh,900px); min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#23718a transparent; }
+.lupi-community-panel > header { position:sticky; top:-20px; z-index:2; flex-shrink:0; background:#092b3b; padding:10px 0; margin:-10px 0 12px; border-bottom:1px solid #205367; }
+.lupi-community-panel > header h2 { margin-bottom:0; }
+.lupi-community-content { min-height:0; }
+.lupi-community-inside-body { min-height:0; }
+.lupi-community-crest { margin:4px auto; font-size:42px; }
+.lupi-community-content h3 { margin:2px 0; }
+.lupi-community-content p { margin:8px 0; }
+.lupi-community-stats { margin:14px 0; }
+.lupi-community-join { min-height:46px; }
+.lupi-community-tabs button { min-width:0; }
+@media(max-width:600px){
+ .lupi-community-overlay { padding:0; align-items:stretch; justify-items:stretch; }
+ .lupi-community-panel { width:100%; height:100dvh; max-height:100dvh; border-radius:0; border:0; padding: max(14px,env(safe-area-inset-top)) 16px max(22px,env(safe-area-inset-bottom)); }
+ .lupi-community-panel > header { top:calc(-1 * max(14px,env(safe-area-inset-top))); margin-top:calc(-1 * max(14px,env(safe-area-inset-top))); padding-top:max(14px,env(safe-area-inset-top)); }
+ .lupi-community-panel h2 { font-size:20px; }
+ .lupi-community-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; }
+ .lupi-community-inner-tabs { grid-template-columns:repeat(4,minmax(0,1fr)); }
+ .lupi-community-tabs button { font-size:11px; padding:9px 3px; min-width:0; overflow-wrap:anywhere; }
+ .lupi-community-back { padding:9px 11px; font-size:13px; align-self:flex-start; }
+ .lupi-community-inside-head { padding:12px; margin:8px 0 12px; }
+ .lupi-community-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+ .lupi-community-stats span { font-size:12px; padding:10px 6px; }
+ .lupi-community-club { flex-wrap:wrap; }
+}
+@media(max-width:375px){
+ .lupi-community-panel { padding-left:12px; padding-right:12px; }
+ .lupi-community-inner-tabs { grid-template-columns:repeat(2,minmax(0,1fr)); }
+ .lupi-community-inside-head>span { font-size:28px; }
+}
+/* El botón flotante del lobby no debe atravesar el modal */
+body:has(.lupi-community-overlay) .lobby-dev-tools,
+body:has(.lupi-community-overlay) .dev-tools-fab { visibility:hidden!important; }
+
+/* Fase 3.2: Portal sobre el HUD, scroll y controles móviles */
+.lupi-community-overlay { z-index:2147483000; isolation:isolate; }
+.lupi-community-panel { position:relative; }
+@media(max-width:600px) {
+ .lupi-community-overlay { position:fixed; inset:0; width:100vw; height:100dvh; padding:0; background:#04131f; }
+ .lupi-community-panel { height:100dvh; max-height:100dvh; width:100%; padding:16px 16px max(24px,env(safe-area-inset-bottom)); }
+ .lupi-community-panel > header { top:-16px; margin:-16px -16px 14px; padding:16px 16px 12px; background:#092b3b; }
+ .lupi-community-content { padding-bottom:20px; }
+ .lupi-community-inside-head { margin-top:4px; }
+}
+
+/* Fase 4: identidad autorizada de Flores Club y perfiles reales */
+.lupi-community-list-crest{width:42px;height:42px;object-fit:contain;display:block}
+.lupi-community-crest img{width:112px;height:112px;max-width:100%;object-fit:contain}
+.lupi-community-inside-crest{display:grid;place-items:center;width:56px;height:56px;flex-shrink:0}
+.lupi-community-inside-crest img{width:100%;height:100%;object-fit:contain}
+.lupi-community-member{display:flex;align-items:center;gap:12px;background:#092a3a;border:1px solid #23576a;border-radius:10px;padding:12px;margin:8px 0;min-width:0}
+.lupi-community-member strong,.lupi-community-member small{display:block;overflow-wrap:anywhere}
+.lupi-community-member small{color:#9dbdc9;font-size:12px;margin-top:3px}
+.lupi-community-member-avatar{width:38px;height:38px;flex-shrink:0;display:grid;place-items:center;border-radius:50%;background:#155269;color:#fff;font-weight:900;border:1px solid #2bd7ff}
+.lupi-community-rank{color:#ffd23f;min-width:34px}
+
+/* Fase 5: desafíos verificables */
+.lupi-community-challenge{border:1px solid #23718a;background:#092a3a;border-radius:12px;padding:16px;display:grid;gap:10px}
+.lupi-community-challenge strong{color:#ffd23f}
+.lupi-community-challenge p{margin:0}
+.lupi-community-challenge small{color:#b0d0db}
+.lupi-community-progress-track{height:10px;border-radius:99px;background:#04131f;overflow:hidden;border:1px solid #23576a}
+.lupi-community-progress-track>div{height:100%;background:#20c9f3;transition:width .25s}
+.lupi-community-refresh{background:#103b4e;border:1px solid #2bd7ff;border-radius:8px;padding:10px;color:white;cursor:pointer;justify-self:start}
+
+/* Fase 6: desafíos desde miembros */
+.lupi-community-member > div:nth-child(2){flex:1;min-width:0}
+.lupi-community-member-challenge{margin-left:auto;flex-shrink:0;border:1px solid #29d9fa;background:#104157;color:#f1fdff;border-radius:8px;padding:9px 11px;font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+.lupi-community-member-challenge:disabled{opacity:.5;cursor:not-allowed;border-color:#4b6875}
+@media(max-width:420px){.lupi-community-member{flex-wrap:wrap}.lupi-community-member-challenge{margin-left:50px}}
+
+/* Fase 6: selector PvP comunitario */
+.lupi-community-duel-picker { margin: 14px 0; padding: 14px; border: 1px solid #29c6e4; border-radius: 12px; background: #092b3a; }
+.lupi-community-duel-picker-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.lupi-community-duel-picker-head button { background: transparent; border: 1px solid #467184; border-radius: 7px; color: inherit; cursor: pointer; padding: 4px 10px; }
+.lupi-community-duel-picker p { margin: 9px 0; font-size: 13px; }
+.lupi-community-duel-option, .lupi-community-duel-locked { display: block; box-sizing: border-box; width: 100%; padding: 12px; margin-top: 8px; text-align: left; border-radius: 9px; }
+.lupi-community-duel-option { background: #075344; color: #fff; border: 1px solid #24d9a3; cursor: pointer; font-weight: 700; }
+.lupi-community-duel-option:disabled { opacity: .55; cursor: not-allowed; }
+.lupi-community-duel-locked { background: #102633; border: 1px solid #34515e; color: #9fb4be; }
+.lupi-community-duel-option small, .lupi-community-duel-locked small { display: block; font-weight: 400; margin-top: 4px; font-size: 12px; }
+
+/* Fase 7: ranking competitivo y selector de duelo */
+.lupi-community-ranking-switch { display:flex; gap:8px; margin: 12px 0; }
+.lupi-community-ranking-switch button { flex:1; padding:10px; border-radius:9px; border:1px solid #2a7285; background:#092635; color:#b8d3dd; cursor:pointer; }
+.lupi-community-ranking-switch button.active { border-color:#00cfff; background:#0b4553; color:white; }
+.lupi-community-pvp-history { margin-top:20px; }
+.lupi-community-pvp-history-row { display:flex; justify-content:space-between; gap:12px; align-items:center; border-bottom:1px solid #235064; padding:10px 0; font-size:13px; }
+.lupi-community-pvp-history-row small { color:#9bb3c1; white-space:nowrap; }
+
+/* Fase 8: estructura compacta con scroll exclusivo del contenido */
+.lupi-community-panel:has(.lupi-community-inside-body) { overflow:hidden; }
+.lupi-community-panel:has(.lupi-community-inside-body) > header { position:relative; top:auto; margin:0 0 8px; padding:0 0 9px; }
+.lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-back { flex-shrink:0; margin:0 0 8px; padding:8px 10px; }
+.lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-head { flex-shrink:0; margin:0 0 10px; padding:9px 12px; }
+.lupi-community-panel:has(.lupi-community-inside-body) .lupi-community-inside-crest { width:42px; height:42px; }
+.lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inner-tabs { flex-shrink:0; margin:0 0 8px; }
+.lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-body { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; padding:0 3px 18px 0; scrollbar-width:thin; scrollbar-color:#28738a transparent; }
+.lupi-community-panel:has(.lupi-community-inside-body) .lupi-community-inside-body > h3:first-child { margin-top:4px; }
+.lupi-community-podium { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin:12px 0; }
+.lupi-community-podium-card { display:flex; flex-direction:column; align-items:center; text-align:center; gap:5px; min-width:0; padding:12px 6px; border:1px solid #326075; background:#0a2938; border-radius:11px; }
+.lupi-community-podium-card.place-1 { border-color:#e3b64c; background:linear-gradient(160deg,#3c3217,#0b2d3c 65%); }
+.lupi-community-podium-card.place-2 { border-color:#91aab7; }
+.lupi-community-podium-card.place-3 { border-color:#986b4a; }
+.lupi-community-podium-medal { font-size:25px; }
+.lupi-community-podium-card strong { font-size:12px; overflow-wrap:anywhere; }
+.lupi-community-podium-card b { color:#ffda58; }
+.lupi-community-podium-card small { font-size:11px; color:#a9c5d0; }
+.lupi-community-ranking-row.is-me,.lupi-community-podium-card.is-me { box-shadow:inset 0 0 0 1px #20d4ef; background-color:#0b3a4c; }
+.lupi-community-ranking-list { margin-bottom:14px; }
+.lupi-community-rivals { padding:12px; border:1px solid #246176; border-radius:12px; background:#092a3a; margin:12px 0; }
+.lupi-community-rivals h3 { margin:0 0 6px; }
+.lupi-community-rival-row { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:9px 0; border-top:1px solid #235064; }
+.lupi-community-rival-row span { overflow-wrap:anywhere; font-size:13px; }
+.lupi-community-rival-row span::first-letter { color:#30dcad; }
+.lupi-community-rival-row button { border:1px solid #25d4ee; background:#0b4658; color:#fff; border-radius:8px; padding:8px 10px; white-space:nowrap; cursor:pointer; }
+.lupi-community-rival-row button:disabled { opacity:.5; cursor:not-allowed; }
+@media(max-width:600px) { .lupi-community-panel:has(.lupi-community-inside-body) > header { margin:0 0 8px; padding:0 0 10px; } .lupi-community-podium { gap:5px; } .lupi-community-podium-card { padding:9px 4px; } .lupi-community-podium-card strong { font-size:11px; } }
+
+/* Fase 9 — selector de duelo como pantalla propia, accesible en móvil */
+.lupi-community-panel:has(.lupi-community-duel-picker) > .lupi-community-back,
+.lupi-community-panel:has(.lupi-community-duel-picker) > .lupi-community-inside-head,
+.lupi-community-panel:has(.lupi-community-duel-picker) > .lupi-community-inner-tabs { display:none; }
+.lupi-community-panel:has(.lupi-community-duel-picker) .lupi-community-inside-body { display:flex; flex-direction:column; overflow-y:auto; }
+.lupi-community-duel-picker { box-sizing:border-box; width:100%; margin:0; padding:18px; background:linear-gradient(155deg,#0b3141,#071e2b); }
+.lupi-community-duel-picker-head strong { font-size:clamp(17px,4.5vw,22px); line-height:1.25; overflow-wrap:anywhere; }
+.lupi-community-duel-picker-head button { flex:0 0 44px; min-height:44px; font-size:20px; }
+.lupi-community-duel-picker p { font-size:14px; line-height:1.5; margin:14px 0 18px; }
+.lupi-community-duel-option,.lupi-community-duel-locked { min-height:76px; padding:15px; font-size:16px; line-height:1.3; }
+.lupi-community-duel-option small,.lupi-community-duel-locked small { font-size:13px; line-height:1.45; margin-top:7px; }
+@media(max-width:600px) {
+ .lupi-community-panel:has(.lupi-community-duel-picker) { height:100dvh; max-height:100dvh; }
+ .lupi-community-panel:has(.lupi-community-duel-picker) .lupi-community-inside-body { flex:1; min-height:0; padding:12px 0 max(20px,env(safe-area-inset-bottom)); }
+ .lupi-community-duel-picker { border-radius:14px; padding:16px; }
+ .lupi-community-duel-option,.lupi-community-duel-locked { min-height:84px; }
+}
+
+/* Fase 10 — ranking legible, desafíos consistentes y móvil */
+.lupi-community-panel { scrollbar-gutter:stable; }
+.lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-body { padding-right:12px; scrollbar-gutter:stable; }
+.lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-body::-webkit-scrollbar { width:5px; }
+.lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-body::-webkit-scrollbar-thumb { background:#23718a; border-radius:10px; }
+.lupi-community-my-rank { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:12px; margin:10px 0; border:1px solid #26c9e7; border-radius:10px; background:#0a394b; font-size:13px; }
+.lupi-community-my-rank strong { color:#ffce3d; font-size:18px; margin-left:5px; }
+.lupi-community-ranking-row { gap:10px; }
+.lupi-community-ranking-row > div { flex:1; min-width:0; }
+.lupi-community-ranking-row > b:last-child { white-space:nowrap; }
+.lupi-community-duel-picker { border-color:#2bd7ff; background:linear-gradient(155deg,#0a3142,#061925); }
+.lupi-community-duel-picker-head strong small { display:block; margin-top:5px; color:#a5cbd8; font-size:12px; font-weight:500; }
+.lupi-community-duel-option { background:#075344; border-color:#24d9a3; }
+.lupi-community-duel-locked { opacity:.65; }
+@media(max-width:600px) {
+ .lupi-community-overlay { padding:0; align-items:stretch; }
+ .lupi-community-panel { width:100%; height:100dvh; max-height:100dvh; border-radius:0; padding: max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom)); scrollbar-gutter:auto; }
+ .lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-body { padding-right:9px; }
+ .lupi-community-inner-tabs { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:5px; }
+ .lupi-community-inner-tabs button { min-width:0; font-size:11px; padding:10px 2px; }
+ .lupi-community-ranking-row { flex-wrap:nowrap; padding:10px 8px; }
+ .lupi-community-ranking-row small { font-size:10px; }
+ .lupi-community-podium-card { padding:10px 3px; }
+ .lupi-community-podium-card strong { font-size:10px; }
+ .lupi-community-pvp-history-row { align-items:flex-start; flex-direction:column; gap:3px; }
+ .lupi-community-my-rank { font-size:12px; }
+ .lupi-community-duel-picker { padding:12px; }
+}
+
+/* V11: modal aislado del layout del lobby, sin escala heredada */
+.lupi-community-overlay { position:fixed; inset:0; width:100%; height:100dvh; z-index:99999; box-sizing:border-box; }
+.lupi-community-panel { min-width:0; font-size:14px; line-height:1.4; }
+.lupi-community-panel *, .lupi-community-panel *::before, .lupi-community-panel *::after { box-sizing:border-box; }
+@media (max-width:600px) {
+ .lupi-community-overlay { display:flex; align-items:stretch; justify-content:stretch; padding:0; }
+ .lupi-community-panel { flex:1 1 auto; width:100%; min-width:0; max-width:none; height:100%; max-height:100%; margin:0; border:0; border-radius:0; padding: max(16px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom)); font-size:14px; }
+ .lupi-community-panel h2 { font-size:23px; }
+ .lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-body { padding-right:4px; scrollbar-gutter:auto; }
+ .lupi-community-tabs button { min-height:44px; font-size:12px; }
+ .lupi-community-ranking-switch button { min-height:44px; font-size:13px; }
+ .lupi-community-podium-card strong { font-size:12px; }
+ .lupi-community-podium-card small { font-size:11px; }
+ .lupi-community-my-rank { flex-wrap:wrap; }
+ .lupi-community-rival-row button { min-height:44px; }
+}
+
+
+/* V12: pantalla completa en teléfonos, incluso con viewport CSS ampliado */
+@media (pointer: coarse) and (max-width: 900px), (max-width: 600px) {
+  body > .lupi-community-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    background: #04131f !important;
+    overflow: hidden !important;
+  }
+  body > .lupi-community-overlay > .lupi-community-panel {
+    box-sizing: border-box !important;
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    padding: 16px 14px max(18px, env(safe-area-inset-bottom)) !important;
+    overflow: hidden !important;
+  }
+  .lupi-community-panel .lupi-community-inside-body {
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+}
+
+/* V13 — LUPI WORLD / COMPETITIVE ARENA — visual only */
+.lupi-community-panel {
+ --arena-gold:#ffcc48; --arena-cyan:#2bd9f3;
+ background:radial-gradient(ellipse at 50% -12%,rgba(29,130,155,.22),transparent 55%),linear-gradient(165deg,#092737 0%,#041520 78%)!important;
+ color:#eefaff; letter-spacing:.005em;
+}
+.lupi-community-panel > header small {font-weight:800;letter-spacing:.2em}
+.lupi-community-panel > header h2 {font-weight:900;letter-spacing:.025em;text-shadow:0 2px 16px #0008}
+.lupi-community-inside-head {background:linear-gradient(110deg,#0d4053,#092839);border-color:#2b8195;box-shadow:inset 0 1px #ffffff13,0 8px 25px #0003}
+.lupi-community-inner-tabs button,.lupi-community-ranking-switch button {transition:background .18s,border-color .18s,box-shadow .18s;min-height:44px}
+.lupi-community-inner-tabs button.active,.lupi-community-ranking-switch button.active {border-color:var(--arena-cyan);background:linear-gradient(155deg,#0d5265,#0b3449);box-shadow:inset 0 -2px 0 #2bd9f355,0 0 18px #00cfff12}
+.lupi-community-inside-body > h3:first-child {font-weight:900;letter-spacing:.01em}
+.lupi-community-my-rank {border-color:#26d8f5;background:linear-gradient(100deg,#0d455a,#082a3b);box-shadow:inset 3px 0 0 #2bd9f3,0 7px 18px #0003;min-height:54px}
+.lupi-community-my-rank strong {color:var(--arena-gold);font-size:20px}
+.lupi-community-podium {align-items:stretch;gap:9px;margin:18px 0 15px}
+.lupi-community-podium-card {position:relative;isolation:isolate;justify-content:center;min-height:132px;gap:6px;padding:14px 7px 12px;border-radius:13px;background:linear-gradient(160deg,#10394b,#071d2a);box-shadow:inset 0 1px #ffffff15,0 10px 22px #0004;transition:transform .2s,border-color .2s}
+.lupi-community-podium-card::before {content:"";position:absolute;inset:0 0 auto;height:46%;border-radius:inherit;background:radial-gradient(ellipse at 50% 0%,#ffffff0d,transparent 80%);pointer-events:none;z-index:-1}
+.lupi-community-podium-card.place-1 {border-color:#f7c64c;background:linear-gradient(155deg,#51401c,#102b35 68%);box-shadow:inset 0 1px #ffecac35,0 0 23px #f9ba2d1c,0 12px 24px #0005}
+.lupi-community-podium-card.place-2 {border-color:#91e4fb;background:linear-gradient(155deg,#16475c,#0a2939 75%)}
+.lupi-community-podium-card.place-3 {border-color:#b98965;background:linear-gradient(155deg,#3d3028,#0a2939 75%)}
+.lupi-community-podium-medal {font-size:29px;filter:drop-shadow(0 3px 4px #0008)}
+.lupi-community-podium-card strong {font-size:12px;line-height:1.3;overflow-wrap:anywhere;max-width:100%}
+.lupi-community-podium-card b {font-size:17px;color:var(--arena-gold);font-variant-numeric:tabular-nums}
+.lupi-community-podium-card small {font-size:11px;line-height:1.3}
+.lupi-community-ranking-list {display:grid;gap:8px}
+.lupi-community-ranking-row {border-radius:11px;border:1px solid #24576b;background:linear-gradient(105deg,#0c3042,#082431);min-height:62px;padding:11px 12px;box-shadow:inset 0 1px #ffffff0a}
+.lupi-community-ranking-row.is-me {border-color:var(--arena-cyan);box-shadow:inset 3px 0 0 var(--arena-cyan),0 0 12px #00cfff13}
+.lupi-community-ranking-row .lupi-community-rank {color:var(--arena-gold);font-size:16px}
+.lupi-community-ranking-row strong {overflow-wrap:anywhere;line-height:1.35}
+.lupi-community-ranking-row > b:last-child {font-size:15px;font-variant-numeric:tabular-nums}
+.lupi-community-rivals {background:linear-gradient(145deg,#0b3041,#071e2b);box-shadow:inset 0 1px #ffffff12}
+.lupi-community-rival-row button {min-height:44px;font-weight:800}
+.lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-body {scrollbar-color:#267f97 transparent;scrollbar-gutter:stable;padding-right:8px}
+.lupi-community-panel button:focus-visible {outline:2px solid #ffcc48;outline-offset:2px}
+@media(hover:hover) { .lupi-community-podium-card:hover {transform:translateY(-3px)} }
+@media(max-width:600px) {
+ .lupi-community-panel {font-size:15px;line-height:1.45}
+ .lupi-community-podium {gap:6px}
+ .lupi-community-podium-card {min-height:128px;padding:12px 4px}
+ .lupi-community-podium-card strong {font-size:11px}
+ .lupi-community-podium-card b {font-size:15px}
+ .lupi-community-podium-card small {font-size:10px}
+ .lupi-community-ranking-row {padding:11px 9px}
+ .lupi-community-panel:has(.lupi-community-inside-body) > .lupi-community-inside-body {padding-right:4px;scrollbar-gutter:auto}
+}
+@media(prefers-reduced-motion:reduce) {.lupi-community-podium-card,.lupi-community-inner-tabs button,.lupi-community-ranking-switch button {transition:none}}
+
+/* V14 — Arena Competitive: jerarquía de podio y encabezado editorial */
+.lupi-arena-heading{display:flex;flex-direction:column;gap:3px;margin:6px 0 13px;padding:12px 13px;border-left:3px solid #ffd23f;background:linear-gradient(100deg,#17384a,#092332 80%);border-radius:4px 10px 10px 4px}
+.lupi-arena-heading h3{margin:0!important;font:italic 900 clamp(21px,4vw,28px)/1.05 'Barlow Condensed',sans-serif!important;color:#fff!important;text-transform:uppercase;letter-spacing:.025em}
+.lupi-arena-eyebrow{font-size:10px;font-weight:900;letter-spacing:.15em;color:#ffd23f}
+.lupi-arena-season{font-size:10px;font-weight:800;letter-spacing:.09em;color:#94b8c8}
+.lupi-community-podium{display:grid!important;grid-template-columns:1fr 1.12fr 1fr;align-items:end!important;gap:8px!important;margin-top:25px!important}
+.lupi-community-podium-card{min-width:0;min-height:142px!important;padding:17px 5px 12px!important;overflow:visible;display:flex;flex-direction:column;align-items:center;text-align:center;position:relative}
+.lupi-community-podium-card.place-1{min-height:173px!important;transform:translateY(-7px);background:linear-gradient(165deg,#65501d,#243c3d 54%,#0a2331);box-shadow:0 0 26px #ffc83d32,inset 0 1px #ffe8a855!important}
+.lupi-community-podium-card.place-1::after{content:'CAMPEÓN';position:absolute;top:-18px;left:50%;transform:translateX(-50%);background:#ffd23f;color:#1a210e;border-radius:5px 5px 0 0;padding:4px 8px;font:900 9px/1 'Barlow',sans-serif;letter-spacing:.06em}
+.lupi-community-podium-place{font:900 12px/1 'Barlow',sans-serif;color:#b4cbd4}
+.lupi-community-podium-card.place-1 .lupi-community-podium-place{color:#ffda65}
+.lupi-community-podium-card strong{overflow-wrap:anywhere;word-break:normal;line-height:1.25}
+.lupi-community-podium-card b{font-size:19px!important}
+.lupi-community-ranking-row{transition:background .18s,transform .18s}
+@media(hover:hover){.lupi-community-ranking-row:hover{background:#11435a;transform:translateX(2px)}}
+@media(max-width:600px){.lupi-arena-heading{padding:10px}.lupi-community-podium{gap:5px!important}.lupi-community-podium-card{min-height:136px!important;padding:12px 3px 10px!important}.lupi-community-podium-card.place-1{min-height:160px!important}.lupi-community-podium-card strong{font-size:11px!important}.lupi-community-podium-card small{font-size:10px!important}}
+@media(prefers-reduced-motion:reduce){.lupi-community-ranking-row{transition:none}}
+
+/* V15 FLORES CLUB: la imagen funciona como atmósfera, controles son HTML reales */
+.lupi-community--flores .lupi-community-panel--club{background:linear-gradient(180deg,#001712d9,#00120de8),url('../assets/flores-arena-entry.png') center center/cover no-repeat;border-color:#10ba87;color:#fff;box-shadow:0 0 50px #00ae6940,0 24px 70px #000c}
+.lupi-community--flores .lupi-community-panel--club>header{background:#001b17ad;border-color:#517e5366}
+.lupi-community--flores .lupi-community-panel--club header small{color:#ffd642}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-back{background:#00281fcf;border-color:#438e68}
+.lupi-community--flores .lupi-community-content{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:440px;padding:12px 0 22px}
+.lupi-community--flores .lupi-community-content .lupi-community-crest img{width:clamp(108px,20vw,155px);height:clamp(108px,20vw,155px);filter:drop-shadow(0 0 20px #10dc7c66)}
+.lupi-community--flores .lupi-community-content h3{font-size:clamp(29px,5vw,42px);font-weight:900;font-style:italic;text-transform:uppercase;color:#ffdb45;text-shadow:0 3px 15px #000}
+.lupi-community--flores .lupi-community-content p{font-size:15px;color:#f2fff7;line-height:1.5;max-width:390px;text-shadow:0 2px 10px #000}
+.lupi-community--flores .lupi-community-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.lupi-community--flores .lupi-community-stats span{border:1px solid #39895e;background:#002c22eb;font-weight:800;color:#f2fff4}
+.lupi-community--flores .lupi-community-join{min-height:54px;background:linear-gradient(120deg,#ffe77b,#ffc526);color:#102019;font-size:15px;box-shadow:0 8px 26px #ffd43c44}
+.lupi-community--flores .lupi-community-inside-head{background:#043c2b;border-color:#3e8b62}
+.lupi-community--flores .lupi-community-inner-tabs button.active{background:#08734e;border-color:#ffd13e}
+.lupi-club-welcome{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:360px;padding:16px 0}
+.lupi-club-welcome>img{width:110px;height:110px;object-fit:contain;filter:drop-shadow(0 0 20px #00e07966)}
+.lupi-community--flores .lupi-club-welcome h3{font-size:clamp(25px,5vw,34px);color:#ffd643;text-transform:uppercase;font-style:italic}
+.lupi-community--flores .lupi-club-welcome p{color:#edfff4;text-shadow:0 2px 8px #000}
+.lupi-club-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:10px}
+.lupi-club-actions button{border:1px solid #eac13c;border-radius:9px;min-height:46px;background:#07442f;color:#fff;font-weight:800;cursor:pointer}
+.lupi-club-actions button:first-child{background:#ffd23d;color:#10221b}
+@media(max-width:600px){.lupi-community--flores .lupi-community-content{min-height:calc(100dvh - 200px)}.lupi-community--flores .lupi-community-stats{gap:6px}.lupi-community--flores .lupi-community-stats span{font-size:12px}.lupi-club-actions{grid-template-columns:1fr}}
+
+
+/* V16 — FLORES CLUB EXPERIENCE: identidad exclusiva sin afectar otras comunidades */
+.lupi-community--flores .lupi-community-panel--club {
+  --flores-gold:#ffd440;--flores-green:#0baf70;
+  background:linear-gradient(180deg,rgba(1,16,18,.68) 0%,rgba(0,19,17,.55) 35%,rgba(0,16,16,.92) 100%),
+    url('../assets/flores-arena-entry.png') center center/cover no-repeat,
+    radial-gradient(ellipse at 50% 65%,#167c58 0%,#073b35 35%,#02141e 80%) !important;
+  border:1px solid #1dbd84!important;
+  box-shadow:0 22px 70px #000c,inset 0 0 90px #00160e80;
+}
+.lupi-community--flores .lupi-community-panel--club > header {background:linear-gradient(90deg,#032a25d9,#031e23ba);border-bottom-color:#2c8b69}
+.lupi-community--flores .lupi-community-panel--club > header h2{color:#fff;letter-spacing:.045em}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-inside-head{background:#04392ee0;border-color:#3d956f}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-inner-tabs button{background:#062b2bdb;border-color:#337c69}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-inner-tabs button.active{background:#0a674b;border-color:#ffcf3c;box-shadow:inset 0 -2px #ffcf3c}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-inside-body{background:transparent;scrollbar-color:#2f9476 transparent}
+.lupi-community--flores .lupi-club-welcome{position:relative;isolation:isolate;min-height:390px;gap:14px;padding:25px 15px 30px;border:1px solid #378c6866;border-radius:15px;background:radial-gradient(ellipse at 50% 22%,#11ac6640,transparent 52%),linear-gradient(180deg,#031a1cb8,#001514e8);box-shadow:inset 0 1px #b9ffe025,0 15px 35px #0005}
+.lupi-community--flores .lupi-club-kicker{font-size:10px;font-weight:900;letter-spacing:.22em;color:#ffe17c;text-shadow:0 2px 8px #000}
+.lupi-community--flores .lupi-club-welcome>img{width:clamp(104px,24vw,144px);height:clamp(104px,24vw,144px);filter:drop-shadow(0 0 25px #18f59a80)}
+.lupi-community--flores .lupi-club-welcome h3{font-size:clamp(26px,5.5vw,37px);line-height:1.05;max-width:420px;margin:4px 0;color:#ffd440!important;text-shadow:0 3px 12px #000}
+.lupi-community--flores .lupi-club-welcome p{max-width:360px;margin:0;font-size:14px;line-height:1.55}
+.lupi-community--flores .lupi-club-welcome .lupi-community-info-tile{background:#073b30e8;border-color:#408d67;color:#eaffef;font-weight:800;margin:3px 0}
+.lupi-community--flores .lupi-club-actions{margin-top:8px}
+.lupi-community--flores .lupi-club-actions button{min-height:50px}
+.lupi-community--flores .lupi-community-content{background:radial-gradient(ellipse at 50% 25%,#15915a33,transparent 65%);border-radius:14px}
+@media(max-width:600px){
+ .lupi-community--flores .lupi-community-panel--club{border:0!important;border-radius:0}
+ .lupi-community--flores .lupi-club-welcome{min-height:0;padding:18px 12px 22px;gap:11px}
+ .lupi-community--flores .lupi-club-welcome>img{width:104px;height:104px}
+ .lupi-community--flores .lupi-club-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .lupi-community--flores .lupi-club-actions button{font-size:11px;padding:8px 4px}
+ .lupi-community--flores .lupi-community-content{min-height:0;padding:18px 0}
+}
+@media(max-width:360px){.lupi-community--flores .lupi-club-actions{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.lupi-community--flores .lupi-club-welcome *{animation:none!important}}
+
+
+/* V17 — FLORES: UI AAA sobre fondo LIMPIO, sin textos incrustados */
+.lupi-community--flores .lupi-community-panel--club {
+  --flores-gold:#ffd343;
+  background:linear-gradient(180deg,rgba(0,12,13,.44) 0%,rgba(0,19,17,.30) 38%,rgba(0,10,13,.78) 100%),url('../assets/flores-arena-entry.png') center/cover no-repeat!important;
+  border:1px solid #14d5a2!important;border-radius:20px;
+  box-shadow:0 24px 80px #000d,inset 0 0 45px #0008;
+  padding:clamp(16px,2.5vw,28px);
+}
+.lupi-community--flores .lupi-community-panel--club > header {
+  position:relative;top:auto;margin:0 0 12px;padding:0 0 12px;
+  background:transparent;border-bottom:1px solid #28c39a55;
+}
+.lupi-community--flores .lupi-community-panel--club > header small{font-size:12px;letter-spacing:.22em;color:#ffd343}
+.lupi-community--flores .lupi-community-panel--club > header h2 {
+  font-family:'Barlow Condensed','Arial Narrow',Impact,sans-serif;
+  font-size:clamp(30px,5vw,48px);font-weight:900;font-style:italic;
+  line-height:1.05;text-transform:uppercase;letter-spacing:.035em;
+  text-shadow:0 4px 18px #000c;
+}
+.lupi-community--flores .lupi-community-panel--club header button{background:#001a1cbb;border-color:#11a992;color:#fff;min-width:44px;min-height:44px}
+.lupi-community--flores .lupi-community-panel--club > .lupi-community-back{
+  width:100%;flex-shrink:0;margin:0 0 12px;min-height:40px;
+  background:#00251eb8;border:1px solid #4aa6879c;color:#e7fff7;
+}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  width:100%;min-height:0;gap:0;margin:auto 0;
+  padding:clamp(12px,2vh,24px) 0 8px;background:none;border:0;
+}
+.lupi-community--flores .lupi-community-content .lupi-community-crest{margin:0 0 20px}
+.lupi-community--flores .lupi-community-content .lupi-community-crest img{
+  width:clamp(128px,24vw,235px);height:clamp(128px,24vw,235px);
+  filter:drop-shadow(0 0 18px #00ed8a75) drop-shadow(0 8px 15px #000b);
+}
+.lupi-community--flores .lupi-community-content h3 {
+  font-family:'Barlow Condensed','Arial Narrow',Impact,sans-serif;
+  font-size:clamp(34px,6vw,56px);font-style:italic;font-weight:900;
+  line-height:1.02;margin:0 0 10px;color:#ffd343;letter-spacing:.02em;
+  text-shadow:0 4px 12px #000c;
+}
+.lupi-community--flores .lupi-community-content p{
+  max-width:470px;margin:0 auto 14px;font-size:clamp(13px,1.6vw,17px);
+  line-height:1.55;color:#f2fff9;text-shadow:0 2px 9px #000;
+}
+.lupi-community--flores .lupi-community-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:12px;margin:12px 0 22px}
+.lupi-community--flores .lupi-community-stats span{
+  display:grid;place-items:center;min-height:68px;padding:12px 8px;
+  background:linear-gradient(135deg,#003d2fd9,#001a1be8);
+  border:1px solid #1fbb8d;border-radius:12px;color:#fff;
+  font-weight:900;font-size:clamp(12px,1.6vw,16px);
+  box-shadow:inset 0 1px #aaffd21c,0 6px 18px #0006;
+}
+.lupi-community--flores .lupi-community-stats span:last-child{border-color:#c7a52f;background:linear-gradient(135deg,#352d0fc9,#001c1bdf)}
+.lupi-community--flores .lupi-community-join{
+  width:100%;min-height:62px;border:1px solid #ffe78d;border-radius:12px;
+  background:linear-gradient(180deg,#ffe881,#ffcb2f 70%,#d99914);
+  color:#07170f;font-size:clamp(13px,1.9vw,19px);font-weight:950;
+  letter-spacing:.02em;text-transform:uppercase;
+  box-shadow:inset 0 2px #fff7,0 0 28px #ffd3434d,0 10px 18px #0009;
+  transition:transform .18s,filter .18s;
+}
+@media(hover:hover){.lupi-community--flores .lupi-community-join:hover{transform:translateY(-2px);filter:brightness(1.08)}}
+@media(max-width:600px){
+  .lupi-community--flores .lupi-community-panel--club{width:100%;height:100dvh;max-height:100dvh;border:0!important;border-radius:0;padding:max(16px,env(safe-area-inset-top)) 16px max(18px,env(safe-area-inset-bottom));background-position:center center!important}
+  .lupi-community--flores .lupi-community-panel--club > header h2{font-size:clamp(28px,8vw,38px)}
+  .lupi-community--flores .lupi-community-content .lupi-community-crest img{width:clamp(120px,33vw,165px);height:clamp(120px,33vw,165px)}
+  .lupi-community--flores .lupi-community-content h3{font-size:clamp(29px,8vw,39px)}
+  .lupi-community--flores .lupi-community-stats{gap:8px;margin:12px 0 18px}
+  .lupi-community--flores .lupi-community-stats span{min-height:52px;font-size:12px;padding:8px 4px}
+  .lupi-community--flores .lupi-community-join{min-height:54px}
+}
+@media(max-height:700px){
+  .lupi-community--flores .lupi-community-content .lupi-community-crest img{width:110px;height:110px}
+  .lupi-community--flores .lupi-community-content .lupi-community-crest{margin-bottom:10px}
+  .lupi-community--flores .lupi-community-stats{margin:8px 0 12px}
+}
+
+/* V18 — transición de acceso a Flores Club, sin interferir con otras comunidades */
+.lupi-community--flores .lupi-club-entry-transition {
+ position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;
+ pointer-events:all;overflow:hidden;background:#00130ee8;color:#ffdc59;
+ font:italic 900 clamp(19px,5vw,36px)/1.15 "Barlow Condensed",Impact,sans-serif;
+ letter-spacing:.08em;text-align:center;padding:24px;animation:lupi-club-enter-fade .72s ease-in-out both;
+}
+.lupi-community--flores .lupi-club-entry-transition__light {
+ position:absolute;inset:-35%;z-index:-1;transform:scale(.5);
+ background:radial-gradient(ellipse at center,#0cf49e9c 0%,#04673e85 23%,transparent 63%);
+ animation:lupi-club-light-sweep .72s ease-out both;
+}
+.lupi-community--flores .lupi-club-entry-transition span {text-shadow:0 0 20px #00ffab,0 2px 15px #000;animation:lupi-club-entry-title .72s ease-in-out both}
+@keyframes lupi-club-enter-fade {0%{opacity:0}25%,76%{opacity:1}100%{opacity:0}}
+@keyframes lupi-club-light-sweep {0%{transform:scale(.45);opacity:.3}70%{transform:scale(1.6);opacity:1}100%{transform:scale(2.3);opacity:0}}
+@keyframes lupi-club-entry-title {0%{transform:translateY(12px);opacity:0}25%,72%{transform:none;opacity:1}100%{transform:translateY(-10px);opacity:0}}
+/* Paneles deportivos de la entrada */
+.lupi-community--flores .lupi-community-stats span {position:relative;letter-spacing:.01em;border-width:1px;min-height:65px}
+.lupi-community--flores .lupi-community-stats span:first-child {box-shadow:inset 0 1px #aaffd21c,0 0 18px #00d18d24}
+.lupi-community--flores .lupi-community-stats span:last-child {box-shadow:inset 0 1px #ffe6a01e,0 0 18px #ffc73424}
+.lupi-community--flores .lupi-community-join:focus-visible,.lupi-community--flores .lupi-club-actions button:focus-visible {outline:3px solid #fff;outline-offset:3px}
+@media(prefers-reduced-motion:reduce) {
+ .lupi-community--flores .lupi-club-entry-transition,
+ .lupi-community--flores .lupi-club-entry-transition * {animation:none!important;transition:none!important}
+}
+
+
+/* V20 — marco de acceso al club y HUD de tres botones; solo Flores */
+.lupi-community--flores .lupi-community-panel--club {
+  position:relative; isolation:isolate;
+  border:2px solid #00d7b0!important;
+  border-radius:22px!important;
+  box-shadow:0 0 0 2px #00170f,0 25px 85px #000e,inset 0 0 38px #0009,0 0 24px #00db9822;
+}
+/* Marco ornamental independiente de los controles */
+.lupi-community--flores .lupi-community-panel--club::after {
+  content:"";position:absolute;inset:0;z-index:5;pointer-events:none;
+  border-radius:20px;
+  background:linear-gradient(135deg,#ffe06a 0 18px,transparent 19px) top left/45px 45px no-repeat,
+    linear-gradient(225deg,#ffe06a 0 18px,transparent 19px) top right/45px 45px no-repeat,
+    linear-gradient(45deg,#ffe06a 0 18px,transparent 19px) bottom left/45px 45px no-repeat,
+    linear-gradient(315deg,#ffe06a 0 18px,transparent 19px) bottom right/45px 45px no-repeat;
+  opacity:.95;
+}
+.lupi-community--flores .lupi-community-panel--club > header {border-bottom-color:#00b58d80}
+.lupi-community--flores .lupi-community-panel--club > .lupi-community-back {border-color:#00a881a8;border-radius:9px}
+.lupi-community--flores .lupi-community-stats {gap:12px}
+.lupi-community--flores .lupi-community-stats > span {
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  min-width:0;min-height:70px;text-align:left;
+  border-radius:3px 14px 3px 14px;
+  border:1px solid #00d9a5;
+  background:linear-gradient(115deg,#004a38e8,#001a1de8);
+  box-shadow:inset 0 1px #ffffff23,0 0 18px #00d59b22,0 8px 18px #0008;
+}
+.lupi-community--flores .lupi-community-stats > span:last-child {
+  border-color:#e5bd32;
+  background:linear-gradient(115deg,#3a300fcf,#001c1de8);
+}
+.lupi-community--flores .flores-stat-icon {flex:0 0 auto;color:#00e8ac;font-size:29px;line-height:1;filter:drop-shadow(0 0 8px #00e8ac55)}
+.lupi-community--flores .flores-stat-trophy {font-size:26px;filter:drop-shadow(0 0 8px #ffd34b66)}
+.lupi-community--flores .flores-stat-copy {display:flex;flex-direction:column;gap:3px;min-width:0}
+.lupi-community--flores .flores-stat-copy strong {font-family:'Barlow Condensed',Impact,'Arial Narrow',sans-serif;font-size:clamp(13px,2.1vw,19px);font-weight:900;line-height:1.1;letter-spacing:.025em}
+.lupi-community--flores .flores-stat-copy small {color:#72e8d5;font-size:clamp(9px,1.35vw,12px);font-weight:800;letter-spacing:.12em;line-height:1.2}
+.lupi-community--flores .lupi-community-join {
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  border:2px solid #ffe88e;border-radius:5px 15px 5px 15px;
+  background:linear-gradient(180deg,#fff3a0 0%,#ffdb50 38%,#ffbd24 85%,#d38b0c 100%);
+  box-shadow:inset 0 2px #fff9,inset 0 -3px #b8730b,0 0 24px #ffd33d66,0 10px 24px #000a;
+  text-shadow:0 1px #fff4;
+}
+.lupi-community--flores .flores-join-shield {font-size:24px;line-height:1}
+@media(max-width:600px) {
+  .lupi-community--flores .lupi-community-panel--club {border-width:1px!important;border-radius:17px!important}
+  .lupi-community--flores .lupi-community-panel--club::after {border-radius:16px;background-size:28px 28px}
+  .lupi-community--flores .lupi-community-stats {gap:8px}
+  .lupi-community--flores .lupi-community-stats > span {min-height:55px;padding:8px 5px;gap:5px}
+  .lupi-community--flores .flores-stat-icon {font-size:19px}
+  .lupi-community--flores .flores-stat-trophy {font-size:18px}
+  .lupi-community--flores .flores-stat-copy strong {font-size:clamp(10px,2.8vw,13px)}
+  .lupi-community--flores .flores-stat-copy small {font-size:clamp(7px,1.9vw,9px);letter-spacing:.045em}
+  .lupi-community--flores .lupi-community-join {gap:7px;min-height:54px;font-size:clamp(11px,3.1vw,15px)}
+  .lupi-community--flores .flores-join-shield {font-size:18px}
+}
+
+/* V21 · PNG transparentes de identidad Flores */
+.lupi-community--flores .flores-stat-image {display:block;width:clamp(42px,4.2vw,60px);height:clamp(42px,4.2vw,60px);object-fit:contain;flex:0 0 auto;filter:drop-shadow(0 0 8px #00e8ac55);background:transparent;border:0;box-shadow:none;padding:0}
+.lupi-community--flores .flores-stat-image.flores-stat-trophy {filter:drop-shadow(0 0 8px #ffd34b77)}
+.lupi-community--flores .flores-join-shield-image {display:inline-block;width:30px;height:30px;object-fit:contain;vertical-align:middle;flex-shrink:0;background:transparent;border:0;box-shadow:none;padding:0}
+@media(max-width:600px){.lupi-community--flores .flores-stat-image {width:clamp(28px,8vw,40px);height:clamp(28px,8vw,40px)}.lupi-community--flores .flores-join-shield-image {width:23px;height:23px}}
+
+/* V22 — pulido visual: marco técnico, HUD limpio y CTA metálico */
+.lupi-community--flores .lupi-community-panel--club{
+  border:1px solid #16e0b0!important;border-radius:18px!important;
+  box-shadow:0 0 0 1px #063f32,0 22px 75px #000d,inset 0 0 24px #001c19,0 0 16px #00c99b25;
+}
+/* Reemplaza los triángulos macizos por cuatro ángulos delineados */
+.lupi-community--flores .lupi-community-panel--club::after{
+  inset:4px;border-radius:14px;opacity:1;
+  background:
+    linear-gradient(#ffdc61,#ffdc61) top left / 24px 3px no-repeat,
+    linear-gradient(#ffdc61,#ffdc61) top left / 3px 24px no-repeat,
+    linear-gradient(#ffdc61,#ffdc61) top right / 24px 3px no-repeat,
+    linear-gradient(#ffdc61,#ffdc61) top right / 3px 24px no-repeat,
+    linear-gradient(#ffdc61,#ffdc61) bottom left / 24px 3px no-repeat,
+    linear-gradient(#ffdc61,#ffdc61) bottom left / 3px 24px no-repeat,
+    linear-gradient(#ffdc61,#ffdc61) bottom right / 24px 3px no-repeat,
+    linear-gradient(#ffdc61,#ffdc61) bottom right / 3px 24px no-repeat;
+  filter:drop-shadow(0 0 5px #f5c33e55);
+}
+.lupi-community--flores .lupi-community-stats > span,
+.lupi-community--flores .lupi-community-stats > span:last-child{
+  display:flex;align-items:center;justify-content:flex-start;gap:12px;
+  padding:11px 15px;min-width:0;min-height:82px;
+  border-radius:10px 3px 10px 3px;
+  text-align:left;
+}
+.lupi-community--flores .lupi-community-stats .flores-stat-copy{
+  display:flex;flex-direction:column;gap:4px;align-items:flex-start;
+  background:none!important;border:0!important;border-radius:0!important;
+  padding:0!important;margin:0!important;box-shadow:none!important;
+  min-height:0!important;min-width:0;flex:1;
+}
+.lupi-community--flores .lupi-community-stats .flores-stat-copy strong,
+.lupi-community--flores .lupi-community-stats .flores-stat-copy small{
+  display:block;background:none!important;border:0!important;padding:0!important;
+  box-shadow:none!important;min-height:0!important;text-align:left;
+}
+.lupi-community--flores .flores-stat-image{width:52px;height:52px;filter:drop-shadow(0 0 10px #00efaa44)}
+.lupi-community--flores .flores-stat-image.flores-stat-trophy{filter:drop-shadow(0 0 10px #ffcc3766)}
+.lupi-community--flores .lupi-community-join{
+  position:relative;overflow:hidden;isolation:isolate;border-radius:9px 3px 9px 3px;
+  border:2px solid #ffeaa0;
+  background:linear-gradient(180deg,#fff0a0 0%,#ffe169 18%,#ffcf37 55%,#e7a718 91%,#b8790b 100%);
+  box-shadow:inset 0 2px #fff9,inset 0 -3px #975a0c,0 0 16px #ffd13a55,0 9px 20px #0009;
+  transition:filter .2s ease,transform .2s ease,box-shadow .2s ease;
+}
+.lupi-community--flores .lupi-community-join::after{
+  content:"";position:absolute;inset:-45% auto -45% -35%;width:20%;pointer-events:none;
+  transform:skewX(-24deg) translateX(-300%);background:linear-gradient(90deg,transparent,#fff9,transparent);
+}
+@media(hover:hover){
+  .lupi-community--flores .lupi-community-join:hover::after{animation:flores-v22-sheen .65s ease-out both}
+  .lupi-community--flores .lupi-community-join:hover{box-shadow:inset 0 2px #fff9,inset 0 -3px #975a0c,0 0 25px #ffd13a77,0 11px 23px #000a}
+}
+@keyframes flores-v22-sheen{to{transform:skewX(-24deg) translateX(850%)}}
+@media(max-width:600px){
+  .lupi-community--flores .lupi-community-panel--club{border-radius:15px!important}
+  .lupi-community--flores .lupi-community-panel--club::after{inset:3px;border-radius:12px;background-size:16px 2px,2px 16px,16px 2px,2px 16px,16px 2px,2px 16px,16px 2px,2px 16px}
+  .lupi-community--flores .lupi-community-stats > span,
+  .lupi-community--flores .lupi-community-stats > span:last-child{min-height:61px;padding:8px 9px;gap:7px}
+  .lupi-community--flores .flores-stat-image{width:clamp(28px,7vw,38px);height:clamp(28px,7vw,38px)}
+  .lupi-community--flores .flores-stat-copy strong{font-size:clamp(10px,2.7vw,13px)}
+  .lupi-community--flores .flores-stat-copy small{font-size:clamp(7px,1.9vw,9px);letter-spacing:.035em}
+}
+@media(prefers-reduced-motion:reduce){.lupi-community--flores .lupi-community-join::after{animation:none!important}}
+
+
+/* V23 · marco ornamental extraído de la referencia, PNG alfa independiente.
+   Solo pantalla de acceso Flores; no altera otras comunidades ni lógica. */
+.lupi-community--flores .lupi-community-panel--club {
+  border:0!important;
+  border-radius:22px!important;
+  overflow:hidden;
+  box-shadow:0 22px 75px #000d,0 0 22px #00d7a633;
+}
+.lupi-community--flores .lupi-community-panel--club::after {
+  content:'';position:absolute;inset:0;z-index:8;pointer-events:none;
+  border:0;border-radius:0;opacity:1;filter:none;
+  background:none!important;
+  border-style:solid;
+  border-width:32px;
+  border-image-source:url('../assets/flores-frame-v23.png');
+  border-image-slice:49;
+  border-image-width:32px;
+  border-image-repeat:stretch;
+}
+@media(max-width:600px){
+ .lupi-community--flores .lupi-community-panel--club {border-radius:18px!important}
+ .lupi-community--flores .lupi-community-panel--club::after{
+   inset:0;border-width:20px;border-image-width:20px;border-image-slice:49;
+   background:none!important;filter:none;
+ }
+}
+
+/* V24 · acabado final: marco ornamental detrás de los controles, sin tapar el CTA */
+.lupi-community--flores .lupi-community-panel--club {
+  isolation:isolate;
+  padding-bottom:clamp(30px,3.5vh,40px)!important;
+}
+.lupi-community--flores .lupi-community-panel--club::after {
+  z-index:1!important;
+  border-width:22px!important;
+  border-image-width:22px!important;
+  border-image-slice:49!important;
+  opacity:.88!important;
+}
+.lupi-community--flores .lupi-community-panel--club > * {
+  position:relative;
+  z-index:2;
+}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+  padding-left:clamp(5px,1vw,12px);
+  padding-right:clamp(5px,1vw,12px);
+}
+.lupi-community--flores .lupi-community-stats {
+  width:calc(100% - 12px);
+  gap:10px;
+  margin-bottom:18px;
+}
+.lupi-community--flores .lupi-community-join {
+  width:calc(100% - 12px);
+  z-index:3;
+  flex-shrink:0;
+  margin-bottom:0;
+}
+@media(max-width:600px){
+  .lupi-community--flores .lupi-community-panel--club {
+    padding-left:clamp(18px,4.5vw,24px)!important;
+    padding-right:clamp(18px,4.5vw,24px)!important;
+    padding-bottom:max(30px,env(safe-area-inset-bottom))!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club::after {
+    border-width:15px!important;
+    border-image-width:15px!important;
+    opacity:.86!important;
+  }
+  .lupi-community--flores .lupi-community-stats {width:100%;gap:8px;margin-bottom:12px}
+  .lupi-community--flores .lupi-community-join {width:100%}
+}
+
+/* V25 — Flores: pantalla completa real en móvil; contenido protegido del marco.
+   Sin transform/zoom: mantiene los tamaños CSS reales y los controles táctiles. */
+@media (max-width:600px), (pointer:coarse) and (max-width:900px) {
+  body > .lupi-community-overlay.lupi-community--flores {
+    position:fixed!important;inset:0!important;
+    width:100vw!important;width:100dvw!important;
+    height:100dvh!important;min-height:100dvh!important;
+    max-height:100dvh!important;
+    padding:0!important;margin:0!important;
+    display:flex!important;align-items:stretch!important;justify-content:stretch!important;
+    overflow:hidden!important;
+  }
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    box-sizing:border-box!important;
+    flex:1 1 auto!important;
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    height:100dvh!important;min-height:0!important;max-height:100dvh!important;
+    margin:0!important;border:0!important;border-radius:0!important;
+    padding: max(22px,env(safe-area-inset-top)) 28px max(28px,env(safe-area-inset-bottom))!important;
+    display:flex!important;flex-direction:column!important;
+    overflow:hidden!important;
+    background-position:center center!important;
+  }
+  /* El borde ornamental no debe ocupar espacio ni interceptar los botones. */
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club::after {
+    inset:0!important;border-width:18px!important;border-image-width:18px!important;
+    pointer-events:none!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > header {flex:0 0 auto;margin-bottom:9px;padding-bottom:8px}
+  .lupi-community--flores .lupi-community-panel--club > header h2 {font-size:clamp(25px,7vw,34px);margin-bottom:0}
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-back {flex:0 0 auto;margin-bottom:9px;min-height:40px}
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-inside-head {flex:0 0 auto;margin-bottom:8px}
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-inner-tabs {flex:0 0 auto;margin-bottom:8px}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-inside-body {
+    flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+    padding:5px 2px 10px;scrollbar-width:thin;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+    flex:1 1 auto;min-height:0!important;margin:0!important;
+    padding:clamp(8px,2vh,20px) 0 8px!important;
+    justify-content:center;gap:clamp(6px,1.1vh,12px);
+  }
+  .lupi-community--flores .lupi-community-content .lupi-community-crest {margin:0 0 clamp(4px,1.5vh,14px)!important}
+  .lupi-community--flores .lupi-community-content .lupi-community-crest img {
+    width:clamp(105px,29vw,150px);height:clamp(105px,29vw,150px);
+  }
+  .lupi-community--flores .lupi-community-content h3 {font-size:clamp(27px,7.5vw,37px);margin-bottom:3px}
+  .lupi-community--flores .lupi-community-content p {font-size:clamp(12px,3vw,14px);margin-bottom:4px;line-height:1.4}
+  .lupi-community--flores .lupi-community-stats {width:100%!important;gap:8px;margin:clamp(5px,1.4vh,13px) 0 7px!important}
+  .lupi-community--flores .lupi-community-stats > span {min-width:0;min-height:56px;padding:7px 6px;gap:6px}
+  .lupi-community--flores .flores-stat-image {width:clamp(27px,7vw,36px);height:clamp(27px,7vw,36px)}
+  .lupi-community--flores .lupi-community-join {width:100%!important;min-height:50px;margin:0!important;padding:9px 5px;font-size:clamp(11px,3vw,14px)}
+  .lupi-community--flores .lupi-club-welcome {min-height:0!important;padding:clamp(12px,2vh,20px) 10px 18px;gap:clamp(7px,1.2vh,12px)}
+  .lupi-community--flores .lupi-club-welcome > img {width:clamp(90px,25vw,124px);height:clamp(90px,25vw,124px)}
+  .lupi-community--flores .lupi-club-welcome h3 {font-size:clamp(24px,6.7vw,33px)}
+  .lupi-community--flores .lupi-club-actions {width:100%;gap:8px}
+  .lupi-community--flores .lupi-club-actions button {min-height:44px}
+}
+@media (max-width:600px) and (max-height:700px) {
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {justify-content:flex-start;overflow-y:auto}
+  .lupi-community--flores .lupi-community-content .lupi-community-crest img {width:94px;height:94px}
+}
+
+/* V26 — ajuste final sobre el SRC real: marco completo y contenido dentro del área útil.
+   Mantener las reglas de escritorio y el comportamiento de otras comunidades. */
+@media (max-width:600px) {
+  html:has(body > .lupi-community-overlay.lupi-community--flores),
+  body:has(> .lupi-community-overlay.lupi-community--flores) {overflow:hidden!important;}
+  body > .lupi-community-overlay.lupi-community--flores {
+    inset:0!important;width:100%!important;height:100dvh!important;
+    min-height:100dvh!important;max-height:100dvh!important;
+    padding:0!important;display:flex!important;overflow:hidden!important;
+  }
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    width:100%!important;min-width:0!important;max-width:none!important;
+    height:100dvh!important;min-height:100dvh!important;max-height:100dvh!important;
+    margin:0!important;box-sizing:border-box!important;
+    padding: max(26px,env(safe-area-inset-top)) 27px max(32px,env(safe-area-inset-bottom))!important;
+    border:0!important;border-radius:0!important;
+    overflow:hidden!important;display:flex!important;flex-direction:column!important;
+  }
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club::after {
+    inset:0!important;border-width:17px!important;border-image-width:17px!important;
+    border-image-slice:49!important;opacity:.9!important;z-index:1!important;
+    pointer-events:none!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > header,
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-back,
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-inside-head,
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-inner-tabs {
+    margin-left:0!important;margin-right:0!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+    min-height:0!important;min-width:0!important;max-width:100%!important;
+    padding-left:3px!important;padding-right:3px!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats,
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-join,
+  .lupi-community--flores .lupi-community-panel--club .lupi-club-actions {
+    max-width:100%!important;box-sizing:border-box!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats > span {
+    overflow:hidden;min-width:0;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-join {
+    margin-bottom:4px!important;
+  }
+}
+@media(max-width:380px) {
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    padding-left:23px!important;padding-right:23px!important;
+  }
+  .lupi-community--flores .lupi-community-content h3 {font-size:clamp(24px,7vw,30px)}
+  .lupi-community--flores .lupi-community-stats {gap:5px!important}
+}
+
+/* V27 — SAFE AREA REAL: el contenido nunca invade el PNG ornamental.
+   El marco es decorativo; las zonas de interacción están dentro del perímetro. */
+.lupi-community--flores .lupi-community-panel--club {
+  --flores-safe-x: clamp(38px, 8%, 48px);
+  --flores-safe-top: 32px;
+  --flores-safe-bottom: 38px;
+  box-sizing:border-box!important;
+  padding-left:var(--flores-safe-x)!important;
+  padding-right:var(--flores-safe-x)!important;
+  padding-top:var(--flores-safe-top)!important;
+  padding-bottom:var(--flores-safe-bottom)!important;
+}
+.lupi-community--flores .lupi-community-panel--club::after {
+  inset:0!important;
+  z-index:8!important;
+  opacity:1!important;
+  pointer-events:none!important;
+}
+.lupi-community--flores .lupi-community-panel--club > * {
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-stats,
+.lupi-community--flores .lupi-community-panel--club .lupi-community-join {
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-stats > span {
+  box-sizing:border-box!important;
+  min-width:0!important;
+}
+@media (max-width:600px) {
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    --flores-safe-x: clamp(32px, 8.5vw, 42px);
+    --flores-safe-top: max(32px, env(safe-area-inset-top));
+    --flores-safe-bottom: max(42px, env(safe-area-inset-bottom));
+    padding:var(--flores-safe-top) var(--flores-safe-x) var(--flores-safe-bottom)!important;
+    width:100dvw!important;
+    height:100dvh!important;
+    max-width:100dvw!important;
+    max-height:100dvh!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club::after {
+    border-width:24px!important;
+    border-image-width:24px!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+    min-height:0!important;
+    flex:1 1 auto!important;
+    overflow-y:auto;
+    overflow-x:hidden;
+    scrollbar-width:none;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content::-webkit-scrollbar {display:none}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats {gap:7px!important}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats > span {padding:6px 4px!important}
+  .lupi-community--flores .lupi-community-panel--club .flores-stat-copy strong {font-size:clamp(10px,2.7vw,13px)!important}
+  .lupi-community--flores .lupi-community-panel--club .flores-stat-copy small {font-size:clamp(8px,2vw,10px)!important}
+}
+
+/* =========================================================
+   V28 — CORRECCIÓN DEFINITIVA PARA MÓVIL: FULLSCREEN + SAFE AREA
+   ========================================================= */
+@media (max-width: 600px) {
+  /* 1. El overlay ocupa toda la pantalla sin márgenes */
+  body > .lupi-community-overlay.lupi-community--flores {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    overflow: hidden !important;
+    background: #00130e !important; /* Color de fondo de respaldo */
+  }
+
+  /* 2. El panel ocupa todo, pero añadimos "padding" para que el contenido no toque el marco */
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    
+    /* AQUÍ ESTÁ LA MAGIA: Espacio para que el marco no tape el contenido */
+    padding-top: max(28px, env(safe-area-inset-top)) !important;
+    padding-bottom: max(32px, env(safe-area-inset-bottom)) !important;
+    padding-left: 24px !important;  /* Ajusta según el grosor de tu marco */
+    padding-right: 24px !important; /* Ajusta según el grosor de tu marco */
+    
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important; /* Evita scroll en el panel, el scroll va dentro */
+    background-position: center center !important;
+  }
+
+  /* 3. El marco decorativo (PNG) se dibuja por encima pero no bloquea los clics */
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 10 !important; /* Por encima del contenido */
+    pointer-events: none !important; /* Permite hacer clic a través del marco */
+    border-image-source: url('../assets/flores-frame-v23.png') !important;
+    border-image-slice: 49 !important;
+    border-image-width: 24px !important; /* Grosor del marco en móvil */
+    border-width: 24px !important;
+    border-style: solid !important;
+    opacity: 0.95 !important;
+  }
+
+  /* 4. El contenido interno se adapta y hace scroll si es necesario */
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    overflow-y: auto !important; /* Scroll solo si el contenido es muy alto */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 10px 0 !important;
+    gap: 12px !important;
+    z-index: 2 !important; /* Por debajo del marco (z-index 10) pero por encima del fondo */
+  }
+
+  /* Ajustes específicos para que quepa todo en pantallas pequeñas */
+  .lupi-community--flores .lupi-community-content .lupi-community-crest img {
+    width: clamp(100px, 28vw, 140px) !important;
+    height: clamp(100px, 28vw, 140px) !important;
+  }
+  
+  .lupi-community--flores .lupi-community-content h3 {
+    font-size: clamp(26px, 7vw, 34px) !important;
+    margin-bottom: 4px !important;
+  }
+
+  .lupi-community--flores .lupi-community-stats {
+    width: 100% !important;
+    gap: 8px !important;
+    margin: 10px 0 !important;
+  }
+
+  .lupi-community--flores .lupi-community-join {
+    width: 100% !important;
+    min-height: 50px !important;
+    margin-top: 4px !important;
+  }
+
+  /* Ajustar el header si se muestra */
+  .lupi-community--flores .lupi-community-panel--club > header {
+    z-index: 11 !important; /* Por encima del marco */
+    padding-top: 4px !important;
+  }
+}
+/* V29 — layout real, sin solapamiento ni recorte del CTA.
+   El frame es una capa visual; el contenido y el scroll usan el área segura. */
+body > .lupi-community-overlay.lupi-community--flores {
+  box-sizing:border-box!important;
+  overflow:hidden!important;
+}
+body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+  box-sizing:border-box!important;
+  display:flex!important;
+  flex-direction:column!important;
+  min-height:0!important;
+  height:min(92dvh,760px)!important;
+  max-height:calc(100dvh - 24px)!important;
+  width:min(560px,calc(100vw - 24px))!important;
+  padding:32px 46px 40px!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club::after {
+  box-sizing:border-box!important;
+  inset:0!important;
+  border:0!important;
+  border-image:none!important;
+  background:url('../assets/flores-frame-v23.png') center / 100% 100% no-repeat!important;
+  opacity:1!important;
+  z-index:8!important;
+  pointer-events:none!important;
+}
+.lupi-community--flores .lupi-community-panel--club > header,
+.lupi-community--flores .lupi-community-panel--club > .lupi-community-back {
+  flex:0 0 auto!important;
+}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+  box-sizing:border-box!important;
+  flex:1 1 auto!important;
+  min-height:0!important;
+  min-width:0!important;
+  width:100%!important;
+  max-width:100%!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  padding:8px 0 12px!important;
+  justify-content:safe center!important;
+}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-stats,
+.lupi-community--flores .lupi-community-panel--club .lupi-community-join {
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  flex-shrink:0!important;
+}
+.lupi-community--flores .lupi-community-panel--club .lupi-community-stats > span {
+  min-width:0!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:600px) {
+  body > .lupi-community-overlay.lupi-community--flores {
+    inset:0!important;
+    width:100%!important;
+    height:100dvh!important;
+    padding:0!important;
+    display:flex!important;
+    align-items:stretch!important;
+  }
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    width:100%!important;
+    max-width:none!important;
+    height:100dvh!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    border-radius:0!important;
+    padding:max(32px,env(safe-area-inset-top)) clamp(30px,8vw,40px) max(38px,env(safe-area-inset-bottom))!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+    padding:8px 0 16px!important;
+    justify-content:safe center!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-join {
+    margin:8px 0 0!important;
+    min-height:50px!important;
+  }
+}
+
+/* =============================================================
+   V30 — FLORES: viewport completo + zona segura del marco PNG
+   Agregar al FINAL. No modifica otras comunidades.
+   ============================================================= */
+body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+  scrollbar-gutter:auto!important;
+}
+@media (max-width:600px) {
+  body > .lupi-community-overlay.lupi-community--flores {
+    position:fixed!important;
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    padding:0!important;
+    margin:0!important;
+    display:flex!important;
+    align-items:stretch!important;
+    justify-content:stretch!important;
+    overflow:hidden!important;
+  }
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    flex:1 1 auto!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:100dvh!important;
+    min-height:0!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    border:0!important;
+    border-radius:0!important;
+    padding:
+      max(38px,env(safe-area-inset-top))
+      clamp(34px,9vw,48px)
+      max(44px,env(safe-area-inset-bottom))!important;
+    display:flex!important;
+    flex-direction:column!important;
+    overflow:hidden!important;
+    background-position:center!important;
+  }
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club::after {
+    content:""!important;
+    position:absolute!important;
+    inset:0!important;
+    background:url('../assets/flores-frame-v23.png') center/100% 100% no-repeat!important;
+    border:0!important;
+    border-image:none!important;
+    opacity:1!important;
+    z-index:8!important;
+    pointer-events:none!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > header {
+    flex:0 0 auto!important;
+    min-width:0!important;
+    margin:0 0 10px!important;
+    padding:0 0 9px!important;
+    position:relative!important;
+    top:auto!important;
+    z-index:9!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > header h2 {
+    font-size:clamp(23px,6.5vw,33px)!important;
+    line-height:1!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > header button {
+    min-width:38px!important;
+    min-height:38px!important;
+    padding:6px!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-back {
+    flex:0 0 auto!important;
+    min-height:40px!important;
+    margin:0 0 8px!important;
+    z-index:9!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+    flex:1 1 auto!important;
+    min-height:0!important;
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:12px 0 8px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:safe center!important;
+    gap:clamp(5px,1.3dvh,12px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    scrollbar-width:none!important;
+    z-index:2!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content::-webkit-scrollbar {display:none!important}
+  .lupi-community--flores .lupi-community-content .lupi-community-crest {
+    margin:0 auto clamp(4px,1dvh,12px)!important;
+    flex:0 0 auto!important;
+  }
+  .lupi-community--flores .lupi-community-content .lupi-community-crest img {
+    width:clamp(112px,32vw,170px)!important;
+    height:clamp(112px,32vw,170px)!important;
+  }
+  .lupi-community--flores .lupi-community-content h3 {
+    font-size:clamp(27px,7.3vw,38px)!important;
+    line-height:1.05!important;
+    margin:0!important;
+  }
+  .lupi-community--flores .lupi-community-content p {
+    font-size:clamp(12px,3.1vw,14px)!important;
+    line-height:1.4!important;
+    margin:0!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats {
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    width:100%!important;
+    gap:8px!important;
+    margin:clamp(6px,1.5dvh,14px) 0 0!important;
+    flex:0 0 auto!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats > span {
+    min-width:0!important;
+    min-height:60px!important;
+    padding:8px 6px!important;
+    gap:6px!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-join {
+    flex:0 0 auto!important;
+    width:100%!important;
+    min-height:52px!important;
+    margin:8px 0 0!important;
+    font-size:clamp(11px,3vw,14px)!important;
+  }
+}
+@media (max-width:600px) and (max-height:700px) {
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    padding-top:max(30px,env(safe-area-inset-top))!important;
+    padding-bottom:max(32px,env(safe-area-inset-bottom))!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {gap:4px!important;padding:4px 0!important}
+  .lupi-community--flores .lupi-community-content .lupi-community-crest img {width:96px!important;height:96px!important}
+  .lupi-community--flores .lupi-community-content h3 {font-size:25px!important}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats > span {min-height:48px!important}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-join {min-height:46px!important}
+}
+
+/* V31 — marco Flores: área útil real y proporciones responsive */
+@media (min-width:601px) {
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    width:min(510px,calc(100vw - 32px))!important;
+    height:min(94dvh,900px)!important;
+    max-height:calc(100dvh - 20px)!important;
+    padding:48px 48px 48px!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > header {padding-left:10px!important;margin-top:8px!important;}
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-back {margin-top:6px!important;}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {gap:clamp(8px,1.4dvh,16px)!important;}
+}
+@media (max-width:600px) {
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {
+    padding-top:max(78px,env(safe-area-inset-top))!important;
+    padding-right:clamp(45px,12vw,60px)!important;
+    padding-left:clamp(45px,12vw,60px)!important;
+    padding-bottom:max(76px,env(safe-area-inset-bottom))!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > header {
+    margin:0 0 12px!important;
+    padding:0 4px 8px!important;
+  }
+  .lupi-community--flores .lupi-community-panel--club > header > div {padding-left:8px!important;}
+  .lupi-community--flores .lupi-community-panel--club > header h2 {font-size:clamp(20px,5.5vw,28px)!important;}
+  .lupi-community--flores .lupi-community-panel--club > .lupi-community-back {margin:0 0 12px!important;min-height:38px!important;}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {
+    justify-content:center!important;
+    gap:clamp(8px,1.5dvh,16px)!important;
+    padding:8px 0 12px!important;
+  }
+  .lupi-community--flores .lupi-community-content .lupi-community-crest img {width:clamp(105px,29vw,145px)!important;height:clamp(105px,29vw,145px)!important;}
+  .lupi-community--flores .lupi-community-content h3 {font-size:clamp(23px,6vw,31px)!important;}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-stats > span {min-height:56px!important;}
+}
+@media (max-width:600px) and (max-height:700px) {
+  body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--club {padding-top:56px!important;padding-bottom:52px!important;}
+  .lupi-community--flores .lupi-community-panel--club .lupi-community-content {gap:5px!important;}
+}
+/* V32 — Ajuste exclusivo de escritorio */
+@media (min-width: 601px) {
+
+  /* Aprovechar mejor la altura disponible */
+  body > .lupi-community-overlay.lupi-community--flores
+  > .lupi-community-panel--club {
+    padding: 42px 48px 34px !important;
+  }
+
+  /* Compactar y subir el contenido */
+  .lupi-community--flores
+  .lupi-community-panel--club
+  .lupi-community-content {
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    padding: 6px 0 8px !important;
+    margin: 0 !important;
+  }
+
+  /* Reducir el espacio alrededor del escudo */
+  .lupi-community--flores
+  .lupi-community-content .lupi-community-crest {
+    margin: 0 auto 8px !important;
+  }
+
+  /* Acercar las estadísticas al botón */
+  .lupi-community--flores
+  .lupi-community-panel--club
+  .lupi-community-stats {
+    margin: 8px 0 4px !important;
+  }
+
+  /* Botón visible dentro del marco */
+  .lupi-community--flores
+  .lupi-community-panel--club
+  .lupi-community-join {
+    min-height: 48px !important;
+    margin: 4px 0 0 !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* V33 — Móviles de poca altura */
+@media (max-width: 600px) and (max-height: 720px) {
+
+  .lupi-community--flores
+  .lupi-community-panel--club {
+    padding-bottom: 20px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-panel--club
+  .lupi-community-content {
+    gap: 2px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-content .lupi-community-crest {
+    margin-bottom: 4px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-stats {
+    margin: 4px 0 !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-join {
+    min-height: 40px !important;
+    margin-top: 2px !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+/* V34 — Flores Futsal: móviles compactos */
+@media (max-width: 600px) and (max-height: 720px) {
+
+  body > .lupi-community-overlay.lupi-community--flores
+  > .lupi-community-panel--club {
+    padding-top: 48px !important;
+    padding-bottom: 42px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-panel--club > header {
+    margin-bottom: 6px !important;
+    padding-bottom: 4px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-panel--club > .lupi-community-back {
+    margin-bottom: 5px !important;
+    min-height: 32px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-panel--club .lupi-community-content {
+    justify-content: space-between !important;
+    gap: 3px !important;
+    padding: 2px 0 5px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-content .lupi-community-crest img {
+    width: 88px !important;
+    height: 88px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-content h3 {
+    font-size: 24px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-panel--club .lupi-community-stats {
+    margin: 3px 0 0 !important;
+    gap: 5px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-panel--club .lupi-community-stats > span {
+    min-height: 44px !important;
+    padding: 4px !important;
+  }
+
+  .lupi-community--flores
+  .lupi-community-panel--club .lupi-community-join {
+    min-height: 40px !important;
+    margin: 3px 0 0 !important;
+    padding: 5px !important;
+  }
+}

@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type ItemSlot = "top" | "bottom" | "boots" | "accessory";
 export type ItemRarity = "common" | "rare" | "epic" | "legendary";
@@ -118,10 +118,22 @@ const FALLBACK_CATALOG: Omit<InventoryItem, "owned" | "equipped">[] = [
   },
 ];
 
+/** Misma lógica de "un solo ítem equipado por slot", reutilizable. */
+function applyEquip(prev: InventoryItem[], itemId: string, equip: boolean) {
+  const target = prev.find((i) => i.id === itemId);
+  if (!target) return prev;
+  return prev.map((i) => {
+    if (i.id === itemId) return { ...i, equipped: equip };
+    if (equip && i.slot === target.slot) return { ...i, equipped: false };
+    return i;
+  });
+}
+
 export function useAuraInventory(userId: string, level: number) {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
+  const instanceId = useRef(Math.random().toString(36).slice(2));
 
   const load = useCallback(async () => {
     if (!userId) return;
@@ -175,7 +187,6 @@ export function useAuraInventory(userId: string, level: number) {
         requiredLevel: row.required_level,
         owned: ownedMap.has(row.id) || level >= row.required_level,
         equipped: ownedMap.get(row.id) ?? false,
-        // Imagen específica para avatar equipado
         equippedImageUrl: row.equipped_image_url,
       }))
     );
@@ -183,9 +194,28 @@ export function useAuraInventory(userId: string, level: number) {
     setLoading(false);
   }, [userId, level]);
 
+  // Carga inicial
   useEffect(() => {
     load();
   }, [load]);
+
+  // Cuando OTRA instancia del hook cambia el equipamiento, sincronizar esta.
+  useEffect(() => {
+    const onUpdated = (event: Event) => {
+      const d = (event as CustomEvent<{
+        userId?: string; itemId?: string; equipped?: boolean; source?: string;
+      }>).detail;
+      if (!d || d.userId !== userId || d.source === instanceId.current) return;
+      if (usingFallback && d.itemId) {
+        // sin base de datos no hay nada que recargar: aplicar el cambio en memoria
+        setItems((prev) => applyEquip(prev, d.itemId!, !!d.equipped));
+      } else {
+        load();
+      }
+    };
+    window.addEventListener("lupi:inventory-updated", onUpdated);
+    return () => window.removeEventListener("lupi:inventory-updated", onUpdated);
+  }, [userId, usingFallback, load]);
 
   const toggleEquip = useCallback(
     async (itemId: string) => {
@@ -194,16 +224,17 @@ export function useAuraInventory(userId: string, level: number) {
 
       const willEquip = !target.equipped;
 
-      setItems((prev) =>
-        prev.map((i) => {
-          if (i.id === itemId) return { ...i, equipped: willEquip };
-          if (willEquip && i.slot === target.slot) return { ...i, equipped: false };
-          return i;
-        })
-      );
+      setItems((prev) => applyEquip(prev, itemId, willEquip));
+
+      const notify = () =>
+        window.dispatchEvent(
+          new CustomEvent("lupi:inventory-updated", {
+            detail: { userId, itemId, equipped: willEquip, source: instanceId.current },
+          })
+        );
 
       if (usingFallback) {
-        window.dispatchEvent(new CustomEvent("lupi:inventory-updated", { detail: { userId, itemId, equipped: willEquip } }));
+        notify();
         return;
       }
 
@@ -218,9 +249,7 @@ export function useAuraInventory(userId: string, level: number) {
         return;
       }
 
-      window.dispatchEvent(
-        new CustomEvent("lupi:inventory-updated", { detail: { userId, itemId, equipped: willEquip } })
-      );
+      notify();
     },
     [items, usingFallback, load, userId]
   );

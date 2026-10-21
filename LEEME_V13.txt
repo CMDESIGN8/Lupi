@@ -1,0 +1,6 @@
+LUPI WORLD — V13 AAA COMPETITIVE ARENA
+Instalación: reemplazar src/components/CommunitiesPanel.css por el archivo del ZIP.
+Se incluyen los TSX y CSS de V12 sin cambios, como respaldo.
+Cambios V13: podio premium, tarjetas de ranking, acentos dorado/cian, estados activos, legibilidad, focus visible y microinteracciones.
+No modifica consultas Supabase, cálculos, puntuaciones ni sincronización PvP.
+No se ejecutó compilación ni prueba visual en navegador; verificar en 360, 393, 440px y escritorio.

@@ -1314,3 +1314,30 @@
     transition: none;
   }
 }
+
+/* Parte visible real de Avatar2D: del pelo (y≈60) a los botines (y≈497) ≈ 437px
+   → 190 / 437 ≈ 0.435 */
+.lw-avatar__rig {
+  --fit: 0.435;
+  position: absolute;
+  left: 50%;
+  /* baja el sprite para que los botines (23px sobre el borde inferior del
+     Avatar2D) queden en el piso de la caja, y 9px más adentro del aro,
+     como pisaba el maniquí anterior */
+  bottom: calc(-23px * var(--fit) - 9px);
+  width: 390px;
+  height: 520px;
+  margin-left: -195px;
+  transform: scale(var(--fit));
+  transform-origin: 50% 100%;
+  pointer-events: none;
+}
+
+/* Sombra de contacto para que no flote (reemplaza ocultar .avatar2d__shadow) */
+.lw-avatar .avatar2d__aura { display: none; }
+.lw-avatar .avatar2d__shadow {
+  bottom: 18px;
+  width: 200px;
+  height: 34px;
+  opacity: 0.9;
+}

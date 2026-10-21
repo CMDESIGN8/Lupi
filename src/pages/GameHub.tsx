@@ -1,3 +1,5 @@
+import { supabase } from "../lib/supabaseClient";
+import { CommunitiesPanel } from "../components/CommunitiesPanel";
 import { AvatarFace } from "../components/AvatarFace";
 import { AvatarEditor } from "../components/AvatarEditor";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
@@ -387,6 +389,16 @@ import { useAchievements } from "../hooks/useAchievements";
       onMatchRecorded,
     }: Props) {
       const [view, setView] = useState<"lobby" | "match">("lobby");
+      const [showCommunities, setShowCommunities] = useState(false);
+      const [lobbyCommunity, setLobbyCommunity] = useState<string | null>(null);
+      const refreshLobbyCommunity = async () => {
+        const { data, error } = await supabase.from("community_members").select("community_id, communities(name)").eq("user_id", user.id).order("joined_at", { ascending: true }).limit(1);
+        if (error) return;
+        const item = data?.[0];
+        const relation = item?.communities as unknown as { name: string } | { name: string }[] | null | undefined;
+        setLobbyCommunity(Array.isArray(relation) ? relation[0]?.name ?? null : relation?.name ?? null);
+      };
+      useEffect(() => { void refreshLobbyCommunity(); }, [user.id]);
       const [debutWaiting, setDebutWaiting] = useState(false);
       const [battleMode, setBattleMode] = useState<BattleMode>("quick");
       // Sprint 06: nunca iniciar automáticamente un partido para cuentas nuevas.
@@ -594,7 +606,8 @@ const {
           case "create_avatar": onNavigate("profile"); break;
           case "enter_world": adventureComplete("enter_world"); break;
           case "equip_avatar": {
-            setEquipGuideRequest(n => n + 1);
+            // Abrir el editor completo (identidad + vestuario), no solo la guía de equipamiento.
+            setShowAvatarEditor(true);
             break;
           }
           case "social": {
@@ -1018,7 +1031,9 @@ const handleLobbyMissionClaim = async (missionId: string) => {
     
     {selectedWorldPlayer && (
       <PlayerCard
-    player={selectedWorldPlayer}
+    player={selectedWorldPlayer.userId === user.id
+      ? { ...selectedWorldPlayer, look, appearance: myAppearance }
+      : selectedWorldPlayer}
     meId={user.id}
     catalog={auraItems}
     muted={isMuted(selectedWorldPlayer.userId)}
@@ -1197,8 +1212,21 @@ onChallengeGame={(player, game) => {
   }}
 />
                   </div>
+                  {showCommunities && <CommunitiesPanel
+                    userId={user.id}
+                    onClose={() => setShowCommunities(false)}
+                    onMembershipChange={() => void refreshLobbyCommunity()}
+                    onlineMemberIds={lobbyPlayers.filter(p => p.userId !== user.id && p.activity === "lobby").map(p => p.userId)}
+                    challengePendingToId={outgoing?.toId ?? null}
+                    onChallengeMember={(member, game, communityId) => {
+                      if (view !== "lobby" || game !== "rps") return false;
+                      const sent = challenge(member, 1, game, communityId);
+                      if (sent) updateMissionProgress("challenge");
+                      return sent;
+                    }}
+                  />}
                   <div className="gh-locker-zone">
-        <button type="button" onClick={() => setShowAvatarEditor(true)} className="gh-avatar-customize-trigger" style={{width:"100%",marginBottom:8,background:"#173e30",color:"#e4cf72",border:"1px solid #8d793c",borderRadius:8,padding:"9px",cursor:"pointer",fontWeight:800}}>✦ PERSONALIZAR MI PERSONAJE</button>
+        <button type="button" onClick={() => setShowAvatarEditor(true)} className="gh-avatar-customize-trigger" style={{width:"100%",marginBottom:8,background:"#0b3545",color:"#ffd23f",border:"1px solid #28d9ff",borderRadius:8,padding:"9px",cursor:"pointer",fontWeight:800}}>✦ PERSONALIZAR MI PERSONAJE</button>
         <LockerPreview
           userId={user.id}
           level={level}
@@ -1341,7 +1369,9 @@ onChallengeGame={(player, game) => {
                     <span className="gh-world__play-arrow" aria-hidden>→</span>
                   </button>
 
+                  {lobbyCommunity && <button type="button" onClick={() => setShowCommunities(true)} title="Abrir mis comunidades" style={{display:"block",margin:"6px auto",padding:"7px 14px",border:"1px solid #2bd7ff",borderRadius:9,background:"#072635",color:"#d7f8ff",fontWeight:800,cursor:"pointer",maxWidth:"min(90vw,320px)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>🏟️ {lobbyCommunity} · Mi comunidad →</button>}
                   <div className="gh-world__actions" aria-label="Acciones rápidas">
+                    <button type="button" onClick={() => setShowCommunities(true)} aria-label="Abrir clubes y comunidades"><span>♧</span><strong>CLUBES</strong></button>
 
                         <button
                           type="button"
@@ -1405,6 +1435,7 @@ onChallengeGame={(player, game) => {
                   )}
 
                   <div className="gh-world__dock">
+                    <button type="button" onClick={() => setShowCommunities(true)}><span>♧</span><strong>CLUBES</strong></button>
                     <button className="is-active" type="button" onClick={() => setView("lobby")}>
                       <span>⚽</span><strong>LOBBY</strong>
                     </button>

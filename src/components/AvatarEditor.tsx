@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { useAuraInventory, type ItemRarity, type ItemSlot } from "../hooks/useAuraInventory";
-import { HAIRS, HAIR_COLORS, SKINS, type AvatarAppearance } from "../lib/avatarAppearance";
+import { HAIRS, HAIR_COLORS, SKINS, EYES, BROWS, NOSES, MOUTHS, type AvatarAppearance } from "../lib/avatarAppearance";
 import { AvatarFace } from "./AvatarFace";
 import { CharacterStage } from "./CharacterStage";
 import { CheckIcon, GridIcon, LockIcon, SlotIcon } from "./EditorIcons";
@@ -245,6 +245,24 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                 />
               ))}
             </div>
+
+            {([
+              ["eyes", "OJOS", EYES, { normal:"Normales",large:"Grandes",almond:"Almendrados",bright:"Brillantes" }],
+              ["brows", "CEJAS", BROWS, { natural:"Naturales",straight:"Rectas",arched:"Arqueadas",bold:"Marcadas" }],
+              ["nose", "NARIZ", NOSES, { soft:"Suave",small:"Pequeña",round:"Redonda",defined:"Definida" }],
+              ["mouth", "BOCA", MOUTHS, { normal:"Normal",small:"Pequeña",wide:"Ancha",full:"Carnosa" }],
+            ] as const).map(([key, title, values, labels]) => (
+              <div key={key}>
+                <h3 className="lw-id__label">{title}</h3>
+                <div className="lw-id__opts">
+                  {values.map(value => (
+                    <FaceOption key={value} appearance={{...draft,[key]:value}}
+                      label={(labels as Record<string,string>)[value]}
+                      active={draft[key] === value} onPick={() => change(key,value)} />
+                  ))}
+                </div>
+              </div>
+            ))}
 
             <h3 className="lw-id__label">EXPRESIÓN</h3>
             <div className="lw-id__opts lw-id__opts--3">

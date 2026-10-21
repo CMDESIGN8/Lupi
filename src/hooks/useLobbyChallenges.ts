@@ -7,6 +7,7 @@ export type ChallengeGame = "futsal" | "trivia" | "rps" | "truco" | "physical";
 
 export type Challenge = {
   gameType: ChallengeGame;
+  communityId?: string;
   /** También sirve como id de la partida. */
   id: string;
   fromId: string;
@@ -75,7 +76,7 @@ function parseChallenge(raw: any): Challenge | null {
   const botIndex = Number.isFinite(botRaw) ? Math.min(Math.max(botRaw, 0), MAX_BOT_INDEX) : 1;
   const allowed: ChallengeGame[] = ["futsal", "trivia", "rps", "truco", "physical"];
   const gameType: ChallengeGame = allowed.includes(raw?.gameType) ? raw.gameType : "futsal";
-  return { id, fromId, fromName, toId, toName: str(raw?.toName, 24), botIndex, gameType, at: Date.now() };
+  return { id, fromId, fromName, toId, toName: str(raw?.toName, 24), botIndex, gameType, communityId: typeof raw?.communityId === "string" && /^[0-9a-f-]{36}$/i.test(raw.communityId) ? raw.communityId : undefined, at: Date.now() };
 }
 
 export function useLobbyChallenges({
@@ -213,7 +214,7 @@ export function useLobbyChallenges({
 
   /** Devuelve true si el desafío salió. */
   const challenge = useCallback(
-    (target: { userId: string; username: string }, botIndex = 1, gameType: ChallengeGame = "futsal") => {
+    (target: { userId: string; username: string }, botIndex = 1, gameType: ChallengeGame = "futsal", communityId?: string) => {
       const channel = channelRef.current;
       if (!channel || !ready || outgoingRef.current || target.userId === meId) return false;
 
@@ -225,6 +226,7 @@ export function useLobbyChallenges({
         toName: target.username.slice(0, 24),
         botIndex: Math.min(Math.max(Math.trunc(botIndex), 0), MAX_BOT_INDEX),
         gameType,
+        communityId,
         at: Date.now(),
       };
 

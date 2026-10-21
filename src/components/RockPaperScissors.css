@@ -11,3 +11,32 @@
 .rps-choices button:hover:not(:disabled){background:#1c4631}.rps-choices button:disabled{opacity:.45;cursor:not-allowed}
 .rps-choices button span{font-size:40px}.rps-choices button strong{font-size:11px}.rps-error{color:#ff9292!important}.rps-reveal{color:#f5c745;font-size:13px}
 @media(max-width:480px){.rps-arena{padding:15px}.rps-header{font-size:9px}.rps-choices{gap:7px}.rps-choices button{padding:20px 4px}.rps-choices button span{font-size:31px}}
+
+/* Fase 9 — Arena PvP responsive, sin tarjeta miniatura */
+.rps-arena { width:100%; min-height:calc(100dvh - 32px); display:flex; flex-direction:column; justify-content:center; }
+.rps-header { width:100%; }
+.rps-arena h2 { line-height:1.1; }
+.rps-score strong { font-size:clamp(14px,3.6vw,20px); }
+.rps-arena h3 { margin:8px 0; }
+.rps-community-report { line-height:1.45; }
+@media(max-width:600px) {
+ .rps-arena { min-height:100dvh; max-width:none; margin:0; border:0; border-radius:0; padding:calc(18px + env(safe-area-inset-top)) 18px calc(24px + env(safe-area-inset-bottom)); justify-content:flex-start; }
+ .rps-header { min-height:48px; gap:8px; font-size:10px; }
+ .rps-header button,.rps-exit { min-height:44px; font-size:13px; }
+ .rps-arena h2 { margin:clamp(44px,9dvh,100px) 0 8px; font-size:clamp(30px,8vw,44px); }
+ .rps-arena > p { font-size:14px; }
+ .rps-score { width:100%; margin:clamp(35px,8dvh,85px) auto 32px; gap:10px; }
+ .rps-score strong { font-size:clamp(15px,4vw,20px); }
+ .rps-score b { font-size:clamp(52px,14vw,76px); line-height:1.1; }
+ .rps-score > span { font-size:clamp(32px,9vw,45px); }
+ .rps-score small { font-size:12px; }
+ .rps-choices { width:100%; margin:25px auto; gap:8px; }
+ .rps-choices button { min-height:100px; padding:12px 3px; }
+ .rps-choices button span { font-size:36px; }
+ .rps-exit { margin:18px auto 0; padding:12px 20px; }
+}
+@media(max-width:380px) {
+ .rps-arena { padding-inline:12px; }
+ .rps-header { font-size:9px; }
+ .rps-score { gap:5px; }
+}

@@ -39,10 +39,7 @@
   color: var(--lupi-primary);
   text-shadow: 0 0 14px rgba(36,233,135,.28);
 }
-.gh-root .gh-brand::after {
-  background: linear-gradient(90deg,transparent,var(--lupi-primary) 30%,var(--lupi-primary) 70%,transparent);
-  box-shadow: 0 0 12px rgba(36,233,135,.32);
-}
+
 
 /* Los puntos/XP pasan a verde; las monedas y el nivel quedan dorados. */
 .gh-root .gh-currency--points {

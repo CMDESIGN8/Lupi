@@ -1,3 +1,5 @@
+import { useEffect, useRef, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 import type { Challenge } from "../hooks/useLobbyChallenges";
 import { useRpsMatch } from "../hooks/useRpsMatch";
 import "./RockPaperScissors.css";
@@ -10,6 +12,21 @@ const choices = [
 ] as const;
 export function RockPaperScissors({ challenge, meId, onExit }: Props) {
   const { state, error, busy, play } = useRpsMatch(challenge);
+  const reported = useRef(false);
+  const [communityReport, setCommunityReport] = useState("");
+  useEffect(() => {
+    if (!challenge.communityId || state?.status !== "finished" || reported.current) return;
+    reported.current = true;
+    void supabase.rpc("record_community_rps_result", {
+      p_community_id: challenge.communityId,
+      p_match_id: challenge.id,
+      p_host_id: challenge.fromId,
+      p_guest_id: challenge.toId,
+    }).then(({ data, error: reportError }) => {
+      if (reportError) { setCommunityReport("No se pudo registrar en la comunidad: " + reportError.message); return; }
+      setCommunityReport(data?.confirmed ? "✓ Resultado confirmado para el ranking comunitario" : "Duelo finalizado. El resultado del ranking comunitario espera la confirmación del rival.");
+    });
+  }, [challenge, state?.status]);
   const host = challenge.fromId === meId;
   const myName = host ? challenge.fromName : challenge.toName;
   const rivalName = host ? challenge.toName : challenge.fromName;
@@ -31,6 +48,7 @@ export function RockPaperScissors({ challenge, meId, onExit }: Props) {
         <div><small>RIVAL</small><strong>{rivalName}</strong><b>{rivalWins}</b></div>
       </div>
       {error && <p role="alert" className="rps-error">{error}</p>}
+      {communityReport && <p role="status" className="rps-community-report">{communityReport}</p>}
       {!state && !error && <p>Conectando con la arena…</p>}
       {state && (
         <>

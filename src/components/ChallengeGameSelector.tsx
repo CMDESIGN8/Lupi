@@ -9,9 +9,9 @@ type Props = {
 };
 
 const games = [
-  { id: "futsal", icon: "⚽", name: "FUTSAL", description: "Duelo 1 vs 1", available: true },
+  { id: "futsal", icon: "⚽", name: "FUTSAL", description: "PvP en desarrollo · Actualmente contra la máquina", available: false },
   { id: "trivia", icon: "🧠", name: "PREGUNTADOS", description: "Demostrá cuánto sabés", available: false },
-  { id: "rps", icon: "✊", name: "PIEDRA, PAPEL O TIJERA", description: "Mejor de 3", available: true },
+  { id: "rps", icon: "✊", name: "PIEDRA, PAPEL O TIJERA", description: "PvP sincronizado · Mejor de 3", available: true },
   { id: "truco", icon: "🃏", name: "TRUCO", description: "Cartas y estrategia", available: false },
   { id: "physical", icon: "💪", name: "RETO FÍSICO", description: "Desafíos de la vida real", available: false },
 ] as const;

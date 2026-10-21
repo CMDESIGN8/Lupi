@@ -32,10 +32,7 @@
   color: var(--lupi-primary) !important;
   text-shadow: 0 0 12px rgba(36,233,135,.20);
 }
-.gh-root .gh-brand::after {
-  background: linear-gradient(90deg,transparent,var(--lupi-primary),transparent);
-  box-shadow: 0 0 10px rgba(36,233,135,.25);
-}
+
 /* Los numeros del HUD son informativos, no un segundo color de accion */
 .gh-root .gh-currency--points,
 .gh-root .gh-currency--coins {

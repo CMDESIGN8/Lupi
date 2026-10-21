@@ -140,3 +140,17 @@
     max-height: calc(100dvh - 48px);
   }
 }
+/* Fase 10 — misma identidad visual que desafíos comunitarios */
+.cgs-overlay { z-index:10001; background:rgba(1,10,17,.86); }
+.cgs-modal { width:min(560px,100%); border-color:#28d9ff; background:linear-gradient(150deg,#092e40,#04131f); }
+.cgs-game.is-available { border-color:#24d9a3; background:#075344; }
+.cgs-game.is-available:hover { background:#086955; }
+.cgs-game.is-locked { border-color:#34515e; background:#102633; opacity:.6; }
+.cgs-info small { color:#b0d0db; }
+.cgs-status { color:#ffce3d; }
+@media(max-width:600px) {
+ .cgs-overlay { padding:0; align-items:stretch; }
+ .cgs-modal { width:100%; height:100dvh; max-height:100dvh; border-radius:0; padding: max(60px,env(safe-area-inset-top)) 16px max(20px,env(safe-area-inset-bottom)); }
+ .cgs-game { min-height:72px; }
+ .cgs-status { white-space:normal; text-align:right; max-width:90px; }
+}
