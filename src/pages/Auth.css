@@ -1339,45 +1339,58 @@ to {transform:translateX(130%)}
 }
 
 
-/* V4.7 — REFLECTORES DIAGONALES HACIA EL CENTRO */
+/* V4.8 — HACES DE ESTADIO: geometría visible, no manchas radiales.
+   Los haces parten de las esquinas superiores y convergen hacia adentro. */
 .auth-screen .auth-stage__spot {
- position:absolute;top:-12%;width:clamp(210px,28vw,420px);
- height:clamp(540px,100dvh,1050px);z-index:2;
- clip-path:none;-webkit-clip-path:none;border-radius:0;
- -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 36%,transparent 97%);
- mask-image:linear-gradient(180deg,#000 0%,#000 36%,transparent 97%);
- background:radial-gradient(ellipse 53% 76% at 50% 4%,rgba(182,239,255,.77) 0%,rgba(63,183,255,.47) 26%,rgba(17,113,235,.27) 57%,transparent 100%);
- filter:blur(12px);mix-blend-mode:screen;opacity:.78;
- transform-origin:50% 0;pointer-events:none;will-change:transform,opacity;
+  position:absolute;
+  top:0;
+  width: min(46vw, 650px);
+  height: min(94dvh, 900px);
+  z-index:2;
+  border-radius:0;
+  opacity:0;
+  filter:blur(5px);
+  mix-blend-mode:screen;
+  pointer-events:none;
+  transform:none;
+  transform-origin:top center;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 12%,rgba(0,0,0,.8) 44%,transparent 100%);
+  mask-image:linear-gradient(to bottom,#000 0%,#000 12%,rgba(0,0,0,.8) 44%,transparent 100%);
+  background:linear-gradient(90deg,transparent 0%,rgba(23,145,255,.08) 12%,rgba(92,207,255,.25) 47%,rgba(167,240,255,.3) 53%,rgba(30,151,255,.1) 85%,transparent 100%);
+}
+/* El vértice está arriba en la esquina; el cono se abre hacia el centro. */
+.auth-screen .auth-stage__spot--left {
+  left:0;right:auto;
+  clip-path:polygon(0 0,12% 0,100% 100%,20% 100%);
+  -webkit-clip-path:polygon(0 0,12% 0,100% 100%,20% 100%);
+  animation:lupi-v48-light 1800ms ease-out 150ms both;
+}
+.auth-screen .auth-stage__spot--right {
+  right:0;left:auto;
+  clip-path:polygon(88% 0,100% 0,80% 100%,0 100%);
+  -webkit-clip-path:polygon(88% 0,100% 0,80% 100%,0 100%);
+  animation:lupi-v48-light 1800ms ease-out 320ms both;
 }
 .auth-screen .auth-stage__spot::after {
- content:"";position:absolute;inset:0;
- background:radial-gradient(ellipse 25% 78% at 50% 3%,rgba(216,250,255,.48),rgba(60,189,255,.12) 50%,transparent 100%);
- filter:blur(10px);pointer-events:none;
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent 12%,rgba(125,230,255,.17) 50%,transparent 88%);
+  filter:blur(12px);
 }
-.auth-screen .auth-stage__spot--left {left:-7%;right:auto;animation:lupi-v47-left 2s ease-out both;}
-.auth-screen .auth-stage__spot--right {right:-7%;left:auto;animation:lupi-v47-right 2s ease-out both;}
-@keyframes lupi-v47-left {
- 0%{opacity:0;transform:rotate(12deg) scaleY(.65)}
- 65%{opacity:.9;transform:rotate(39deg) scaleY(1.05)}
- 100%{opacity:.78;transform:rotate(39deg) scaleY(1)}
-}
-@keyframes lupi-v47-right {
- 0%{opacity:0;transform:rotate(-12deg) scaleY(.65)}
- 65%{opacity:.9;transform:rotate(-39deg) scaleY(1.05)}
- 100%{opacity:.78;transform:rotate(-39deg) scaleY(1)}
+@keyframes lupi-v48-light {
+  0%{opacity:0;filter:blur(24px) brightness(.3)}
+  55%{opacity:.95;filter:blur(5px) brightness(1.25)}
+  100%{opacity:.76;filter:blur(7px) brightness(1)}
 }
 @media(max-width:900px){
- .auth-screen .auth-stage__spot{top:-7%;width:clamp(130px,36vw,280px);height:clamp(400px,74dvh,730px);filter:blur(10px)}
- .auth-screen .auth-stage__spot--left{left:-16%}
- .auth-screen .auth-stage__spot--right{right:-16%}
+  .auth-screen .auth-stage__spot{width:65vw;height:65dvh;filter:blur(5px)}
+  .auth-screen .auth-stage__spot--left{left:0}
+  .auth-screen .auth-stage__spot--right{right:0}
 }
 @media(max-width:600px){
- .auth-screen .auth-stage__spot{top:-5%;width:clamp(130px,39vw,190px);height:clamp(380px,64dvh,610px);filter:blur(9px)}
- .auth-screen .auth-stage__spot--left{left:-18%}
- .auth-screen .auth-stage__spot--right{right:-18%}
+  .auth-screen .auth-stage__spot{width:78vw;height:44dvh}
+  .auth-screen .auth-stage__spot--left{clip-path:polygon(0 0,12% 0,95% 100%,30% 100%)}
+  .auth-screen .auth-stage__spot--right{clip-path:polygon(88% 0,100% 0,70% 100%,5% 100%)}
 }
 @media(prefers-reduced-motion:reduce){
- .auth-screen .auth-stage__spot--left{animation:none!important;opacity:.78!important;transform:rotate(39deg)!important}
- .auth-screen .auth-stage__spot--right{animation:none!important;opacity:.78!important;transform:rotate(-39deg)!important}
+  .auth-screen .auth-stage__spot--left,.auth-screen .auth-stage__spot--right{animation:none!important;opacity:.76!important;filter:blur(7px)!important}
 }
