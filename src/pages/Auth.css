@@ -1460,3 +1460,123 @@ to {transform:translateX(130%)}
   .auth-screen .auth-stage__spot--left{animation:none!important;opacity:.62;transform:rotate(-40deg)!important;}
   .auth-screen .auth-stage__spot--right{animation:none!important;opacity:.62;transform:rotate(40deg)!important;}
 }
+
+
+/* V4.5 — Haz visible + halo independiente. Colocar AL FINAL del CSS. */
+.auth-screen .auth-stage__spot {
+  position:absolute;
+  top:-10%;
+  width:clamp(250px,34vw,490px);
+  height:105%;
+  z-index:1;
+  pointer-events:none;
+  transform-origin:50% 0%;
+  clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);
+  -webkit-clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);
+  background:linear-gradient(180deg,rgba(180,241,255,.56) 0%,rgba(43,178,240,.34) 27%,rgba(0,130,235,.18) 58%,rgba(0,100,220,0) 100%);
+  filter:blur(7px);
+  mix-blend-mode:screen;
+  opacity:.8;
+  will-change:transform,opacity;
+}
+/* El halo utiliza la misma geometría, pero un gradiente más ancho y difuso. */
+.auth-screen .auth-stage__spot::after {
+  content:"";
+  position:absolute;
+  inset:-4% -28%;
+  background:radial-gradient(ellipse at 50% 20%,rgba(75,201,255,.32),rgba(0,130,240,.12) 48%,transparent 76%);
+  filter:blur(22px);
+  pointer-events:none;
+}
+.auth-screen .auth-stage__spot--left {
+  left:-8%;right:auto;
+  animation:lupi-v45-left 1600ms ease-out both;
+}
+.auth-screen .auth-stage__spot--right {
+  right:-8%;left:auto;
+  animation:lupi-v45-right 1600ms ease-out both;
+}
+@keyframes lupi-v45-left {
+  0%{opacity:0;transform:rotate(-35deg) scaleY(.82)}
+  75%{opacity:.9;transform:rotate(-35deg) scaleY(1)}
+  100%{opacity:.8;transform:rotate(-35deg) scaleY(1)}
+}
+@keyframes lupi-v45-right {
+  0%{opacity:0;transform:rotate(35deg) scaleY(.82)}
+  75%{opacity:.9;transform:rotate(35deg) scaleY(1)}
+  100%{opacity:.8;transform:rotate(35deg) scaleY(1)}
+}
+@media(max-width:900px){
+  .auth-screen .auth-stage__spot{top:-5%;width:40vw;height:56dvh;filter:blur(6px)}
+  .auth-screen .auth-stage__spot--left{left:-18%}
+  .auth-screen .auth-stage__spot--right{right:-18%}
+}
+@media(max-width:600px){
+  .auth-screen .auth-stage__spot{top:-3%;width:48vw;height:34dvh;min-height:230px;max-height:370px;filter:blur(5px)}
+  .auth-screen .auth-stage__spot--left{left:-20%}
+  .auth-screen .auth-stage__spot--right{right:-20%}
+}
+@media(prefers-reduced-motion:reduce){
+  .auth-screen .auth-stage__spot--left{animation:none!important;opacity:.8;transform:rotate(-35deg)!important}
+  .auth-screen .auth-stage__spot--right{animation:none!important;opacity:.8;transform:rotate(35deg)!important}
+}
+
+
+/* V4.5 — Haz visible + halo independiente. Colocar AL FINAL del CSS. */
+.auth-screen .auth-stage__spot {
+  position:absolute;
+  top:-10%;
+  width:clamp(250px,34vw,490px);
+  height:105%;
+  z-index:1;
+  pointer-events:none;
+  transform-origin:50% 0%;
+  clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);
+  -webkit-clip-path:polygon(46% 0,54% 0,100% 100%,0 100%);
+  background:linear-gradient(180deg,rgba(180,241,255,.56) 0%,rgba(43,178,240,.34) 27%,rgba(0,130,235,.18) 58%,rgba(0,100,220,0) 100%);
+  filter:blur(7px);
+  mix-blend-mode:screen;
+  opacity:.8;
+  will-change:transform,opacity;
+}
+/* El halo utiliza la misma geometría, pero un gradiente más ancho y difuso. */
+.auth-screen .auth-stage__spot::after {
+  content:"";
+  position:absolute;
+  inset:-4% -28%;
+  background:radial-gradient(ellipse at 50% 20%,rgba(75,201,255,.32),rgba(0,130,240,.12) 48%,transparent 76%);
+  filter:blur(22px);
+  pointer-events:none;
+}
+.auth-screen .auth-stage__spot--left {
+  left:-8%;right:auto;
+  animation:lupi-v45-left 1600ms ease-out both;
+}
+.auth-screen .auth-stage__spot--right {
+  right:-8%;left:auto;
+  animation:lupi-v45-right 1600ms ease-out both;
+}
+@keyframes lupi-v45-left {
+  0%{opacity:0;transform:rotate(-35deg) scaleY(.82)}
+  75%{opacity:.9;transform:rotate(-35deg) scaleY(1)}
+  100%{opacity:.8;transform:rotate(-35deg) scaleY(1)}
+}
+@keyframes lupi-v45-right {
+  0%{opacity:0;transform:rotate(35deg) scaleY(.82)}
+  75%{opacity:.9;transform:rotate(35deg) scaleY(1)}
+  100%{opacity:.8;transform:rotate(35deg) scaleY(1)}
+}
+@media(max-width:900px){
+  .auth-screen .auth-stage__spot{top:-5%;width:40vw;height:56dvh;filter:blur(6px)}
+  .auth-screen .auth-stage__spot--left{left:-18%}
+  .auth-screen .auth-stage__spot--right{right:-18%}
+}
+@media(max-width:600px){
+  .auth-screen .auth-stage__spot{top:-3%;width:48vw;height:34dvh;min-height:230px;max-height:370px;filter:blur(5px)}
+  .auth-screen .auth-stage__spot--left{left:-20%}
+  .auth-screen .auth-stage__spot--right{right:-20%}
+}
+@media(prefers-reduced-motion:reduce){
+  .auth-screen .auth-stage__spot--left{animation:none!important;opacity:.8;transform:rotate(-35deg)!important}
+  .auth-screen .auth-stage__spot--right{animation:none!important;opacity:.8;transform:rotate(35deg)!important}
+}
