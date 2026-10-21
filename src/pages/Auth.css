@@ -1338,81 +1338,46 @@ to {transform:translateX(130%)}
 
 }
 
-/* =============================================================
-   LUPI WORLD V4.6 — CINEMATIC STADIUM LIGHTING
-   Una sola capa final de reflectores; conserva formulario y CTA.
-   ============================================================= */
+
+/* V4.7 — REFLECTORES DIAGONALES HACIA EL CENTRO */
 .auth-screen .auth-stage__spot {
-  position:absolute;
-  top:-8%;
-  width:clamp(190px,22vw,340px);
-  height:clamp(460px,78dvh,850px);
-  z-index:1;
-  opacity:.52;
-  pointer-events:none;
-  transform-origin:50% 0%;
-  clip-path:none;
-  -webkit-clip-path:none;
-  border-radius:50% 50% 46% 46% / 2% 2% 96% 96%;
-  background:linear-gradient(180deg,
-    rgba(195,244,255,.54) 0%,
-    rgba(85,198,255,.36) 18%,
-    rgba(29,137,234,.19) 47%,
-    rgba(8,101,210,.07) 72%,
-    transparent 100%);
-  -webkit-mask-image:radial-gradient(ellipse 56% 82% at 50% 8%,#000 8%,rgba(0,0,0,.8) 42%,transparent 100%);
-  mask-image:radial-gradient(ellipse 56% 82% at 50% 8%,#000 8%,rgba(0,0,0,.8) 42%,transparent 100%);
-  filter:blur(19px);
-  mix-blend-mode:screen;
-  will-change:transform,opacity;
+ position:absolute;top:-12%;width:clamp(210px,28vw,420px);
+ height:clamp(540px,100dvh,1050px);z-index:2;
+ clip-path:none;-webkit-clip-path:none;border-radius:0;
+ -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 36%,transparent 97%);
+ mask-image:linear-gradient(180deg,#000 0%,#000 36%,transparent 97%);
+ background:radial-gradient(ellipse 53% 76% at 50% 4%,rgba(182,239,255,.77) 0%,rgba(63,183,255,.47) 26%,rgba(17,113,235,.27) 57%,transparent 100%);
+ filter:blur(12px);mix-blend-mode:screen;opacity:.78;
+ transform-origin:50% 0;pointer-events:none;will-change:transform,opacity;
 }
 .auth-screen .auth-stage__spot::after {
-  content:"";
-  position:absolute;
-  inset:0 -22% 15%;
-  border-radius:50%;
-  background:radial-gradient(ellipse at 50% 5%,rgba(157,231,255,.33),rgba(41,151,248,.12) 42%,transparent 76%);
-  filter:blur(26px);
-  pointer-events:none;
+ content:"";position:absolute;inset:0;
+ background:radial-gradient(ellipse 25% 78% at 50% 3%,rgba(216,250,255,.48),rgba(60,189,255,.12) 50%,transparent 100%);
+ filter:blur(10px);pointer-events:none;
 }
-.auth-screen .auth-stage__spot--left {
-  left:1%;right:auto;
-  animation:lupi-v46-left 2.05s cubic-bezier(.2,.7,.2,1) both;
+.auth-screen .auth-stage__spot--left {left:-7%;right:auto;animation:lupi-v47-left 2s ease-out both;}
+.auth-screen .auth-stage__spot--right {right:-7%;left:auto;animation:lupi-v47-right 2s ease-out both;}
+@keyframes lupi-v47-left {
+ 0%{opacity:0;transform:rotate(12deg) scaleY(.65)}
+ 65%{opacity:.9;transform:rotate(39deg) scaleY(1.05)}
+ 100%{opacity:.78;transform:rotate(39deg) scaleY(1)}
 }
-.auth-screen .auth-stage__spot--right {
-  right:1%;left:auto;
-  animation:lupi-v46-right 2.05s cubic-bezier(.2,.7,.2,1) both;
+@keyframes lupi-v47-right {
+ 0%{opacity:0;transform:rotate(-12deg) scaleY(.65)}
+ 65%{opacity:.9;transform:rotate(-39deg) scaleY(1.05)}
+ 100%{opacity:.78;transform:rotate(-39deg) scaleY(1)}
 }
-@keyframes lupi-v46-left {
-  0% {opacity:0;transform:rotate(-49deg) scaleY(.72)}
-  68% {opacity:.64;transform:rotate(-43deg) scaleY(1.02)}
-  100% {opacity:.52;transform:rotate(-43deg) scaleY(1)}
+@media(max-width:900px){
+ .auth-screen .auth-stage__spot{top:-7%;width:clamp(130px,36vw,280px);height:clamp(400px,74dvh,730px);filter:blur(10px)}
+ .auth-screen .auth-stage__spot--left{left:-16%}
+ .auth-screen .auth-stage__spot--right{right:-16%}
 }
-@keyframes lupi-v46-right {
-  0% {opacity:0;transform:rotate(49deg) scaleY(.72)}
-  68% {opacity:.64;transform:rotate(43deg) scaleY(1.02)}
-  100% {opacity:.52;transform:rotate(43deg) scaleY(1)}
+@media(max-width:600px){
+ .auth-screen .auth-stage__spot{top:-5%;width:clamp(130px,39vw,190px);height:clamp(380px,64dvh,610px);filter:blur(9px)}
+ .auth-screen .auth-stage__spot--left{left:-18%}
+ .auth-screen .auth-stage__spot--right{right:-18%}
 }
-/* En teléfonos, focos altos que apuntan 45° hacia el centro. */
-@media (max-width:900px) {
-  .auth-screen .auth-stage__spot {
-    top:-3%;width:clamp(105px,23vw,200px);
-    height:clamp(260px,44dvh,490px);
-    filter:blur(15px);
-  }
-  .auth-screen .auth-stage__spot--left {left:-3%;}
-  .auth-screen .auth-stage__spot--right {right:-3%;}
-}
-@media (max-width:600px) {
-  .auth-screen .auth-stage__spot {
-    top:-1%;width:clamp(100px,27vw,155px);
-    height:clamp(245px,38dvh,370px);
-    filter:blur(13px);
-  }
-  .auth-screen .auth-stage__spot--left {left:-8%;}
-  .auth-screen .auth-stage__spot--right {right:-8%;}
-}
-@media (prefers-reduced-motion:reduce) {
-  .auth-screen .auth-stage__spot--left {animation:none!important;opacity:.52!important;transform:rotate(-43deg)!important;}
-  .auth-screen .auth-stage__spot--right {animation:none!important;opacity:.52!important;transform:rotate(43deg)!important;}
+@media(prefers-reduced-motion:reduce){
+ .auth-screen .auth-stage__spot--left{animation:none!important;opacity:.78!important;transform:rotate(39deg)!important}
+ .auth-screen .auth-stage__spot--right{animation:none!important;opacity:.78!important;transform:rotate(-39deg)!important}
 }
