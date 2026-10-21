@@ -482,57 +482,13 @@ export function CardBattle({
   }, [bot, userDeck]);
 
   // ── Post-partido ──────────────────────────────────────────────────────────
-  async function updateDailyChallenges(
-  won: boolean,
-  userScore: number,
-  opponent: BotPlayer
-) {
-  try {
-    console.log('🎯 DAILY CHALLENGE DEBUG', {
-      userId,
-      won,
-      userScore,
-      opponent: opponent.name,
-      opponentLevel: opponent.level,
-    });
-    const { data, error } = await supabase.rpc('update_daily_progress', {
-      p_user_id: userId,
-      p_action_type: won
-        ? 'battle_win'
-        : 'battle_lose',
-      p_metadata: {
-        score: userScore,
-        is_legend: opponent.level >= 3,
-      },
-    });
-
-    if (error) {
-      console.error('Error actualizando desafíos diarios:', error);
-      return null;
-    }
-
-    console.log('🎯 Desafíos diarios actualizados:', data);
-
-    return data;
-  } catch (err) {
-    console.error('Error inesperado actualizando desafíos:', err);
-    return null;
-  }
-}
-
+  // Seguridad: el resultado de un partido simulado no es evidencia verificable.
+  // No llamar a update_daily_progress desde el cliente.
+  // Los desafíos diarios competitivos quedan pendientes de un validador del servidor.
 
   async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[]) {
     const won   = ug > rg;
     const tied  = ug === rg;
-    const dailyProgress = await updateDailyChallenges(
-  won,
-  ug,
-  bot
-);
-
-if (dailyProgress?.challenges) {
-  onDailyChallengesUpdated?.(dailyProgress.challenges);
-}
 
     const newStreak   = won ? Math.min(userStats.streak + 1, 10) : 0;
     const streakBonus = won ? newStreak * 5 : 0;
@@ -585,8 +541,8 @@ if (dailyProgress?.challenges) {
           .eq('id', card.id);
       }
 
-      // El trigger on_match_finished acredita XP/puntos/stats en una transacción.
-      // Nunca escribir esos campos directamente desde el cliente.
+      // El trigger on_match_finished ya NO acredita XP/puntos/stats.
+      // El partido se registra como resultado recreativo, no verificable.
       const { error: matchError } = await supabase.from('matches').insert({
         user_id: userId,
         user_deck_id: userDeck.id,
