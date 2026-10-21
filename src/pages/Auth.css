@@ -512,3 +512,50 @@
 @media (max-width:900px) { .auth-screen .auth-card-v2 { background:linear-gradient(160deg,rgba(2,29,36,.94),rgba(0,12,22,.96)); } .auth-screen .auth-stage__scene { filter:saturate(1.05) brightness(.86); } }
 @media (max-width:600px) { .auth-screen .auth-shell { max-width:540px; } .auth-screen .auth-card-v2 { border-radius:16px; } .auth-screen .auth-pillar { border-radius:9px; } .auth-screen .auth-tabs button,.auth-screen .auth-google-button,.auth-screen .auth-submit { touch-action:manipulation; } .auth-screen .auth-stage__shade { background:linear-gradient(180deg,rgba(0,6,13,.2),rgba(0,7,15,.34) 24%,rgba(0,8,17,.82) 60%,#020b10 100%); } }
 @media (prefers-reduced-motion:reduce) { .auth-screen .auth-pillar,.auth-screen .auth-submit,.auth-screen .auth-google-button { transition:none!important; } }
+
+/* =============================================================
+   V3 — CYBERPUNK CYAN / BLUE · LUPI WORLD
+   Palette matched to the cinematic loading screen.
+   CSS-only: auth behavior, form structure and image are untouched.
+   ============================================================= */
+.auth-screen{--neon:#35eaff;--gold:#ffe25a;--electric:#078fff;color:#effcff;background:#000814}
+.auth-screen .auth-stage__scene{filter:saturate(1.15) contrast(1.08) hue-rotate(-5deg)}
+.auth-screen .auth-stage__shade{background:linear-gradient(90deg,rgba(0,7,23,.49),rgba(0,12,31,.08) 42%,rgba(0,7,25,.66)),linear-gradient(180deg,rgba(0,5,17,.2),transparent 37%,rgba(0,5,17,.78))}
+.auth-screen .auth-stage__fog{opacity:.5;filter:hue-rotate(12deg)}
+.auth-screen .auth-intro h1 em{color:#3ef0ff;text-shadow:0 4px 14px #000,0 0 24px rgba(0,229,255,.58)}
+.auth-screen .auth-kicker,.auth-screen .auth-card-eyebrow{color:#48edff;letter-spacing:.19em}
+.auth-screen .auth-live-dot{background:#36eaff;box-shadow:0 0 12px rgba(54,234,255,.85)}
+.auth-screen .auth-intro>p{color:#e8faff;background:linear-gradient(90deg,transparent,rgba(0,12,29,.72) 18%,rgba(0,12,29,.72) 82%,transparent)}
+.auth-screen .auth-pillar{border-color:rgba(53,218,255,.43);background:linear-gradient(155deg,rgba(3,34,66,.82),rgba(0,10,27,.82));box-shadow:0 12px 30px rgba(0,0,0,.42),inset 0 1px 0 rgba(215,249,255,.11)}
+.auth-screen .auth-pillar::before{background:linear-gradient(90deg,transparent,rgba(160,241,255,.5),transparent)}
+.auth-screen .auth-pillar strong{color:#f3fdff;letter-spacing:.035em}
+.auth-screen .auth-pillar small{color:#b2dce9;font-size:clamp(10px,.87vw,13px)}
+.auth-screen .auth-pillar>span{filter:drop-shadow(0 0 9px rgba(53,234,255,.3))}
+.auth-screen .auth-pillar:hover{border-color:#39eaff;background:linear-gradient(155deg,rgba(5,53,86,.91),rgba(0,16,40,.92));box-shadow:0 16px 36px rgba(0,0,0,.5),0 0 24px rgba(0,190,255,.2)}
+.auth-screen .auth-card-v2{position:relative;border:1px solid rgba(53,217,255,.65);background:linear-gradient(150deg,rgba(2,24,52,.87),rgba(0,11,31,.94) 56%,rgba(0,15,37,.94));box-shadow:0 28px 85px rgba(0,0,0,.75),0 0 40px rgba(0,166,255,.1),inset 0 1px 0 rgba(220,250,255,.14);backdrop-filter:blur(24px) saturate(130%);-webkit-backdrop-filter:blur(24px) saturate(130%)}
+.auth-screen .auth-card-v2::after{background:rgba(0,156,255,.14)}
+.auth-screen .auth-card-heading p{color:#bbd8e7}
+.auth-screen .auth-tabs{border-color:rgba(79,197,240,.23);background:rgba(0,6,20,.75)}
+.auth-screen .auth-tabs button{color:#b4d0dd}
+.auth-screen .auth-tabs button.active{color:#6ef5ff;border-color:rgba(53,234,255,.76);background:linear-gradient(180deg,rgba(0,169,255,.22),rgba(0,130,225,.08));box-shadow:0 0 17px rgba(0,190,255,.12),inset 0 1px 0 rgba(255,255,255,.1)}
+.auth-screen .auth-google-button{border-color:rgba(93,200,243,.4);background:linear-gradient(135deg,rgba(4,31,61,.86),rgba(0,13,34,.88));color:#f1fcff}
+.auth-screen .auth-google-button:hover:not(:disabled){border-color:#35eaff;background:rgba(2,49,83,.9);box-shadow:0 0 20px rgba(0,190,255,.16)}
+.auth-screen .auth-divider{color:#91b8ca}
+.auth-screen .form-label{color:#c3e5f1}
+.auth-screen .form-input{border-color:rgba(123,196,228,.5);background:rgba(0,8,27,.8);color:#f2fcff}
+.auth-screen .form-input::placeholder{color:#85a8b9}
+.auth-screen .form-input:hover:not(:focus){border-color:rgba(167,232,255,.8)}
+.auth-screen .form-input:focus{border-color:#3eefff;background:rgba(0,18,42,.95);box-shadow:0 0 0 3px rgba(0,205,255,.17),0 0 23px rgba(0,162,255,.12)}
+.auth-screen .auth-submit{color:#001628;background:linear-gradient(100deg,#00a9ed 0%,#59f1ff 49%,#00b4fa 100%);box-shadow:0 8px 26px rgba(0,176,255,.28),0 0 15px rgba(0,211,255,.1),inset 0 1px 0 rgba(255,255,255,.65)}
+.auth-screen .auth-submit:hover:not(:disabled){filter:brightness(1.09);box-shadow:0 13px 35px rgba(0,176,255,.42),0 0 26px rgba(0,211,255,.22)}
+.auth-screen .auth-reward-item{border-color:rgba(45,177,233,.22);background:rgba(0,31,56,.65)}
+.auth-screen .auth-reward-item strong{color:#e7faff}
+.auth-screen .auth-reward-item small,.auth-screen .auth-card-footer{color:#a3c9d7}
+.auth-screen .auth-card-footer span{color:#3ceaff}
+.auth-screen .auth-confirmation{border-color:rgba(65,218,255,.48);background:rgba(0,44,75,.58)}
+.auth-screen .auth-confirmation button{border-color:#35eaff;color:#67efff}
+.auth-screen .auth-tabs button:focus-visible,.auth-screen .auth-google-button:focus-visible,.auth-screen .auth-submit:focus-visible,.auth-screen .form-input:focus-visible{outline:2px solid #79f5ff;outline-offset:3px}
+@media(min-width:901px){.auth-screen .auth-shell{grid-template-columns:minmax(0,1.22fr) minmax(390px,.98fr);gap:clamp(32px,4.2vw,72px)}.auth-screen .auth-card-v2{border-radius:22px}}
+@media(max-width:900px){.auth-screen .auth-card-v2{background:linear-gradient(160deg,rgba(2,23,51,.95),rgba(0,9,28,.97))}}
+@media(max-width:600px){.auth-screen .auth-stage__shade{background:linear-gradient(180deg,rgba(0,6,20,.24),rgba(0,9,27,.38) 23%,rgba(0,8,27,.87) 60%,#000814 100%)}.auth-screen .auth-pillar{border-radius:10px}.auth-screen .auth-card-v2{border-radius:16px}.auth-screen .auth-submit{min-height:48px}}
+@media(prefers-reduced-motion:reduce){.auth-screen .auth-pillar,.auth-screen .auth-submit,.auth-screen .auth-google-button{transition:none!important}}
