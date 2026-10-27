@@ -982,8 +982,8 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
           <div className={`gh-shell ${(gameTab === "play" && view === "lobby") || gameTab === "deck" ? "gh-shell--wide" : ""} ${gameTab === "deck" || view === "match" ? "gh-shell--compact-hud" : ""}`}>
             <header className="gh-hud">
-  <button className="gh-back" onClick={onBackHome} aria-label="Volver">
-    <span aria-hidden>‹</span> LUPI WORLD
+  <button type="button" className="gh-back gh-back--home" onClick={onBackHome} aria-label="Volver a la página de inicio">
+    <span aria-hidden>⌂</span> Volver al inicio
   </button>
 
   <div className="gh-brand">
@@ -1520,6 +1520,7 @@ onChallengeGame={(player, game) => {
   onDailyChallengesUpdated={handleDailyChallengesUpdated}
   onMatchRecorded={() => { recordLupiMatchCompleted(); adventureComplete("first_match"); onMatchRecorded?.(); }}
   isCampaignMode={true}
+  autoStart={false}
   forcedOpponent={{
     name: "Bot Novato",
     overall_rating: 55,

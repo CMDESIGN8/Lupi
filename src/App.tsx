@@ -170,8 +170,8 @@ export default function App() {
 
   const handleSigningWelcomeContinue = useCallback(() => {
     setShowSigningWelcome(false);
-    enterGame("game");
-  }, [enterGame]);
+    goHome();
+  }, [goHome]);
 
   const handleLogout = useCallback(() => {
     setShowSigningWelcome(false);

@@ -33,6 +33,7 @@ interface CardBattleProps {
   onNavigateToDeck?: () => void;
   forcedOpponent?: BotPlayer | null;
   isCampaignMode?: boolean;
+  autoStart?: boolean;
   onCampaignMatchComplete?: (won: boolean, bot: BotPlayer) => void;
 
   onDailyChallengesUpdated?: (
@@ -136,12 +137,13 @@ export function CardBattle({
   onNavigateToDeck,
   forcedOpponent = null,
   isCampaignMode = false,
+  autoStart = true,
   onCampaignMatchComplete,
   onDailyChallengesUpdated,
 }: CardBattleProps) {
 
   const [phase, setPhase] = useState<'select'|'battle'|'result'>(
-  isCampaignMode && forcedOpponent ? 'battle' : 'select'
+  autoStart && isCampaignMode && forcedOpponent ? 'battle' : 'select'
 );
   
   // En modo campaña, el bot se setea automáticamente al oponente forzado
@@ -191,7 +193,7 @@ export function CardBattle({
   // Si cambia el oponente forzado en modo campaña, actualizar el bot seleccionado
   const autoStarted = useRef(false);
   useEffect(() => {
-    if (isCampaignMode && forcedOpponent && !autoStarted.current) {
+    if (autoStart && isCampaignMode && forcedOpponent && !autoStarted.current) {
       autoStarted.current = true;
       void startBattle();
     }
@@ -810,6 +812,12 @@ export function CardBattle({
         {/* ════════════════════════ FASE SELECT ════════════════════════ */}
         {phase === 'select' && (
   <div className="rival-selector">
+    <section aria-label="Cómo jugar tu partido" style={{padding:16,marginBottom:16,border:'1px solid #22d3ee',borderRadius:16,background:'#0b1d2b',color:'#fff'}}>
+      <h2 style={{margin:'0 0 8px'}}>Antes de entrar a la cancha</h2>
+      <p>Explorá tu quinteto en la cancha y revisá sus estadísticas. Tocá «Mi equipo» si querés cambiar las cartas del mazo.</p>
+      <p>Durante el partido, elegí cómo resolver cada jugada cuando aparezcan las opciones. Para completar tu primera misión, llegá al final: no necesitás ganar.</p>
+      <strong>El encuentro empieza cuando tocás «Jugar partido».</strong>
+    </section>
     {/* TARJETA DE ESTADÍSTICAS DEL EQUIPO - ARRIBA */}
     <div className="team-stats-card">
       <div className="team-stats-header">

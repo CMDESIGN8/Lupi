@@ -476,7 +476,7 @@ export function SigningWelcome({ user, onContinue }: Props) {
                   onClick={enterWorld}
                   disabled={!celebrated || enteringWorld}
                 >
-                  ENTRAR A LUPI WORLD →
+                  IR A MI INICIO →
                 </button>
               : <div className="futsal-lineup__autoplay" role="status">REVELANDO JUGADORES AUTOMÁTICAMENTE…</div>}
             {done && <button type="button" className="futsal-lineup__dt-button" onClick={() => setShowDtAnalysis(true)}>♟ VER ANÁLISIS DE LUPI DT ↗</button>}

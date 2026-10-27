@@ -4151,3 +4151,17 @@
 .gh-world .gh-locker-zone .locker-slot .locker-slot-icon{width:100%;height:100%;display:grid;place-items:center}
 .gh-world .gh-locker-zone .locker-slot .locker-slot-guided-label{display:none!important}
 @media(max-width:700px){.gh-world .gh-locker-zone .locker-equipment .locker-slot{width:52px!important;height:52px!important;min-width:52px!important;min-height:52px!important;max-width:52px!important;max-height:52px!important;padding:6px!important}}
+
+/* Beta 01: salida explícita al inicio, también en móvil. */
+.gh-root .gh-hud .gh-back.gh-back--home {
+ display:inline-flex; align-items:center; justify-content:center; gap:8px;
+ min-height:44px; padding:10px 14px; font-size:13px; font-weight:800;
+ line-height:1.2; color:#e7fcff; background:#103244;
+ border:1px solid #38d5ed; border-radius:12px; white-space:nowrap;
+}
+.gh-root .gh-hud .gh-back.gh-back--home span {font-size:22px;}
+.gh-root .gh-hud .gh-back.gh-back--home:hover {background:#16465b;}
+.gh-root .gh-hud .gh-back.gh-back--home:focus-visible {outline:3px solid #f5d679;outline-offset:3px;}
+@media(max-width:480px){
+ .gh-root .gh-hud .gh-back.gh-back--home {font-size:12px;padding:8px 10px;gap:5px;}
+}
