@@ -1,3 +1,4 @@
+import { MatchTutorial } from './MatchTutorial';
 // src/components/CardBattle.tsx — v6 (con soporte para modo campaña)
 // Fix #1: arena-container width:10% removido
 // Fix #2: scoreboard top corregido en mobile
@@ -626,6 +627,10 @@ export function CardBattle({
     return handleStartBattle;
   };
 
+  if (phase === 'select' && !autoStart) {
+    return <MatchTutorial cards={deckCards} opponent={bot.name} onTeam={onNavigateToDeck} onStart={handleStartBattle} />;
+  }
+
   return (
     <div className="arena-container">
 
@@ -636,7 +641,7 @@ export function CardBattle({
           <span className="arena-badge">FUTSAL</span>
         </div>
         <button className="deck-link-btn" onClick={onNavigateToDeck}>
-          📋 MI EQUIPO <span className="deck-count">{deckCards.length}/5</span>
+          📋 Ver mi equipo <span className="deck-count">{deckCards.length}/5</span>
         </button>
       </div>
 
@@ -812,12 +817,7 @@ export function CardBattle({
         {/* ════════════════════════ FASE SELECT ════════════════════════ */}
         {phase === 'select' && (
   <div className="rival-selector">
-    <section aria-label="Cómo jugar tu partido" style={{padding:16,marginBottom:16,border:'1px solid #22d3ee',borderRadius:16,background:'#0b1d2b',color:'#fff'}}>
-      <h2 style={{margin:'0 0 8px'}}>Antes de entrar a la cancha</h2>
-      <p>Explorá tu quinteto en la cancha y revisá sus estadísticas. Tocá «Mi equipo» si querés cambiar las cartas del mazo.</p>
-      <p>Durante el partido, elegí cómo resolver cada jugada cuando aparezcan las opciones. Para completar tu primera misión, llegá al final: no necesitás ganar.</p>
-      <strong>El encuentro empieza cuando tocás «Jugar partido».</strong>
-    </section>
+
     {/* TARJETA DE ESTADÍSTICAS DEL EQUIPO - ARRIBA */}
     <div className="team-stats-card">
       <div className="team-stats-header">

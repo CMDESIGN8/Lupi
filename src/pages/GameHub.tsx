@@ -1019,6 +1019,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
             
 
+            {gameTab === "deck" && view === "match" && <button type="button" className="gh-return-preview" onClick={() => setGameTab("play")}>← Volver a la previa del partido</button>}
             <div className="gh-scene" key={sceneKey}>
               {challengeTarget && (
   <ChallengeGameSelector
@@ -1504,7 +1505,7 @@ onChallengeGame={(player, game) => {
               {!debutWaiting && gameTab === "play" && view === "match" && (
                 <section className="gh-match">
                   <div className="gh-match__bar">
-                    <button className="gh-ghost" onClick={() => setView("lobby")}><span aria-hidden>‹</span> Lobby</button>
+                    <button className="gh-ghost" onClick={() => setView("lobby")}><span aria-hidden>‹</span> Volver al lobby</button>
                     <span style={{fontSize:12,opacity:.8}}>⚽ Partido rápido · Tomá decisiones para ganar XP</span>
 
                   </div>
