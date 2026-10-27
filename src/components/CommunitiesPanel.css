@@ -1357,3 +1357,4 @@ body > .lupi-community-overlay.lupi-community--flores > .lupi-community-panel--c
     padding: 5px !important;
   }
 }
+.lupi-community-futsal-link{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;padding:12px 14px;border-radius:10px;border:1px solid #22d8f4;color:#e8fcff;background:#07506b;font-weight:800;font-size:12px}

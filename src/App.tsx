@@ -23,6 +23,7 @@ import { ProfileTab } from "./pages/ProfileTab";
 import { GameHub } from "./pages/GameHub";
 import { MarketplaceTab } from "./pages/MarketplaceTab";
 
+import { UserCardProfile } from "./components/UserCardProfile";
 import { AppHeader } from "./components/home/AppHeader";
 import { OnboardingTour } from "./components/OnboardingTour";
 import { DevTools } from "./components/DevTools";
@@ -144,6 +145,15 @@ export default function App() {
   };
 }, []);
 
+  useEffect(() => {
+    if (!user?.id) return;
+    const destination = sessionStorage.getItem("lupi-prode-return");
+    if (destination && /^\/futsal(?:\?|$)/.test(destination)) {
+      sessionStorage.removeItem("lupi-prode-return");
+      window.location.assign(destination);
+    }
+  }, [user?.id]);
+
   const handleAuth = useCallback((authenticatedUser: AppUser) => {
     setUser(authenticatedUser);
     // El tutorial se presenta luego del fichaje, cuando corresponda.
@@ -223,7 +233,7 @@ export default function App() {
   if (loadingPhase !== "done") {
     return (
       <ToastProvider>
-        <div className="app-wrapper">
+        <div className={`app-wrapper app-unified${tab === "home" ? " app-home-dashboard" : ""}`}>
           <div className={`loading-screen lupi-cinematic-loading lupi-loading-finale${loadingPhase === "exiting" ? " is-exiting" : ""}`} role="status" aria-live="polite" aria-label="Cargando Lupi World">
             <div className="lupi-stadium-blackout" aria-hidden="true" />
             <div className="lupi-stadium-beam lupi-stadium-beam--left" aria-hidden="true" />
@@ -252,7 +262,7 @@ export default function App() {
 if (user && needsPlayerOnboarding(user)) {
   return (
     <ToastProvider>
-      <div className="app-wrapper">
+      <div className={`app-wrapper app-unified${tab === "home" ? " app-home-dashboard" : ""}`}>
         <ErrorBoundary>
           <PlayerOnboarding onComplete={handleOnboardingComplete} />
         </ErrorBoundary>
@@ -263,7 +273,7 @@ if (user && needsPlayerOnboarding(user)) {
   if (!user) {
     return (
       <ToastProvider>
-        <div className="app-wrapper">
+        <div className={`app-wrapper app-unified${tab === "home" ? " app-home-dashboard" : ""}`}>
           <ErrorBoundary>
             <AuthScreen onAuth={handleAuth} />
           </ErrorBoundary>
@@ -286,13 +296,13 @@ if (user && needsPlayerOnboarding(user)) {
 
   return (
     <ToastProvider>
-      <div className="app-wrapper">
+      <div className={`app-wrapper app-unified${tab === "home" ? " app-home-dashboard" : ""}`}>
         <ErrorBoundary>
           {showTour && (
             <OnboardingTour onComplete={handleTourComplete} />
           )}
 
-          {appRoute === "home" && ( <header className="app-header"><AppHeader userId={user.id} /></header> )}
+          {appRoute === "home" && <><header className="app-masthead"><BottomNav activeTab={tab} onTabChange={handleTabChange} onEnterGame={()=>enterGame("game")} pendingRewards={pendingRewards}/></header><div className="app-content-intro"><div className="masthead-top"><div className="masthead-identity"><AppHeader userId={user.id}/></div>{tab === "home" && <div className="masthead-greeting"><div><span>TU PUNTO DE PARTIDA</span><h1>Hola, {user.username} <em>✦</em></h1></div><p>Un paso para vos. Un lugar para tu gente.</p></div>}</div></div></>}
 
           {appRoute === "home" ? (
             <>
@@ -305,17 +315,19 @@ if (user && needsPlayerOnboarding(user)) {
                   onRewardClaimed={refreshPendingRewards}
                 />
               )}
+              {["benefits", "ticket", "ranking"].includes(tab) && <div className="profile-dashboard-links"><button type="button" onClick={()=>handleNavigate("profile")}>← Volver al perfil</button></div>}
               {tab === "ticket" && (
                 <TicketTab user={user} onPointsUpdate={handlePointsUpdate} />
               )}
               {tab === "ranking" && <LeaderboardTab user={user} />}
               {tab === "profile" && (
-                <ProfileTab
+                <><div className="profile-dashboard-links"><button type="button" onClick={()=>handleNavigate("benefits")}>🎁 Mis beneficios{pendingRewards > 0 ? ` · ${pendingRewards} pendientes` : ""}</button><button type="button" onClick={()=>handleNavigate("ticket")}>🎟 Mis entradas</button></div><button type="button" className="profile-character-link" onClick={()=>handleNavigate("character")}>👕 Mi personaje · Avatar y equipamiento →</button><ProfileTab
                   user={user}
                   onLogout={handleLogout}
                   onRestartTour={handleRestartTour}
-                />
+                /></>
               )}
+              {tab === "character" && <section className="character-screen"><button type="button" className="character-back" onClick={()=>handleNavigate("profile")}>← Volver al perfil</button><h1>Mi personaje</h1><p>Tu avatar, tu equipo y tu inventario.</p><UserCardProfile userId={user.id}/></section>}
               {tab === "benefits" && (
                 <BenefitsTab user={user} onPointsUpdate={handlePointsUpdate} />
               )}
@@ -341,7 +353,7 @@ if (user && needsPlayerOnboarding(user)) {
               onBackHome={goHome}
                debutRequested={false}
                onMatchRecorded={() => setHasPlayedMatch(true)}
-              onNavigate={(target) => { goHome(); handleNavigate(target); }}
+              onNavigate={handleNavigate}
 
             />
           )}
@@ -356,14 +368,7 @@ if (user && needsPlayerOnboarding(user)) {
             />
           )}
 
-          {appRoute === "home" && (
-            <BottomNav
-  activeTab={tab}
-  onTabChange={handleTabChange}
-  onEnterGame={() => enterGame("game")}
-  pendingRewards={pendingRewards}
-/>
-          )}
+
         </ErrorBoundary>
       </div>
     </ToastProvider>

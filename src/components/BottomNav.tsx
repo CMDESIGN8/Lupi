@@ -27,15 +27,7 @@ export function BottomNav({
         Inicio
       </button>
 
-      <button
-        className={`nav-item${activeTab === "shop" ? " active" : ""}`}
-        onClick={() => onTabChange("shop")}
-        aria-current={activeTab === "shop" ? "page" : undefined}
-        aria-label="Tienda"
-      >
-        <span className="nav-icon">🛒</span>
-        Tienda
-      </button>
+      <a className="nav-item" href="/futsal" aria-label="Futsal"><span className="nav-icon">⚽</span>Futsal</a>
 
       <button
         className="nav-item game-nav-main"
@@ -46,26 +38,15 @@ export function BottomNav({
         Jugar
       </button>
 
-      <button
-        className={`nav-item${activeTab === "benefits" ? " active" : ""}`}
-        onClick={() => onTabChange("benefits")}
-        aria-current={activeTab === "benefits" ? "page" : undefined}
-        aria-label="Beneficios"
-      >
-        <span className="nav-icon nav-icon-rel">
-          🎁
-          <NavBadge count={pendingRewards} />
-        </span>
-        Beneficios
-      </button>
+      <button className={`nav-item${activeTab === "shop" ? " active" : ""}`} onClick={() => onTabChange("shop")} aria-current={activeTab === "shop" ? "page" : undefined}><span className="nav-icon">🛒</span>Tienda</button>
 
       <button
-        className={`nav-item${activeTab === "profile" ? " active" : ""}`}
+        className={`nav-item${(activeTab === "profile" || activeTab === "character" || activeTab === "benefits") ? " active" : ""}`}
         onClick={() => onTabChange("profile")}
-        aria-current={activeTab === "profile" ? "page" : undefined}
+        aria-current={(activeTab === "profile" || activeTab === "character" || activeTab === "benefits") ? "page" : undefined}
         aria-label="Perfil"
       >
-        <span className="nav-icon">👤</span>
+        <span className="nav-icon nav-icon-rel">👤<NavBadge count={pendingRewards} /></span>
         Perfil
       </button>
     </nav>

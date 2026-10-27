@@ -1,3 +1,5 @@
+import { MissionBriefing } from "../components/MissionBriefing";
+import type { DailyMission } from "../types/campaignStory";
 import { supabase } from "../lib/supabaseClient";
 import { CommunitiesPanel } from "../components/CommunitiesPanel";
 import { AvatarFace } from "../components/AvatarFace";
@@ -388,7 +390,7 @@ import { useAchievements } from "../hooks/useAchievements";
       debutRequested = false,
       onMatchRecorded,
     }: Props) {
-      const [view, setView] = useState<"lobby" | "match">("lobby");
+      const [view, setView] = useState<"lobby" | "match">(()=>new URLSearchParams(window.location.search).get("start")==="match"?"match":"lobby");
       const [showCommunities, setShowCommunities] = useState(false);
       const [lobbyCommunity, setLobbyCommunity] = useState<string | null>(null);
       const refreshLobbyCommunity = async () => {
@@ -429,6 +431,7 @@ import { useAchievements } from "../hooks/useAchievements";
       const { count: packCount, refresh: refreshPackCount } = usePacksCount(user.id);
       const {
   currentDay,
+  currentMissions,
   lobbyMission,
   claimReward,
   startMission,
@@ -508,7 +511,7 @@ const {
        const [welcomeDismissed, setWelcomeDismissed] = useState(() =>
         typeof window !== "undefined" && localStorage.getItem(`lupi_world_intro_v1_${user.id}`) === "1"
       );
-      const showFirstWelcome = adventure.ready && rewardsLoaded && !welcomeDismissed &&
+      const showFirstWelcome = view === "lobby" && adventure.ready && rewardsLoaded && !welcomeDismissed &&
         !claimedFirst.includes("welcome") && gameTab === "play" && view === "lobby";
       useEffect(() => {
         setLupiDialogueChars(0);
@@ -594,7 +597,7 @@ const {
       const adventureCopy: Record<AdventureStep, { title: string; description: string; button: string }> = {
         create_avatar: {title:"Creá tu identidad",description:"Elegí cómo te van a conocer en el mundo.",button:"VER PERFIL"},
         enter_world: {title:"Entrá a tu mundo",description:"Conocé el vestuario y a Lupi.",button:"EXPLORAR"},
-        equip_avatar: {title:"Dale estilo a tu personaje",description:"Tocá PERSONALIZAR, elegí una prenda y presioná EQUIPAR.",button:"PERSONALIZAR"},
+        equip_avatar: {title:"Dale estilo a tu personaje",description:"Tocá PERSONALIZAR para abrir el editor y darle tu estilo al personaje.",button:"PERSONALIZAR"},
         social: {title:"Saludá a la comunidad",description:"Mandá tu primer saludo en el chat para completar el desafío.",button:"VER SOCIAL"},
         open_pack: {title:"Descubrí tus primeras cartas",description:"Abrí un pack disponible en tu cuenta.",button:"ABRIR PACK"},
         build_team: {title:"Armá tu equipo",description:"Prepará cinco jugadores para tu primer partido.",button:"VER EQUIPO"},
@@ -810,6 +813,21 @@ const {
       
 
 
+      const homeMissionOpened = useRef(false);
+      const requestedHomeMission = useRef(new URLSearchParams(window.location.search).get("mission"));
+      const [missionBriefing,setMissionBriefing] = useState<DailyMission|null>(null);
+      useEffect(() => {
+        if (homeMissionOpened.current || new URLSearchParams(window.location.search).get("start") === "match") return;
+        const id = requestedHomeMission.current;
+        if (!id) return;
+        const requested = currentMissions.find(m => m.id === id);
+        if (!requested) return;
+        homeMissionOpened.current = true;
+        if (requested.type === "play_match") setMissionBriefing(requested);
+        else if (requested.type === "open_pack" && !requested.isCompleted) setShowPackModal(true);
+        // Social missions remain in the lobby, where the chat and rivals live.
+      }, [currentMissions]);
+
       const handleGameNavigate = (target: string) => {
         switch (target) {
           case "campaign":
@@ -920,6 +938,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
       return (
         <>
+        {missionBriefing && <MissionBriefing mission={missionBriefing} onStart={()=>{setMissionBriefing(null);openMatch("quick");}} onTeam={()=>{setMissionBriefing(null);setGameTab("deck");}} onClose={()=>setMissionBriefing(null)}/>}
         {showAvatarEditor && <AvatarEditor userId={user.id} onClose={() => setShowAvatarEditor(false)} />}
         <div className={`main-content gh-root ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""}`}>
           {showFirstWelcome && (

@@ -1363,3 +1363,9 @@
  .locker-selector-overlay .locker-selector--portal {padding: 12px !important;max-height: 85dvh !important;}
  .locker-selector-overlay .locker-items {grid-template-columns: 1fr 1fr;}
 }
+
+/* Portal selectors do not inherit styles scoped inside the lobby. */
+.locker-selector-overlay .locker-guide-step{display:flex;flex-direction:column;gap:8px;padding:14px;margin:0 0 16px;background:#071f29;border:1px solid #548b91;border-radius:11px;color:#e8f6f7}
+.locker-selector-overlay .locker-guide-step>span{font-size:10px;letter-spacing:1.3px;color:#7ee3db;font-weight:800}
+.locker-selector-overlay .locker-guide-step>strong{font-size:22px;line-height:1.25}
+.locker-selector-overlay .locker-guide-step>p{font-size:13px;line-height:1.6;margin:0;color:#bdd7db}

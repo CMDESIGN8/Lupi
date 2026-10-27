@@ -4140,3 +4140,14 @@
   }
 
 }
+
+/* Desktop equipment hint sits below Customize, away from the action dock. */
+@media(min-width:769px){
+ .gh-world .gh-locker-zone .locker-guide-hint{top:8px;bottom:auto;left:50%;transform:translateX(-50%);width:min(330px,85%);font-size:12px;line-height:1.4;padding:10px 14px;z-index:150}
+}
+
+/* Equipment controls share one square size in every viewport. */
+.gh-world .gh-locker-zone .locker-equipment .locker-slot{width:64px!important;height:64px!important;min-width:64px!important;min-height:64px!important;max-width:64px!important;max-height:64px!important;padding:8px!important;border-radius:13px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;aspect-ratio:1!important}
+.gh-world .gh-locker-zone .locker-slot .locker-slot-icon{width:100%;height:100%;display:grid;place-items:center}
+.gh-world .gh-locker-zone .locker-slot .locker-slot-guided-label{display:none!important}
+@media(max-width:700px){.gh-world .gh-locker-zone .locker-equipment .locker-slot{width:52px!important;height:52px!important;min-width:52px!important;min-height:52px!important;max-width:52px!important;max-height:52px!important;padding:6px!important}}

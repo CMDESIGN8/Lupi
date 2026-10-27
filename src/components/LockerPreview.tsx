@@ -332,14 +332,10 @@ export function LockerPreview({
         })}
       </div>
 
-      {/* Tutorial contextual: la explicación acompaña al selector, no al HUD. */}
-      {onboardingActive && !selectedSlot && !guideComplete && (
-        <div className="locker-guide-hint" role="status">✦ Elegí una de las prendas señaladas para equipar a tu personaje.</div>
-      )}
       {selectedSlot && createPortal(
         <div className="locker-selector-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) setSelectedSlot(null); }}>
         <div className={`locker-selector locker-selector--portal ${onboardingActive ? "locker-selector--tutorial" : ""}`} role="dialog" aria-modal="true" aria-label={`Elegir ${SLOT_META[selectedSlot].label}`} >
-          {onboardingActive && <div className="locker-guide-step"><span>✦ LUPI TE ACOMPAÑA · PASO 1 DE 2</span><strong>¡Dale tu estilo!</strong><p>Elegí una prenda disponible y tocá <b>EQUIPAR</b>. Vas a verla puesta en tu personaje.</p></div>}
+
           <div className="locker-selector-header">
             <div>
               <span>

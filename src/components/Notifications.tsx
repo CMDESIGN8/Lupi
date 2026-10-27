@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import { api, Notification } from '../lib/api';
 
 interface NotificationsProps {
@@ -10,7 +10,10 @@ export function Notifications({ userId }: NotificationsProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+  const [actionError, setActionError] = useState("");
+  const [marking, setMarking] = useState(false);
 
   useEffect(() => {
     loadNotifications();
@@ -25,21 +28,14 @@ export function Notifications({ userId }: NotificationsProps) {
     return () => unsubscribe();
   }, [userId]);
 
-  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-
-    if (showDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    if (!showDropdown) return;
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    dialog.showModal();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { if (dialog.open) dialog.close(); document.body.style.overflow = previousOverflow; };
   }, [showDropdown]);
 
   const loadNotifications = async () => {
@@ -63,6 +59,8 @@ export function Notifications({ userId }: NotificationsProps) {
   };
 
   const markAsRead = async (id: string) => {
+    if (marking || notifications.find(n => n.id === id)?.read) return;
+    setMarking(true); setActionError("");
     try {
       await api.markNotificationAsRead(id);
       setNotifications(prev =>
@@ -70,11 +68,14 @@ export function Notifications({ userId }: NotificationsProps) {
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
-      console.error('Error marking as read:', error);
+      setActionError('No pudimos marcar la notificación. Intentá otra vez.');
+    } finally { setMarking(false);
     }
   };
 
   const markAllAsRead = async () => {
+    if (marking) return;
+    setMarking(true); setActionError("");
     try {
       await api.markAllNotificationsAsRead(userId);
       setNotifications(prev =>
@@ -82,7 +83,8 @@ export function Notifications({ userId }: NotificationsProps) {
       );
       setUnreadCount(0);
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      setActionError('No pudimos marcar las notificaciones. Intentá otra vez.');
+    } finally { setMarking(false);
     }
   };
 
@@ -101,9 +103,9 @@ export function Notifications({ userId }: NotificationsProps) {
   };
 
   return (
-    <div className="notifications-container" ref={dropdownRef}>
+    <div className="notifications-container">
       <button 
-        className="notifications-bell"
+        type="button" aria-label={unreadCount ? `Notificaciones: ${unreadCount} sin leer` : "Notificaciones"} aria-haspopup="dialog" aria-expanded={showDropdown} className="notifications-bell"
         onClick={() => setShowDropdown(!showDropdown)}
       >
         <span className="bell-icon">🔔</span>
@@ -113,22 +115,23 @@ export function Notifications({ userId }: NotificationsProps) {
       </button>
 
       {showDropdown && (
-        <div className="notifications-dropdown">
+        <dialog ref={dialogRef} className="notifications-dropdown" aria-labelledby={titleId} onCancel={() => setShowDropdown(false)} onClose={() => setShowDropdown(false)} onClick={event => { if (event.target !== event.currentTarget) return; const box = event.currentTarget.getBoundingClientRect(); if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) closeDropdown(); }}>
           <div className="notifications-header">
-            <h3>Notificaciones</h3>
+            <h3 id={titleId}>Notificaciones</h3>
             <div className="header-actions">
               {unreadCount > 0 && (
-                <button onClick={markAllAsRead} className="mark-all-read">
+                <button type="button" disabled={marking} onClick={markAllAsRead} className="mark-all-read">
                   Marcar todas
                 </button>
               )}
               {/* Botón de cerrar */}
-              <button onClick={closeDropdown} className="close-dropdown" aria-label="Cerrar">
+              <button type="button" autoFocus onClick={closeDropdown} className="close-dropdown" aria-label="Cerrar">
                 ✕
               </button>
             </div>
           </div>
 
+          {actionError && <p role="alert" className="notifications-action-error">{actionError}</p>}
           <div className="notifications-list">
             {loading ? (
               <div className="notifications-loading">
@@ -144,7 +147,7 @@ export function Notifications({ userId }: NotificationsProps) {
               notifications.map(notification => (
                 <div
                   key={notification.id}
-                  className={`notification-item ${!notification.read ? 'unread' : ''}`}
+                  role="button" tabIndex={0} aria-disabled={marking || notification.read} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); void markAsRead(notification.id); } }} className={`notification-item ${!notification.read ? 'unread' : ''}`}
                   onClick={() => markAsRead(notification.id)}
                 >
                   <div className="notification-icon">
@@ -165,7 +168,7 @@ export function Notifications({ userId }: NotificationsProps) {
               ))
             )}
           </div>
-        </div>
+        </dialog>
       )}
 
       <style>{`
@@ -444,6 +447,15 @@ export function Notifications({ userId }: NotificationsProps) {
             padding: 12px 16px;
           }
         }
+        dialog.notifications-dropdown { position: fixed; inset: 0; margin: auto; width: min(460px, calc(100vw - 32px)); max-width: none; height: fit-content; max-height: calc(100dvh - 40px); padding: 0; color: #eff6fa; overflow: hidden; animation: none; }
+        dialog.notifications-dropdown[open] { display: flex; flex-direction: column; }
+        dialog.notifications-dropdown::backdrop { background: #020812b8; backdrop-filter: blur(4px); }
+        dialog.notifications-dropdown .notifications-header { flex-shrink: 0; gap: 10px; flex-wrap: wrap; }
+        dialog.notifications-dropdown .notifications-list { min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; }
+        dialog.notifications-dropdown .notification-content { min-width: 0; overflow-wrap: anywhere; }
+        dialog.notifications-dropdown .close-dropdown { min-width: 44px; min-height: 44px; }
+        dialog.notifications-dropdown .notifications-action-error { padding: 12px 20px; font-size: 13px; color: #ffbca8; }
+        dialog.notifications-dropdown button:focus-visible, dialog.notifications-dropdown [role="button"]:focus-visible { outline: 2px solid #74d8e3; outline-offset: -3px; }
       `}</style>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import { api, type AppUser } from "../lib/api";
 import "./Auth.css";
+import "./AuthFutsalAccess.css";
 
 type Mode = "login" | "register";
 type FormData = { email: string; password: string };
@@ -106,6 +107,14 @@ export function AuthScreen({ onAuth }: { onAuth: (u: AppUser) => void }) {
             <div className="auth-pillar"><span aria-hidden="true">👥</span><strong>CONECTÁ</strong><small>Tu comunidad</small></div>
             <div className="auth-pillar"><span aria-hidden="true">🏆</span><strong>PROGRESÁ</strong><small>XP, cartas y premios</small></div>
           </div>
+          <a className="auth-futsal-access" href="/futsal">
+            <span className="auth-futsal-access__icon" aria-hidden="true">⚽</span>
+            <span className="auth-futsal-access__copy">
+              <span className="auth-futsal-access__title">Ver tablas y videos</span>
+              <span className="auth-futsal-access__hint">Lupi Futsal · Sin registrarte</span>
+            </span>
+            <span className="auth-futsal-access__arrow" aria-hidden="true">→</span>
+          </a>
         </header>
 
         <section className="auth-card-v2" aria-label="Acceso a Lupi World">
