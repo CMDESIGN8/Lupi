@@ -96,16 +96,20 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [shopBusy,setShopBusy] = useState(false);
   const [shopMessage,setShopMessage] = useState("");
   const [shopCoins,setShopCoins] = useState<number | null>(null);
-  useEffect(() => { void supabase.from("shop_items").select("id,cost").in("id",["flores-club-camiseta-roja","flores-club-short-rojo"]).eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
+  useEffect(() => { void supabase.from("shop_items").select("id,cost").in("id",["flores-club-camiseta-roja","flores-club-short-rojo","flores-club-8va-camiseta-verde","flores-club-8va-short-negro"]).eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
   const buyFlores = async (ids: string[]) => {
     if(shopBusy || usingFallback) return;
     setShopBusy(true);setShopMessage("");
-    try { const {data,error}=await supabase.rpc("purchase_flores_outfit",{p_item_ids:ids});
+    try {
+      const is8va = ids.every(id => id.startsWith("flores-club-8va-"));
+      const {data,error} = is8va
+        ? await supabase.rpc("purchase_flores_8va", {p_bundle: ids.length > 1, p_item_id: ids.length === 1 ? ids[0] : null})
+        : await supabase.rpc("purchase_flores_outfit", {p_item_ids: ids});
       if(error) throw error;
       setShopCoins(data?.newCoins ?? null);
       await refresh();
       window.dispatchEvent(new CustomEvent("lupi:inventory-updated",{detail:{userId}}));
-      setShopMessage(data?.granted?.length ? "¡Compra realizada! Ya tenés tus prendas en el armario." : "Ya tenés estas prendas.");
+      setShopMessage(data?.success || data?.granted?.length ? "¡Compra realizada! Ya tenés tus prendas en el armario." : "Ya tenés estas prendas.");
     } catch(e) { setShopMessage(e instanceof Error ? e.message : "No se pudo completar la compra."); }
     finally {setShopBusy(false);} };
   const [draft, setDraft] = useState(appearance);
@@ -442,7 +446,9 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
               {OUTFIT_COLLECTIONS.map(collection => {
                 const progress = collectionProgress(collection, items);
                 const complete = progress.owned === progress.total;
-                const remaining = collection.itemIds.reduce((sum, id) => sum + (items.find(i => i.id === id)?.owned ? 0 : (shopPrices[id] ?? 0)), 0);
+                const missingCount = collection.itemIds.filter(id => !items.find(i => i.id === id)?.owned).length;
+                const subtotal = collection.itemIds.reduce((sum, id) => sum + (items.find(i => i.id === id)?.owned ? 0 : (shopPrices[id] ?? 0)), 0);
+                const remaining = collection.theme === "green" && missingCount === 2 ? Math.max(0, subtotal - 50) : subtotal;
                 const unavailable = collection.itemIds.some(id => !items.find(i => i.id === id)?.owned && shopPrices[id] == null);
                 return <div className="lupi-collections__shop-card lupi-flores-store" key={collection.id}>
                   <div className="lupi-flores-store__banner">
