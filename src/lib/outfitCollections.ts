@@ -6,17 +6,38 @@ export type OutfitCollection = {
   season: string;
   description: string;
   itemIds: readonly string[];
+  status?: "upcoming";
+  theme?: "red" | "green" | "muted";
 };
 
 // Los IDs son los registrados en aura_items. No modifica tablas ni inventarios.
 export const OUTFIT_COLLECTIONS: readonly OutfitCollection[] = [
   {
     id: "flores-club-2026",
-    title: "FLORES CLUB",
+    title: "FLORES CLUB · ARQUEROS",
     season: "TEMPORADA 2026",
-    description: "Uniforme rojo titular",
+    description: "Arqueros · Temporada 2026",
+    theme: "red",
     itemIds: ["flores-club-camiseta-roja", "flores-club-short-rojo"],
   },
+  {
+    id: "flores-club-8va-2026",
+    title: "FLORES CLUB · 8.ª DIVISIÓN",
+    season: "TEMPORADA 2026",
+    description: "Camiseta verde · Short negro · Sponsor LupiApp",
+    itemIds: ["flores-club-8va-camiseta-verde", "flores-club-8va-short-negro"],
+    theme: "green",
+    status: "upcoming",
+  },
+  ...[7, 6, 5].map(division => ({
+    id: `flores-club-${division}division-2026`,
+    title: `FLORES CLUB · ${division}.ª DIVISIÓN`,
+    season: "TEMPORADA 2026",
+    description: "Próximamente",
+    itemIds: [] as string[],
+    status: "upcoming" as const,
+    theme: "muted" as const,
+  })),
 ];
 
 export function collectionProgress(collection: OutfitCollection, items: InventoryItem[]) {

@@ -77,3 +77,50 @@
  .lupi-flores-store__banner {gap:9px}
  .lupi-flores-store__completion {flex:1 1 100%}
 }
+
+/* V6.23 — compact horizontal collection tiles */
+.lupi-collections--wardrobe{padding:10px;min-width:0}
+.lupi-collections__card-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.lupi-collection-tile{position:relative;display:grid;grid-template-columns:minmax(50px,38%) minmax(0,1fr);grid-template-rows:minmax(80px,1fr) auto;gap:5px 8px;min-width:0;padding:9px;border:1px solid #25677a;border-radius:10px;background:linear-gradient(140deg,#092a3a,#041827);overflow:hidden}
+.lupi-collection-tile--red{border-color:#c34a4a;background:linear-gradient(130deg,#38141b,#071d2b 72%)}
+.lupi-collection-tile--green{border-color:#b4d55c;background:linear-gradient(130deg,#143d2f,#071e2c 72%)}
+.lupi-collection-tile.is-upcoming{opacity:.72}
+.lupi-collection-tile__visual{display:flex;align-items:center;justify-content:center;gap:0;min-width:0;min-height:77px}
+.lupi-collection-tile__visual img{width:53%;max-height:91px;object-fit:contain;filter:drop-shadow(0 5px 6px #0009)}
+.lupi-collection-tile__visual img:only-child{width:90%}
+.lupi-collection-tile__placeholder{font-size:50px;color:#526576;line-height:1}
+.lupi-collection-tile--green .lupi-collection-tile__placeholder{color:#2a9973}
+.lupi-collection-tile__placeholder--1{font-size:38px}
+.lupi-collection-tile__copy{min-width:0;display:flex;flex-direction:column;justify-content:center;gap:5px}
+.lupi-collection-tile__copy strong{font-size:clamp(10px,1vw,14px);line-height:1.2;color:#fff;overflow-wrap:anywhere}
+.lupi-collection-tile__copy small{font-size:9px;color:#9abcc7}
+.lupi-collection-tile__coming{font-size:9px;color:#a7b6c2;font-weight:800}
+.lupi-collection-tile__footer{grid-column:1/-1;display:grid;gap:6px}
+.lupi-collection-tile__footer .lupi-collections__bar{height:5px}
+.lupi-collection-tile__footer .lupi-collections__progress{font-size:10px}
+.lupi-collection-tile__equip{grid-column:1/-1;background:#073e48;border:1px solid #1cb6b5;border-radius:6px;color:#c8fffb;font-size:10px;min-height:29px}
+@media(min-width:1100px){.lupi-collections__card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:520px){.lupi-collections--wardrobe{padding:7px}.lupi-collections__card-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.lupi-collection-tile{grid-template-columns:40% minmax(0,1fr);padding:6px;gap:4px}.lupi-collection-tile__visual{min-height:64px}.lupi-collection-tile__visual img{max-height:65px}.lupi-collection-tile__copy strong{font-size:9px}.lupi-collection-tile__copy small,.lupi-collection-tile__coming{font-size:7px}}
+
+/* V6.24 — collection gallery: two readable premium cards per row */
+.lupi-collections--wardrobe{padding:clamp(8px,1vw,14px);overflow:visible}
+.lupi-collections__card-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:clamp(8px,1.4vw,16px)!important;align-items:stretch}
+.lupi-collection-tile{display:flex!important;flex-direction:column!important;align-items:stretch;min-width:0!important;min-height:220px;padding:clamp(8px,1.2vw,14px)!important;gap:8px!important;border:1.5px solid #30586a;border-radius:12px;overflow:hidden;background:linear-gradient(150deg,#0d2638,#051725);box-shadow:inset 0 0 24px #0006}
+.lupi-collection-tile--red{border-color:#fb394d;background:repeating-linear-gradient(140deg,transparent 0 42px,#9b162114 43px 57px),linear-gradient(140deg,#3b0b19,#120b18 68%);box-shadow:inset 0 0 20px #ac1e2530,0 0 12px #d71e2b16}
+.lupi-collection-tile--green{border-color:#c2e04c;background:repeating-linear-gradient(140deg,transparent 0 42px,#2fb95e10 43px 57px),linear-gradient(140deg,#0b382a,#071d20 72%);box-shadow:inset 0 0 20px #59d63a1e,0 0 12px #c0e04b19}
+.lupi-collection-tile--muted{border-color:#315267;background:linear-gradient(140deg,#102a39,#061a29)}
+.lupi-collection-tile.is-upcoming{opacity:1}
+.lupi-collection-tile__heading{display:flex;flex-direction:column;gap:2px;min-width:0;line-height:1.18}
+.lupi-collection-tile__heading strong{font-size:clamp(11px,1.2vw,17px);letter-spacing:.5px;white-space:normal;overflow-wrap:normal;word-break:normal;color:white}
+.lupi-collection-tile__heading span{font-size:clamp(11px,1.1vw,16px);color:#8de3ef;white-space:normal;word-break:normal}
+.lupi-collection-tile__heading small{font-size:clamp(9px,.8vw,12px);color:#c0cfd8}
+.lupi-collection-tile__visual{display:flex;align-items:center;justify-content:center;gap:3px;flex:1;min-height:100px!important;max-height:210px;overflow:hidden}
+.lupi-collection-tile__visual img{width:49%;height:100%;max-height:190px;min-width:0;object-fit:contain;filter:drop-shadow(0 7px 9px #000b)}
+.lupi-collection-tile__visual img:only-child{width:85%}
+.lupi-collection-tile__placeholder{font-size:clamp(42px,5vw,75px);color:#526879}
+.lupi-collection-tile__footer{display:flex!important;flex-direction:column;gap:6px;margin-top:auto;width:100%}
+.lupi-collection-tile__footer .lupi-collections__bar{height:6px}
+.lupi-collection-tile__footer .lupi-collections__progress{font-size:clamp(9px,.8vw,12px);gap:4px}
+.lupi-collection-tile__equip{width:100%;padding:6px 4px;min-height:28px;font-size:10px}
+.lupi-collection-tile__coming{text-align:center;color:#d2d9e2;font-size:10px;letter-spacing:.5px;font-weight:800}
+@media(max-width:520px){.lupi-collections--wardrobe{padding:7px}.lupi-collections__card-grid{gap:7px!important}.lupi-collection-tile{min-height:175px;padding:7px!important;gap:6px!important}.lupi-collection-tile__heading strong{font-size:11px}.lupi-collection-tile__heading span{font-size:10px}.lupi-collection-tile__heading small{font-size:8px}.lupi-collection-tile__visual{min-height:82px!important;max-height:115px}.lupi-collection-tile__visual img{max-height:110px}.lupi-collection-tile__footer .lupi-collections__progress{font-size:9px}.lupi-collection-tile__coming{font-size:8px}}

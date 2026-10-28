@@ -1,3 +1,5 @@
+import flores8vaCamisetaPreview from "../assets/flores-8va-camiseta-preview.webp";
+import flores8vaShortPreview from "../assets/flores-8va-short-preview.webp";
 import { supabase } from "../lib/supabaseClient";
 // src/components/AvatarEditor.tsx
 import { createPortal } from "react-dom";
@@ -495,26 +497,36 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
               {showCollections && wardrobeTab === "wardrobe" ? (
                   <section className="lupi-collections lupi-collections--wardrobe" aria-label="Colecciones de uniformes">
                   <div className="lupi-collections__heading">COLECCIONES <span>UNIFORMES</span></div>
-                  {OUTFIT_COLLECTIONS.map(collection => {
-                    const progress = collectionProgress(collection, items);
-                    const complete = progress.owned === progress.total;
-                    return <div className="lupi-collections__detail" key={collection.id}>
-                      <div className="lupi-collections__info"><strong>{collection.title}</strong><small>{collection.season} · {collection.description}</small></div>
-                      <div className="lupi-collections__progress"><span>{progress.owned} / {progress.total} prendas</span><span>{Math.round(progress.owned / Math.max(progress.total,1) * 100)}%</span></div>
-                      <div className="lupi-collections__bar"><div style={{width:`${progress.owned / Math.max(progress.total,1) * 100}%`}} /></div>
-                      <div className="lupi-collections__items">{collection.itemIds.map(id => {
-                        const item = items.find(entry => entry.id === id);
-                        return <div className="lupi-collections__piece" key={id} title={item?.name ?? id}>
-                          {item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span>?</span>}
-                          {item?.owned && <span className="lupi-collections__owned">✓</span>}
-                        </div>;
-                      })}</div>
-                      <button className="lupi-collections__equip" type="button" disabled={!complete || progress.equipped || outfitBusy || usingFallback}
-                        onClick={() => void equipOutfit(collection.itemIds)}>
-                        {progress.equipped ? "✓ CONJUNTO EQUIPADO" : !complete ? "CONJUNTO INCOMPLETO" : outfitBusy ? "EQUIPANDO…" : "EQUIPAR CONJUNTO"}
-                      </button>
-                    </div>;
-                  })}
+                  <div className="lupi-collections__card-grid">
+                    {OUTFIT_COLLECTIONS.map(collection => {
+                      const progress = collectionProgress(collection, items);
+                      const total = progress.total;
+                      const percentage = total ? Math.round(progress.owned / total * 100) : 0;
+                      const complete = total > 0 && progress.owned === total;
+                      const upcoming = collection.status === "upcoming" && !progress.owned;
+                      const category = collection.theme === "red" ? "Arqueros" : collection.theme === "green" ? "8.ª División" : collection.title.split("·").pop()?.trim() ?? "División";
+                      return <article className={`lupi-collection-tile lupi-collection-tile--${collection.theme ?? "muted"} ${upcoming ? "is-upcoming" : ""}`} key={collection.id}>
+                        <div className="lupi-collection-tile__heading">
+                          <strong>FLORES CLUB</strong>
+                          <span>{category}</span>
+                          <small>Temporada 2026</small>
+                        </div>
+                        <div className="lupi-collection-tile__visual" aria-label={`Uniforme ${category}`}>
+                          {collection.itemIds.length ? collection.itemIds.map((id, index) => {
+                            const item = items.find(entry => entry.id === id);
+                            const preview = collection.theme === "green" ? (index === 0 ? flores8vaCamisetaPreview : flores8vaShortPreview) : undefined;
+                            return item?.imageUrl || preview ? <img key={id} src={item?.imageUrl || preview} alt={index === 0 ? `Camiseta ${category}` : `Short ${category}`} /> :
+                              <span className="lupi-collection-tile__placeholder" key={id} aria-hidden="true">♟</span>;
+                          }) : <span className="lupi-collection-tile__placeholder" aria-hidden="true">♟</span>}
+                        </div>
+                        <div className="lupi-collection-tile__footer">
+                          <div className="lupi-collections__bar"><div style={{width:`${percentage}%`}} /></div>
+                          <div className="lupi-collections__progress"><span>{progress.owned}/{total} prendas</span><span>{percentage}%</span></div>
+                        </div>
+                        {complete ? <button className="lupi-collection-tile__equip" type="button" disabled={progress.equipped || outfitBusy || usingFallback} onClick={() => void equipOutfit(collection.itemIds)}>{progress.equipped ? "✓ EQUIPADO" : "EQUIPAR CONJUNTO"}</button> : upcoming ? <div className="lupi-collection-tile__coming">🔒 PRÓXIMAMENTE</div> : null}
+                      </article>;
+                    })}
+                  </div>
                   {outfitError && <p role="alert">{outfitError}</p>}
                 </section>
               ) : (<>
