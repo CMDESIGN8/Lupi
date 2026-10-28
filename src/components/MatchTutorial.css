@@ -17,3 +17,33 @@
 @media(max-width:600px){.match-tutorial{padding:20px 16px;border-radius:18px}.mt-content{min-height:0}.gh-root--playing .arena-header .arena-title{font-size:16px;flex-wrap:wrap}.gh-root--playing .arena-header .deck-link-btn{width:100%;font-size:14px}.gh-root--playing .gh-match__bar button{min-height:44px;font-size:13px}.gh-root--playing .arena-container .dp-opt-group{display:none}.gh-root--playing .arena-container .dp-stats-row{display:none}}
 
 .gh-root .gh-return-preview{display:block;width:100%;min-height:48px;padding:12px 16px;margin:12px 0;background:#113646;color:#b4f7ff;border:1px solid #39d3e5;border-radius:12px;font:700 14px/1.4 system-ui,sans-serif;cursor:pointer}
+
+/* Cinematic briefing: scoped effects, no game-engine or reward changes. */
+.mt-cinematic{position:relative;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 10% 0%,#14445b80,transparent 60%),linear-gradient(155deg,#0b1d2c,#050c16);border-color:#3dcde64d;box-shadow:0 24px 80px #0008,inset 0 1px #b8faff26;animation:mt-arrive .6s cubic-bezier(.16,1,.3,1) both}
+.mt-cinematic>header,.mt-cinematic>.mt-dots,.mt-cinematic>.mt-content,.mt-cinematic>footer{position:relative;z-index:1}
+.mt-atmosphere{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:linear-gradient(#77e8ff05 1px,transparent 1px),linear-gradient(90deg,#77e8ff05 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(#000,transparent)}
+.mt-atmosphere i{position:absolute;width:110px;height:600px;top:-300px;left:0;background:linear-gradient(180deg,#45dfff20,transparent);transform:rotate(-30deg);filter:blur(18px);animation:mt-light 12s ease-in-out infinite alternate}
+.mt-atmosphere i:nth-child(2){left:80%;animation-delay:-6s;background:linear-gradient(180deg,#b896ff24,transparent)}
+.mt-atmosphere i:nth-child(3){width:3px;height:3px;top:25%;left:90%;filter:none;border-radius:50%;background:#baf9ff;box-shadow:-80px 120px #61d9ff,-240px 30px #f6d77980,-120px 300px #61d9ff80;animation:mt-particles 8s ease-in-out infinite alternate}
+.mt-cinematic .mt-content{animation:mt-reveal .42s cubic-bezier(.16,1,.3,1) both;transition:opacity .18s,transform .18s}
+.mt-cinematic.mt-state--out .mt-content{opacity:0;transform:translateY(-12px);animation:none}
+.mt-cinematic h1{text-shadow:0 4px 24px #0008;font-weight:900}
+.mt-cinematic .mt-team article{border:1px solid #76dfff20;background:linear-gradient(110deg,#143448cc,#0b1b2a);box-shadow:inset 3px 0 #2dd9ec;animation:mt-card .45s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--card-order)*65ms)}
+.mt-cinematic .mt-team b{color:#f4dc89}.mt-cinematic .mt-shirt{filter:drop-shadow(0 0 10px #2ed7ec60)}
+.mt-cinematic .mt-dots i{transition:background .3s,box-shadow .3s}.mt-cinematic .mt-dots i.active{box-shadow:0 0 12px #2ed7ec80}
+.mt-cinematic .mt-next{position:relative;overflow:hidden;background:linear-gradient(110deg,#63f3ef,#21c6e7);box-shadow:0 6px 22px #18cce32e;transition:transform .2s,box-shadow .2s}
+.mt-cinematic .mt-next:before{content:'';position:absolute;inset:-100% auto -100% -50%;width:22%;background:#fff4;transform:rotate(25deg);animation:mt-sheen 5s ease-in-out infinite;pointer-events:none}
+@media(hover:hover){.mt-cinematic button:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px #2ed7ec30}}
+.mt-cinematic button:active:not(:disabled){transform:scale(.98)}
+.mt-cinematic .mt-symbol{filter:drop-shadow(0 0 20px #40ddff60);animation:mt-emblem .6s cubic-bezier(.16,1,.3,1) both}
+.mt-cinematic .mt-example{border:1px solid #48d9ef26;background:linear-gradient(120deg,#133143,#0c1d30)}
+.mt-kickoff{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;background:radial-gradient(ellipse,#16475d,#050c16 75%);animation:mt-reveal .3s both}
+.mt-kickoff span{font-size:12px;letter-spacing:.3em;color:#72e6f1}.mt-kickoff strong{font-size:clamp(32px,8vw,48px);font-style:italic;color:#fff;animation:mt-emblem .7s both}.mt-kickoff small{color:#abc8d5}
+@keyframes mt-arrive{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes mt-reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes mt-card{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes mt-emblem{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes mt-light{to{transform:translateX(90px) rotate(-12deg);opacity:.5}}
+@keyframes mt-particles{to{transform:translateY(-24px);opacity:.3}}
+@keyframes mt-sheen{0%,65%{left:-50%}100%{left:150%}}
+@media(prefers-reduced-motion:reduce){.mt-cinematic,.mt-cinematic *,.mt-cinematic *:before{animation:none!important;transition:none!important}}

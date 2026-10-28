@@ -640,9 +640,9 @@ export function CardBattle({
           <span>⚽</span><span>FLORES CLUB ARENA</span>
           <span className="arena-badge">FUTSAL</span>
         </div>
-        <button className="deck-link-btn" onClick={onNavigateToDeck}>
+        {phase === 'select' && <button className="deck-link-btn" onClick={onNavigateToDeck}>
           📋 Ver mi equipo <span className="deck-count">{deckCards.length}/5</span>
-        </button>
+        </button>}
       </div>
 
       {/* ════════════════════════ CANCHA ════════════════════════ */}
