@@ -940,7 +940,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
         <>
         {missionBriefing && <MissionBriefing mission={missionBriefing} onStart={()=>{setMissionBriefing(null);openMatch("quick");}} onTeam={()=>{setMissionBriefing(null);setGameTab("deck");}} onClose={()=>setMissionBriefing(null)}/>}
         {showAvatarEditor && <AvatarEditor userId={user.id} onClose={() => setShowAvatarEditor(false)} />}
-        <div className={`main-content gh-root ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""}`}>
+        <div className={`main-content gh-root ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""} ${gameTab === "deck" && view === "match" ? "gh-root--team-preview" : ""}`}>
           {showFirstWelcome && (
             <div className={`lupi-first-welcome lupi-anime-intro${welcomeExiting ? " is-exiting" : ""}`} role="presentation">
               <section className="lupi-anime-intro__scene" role="dialog" aria-modal="true" aria-labelledby="lupi-anime-title">

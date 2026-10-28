@@ -4165,3 +4165,14 @@
 @media(max-width:480px){
  .gh-root .gh-hud .gh-back.gh-back--home {font-size:12px;padding:8px 10px;gap:5px;}
 }
+
+/* Beta04: edición de mazo desde la previa, sin HUD de lobby. */
+.gh-root.gh-root--team-preview .gh-hud,.gh-root.gh-root--team-preview .gh-light{display:none!important}
+.gh-root.gh-root--team-preview{padding-top:12px!important;background:#06131c}
+.gh-root.gh-root--team-preview .gh-shell{padding-top:0!important}
+.gh-root.gh-root--team-preview .gh-return-preview{margin-top:0}
+/* Regreso integrado como navegación, conservando área táctil. */
+.gh-root .gh-hud .gh-back.gh-back--home{background:transparent;border:0;border-radius:0;box-shadow:none;color:#b6d2d9;min-height:44px;padding:8px 4px;font-size:11px;letter-spacing:.04em;gap:7px}
+.gh-root .gh-hud .gh-back.gh-back--home span{font-size:19px;color:#66dcf0}
+.gh-root .gh-hud .gh-back.gh-back--home:hover{background:#62d6eb0d;color:#fff}
+@media(max-width:600px){.gh-root:has(.gh-world) .gh-hud{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:6px 10px!important;clip-path:none!important}.gh-root:has(.gh-world) .gh-hud .gh-back--home{grid-column:1/-1;grid-row:1;justify-self:start}.gh-root:has(.gh-world) .gh-hud .gh-brand{grid-column:1;grid-row:2}.gh-root:has(.gh-world) .gh-hud .gh-hud__right{grid-column:2;grid-row:2;gap:5px}.gh-root:has(.gh-world) .gh-hud .gh-wallet{padding:5px 7px;font-size:12px;min-width:0}}
