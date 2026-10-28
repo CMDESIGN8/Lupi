@@ -47,3 +47,20 @@
 @keyframes mt-particles{to{transform:translateY(-24px);opacity:.3}}
 @keyframes mt-sheen{0%,65%{left:-50%}100%{left:150%}}
 @media(prefers-reduced-motion:reduce){.mt-cinematic,.mt-cinematic *,.mt-cinematic *:before{animation:none!important;transition:none!important}}
+
+/* Beta05: quinteto final con el arte original de la bienvenida. */
+.mt-cinematic:has(.mt-lineup){max-width:760px;background:radial-gradient(ellipse at 50% 70%,#087f8540,transparent 65%),linear-gradient(145deg,#0c2332,#040f1b)}
+.mt-lineup{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 30px;padding:18px 14px 24px;max-width:540px;margin:auto;position:relative;background:repeating-linear-gradient(115deg,transparent 0 20%,#a4ffff04 20% 28%,transparent 28% 40%)}
+.mt-lineup-slot{min-width:0;text-align:center;animation:mt-card .65s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--card-order)*100ms)}
+.mt-lineup-slot:last-child:nth-child(odd){grid-column:1/-1;width:calc((100% - 30px)/2);justify-self:center}
+.match-tutorial .mt-card-button{display:block;position:relative;width:100%;aspect-ratio: .7;padding:0;border:0;border-radius:16px;background:transparent;min-height:0;transition:transform .25s,filter .25s}
+.mt-card-button .starter-card{--display:'Barlow Condensed','Arial Narrow',sans-serif;font-family:system-ui,sans-serif}
+.mt-card-button .starter-card__top strong{font-size:24cqw}.mt-card-button .starter-card__position{font-size:7cqw}
+.mt-card-button .starter-card__bottom{padding-bottom:16%}.mt-card-button .starter-card__bottom h3{font-size:10cqw;line-height:1;margin:0}.mt-card-button .starter-card__rarity{font-size:6cqw;margin-top:5px}
+.mt-card-hint{position:absolute;bottom:4%;left:7%;right:7%;border-radius:20px;background:#03101dda;color:#e1fcff;font-size:10px;letter-spacing:.12em;padding:4px}
+.mt-role{display:block;color:#a8e4df;font-size:10px;letter-spacing:.12em;margin-top:9px}.mt-lineup-subtitle{text-align:center;font-size:11px!important;letter-spacing:.12em;color:#7ddfdc!important}
+.mt-player-detail{padding:16px;border:1px solid #51d7e84d;border-radius:14px;background:#071a27;margin-bottom:14px}.mt-player-detail>div{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.mt-player-detail span{font-size:11px;color:#aac5d4}.mt-player-detail b{display:block;font-size:22px;color:#f0d98d}.mt-player-detail button{width:100%;background:transparent;color:#bceaf0;border:1px solid #35616f}
+.mt-dt{display:flex;align-items:center;gap:14px;padding:14px;background:#061521cc;border:1px solid #58d9df4d;border-radius:16px;margin-bottom:14px}.mt-dt>span{font-size:34px;color:#52dcd8}.mt-dt p{margin:0;font-size:13px}.mt-dt strong{display:block;color:#64e7df;font-size:11px;letter-spacing:.12em;margin-bottom:6px}
+@media(max-width:380px){.mt-lineup{gap:18px;padding:12px 0}.mt-lineup-slot:last-child:nth-child(odd){width:calc((100% - 18px)/2)}.mt-card-hint{font-size:8px}}
+@media(hover:hover){.match-tutorial .mt-card-button:hover{transform:translateY(-6px) scale(1.02);filter:brightness(1.1)}}
+@media(prefers-reduced-motion:reduce){.mt-lineup-slot{animation:none!important}.match-tutorial .mt-card-button{transition:none!important}}

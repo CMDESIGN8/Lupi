@@ -231,7 +231,7 @@ function preloadArt(items: UserCard[]) {
   }
 }
 
-const CardFace = memo(function CardFace({ item, index, variant = "full" }: { item: UserCard; index: number; variant?: Variant }) {
+export const CardFace = memo(function CardFace({ item, index, variant = "full" }: { item: UserCard; index: number; variant?: Variant }) {
   const card = item.card;
   if (!card) return null;
   const rarity = rarityFor(Number(card.overall_rating) || 0);
