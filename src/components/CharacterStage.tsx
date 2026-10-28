@@ -54,7 +54,7 @@ export function CharacterStage({ items, appearance, mode, level, xp, xpNeeded }:
       {mode === "full" ? (
         <div
           className="lw-id__avatar"
-          style={{ top: `calc(50% - ${AVATAR_VISIBLE_H * scale / 2 + AVATAR_TOP_TRIM * scale}px)`, transform: `translateX(-50%) scale(${scale})` } as CSSProperties}
+          style={{ top: `calc(50% - ${AVATAR_VISIBLE_H * scale / 2 + AVATAR_TOP_TRIM * scale}px - var(--avatar-mobile-lift, 0px))`, transform: `translateX(-50%) scale(${scale})` } as CSSProperties}
         >
           <Avatar2D items={items} appearance={appearance} />
         </div>

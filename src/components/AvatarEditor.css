@@ -1665,3 +1665,12 @@
     grid-template-rows: minmax(160px, 29dvh) 44px minmax(0, 1fr) auto !important;
   }
 }
+
+/* V6.17 — mobile finishing pass: align avatar feet with the background's
+   illuminated platform, and avoid drawing a second floor ring. */
+@media (max-width: 860px) {
+  .lw-id__character { --avatar-mobile-lift: 12px; }
+  .lw-id__character .lw-id__ring { display: none !important; }
+  .lw-id__character .lw-id__spot { opacity: .35; }
+  .lw-id__wardrobe-body { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+}
