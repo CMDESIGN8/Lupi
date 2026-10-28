@@ -27,7 +27,6 @@ export const OUTFIT_COLLECTIONS: readonly OutfitCollection[] = [
     description: "Camiseta verde · Short negro · Sponsor LupiApp",
     itemIds: ["flores-club-8va-camiseta-verde", "flores-club-8va-short-negro"],
     theme: "green",
-    status: "upcoming",
   },
   ...[7, 6, 5].map(division => ({
     id: `flores-club-${division}division-2026`,

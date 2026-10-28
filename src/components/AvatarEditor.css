@@ -1856,3 +1856,10 @@
  .lw-id__cats button span {font-size:8px;}
  .lw-id__collection-icon {font-size:20px!important;}
 }
+
+/* V6.25 — one scroll owner in wardrobe; categories remain visible */
+.lw-id__panel--wardrobe .lw-id__wardrobe-body{min-height:0;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#0bc8dc #082635;padding-bottom:28px!important}
+.lw-id__wardrobe-body>.lupi-collections--wardrobe{overflow:visible!important;max-height:none!important;height:auto!important;min-height:min-content!important;flex:0 0 auto!important}
+.lw-id__wardrobe-body>.lw-id__scroll{overflow:visible!important;max-height:none!important;height:auto!important;flex:none!important}
+.lw-id__wardrobe-body>.lw-id__cats{position:sticky;top:0;z-index:8;background:#051d2bf2;padding:5px 0 7px;margin-top:0;backdrop-filter:blur(9px)}
+@media(max-width:860px){.lw-id__panel--wardrobe{min-height:0!important;overflow:hidden!important}.lw-id__panel--wardrobe .lw-id__wardrobe-body{flex:1 1 auto!important;min-height:0!important;max-height:100%!important}.lw-id__wardrobe-body>.lupi-collections--wardrobe{padding-bottom:18px!important}}

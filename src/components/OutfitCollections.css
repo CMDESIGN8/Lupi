@@ -124,3 +124,43 @@
 .lupi-collection-tile__equip{width:100%;padding:6px 4px;min-height:28px;font-size:10px}
 .lupi-collection-tile__coming{text-align:center;color:#d2d9e2;font-size:10px;letter-spacing:.5px;font-weight:800}
 @media(max-width:520px){.lupi-collections--wardrobe{padding:7px}.lupi-collections__card-grid{gap:7px!important}.lupi-collection-tile{min-height:175px;padding:7px!important;gap:6px!important}.lupi-collection-tile__heading strong{font-size:11px}.lupi-collection-tile__heading span{font-size:10px}.lupi-collection-tile__heading small{font-size:8px}.lupi-collection-tile__visual{min-height:82px!important;max-height:115px}.lupi-collection-tile__visual img{max-height:110px}.lupi-collection-tile__footer .lupi-collections__progress{font-size:9px}.lupi-collection-tile__coming{font-size:8px}}
+
+/* V6.25 — compact, legible two-column collection cards in the wardrobe */
+.lupi-collections--wardrobe{min-width:0!important;width:100%;box-sizing:border-box}
+.lupi-collections__card-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+.lupi-collection-tile{box-sizing:border-box;min-width:0!important;overflow:hidden;min-height:0!important}
+.lupi-collection-tile__heading{width:100%;min-width:0;overflow:hidden}
+.lupi-collection-tile__heading strong{font-size:clamp(10px,1.05vw,15px);line-height:1.2;overflow-wrap:break-word;word-break:normal;hyphens:none}
+.lupi-collection-tile__heading span{font-size:clamp(10px,.9vw,13px)}
+.lupi-collection-tile__visual{flex:0 0 auto;min-height:95px!important;height:clamp(100px,11vw,155px);max-height:none!important}
+.lupi-collection-tile__visual img{max-height:100%;width:48%;object-fit:contain}
+.lupi-collection-tile__footer{flex:0 0 auto}
+@media(max-width:860px){.lupi-collections__card-grid{gap:7px!important}.lupi-collection-tile{padding:7px!important;gap:6px!important}.lupi-collection-tile__visual{height:clamp(78px,22vw,120px);min-height:78px!important}.lupi-collection-tile__heading strong{font-size:clamp(10px,2.8vw,13px)}.lupi-collection-tile__heading span{font-size:10px}.lupi-collection-tile__heading small{font-size:8px}.lupi-collection-tile__footer .lupi-collections__progress{font-size:9px}}
+
+/* V6.26 — arqueros jersey visual weight matches 8th division kit.
+   Visual-only: preserve real item assets, inventory state and equipping. */
+.lupi-collection-tile--red .lupi-collection-tile__visual {
+  gap: 0;
+  overflow: visible;
+}
+.lupi-collection-tile--red .lupi-collection-tile__visual img:first-child {
+  width: 59%;
+  max-width: none;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.13);
+  transform-origin: 50% 50%;
+  z-index: 1;
+}
+.lupi-collection-tile--red .lupi-collection-tile__visual img:nth-child(2) {
+  width: 41%;
+  max-width: none;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.02);
+}
+@media (max-width: 520px) {
+  .lupi-collection-tile--red .lupi-collection-tile__visual img:first-child {
+    transform: scale(1.08);
+  }
+}

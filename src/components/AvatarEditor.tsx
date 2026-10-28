@@ -455,7 +455,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                       const item = items.find(i => i.id === id);
                       const price = shopPrices[id];
                       const owned = !!item?.owned;
-                      const label = id.includes('camiseta') ? 'CAMISETA ROJA' : 'SHORT ROJO';
+                      const label = collection.theme === 'green' ? (id.includes('camiseta') ? 'CAMISETA VERDE' : 'SHORT NEGRO') : (id.includes('camiseta') ? 'CAMISETA ROJA' : 'SHORT ROJO');
                       return <article className={`lupi-flores-store__product ${owned ? 'is-owned' : ''}`} key={id}>
                         <div className="lupi-flores-store__product-art">{item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span aria-hidden="true">👕</span>}{owned && <span className="lupi-flores-store__check" aria-label="Obtenido">✓</span>}</div>
                         <div className="lupi-flores-store__product-info"><span>FLORES CLUB · 2026</span><strong>{label}</strong><small>{owned ? 'EN TU ARMARIO' : price == null ? 'NO DISPONIBLE' : `${price} LUPICOINS`}</small></div>

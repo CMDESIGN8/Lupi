@@ -1,3 +1,7 @@
+import flores8vaTop from "../assets/flores-8va-camiseta-equipable.png";
+import flores8vaTopPreview from "../assets/flores-8va-camiseta-preview.webp";
+import flores8vaBottom from "../assets/flores-8va-short-equipable.png";
+import flores8vaBottomPreview from "../assets/flores-8va-short-preview.webp";
 import { supabase } from "../lib/supabaseClient";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -51,6 +55,8 @@ export const COLOR_BY_ID: Record<string, string> = {
 
 /** Convención de imágenes: /public/items/<id>.png */
 const defaultImage = (id: string) => `/items/${id}.png`;
+const FLORES_8VA_PREVIEWS: Record<string,string> = {"flores-club-8va-camiseta-verde":flores8vaTopPreview,"flores-club-8va-short-negro":flores8vaBottomPreview};
+const FLORES_8VA_SPRITES: Record<string,string> = {"flores-club-8va-camiseta-verde":flores8vaTop,"flores-club-8va-short-negro":flores8vaBottom};
 
 /**
  * Catálogo local de respaldo (modo prototipo).
@@ -180,14 +186,14 @@ export function useAuraInventory(userId: string, level: number) {
         world: row.world,
         drop: row.drop_code,
         icon: row.icon,
-        imageUrl: row.image_url ?? defaultImage(row.id),
+        imageUrl: FLORES_8VA_PREVIEWS[row.id] ?? row.image_url ?? defaultImage(row.id),
         modelUrl: row.model_url,
         shopUrl: row.shop_url,
         color: row.color ?? COLOR_BY_ID[row.id] ?? DEFAULT_ITEM_COLOR,
         requiredLevel: row.required_level,
         owned: ownedMap.has(row.id) || (!row.id.startsWith("flores-club-") && level >= row.required_level),
         equipped: ownedMap.get(row.id) ?? false,
-        equippedImageUrl: row.equipped_image_url,
+        equippedImageUrl: FLORES_8VA_SPRITES[row.id] ?? row.equipped_image_url,
       }))
     );
     setUsingFallback(false);
