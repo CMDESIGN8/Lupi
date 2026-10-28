@@ -33,6 +33,7 @@ type Props = {
 const SLOTS: { key: ItemSlot; label: string; tag: string }[] = [
   { key: "top", label: "REMERAS", tag: "REMERA" },
   { key: "bottom", label: "PANTALONES", tag: "PANTALÓN" },
+  { key: "socks", label: "MEDIAS", tag: "MEDIAS" },
   { key: "boots", label: "BOTINES", tag: "BOTINES" },
   { key: "accessory", label: "ACCESORIOS", tag: "ACCESORIO" },
 ];
@@ -96,7 +97,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [shopBusy,setShopBusy] = useState(false);
   const [shopMessage,setShopMessage] = useState("");
   const [shopCoins,setShopCoins] = useState<number | null>(null);
-  useEffect(() => { void supabase.from("shop_items").select("id,cost").in("id",["flores-club-camiseta-roja","flores-club-short-rojo","flores-club-8va-camiseta-verde","flores-club-8va-short-negro"]).eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
+  useEffect(() => { void supabase.from("shop_items").select("id,cost").in("id",["flores-club-camiseta-roja","flores-club-short-rojo","flores-club-8va-camiseta-verde","flores-club-8va-short-negro","flores-club-medias-rojas","flores-club-medias-verdes"]).eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
   const buyFlores = async (ids: string[]) => {
     if(shopBusy || usingFallback) return;
     setShopBusy(true);setShopMessage("");
