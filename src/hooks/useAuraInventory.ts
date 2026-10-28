@@ -5,7 +5,7 @@ import flores8vaBottomPreview from "../assets/flores-8va-short-preview.webp";
 import { supabase } from "../lib/supabaseClient";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type ItemSlot = "top" | "bottom" | "boots" | "accessory";
+export type ItemSlot = "top" | "bottom" | "socks" | "boots" | "accessory";
 export type ItemRarity = "common" | "rare" | "epic" | "legendary";
 export type ItemWorld = "URBAN" | "GAMER" | "SPORT";
 
@@ -25,6 +25,8 @@ export type InventoryItem = {
   owned: boolean;
   equipped: boolean;
   equippedImageUrl: string | null;
+  durability?: number | null;
+  maxDurability?: number | null;
 };
 
 type CatalogRow = {
