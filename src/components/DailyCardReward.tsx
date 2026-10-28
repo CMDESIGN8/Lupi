@@ -1,3 +1,5 @@
+import { CardFace } from './SigningWelcome';
+import './PackExperience.css';
 // src/components/DailyCardReward.tsx
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
@@ -12,12 +14,7 @@ interface DailyCardRewardProps {
 // FUNCIONES AUXILIARES - MOVER AQUÍ (FUERA DEL COMPONENTE)
 // ============================================================
 
-const POSITION_ICONS: Record<string, { icon: string; name: string; color: string }> = {
-  arquero: { icon: '🧤', name: 'ARQUERO', color: '#4a90d9' },
-  cierre: { icon: '🛡️', name: 'CIERRE', color: '#e67e22' },
-  ala: { icon: '⚡', name: 'ALA', color: '#2ecc71' },
-  pivot: { icon: '🎯', name: 'PIVOT', color: '#e74c3c' },
-};
+
 
 const getRarityColor = (rating: number): string => {
   if (rating >= 90) return '#FFD700';
@@ -92,7 +89,7 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
     setLoading(true);
     
     // Animación de apertura
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1800));
     
     try {
       const today = new Date().toISOString().split('T')[0];
@@ -202,7 +199,6 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
 
   // Modal para mostrar la carta obtenida
   if (showCardModal && obtainedCard) {
-    const posInfo = POSITION_ICONS[obtainedCard.position as keyof typeof POSITION_ICONS] || { icon: '⚽', name: 'JUG', color: '#888' };
     const rarityColor = getRarityColor(obtainedCard.overall_rating);
     
     return (
@@ -214,53 +210,11 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
             ¡CARTA OBTENIDA!
           </div>
           
-          {/* Carta estilo álbum */}
-          <div className="obtained-card" style={{ borderColor: rarityColor }}>
-            <div className="obtained-card-inner">
-              <div className="obtained-card-shine" />
-              <div className="obtained-card-gloss" />
-              
-              {/* Rarity / OVR */}
-              <div className="obtained-card-rarity" style={{ background: rarityColor }}>
-                {obtainedCard.overall_rating}
-              </div>
-              
-              {/* Position badge */}
-              <div className="obtained-card-position" style={{ background: posInfo.color }}>
-                {posInfo.icon}
-              </div>
-              
-              {/* Imagen del jugador */}
-              <div className="obtained-card-image">
-                <img src="/images/player.png" alt={obtainedCard.name} />
-              </div>
-              
-              {/* Nombre */}
-              <div className="obtained-card-name">{obtainedCard.name}</div>
-              
-              {/* Level */}
-              <div className="obtained-card-level">⭐ NIVEL 1</div>
-              
-              {/* Stats */}
-              <div className="obtained-card-stats">
-                <div className="stat"><span>⚡</span>{obtainedCard.pace}</div>
-                <div className="stat"><span>✨</span>{obtainedCard.dribbling}</div>
-                <div className="stat"><span>🎯</span>{obtainedCard.finishing}</div>
-                <div className="stat"><span>💪</span>{obtainedCard.physical}</div>
-                <div className="stat"><span>🛡️</span>{obtainedCard.defending}</div>
-                <div className="stat"><span>⚽</span>{obtainedCard.passing}</div>
-              </div>
-              
-              {/* Category */}
-              <div className="obtained-card-category">{obtainedCard.category}</div>
-              
-              {/* Badge real si es socio */}
-              {obtainedCard.card_type === 'socio' && (
-                <div className="obtained-card-real-badge">🔴 JUGADOR REAL</div>
-              )}
-            </div>
+          <div className="pack-revealed-card" style={{ borderColor: rarityColor }}>
+            <CardFace item={{ card: obtainedCard }} index={0} variant="full" />
           </div>
-          
+          <p className="pack-added-note">La carta ya está en tu colección.</p>
+
           <button className="card-obtained-button" onClick={closeCardModal}>
             CONTINUAR
           </button>
@@ -285,10 +239,11 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
           <div className="pack-content">
             {!isOpening && !claimed && (
               <>
-                <div className="pack-icon">🎁</div>
-                <h3>SOBRE MISTERIOSO</h3>
+                <span className="pack-eyebrow">LUPI WORLD · INVENTARIO</span>
+                <div className="pack-icon pack-sealed" aria-hidden="true"><span className="pack-sealed-mark">L<span>W</span></span><small>PLAYER CARD</small><i>✦</i></div>
+                <h3>Tu próxima carta</h3>
                 <p className="pack-description">
-                  ¡Una carta exclusiva<br />te espera!
+                  Abrí el sobre y descubrí quién se suma a tu equipo.
                 </p>
                 <button 
                   className="open-pack-btn"
@@ -298,7 +253,7 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
                   {loading ? (
                     <span className="btn-loading">⚡ ABRIENDO...</span>
                   ) : (
-                    <span className="btn-text">📦 ABRIR SOBRE</span>
+                    <span className="btn-text">ABRIR SOBRE →</span>
                   )}
                 </button>
               </>
@@ -306,21 +261,26 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
             
             {(isOpening || claimed) && !showCardModal && (
               <div className="opening-state">
-                <div className="opening-loader">
-                  <div className="loader-ring" />
-                  <div className="loader-ring" />
-                  <div className="loader-ring" />
-                </div>
-                <p className="opening-text">
-                  {isOpening ? 'ABRIENDO SOBRE...' : 'SOBRE ABIERTO'}
-                </p>
-                {claimed && !isOpening && !showCardModal && (
-                  <div className="claimed-info">
-                    <p>✅ Ya abriste tu sobre</p>
-                    <p className="proximo">PRÓXIMO SOBRE</p>
-                    <p className="countdown">⏰ {timeLeft}</p>
+                {isOpening ? <div className="pack-opening-scene" role="status" aria-live="polite">
+                  <span className="pack-scene-kicker">LUPI WORLD · REVELACIÓN</span>
+                  <div className="pack-burst" aria-hidden="true">
+                    <div className="pack-rays" />
+                    <div className="pack-rip-top"><span>✦</span></div>
+                    <div className="pack-rip-body"><strong>LW</strong><small>PLAYER CARD</small></div>
+                    <div className="pack-emerging-card"><span>♛</span><strong>?</strong></div>
+                    {Array.from({length:18},(_,i)=><i key={i} className="pack-particle" style={{'--p':i} as React.CSSProperties}/>)}
                   </div>
-                )}
+                  <h3>El próximo fichaje…</h3>
+                  <p className="pack-scene-copy">Abriendo tu sobre. Prepará tu quinteto.</p>
+                  <div className="pack-energy" aria-hidden="true"><span/></div>
+                </div> : <div className="pack-complete-scene" role="status">
+                  <span className="pack-scene-kicker">LUPI WORLD · INVENTARIO</span>
+                  <div className="pack-complete-cards" aria-hidden="true"><i/><i/><i><span>♛</span><b>✓</b></i></div>
+                  <h3>Fichaje completado</h3>
+                  <p className="pack-scene-copy">Tu carta ya forma parte de la colección.</p>
+                  <div className="pack-next-drop"><span>PRÓXIMO SOBRE</span><strong>{timeLeft || 'Calculando…'}</strong><small>Volvé para descubrir otro jugador.</small></div>
+                </div>}
+
               </div>
             )}
           </div>

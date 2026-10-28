@@ -1,0 +1,100 @@
+/* Pack UI: styles scoped above the legacy daily reward rules. */
+.pack-modal-overlay .pack-modal-content{width:min(420px,100%);max-width:100%;max-height:calc(100dvh - 32px);border:1px solid #6ddae433;border-radius:24px;background:#06111d;box-shadow:0 30px 100px #000a}
+.pack-modal-overlay .pack-modal-close{top:12px;right:12px;min-width:44px;min-height:44px;background:#12314299;border:1px solid #a6edff25}
+.daily-card-reward .pack-wrapper{width:100%;max-width:420px}
+.daily-card-reward .pack{width:100%;height:auto;min-height:500px;border:0;border-radius:24px;background:radial-gradient(ellipse at 50% 30%,#18455d80,transparent 62%),linear-gradient(155deg,#0c2231,#060d18);box-shadow:none}
+.daily-card-reward .pack.available,.daily-card-reward .pack.available:hover{animation:none;transform:none;border:0;box-shadow:none;cursor:default}
+.daily-card-reward .pack-ribbon{display:none}
+.daily-card-reward .pack-content{padding:36px 24px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px;text-align:center;position:relative;z-index:2}
+.daily-card-reward .pack-eyebrow{font:800 9px/1.4 system-ui,sans-serif;letter-spacing:.2em;color:#8acbd8;align-self:flex-start;margin-bottom:26px}
+.daily-card-reward .pack-icon.pack-sealed{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;width:130px;height:180px;margin:0 auto 28px;border:1px solid #edcf7a;border-radius:8px;background:repeating-linear-gradient(135deg,#5ad7e408 0 1px,transparent 1px 12px),linear-gradient(145deg,#204558,#071926 65%,#295564);box-shadow:0 16px 38px #0008,0 0 48px #55cdda26,inset 0 0 0 5px #e8cc7a12;transform:rotate(-7deg);animation:pack-sealed-float 5s ease-in-out infinite}
+.pack-sealed:before,.pack-sealed:after{content:'';position:absolute;left:0;right:0;height:8px;background:repeating-linear-gradient(90deg,#e9cb7d80 0 1px,transparent 1px 5px);border-block:1px solid #e9cb7d66}.pack-sealed:before{top:6px}.pack-sealed:after{bottom:6px}
+.daily-card-reward .pack-sealed-mark{font:950 italic 48px/.9 system-ui,sans-serif;color:#e7faff;letter-spacing:-.12em;text-shadow:0 0 24px #46d9e780}.pack-sealed-mark>span{color:#46d9e7}.daily-card-reward .pack-sealed>small{font:700 8px/1.5 system-ui,sans-serif;letter-spacing:.15em;color:#c9dbe2;margin-top:14px}.daily-card-reward .pack-sealed>i{font-size:18px;font-style:normal;color:#f0d58a;margin-top:10px}
+.daily-card-reward .pack-content h3{font:900 30px/1.1 system-ui,sans-serif;letter-spacing:-.04em;color:#f2f9ff;text-shadow:none;margin:0 0 12px}
+.daily-card-reward .pack-description{font:400 14px/1.65 system-ui,sans-serif;color:#a9c2d0;max-width:260px;margin:0 auto 24px}
+.daily-card-reward .open-pack-btn{width:100%;min-height:50px;padding:14px;border-radius:13px;background:linear-gradient(115deg,#f4dda0,#e6bf62);border:1px solid #f5df9b;color:#112432;box-shadow:0 7px 22px #edc76b24;font:850 14px/1.3 system-ui,sans-serif;letter-spacing:.07em;transition:transform .2s,filter .2s}
+.daily-card-reward .open-pack-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.08)}.daily-card-reward .open-pack-btn:active{transform:scale(.98)}.daily-card-reward .open-pack-btn:disabled{opacity:.65;cursor:wait}
+.daily-card-reward .pack-sparkles .sparkle{background:#73e7f2;box-shadow:0 0 8px #73e7f2}.daily-card-reward .opening-text{font:800 16px/1.4 system-ui,sans-serif;letter-spacing:.1em;color:#a1ecf0}.daily-card-reward .loader-ring{border-top-color:#67dce9}.daily-card-reward .claimed-info{font-family:system-ui,sans-serif;color:#c1dae3}
+.pack-modal-content .card-obtained-overlay{background:#030c17eb;overflow-y:auto;padding:24px 16px;box-sizing:border-box}
+.pack-modal-content .card-obtained-container{width:min(350px,100%);max-height:calc(100dvh - 48px);overflow-y:auto;padding:20px;background:radial-gradient(ellipse at top,#143d51,#07131f);border:1px solid #6cdce43d;border-radius:24px;box-sizing:border-box}
+.pack-modal-content .card-obtained-title{font:900 22px/1.2 system-ui,sans-serif;color:#f2df9c;letter-spacing:-.02em;margin-bottom:20px}
+.pack-revealed-card{width:100%;max-width:240px;aspect-ratio:.68;margin:0 auto;--display:'Barlow Condensed','Arial Narrow',sans-serif;animation:pack-card-arrive .7s cubic-bezier(.16,1,.3,1) both}
+.pack-added-note{text-align:center;font:400 12px/1.5 system-ui,sans-serif;color:#a7c6d4;margin:18px 0}
+.pack-modal-content .card-obtained-button{width:100%;min-height:48px;border-radius:12px;background:linear-gradient(115deg,#6ae7e5,#22bdd6);color:#06202c;font:850 14px/1.3 system-ui,sans-serif;border:0}
+.pack-modal-content button:focus-visible{outline:3px solid #b7f4ff;outline-offset:3px}
+@keyframes pack-sealed-float{0%,100%{transform:translateY(0) rotate(-7deg)}50%{transform:translateY(-8px) rotate(-3deg)}}
+@keyframes pack-card-arrive{from{opacity:0;transform:translateY(18px) scale(.87)}to{opacity:1;transform:none}}
+@media(max-width:380px){.daily-card-reward .pack-content{padding:32px 20px 24px;min-height:460px}.daily-card-reward .pack{min-height:460px}.daily-card-reward .pack-content h3{font-size:27px}}
+@media(prefers-reduced-motion:reduce){.daily-card-reward *,.pack-modal-content *{animation:none!important;transition:none!important}}
+
+/* Beta10: apertura física del sobre, sin aros de carga. */
+.daily-card-reward .pack.opening-animation{animation:none!important;opacity:1!important;transform:none!important}
+.daily-card-reward .opening-state{width:100%;padding:0}
+.daily-card-reward .pack.opened{background:radial-gradient(ellipse at 50% 35%,#174a6080,transparent 65%),linear-gradient(155deg,#0b2130,#050d18)}
+.pack-opening-scene,.pack-complete-scene{position:relative;width:100%;font-family:system-ui,sans-serif;text-align:center}
+.pack-scene-kicker{display:block;color:#8bc4d2;font-size:9px;font-weight:800;letter-spacing:.17em;margin-bottom:18px}
+.pack-burst{height:240px;position:relative;isolation:isolate;display:grid;place-items:center;perspective:700px}
+.pack-rays{position:absolute;inset:15px;background:repeating-conic-gradient(from 10deg,transparent 0deg 22deg,#67e7ff14 23deg 27deg,transparent 28deg 42deg);mask-image:radial-gradient(circle,#000 10%,transparent 70%);animation:pack-ray-turn 12s linear infinite}
+.pack-rip-body,.pack-rip-top{position:absolute;left:50%;width:128px;margin-left:-64px;border:1px solid #efd78e;background:repeating-linear-gradient(135deg,#69e6eb08 0 1px,transparent 1px 10px),linear-gradient(145deg,#244c60,#081c2b 70%);box-shadow:0 0 35px #5dd8ea30;z-index:3}
+.pack-rip-body{top:80px;height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;border-radius:0 0 8px 8px;clip-path:polygon(0 3%,8% 0,16% 4%,24% 0,32% 3%,40% 0,48% 3%,56% 0,64% 4%,72% 0,80% 3%,88% 0,100% 4%,100% 100%,0 100%);animation:pack-body-drop 1.5s .2s cubic-bezier(.2,.8,.2,1) both}
+.pack-rip-body strong{font-size:42px;font-weight:950;font-style:italic;letter-spacing:-.1em;color:#c7f8ff}.pack-rip-body small{font-size:8px;letter-spacing:.14em;color:#b2cbd8}
+.pack-rip-top{top:44px;height:45px;display:grid;place-items:center;border-radius:8px 8px 0 0;color:#efd78e;animation:pack-seal-rip 1s .25s cubic-bezier(.2,.8,.2,1) both}
+.pack-emerging-card{position:absolute;top:42px;left:50%;margin-left:-56px;width:112px;height:160px;z-index:2;border-radius:12px;border:2px solid #e6cf8b;background:radial-gradient(circle at 50% 35%,#207487,#08162b 80%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;box-shadow:0 0 65px #57e5ef60;animation:pack-card-emerge 1.4s .35s cubic-bezier(.16,1,.3,1) both}
+.pack-emerging-card>span{color:#ead08a;font-size:24px}.pack-emerging-card>strong{font-size:55px;color:#e9fcff}
+.pack-particle{position:absolute;left:50%;top:46%;width:3px;height:8px;border-radius:2px;background:#f9d985;transform:rotate(calc(var(--p)*20deg));animation:pack-spark-burst 1.6s calc(.4s + var(--p)*.018s) both;box-shadow:0 0 8px #f9d98599}
+.daily-card-reward .pack-opening-scene h3,.daily-card-reward .pack-complete-scene h3{font-size:27px;letter-spacing:-.04em;margin:10px 0 12px}.daily-card-reward .pack-scene-copy{font-size:13px;line-height:1.7;color:#a5c3d1;max-width:260px;margin:0 auto 22px}
+.pack-energy{height:3px;width:130px;margin:auto;background:#79deed15;border-radius:3px;overflow:hidden}.pack-energy>span{display:block;width:45%;height:100%;background:linear-gradient(90deg,transparent,#80f1ef,transparent);animation:pack-energy-drift 1.4s ease-in-out infinite}
+.pack-complete-cards{position:relative;width:170px;height:180px;margin:20px auto 26px}
+.pack-complete-cards>i{position:absolute;left:30px;top:10px;width:110px;height:150px;border:1px solid #315970;border-radius:12px;background:linear-gradient(145deg,#173c50,#081726);transform:rotate(-16deg) translateX(-15px)}
+.pack-complete-cards>i:nth-child(2){transform:rotate(14deg) translateX(15px)}.pack-complete-cards>i:last-child{transform:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:15px;border-color:#ddc476;box-shadow:0 0 40px #53d3d42a;animation:pack-card-arrive .6s both}
+.pack-complete-cards span{font-size:35px;color:#dfc880}.pack-complete-cards b{width:36px;height:36px;display:grid;place-items:center;border:1px solid #6be2c666;border-radius:50%;font:800 20px system-ui;color:#80edcf;background:#4ad7b515}
+.pack-next-drop{border-top:1px solid #84d9e322;padding:18px 12px 0;display:grid;gap:10px}.pack-next-drop>span{font-size:9px;color:#7daabf;letter-spacing:.18em}.pack-next-drop strong{font-size:32px;font-weight:800;color:#f0dda0;font-variant-numeric:tabular-nums;letter-spacing:.08em}.pack-next-drop small{font-size:11px;color:#8eafbe}
+.pack-modal-content .card-obtained-container{animation:pack-card-arrive .65s cubic-bezier(.16,1,.3,1) both;background:radial-gradient(ellipse at 50% 30%,#1b5567,#06131f 75%)}
+@keyframes pack-seal-rip{0%{transform:none}35%{transform:translateY(-6px) rotate(-8deg)}100%{transform:translate(70px,-60px) rotate(28deg);opacity:0}}
+@keyframes pack-body-drop{0%,35%{transform:none}100%{transform:translateY(32px) rotate(-5deg);opacity:.35}}
+@keyframes pack-card-emerge{from{opacity:0;transform:translateY(75px) scale(.85) rotateY(50deg)}to{opacity:1;transform:translateY(-22px) scale(1) rotateY(0)}}
+@keyframes pack-spark-burst{from{opacity:0;transform:rotate(calc(var(--p)*20deg)) translateY(0)}20%{opacity:1}to{opacity:0;transform:rotate(calc(var(--p)*20deg)) translateY(-115px)}}
+@keyframes pack-ray-turn{to{transform:rotate(360deg)}}@keyframes pack-energy-drift{from{transform:translateX(-110%)}to{transform:translateX(330%)}}
+@media(prefers-reduced-motion:reduce){.daily-card-reward .pack-opening-scene *,.daily-card-reward .pack-complete-scene *{animation:none!important}.pack-rip-top,.pack-particle{display:none}.pack-energy>span{width:100%}}
+
+/* Beta11: tres zonas independientes en la carta obtenida. */
+.pack-revealed-card{aspect-ratio:.62}
+.pack-revealed-card .starter-card--full{
+ --navy:#071522;
+ display:grid;
+ grid-template-rows:auto minmax(0,1fr) auto;
+ gap:6px;
+ padding:12px;
+}
+.pack-revealed-card .starter-card--full .starter-card__top{grid-row:1;z-index:3}
+.pack-revealed-card .starter-card--full .starter-card__portrait{
+ position:relative;
+ inset:auto;
+ grid-row:2;
+ width:100%;height:100%;min-height:0;
+ overflow:hidden;
+}
+.pack-revealed-card .starter-card--full .starter-card__player{max-height:100%;width:auto;max-width:100%;object-fit:contain}
+.pack-revealed-card .starter-card--full .starter-card__player--image{height:100%;width:100%;object-fit:contain;object-position:center bottom}
+.pack-revealed-card .starter-card--full .starter-card__bottom{
+ grid-row:3;
+ position:relative;
+ z-index:4;
+ margin:0;
+ padding:10px 0 0;
+ background:#071522;
+ border-top:1px solid #b0d4e51a;
+}
+.pack-revealed-card .starter-card--full .starter-card__bottom h3{
+ margin:0;
+ padding:0;
+ font:850 16px/1.2 system-ui,sans-serif;
+ letter-spacing:-.03em;
+ text-shadow:none;
+ color:#f4f9ff;
+ white-space:normal;
+ overflow-wrap:anywhere;
+}
+.pack-revealed-card .starter-card--full .starter-card__rarity{margin:6px 0 8px;font:750 9px/1.3 system-ui,sans-serif;letter-spacing:.13em}
+.pack-revealed-card .starter-card--full .starter-card__stats{gap:4px;font:500 10px/1.3 system-ui,sans-serif}
+.pack-revealed-card .starter-card--full .starter-card__stats span{padding:4px 6px}

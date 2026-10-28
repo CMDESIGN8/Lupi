@@ -15,7 +15,7 @@ export function PackModal({ isOpen, onClose, userId, onCardReceived }: PackModal
   return (
     <div className="pack-modal-overlay" onClick={onClose}>
       <div className="pack-modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="pack-modal-close" onClick={onClose}>✕</button>
+        <button type="button" aria-label="Cerrar sobre" className="pack-modal-close" onClick={onClose}>✕</button>
         <DailyCardReward 
           userId={userId} 
           onCardReceived={(card) => {

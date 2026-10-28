@@ -40,3 +40,69 @@
 .home-experience .home-stadium .hs-duel .pv-team-mark{width:clamp(90px,11vw,140px);height:clamp(104px,13vw,160px);font-size:clamp(34px,5vw,54px)}
 .home-experience .home-stadium .hs-duel{margin:20px 0 26px;gap:10px}
 @media(max-width:380px){.home-experience .home-stadium .hs-duel .pv-team>img{width:88px;height:104px}.home-experience .home-stadium .hs-duel .pv-team-mark{width:80px;height:96px}}
+
+/* Beta07: etiquetas de localía legibles y consola más transparente. */
+.home-experience .home-stadium .hs-duel>div>small{
+ font-size:clamp(14px,1.4vw,18px);
+ font-weight:900;
+ line-height:1.3;
+ letter-spacing:.14em;
+ color:#f0faf7;
+ text-shadow:0 2px 6px #000,0 0 14px #0008;
+}
+.home-experience .home-stadium .hs-console{
+ background:rgba(6,28,38,.38);
+ border-color:rgba(151,190,177,.34);
+}
+.home-experience .home-stadium .hs-console .pc-closing{
+ background:rgba(9,32,39,.35);
+}
+
+/* Beta08: pie de cancha continuo, sin cajas superpuestas. */
+.home-experience .home-futsal.home-stadium{--hs-edge:22px;padding-bottom:0}
+.home-experience .home-stadium .hs-console{
+ position:relative;
+ margin:8px calc(-1 * var(--hs-edge)) 0;
+ padding:28px var(--hs-edge) 20px;
+ border:0;
+ border-radius:0;
+ box-shadow:none;
+ background:linear-gradient(180deg,rgba(4,20,28,0),rgba(4,20,28,.42) 25%,rgba(4,20,28,.68));
+ gap:22px;
+}
+.home-experience .home-stadium .hs-console .pc-closing{
+ border:0;
+ border-radius:0;
+ padding:10px 4px;
+ background:transparent;
+ box-shadow:none;
+}
+.home-experience .home-stadium .hs-console .pc-title{color:#f5dc99;letter-spacing:.1em;font-size:10px}
+.home-experience .home-stadium .hs-console .pc-closing time{color:#e2f2ef;text-shadow:0 1px 5px #000}
+.home-experience .home-stadium .hs-console .pc-digits strong{
+ background:rgba(3,19,26,.64);
+ border:1px solid rgba(163,211,202,.13);
+ border-radius:8px;
+ box-shadow:inset 0 1px rgba(222,255,246,.04);
+}
+.home-experience .home-stadium .hs-progress-label{color:#e0efe9;text-shadow:0 1px 4px #0009;font-size:10px}
+.home-experience .home-stadium .hs-play>small{color:#b9d3cd}
+.home-experience .home-stadium .home-futsal-links{
+ margin:0 calc(-1 * var(--hs-edge));
+ padding:10px var(--hs-edge) 12px;
+ border:0;
+ border-top:1px solid rgba(177,220,207,.14);
+ border-radius:0;
+ background:rgba(4,20,28,.68);
+ box-shadow:none;
+}
+.home-experience .home-stadium .home-futsal-links>a{
+ border:0;background:transparent;box-shadow:none;color:#c6e6df;min-height:44px;
+}
+.home-experience .home-stadium .home-futsal-links>a:hover{background:rgba(134,224,205,.07);color:#fff}
+@media(max-width:740px){
+ .home-experience .home-futsal.home-stadium{--hs-edge:13px;padding-bottom:0}
+ .home-experience .home-stadium .hs-console{padding:22px var(--hs-edge) 18px;gap:15px}
+ .home-experience .home-stadium .hs-console .pc-closing{padding:8px 2px}
+ .home-experience .home-stadium .home-futsal-links{margin-top:0;padding-top:8px}
+}
