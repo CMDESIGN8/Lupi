@@ -98,7 +98,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [renewBusy,setRenewBusy] = useState<string | null>(null);
   const [shopMessage,setShopMessage] = useState("");
   const [shopCoins,setShopCoins] = useState<number | null>(null);
-  useEffect(() => { void supabase.from("shop_items").select("id,cost").in("id",["flores-club-camiseta-roja","flores-club-short-rojo","flores-club-8va-camiseta-verde","flores-club-8va-short-negro","flores-club-medias-rojas","flores-club-medias-verdes"]).eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
+  useEffect(() => { void supabase.from("shop_items").select("id,cost").eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
   const renewEquipment = async (id: string) => {
     if (renewBusy || usingFallback) return;
     setRenewBusy(id); setShopMessage("");
@@ -585,6 +585,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                 ) : (
                   <div className="lw-id__items">
                     {shown.map((item) => (
+                      <div className="lw-id__inventory-entry" key={item.id}>
                       <button
                         type="button"
                         key={item.id}
@@ -630,6 +631,12 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                           </em>
                         )}
                       </button>
+                      {item.owned && item.durability != null && item.durability <= 3 && (
+                        <button type="button" className="lw-id__renew" disabled={!!renewBusy || usingFallback || shopPrices[item.id] == null} onClick={() => void renewEquipment(item.id)}>
+                          {renewBusy === item.id ? "RENOVANDO…" : `RENOVAR 10/10 · ${shopPrices[item.id] ?? "—"} 🪙`}
+                        </button>
+                      )}
+                      </div>
                     ))}
                   </div>
                 )}
