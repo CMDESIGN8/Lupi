@@ -1871,3 +1871,5 @@
 .lw-id__durability{display:flex;flex-direction:column;gap:3px;font-size:10px}
 .lw-id__durability-track{display:block;height:5px;background:#29323d;border-radius:8px;overflow:hidden}
 .lw-id__durability-track i{display:block;height:100%}
+
+.lw-id__wear-alert{color:#ffb33b;font-weight:800;font-size:10px;letter-spacing:.03em}
