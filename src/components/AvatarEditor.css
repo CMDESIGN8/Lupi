@@ -1644,3 +1644,24 @@
   }
   .lw-id__stage { overflow: hidden; }
 }
+
+/* V6.16 — avatar protagonista en móvil, geometría uniforme entre pestañas. */
+@media (max-width: 860px) and (min-height: 741px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="character"],
+  .lw-id__layout[data-mobile-tab="wardrobe"],
+  .lw-id__layout[data-wardrobe-tab="shop"],
+  .lw-id__layout[data-mobile-tab="wardrobe"][data-wardrobe-tab="shop"] {
+    grid-template-rows: minmax(215px, min(35dvh, 340px)) 48px minmax(0, 1fr) auto !important;
+  }
+  .lw-id__ring { bottom: 1% !important; }
+}
+@media (max-width: 860px) and (max-height: 740px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="character"],
+  .lw-id__layout[data-mobile-tab="wardrobe"],
+  .lw-id__layout[data-wardrobe-tab="shop"],
+  .lw-id__layout[data-mobile-tab="wardrobe"][data-wardrobe-tab="shop"] {
+    grid-template-rows: minmax(160px, 29dvh) 44px minmax(0, 1fr) auto !important;
+  }
+}

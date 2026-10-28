@@ -34,7 +34,9 @@ export function CharacterStage({ items, appearance, mode, level, xp, xpNeeded }:
     const measure = () => {
       const { width, height } = box.getBoundingClientRect();
       const byWidth = Math.max(0.3, (width - 12) / AVATAR_W);
-      const byHeight = Math.max(0.3, (height - 42) / AVATAR_VISIBLE_H);
+      // En móvil, aprovechar más la altura del escenario sin recortar cabeza ni botines.
+      const mobile = window.matchMedia("(max-width: 860px)").matches;
+      const byHeight = Math.max(0.3, (height - (mobile ? 14 : 42)) / AVATAR_VISIBLE_H);
       setScale(Math.min(2.1, byWidth, byHeight));
     };
     measure();
