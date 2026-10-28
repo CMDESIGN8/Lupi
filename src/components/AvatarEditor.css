@@ -1674,3 +1674,38 @@
   .lw-id__character .lw-id__spot { opacity: .35; }
   .lw-id__wardrobe-body { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
 }
+
+/* V6.18 - Fondo sin aro impreso y apoyo natural bajo el avatar.
+   El vestuario no contiene un personaje: Avatar2D sigue siendo interactivo. */
+.lw-id__ring {
+  left: 50% !important;
+  width: min(44%, 150px) !important;
+  height: 12px !important;
+  transform: translateX(-50%) !important;
+  border: 0 !important;
+  background: radial-gradient(ellipse, rgba(0,0,0,.42), rgba(0,0,0,0) 73%) !important;
+  box-shadow: none !important;
+}
+@media (max-width:860px) {
+  .lw-id__ring { bottom: 2% !important; }
+  .lw-id__stage::before { background-image: linear-gradient(90deg, rgba(2,12,22,.4), transparent 35%, rgba(2,12,22,.24)), url('../assets/flores-locker-room.webp') !important; }
+}
+
+/* V6.19 — escenario sin aro, sombra de contacto y panel móvil navegable. */
+.lw-id__ring { display: none !important; }
+@media (max-width: 860px) {
+  .lw-id__stage { isolation: isolate; }
+  .lw-id__character .lw-id__spot { opacity: .18 !important; }
+  .lw-id__panel--identity { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+  .lw-id__panel--identity > .lw-id__scroll {
+    display: block; flex: 1 1 0; min-height: 0; max-height: 100%;
+    overflow-y: auto !important; overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;
+    touch-action: pan-y; padding-bottom: max(38px, env(safe-area-inset-bottom, 0px));
+    scrollbar-width: thin; scrollbar-color: #0ac5db #062233;
+  }
+  .lw-id__panel--identity > .lw-id__scroll::-webkit-scrollbar { width: 4px; }
+  .lw-id__panel--identity > .lw-id__scroll::-webkit-scrollbar-thumb { background: #0ac5db; border-radius: 6px; }
+  .lw-id__panel--identity > .lw-id__seg { flex: 0 0 auto; }
+  .lw-id__wardrobe-body { padding-bottom: 38px !important; }
+}
