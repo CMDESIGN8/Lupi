@@ -132,14 +132,32 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
       
       const allCards = [
         ...(availableCards || []).map(c => ({ ...c, card_type: 'npc' })),
-        ...filteredSocios.map(s => ({ 
-          ...s, 
-          card_type: 'socio',
-          overall_rating: Math.floor(
-            (s.user_card_pace + s.user_card_dribbling + s.user_card_passing + 
-             s.user_card_defending + s.user_card_finishing + s.user_card_physical) / 6
-          )
-        }))
+        ...filteredSocios.map((profile): UnifiedCard => {
+          const stat = (value: unknown): number => {
+            const number = Number(value ?? 10);
+            return Number.isFinite(number) ? number : 10;
+          };
+          const pace = stat(profile.user_card_pace);
+          const dribbling = stat(profile.user_card_dribbling);
+          const passing = stat(profile.user_card_passing);
+          const defending = stat(profile.user_card_defending);
+          const finishing = stat(profile.user_card_finishing);
+          const physical = stat(profile.user_card_physical);
+          const position = profile.position === 'arquero' || profile.position === 'cierre' || profile.position === 'pivot' ? profile.position : 'ala';
+          return {
+            id: profile.id,
+            name: String(profile.username || profile.name || 'Jugador').trim() || 'Jugador',
+            card_type: 'socio',
+            profile_id: profile.id,
+            is_real: true,
+            position,
+            category: 'socios',
+            pace, dribbling, passing, defending, finishing, physical,
+            overall_rating: Math.floor((pace + dribbling + passing + defending + finishing + physical) / 6),
+            total_wins_lifetime: Number(profile.total_wins_lifetime) || 0,
+            total_battles_lifetime: Number(profile.total_battles_lifetime) || 0,
+          };
+        })
       ];
       
       if (allCards.length === 0) {

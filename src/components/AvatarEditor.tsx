@@ -9,6 +9,8 @@ import { CharacterStage } from "./CharacterStage";
 import { CheckIcon, GridIcon, LockIcon, SlotIcon } from "./EditorIcons";
 import { trapTabKey } from "./player-card/hooks";
 import "./AvatarEditor.css";
+import { OUTFIT_COLLECTIONS, collectionProgress } from "../lib/outfitCollections";
+import "./OutfitCollections.css";
 
 type Props = {
   userId: string;
@@ -95,6 +97,8 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [slot, setSlot] = useState<ItemSlot | "all">("all");
   const [rarity, setRarity] = useState<"all" | ItemRarity>("all");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [outfitBusy, setOutfitBusy] = useState(false);
+  const [outfitError, setOutfitError] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => setDraft(appearance), [appearance]);
@@ -123,6 +127,25 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
       (slot === "all" || item.slot === slot) &&
       (rarity === "all" || item.rarity === rarity),
   );
+
+  const equipOutfit = async (ids: readonly string[]) => {
+    if (outfitBusy || loading || usingFallback) return;
+    const targets = ids.map(id => items.find(item => item.id === id));
+    if (targets.some(item => !item || !item.owned)) return;
+    setOutfitBusy(true);
+    setOutfitError(null);
+    try {
+      // Cada RPC se ejecuta por separado; no se presenta como transacción atómica.
+      for (const id of ids) {
+        const item = items.find(entry => entry.id === id);
+        if (item && !item.equipped) await toggleEquip(id);
+      }
+    } catch (error) {
+      setOutfitError(error instanceof Error ? error.message : "No se pudo equipar el conjunto.");
+    } finally {
+      setOutfitBusy(false);
+    }
+  };
 
   const equip = async (id: string) => {
     setBusyId(id);
@@ -365,6 +388,38 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
             </div>
           ) : (
             <>
+              {wardrobeTab === "wardrobe" && (
+                <section className="lupi-collections" aria-label="Colecciones de uniformes">
+                  <div className="lupi-collections__heading">COLECCIONES <span>UNIFORMES</span></div>
+                  {OUTFIT_COLLECTIONS.map(collection => {
+                    const progress = collectionProgress(collection, items);
+                    const complete = progress.owned === progress.total;
+                    return (
+                      <div className="lupi-collections__card" key={collection.id}>
+                        <div className="lupi-collections__info">
+                          <strong>{collection.title}</strong>
+                          <small>{collection.season} · {collection.description}</small>
+                          <span>{progress.owned}/{progress.total} prendas obtenidas</span>
+                        </div>
+                        <div className="lupi-collections__items">
+                          {collection.itemIds.map(id => {
+                            const item = items.find(entry => entry.id === id);
+                            return <div className="lupi-collections__piece" key={id} title={item?.name ?? id}>
+                              {item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span>?</span>}
+                            </div>;
+                          })}
+                        </div>
+                        <button type="button" disabled={!complete || progress.equipped || outfitBusy || usingFallback}
+                          onClick={() => void equipOutfit(collection.itemIds)}>
+                          {progress.equipped ? "✓ CONJUNTO EQUIPADO" : complete ? (outfitBusy ? "EQUIPANDO…" : "EQUIPAR CONJUNTO") : "CONJUNTO INCOMPLETO"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {outfitError && <p role="alert">{outfitError}</p>}
+                </section>
+              )}
+
               <div className="lw-id__cats">
                 <button type="button" aria-pressed={slot === "all"} onClick={() => setSlot("all")}>
                   <GridIcon size={26} />

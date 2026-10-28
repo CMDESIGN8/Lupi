@@ -1281,7 +1281,7 @@ onChallengeGame={(player, game) => {
                           <h2 id="lupi-reward-title">{rewardModalKey === "welcome" ? "¡ESTO RECIÉN EMPIEZA!" : FIRST_REWARDS[rewardModalKey].title}</h2>
                           <p>{rewardModalKey === "welcome" ? "¡Bien ahí, crack! Todo jugador necesita un primer impulso. Te traje algo para arrancar tu aventura." : "¡Otra misión superada! Tu esfuerzo merece una recompensa. ¡Seguí así!"}</p>
                           <div className="lupi-reward-anime__loot" aria-label="Premios disponibles">
-                            <span><i aria-hidden="true">🪙</i><b>+{FIRST_REWARDS[rewardModalKey].coins}</b><small>LUPI COINS</small></span>
+                            <span><i aria-hidden="true">💰</i><b>+{FIRST_REWARDS[rewardModalKey].coins}</b><small>LUPI COINS</small></span>
                             <span><i aria-hidden="true">✦</i><b>+{FIRST_REWARDS[rewardModalKey].xp}</b><small>EXPERIENCIA</small></span>
                           </div>
                           {rewardError && <p className="lupi-reward-anime__error" role="alert">{rewardError}</p>}
