@@ -27,6 +27,14 @@ begin
  if v_uid is null then raise exception 'Authentication required'; end if;
  select slot into v_slot from public.aura_items where id=p_item_id;
  if v_slot not in ('socks','boots') or v_slot is null then raise exception 'Not renewable'; end if;
+ -- Serialize renewals for this user before checking durability or balance.
+ perform 1 from public.profiles where id=v_uid for update;
+ if not found then raise exception 'Profile not found'; end if;
+ -- A missing durability row means a legacy item with full initial uses.
+ insert into public.equipment_durability(user_id,item_id,remaining,max_uses)
+ select v_uid,p_item_id,10,10
+ where exists(select 1 from public.user_items where user_id=v_uid and item_id=p_item_id)
+ on conflict(user_id,item_id) do nothing;
  if exists(select 1 from public.equipment_durability where user_id=v_uid and item_id=p_item_id and remaining=10) then raise exception 'Equipment already at full durability'; end if;
  if not exists(select 1 from public.user_items where user_id=v_uid and item_id=p_item_id)
  then raise exception 'Item not owned'; end if;
