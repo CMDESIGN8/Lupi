@@ -123,7 +123,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [rarity, setRarity] = useState<"all" | ItemRarity>("all");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [outfitBusy, setOutfitBusy] = useState(false);
-  const [collectionsExpanded, setCollectionsExpanded] = useState(true);
+  const [showCollections, setShowCollections] = useState(false);
   const [outfitError, setOutfitError] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   // Efecto visual efímero al seleccionar una prenda para equipar.
@@ -472,12 +472,30 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
             </section>
           ) : (
             <div className="lw-id__wardrobe-body">
-              {wardrobeTab === "wardrobe" && (
-                <section className="lupi-collections" aria-label="Colecciones de uniformes">
-                  <button type="button" className="lupi-collections__toggle" aria-expanded={collectionsExpanded} onClick={() => setCollectionsExpanded(v => !v)}>
-                    <span>COLECCIONES <em>UNIFORMES</em></span><span>{collectionsExpanded ? "−" : "+"}</span>
+
+              <div className="lw-id__cats">
+                <button type="button" aria-pressed={slot === "all"} onClick={() => { setShowCollections(false); setSlot("all"); }}>
+                  <GridIcon size={26} />
+                  <span>TODOS</span>
+                </button>
+                {SLOTS.map((entry) => (
+                  <button type="button" key={entry.key} aria-pressed={slot === entry.key} onClick={() => { setShowCollections(false); setSlot(entry.key); }}>
+                    <SlotIcon slot={entry.key} size={26} />
+                    <span>{entry.label}</span>
                   </button>
-                  {collectionsExpanded && OUTFIT_COLLECTIONS.map(collection => {
+                ))}
+                {wardrobeTab === "wardrobe" && (
+                  <button type="button" aria-pressed={showCollections} onClick={() => setShowCollections(true)}>
+                    <span className="lw-id__collection-icon" aria-hidden="true">▣</span>
+                    <span>COLECCIONES</span>
+                  </button>
+                )}
+              </div>
+
+              {showCollections && wardrobeTab === "wardrobe" ? (
+                  <section className="lupi-collections lupi-collections--wardrobe" aria-label="Colecciones de uniformes">
+                  <div className="lupi-collections__heading">COLECCIONES <span>UNIFORMES</span></div>
+                  {OUTFIT_COLLECTIONS.map(collection => {
                     const progress = collectionProgress(collection, items);
                     const complete = progress.owned === progress.total;
                     return <div className="lupi-collections__detail" key={collection.id}>
@@ -499,21 +517,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                   })}
                   {outfitError && <p role="alert">{outfitError}</p>}
                 </section>
-              )}
-
-              <div className="lw-id__cats">
-                <button type="button" aria-pressed={slot === "all"} onClick={() => setSlot("all")}>
-                  <GridIcon size={26} />
-                  <span>TODOS</span>
-                </button>
-                {SLOTS.map((entry) => (
-                  <button type="button" key={entry.key} aria-pressed={slot === entry.key} onClick={() => setSlot(entry.key)}>
-                    <SlotIcon slot={entry.key} size={26} />
-                    <span>{entry.label}</span>
-                  </button>
-                ))}
-              </div>
-
+              ) : (<>
               <div className="lw-id__rarities" role="group" aria-label="Rareza">
                 {RARITIES.map((value) => (
                   <button
@@ -592,6 +596,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                   </div>
                 )}
               </div>
+              </>)}
             </div>
           )}
         </aside>

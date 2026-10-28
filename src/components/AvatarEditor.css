@@ -1844,3 +1844,15 @@
     margin: 0;
   }
 }
+
+/* V6.22: Colecciones como sexta categoría, sin acordeón encima de los filtros. */
+.lw-id__cats {grid-template-columns:repeat(6,minmax(0,1fr));}
+.lw-id__cats button {min-width:0;}
+.lw-id__collection-icon {font-size:24px!important;line-height:1!important;color:inherit;}
+.lw-id__wardrobe-body>.lupi-collections--wardrobe {margin:10px 0 0;min-height:0;overflow-y:auto;overscroll-behavior:contain;}
+@media(max-width:860px){
+ .lw-id__cats {grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;}
+ .lw-id__cats button {min-height:43px;padding:5px 2px;gap:3px;}
+ .lw-id__cats button span {font-size:8px;}
+ .lw-id__collection-icon {font-size:20px!important;}
+}
