@@ -1410,3 +1410,204 @@
     opacity: .82;
   }
 }
+
+/* V6.12 — transformación energética legible, sin velar la ropa.
+   Efecto sobre el escenario, independiente del avatar y de Supabase. */
+.lw-id__stage > .lw-id__equip-fx {
+  position:absolute; inset:0; z-index:30; pointer-events:none;
+  overflow:hidden; isolation:isolate;
+  --fx-center-x:65%; --fx-top:23%; --fx-bottom:12%;
+}
+.lw-id__equip-fx .lw-id__equip-flash {
+  position:absolute; left:var(--fx-center-x); top:var(--fx-top);
+  width:22%; height:60%; border-radius:48%; transform:translateX(-50%);
+  background:radial-gradient(ellipse, rgba(220,255,255,.24) 0%, rgba(0,240,255,.11) 43%, transparent 74%);
+  box-shadow:0 0 42px 10px rgba(0,226,255,.34);
+  animation:lw-fx-flash 1.25s ease-out both;
+}
+.lw-id__equip-fx .lw-id__equip-burst {
+  position:absolute; left:var(--fx-center-x); top:48%; width:7%; aspect-ratio:1;
+  border:3px solid #d6ffff; border-radius:50%;
+  box-shadow:0 0 15px 5px #00eaff,0 0 35px 10px rgba(0,215,255,.6);
+  animation:lw-fx-burst 1.1s ease-out both;
+}
+.lw-id__equip-fx .lw-id__equip-wave {
+  position:absolute; left:var(--fx-center-x); bottom:var(--fx-bottom);
+  width:28%; height:7%; border:3px solid #9cffff; border-radius:50%;
+  box-shadow:0 0 14px 4px rgba(0,240,255,.75), inset 0 0 10px rgba(0,240,255,.4);
+  animation:lw-fx-wave 1.25s ease-out both;
+}
+.lw-id__equip-fx .lw-id__equip-ring {
+  position:absolute; left:var(--fx-center-x); bottom:var(--fx-bottom);
+  width:23%; height:8%; border:2px solid #a6ffff; border-radius:50%;
+  box-shadow:0 0 12px 3px rgba(0,236,255,.85);
+  animation:lw-fx-ring 1.15s cubic-bezier(.16,.65,.25,1) both;
+  animation-delay:calc(var(--ring-i) * 145ms);
+}
+.lw-id__equip-fx .lw-id__equip-scan {
+  position:absolute; left:var(--fx-center-x); bottom:var(--fx-bottom);
+  width:25%; height:4px; transform:translateX(-50%);
+  background:linear-gradient(90deg,transparent,#aaffff 22%,white 50%,#aaffff 78%,transparent);
+  box-shadow:0 0 12px 4px #00eaff,0 0 30px 7px rgba(0,255,255,.45);
+  animation:lw-fx-scan 1.05s ease-in-out both;
+}
+.lw-id__equip-fx i {
+  --side:calc((var(--fx-i) - 10.5) * 1.05%);
+  position:absolute; left:calc(var(--fx-center-x) + var(--side)); bottom:var(--fx-bottom);
+  width:4px; height:12px; border-radius:3px;
+  background:#e5ffff; box-shadow:0 0 8px 3px #00dfff;
+  animation:lw-fx-particle 1.1s ease-out both;
+  animation-delay:calc(var(--fx-i) * 27ms);
+}
+@keyframes lw-fx-flash {
+  0%{opacity:0;filter:brightness(2)} 12%{opacity:1} 28%{opacity:.85}
+  65%{opacity:.32} 100%{opacity:0}
+}
+@keyframes lw-fx-burst {
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.15)}
+  15%{opacity:1} 65%{opacity:.8}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(3.8)}
+}
+@keyframes lw-fx-wave {
+  0%{opacity:0;transform:translateX(-50%) scale(.6)}
+  18%{opacity:1} 100%{opacity:0;transform:translateX(-50%) scale(1.7)}
+}
+@keyframes lw-fx-ring {
+  0%{opacity:0;transform:translate(-50%,0) scale(.55)}
+  15%{opacity:1} 70%{opacity:.95}
+  100%{opacity:0;transform:translate(-50%,-190px) scale(.85)}
+}
+@keyframes lw-fx-scan {
+  0%{opacity:0;transform:translate(-50%,0) scaleX(.4)}
+  12%{opacity:1} 75%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-210px) scaleX(.7)}
+}
+@keyframes lw-fx-particle {
+  0%{opacity:0;transform:translate(0,0) scale(.4)}
+  20%{opacity:1} 75%{opacity:.9}
+  100%{opacity:0;transform:translate(calc((var(--fx-i) - 10.5) * 4px),-165px) scale(.2)}
+}
+@media(max-width:860px){
+  .lw-id__stage > .lw-id__equip-fx {--fx-center-x:57%;--fx-top:23%;--fx-bottom:9%}
+  .lw-id__equip-fx .lw-id__equip-flash{width:29%;height:65%}
+  .lw-id__equip-fx .lw-id__equip-wave{width:38%}
+  .lw-id__equip-fx .lw-id__equip-ring{width:30%}
+  .lw-id__equip-fx .lw-id__equip-scan{width:31%}
+  @keyframes lw-fx-ring {
+    0%{opacity:0;transform:translate(-50%,0) scale(.55)}
+    15%{opacity:1} 70%{opacity:.95}
+    100%{opacity:0;transform:translate(-50%,-105px) scale(.85)}
+  }
+  @keyframes lw-fx-scan {
+    0%{opacity:0;transform:translate(-50%,0) scaleX(.4)}
+    12%{opacity:1} 75%{opacity:1}
+    100%{opacity:0;transform:translate(-50%,-115px) scaleX(.7)}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .lw-id__equip-fx *{animation-duration:.01ms!important}
+}
+
+
+/* V6.13 — FX anchored to character column, unmistakable confirmation.
+   Avoid covering the outfit or changing CharacterStage geometry. */
+.lw-id__stage > .lw-id__equip-fx {
+  --fx-center-x: 50%;
+  --fx-top: 12%;
+  --fx-bottom: 11%;
+  inset: 0 0 0 94px;
+  z-index: 60;
+  overflow: visible;
+  isolation: auto;
+}
+.lw-id__stage--equipping .lw-id__character {
+  animation: lw-equipped-avatar-pulse 1.45s ease-out both;
+}
+.lw-id__stage--equipping .lw-id__ring {
+  animation: lw-equipped-floor-pulse 1.45s ease-out both;
+}
+.lw-id__equip-fx .lw-id__equip-flash {
+  width: 55%; height: 78%; top: 9%;
+  background: radial-gradient(ellipse, rgba(160,255,255,.34), rgba(0,210,255,.16) 40%, transparent 72%);
+  box-shadow: 0 0 42px rgba(0,230,255,.38);
+}
+.lw-id__equip-fx .lw-id__equip-confirm {
+  position:absolute; left:50%; top:4%; transform:translateX(-50%);
+  display:block; white-space:nowrap; padding:7px 13px;
+  border:1px solid #6efff4; border-radius:7px;
+  background:rgba(1,28,43,.94); color:#dcfffb;
+  box-shadow:0 0 16px rgba(0,255,238,.6), inset 0 0 12px rgba(0,255,238,.18);
+  font:800 13px/1.2 system-ui,sans-serif; letter-spacing:2px;
+  animation:lw-equipped-confirm 1.55s ease-out both;
+  z-index:10;
+}
+@keyframes lw-equipped-confirm {
+  0% { opacity:0; translate:0 12px; scale:.85; }
+  13%,65% { opacity:1; translate:0 0; scale:1; }
+  100% { opacity:0; translate:0 -16px; scale:1.04; }
+}
+@keyframes lw-equipped-avatar-pulse {
+  0%,100% { filter:none; }
+  12% { filter:drop-shadow(0 0 20px rgba(75,255,250,.95)) brightness(1.28); }
+  35% { filter:drop-shadow(0 0 12px rgba(0,235,255,.8)) brightness(1.1); }
+  65% { filter:drop-shadow(0 0 7px rgba(0,230,255,.4)); }
+}
+@keyframes lw-equipped-floor-pulse {
+  0%,100% { filter:none; }
+  18% { filter:drop-shadow(0 0 20px #00eaff) brightness(2.3); }
+  65% { filter:drop-shadow(0 0 8px #00eaff); }
+}
+@media(max-width:860px) {
+  .lw-id__stage > .lw-id__equip-fx {
+    inset:0 0 0 64px;
+    --fx-center-x:50%; --fx-top:8%; --fx-bottom:5%;
+  }
+  .lw-id__equip-fx .lw-id__equip-confirm {
+    font-size:9px; letter-spacing:1px; padding:5px 7px; top:3%;
+  }
+  .lw-id__equip-fx .lw-id__equip-flash { width:65%; height:82%; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .lw-id__stage--equipping .lw-id__character,
+  .lw-id__stage--equipping .lw-id__ring {animation:none!important;}
+  .lw-id__equip-fx .lw-id__equip-confirm {animation:none!important; opacity:1;}
+}
+
+/* V6.14: one scroll container for the whole wardrobe, including expanded collections.
+   The tab strip stays visible; filters and cards scroll together without clipping. */
+.lw-id__panel--wardrobe { overflow: hidden; }
+.lw-id__panel--wardrobe > .lw-id__seg { flex: 0 0 auto; }
+.lw-id__wardrobe-body {
+  flex: 1 1 0; min-height: 0; min-width: 0; overflow-y: auto; overflow-x: hidden;
+  overscroll-behavior-y: contain; scrollbar-width: thin; scrollbar-color: #00cfe7 #082535;
+  padding: 0 3px 20px 0;
+}
+.lw-id__wardrobe-body::-webkit-scrollbar { width: 6px; }
+.lw-id__wardrobe-body::-webkit-scrollbar-thumb { background: #08bcd5; border-radius: 9px; }
+.lw-id__wardrobe-body > .lw-id__scroll {
+  flex: none; min-height: auto; height: auto; overflow: visible;
+  -webkit-mask-image: none; mask-image: none; padding-bottom: 20px;
+}
+.lw-id__wardrobe-body .lupi-collections { flex: none; }
+.lw-id__wardrobe-body .lw-id__cats { margin-top: 12px; }
+/* FX: precise energy around character, not a giant opaque sphere. */
+.lw-id__stage > .lw-id__equip-fx {
+  inset: 0 0 0 94px; --fx-center-x: 50%; --fx-top: 13%; --fx-bottom: 11%;
+  z-index: 6; overflow: hidden; pointer-events: none;
+}
+.lw-id__equip-fx .lw-id__equip-flash {
+  width: 36%; height: 67%; top: 15%; background: radial-gradient(ellipse,rgba(130,255,255,.22),rgba(0,220,255,.07) 48%,transparent 74%);
+  box-shadow: none;
+}
+.lw-id__equip-fx .lw-id__equip-ring { border-width: 3px; box-shadow: 0 0 18px 4px rgba(0,245,255,.85); }
+.lw-id__equip-fx .lw-id__equip-scan { height: 6px; box-shadow: 0 0 16px 6px rgba(0,240,255,.9); }
+.lw-id__equip-fx i { width: 5px; height: 15px; background: #f0ffff; box-shadow: 0 0 11px 4px #00ddff; }
+.lw-id__equip-fx .lw-id__equip-confirm { top: 2%; }
+@media (max-width: 860px) {
+  .lw-id__stage > .lw-id__equip-fx { inset: 0 0 0 64px; --fx-center-x: 50%; --fx-top: 10%; --fx-bottom: 6%; }
+  .lw-id__wardrobe-body { -webkit-overflow-scrolling: touch; touch-action: pan-y; padding-bottom: 28px; }
+  .lw-id__equip-fx .lw-id__equip-flash { width: 55%; height: 72%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lw-id__equip-fx .lw-id__equip-confirm { animation: none !important; opacity: 1; }
+}

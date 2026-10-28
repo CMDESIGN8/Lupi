@@ -118,6 +118,15 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [collectionsExpanded, setCollectionsExpanded] = useState(true);
   const [outfitError, setOutfitError] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  // Efecto visual efímero al seleccionar una prenda para equipar.
+  const [equipFx, setEquipFx] = useState(0);
+  const equipFxTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const triggerEquipFx = () => {
+    setEquipFx((value) => value + 1);
+    if (equipFxTimer.current) clearTimeout(equipFxTimer.current);
+    equipFxTimer.current = setTimeout(() => setEquipFx(0), 1650);
+  };
+  useEffect(() => () => { if (equipFxTimer.current) clearTimeout(equipFxTimer.current); }, []);
 
   useEffect(() => setDraft(appearance), [appearance]);
 
@@ -156,7 +165,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
       // Cada RPC se ejecuta por separado; no se presenta como transacción atómica.
       for (const id of ids) {
         const item = items.find(entry => entry.id === id);
-        if (item && !item.equipped) await toggleEquip(id);
+        if (item && !item.equipped) { triggerEquipFx(); await toggleEquip(id); }
       }
     } catch (error) {
       setOutfitError(error instanceof Error ? error.message : "No se pudo equipar el conjunto.");
@@ -168,6 +177,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const equip = async (id: string) => {
     setBusyId(id);
     try {
+      triggerEquipFx();
       await toggleEquip(id);
     } finally {
       setBusyId(null);
@@ -220,7 +230,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
         </div>
       </header>
 
-      <div className="lw-id__layout" data-mobile-tab={mobileTab} data-wardrobe-tab={wardrobeTab}>
+      <div className="lw-id__layout" data-mobile-tab={mobileTab}>
         {/* ===== Personalización ===== */}
         <aside className="lw-id__panel lw-id__panel--identity" aria-label="Personalización">
           <div className="lw-id__seg" role="group" aria-label="Vista previa">
@@ -321,7 +331,22 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
         </aside>
 
         {/* ===== Escenario ===== */}
-        <main className="lw-id__stage">
+        <main className={`lw-id__stage${equipFx > 0 ? " lw-id__stage--equipping" : ""}`}>
+          {equipFx > 0 && (
+            <div key={equipFx} className="lw-id__equip-fx" aria-hidden="true">
+              <span className="lw-id__equip-flash" />
+              <span className="lw-id__equip-confirm">✦ EQUIPADO ✦</span>
+              <span className="lw-id__equip-burst" />
+              <span className="lw-id__equip-wave" />
+              <span className="lw-id__equip-scan" />
+              {Array.from({ length: 3 }, (_, index) => (
+                <span key={`ring-${index}`} className="lw-id__equip-ring" style={{ "--ring-i": index } as CSSProperties} />
+              ))}
+              {Array.from({ length: 22 }, (_, index) => (
+                <i key={index} style={{ "--fx-i": index } as CSSProperties} />
+              ))}
+            </div>
+          )}
           <div className="lw-id__slots" role="group" aria-label="Equipamiento puesto">
             {SLOTS.map((entry) => {
               const item = equipped.find((candidate) => candidate.slot === entry.key);
@@ -360,9 +385,6 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
             }}
           >
             ARMARIO
-          </button>
-          <button type="button" aria-pressed={mobileTab === "wardrobe" && wardrobeTab === "shop"} onClick={() => { setMobileTab("wardrobe"); setWardrobeTab("shop"); }}>
-            TIENDA
           </button>
           <button
             type="button"
@@ -438,7 +460,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
               })}
             </section>
           ) : (
-            <>
+            <div className="lw-id__wardrobe-body">
               {wardrobeTab === "wardrobe" && (
                 <section className="lupi-collections" aria-label="Colecciones de uniformes">
                   <button type="button" className="lupi-collections__toggle" aria-expanded={collectionsExpanded} onClick={() => setCollectionsExpanded(v => !v)}>
@@ -559,7 +581,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
         </aside>
 
