@@ -12,7 +12,26 @@ const DEFAULTS: Record<AvatarVisualSlot, ItemVisual> = {
   accessory: { x:"50%", y:"60px",  width:"110px", height:"110px", scale:1, rotation:0, z:35 },
 };
 /** Futuro catálogo: registrar aquí excepciones calibradas para cada ítem. */
-export const ITEM_VISUAL_OVERRIDES: Record<string, Partial<ItemVisual>> = {};
+export const ITEM_VISUAL_OVERRIDES: Record<string, Partial<ItemVisual>> = {
+  "flores-club-8va-camiseta-verde": {
+    x: "49%",
+    y: "205px",
+    width: "210px",
+    height: "195px",
+    scale: 0.80,
+    rotation: 0,
+    z: 22,
+  },
+  "flores-club-8va-short-negro": {
+  x: "50%",
+  y: "290px",
+  width: "700px",
+  height: "205px",
+  scale: 0.90,
+  rotation: 0,
+  z: 21,
+},
+};
 export function getItemVisual(slot: AvatarVisualSlot, item: InventoryItem | null): CSSProperties {
   const v = { ...DEFAULTS[slot], ...(item ? ITEM_VISUAL_OVERRIDES[item.id] : {}) };
   return {
