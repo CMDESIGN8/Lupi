@@ -324,7 +324,7 @@
 .avatar2d__layer--accessory{z-index:35}
 
 /* V3: transformaciones de ítems parametrizadas, compatibles con las prendas existentes. */
-.avatar2d__layer--top,.avatar2d__layer--bottom,.avatar2d__layer--boots,.avatar2d__layer--accessory{
+.avatar2d__layer--top,.avatar2d__layer--bottom,.avatar2d__layer--socks,.avatar2d__layer--boots,.avatar2d__layer--accessory{
  left:var(--item-x,50%);top:var(--item-y);width:var(--item-w);height:var(--item-h);
  transform:translate(-50%,-50%) scale(calc(var(--avatar-scale,1) * var(--item-scale,1))) rotate(var(--item-rotation,0deg));
  transform-origin:center center;z-index:var(--item-z,22);
