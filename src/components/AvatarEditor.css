@@ -1709,3 +1709,138 @@
   .lw-id__panel--identity > .lw-id__seg { flex: 0 0 auto; }
   .lw-id__wardrobe-body { padding-bottom: 38px !important; }
 }
+
+/* V6.20 — Armario: scroll único y colección compacta en pantallas pequeñas.
+   No altera compras, equipamiento, ni el escenario del avatar. */
+@media (max-width: 860px) {
+  .lw-id__layout[data-mobile-tab="wardrobe"] .lw-id__panel--wardrobe {
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+  .lw-id__layout[data-mobile-tab="wardrobe"] .lw-id__wardrobe-body {
+    display: block !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #09c7db #082c3b;
+    padding: 0 4px 64px 0 !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+  .lw-id__wardrobe-body::-webkit-scrollbar { width: 4px; }
+  .lw-id__wardrobe-body::-webkit-scrollbar-thumb { background: #09c7db; border-radius: 6px; }
+  .lw-id__wardrobe-body > .lw-id__scroll {
+    display: block !important;
+    flex: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    padding-bottom: 28px !important;
+  }
+  .lw-id__wardrobe-body .lupi-collections {
+    margin: 0 0 8px;
+    padding: 9px;
+  }
+  .lw-id__wardrobe-body .lupi-collections__toggle { padding: 2px 0 7px; font-size: 11px; }
+  .lw-id__wardrobe-body .lupi-collections__detail { padding: 8px; gap: 6px; }
+  .lw-id__wardrobe-body .lupi-collections__info { gap: 2px; }
+  .lw-id__wardrobe-body .lupi-collections__info strong { font-size: 12px; }
+  .lw-id__wardrobe-body .lupi-collections__info small { font-size: 9px; }
+  .lw-id__wardrobe-body .lupi-collections__progress { font-size: 10px; }
+  .lw-id__wardrobe-body .lupi-collections__bar { height: 4px; }
+  .lw-id__wardrobe-body .lupi-collections__items { gap: 5px; }
+  .lw-id__wardrobe-body .lupi-collections__piece { width: 39px; height: 43px; }
+  .lw-id__wardrobe-body .lupi-collections__equip { min-height: 30px; font-size: 10px; }
+  .lw-id__wardrobe-body .lw-id__cats { margin-top: 8px; }
+  .lw-id__savebar { position: relative; z-index: 8; }
+}
+
+/* V6.21 — scroll móvil confiable en las cuatro pestañas.
+   La escena no cambia: solo se distribuye correctamente el área inferior.
+   Un único contenedor desplazable por pestaña, con espacio de cierre para
+   que la última tarjeta no quede debajo de Guardar cambios. */
+@media (max-width: 860px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="character"],
+  .lw-id__layout[data-mobile-tab="wardrobe"],
+  .lw-id__layout[data-wardrobe-tab="shop"],
+  .lw-id__layout[data-mobile-tab="wardrobe"][data-wardrobe-tab="shop"] {
+    min-height: 0 !important;
+    overflow: hidden !important;
+    grid-template-rows: minmax(0, min(35dvh, 340px)) 48px minmax(0, 1fr) auto !important;
+  }
+
+  .lw-id__panel--identity,
+  .lw-id__panel--wardrobe {
+    box-sizing: border-box;
+    height: 100%;
+    min-height: 0 !important;
+    max-height: 100%;
+    overflow: hidden !important;
+  }
+
+  .lw-id__panel--identity > .lw-id__scroll {
+    flex: 1 1 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 72px !important;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+
+  .lw-id__panel--wardrobe .lw-id__wardrobe-body {
+    flex: 1 1 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 80px !important;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+  .lw-id__wardrobe-body > .lw-id__scroll {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding-bottom: 48px !important;
+  }
+
+  /* La tienda también usa el panel como única superficie desplazable. */
+  .lw-id__layout[data-wardrobe-tab="shop"] .lw-id__panel--wardrobe {
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-gutter: stable;
+    padding-bottom: 72px !important;
+  }
+  .lw-id__layout[data-wardrobe-tab="shop"] .lupi-collections--shop {
+    flex: 0 0 auto !important;
+    min-height: max-content;
+  }
+
+  .lw-id__savebar {
+    position: relative;
+    z-index: 10;
+    flex-shrink: 0;
+    margin: 0;
+  }
+}
