@@ -98,6 +98,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [rarity, setRarity] = useState<"all" | ItemRarity>("all");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [outfitBusy, setOutfitBusy] = useState(false);
+  const [collectionsExpanded, setCollectionsExpanded] = useState(true);
   const [outfitError, setOutfitError] = useState<string | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
@@ -379,42 +380,50 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
           </div>
 
           {wardrobeTab === "shop" ? (
-            <div className="lw-id__empty">
-              <strong>TIENDA PRÓXIMAMENTE</strong>
-              <p>El catálogo de compras todavía no está conectado. Tus ítems actuales están en Mi armario.</p>
-              <button type="button" onClick={() => setWardrobeTab("wardrobe")}>
-                VER MI ARMARIO
-              </button>
-            </div>
+            <section className="lupi-collections lupi-collections--shop" aria-label="Tienda de uniformes">
+              <div className="lupi-collections__heading">TIENDA <span>UNIFORMES DE CLUBES</span></div>
+              <p className="lupi-collections__sub">Próximamente vas a poder comprar prendas sueltas o el conjunto completo con monedas. Los precios y las compras todavía no están habilitados.</p>
+              {OUTFIT_COLLECTIONS.map(collection => {
+                const progress = collectionProgress(collection, items);
+                return <div className="lupi-collections__shop-card" key={collection.id}>
+                  <div className="lupi-collections__info"><strong>{collection.title}</strong><small>{collection.season} · {collection.description}</small><span>{progress.owned} de {progress.total} prendas en tu armario</span></div>
+                  <div className="lupi-collections__items">{collection.itemIds.map(id => {
+                    const item = items.find(entry => entry.id === id);
+                    return <div className="lupi-collections__piece" key={id} title={item?.name ?? id}>
+                      {item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span>?</span>}
+                      {item?.owned && <span className="lupi-collections__owned">✓</span>}
+                    </div>;
+                  })}</div>
+                  <button type="button" onClick={() => setWardrobeTab("wardrobe")}>VER COLECCIÓN EN MI ARMARIO</button>
+                </div>;
+              })}
+            </section>
           ) : (
             <>
               {wardrobeTab === "wardrobe" && (
                 <section className="lupi-collections" aria-label="Colecciones de uniformes">
-                  <div className="lupi-collections__heading">COLECCIONES <span>UNIFORMES</span></div>
-                  {OUTFIT_COLLECTIONS.map(collection => {
+                  <button type="button" className="lupi-collections__toggle" aria-expanded={collectionsExpanded} onClick={() => setCollectionsExpanded(v => !v)}>
+                    <span>COLECCIONES <em>UNIFORMES</em></span><span>{collectionsExpanded ? "−" : "+"}</span>
+                  </button>
+                  {collectionsExpanded && OUTFIT_COLLECTIONS.map(collection => {
                     const progress = collectionProgress(collection, items);
                     const complete = progress.owned === progress.total;
-                    return (
-                      <div className="lupi-collections__card" key={collection.id}>
-                        <div className="lupi-collections__info">
-                          <strong>{collection.title}</strong>
-                          <small>{collection.season} · {collection.description}</small>
-                          <span>{progress.owned}/{progress.total} prendas obtenidas</span>
-                        </div>
-                        <div className="lupi-collections__items">
-                          {collection.itemIds.map(id => {
-                            const item = items.find(entry => entry.id === id);
-                            return <div className="lupi-collections__piece" key={id} title={item?.name ?? id}>
-                              {item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span>?</span>}
-                            </div>;
-                          })}
-                        </div>
-                        <button type="button" disabled={!complete || progress.equipped || outfitBusy || usingFallback}
-                          onClick={() => void equipOutfit(collection.itemIds)}>
-                          {progress.equipped ? "✓ CONJUNTO EQUIPADO" : complete ? (outfitBusy ? "EQUIPANDO…" : "EQUIPAR CONJUNTO") : "CONJUNTO INCOMPLETO"}
-                        </button>
-                      </div>
-                    );
+                    return <div className="lupi-collections__detail" key={collection.id}>
+                      <div className="lupi-collections__info"><strong>{collection.title}</strong><small>{collection.season} · {collection.description}</small></div>
+                      <div className="lupi-collections__progress"><span>{progress.owned} / {progress.total} prendas</span><span>{Math.round(progress.owned / Math.max(progress.total,1) * 100)}%</span></div>
+                      <div className="lupi-collections__bar"><div style={{width:`${progress.owned / Math.max(progress.total,1) * 100}%`}} /></div>
+                      <div className="lupi-collections__items">{collection.itemIds.map(id => {
+                        const item = items.find(entry => entry.id === id);
+                        return <div className="lupi-collections__piece" key={id} title={item?.name ?? id}>
+                          {item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span>?</span>}
+                          {item?.owned && <span className="lupi-collections__owned">✓</span>}
+                        </div>;
+                      })}</div>
+                      <button className="lupi-collections__equip" type="button" disabled={!complete || progress.equipped || outfitBusy || usingFallback}
+                        onClick={() => void equipOutfit(collection.itemIds)}>
+                        {progress.equipped ? "✓ CONJUNTO EQUIPADO" : !complete ? "CONJUNTO INCOMPLETO" : outfitBusy ? "EQUIPANDO…" : "EQUIPAR CONJUNTO"}
+                      </button>
+                    </div>;
                   })}
                   {outfitError && <p role="alert">{outfitError}</p>}
                 </section>
