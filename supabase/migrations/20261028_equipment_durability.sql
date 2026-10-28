@@ -27,6 +27,7 @@ begin
  if v_uid is null then raise exception 'Authentication required'; end if;
  select slot into v_slot from public.aura_items where id=p_item_id;
  if v_slot not in ('socks','boots') or v_slot is null then raise exception 'Not renewable'; end if;
+ if exists(select 1 from public.equipment_durability where user_id=v_uid and item_id=p_item_id and remaining=10) then raise exception 'Equipment already at full durability'; end if;
  if not exists(select 1 from public.user_items where user_id=v_uid and item_id=p_item_id)
  then raise exception 'Item not owned'; end if;
  select cost into v_cost from public.shop_items where id=p_item_id and active=true and available=true;
