@@ -57,8 +57,8 @@ export const COLOR_BY_ID: Record<string, string> = {
 
 /** Convención de imágenes: /public/items/<id>.png */
 const defaultImage = (id: string) => `/items/${id}.png`;
-const FLORES_8VA_PREVIEWS: Record<string,string> = {"flores-club-8va-camiseta-verde":flores8vaTopPreview,"flores-club-8va-short-negro":flores8vaBottomPreview};
-const FLORES_8VA_SPRITES: Record<string,string> = {"flores-club-8va-camiseta-verde":flores8vaTop,"flores-club-8va-short-negro":flores8vaBottom};
+const FLORES_8VA_PREVIEWS: Record<string,string> = {"flores-club-medias-rojas":"/items/flores-club-medias-rojas.svg","flores-club-medias-verdes":"/items/flores-club-medias-verdes.svg","flores-club-8va-camiseta-verde":flores8vaTopPreview,"flores-club-8va-short-negro":flores8vaBottomPreview};
+const FLORES_8VA_SPRITES: Record<string,string> = {"flores-club-medias-rojas":"/items/flores-club-medias-rojas.svg","flores-club-medias-verdes":"/items/flores-club-medias-verdes.svg","flores-club-8va-camiseta-verde":flores8vaTop,"flores-club-8va-short-negro":flores8vaBottom};
 
 /**
  * Catálogo local de respaldo (modo prototipo).
