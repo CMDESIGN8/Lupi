@@ -65,3 +65,15 @@
  .lupi-flores-store__banner {padding:11px;gap:9px}
  .lupi-flores-store__completion {flex:1 1 100%;}
 }
+
+/* V6.4 — cards remain legible and fully scrollable on actual phones */
+@media (max-width: 860px) {
+ .lupi-flores-store__grid {grid-template-columns: repeat(2, minmax(0,1fr));gap:10px}
+ .lupi-flores-store__product--bundle {grid-column:1 / -1}
+ .lupi-flores-store__product-art {height:clamp(100px,28vw,150px)}
+ .lupi-flores-store__product-info {min-height:85px;padding:10px 5px}
+ .lupi-flores-store__product-info strong {font-size:clamp(12px,3vw,15px)}
+ .lupi-flores-store__buy {font-size:clamp(11px,2.7vw,13px);min-height:44px}
+ .lupi-flores-store__banner {gap:9px}
+ .lupi-flores-store__completion {flex:1 1 100%}
+}

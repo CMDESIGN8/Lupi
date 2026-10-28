@@ -1213,7 +1213,7 @@
 .lw-id__bg {
   background:
     linear-gradient(90deg, rgba(1,10,20,.50),rgba(1,12,23,.32) 48%,rgba(1,10,20,.64)),
-    url('../assets/flores-locker-room.webp') center center / cover no-repeat !important;
+    url('../assets/flores-locker-room-desktop.webp') center 56% / cover no-repeat !important;
 }
 @media (min-width: 861px) {
   .lw-id__layout[data-wardrobe-tab="shop"] {
@@ -1246,4 +1246,149 @@
     min-height: min-content;
     margin: 0;
   }
+}
+
+/* V6.4 — Mobile real-device viewport: usable shop, compact stage and fixed save */
+@media (max-width: 860px) {
+  .lw-id { height: 100dvh; max-height: 100dvh; width: 100%; }
+  .lw-id__header { padding: max(8px, env(safe-area-inset-top, 0px)) 12px 6px; }
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="wardrobe"],
+  .lw-id__layout[data-wardrobe-tab="shop"],
+  .lw-id__layout[data-mobile-tab="wardrobe"][data-wardrobe-tab="shop"] {
+    height: auto;
+    flex: 1 1 0;
+    min-height: 0;
+    grid-template-rows: minmax(160px, min(29dvh, 280px)) 48px minmax(0, 1fr) auto !important;
+    gap: 7px;
+    padding: 0 10px max(8px, env(safe-area-inset-bottom, 0px));
+  }
+  .lw-id__stage { height: 100%; min-height: 0; }
+  .lw-id__nav { height: 48px; min-height: 48px; }
+  .lw-id__nav button { font-size: clamp(11px, 2.9vw, 14px) !important; min-height: 46px; }
+  .lw-id__layout[data-wardrobe-tab="shop"] .lw-id__panel--wardrobe {
+    display: flex !important;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    padding: 0;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #147a8b transparent;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+  .lw-id__layout[data-wardrobe-tab="shop"] .lw-id__panel--wardrobe > .lw-id__seg { display: none; }
+  .lw-id__layout[data-wardrobe-tab="shop"] .lupi-collections--shop {
+    flex: 0 0 auto;
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    min-height: max-content;
+  }
+  .lw-id__savebar { z-index: 4; background: linear-gradient(transparent, rgba(1,14,23,.88) 35%); padding-top: 5px; }
+  .lw-id__save { min-height: 48px; height: 48px; }
+}
+@media (max-width: 860px) and (max-height: 740px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="wardrobe"],
+  .lw-id__layout[data-wardrobe-tab="shop"] {
+    grid-template-rows: minmax(135px, 25dvh) 44px minmax(0, 1fr) auto !important;
+  }
+}
+
+/* ============================================================
+   V6.5 — Escenario móvil estable en todas las pestañas.
+   No modificar dimensiones de slots ni altura del escenario
+   al cambiar Personaje / Armario / Tienda / Inventario.
+   ============================================================ */
+@media (max-width: 860px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="character"],
+  .lw-id__layout[data-mobile-tab="wardrobe"],
+  .lw-id__layout[data-wardrobe-tab="shop"],
+  .lw-id__layout[data-mobile-tab="wardrobe"][data-wardrobe-tab="shop"] {
+    grid-template-rows: minmax(160px, min(29dvh, 280px)) 48px minmax(0, 1fr) auto !important;
+  }
+
+  .lw-id__stage {
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    grid-template-columns: 58px minmax(0, 1fr);
+    gap: 6px;
+  }
+
+  .lw-id__slots,
+  .lw-id__layout[data-mobile-tab="wardrobe"] .lw-id__slots {
+    justify-content: flex-start;
+    gap: 5px;
+    padding-top: 2px;
+  }
+
+  .lw-id__slot,
+  .lw-id__layout[data-mobile-tab="wardrobe"] .lw-id__slot {
+    box-sizing: border-box;
+    width: 58px;
+    height: 62px;
+    min-height: 62px;
+    padding: 6px 2px 4px;
+  }
+
+  .lw-id__slot small,
+  .lw-id__layout[data-mobile-tab="wardrobe"] .lw-id__slot small {
+    display: block;
+    font-size: 8px;
+  }
+
+  .lw-id__slot-art img,
+  .lw-id__layout[data-mobile-tab="wardrobe"] .lw-id__slot-art img {
+    max-height: 34px;
+  }
+
+  .lw-id__character { height: 100%; }
+  .lw-id__ring { bottom: 2%; }
+}
+
+@media (max-width: 860px) and (max-height: 740px) {
+  .lw-id__layout,
+  .lw-id__layout[data-mobile-tab="character"],
+  .lw-id__layout[data-mobile-tab="wardrobe"],
+  .lw-id__layout[data-wardrobe-tab="shop"],
+  .lw-id__layout[data-mobile-tab="wardrobe"][data-wardrobe-tab="shop"] {
+    grid-template-rows: minmax(135px, 25dvh) 44px minmax(0, 1fr) auto !important;
+  }
+}
+
+/* V6.6 — Fondo separado por dispositivo; escenario móvil anclado. */
+@media (max-width: 860px) {
+  /* Evitar que el fondo vertical se escale a toda la altura de la aplicación. */
+  .lw-id__bg {
+    background:
+      linear-gradient(180deg, rgba(2, 13, 24, .55), rgba(2, 13, 24, .92)),
+      url('../assets/flores-locker-room.webp') center 46% / cover no-repeat !important;
+  }
+
+  /* Encuadre propio del escenario, idéntico en las cuatro pestañas. */
+  .lw-id__stage {
+    position: relative;
+    isolation: isolate;
+  }
+  .lw-id__stage::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, rgba(2, 12, 22, .4), transparent 35%, rgba(2, 12, 22, .24)),
+      url('../assets/flores-locker-room.webp') center 51% / 100% auto no-repeat;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 87%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 87%, transparent);
+  }
+  .lw-id__slots { position: relative; z-index: 3; }
+  .lw-id__character { position: relative; z-index: 1; }
+  .lw-id__ring { bottom: 2%; }
 }
