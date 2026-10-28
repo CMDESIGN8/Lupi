@@ -146,7 +146,7 @@ export function useAuraInventory(userId: string, level: number) {
   const load = useCallback(async () => {
     if (!userId) return;
 
-    const [catalogRes, ownedRes] = await Promise.all([
+    const [catalogRes, ownedRes, durabilityRes] = await Promise.all([
       supabase
         .from("aura_items")
         .select("*")
@@ -155,6 +155,7 @@ export function useAuraInventory(userId: string, level: number) {
         .from("user_items")
         .select("item_id, equipped")
         .eq("user_id", userId),
+      supabase.from("equipment_durability").select("item_id,remaining,max_uses").eq("user_id",userId),
     ]);
 
     const catalog = catalogRes.data as CatalogRow[] | null;
@@ -179,6 +180,7 @@ export function useAuraInventory(userId: string, level: number) {
       (ownedRes.data ?? []).map((row) => [row.item_id, !!row.equipped])
     );
 
+    const durabilityMap = new Map((durabilityRes.data ?? []).map(row => [row.item_id, row]));
     setItems(
       catalog.map((row) => ({
         id: row.id,
@@ -196,6 +198,8 @@ export function useAuraInventory(userId: string, level: number) {
         owned: ownedMap.has(row.id) || (!row.id.startsWith("flores-club-") && level >= row.required_level),
         equipped: ownedMap.get(row.id) ?? false,
         equippedImageUrl: FLORES_8VA_SPRITES[row.id] ?? row.equipped_image_url,
+        durability: row.slot === "socks" || row.slot === "boots" ? (durabilityMap.get(row.id)?.remaining ?? 10) : null,
+        maxDurability: row.slot === "socks" || row.slot === "boots" ? 10 : null,
       }))
     );
     setUsingFallback(false);
@@ -228,7 +232,7 @@ export function useAuraInventory(userId: string, level: number) {
   const toggleEquip = useCallback(
     async (itemId: string) => {
       const target = items.find((i) => i.id === itemId);
-      if (!target || !target.owned) return;
+      if (!target || !target.owned || (target.durability != null && target.durability <= 0 && !target.equipped)) return;
 
       const willEquip = !target.equipped;
 
