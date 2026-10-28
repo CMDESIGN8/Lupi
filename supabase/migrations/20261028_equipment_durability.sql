@@ -32,9 +32,9 @@ begin
  then raise exception 'Item not owned'; end if;
  select cost into v_cost from public.shop_items where id=p_item_id and active=true and available=true;
  if v_cost is null or v_cost < 0 then raise exception 'Item not for sale'; end if;
- select coins into v_balance from public.user_stats where user_id=v_uid for update;
+ select coins into v_balance from public.profiles where id=v_uid for update;
  if v_balance is null or v_balance < v_cost then raise exception 'Insufficient coins'; end if;
- update public.user_stats set coins=coins-v_cost where user_id=v_uid;
+ update public.profiles set coins=coins-v_cost where id=v_uid;
  insert into public.equipment_durability(user_id,item_id,remaining)
  values(v_uid,p_item_id,10)
  on conflict(user_id,item_id) do update set remaining=10;
