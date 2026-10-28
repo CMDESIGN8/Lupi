@@ -1392,3 +1392,21 @@
   .lw-id__character { position: relative; z-index: 1; }
   .lw-id__ring { bottom: 2%; }
 }
+
+/* V6.8 — Recupera la geometría del avatar V6.6.
+   No aplicar scale/translate al avatar: CharacterStage calcula
+   su propio transform y el aumento V6.7 recortaba los pies. */
+@media (max-width: 860px) {
+  .lw-id__character .lw-id__avatar {
+    scale: 1;
+    translate: none;
+  }
+
+  /* Conservar únicamente la iluminación suave de V6.7. */
+  .lw-id__character .lw-id__spot {
+    inset: 8% 12% 4%;
+    background: radial-gradient(ellipse 44% 52% at 50% 51%, rgba(46, 178, 220, .21), rgba(20, 96, 141, .09) 62%, transparent 86%);
+    filter: blur(18px);
+    opacity: .82;
+  }
+}
