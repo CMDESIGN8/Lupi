@@ -45,7 +45,7 @@ export function MatchTutorial({ cards, opponent, onTeam, onStart }: Props) {
           const player = getCardData(card);
           return <div className="mt-lineup-slot" key={card.id || i} style={{'--card-order': i} as CSSProperties}>
             <button className="mt-card-button" type="button" aria-expanded={selected === i} aria-label={`Ver estadísticas de ${player.name || 'Jugador'}`} onClick={() => setSelected(selected === i ? null : i)}>
-              <CardFace item={card.card ? card : { ...card, card: player } as UserCard} index={i} variant="lineup" />
+              {card.card ? <CardFace item={card} index={i} variant="lineup" /> : <span className="mt-example"><strong>{player.name || 'Jugador'}</strong><small>Datos de carta no disponibles</small></span>}
               <span className="mt-card-hint">VER STATS ↗</span>
             </button>
             <span className="mt-role">{['ARQUERO', 'CIERRE', 'ALA IZQ.', 'ALA DER.', 'PÍVOT'][i]}</span>
