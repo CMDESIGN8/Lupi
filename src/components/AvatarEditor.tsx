@@ -115,10 +115,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
     if(shopBusy || usingFallback) return;
     setShopBusy(true);setShopMessage("");
     try {
-      const is8va = ids.every(id => id.startsWith("flores-club-8va-"));
-      const {data,error} = is8va
-        ? await supabase.rpc("purchase_flores_8va", {p_bundle: ids.length > 1, p_item_id: ids.length === 1 ? ids[0] : null})
-        : await supabase.rpc("purchase_flores_outfit", {p_item_ids: ids});
+      const {data,error} = await supabase.rpc("purchase_flores_uniform", {p_item_ids: ids});
       if(error) throw error;
       setShopCoins(data?.newCoins ?? null);
       await refresh();
