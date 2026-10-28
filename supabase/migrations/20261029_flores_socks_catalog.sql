@@ -11,25 +11,17 @@ on conflict (id) do update
 set name=excluded.name,slot=excluded.slot,image_url=excluded.image_url,
  equipped_image_url=excluded.equipped_image_url,color=excluded.color;
 
--- Clone the existing shop row for the corresponding shorts, including its effect
--- metadata, substituting the item id inside the JSON payload.
-with source_items as (
- select 'flores-club-short-rojo'::text as source_id,
-        'flores-club-medias-rojas'::text as new_id,
-        'Medias rojas · Flores Club'::text as new_title
- union all
- select 'flores-club-8va-short-negro','flores-club-medias-verdes','Medias verdes · Flores Club'
-)
+-- Match the confirmed shop item contract: uniformes / aura_item / item_id.
 insert into public.shop_items
  (id,title,description,cost,icon,category,badge,stock,effect_type,
   effect_payload,available,active,sort_order,created_at)
-select s.new_id,s.new_title,'Medias de fútbol · Flores Club 2026',50,'🧦',
-       old.category,old.badge,old.stock,old.effect_type,
-       replace(old.effect_payload::text,to_json(old.id)::text,to_json(s.new_id)::text)::jsonb,
-       old.available,old.active,old.sort_order+1,now()
-from source_items s
-join public.shop_items old on old.id=s.source_id
-on conflict (id) do update set cost=50,
- title=excluded.title,description=excluded.description,icon=excluded.icon,
- effect_payload=excluded.effect_payload;
+values
+ ('flores-club-medias-rojas','Flores Club - Medias Rojas','Medias de arquero · Flores Club',50,'🧦','uniformes',null,null,'aura_item',
+  '{"item_id":"flores-club-medias-rojas"}'::jsonb,true,true,51,now()),
+ ('flores-club-medias-verdes','Flores Club 8va - Medias Verdes','Medias 8va división · Flores Club',50,'🧦','uniformes',null,null,'aura_item',
+  '{"item_id":"flores-club-medias-verdes"}'::jsonb,true,true,52,now())
+on conflict (id) do update set
+ title=excluded.title,description=excluded.description,cost=excluded.cost,
+ icon=excluded.icon,category=excluded.category,effect_type=excluded.effect_type,
+ effect_payload=excluded.effect_payload,available=excluded.available,active=excluded.active;
 commit;
