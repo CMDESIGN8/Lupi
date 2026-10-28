@@ -17,3 +17,51 @@
 .lupi-collections__equip:disabled{opacity:.7;cursor:default}
 .lupi-collections__shop-card>button{background:#0b3546}
 @media(max-width:500px){.lupi-collections{padding:10px}.lupi-collections__piece{width:53px;height:58px}.lupi-collections__info strong{font-size:14px}}
+.lupi-flores-purchase{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}.lupi-flores-purchase button{min-width:0;white-space:normal}.lupi-flores-shop-status{color:#9df4ff;font-weight:700;font-size:13px}@media(max-width:520px){.lupi-flores-purchase{grid-template-columns:1fr}}
+
+/* Flores Club store — stadium collection cards (visual only; purchase logic unchanged) */
+.lupi-collections--shop{background:linear-gradient(155deg,#061a2b,#031521 70%);border-color:#126a83;padding:clamp(12px,2vw,20px)}
+.lupi-collections--shop .lupi-collections__heading{font-size:clamp(16px,1.6vw,22px);letter-spacing:2px;margin-bottom:6px}
+.lupi-collections--shop .lupi-collections__sub{font-size:12px;max-width:65ch;margin:0 0 16px}
+.lupi-flores-store.lupi-collections__shop-card{padding:0;border:0;gap:12px;background:transparent}
+.lupi-flores-store__banner{position:relative;display:flex;align-items:center;gap:12px;padding:16px;border:1px solid #a31e2a;border-radius:13px;overflow:hidden;background:repeating-linear-gradient(130deg,transparent 0 24px,#ae122320 25px 34px),linear-gradient(120deg,#660d1c,#1b101c 68%,#071725);box-shadow:inset 0 0 35px #0008}
+.lupi-flores-store__crest{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 58px;height:67px;border:2px solid #e5c449;border-radius:14px 14px 22px 22px;background:#09251e;color:#ffdb55;font-size:21px;font-weight:1000;text-shadow:0 1px 4px #000}
+.lupi-flores-store__crest span{font-size:11px;color:#19d2a6}
+.lupi-flores-store__banner-title{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}.lupi-flores-store__eyebrow{font-size:9px;font-weight:900;color:#ffce70;letter-spacing:1.1px}.lupi-flores-store__banner-title strong{font-size:clamp(17px,2vw,26px);letter-spacing:1px;color:#fff}.lupi-flores-store__banner-title small{font-size:11px;color:#f6c5c8}
+.lupi-flores-store__completion{flex:0 0 145px;padding:10px;border:1px solid #436070;border-radius:9px;background:#031521df;color:#d6f8fa}.lupi-flores-store__completion>span{display:flex;justify-content:space-between;font-size:10px;font-weight:800}.lupi-flores-store__completion b{color:#5ef2d0}.lupi-flores-store__completion small{font-size:10px}.lupi-flores-store__track{height:6px;margin:8px 0;border-radius:10px;background:#174451;overflow:hidden}.lupi-flores-store__track i{display:block;height:100%;background:linear-gradient(90deg,#00bb9c,#4af8d2);transition:width .3s}
+.lupi-flores-store__grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.lupi-flores-store__product{display:flex;flex-direction:column;min-width:0;overflow:hidden;border:1px solid #0aa9bd;border-radius:12px;background:radial-gradient(ellipse at 50% 12%,#14485a,#061c2c 68%);box-shadow:inset 0 0 25px #0005,0 3px 15px #0004}
+.lupi-flores-store__product.is-owned{border-color:#1cd6bc}.lupi-flores-store__product--bundle{border-color:#e2b943;background:radial-gradient(ellipse at 50% 10%,#56451d,#101b27 70%)}
+.lupi-flores-store__product-art{position:relative;height:clamp(90px,12vw,160px);display:flex;align-items:center;justify-content:center;padding:9px;background:repeating-linear-gradient(145deg,transparent 0 35px,#df18210d 36px 44px)}
+.lupi-flores-store__product-art img{max-height:100%;max-width:95%;object-fit:contain;filter:drop-shadow(0 9px 9px #000a)}
+.lupi-flores-store__bundle-art img{width:52%;margin-inline:-5%;object-fit:contain}
+.lupi-flores-store__check{position:absolute;right:9px;top:8px;display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#00bd9a;color:#fff;font-weight:900;font-size:17px;box-shadow:0 0 12px #00d7a9a0}
+.lupi-flores-store__product-info{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px;flex:1;padding:10px 6px;min-height:83px}.lupi-flores-store__product-info span{color:#7bb4c4;font-size:9px;letter-spacing:1px}.lupi-flores-store__product-info strong{font-size:clamp(11px,1.2vw,16px);color:#fff;line-height:1.2}.lupi-flores-store__product-info small{font-size:10px;color:#f2d36d;font-weight:800}
+.lupi-flores-store__product.is-owned .lupi-flores-store__product-info small{color:#56e6ca}
+.lupi-flores-store__buy{min-height:39px;margin:0 8px 9px;padding:7px 5px;border:1px solid #00d9bd;border-radius:8px;background:linear-gradient(#07584e,#04342e);color:#eafff9;font-size:clamp(9px,1vw,12px);font-weight:900;letter-spacing:.4px;cursor:pointer;transition:filter .2s,transform .2s,box-shadow .2s}.lupi-flores-store__buy:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.2);box-shadow:0 0 14px #00cdb56a}.lupi-flores-store__buy:disabled{cursor:default;opacity:1;background:linear-gradient(#075146,#032b28);color:#56e6c4}.lupi-flores-store__buy--bundle{border-color:#e9bc3d;background:linear-gradient(#6b5412,#302408);color:#ffe38c}.lupi-flores-store__product--bundle .lupi-flores-store__buy:disabled{border-color:#d5a83c;color:#ffe38c;background:#483b14}
+.lupi-flores-store__wardrobe-link{align-self:center;width:100%;min-height:38px;padding:8px;border:1px solid #15687c;border-radius:8px;background:#072c3b;color:#c6f7ff;font-size:11px;font-weight:900;letter-spacing:1px;cursor:pointer}.lupi-flores-store__wardrobe-link:hover{background:#0b4052}
+.lupi-flores-shop-status{padding:10px 12px;border:1px solid #13bda4;border-radius:8px;background:#064137;color:#a8ffe8;font-size:12px}
+@media(max-width:700px){.lupi-flores-store__grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lupi-flores-store__product--bundle{grid-column:1/-1}.lupi-flores-store__completion{flex-basis:110px}.lupi-flores-store__banner{flex-wrap:wrap}.lupi-flores-store__banner-title{min-width:130px}}
+@media(max-width:400px){.lupi-flores-store__completion{flex:1 1 100%}.lupi-flores-store__crest{flex-basis:45px;height:55px}.lupi-flores-store__product-art{height:110px}}
+
+/* V6.3 responsive store cards: preserve full actions and readable prices */
+.lupi-flores-store__grid {align-items:stretch}
+.lupi-flores-store__product {min-width:0}
+.lupi-flores-store__buy {overflow-wrap:anywhere;line-height:1.25}
+@media (min-width: 861px) and (max-width: 1450px) {
+ .lupi-flores-store__banner {padding:12px}
+ .lupi-flores-store__completion {flex-basis:112px}
+ .lupi-flores-store__grid {gap:7px}
+ .lupi-flores-store__product-art {height:clamp(94px,10vw,145px)}
+ .lupi-flores-store__product-info {min-height:90px}
+}
+@media (max-width: 860px) {
+ .lupi-collections--shop {padding:12px}
+ .lupi-flores-store__grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .lupi-flores-store__product--bundle {grid-column:1/-1}
+ .lupi-flores-store__product-art {height:clamp(95px,25vw,150px)}
+ .lupi-flores-store__product-info {min-height:80px}
+ .lupi-flores-store__buy {min-height:42px;font-size:11px}
+ .lupi-flores-store__banner {padding:11px;gap:9px}
+ .lupi-flores-store__completion {flex:1 1 100%;}
+}

@@ -1,3 +1,4 @@
+import { supabase } from "../lib/supabaseClient";
 // src/components/AvatarEditor.tsx
 import { createPortal } from "react-dom";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -88,7 +89,23 @@ function FaceOption({
 
 export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points, coins, sceneImage }: Props) {
   const { appearance, save, saving, error } = useAvatarAppearance(userId);
-  const { items, loading, toggleEquip, usingFallback } = useAuraInventory(userId, level);
+  const { items, loading, toggleEquip, usingFallback, refresh } = useAuraInventory(userId, level);
+  const [shopPrices,setShopPrices] = useState<Record<string,number>>({});
+  const [shopBusy,setShopBusy] = useState(false);
+  const [shopMessage,setShopMessage] = useState("");
+  const [shopCoins,setShopCoins] = useState<number | null>(null);
+  useEffect(() => { void supabase.from("shop_items").select("id,cost").in("id",["flores-club-camiseta-roja","flores-club-short-rojo"]).eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
+  const buyFlores = async (ids: string[]) => {
+    if(shopBusy || usingFallback) return;
+    setShopBusy(true);setShopMessage("");
+    try { const {data,error}=await supabase.rpc("purchase_flores_outfit",{p_item_ids:ids});
+      if(error) throw error;
+      setShopCoins(data?.newCoins ?? null);
+      await refresh();
+      window.dispatchEvent(new CustomEvent("lupi:inventory-updated",{detail:{userId}}));
+      setShopMessage(data?.granted?.length ? "¡Compra realizada! Ya tenés tus prendas en el armario." : "Ya tenés estas prendas.");
+    } catch(e) { setShopMessage(e instanceof Error ? e.message : "No se pudo completar la compra."); }
+    finally {setShopBusy(false);} };
   const [draft, setDraft] = useState(appearance);
   const [done, setDone] = useState(false);
   const [previewMode, setPreviewMode] = useState<"full" | "face">("full");
@@ -194,7 +211,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
           {coins != null && (
             <span className="lw-id__chip" title="Monedas">
               <i aria-hidden="true">💰</i>
-              {coins}
+              {shopCoins ?? coins}
             </span>
           )}
           <button ref={closeRef} type="button" className="lw-id__close" onClick={onClose} aria-label="Cerrar editor">
@@ -203,7 +220,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
         </div>
       </header>
 
-      <div className="lw-id__layout" data-mobile-tab={mobileTab}>
+      <div className="lw-id__layout" data-mobile-tab={mobileTab} data-wardrobe-tab={wardrobeTab}>
         {/* ===== Personalización ===== */}
         <aside className="lw-id__panel lw-id__panel--identity" aria-label="Personalización">
           <div className="lw-id__seg" role="group" aria-label="Vista previa">
@@ -344,6 +361,9 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
           >
             ARMARIO
           </button>
+          <button type="button" aria-pressed={mobileTab === "wardrobe" && wardrobeTab === "shop"} onClick={() => { setMobileTab("wardrobe"); setWardrobeTab("shop"); }}>
+            TIENDA
+          </button>
           <button
             type="button"
             aria-pressed={mobileTab === "wardrobe" && wardrobeTab === "inventory"}
@@ -382,19 +402,38 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
           {wardrobeTab === "shop" ? (
             <section className="lupi-collections lupi-collections--shop" aria-label="Tienda de uniformes">
               <div className="lupi-collections__heading">TIENDA <span>UNIFORMES DE CLUBES</span></div>
-              <p className="lupi-collections__sub">Próximamente vas a poder comprar prendas sueltas o el conjunto completo con monedas. Los precios y las compras todavía no están habilitados.</p>
+              <p className="lupi-collections__sub">Comprá prendas sueltas o completá tu uniforme con LUPICOINS. Las prendas obtenidas en misiones también cuentan.</p>
+              {shopMessage && <p role="status" className="lupi-flores-shop-status">{shopMessage}</p>}
               {OUTFIT_COLLECTIONS.map(collection => {
                 const progress = collectionProgress(collection, items);
-                return <div className="lupi-collections__shop-card" key={collection.id}>
-                  <div className="lupi-collections__info"><strong>{collection.title}</strong><small>{collection.season} · {collection.description}</small><span>{progress.owned} de {progress.total} prendas en tu armario</span></div>
-                  <div className="lupi-collections__items">{collection.itemIds.map(id => {
-                    const item = items.find(entry => entry.id === id);
-                    return <div className="lupi-collections__piece" key={id} title={item?.name ?? id}>
-                      {item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span>?</span>}
-                      {item?.owned && <span className="lupi-collections__owned">✓</span>}
-                    </div>;
-                  })}</div>
-                  <button type="button" onClick={() => setWardrobeTab("wardrobe")}>VER COLECCIÓN EN MI ARMARIO</button>
+                const complete = progress.owned === progress.total;
+                const remaining = collection.itemIds.reduce((sum, id) => sum + (items.find(i => i.id === id)?.owned ? 0 : (shopPrices[id] ?? 0)), 0);
+                const unavailable = collection.itemIds.some(id => !items.find(i => i.id === id)?.owned && shopPrices[id] == null);
+                return <div className="lupi-collections__shop-card lupi-flores-store" key={collection.id}>
+                  <div className="lupi-flores-store__banner">
+                    <div className="lupi-flores-store__crest" aria-hidden="true">FC<span>26</span></div>
+                    <div className="lupi-flores-store__banner-title"><span className="lupi-flores-store__eyebrow">COLECCIÓN OFICIAL · {collection.season}</span><strong>{collection.title}</strong><small>{collection.description}</small></div>
+                    <div className="lupi-flores-store__completion"><span>COLECCIÓN <b>{Math.round(progress.owned / Math.max(progress.total, 1) * 100)}%</b></span><div className="lupi-flores-store__track"><i style={{width: `${progress.owned / Math.max(progress.total,1)*100}%`}} /></div><small>{progress.owned} / {progress.total} prendas</small></div>
+                  </div>
+                  <div className="lupi-flores-store__grid">
+                    {collection.itemIds.map(id => {
+                      const item = items.find(i => i.id === id);
+                      const price = shopPrices[id];
+                      const owned = !!item?.owned;
+                      const label = id.includes('camiseta') ? 'CAMISETA ROJA' : 'SHORT ROJO';
+                      return <article className={`lupi-flores-store__product ${owned ? 'is-owned' : ''}`} key={id}>
+                        <div className="lupi-flores-store__product-art">{item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span aria-hidden="true">👕</span>}{owned && <span className="lupi-flores-store__check" aria-label="Obtenido">✓</span>}</div>
+                        <div className="lupi-flores-store__product-info"><span>FLORES CLUB · 2026</span><strong>{label}</strong><small>{owned ? 'EN TU ARMARIO' : price == null ? 'NO DISPONIBLE' : `${price} LUPICOINS`}</small></div>
+                        <button className="lupi-flores-store__buy" type="button" disabled={shopBusy || usingFallback || owned || price == null} onClick={() => void buyFlores([id])}>{owned ? '✓ OBTENIDO' : shopBusy ? 'PROCESANDO…' : price == null ? 'NO DISPONIBLE' : `COMPRAR · ${price} 🪙`}</button>
+                      </article>;
+                    })}
+                    <article className={`lupi-flores-store__product lupi-flores-store__product--bundle ${complete ? 'is-owned' : ''}`}>
+                      <div className="lupi-flores-store__product-art lupi-flores-store__bundle-art">{collection.itemIds.map(id => { const item = items.find(i => i.id === id); return item?.imageUrl ? <img key={id} src={item.imageUrl} alt="" /> : null; })}{complete && <span className="lupi-flores-store__check" aria-label="Conjunto obtenido">✓</span>}</div>
+                      <div className="lupi-flores-store__product-info"><span>PACK · TEMPORADA 2026</span><strong>CONJUNTO COMPLETO</strong><small>{complete ? 'COLECCIÓN COMPLETA' : unavailable ? 'NO DISPONIBLE' : `${remaining} LUPICOINS · SOLO PRENDAS FALTANTES`}</small></div>
+                      <button className="lupi-flores-store__buy lupi-flores-store__buy--bundle" type="button" disabled={shopBusy || usingFallback || complete || unavailable} onClick={() => void buyFlores([...collection.itemIds])}>{complete ? '✓ CONJUNTO OBTENIDO' : shopBusy ? 'PROCESANDO…' : unavailable ? 'NO DISPONIBLE' : `COMPLETAR · ${remaining} 🪙`}</button>
+                    </article>
+                  </div>
+                  <button className="lupi-flores-store__wardrobe-link" type="button" onClick={() => setWardrobeTab('wardrobe')}>VER COLECCIÓN EN MI ARMARIO →</button>
                 </div>;
               })}
             </section>

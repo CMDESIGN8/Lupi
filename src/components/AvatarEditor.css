@@ -1208,3 +1208,42 @@
     grid-template-rows: minmax(160px, 31%) 42px minmax(0, 1fr) auto;
   }
 }
+
+/* V6.3 FLORES CLUB — desktop composition and mobile store accessibility */
+.lw-id__bg {
+  background:
+    linear-gradient(90deg, rgba(1,10,20,.50),rgba(1,12,23,.32) 48%,rgba(1,10,20,.64)),
+    url('../assets/flores-locker-room.webp') center center / cover no-repeat !important;
+}
+@media (min-width: 861px) {
+  .lw-id__layout[data-wardrobe-tab="shop"] {
+    grid-template-columns: minmax(240px,.78fr) minmax(300px,1.02fr) minmax(520px,1.65fr);
+    gap: 12px;
+  }
+  .lw-id__layout[data-wardrobe-tab="shop"] .lw-id__panel--wardrobe {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #17839a transparent;
+  }
+}
+@media (max-width: 860px) {
+  .lw-id__nav { grid-template-columns: repeat(4,minmax(0,1fr)) !important; gap: 4px; }
+  .lw-id__nav button { min-width: 0; padding: 0 3px; font-size: clamp(10px,2.8vw,14px) !important; }
+  .lw-id__layout[data-wardrobe-tab="shop"] {
+    grid-template-rows: minmax(150px,26%) 44px minmax(0,1fr) auto !important;
+  }
+  .lw-id__layout[data-wardrobe-tab="shop"] .lw-id__panel--wardrobe {
+    display:flex !important;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #17839a transparent;
+  }
+  .lw-id__layout[data-wardrobe-tab="shop"] .lupi-collections--shop {
+    flex: 0 0 auto;
+    min-height: min-content;
+    margin: 0;
+  }
+}

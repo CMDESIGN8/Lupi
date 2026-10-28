@@ -185,7 +185,7 @@ export function useAuraInventory(userId: string, level: number) {
         shopUrl: row.shop_url,
         color: row.color ?? COLOR_BY_ID[row.id] ?? DEFAULT_ITEM_COLOR,
         requiredLevel: row.required_level,
-        owned: ownedMap.has(row.id) || level >= row.required_level,
+        owned: ownedMap.has(row.id) || (!row.id.startsWith("flores-club-") && level >= row.required_level),
         equipped: ownedMap.get(row.id) ?? false,
         equippedImageUrl: row.equipped_image_url,
       }))
@@ -254,5 +254,5 @@ export function useAuraInventory(userId: string, level: number) {
     [items, usingFallback, load, userId]
   );
 
-  return { items, loading, toggleEquip, usingFallback };
+  return { items, loading, toggleEquip, usingFallback, refresh: load };
 }
