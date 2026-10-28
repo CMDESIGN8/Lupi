@@ -64,3 +64,32 @@
 @media(max-width:380px){.mt-lineup{gap:18px;padding:12px 0}.mt-lineup-slot:last-child:nth-child(odd){width:calc((100% - 18px)/2)}.mt-card-hint{font-size:8px}}
 @media(hover:hover){.match-tutorial .mt-card-button:hover{transform:translateY(-6px) scale(1.02);filter:brightness(1.1)}}
 @media(prefers-reduced-motion:reduce){.mt-lineup-slot{animation:none!important}.match-tutorial .mt-card-button{transition:none!important}}
+
+/* Beta05 hotfix: la previa necesita scroll; el partido mantiene su layout fijo. */
+.gh-root--playing .gh-match:has(.match-tutorial){
+ overflow-y:auto!important;
+ overflow-x:hidden!important;
+ overscroll-behavior-y:contain;
+ -webkit-overflow-scrolling:touch;
+ touch-action:pan-y;
+ display:block!important;
+ padding-bottom:max(24px,env(safe-area-inset-bottom))!important;
+ scroll-padding-bottom:96px;
+}
+.gh-root--playing .gh-match:has(.match-tutorial)>.gh-panel{
+ flex:none!important;
+ height:auto!important;
+ min-height:0!important;
+ max-height:none!important;
+ overflow:visible!important;
+}
+.gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial{
+ height:auto!important;
+ max-height:none!important;
+ min-height:0!important;
+ margin:12px auto 0;
+ overflow:clip;
+}
+.gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial>footer{
+ padding:12px 0 4px;
+}
