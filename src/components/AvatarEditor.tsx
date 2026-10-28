@@ -110,6 +110,14 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [done, setDone] = useState(false);
   const [previewMode, setPreviewMode] = useState<"full" | "face">("full");
   const [mobileTab, setMobileTab] = useState<"character" | "wardrobe">("character");
+  const [isMobileViewport, setIsMobileViewport] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 860px)").matches);
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 860px)");
+    const update = () => setIsMobileViewport(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   const [wardrobeTab, setWardrobeTab] = useState<WardrobeTab>("wardrobe");
   const [slot, setSlot] = useState<ItemSlot | "all">("all");
   const [rarity, setRarity] = useState<"all" | ItemRarity>("all");
@@ -230,7 +238,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
         </div>
       </header>
 
-      <div className="lw-id__layout" data-mobile-tab={mobileTab}>
+      <div className="lw-id__layout" data-mobile-tab={mobileTab} data-wardrobe-tab={wardrobeTab}>
         {/* ===== Personalización ===== */}
         <aside className="lw-id__panel lw-id__panel--identity" aria-label="Personalización">
           <div className="lw-id__seg" role="group" aria-label="Vista previa">
@@ -368,7 +376,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
               );
             })}
           </div>
-          <CharacterStage items={items} appearance={draft} mode={previewMode} level={level} xp={xp} xpNeeded={xpNeeded} />
+          <CharacterStage items={items} appearance={draft} mode={isMobileViewport ? "full" : previewMode} level={level} xp={xp} xpNeeded={xpNeeded} />
         </main>
 
         {/* ===== Pestañas de celular ===== */}
@@ -378,13 +386,16 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
           </button>
           <button
             type="button"
-            aria-pressed={mobileTab === "wardrobe" && wardrobeTab !== "inventory"}
+            aria-pressed={mobileTab === "wardrobe" && wardrobeTab === "wardrobe"}
             onClick={() => {
               setMobileTab("wardrobe");
               setWardrobeTab("wardrobe");
             }}
           >
             ARMARIO
+          </button>
+          <button type="button" aria-pressed={mobileTab === "wardrobe" && wardrobeTab === "shop"} onClick={() => { setMobileTab("wardrobe"); setWardrobeTab("shop"); }}>
+            TIENDA
           </button>
           <button
             type="button"

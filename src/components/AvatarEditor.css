@@ -1611,3 +1611,36 @@
 @media (prefers-reduced-motion: reduce) {
   .lw-id__equip-fx .lw-id__equip-confirm { animation: none !important; opacity: 1; }
 }
+
+/* V6.15 — navegación móvil completa y paneles con scroll independiente.
+   Un mismo escenario para las cuatro pestañas; el rostro se edita en el panel inferior. */
+@media (max-width: 860px) {
+  .lw-id__nav {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+    min-width: 0;
+  }
+  .lw-id__nav button {
+    min-width: 0; padding: 0 2px !important;
+    font-size: clamp(9px, 2.65vw, 13px) !important;
+    white-space: nowrap;
+  }
+  .lw-id__layout[data-mobile-tab="character"] .lw-id__panel--wardrobe,
+  .lw-id__layout[data-mobile-tab="wardrobe"] .lw-id__panel--identity { display: none !important; }
+  .lw-id__layout[data-mobile-tab="wardrobe"] .lw-id__panel--wardrobe {
+    display: flex !important; min-height: 0; overflow: hidden;
+  }
+  .lw-id__panel--wardrobe > .lw-id__seg { display: none !important; }
+  .lw-id__wardrobe-body {
+    flex: 1 1 auto; min-height: 0; overflow-y: auto !important;
+    overflow-x: hidden; overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch; padding-bottom: 24px;
+  }
+  .lw-id__wardrobe-body > .lw-id__scroll { overflow: visible !important; height: auto !important; max-height: none !important; }
+  .lw-id__panel--wardrobe > .lupi-collections--shop {
+    flex: 1 1 auto; min-height: 0; overflow-y: auto !important;
+    overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 24px;
+  }
+  .lw-id__stage { overflow: hidden; }
+}
