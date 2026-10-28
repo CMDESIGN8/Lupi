@@ -619,6 +619,8 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                         )}
                         <strong>{item.name}</strong>
                         <small>{RARITY_LABEL[item.rarity]}</small>
+                        {item.owned && item.durability === 0 && <small role="status" className="lw-id__wear-alert">AGOTADO · RENOVÁ PARA JUGAR</small>}
+                        {item.owned && item.durability != null && item.durability > 0 && item.durability <= 3 && <small className="lw-id__wear-alert">POCA DURABILIDAD</small>}
                         {item.owned && item.durability != null && (
                           <span className="lw-id__durability" aria-label={`Durabilidad ${item.durability} de ${item.maxDurability ?? 10} partidos`}>
                             <span>RESISTENCIA {item.durability}/{item.maxDurability ?? 10}</span>
