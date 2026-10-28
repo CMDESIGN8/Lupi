@@ -2,6 +2,10 @@
 -- Stage only: review constraints and purchase RPC behavior before executing.
 -- Copy existing Flores items' shop metadata to preserve category/effect conventions.
 begin;
+-- Expand the existing slot check without removing supported slots.
+alter table public.aura_items drop constraint if exists aura_items_slot_check;
+alter table public.aura_items add constraint aura_items_slot_check
+ check (slot = any (array['top'::text,'bottom'::text,'socks'::text,'boots'::text,'accessory'::text]));
 insert into public.aura_items
  (id,name,slot,rarity,world,drop_code,icon,image_url,required_level,equipped_image_url,color)
 values
