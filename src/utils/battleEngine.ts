@@ -1,6 +1,6 @@
 // src/utils/battleEngine.ts — v4
 
-import type { UserCard } from '../types/cards';
+import type { UserCard } from '../types/cards.ts';
 
 export type SkillGroup = 'attack' | 'defense' | 'technique';
 
