@@ -86,6 +86,16 @@ Deno.serve(async (request) => {
         Number.isFinite(state.advantage) ? state.advantage : 0;
       const turn = calculateSeededTurn(cards, minute, advantage,
         session.opponent_key, session.simulation_seed, session.turn_index);
+      // Automatic goals are part of the authoritative turn, not client input.
+      // Decisions are scored separately by the validated "decision" action.
+      const userScore = session.user_score +
+        Number(turn.userPhase.autoGoal === "user") +
+        Number(turn.rivalPhase.autoGoal === "user");
+      const opponentScore = session.opponent_score +
+        Number(turn.userPhase.autoGoal === "rival") +
+        Number(turn.rivalPhase.autoGoal === "rival");
+      if (userScore > 20 || opponentScore > 20)
+        return reply({ error: "Match scoring limit reached" }, 409);
       // A single CAS transaction advances the turn. On conflict, the client
       // must resume; never replay a new random turn.
       const { data: nextVersion, error: advanceError } = await admin
@@ -93,13 +103,14 @@ Deno.serve(async (request) => {
           p_session_id: session.id,
           p_expected_version: session.state_version,
           p_turn_index: session.turn_index + 1,
-          p_user_score: session.user_score,
-          p_opponent_score: session.opponent_score,
+          p_user_score: userScore,
+          p_opponent_score: opponentScore,
           p_simulation_state: { ...state, last_turn: turn },
           p_pending_decision: turn.userPhase.moment ?? null,
         });
       if (advanceError) return reply({ error: "Turn conflict or invalid state" }, 409);
-      return reply({ turn, state_version: nextVersion, turn_index: session.turn_index + 1 });
+      return reply({ turn, state_version: nextVersion, turn_index: session.turn_index + 1,
+        user_score: userScore, opponent_score: opponentScore });
     }
     if (body.action === "decision") {
       if (typeof body.session_id !== "string" ||
