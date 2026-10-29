@@ -408,6 +408,14 @@ export function CardBattle({
         setPhase('select');
         return;
       }
+      const lowDurability = (wear ?? []).filter((row) => row.remaining > 0 && row.remaining <= 3);
+      if (lowDurability.length) {
+        const uses = lowDurability.map((row) => `${row.remaining}/10`).join(', ');
+        if (!window.confirm(`⚠️ Tu equipamiento está por agotarse (${uses}). ¿Querés jugar igual?`)) {
+          setPhase('select');
+          return;
+        }
+      }
     }
     isRunning.current = true;
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
