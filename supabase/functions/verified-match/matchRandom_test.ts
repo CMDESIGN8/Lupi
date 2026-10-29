@@ -1,4 +1,4 @@
-import { matchRandom, matchRandomCursor } from "../../src/utils/matchRandom.ts";
+import { matchRandom, matchRandomCursor } from "../../../src/utils/matchRandom.ts";
 
 Deno.test("same coordinates yield the same result", () => {
   const a = matchRandom(123456, 7, "user", 2);
