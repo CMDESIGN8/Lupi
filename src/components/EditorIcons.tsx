@@ -5,6 +5,7 @@ import type { ItemSlot } from "../hooks/useAuraInventory";
 const PATHS: Record<ItemSlot, string> = {
   top: "M8.2 3.5 3 6.6l2.3 4.2 2.7-1.2V20h8V9.6l2.7 1.2L21 6.6l-5.2-3.1C15 5.1 13.7 6 12 6S9 5.1 8.2 3.5z",
   bottom: "M6.2 4h11.6l1.6 16h-5.3L12 11.6 9.9 20H4.6L6.2 4z",
+  socks: "M6 2h5v7l-1 8-2 5H3l2-6 1-7V2zm8 0h5v7l1 7 2 6h-5l-2-5-1-8V2z",
   boots: "M3 13.6c0-1 .6-1.8 1.6-2.1l4-1.1 1.7-5.2h3l-.4 4.3 5.9 2.2c1.3.5 2.2 1.6 2.2 3v1.8H3v-2.9zM3 18.6h18v1.4H3z",
   accessory: "M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3.1-5.4 3.1 1.2-6-4.5-4.2 6.1-.7L12 3z",
 };

@@ -324,7 +324,7 @@
 .avatar2d__layer--accessory{z-index:35}
 
 /* V3: transformaciones de ítems parametrizadas, compatibles con las prendas existentes. */
-.avatar2d__layer--top,.avatar2d__layer--bottom,.avatar2d__layer--boots,.avatar2d__layer--accessory{
+.avatar2d__layer--top,.avatar2d__layer--bottom,.avatar2d__layer--socks,.avatar2d__layer--boots,.avatar2d__layer--accessory{
  left:var(--item-x,50%);top:var(--item-y);width:var(--item-w);height:var(--item-h);
  transform:translate(-50%,-50%) scale(calc(var(--avatar-scale,1) * var(--item-scale,1))) rotate(var(--item-rotation,0deg));
  transform-origin:center center;z-index:var(--item-z,22);
@@ -351,3 +351,8 @@
 .avatar2d__character,
 .avatar2d__base-image,
 .avatar2d__image { -webkit-user-drag: none; }
+
+.avatar2d__layer--socks{left:var(--item-x,50%);top:var(--item-y,415px);width:var(--item-w,125px);height:var(--item-h,125px);transform:translate(-50%,-50%) scale(var(--item-scale,1));z-index:22;pointer-events:none}
+.lw-id__durability{display:flex;flex-direction:column;gap:3px;font-size:10px}
+.lw-id__durability-track{display:block;height:5px;background:#29323d;border-radius:8px;overflow:hidden}
+.lw-id__durability-track i{display:block;height:100%}

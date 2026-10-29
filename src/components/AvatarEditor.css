@@ -1863,3 +1863,13 @@
 .lw-id__wardrobe-body>.lw-id__scroll{overflow:visible!important;max-height:none!important;height:auto!important;flex:none!important}
 .lw-id__wardrobe-body>.lw-id__cats{position:sticky;top:0;z-index:8;background:#051d2bf2;padding:5px 0 7px;margin-top:0;backdrop-filter:blur(9px)}
 @media(max-width:860px){.lw-id__panel--wardrobe{min-height:0!important;overflow:hidden!important}.lw-id__panel--wardrobe .lw-id__wardrobe-body{flex:1 1 auto!important;min-height:0!important;max-height:100%!important}.lw-id__wardrobe-body>.lupi-collections--wardrobe{padding-bottom:18px!important}}
+
+.lw-id__inventory-entry{display:flex;flex-direction:column;gap:6px;min-width:0}
+.lw-id__inventory-entry>.lw-id__item{width:100%;flex:1}
+.lw-id__renew{border:1px solid #ffb33b;border-radius:8px;background:#30271b;color:#ffdf9e;padding:8px;font-size:10px;font-weight:800;cursor:pointer}
+.lw-id__renew:disabled{opacity:.45;cursor:not-allowed}
+.lw-id__durability{display:flex;flex-direction:column;gap:3px;font-size:10px}
+.lw-id__durability-track{display:block;height:5px;background:#29323d;border-radius:8px;overflow:hidden}
+.lw-id__durability-track i{display:block;height:100%}
+
+.lw-id__wear-alert{color:#ffb33b;font-weight:800;font-size:10px;letter-spacing:.03em}

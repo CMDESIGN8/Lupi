@@ -19,6 +19,7 @@ import {
   SkillGroup,
 } from '../utils/battleEngine';
 import { supabase } from '../lib/supabaseClient';
+import { verifiedMatchApi } from '../lib/verifiedMatchApi';
 import { AnimeEffects, AnimeEffectsHandle } from './AnimeEffects';
 
 
@@ -372,23 +373,144 @@ export function CardBattle({
     const deckCards = (userDeck.cards ?? []) as UserCard[];
     if (deckCards.length < 5) { alert('Necesitás 5 cartas en el mazo'); return; }
     if (isRunning.current) return;
+    // Prevent double-start while asynchronous equipment checks are running.
     isRunning.current = true;
+    // UX preflight only. The trusted match server must enforce this again.
+    // Do not consume durability here: client-side matches are not verified.
+    const { data: wornItems, error: wornError } = await supabase
+      .from('user_items')
+      .select('item_id, aura_items!inner(slot)')
+      .eq('user_id', userId)
+      .eq('equipped', true);
+    if (wornError) {
+      alert('No se pudo comprobar el equipamiento. Intentá nuevamente.');
+      setPhase('select');
+      isRunning.current = false;
+      return;
+    }
+    const equipmentIds = (wornItems ?? [])
+      .filter((row) => {
+        const aura = row.aura_items as unknown as { slot?: string } | { slot?: string }[] | null;
+        const slot = Array.isArray(aura) ? aura[0]?.slot : aura?.slot;
+        return slot === 'boots' || slot === 'socks';
+      })
+      .map((row) => row.item_id);
+    if (equipmentIds.length) {
+      const { data: wear, error: wearError } = await supabase
+        .from('equipment_durability')
+        .select('item_id,remaining')
+        .eq('user_id', userId)
+        .in('item_id', equipmentIds);
+      if (wearError) {
+        alert('No se pudo comprobar la durabilidad. Intentá nuevamente.');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+      const exhausted = (wear ?? []).find((row) => row.remaining <= 0);
+      if (exhausted) {
+        alert('Tenés medias o botines agotados (0/10). Renoválos desde el armario antes de jugar.');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+      const lowDurability = (wear ?? []).filter((row) => row.remaining > 0 && row.remaining <= 3);
+      if (lowDurability.length) {
+        const uses = lowDurability.map((row) => `${row.remaining}/10`).join(', ');
+        if (!window.confirm(`⚠️ Tu equipamiento está por agotarse (${uses}). ¿Querés jugar igual?`)) {
+          setPhase('select');
+          isRunning.current = false;
+          return;
+        }
+      }
+    }
+    // Opt-in staging only until verified finalization and DB migrations pass E2E.
+    const serverMode = import.meta.env.VITE_VERIFIED_MATCHES === 'true';
+    let verifiedSession: { id: string; version: number } | null = null;
+    let resumedTurnIndex = 0;
+    let resumedPending: MomentContext | null = null;
+    let resumedScore: { user: number; rival: number } | null = null;
+    const recoveryKey = `lupi:verified-match:${userId}`;
+    if (serverMode) {
+      try {
+        // Server discovery also works after clearing storage or switching devices.
+        const active = await verifiedMatchApi.active();
+        const saved = active?.id ?? null;
+        if (saved) {
+          window.localStorage.setItem(recoveryKey, saved);
+          const session = await verifiedMatchApi.resume(saved);
+          if (session.state === 'completed' || session.state === 'expired') {
+            window.localStorage.removeItem(recoveryKey);
+            if (session.state === 'expired')
+              throw new Error('El partido anterior venció. Volvé a iniciar el partido.');
+          } else {
+            if (session.opponent_key !== bot.name)
+              throw new Error(`Tenés un partido pendiente contra ${session.opponent_key}. Seleccioná ese rival para continuar.`);
+            resumedTurnIndex = session.turn_index;
+            resumedPending = session.pending_decision as MomentContext | null;
+            resumedScore = { user: session.user_score, rival: session.opponent_score };
+            if (resumedPending && !session.simulation_state?.last_turn)
+              throw new Error('No se pudo reconstruir la decisión pendiente.');
+            verifiedSession = { id: session.id, version: session.state_version };
+          }
+        }
+        if (!verifiedSession) {
+          verifiedSession = await verifiedMatchApi.start(bot.name);
+          window.localStorage.setItem(recoveryKey, verifiedSession.id);
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'No se pudo iniciar el partido verificado');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+    }
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
-    let ug = 0, rg = 0;
+    let ug = resumedScore?.user ?? 0, rg = resumedScore?.rival ?? 0;
 
-    setLog([]); setShowFullLog(false); setUGoals(0); setRGoals(0); setMinute(0);
+    setLog([]); setShowFullLog(false); setUGoals(ug); setRGoals(rg);
+    setMinute(resumedTurnIndex * 5);
     resetAll(); setPhase('battle');
 
     addLog('⚽ ¡Silbato inicial! Arrancan los equipos.', 'event');
     moveBall(50, 50, 'user'); setBallVis(true);
     await delay(500);
 
-    for (let t = 1; t <= TOTAL_TURNS; t++) {
-      const min = Math.round((t / TOTAL_TURNS) * 40);
+    try {
+    // Verified SQL finalization requires exactly eight completed turns.
+    // Preserve the six-turn recreational mode unchanged.
+    const totalTurns = verifiedSession ? 8 : TOTAL_TURNS;
+    let authoritativeScore: { user: number; rival: number } | null = resumedScore;
+    // If a turn was committed before the tab closed, do not request it twice.
+    // A pending decision is resolved from the server's stored moment first.
+    if (verifiedSession && resumedPending) {
+      addLog('↩️ Retomamos la decisión pendiente.', 'event');
+      const chosen = await waitForDecision(resumedPending);
+      const decision = await verifiedMatchApi.decision(
+        verifiedSession.id, verifiedSession.version, chosen.id,
+      );
+      verifiedSession.version = decision.version;
+      ug = decision.userScore;
+      rg = decision.opponentScore;
+      authoritativeScore = { user: ug, rival: rg };
+      setUGoals(ug); setRGoals(rg);
+      addLog(decision.result.narrative, decision.result.goalFor === 'user' ? 'goal' : 'event');
+    } else if (verifiedSession && resumedTurnIndex > 0) {
+      addLog(`↩️ Partido recuperado desde el turno ${resumedTurnIndex}.`, 'event');
+    }
+    for (let t = resumedTurnIndex + 1; t <= totalTurns; t++) {
+      const min = Math.round((t / totalTurns) * 40);
       setMinute(min);
       await delay(TURN_MS);
 
-      const turn = generateTurn(deckCards, min, adv, bot.name);
+      const serverTurn = verifiedSession
+        ? await verifiedMatchApi.turn(verifiedSession.id, verifiedSession.version)
+        : null;
+      if (serverTurn && verifiedSession) {
+        verifiedSession.version = serverTurn.version;
+        authoritativeScore = { user: serverTurn.userScore, rival: serverTurn.opponentScore };
+      }
+      const turn = serverTurn?.turn ?? generateTurn(deckCards, min, adv, bot.name);
 
       // FASE USUARIO
       {
@@ -411,7 +533,14 @@ export function CardBattle({
           const chosen = await waitForDecision(ctx);
           await delay(200);
 
-          const res = resolveDecision(chosen, ctx.mainCard, ctx.type, min);
+          const serverDecision = verifiedSession
+            ? await verifiedMatchApi.decision(verifiedSession.id, verifiedSession.version, chosen.id)
+            : null;
+          if (serverDecision && verifiedSession) {
+            verifiedSession.version = serverDecision.version;
+            authoritativeScore = { user: serverDecision.userScore, rival: serverDecision.opponentScore };
+          }
+          const res = serverDecision?.result ?? resolveDecision(chosen, ctx.mainCard, ctx.type, min);
           addLog(res.narrative, res.goalFor === 'user' ? 'goal' : res.success ? 'good' : 'neutral');
 
           if (res.goalFor === 'user') {
@@ -474,13 +603,44 @@ export function CardBattle({
         await backToMidfield();
         await delay(300);
       }
+      // Animations are cosmetic: the server is the source of truth for scores.
+      if (verifiedSession && authoritativeScore) {
+        ug = authoritativeScore.user;
+        rg = authoritativeScore.rival;
+        setUGoals(ug);
+        setRGoals(rg);
+      }
     }
 
     addLog('📯 ¡Silbato final! Terminó el partido.', 'event');
     setMinute(40); setBallVis(false);
     await delay(600);
-    await handleMatchEnd(ug, rg, deckCards);
-    isRunning.current = false;
+    if (verifiedSession) {
+      // The verified endpoint must confirm completion before displaying rewards.
+      // It currently fails closed until the server transcript is fully validated.
+      try {
+        const final = await verifiedMatchApi.finish(verifiedSession.id);
+        window.localStorage.removeItem(recoveryKey);
+        if (typeof final.user_score === 'number' && typeof final.opponent_score === 'number') {
+          ug = final.user_score;
+          rg = final.opponent_score;
+          setUGoals(ug); setRGoals(rg);
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'El servidor no pudo validar el partido');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+    }
+    await handleMatchEnd(ug, rg, deckCards, Boolean(verifiedSession));
+    } catch (error) {
+      console.error('Partido interrumpido:', error);
+      alert(error instanceof Error ? error.message : 'No se pudo completar el partido');
+      setPhase('select');
+    } finally {
+      isRunning.current = false;
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bot, userDeck]);
 
@@ -489,7 +649,7 @@ export function CardBattle({
   // No llamar a update_daily_progress desde el cliente.
   // Los desafíos diarios competitivos quedan pendientes de un validador del servidor.
 
-  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[]) {
+  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[], verified = false) {
     const won   = ug > rg;
     const tied  = ug === rg;
 
@@ -527,17 +687,22 @@ export function CardBattle({
       streak:     newStreak,
     };
 
+    // A verified result does not authorize browser-written card XP.
+    // Verified rewards must be granted atomically by the server in a later step.
+    if (verified) xpGained = 0;
     const leveledUpCards: string[] = [];
     const cardMap = new Map<string, UserCard>();
     for (const c of deckCards) {
-      const { card, leveledUp } = addExperienceToCard(c, xpGained);
+      const { card, leveledUp } = verified
+        ? { card: c, leveledUp: false }
+        : addExperienceToCard(c, xpGained);
       if (leveledUp) leveledUpCards.push(getCardData(card).name);
       cardMap.set(card.id, card);
     }
     const updatedCards = Array.from(cardMap.values());
 
     try {
-      for (const card of updatedCards) {
+      for (const card of verified ? [] : updatedCards) {
         await supabase
           .from('user_cards')
           .update({ level: card.level, experience: card.experience })
@@ -546,7 +711,9 @@ export function CardBattle({
 
       // El trigger on_match_finished ya NO acredita XP/puntos/stats.
       // El partido se registra como resultado recreativo, no verificable.
-      const { error: matchError } = await supabase.from('matches').insert({
+      const { error: matchError } = verified
+        ? { error: null }
+        : await supabase.from('matches').insert({
         user_id: userId,
         user_deck_id: userDeck.id,
         user_score: ug,
@@ -566,7 +733,7 @@ export function CardBattle({
       console.error('Error en persistencia:', err);
     }
 
-    setUserStats(newStats);
+    if (!verified) setUserStats(newStats);
     onBattleComplete(updatedCards);
 
     setMatchResult({
@@ -574,7 +741,7 @@ export function CardBattle({
       userScore:  ug,
       rivalScore: rg,
       xpGained,
-      streakBonus,
+      streakBonus: verified ? 0 : streakBonus,
       leveledUpCards,
       skillUpgrade,
       newStreak,
