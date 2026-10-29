@@ -15,6 +15,7 @@ import {
   calcGroupValue,
   SKILL_GROUP_INFO,
   MomentContext,
+  TurnResult,
   DecisionOption,
   SkillGroup,
 } from '../utils/battleEngine';
@@ -427,9 +428,36 @@ export function CardBattle({
     // Opt-in staging only until verified finalization and DB migrations pass E2E.
     const serverMode = import.meta.env.VITE_VERIFIED_MATCHES === 'true';
     let verifiedSession: { id: string; version: number } | null = null;
+    let resumedTurnIndex = 0;
+    let resumedPending: MomentContext | null = null;
+    let resumedTurn: TurnResult | null = null;
+    let resumedScore: { user: number; rival: number } | null = null;
+    const recoveryKey = `lupi:verified-match:${userId}`;
     if (serverMode) {
       try {
-        verifiedSession = await verifiedMatchApi.start(bot.name);
+        const saved = window.localStorage.getItem(recoveryKey);
+        if (saved) {
+          const session = await verifiedMatchApi.resume(saved);
+          if (session.state === 'completed' || session.state === 'expired') {
+            window.localStorage.removeItem(recoveryKey);
+            if (session.state === 'expired')
+              throw new Error('El partido anterior venció. Volvé a iniciar el partido.');
+          } else {
+            if (session.opponent_key !== bot.name)
+              throw new Error(`Tenés un partido pendiente contra ${session.opponent_key}. Seleccioná ese rival para continuar.`);
+            resumedTurnIndex = session.turn_index;
+            resumedPending = session.pending_decision as MomentContext | null;
+            resumedTurn = session.simulation_state?.last_turn as TurnResult | null ?? null;
+            resumedScore = { user: session.user_score, rival: session.opponent_score };
+            if (resumedPending && !resumedTurn)
+              throw new Error('No se pudo reconstruir la decisión pendiente.');
+            verifiedSession = { id: session.id, version: session.state_version };
+          }
+        }
+        if (!verifiedSession) {
+          verifiedSession = await verifiedMatchApi.start(bot.name);
+          window.localStorage.setItem(recoveryKey, verifiedSession.id);
+        }
       } catch (error) {
         alert(error instanceof Error ? error.message : 'No se pudo iniciar el partido verificado');
         setPhase('select');
@@ -438,9 +466,10 @@ export function CardBattle({
       }
     }
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
-    let ug = 0, rg = 0;
+    let ug = resumedScore?.user ?? 0, rg = resumedScore?.rival ?? 0;
 
-    setLog([]); setShowFullLog(false); setUGoals(0); setRGoals(0); setMinute(0);
+    setLog([]); setShowFullLog(false); setUGoals(ug); setRGoals(rg);
+    setMinute(resumedTurnIndex * 5);
     resetAll(); setPhase('battle');
 
     addLog('⚽ ¡Silbato inicial! Arrancan los equipos.', 'event');
@@ -451,8 +480,25 @@ export function CardBattle({
     // Verified SQL finalization requires exactly eight completed turns.
     // Preserve the six-turn recreational mode unchanged.
     const totalTurns = verifiedSession ? 8 : TOTAL_TURNS;
-    let authoritativeScore: { user: number; rival: number } | null = null;
-    for (let t = 1; t <= totalTurns; t++) {
+    let authoritativeScore: { user: number; rival: number } | null = resumedScore;
+    // If a turn was committed before the tab closed, do not request it twice.
+    // A pending decision is resolved from the server's stored moment first.
+    if (verifiedSession && resumedPending) {
+      addLog('↩️ Retomamos la decisión pendiente.', 'event');
+      const chosen = await waitForDecision(resumedPending);
+      const decision = await verifiedMatchApi.decision(
+        verifiedSession.id, verifiedSession.version, chosen.id,
+      );
+      verifiedSession.version = decision.version;
+      ug = decision.userScore;
+      rg = decision.opponentScore;
+      authoritativeScore = { user: ug, rival: rg };
+      setUGoals(ug); setRGoals(rg);
+      addLog(decision.result.narrative, decision.result.goalFor === 'user' ? 'goal' : 'event');
+    } else if (verifiedSession && resumedTurnIndex > 0) {
+      addLog(`↩️ Partido recuperado desde el turno ${resumedTurnIndex}.`, 'event');
+    }
+    for (let t = resumedTurnIndex + 1; t <= totalTurns; t++) {
       const min = Math.round((t / totalTurns) * 40);
       setMinute(min);
       await delay(TURN_MS);
@@ -574,6 +620,7 @@ export function CardBattle({
       // It currently fails closed until the server transcript is fully validated.
       try {
         const final = await verifiedMatchApi.finish(verifiedSession.id);
+        window.localStorage.removeItem(recoveryKey);
         if (typeof final.user_score === 'number' && typeof final.opponent_score === 'number') {
           ug = final.user_score;
           rg = final.opponent_score;
