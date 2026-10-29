@@ -12,6 +12,7 @@ type MatchResponse = {
   result?: MomentResult;
   match_id?: string;
   error?: string;
+  active_session?: { id: string; opponent_key: string } | null;
   session?: {
     id: string;
     opponent_key: string;
@@ -41,6 +42,12 @@ export const verifiedMatchApi = {
     if (!data.session_id || data.state_version !== 0)
       throw new Error('La sesión no pudo iniciarse');
     return { id: data.session_id, version: data.state_version };
+  },
+  async active(): Promise<{ id: string; opponent_key: string } | null> {
+    const data = await invokeMatch({ action: 'active' });
+    if (data.active_session === undefined)
+      throw new Error('No se pudo consultar el partido pendiente');
+    return data.active_session;
   },
   async resume(sessionId: string) {
     const data = await invokeMatch({ action: 'resume', session_id: sessionId });
