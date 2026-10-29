@@ -447,6 +447,7 @@ export function CardBattle({
     moveBall(50, 50, 'user'); setBallVis(true);
     await delay(500);
 
+    try {
     for (let t = 1; t <= TOTAL_TURNS; t++) {
       const min = Math.round((t / TOTAL_TURNS) * 40);
       setMinute(min);
@@ -569,7 +570,13 @@ export function CardBattle({
       }
     }
     await handleMatchEnd(ug, rg, deckCards, Boolean(verifiedSession));
-    isRunning.current = false;
+    } catch (error) {
+      console.error('Partido interrumpido:', error);
+      alert(error instanceof Error ? error.message : 'No se pudo completar el partido');
+      setPhase('select');
+    } finally {
+      isRunning.current = false;
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bot, userDeck]);
 
