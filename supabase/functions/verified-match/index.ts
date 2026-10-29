@@ -70,11 +70,6 @@ Deno.serve(async (request) => {
       // Time alone is NOT proof of a played match. This endpoint remains
       // disabled until a server-authoritative turn/decision transcript exists.
       return reply({ error: "Verified match finalization not enabled yet" }, 501);
-      const { data: matchId, error: finishError } = await admin.rpc("finalize_verified_match",
-        { p_session_id: body.session_id });
-      if (finishError) throw finishError;
-      return reply({ match_id: matchId, user_score: session.user_score,
-        opponent_score: session.opponent_score });
     }
     return reply({ error: "Invalid action" }, 400);
   } catch (error) {
