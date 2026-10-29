@@ -1,4 +1,5 @@
 import { MatchTutorial } from './MatchTutorial';
+import { createPortal } from 'react-dom';
 // src/components/CardBattle.tsx — v6 (con soporte para modo campaña)
 // Fix #1: arena-container width:10% removido
 // Fix #2: scoreboard top corregido en mobile
@@ -1130,7 +1131,7 @@ export function CardBattle({
         )}
 
         {/* ════════════════════════ MODAL RESULTADO ════════════════════════ */}
-        {phase === 'result' && matchResult && (
+        {phase === 'result' && matchResult && createPortal(
           <div className="result-modal-overlay" onClick={handleCloseResult}>
             <div
               className={`result-modal ${matchResult.winner === 'user' ? 'win' : matchResult.winner === 'draw' ? 'draw' : 'lose'}`}
@@ -1207,7 +1208,8 @@ export function CardBattle({
                 {isCampaignMode ? 'CONTINUAR' : 'JUGAR DE NUEVO'}
               </button>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
 
@@ -1433,9 +1435,9 @@ export function CardBattle({
         .deck-btn{background:rgba(61,255,160,0.1);border:1px solid #3dffa0!important;color:#3dffa0;}
 
         /* Modal resultado */
-        .result-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fi 0.25s ease;}
+        .result-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:clamp(12px,3vw,24px);box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain;animation:fi 0.25s ease;}
         @keyframes fi{from{opacity:0}to{opacity:1}}
-        .result-modal{background:linear-gradient(145deg,#0e1a10,#0a1208);border-radius:24px;padding:28px 24px;max-width:380px;width:100%;border:1px solid rgba(255,255,255,0.1);animation:mp 0.35s cubic-bezier(0.34,1.2,0.64,1);box-shadow:0 20px 60px rgba(0,0,0,0.6);max-height:90vh;overflow-y:auto;scrollbar-width:none;}
+        .result-modal{background:linear-gradient(145deg,#0e1a10,#0a1208);border-radius:24px;padding:28px 24px;max-width:380px;width:100%;border:1px solid rgba(255,255,255,0.1);animation:mp 0.35s cubic-bezier(0.34,1.2,0.64,1);box-shadow:0 20px 60px rgba(0,0,0,0.6);max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;margin:auto;box-sizing:border-box;}
         @keyframes mp{from{transform:scale(0.88) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
         .result-modal.win {border-color:rgba(61,255,160,0.3);}
         .result-modal.lose{border-color:rgba(255,100,60,0.3);}
