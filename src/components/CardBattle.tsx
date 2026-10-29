@@ -19,6 +19,7 @@ import {
   SkillGroup,
 } from '../utils/battleEngine';
 import { supabase } from '../lib/supabaseClient';
+import { verifiedMatchApi } from '../lib/verifiedMatchApi';
 import { AnimeEffects, AnimeEffectsHandle } from './AnimeEffects';
 
 
@@ -423,6 +424,19 @@ export function CardBattle({
         }
       }
     }
+    // Opt-in staging only until verified finalization and DB migrations pass E2E.
+    const serverMode = import.meta.env.VITE_VERIFIED_MATCHES === 'true';
+    let verifiedSession: { id: string; version: number } | null = null;
+    if (serverMode) {
+      try {
+        verifiedSession = await verifiedMatchApi.start(bot.name);
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'No se pudo iniciar el partido verificado');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+    }
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
     let ug = 0, rg = 0;
 
@@ -438,7 +452,11 @@ export function CardBattle({
       setMinute(min);
       await delay(TURN_MS);
 
-      const turn = generateTurn(deckCards, min, adv, bot.name);
+      const serverTurn = verifiedSession
+        ? await verifiedMatchApi.turn(verifiedSession.id, verifiedSession.version)
+        : null;
+      if (serverTurn && verifiedSession) verifiedSession.version = serverTurn.version;
+      const turn = serverTurn?.turn ?? generateTurn(deckCards, min, adv, bot.name);
 
       // FASE USUARIO
       {
@@ -461,7 +479,11 @@ export function CardBattle({
           const chosen = await waitForDecision(ctx);
           await delay(200);
 
-          const res = resolveDecision(chosen, ctx.mainCard, ctx.type, min);
+          const serverDecision = verifiedSession
+            ? await verifiedMatchApi.decision(verifiedSession.id, verifiedSession.version, chosen.id)
+            : null;
+          if (serverDecision && verifiedSession) verifiedSession.version = serverDecision.version;
+          const res = serverDecision?.result ?? resolveDecision(chosen, ctx.mainCard, ctx.type, min);
           addLog(res.narrative, res.goalFor === 'user' ? 'goal' : res.success ? 'good' : 'neutral');
 
           if (res.goalFor === 'user') {
@@ -529,7 +551,24 @@ export function CardBattle({
     addLog('📯 ¡Silbato final! Terminó el partido.', 'event');
     setMinute(40); setBallVis(false);
     await delay(600);
-    await handleMatchEnd(ug, rg, deckCards);
+    if (verifiedSession) {
+      // The verified endpoint must confirm completion before displaying rewards.
+      // It currently fails closed until the server transcript is fully validated.
+      try {
+        const final = await verifiedMatchApi.finish(verifiedSession.id);
+        if (typeof final.user_score === 'number' && typeof final.opponent_score === 'number') {
+          ug = final.user_score;
+          rg = final.opponent_score;
+          setUGoals(ug); setRGoals(rg);
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'El servidor no pudo validar el partido');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+    }
+    await handleMatchEnd(ug, rg, deckCards, Boolean(verifiedSession));
     isRunning.current = false;
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bot, userDeck]);
@@ -539,7 +578,7 @@ export function CardBattle({
   // No llamar a update_daily_progress desde el cliente.
   // Los desafíos diarios competitivos quedan pendientes de un validador del servidor.
 
-  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[]) {
+  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[], verified = false) {
     const won   = ug > rg;
     const tied  = ug === rg;
 
@@ -596,7 +635,9 @@ export function CardBattle({
 
       // El trigger on_match_finished ya NO acredita XP/puntos/stats.
       // El partido se registra como resultado recreativo, no verificable.
-      const { error: matchError } = await supabase.from('matches').insert({
+      const { error: matchError } = verified
+        ? { error: null }
+        : await supabase.from('matches').insert({
         user_id: userId,
         user_deck_id: userDeck.id,
         user_score: ug,
