@@ -67,9 +67,9 @@ Deno.serve(async (request) => {
         .eq("id", body.session_id).single();
       if (error || !session || session.user_id !== user.id)
         return reply({ error: "Session not found" }, 404);
-      // Minimum elapsed time prevents immediate start/finish farming.
-      if (Date.now() - new Date(session.created_at).getTime() < 60_000)
-        return reply({ error: "Match still in progress" }, 409);
+      // Time alone is NOT proof of a played match. This endpoint remains
+      // disabled until a server-authoritative turn/decision transcript exists.
+      return reply({ error: "Verified match finalization not enabled yet" }, 501);
       const { data: matchId, error: finishError } = await admin.rpc("finalize_verified_match",
         { p_session_id: body.session_id });
       if (finishError) throw finishError;
