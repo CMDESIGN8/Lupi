@@ -42,6 +42,19 @@ Deno.serve(async (request) => {
       }
       return reply({ session_id: sessionId, state_version: 0 });
     }
+    if (body.action === "active") {
+      // Recovery must not depend on browser storage: discover only this user's
+      // unfinished, unexpired match. No private seed or deck is returned.
+      const { data: session, error } = await admin
+        .from("verified_match_sessions")
+        .select("id,opponent_key")
+        .eq("user_id", user.id)
+        .eq("state", "started")
+        .gt("expires_at", new Date().toISOString())
+        .maybeSingle();
+      if (error) return reply({ error: "Could not find active match" }, 500);
+      return reply({ active_session: session ?? null });
+    }
     if (body.action === "resume") {
       if (typeof body.session_id !== "string" ||
           !/^[0-9a-f-]{36}$/i.test(body.session_id))
