@@ -42,6 +42,8 @@ begin
  if v_deck_id is null then raise exception 'Active deck not found'; end if;
  -- Deck ownership and all five unique positions are checked in the DB.
  if (select count(*) from public.deck_cards dc
+     where dc.deck_id=v_deck_id) <> 5
+ or (select count(*) from public.deck_cards dc
      join public.user_cards uc on uc.id=dc.user_card_id
      where dc.deck_id=v_deck_id and uc.user_id=p_user_id
        and dc.position between 1 and 5) <> 5
