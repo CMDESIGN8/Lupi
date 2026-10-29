@@ -623,17 +623,22 @@ export function CardBattle({
       streak:     newStreak,
     };
 
+    // A verified result does not authorize browser-written card XP.
+    // Verified rewards must be granted atomically by the server in a later step.
+    if (verified) xpGained = 0;
     const leveledUpCards: string[] = [];
     const cardMap = new Map<string, UserCard>();
     for (const c of deckCards) {
-      const { card, leveledUp } = addExperienceToCard(c, xpGained);
+      const { card, leveledUp } = verified
+        ? { card: c, leveledUp: false }
+        : addExperienceToCard(c, xpGained);
       if (leveledUp) leveledUpCards.push(getCardData(card).name);
       cardMap.set(card.id, card);
     }
     const updatedCards = Array.from(cardMap.values());
 
     try {
-      for (const card of updatedCards) {
+      for (const card of verified ? [] : updatedCards) {
         await supabase
           .from('user_cards')
           .update({ level: card.level, experience: card.experience })
@@ -664,7 +669,7 @@ export function CardBattle({
       console.error('Error en persistencia:', err);
     }
 
-    setUserStats(newStats);
+    if (!verified) setUserStats(newStats);
     onBattleComplete(updatedCards);
 
     setMatchResult({
@@ -672,7 +677,7 @@ export function CardBattle({
       userScore:  ug,
       rivalScore: rg,
       xpGained,
-      streakBonus,
+      streakBonus: verified ? 0 : streakBonus,
       leveledUpCards,
       skillUpgrade,
       newStreak,
