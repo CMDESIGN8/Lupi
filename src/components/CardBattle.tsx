@@ -372,6 +372,43 @@ export function CardBattle({
     const deckCards = (userDeck.cards ?? []) as UserCard[];
     if (deckCards.length < 5) { alert('Necesitás 5 cartas en el mazo'); return; }
     if (isRunning.current) return;
+    // UX preflight only. The trusted match server must enforce this again.
+    // Do not consume durability here: client-side matches are not verified.
+    const { data: wornItems, error: wornError } = await supabase
+      .from('user_items')
+      .select('item_id, aura_items!inner(slot)')
+      .eq('user_id', userId)
+      .eq('equipped', true);
+    if (wornError) {
+      alert('No se pudo comprobar el equipamiento. Intentá nuevamente.');
+      setPhase('select');
+      return;
+    }
+    const equipmentIds = (wornItems ?? [])
+      .filter((row) => {
+        const aura = row.aura_items as unknown as { slot?: string } | { slot?: string }[] | null;
+        const slot = Array.isArray(aura) ? aura[0]?.slot : aura?.slot;
+        return slot === 'boots' || slot === 'socks';
+      })
+      .map((row) => row.item_id);
+    if (equipmentIds.length) {
+      const { data: wear, error: wearError } = await supabase
+        .from('equipment_durability')
+        .select('item_id,remaining')
+        .eq('user_id', userId)
+        .in('item_id', equipmentIds);
+      if (wearError) {
+        alert('No se pudo comprobar la durabilidad. Intentá nuevamente.');
+        setPhase('select');
+        return;
+      }
+      const exhausted = (wear ?? []).find((row) => row.remaining <= 0);
+      if (exhausted) {
+        alert('Tenés medias o botines agotados (0/10). Renoválos desde el armario antes de jugar.');
+        setPhase('select');
+        return;
+      }
+    }
     isRunning.current = true;
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
     let ug = 0, rg = 0;
