@@ -58,6 +58,21 @@ Deno.serve(async (request) => {
       if (error) throw error;
       return reply({ session_id: session.id });
     }
+    if (body.action === "resume") {
+      if (typeof body.session_id !== "string" ||
+          !/^[0-9a-f-]{36}$/i.test(body.session_id))
+        return reply({ error: "Invalid session" }, 400);
+      const { data: session, error } = await admin
+        .from("verified_match_sessions")
+        .select("id,user_id,opponent_key,turn_index,state_version,user_score,opponent_score,simulation_state,pending_decision,state,expires_at")
+        .eq("id", body.session_id).eq("user_id", user.id).single();
+      if (error || !session) return reply({ error: "Session not found" }, 404);
+      if (session.state === "started" && new Date(session.expires_at).getTime() <= Date.now())
+        return reply({ error: "Session expired" }, 410);
+      // Never expose simulation_seed, deck_snapshot or service credentials.
+      const { user_id: _owner, ...publicSession } = session;
+      return reply({ session: publicSession });
+    }
     if (body.action === "finish") {
       if (typeof body.session_id !== "string" ||
           !/^[0-9a-f-]{36}$/i.test(body.session_id))
