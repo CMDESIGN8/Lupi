@@ -31,6 +31,10 @@ const SLOT_META: Record<
     label: "BOTTOM",
     icon: "🩳",
   },
+  socks: {
+    label: "MEDIAS",
+    icon: "🧦",
+  },
   boots: {
     label: "BOTINES",
     icon: "👟",
@@ -44,6 +48,7 @@ const SLOT_META: Record<
 const SLOT_ORDER: ItemSlot[] = [
   "top",
   "bottom",
+  "socks",
   "boots",
   "accessory",
 ];
@@ -107,7 +112,7 @@ export function LockerPreview({
   // El CTA del tutorial abre realmente el selector de prendas.
   useEffect(() => {
     if (!onboardingEquipRequest || loading) return;
-    const preferred: ItemSlot[] = ["top", "bottom", "boots", "accessory"];
+    const preferred: ItemSlot[] = ["top", "bottom", "socks", "boots", "accessory"];
     const slot = preferred.find(candidate => items.some(item => item.slot === candidate && item.owned && !item.equipped))
       ?? preferred.find(candidate => items.some(item => item.slot === candidate && item.owned))
       ?? "top";
