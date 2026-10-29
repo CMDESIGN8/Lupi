@@ -1,4 +1,4 @@
-import { calculateSeededTurn } from "./engine.ts";
+import { calculateSeededTurn, calculateSeededDecision } from "./engine.ts";
 import type { UserCard } from "../../../src/types/cards.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -87,6 +87,47 @@ Deno.serve(async (request) => {
         });
       if (advanceError) return reply({ error: "Turn conflict or invalid state" }, 409);
       return reply({ turn, state_version: nextVersion, turn_index: session.turn_index + 1 });
+    }
+    if (body.action === "decision") {
+      if (typeof body.session_id !== "string" ||
+          !/^[0-9a-f-]{36}$/i.test(body.session_id) ||
+          !Number.isSafeInteger(body.expected_version) || body.expected_version < 0 ||
+          typeof body.option_id !== "string" || body.option_id.length > 80)
+        return reply({ error: "Invalid decision request" }, 400);
+      const { data: session, error } = await admin.from("verified_match_sessions")
+        .select("id,user_id,state,state_version,turn_index,simulation_seed,pending_decision,simulation_state,user_score,opponent_score,expires_at")
+        .eq("id", body.session_id).eq("user_id", user.id).single();
+      if (error || !session) return reply({ error: "Session not found" }, 404);
+      if (session.state !== "started" || new Date(session.expires_at).getTime() <= Date.now())
+        return reply({ error: "Session is not active" }, 410);
+      if (session.state_version !== body.expected_version)
+        return reply({ error: "Stale state version", current_version: session.state_version }, 409);
+      if (!session.pending_decision || !Number.isSafeInteger(session.simulation_seed))
+        return reply({ error: "No valid pending decision" }, 409);
+      const context = session.pending_decision;
+      let result;
+      try {
+        result = calculateSeededDecision(context, body.option_id,
+          session.simulation_seed, session.turn_index - 1);
+      } catch {
+        return reply({ error: "Decision is not available" }, 400);
+      }
+      const userScore = session.user_score + (result.goalFor === "user" ? 1 : 0);
+      const opponentScore = session.opponent_score + (result.goalFor === "rival" ? 1 : 0);
+      const state = session.simulation_state as Record<string, unknown>;
+      const { data: nextVersion, error: advanceError } = await admin
+        .rpc("advance_verified_match_state", {
+          p_session_id: session.id,
+          p_expected_version: session.state_version,
+          p_turn_index: session.turn_index,
+          p_user_score: userScore,
+          p_opponent_score: opponentScore,
+          p_simulation_state: { ...state, last_decision: result },
+          p_pending_decision: null,
+        });
+      if (advanceError) return reply({ error: "Decision conflict or invalid state" }, 409);
+      return reply({ result, user_score: userScore, opponent_score: opponentScore,
+        state_version: nextVersion });
     }
     if (body.action === "finish") {
       if (typeof body.session_id !== "string" ||
