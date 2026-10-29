@@ -15,7 +15,6 @@ import {
   calcGroupValue,
   SKILL_GROUP_INFO,
   MomentContext,
-  TurnResult,
   DecisionOption,
   SkillGroup,
 } from '../utils/battleEngine';
@@ -430,13 +429,15 @@ export function CardBattle({
     let verifiedSession: { id: string; version: number } | null = null;
     let resumedTurnIndex = 0;
     let resumedPending: MomentContext | null = null;
-    let resumedTurn: TurnResult | null = null;
     let resumedScore: { user: number; rival: number } | null = null;
     const recoveryKey = `lupi:verified-match:${userId}`;
     if (serverMode) {
       try {
-        const saved = window.localStorage.getItem(recoveryKey);
+        // Server discovery also works after clearing storage or switching devices.
+        const active = await verifiedMatchApi.active();
+        const saved = active?.id ?? null;
         if (saved) {
+          window.localStorage.setItem(recoveryKey, saved);
           const session = await verifiedMatchApi.resume(saved);
           if (session.state === 'completed' || session.state === 'expired') {
             window.localStorage.removeItem(recoveryKey);
@@ -447,9 +448,8 @@ export function CardBattle({
               throw new Error(`Tenés un partido pendiente contra ${session.opponent_key}. Seleccioná ese rival para continuar.`);
             resumedTurnIndex = session.turn_index;
             resumedPending = session.pending_decision as MomentContext | null;
-            resumedTurn = session.simulation_state?.last_turn as TurnResult | null ?? null;
             resumedScore = { user: session.user_score, rival: session.opponent_score };
-            if (resumedPending && !resumedTurn)
+            if (resumedPending && !session.simulation_state?.last_turn)
               throw new Error('No se pudo reconstruir la decisión pendiente.');
             verifiedSession = { id: session.id, version: session.state_version };
           }
