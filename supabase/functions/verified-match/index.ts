@@ -80,7 +80,7 @@ Deno.serve(async (request) => {
         return reply({ error: "Server deck snapshot is not initialized" }, 409);
       const cards = session.deck_snapshot as UserCard[];
       const state = session.simulation_state as Record<string, unknown>;
-      const minute = session.turn_index * 5;
+      const minute = (session.turn_index + 1) * 5;
       if (session.turn_index >= 8) return reply({ error: "Match turns completed" }, 409);
       const advantage = typeof state.advantage === "number" &&
         Number.isFinite(state.advantage) ? state.advantage : 0;
