@@ -459,7 +459,9 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                 const complete = progress.owned === progress.total;
                 const missingCount = collection.itemIds.filter(id => !items.find(i => i.id === id)?.owned).length;
                 const subtotal = collection.itemIds.reduce((sum, id) => sum + (items.find(i => i.id === id)?.owned ? 0 : (shopPrices[id] ?? 0)), 0);
-                const remaining = collection.theme === "green" && missingCount === 2 ? Math.max(0, subtotal - 50) : subtotal;
+                const missingIds = collection.itemIds.filter(id => !items.find(i => i.id === id)?.owned);
+                const discount = missingCount === 3 || (collection.theme === "green" && missingCount === 2 && !missingIds.includes("flores-club-medias-verdes")) ? Math.min(50, subtotal) : 0;
+                const remaining = subtotal - discount;
                 const unavailable = collection.itemIds.some(id => !items.find(i => i.id === id)?.owned && shopPrices[id] == null);
                 return <div className="lupi-collections__shop-card lupi-flores-store" key={collection.id}>
                   <div className="lupi-flores-store__banner">
