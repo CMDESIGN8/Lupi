@@ -372,6 +372,8 @@ export function CardBattle({
     const deckCards = (userDeck.cards ?? []) as UserCard[];
     if (deckCards.length < 5) { alert('Necesitás 5 cartas en el mazo'); return; }
     if (isRunning.current) return;
+    // Prevent double-start while asynchronous equipment checks are running.
+    isRunning.current = true;
     // UX preflight only. The trusted match server must enforce this again.
     // Do not consume durability here: client-side matches are not verified.
     const { data: wornItems, error: wornError } = await supabase
@@ -382,6 +384,7 @@ export function CardBattle({
     if (wornError) {
       alert('No se pudo comprobar el equipamiento. Intentá nuevamente.');
       setPhase('select');
+      isRunning.current = false;
       return;
     }
     const equipmentIds = (wornItems ?? [])
@@ -400,12 +403,14 @@ export function CardBattle({
       if (wearError) {
         alert('No se pudo comprobar la durabilidad. Intentá nuevamente.');
         setPhase('select');
+        isRunning.current = false;
         return;
       }
       const exhausted = (wear ?? []).find((row) => row.remaining <= 0);
       if (exhausted) {
         alert('Tenés medias o botines agotados (0/10). Renoválos desde el armario antes de jugar.');
         setPhase('select');
+        isRunning.current = false;
         return;
       }
       const lowDurability = (wear ?? []).filter((row) => row.remaining > 0 && row.remaining <= 3);
@@ -413,11 +418,11 @@ export function CardBattle({
         const uses = lowDurability.map((row) => `${row.remaining}/10`).join(', ');
         if (!window.confirm(`⚠️ Tu equipamiento está por agotarse (${uses}). ¿Querés jugar igual?`)) {
           setPhase('select');
+          isRunning.current = false;
           return;
         }
       }
     }
-    isRunning.current = true;
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
     let ug = 0, rg = 0;
 
