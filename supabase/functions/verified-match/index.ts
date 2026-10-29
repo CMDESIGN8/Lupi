@@ -25,40 +25,9 @@ Deno.serve(async (request) => {
     if (authError || !user) return reply({ error: "Invalid session" }, 401);
     const body = await request.json();
     if (body.action === "start") {
-      if (typeof body.opponent !== "string" || !/^[a-zA-Z0-9 _-]{1,80}$/.test(body.opponent))
-        return reply({ error: "Invalid opponent" }, 400);
-      // Limit one unfinished session per user (a DB unique index must enforce this atomically).
-      const { data: pending, error: pendingError } = await admin
-        .from("verified_match_sessions").select("id")
-        .eq("user_id", user.id).eq("state", "started").limit(1);
-      if (pendingError) throw pendingError;
-      if (pending?.length) return reply({ error: "Finish your current match first" }, 409);
-      // Equipment checks here are advisory until moved into a transactional start RPC.
-      const { data: equipped, error: eqError } = await admin.from("user_items")
-        .select("item_id,aura_items!inner(slot)").eq("user_id", user.id).eq("equipped", true);
-      if (eqError) throw eqError;
-      const ids = (equipped ?? []).filter((x) => {
-        const a = x.aura_items as unknown as {slot:string} | {slot:string}[];
-        const slot = Array.isArray(a) ? a[0]?.slot : a?.slot;
-        return slot === "socks" || slot === "boots";
-      }).map((x) => x.item_id);
-      if (ids.length) {
-        const { data: wear, error: wearError } = await admin.from("equipment_durability")
-          .select("item_id,remaining").eq("user_id", user.id).in("item_id", ids);
-        if (wearError) throw wearError;
-        if ((wear ?? []).some((x) => x.remaining <= 0))
-          return reply({ error: "Equipment exhausted" }, 409);
-      }
-      // Score is decided on the server and not supplied by the browser.
-      const bytes = crypto.getRandomValues(new Uint32Array(2));
-      const userScore = bytes[0] % 6;
-      const opponentScore = bytes[1] % 6;
-      const { data: session, error } = await admin.from("verified_match_sessions")
-        .insert({ user_id: user.id, opponent_key: body.opponent,
-          user_score: userScore, opponent_score: opponentScore })
-        .select("id").single();
-      if (error) throw error;
-      return reply({ session_id: session.id });
+      // Never create a fake-score match. Await an atomic start RPC that
+      // snapshots the user's real deck, equipped items and a private seed.
+      return reply({ error: "Verified match start not enabled yet" }, 501);
     }
     if (body.action === "resume") {
       if (typeof body.session_id !== "string" ||
