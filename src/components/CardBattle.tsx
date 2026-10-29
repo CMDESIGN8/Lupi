@@ -448,15 +448,22 @@ export function CardBattle({
     await delay(500);
 
     try {
-    for (let t = 1; t <= TOTAL_TURNS; t++) {
-      const min = Math.round((t / TOTAL_TURNS) * 40);
+    // Verified SQL finalization requires exactly eight completed turns.
+    // Preserve the six-turn recreational mode unchanged.
+    const totalTurns = verifiedSession ? 8 : TOTAL_TURNS;
+    let authoritativeScore: { user: number; rival: number } | null = null;
+    for (let t = 1; t <= totalTurns; t++) {
+      const min = Math.round((t / totalTurns) * 40);
       setMinute(min);
       await delay(TURN_MS);
 
       const serverTurn = verifiedSession
         ? await verifiedMatchApi.turn(verifiedSession.id, verifiedSession.version)
         : null;
-      if (serverTurn && verifiedSession) verifiedSession.version = serverTurn.version;
+      if (serverTurn && verifiedSession) {
+        verifiedSession.version = serverTurn.version;
+        authoritativeScore = { user: serverTurn.userScore, rival: serverTurn.opponentScore };
+      }
       const turn = serverTurn?.turn ?? generateTurn(deckCards, min, adv, bot.name);
 
       // FASE USUARIO
@@ -483,7 +490,10 @@ export function CardBattle({
           const serverDecision = verifiedSession
             ? await verifiedMatchApi.decision(verifiedSession.id, verifiedSession.version, chosen.id)
             : null;
-          if (serverDecision && verifiedSession) verifiedSession.version = serverDecision.version;
+          if (serverDecision && verifiedSession) {
+            verifiedSession.version = serverDecision.version;
+            authoritativeScore = { user: serverDecision.userScore, rival: serverDecision.opponentScore };
+          }
           const res = serverDecision?.result ?? resolveDecision(chosen, ctx.mainCard, ctx.type, min);
           addLog(res.narrative, res.goalFor === 'user' ? 'goal' : res.success ? 'good' : 'neutral');
 
@@ -546,6 +556,13 @@ export function CardBattle({
         setUHL(null); setRHL(null);
         await backToMidfield();
         await delay(300);
+      }
+      // Animations are cosmetic: the server is the source of truth for scores.
+      if (verifiedSession && authoritativeScore) {
+        ug = authoritativeScore.user;
+        rg = authoritativeScore.rival;
+        setUGoals(ug);
+        setRGoals(rg);
       }
     }
 
