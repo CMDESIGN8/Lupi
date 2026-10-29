@@ -14,6 +14,9 @@ create table if not exists public.verified_match_sessions (
 );
 create index if not exists verified_match_sessions_user_idx
  on public.verified_match_sessions(user_id,created_at desc);
+-- Atomically prevent parallel unfinished sessions for the same player.
+create unique index if not exists verified_match_one_active_per_user
+ on public.verified_match_sessions(user_id) where state='started';
 alter table public.verified_match_sessions enable row level security;
 -- No browser access. Only service-role backend can create or finalize sessions.
 revoke all on public.verified_match_sessions from anon, authenticated;
