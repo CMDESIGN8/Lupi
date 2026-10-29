@@ -25,7 +25,13 @@ Deno.serve(async (request) => {
     if (body.action === "start") {
       if (typeof body.opponent !== "string" || !/^[a-zA-Z0-9 _-]{1,80}$/.test(body.opponent))
         return reply({ error: "Invalid opponent" }, 400);
-      // Serialize against renewals and other starts by locking via a dedicated RPC in a future revision.
+      // Limit one unfinished session per user (a DB unique index must enforce this atomically).
+      const { data: pending, error: pendingError } = await admin
+        .from("verified_match_sessions").select("id")
+        .eq("user_id", user.id).eq("state", "started").limit(1);
+      if (pendingError) throw pendingError;
+      if (pending?.length) return reply({ error: "Finish your current match first" }, 409);
+      // Equipment checks here are advisory until moved into a transactional start RPC.
       const { data: equipped, error: eqError } = await admin.from("user_items")
         .select("item_id,aura_items!inner(slot)").eq("user_id", user.id).eq("equipped", true);
       if (eqError) throw eqError;
