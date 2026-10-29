@@ -158,13 +158,25 @@ Deno.serve(async (request) => {
           !/^[0-9a-f-]{36}$/i.test(body.session_id))
         return reply({ error: "Invalid session" }, 400);
       const { data: session, error } = await admin.from("verified_match_sessions")
-        .select("user_id,created_at,user_score,opponent_score")
-        .eq("id", body.session_id).single();
-      if (error || !session || session.user_id !== user.id)
-        return reply({ error: "Session not found" }, 404);
-      // Time alone is NOT proof of a played match. This endpoint remains
-      // disabled until a server-authoritative turn/decision transcript exists.
-      return reply({ error: "Verified match finalization not enabled yet" }, 501);
+        .select("user_id,created_at,state,turn_index,pending_decision,user_score,opponent_score,match_id")
+        .eq("id", body.session_id).eq("user_id", user.id).single();
+      if (error || !session) return reply({ error: "Session not found" }, 404);
+      if (session.state === "completed" && session.match_id)
+        return reply({ match_id: session.match_id, user_score: session.user_score,
+          opponent_score: session.opponent_score });
+      if (session.state !== "started" || session.turn_index !== 8 ||
+          session.pending_decision !== null)
+        return reply({ error: "Match has unfinished turns or decisions" }, 409);
+      // This is only an additional abuse barrier; authoritative turn state
+      // and pacing are enforced by SQL in 20261105.
+      if (Date.now() - new Date(session.created_at).getTime() < 24000)
+        return reply({ error: "Match cannot finish yet" }, 409);
+      const { data: matchId, error: finalizeError } = await admin
+        .rpc("finalize_verified_match", { p_session_id: body.session_id });
+      if (finalizeError || !matchId)
+        return reply({ error: "Match finalization failed" }, 409);
+      return reply({ match_id: matchId, user_score: session.user_score,
+        opponent_score: session.opponent_score });
     }
     return reply({ error: "Invalid action" }, 400);
   } catch (error) {
