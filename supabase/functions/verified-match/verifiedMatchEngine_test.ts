@@ -1,7 +1,7 @@
 import {
   calculateSeededTurn, calculateSeededDecision,
-} from "../../src/utils/verifiedMatchEngine.ts";
-import type { UserCard } from "../../src/types/cards.ts";
+} from "../../../src/utils/verifiedMatchEngine.ts";
+import type { UserCard } from "../../../src/types/cards.ts";
 
 const makeCard = (id: string): UserCard => ({
   id, user_id: "test-user", card_type: "npc", level: 1,
@@ -11,7 +11,7 @@ const makeCard = (id: string): UserCard => ({
     name: "Jugador " + id, position: "pivot", category: "8va",
     overall_rating: 75, pace: 70, dribbling: 72, passing: 68,
     defending: 66, finishing: 76, physical: 74,
-  },
+  } as UserCard["card"],
 });
 const cards = Array.from({ length: 5 }, (_, i) => makeCard(String(i)));
 
@@ -22,9 +22,11 @@ Deno.test("server turn is reproducible across repeated calls", () => {
 });
 
 Deno.test("server rejects decisions not offered by current moment", () => {
-  const turn = calculateSeededTurn(cards, 5, 1, "Bot", 123456, 0);
-  const ctx = turn.userPhase.moment;
-  if (!ctx) throw new Error("Expected an attacking moment");
+  let ctx: ReturnType<typeof calculateSeededTurn>["userPhase"]["moment"];
+  for (let seed = 1; seed <= 1000 && !ctx; seed++) {
+    ctx = calculateSeededTurn(cards, 5, 1, "Bot", seed, 0).userPhase.moment;
+  }
+  if (!ctx) throw new Error("No attacking moment in sampled seeds");
   let rejected = false;
   try { calculateSeededDecision(ctx, "invented-option", 123456, 0); }
   catch { rejected = true; }
