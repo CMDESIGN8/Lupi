@@ -82,7 +82,7 @@ Deno.serve(async (request) => {
         return reply({ error: "Invalid turn request" }, 400);
       const { data: session, error } = await admin
         .from("verified_match_sessions")
-        .select("id,user_id,state,state_version,turn_index,simulation_seed,deck_snapshot,pending_decision,simulation_state,opponent_key,expires_at")
+        .select("id,user_id,state,state_version,turn_index,simulation_seed,deck_snapshot,pending_decision,simulation_state,opponent_key,user_score,opponent_score,expires_at")
         .eq("id", body.session_id).eq("user_id", user.id).single();
       if (error || !session) return reply({ error: "Session not found" }, 404);
       if (session.state !== "started" || new Date(session.expires_at).getTime() <= Date.now())
@@ -111,8 +111,8 @@ Deno.serve(async (request) => {
           p_session_id: session.id,
           p_expected_version: session.state_version,
           p_turn_index: session.turn_index + 1,
-          p_user_score: 0,
-          p_opponent_score: 0,
+          p_user_score: session.user_score,
+          p_opponent_score: session.opponent_score,
           p_simulation_state: { ...state, last_turn: turn },
           p_pending_decision: turn.userPhase.moment ?? null,
         });
