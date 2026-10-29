@@ -1,9 +1,9 @@
-import type { UserCard } from "../types/cards";
+import type { UserCard } from "../types/cards.ts";
 import {
   generateTurn, resolveDecision, type DecisionOption, type MomentContext,
   type MomentResult, type TurnResult,
-} from "./battleEngine";
-import { matchRandomCursor } from "./matchRandom";
+} from "./battleEngine.ts";
+import { matchRandomCursor } from "./matchRandom.ts";
 
 /**
  * Reproducible calculations, shared by Vite and Supabase Deno.
