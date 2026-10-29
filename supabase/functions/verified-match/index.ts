@@ -1,3 +1,5 @@
+import { calculateSeededTurn } from "./engine.ts";
+import type { UserCard } from "../../../src/types/cards.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const headers = {
@@ -72,6 +74,50 @@ Deno.serve(async (request) => {
       // Never expose simulation_seed, deck_snapshot or service credentials.
       const { user_id: _owner, ...publicSession } = session;
       return reply({ session: publicSession });
+    }
+    if (body.action === "turn") {
+      if (typeof body.session_id !== "string" ||
+          !/^[0-9a-f-]{36}$/i.test(body.session_id) ||
+          !Number.isSafeInteger(body.expected_version) || body.expected_version < 0)
+        return reply({ error: "Invalid turn request" }, 400);
+      const { data: session, error } = await admin
+        .from("verified_match_sessions")
+        .select("id,user_id,state,state_version,turn_index,simulation_seed,deck_snapshot,pending_decision,simulation_state,opponent_key,expires_at")
+        .eq("id", body.session_id).eq("user_id", user.id).single();
+      if (error || !session) return reply({ error: "Session not found" }, 404);
+      if (session.state !== "started" || new Date(session.expires_at).getTime() <= Date.now())
+        return reply({ error: "Session is not active" }, 410);
+      if (session.state_version !== body.expected_version)
+        return reply({ error: "Stale state version", current_version: session.state_version }, 409);
+      if (session.pending_decision)
+        return reply({ error: "Resolve pending decision first" }, 409);
+      // Never use a deck or seed supplied by the browser.
+      // A future transactional start RPC must populate both values.
+      if (!Array.isArray(session.deck_snapshot) || session.deck_snapshot.length !== 5 ||
+          !Number.isSafeInteger(session.simulation_seed))
+        return reply({ error: "Server deck snapshot is not initialized" }, 409);
+      const cards = session.deck_snapshot as UserCard[];
+      const state = session.simulation_state as Record<string, unknown>;
+      const minute = session.turn_index * 5;
+      if (session.turn_index >= 8) return reply({ error: "Match turns completed" }, 409);
+      const advantage = typeof state.advantage === "number" &&
+        Number.isFinite(state.advantage) ? state.advantage : 0;
+      const turn = calculateSeededTurn(cards, minute, advantage,
+        session.opponent_key, session.simulation_seed, session.turn_index);
+      // A single CAS transaction advances the turn. On conflict, the client
+      // must resume; never replay a new random turn.
+      const { data: nextVersion, error: advanceError } = await admin
+        .rpc("advance_verified_match_state", {
+          p_session_id: session.id,
+          p_expected_version: session.state_version,
+          p_turn_index: session.turn_index + 1,
+          p_user_score: 0,
+          p_opponent_score: 0,
+          p_simulation_state: { ...state, last_turn: turn },
+          p_pending_decision: turn.userPhase.moment ?? null,
+        });
+      if (advanceError) return reply({ error: "Turn conflict or invalid state" }, 409);
+      return reply({ turn, state_version: nextVersion, turn_index: session.turn_index + 1 });
     }
     if (body.action === "finish") {
       if (typeof body.session_id !== "string" ||
