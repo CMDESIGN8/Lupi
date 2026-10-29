@@ -57,8 +57,8 @@ begin
    or jsonb_array_length(v_session.deck_snapshot) <> 5 then
    raise exception 'Unverified or unfinished match';
  end if;
- insert into public.matches(user_id,user_deck_id,user_score,opponent_score,winner_id,experience_gained)
- values(v_session.user_id,v_session.deck_id,v_session.user_score,v_session.opponent_score,
+ insert into public.matches(user_id,opponent_type,user_deck_id,user_score,opponent_score,winner_id,experience_gained)
+ values(v_session.user_id,'bot',v_session.deck_id,v_session.user_score,v_session.opponent_score,
  case when v_session.user_score>v_session.opponent_score then v_session.user_id else null end,0)
  returning id into v_match_id;
  -- Set the match ID before consumption so the function can read the
