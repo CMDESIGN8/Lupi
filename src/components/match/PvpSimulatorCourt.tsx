@@ -10,7 +10,7 @@ export function PvpSimulatorCourt({state,meId,mine,rival,now,receivedAt,isHost,o
   const fx=useRef<AnimeEffectsHandle>(null);
   const seen=useRef<number|null>(null);
   const attackingHome=meId===state.attackerId; // posesión actual, independiente del lado anfitrión
-  const event=state.history.at(-1);
+  const event=state.history[state.history.length - 1];
   const serverNow=Date.parse(state.serverNow)+Math.max(0,now-receivedAt);
   const next=Date.parse(state.nextAt);
   const revealAge=event && serverNow<next?Math.max(0,4000-(next-serverNow)):null;

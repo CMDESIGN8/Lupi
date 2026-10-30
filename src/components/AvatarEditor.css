@@ -1359,8 +1359,7 @@
   .lw-id__layout[data-wardrobe-tab="shop"],
   .lw-id__layout[data-mobile-tab="wardrobe"][data-wardrobe-tab="shop"] {
     grid-template-rows: minmax(135px, 25dvh) 44px minmax(0, 1fr) auto !important;
-  }
-}
+  }}
 
 /* V6.6 — Fondo separado por dispositivo; escenario móvil anclado. */
 @media (max-width: 860px) {
