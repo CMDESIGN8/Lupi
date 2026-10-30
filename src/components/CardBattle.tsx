@@ -592,11 +592,14 @@ export function CardBattle({
       try {
         const final = await verifiedMatchApi.finish(verifiedSession.id);
         window.localStorage.removeItem(recoveryKey);
+<<<<<<< HEAD
         // The server has finalized the match and consumed equipped wear once.
         // Tell every inventory hook instance to reload the authoritative values.
         window.dispatchEvent(new CustomEvent('lupi:inventory-updated', {
           detail: { userId, source: 'verified-match-finalized' },
         }));
+=======
+>>>>>>> bedd28660ccd5674b1aadc18ee08c739a8ae8553
         if (typeof final.user_score === 'number' && typeof final.opponent_score === 'number') {
           ug = final.user_score;
           rg = final.opponent_score;

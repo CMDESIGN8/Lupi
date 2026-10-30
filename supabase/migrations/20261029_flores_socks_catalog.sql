@@ -9,8 +9,13 @@ alter table public.aura_items add constraint aura_items_slot_check
 insert into public.aura_items
  (id,name,slot,rarity,world,drop_code,icon,image_url,required_level,equipped_image_url,color)
 values
+<<<<<<< HEAD
  ('flores-club-medias-rojas','Medias rojas · Flores Club','socks','common','SPORT','FLORES CLUB 2026','🧦','/items/flores-club-medias-rojas.png',1,'/items/flores-club-medias-rojas.png','#c92c36'),
  ('flores-club-medias-verdes','Medias verdes · Flores Club','socks','common','SPORT','FLORES CLUB 2026','🧦','/items/flores-club-medias-verdes.png',1,'/items/flores-club-medias-verdes.png','#168e53')
+=======
+ ('flores-club-medias-rojas','Medias rojas · Flores Club','socks','common','SPORT','FLORES CLUB 2026','🧦','/items/flores-club-medias-rojas.svg',1,'/items/flores-club-medias-rojas.svg','#c92c36'),
+ ('flores-club-medias-verdes','Medias verdes · Flores Club','socks','common','SPORT','FLORES CLUB 2026','🧦','/items/flores-club-medias-verdes.svg',1,'/items/flores-club-medias-verdes.svg','#168e53')
+>>>>>>> bedd28660ccd5674b1aadc18ee08c739a8ae8553
 on conflict (id) do update
 set name=excluded.name,slot=excluded.slot,image_url=excluded.image_url,
  equipped_image_url=excluded.equipped_image_url,color=excluded.color;
