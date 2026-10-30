@@ -57,13 +57,8 @@ export const COLOR_BY_ID: Record<string, string> = {
 
 /** Convención de imágenes: /public/items/<id>.png */
 const defaultImage = (id: string) => `/items/${id}.png`;
-<<<<<<< HEAD
 const FLORES_8VA_PREVIEWS: Record<string,string> = {"flores-club-medias-rojas":"/items/flores-club-medias-rojas.png","flores-club-medias-verdes":"/items/flores-club-medias-verdes.png","flores-club-8va-camiseta-verde":flores8vaTopPreview,"flores-club-8va-short-negro":flores8vaBottomPreview};
 const FLORES_8VA_SPRITES: Record<string,string> = {"flores-club-medias-rojas":"/items/flores-club-medias-rojas.png","flores-club-medias-verdes":"/items/flores-club-medias-verdes.png","flores-club-8va-camiseta-verde":flores8vaTop,"flores-club-8va-short-negro":flores8vaBottom};
-=======
-const FLORES_8VA_PREVIEWS: Record<string,string> = {"flores-club-medias-rojas":"/items/flores-club-medias-rojas.svg","flores-club-medias-verdes":"/items/flores-club-medias-verdes.svg","flores-club-8va-camiseta-verde":flores8vaTopPreview,"flores-club-8va-short-negro":flores8vaBottomPreview};
-const FLORES_8VA_SPRITES: Record<string,string> = {"flores-club-medias-rojas":"/items/flores-club-medias-rojas.svg","flores-club-medias-verdes":"/items/flores-club-medias-verdes.svg","flores-club-8va-camiseta-verde":flores8vaTop,"flores-club-8va-short-negro":flores8vaBottom};
->>>>>>> bedd28660ccd5674b1aadc18ee08c739a8ae8553
 
 /**
  * Catálogo local de respaldo (modo prototipo).
@@ -183,10 +178,7 @@ export function useAuraInventory(userId: string, _level: number) {
       (ownedRes.data ?? []).map((row) => [row.item_id, !!row.equipped])
     );
 
-<<<<<<< HEAD
     if (durabilityRes.error) console.warn('No se pudo consultar la durabilidad:', durabilityRes.error);
-=======
->>>>>>> bedd28660ccd5674b1aadc18ee08c739a8ae8553
     const durabilityMap = new Map((durabilityRes.data ?? []).map(row => [row.item_id, row]));
     setItems(
       catalog.map((row) => ({
@@ -205,13 +197,8 @@ export function useAuraInventory(userId: string, _level: number) {
         owned: ownedMap.has(row.id),
         equipped: ownedMap.get(row.id) ?? false,
         equippedImageUrl: FLORES_8VA_SPRITES[row.id] ?? row.equipped_image_url,
-<<<<<<< HEAD
         durability: row.slot === "socks" || row.slot === "boots" ? (durabilityMap.get(row.id)?.remaining ?? null) : null,
         maxDurability: row.slot === "socks" || row.slot === "boots" ? (durabilityMap.get(row.id)?.max_uses ?? 10) : null,
-=======
-        durability: row.slot === "socks" || row.slot === "boots" ? (durabilityMap.get(row.id)?.remaining ?? 10) : null,
-        maxDurability: row.slot === "socks" || row.slot === "boots" ? 10 : null,
->>>>>>> bedd28660ccd5674b1aadc18ee08c739a8ae8553
       }))
     );
     setUsingFallback(false);
@@ -241,7 +228,6 @@ export function useAuraInventory(userId: string, _level: number) {
   }, [userId, usingFallback, load]);
 
   const toggleEquip = useCallback(
-<<<<<<< HEAD
     async (itemId: string): Promise<boolean> => {
       if (equipLock.current || loading || usingFallback || !userId) return false;
       const target = items.find(i => i.id === itemId);
@@ -256,12 +242,6 @@ export function useAuraInventory(userId: string, _level: number) {
       equipLock.current = true;
       setEquipping(true);
       setEquipError(null);
-=======
-    async (itemId: string) => {
-      const target = items.find((i) => i.id === itemId);
-      if (!target || !target.owned || (target.durability != null && target.durability <= 0 && !target.equipped)) return;
-
->>>>>>> bedd28660ccd5674b1aadc18ee08c739a8ae8553
       const willEquip = !target.equipped;
       try {
         const { error } = await supabase.rpc("equip_aura_item", {
@@ -292,3 +272,4 @@ export function useAuraInventory(userId: string, _level: number) {
 
   return { items, loading, toggleEquip, usingFallback, refresh: load, equipError, equipping };
 }
+

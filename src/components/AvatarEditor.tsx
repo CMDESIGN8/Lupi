@@ -597,11 +597,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                         data-equipped={item.equipped}
                         data-locked={!item.owned}
                         aria-pressed={item.equipped}
-<<<<<<< HEAD
                         disabled={loading || usingFallback || equipping || outfitBusy || !item.owned || busyId !== null || (item.durability != null && item.durability <= 0 && !item.equipped)}
-=======
-                        disabled={!item.owned || busyId === item.id || (item.durability != null && item.durability <= 0 && !item.equipped)}
->>>>>>> bedd28660ccd5674b1aadc18ee08c739a8ae8553
                         onClick={() => void equip(item.id)}
                       >
                         <span className="lw-id__item-art">
