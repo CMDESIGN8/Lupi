@@ -21,6 +21,8 @@ import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
     import { useLobbyPresence, type LobbyLook, type LobbyPlayer } from "../hooks/useLobbyPresence";
     import { LobbyChat } from "../components/LobbyChat";
 import { ChallengeGameSelector } from "../components/ChallengeGameSelector";
+import { FutsalPvp } from "../components/FutsalPvp";
+import { TriviaDuel } from "../components/TriviaDuel";
 import { RockPaperScissors } from "../components/RockPaperScissors";
 import { DuelVersus } from "../components/DuelVersus";
     import { LockerPreview } from "../components/LockerPreview";
@@ -418,6 +420,8 @@ import { useAchievements } from "../hooks/useAchievements";
         return () => window.clearTimeout(timer);
       }, [dailyChallengeToasts]);
   const [challengeTarget, setChallengeTarget] = useState<LobbyPlayer | null>(null);
+  const [activeFutsal, setActiveFutsal] = useState<Challenge | null>(null);
+  const [activeTrivia, setActiveTrivia] = useState<Challenge | null>(null);
   const [activeRps, setActiveRps] = useState<Challenge | null>(null);
   const [versusChallenge, setVersusChallenge] = useState<Challenge | null>(null);
   const versusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -634,7 +638,7 @@ const {
 
       const { players: lobbyPlayers, status: lobbyStatus } = useLobbyPresence({
       room: "global",
-      activity: view === "match" ? "in-match" : "lobby",
+      activity: view === "match" || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
       me: {
         userId: user.id,
         username: user.username,
@@ -665,7 +669,7 @@ const {
       room: "global",
       meId: user.id,
       meName: user.username || "Jugador",
-      available: view === "lobby",
+      available: view === "lobby" && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge,
       isMuted,
       onAccepted: (challengeData, role) => {
         console.log("DUEL ACCEPTED", { challengeData, role });
@@ -678,10 +682,12 @@ const {
           if (challengeData.gameType === "rps") {
             setView("lobby");
             setActiveRps(challengeData);
+          } else if (challengeData.gameType === "trivia") {
+            setView("lobby");
+            setActiveTrivia(challengeData);
           } else if (challengeData.gameType === "futsal") {
-            setBattleMode("quick");
-            setView("match");
-            window.scrollTo({ top: 0 });
+            setView("lobby");
+            setActiveFutsal(challengeData);
           }
         }, 2200);
       },
@@ -1239,7 +1245,7 @@ onChallengeGame={(player, game) => {
                     onlineMemberIds={lobbyPlayers.filter(p => p.userId !== user.id && p.activity === "lobby").map(p => p.userId)}
                     challengePendingToId={outgoing?.toId ?? null}
                     onChallengeMember={(member, game, communityId) => {
-                      if (view !== "lobby" || game !== "rps") return false;
+                      if (view !== "lobby" || activeRps || activeTrivia || activeFutsal || versusChallenge || (game !== "rps" && game !== "trivia" && game !== "futsal")) return false;
                       const sent = challenge(member, 1, game, communityId);
                       if (sent) updateMissionProgress("challenge");
                       return sent;
@@ -1567,6 +1573,8 @@ onChallengeGame={(player, game) => {
               void refreshPackCount();
             }}
           />
+          {activeFutsal && <div className="rps-screen-overlay trivia-screen-overlay"><FutsalPvp key={activeFutsal.id} challenge={activeFutsal} meId={user.id} deck={activeDeck} players={lobbyPlayers} onExit={() => setActiveFutsal(null)} /></div>}
+          {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
           {activeRps && (
             <div className="rps-screen-overlay">
               <RockPaperScissors
@@ -1577,7 +1585,7 @@ onChallengeGame={(player, game) => {
             </div>
           )}
           {versusChallenge && (
-            <DuelVersus challenge={versusChallenge} meId={user.id} />
+            <DuelVersus challenge={versusChallenge} meId={user.id} players={lobbyPlayers} />
           )}
           {showAchievements && (
   <AchievementsModal

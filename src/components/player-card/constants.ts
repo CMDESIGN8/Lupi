@@ -69,15 +69,16 @@ export const CHALLENGE_OPTIONS: {
   available: boolean;
 }[] = [
   { game: "rps", icon: "✊", title: "Piedra, papel o tijera", description: "Duelo por rondas", available: true },
-  { game: "futsal", icon: "⚽", title: "Futsal", description: "Partido competitivo · PvP en desarrollo", available: false },
-  { game: "trivia", icon: "🧠", title: "Preguntados", description: "Próximamente", available: false },
+  { game: "futsal", icon: "⚽", title: "Futsal", description: "Ataque y defensa · Duelo PvP amistoso", available: true },
+  { game: "trivia", icon: "🧠", title: "Preguntados", description: "Trivia de fútbol · 5 preguntas PvP", available: true },
   { game: "truco", icon: "🃏", title: "Truco", description: "Próximamente", available: false },
 ];
 
 /** Imagen oficial del par de botines AURA XP: se usa siempre en lugar de la del ítem. */
 export const BOOTS_OFFICIAL_IMAGE = "/items/equipped/aura-boots.png";
 
-export function wornImageSrc(item: { slot: string; imageUrl?: string | null }): string | undefined {
-  if (!item.imageUrl) return undefined;
-  return item.slot === "boots" ? BOOTS_OFFICIAL_IMAGE : item.imageUrl;
+export function wornImageSrc(item: { slot: string; imageUrl?: string | null; equippedImageUrl?: string | null }): string | undefined {
+  // En el vestuario mostrar la miniatura del ítem real, sin sustituir todos
+  // los botines por AURA BOOTS (Flores y futuros modelos tienen su propio arte).
+  return item.imageUrl ?? item.equippedImageUrl ?? undefined;
 }

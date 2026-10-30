@@ -1201,9 +1201,7 @@
     ) !important;
 }
 
-.locker-preview .locker-slot.equipped .locker-slot-icon {
-  border: 1px solid var(--slot-rarity, #A7B6AF);
-}
+
 
 .locker-preview .locker-slot.equipped.selected {
   border-color: var(--slot-rarity, #A7B6AF) !important;

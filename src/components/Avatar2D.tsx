@@ -21,7 +21,7 @@ const SLOT_ICONS: Record<string, string> = {
   accessory: "✦",
 };
 
-const SLOT_ORDER: AvatarVisualSlot[] = ["top", "bottom", "boots", "accessory"];
+const SLOT_ORDER: AvatarVisualSlot[] = ["top", "bottom", "socks", "boots", "accessory"];
 
 function AvatarItemImage({
   item,
@@ -96,6 +96,8 @@ export function Avatar2D({
 
   const bottomItem =
     layers.find((x) => x.slot === "bottom")?.item ?? null;
+
+  const socksItem = layers.find((x) => x.slot === "socks")?.item ?? null;
 
   const bootsItem =
     layers.find((x) => x.slot === "boots")?.item ?? null;
@@ -189,6 +191,12 @@ export function Avatar2D({
               item={bottomItem}
               className="avatar2d__image"
             />
+          </div>
+        )}
+
+        {socksItem?.imageUrl && (
+          <div className="avatar2d__layer avatar2d__layer--socks" style={visual["socks"]}>
+            <AvatarItemImage item={socksItem} className="avatar2d__image" />
           </div>
         )}
 

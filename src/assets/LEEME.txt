@@ -1,0 +1,9 @@
+FLORES CLUB — MEDIAS V1
+
+Dos PNG transparentes de cuerpo completo (490x500) y dos miniaturas (400x400).
+Estas imágenes son prototipos de calce: la posición exacta de las pantorrillas debe verificarse contra el avatar real.
+
+Medias rojas: arqueros. Medias verdes: 8.ª y futuras divisiones.
+
+IMPORTANTE: no cambies el número de prendas de las colecciones a 3/3 hasta crear los registros aura_items, entregar las medias a los usuarios correspondientes y añadir el slot socks a la UI, el renderer y los tipos.
+La base de datos permite un slot textual solo si no tiene CHECK/enum restringiendo sus valores; comprobar antes de ejecutar migraciones.

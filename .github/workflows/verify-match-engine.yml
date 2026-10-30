@@ -1,0 +1,17 @@
+name: Verify match engine
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [feature/flores-socks-durability]
+jobs:
+  deno-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check and run deterministic match tests
+        run: |
+          deno test --no-check supabase/functions/verified-match/matchRandom_test.ts supabase/functions/verified-match/verifiedMatchEngine_test.ts

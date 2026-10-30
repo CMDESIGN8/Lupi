@@ -5,7 +5,7 @@ import flores8vaBottomPreview from "../assets/flores-8va-short-preview.webp";
 import { supabase } from "../lib/supabaseClient";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type ItemSlot = "top" | "bottom" | "boots" | "accessory";
+export type ItemSlot = "top" | "bottom" | "socks" | "boots" | "accessory";
 export type ItemRarity = "common" | "rare" | "epic" | "legendary";
 export type ItemWorld = "URBAN" | "GAMER" | "SPORT";
 
@@ -25,6 +25,8 @@ export type InventoryItem = {
   owned: boolean;
   equipped: boolean;
   equippedImageUrl: string | null;
+  durability?: number | null;
+  maxDurability?: number | null;
 };
 
 type CatalogRow = {
@@ -55,8 +57,8 @@ export const COLOR_BY_ID: Record<string, string> = {
 
 /** Convención de imágenes: /public/items/<id>.png */
 const defaultImage = (id: string) => `/items/${id}.png`;
-const FLORES_8VA_PREVIEWS: Record<string,string> = {"flores-club-8va-camiseta-verde":flores8vaTopPreview,"flores-club-8va-short-negro":flores8vaBottomPreview};
-const FLORES_8VA_SPRITES: Record<string,string> = {"flores-club-8va-camiseta-verde":flores8vaTop,"flores-club-8va-short-negro":flores8vaBottom};
+const FLORES_8VA_PREVIEWS: Record<string,string> = {"flores-club-medias-rojas":"/items/flores-club-medias-rojas.png","flores-club-medias-verdes":"/items/flores-club-medias-verdes.png","flores-club-8va-camiseta-verde":flores8vaTopPreview,"flores-club-8va-short-negro":flores8vaBottomPreview};
+const FLORES_8VA_SPRITES: Record<string,string> = {"flores-club-medias-rojas":"/items/flores-club-medias-rojas.png","flores-club-medias-verdes":"/items/flores-club-medias-verdes.png","flores-club-8va-camiseta-verde":flores8vaTop,"flores-club-8va-short-negro":flores8vaBottom};
 
 /**
  * Catálogo local de respaldo (modo prototipo).
@@ -135,16 +137,21 @@ function applyEquip(prev: InventoryItem[], itemId: string, equip: boolean) {
   });
 }
 
-export function useAuraInventory(userId: string, level: number) {
+export function useAuraInventory(userId: string, _level: number) {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [equipError, setEquipError] = useState<string | null>(null);
+  const [equipping, setEquipping] = useState(false);
+  const equipLock = useRef(false);
+  const loadVersion = useRef(0);
   const instanceId = useRef(Math.random().toString(36).slice(2));
 
   const load = useCallback(async () => {
-    if (!userId) return;
+    const version = ++loadVersion.current;
+    if (!userId) { setItems([]); setLoading(false); return; }
 
-    const [catalogRes, ownedRes] = await Promise.all([
+    const [catalogRes, ownedRes, durabilityRes] = await Promise.all([
       supabase
         .from("aura_items")
         .select("*")
@@ -153,21 +160,15 @@ export function useAuraInventory(userId: string, level: number) {
         .from("user_items")
         .select("item_id, equipped")
         .eq("user_id", userId),
+      supabase.from("equipment_durability").select("item_id,remaining,max_uses").eq("user_id",userId),
     ]);
 
+    if (version !== loadVersion.current) return;
     const catalog = catalogRes.data as CatalogRow[] | null;
 
     if (catalogRes.error || ownedRes.error || !catalog?.length) {
-      const seenSlots = new Set<ItemSlot>();
-
-      setItems(
-        FALLBACK_CATALOG.map((item) => {
-          const owned = level >= item.requiredLevel;
-          const equipped = owned && !seenSlots.has(item.slot);
-          if (equipped) seenSlots.add(item.slot);
-          return { ...item, owned, equipped };
-        })
-      );
+      // Un fallo de lectura no concede prendas ni simula propiedad.
+      setItems(FALLBACK_CATALOG.map(item => ({ ...item, owned: false, equipped: false })));
       setUsingFallback(true);
       setLoading(false);
       return;
@@ -177,6 +178,8 @@ export function useAuraInventory(userId: string, level: number) {
       (ownedRes.data ?? []).map((row) => [row.item_id, !!row.equipped])
     );
 
+    if (durabilityRes.error) console.warn('No se pudo consultar la durabilidad:', durabilityRes.error);
+    const durabilityMap = new Map((durabilityRes.data ?? []).map(row => [row.item_id, row]));
     setItems(
       catalog.map((row) => ({
         id: row.id,
@@ -191,18 +194,24 @@ export function useAuraInventory(userId: string, level: number) {
         shopUrl: row.shop_url,
         color: row.color ?? COLOR_BY_ID[row.id] ?? DEFAULT_ITEM_COLOR,
         requiredLevel: row.required_level,
-        owned: ownedMap.has(row.id) || (!row.id.startsWith("flores-club-") && level >= row.required_level),
+        owned: ownedMap.has(row.id),
         equipped: ownedMap.get(row.id) ?? false,
         equippedImageUrl: FLORES_8VA_SPRITES[row.id] ?? row.equipped_image_url,
+        durability: row.slot === "socks" || row.slot === "boots" ? (durabilityMap.get(row.id)?.remaining ?? null) : null,
+        maxDurability: row.slot === "socks" || row.slot === "boots" ? (durabilityMap.get(row.id)?.max_uses ?? 10) : null,
       }))
     );
     setUsingFallback(false);
     setLoading(false);
-  }, [userId, level]);
+  }, [userId]);
 
   // Carga inicial
   useEffect(() => {
-    load();
+    setItems([]);
+    setLoading(true);
+    setEquipError(null);
+    void load();
+    return () => { loadVersion.current++; };
   }, [load]);
 
   // Cuando OTRA instancia del hook cambia el equipamiento, sincronizar esta.
@@ -212,53 +221,54 @@ export function useAuraInventory(userId: string, level: number) {
         userId?: string; itemId?: string; equipped?: boolean; source?: string;
       }>).detail;
       if (!d || d.userId !== userId || d.source === instanceId.current) return;
-      if (usingFallback && d.itemId) {
-        // sin base de datos no hay nada que recargar: aplicar el cambio en memoria
-        setItems((prev) => applyEquip(prev, d.itemId!, !!d.equipped));
-      } else {
-        load();
-      }
+      void load();
     };
     window.addEventListener("lupi:inventory-updated", onUpdated);
     return () => window.removeEventListener("lupi:inventory-updated", onUpdated);
   }, [userId, usingFallback, load]);
 
   const toggleEquip = useCallback(
-    async (itemId: string) => {
-      const target = items.find((i) => i.id === itemId);
-      if (!target || !target.owned) return;
-
+    async (itemId: string): Promise<boolean> => {
+      if (equipLock.current || loading || usingFallback || !userId) return false;
+      const target = items.find(i => i.id === itemId);
+      if (!target?.owned) {
+        setEquipError("Todavía no tenés esta prenda. Conseguíla antes de equiparla.");
+        return false;
+      }
+      if (target.durability != null && target.durability <= 0 && !target.equipped) {
+        setEquipError("Esta prenda está agotada. Renovala antes de equiparla.");
+        return false;
+      }
+      equipLock.current = true;
+      setEquipping(true);
+      setEquipError(null);
       const willEquip = !target.equipped;
-
-      setItems((prev) => applyEquip(prev, itemId, willEquip));
-
-      const notify = () =>
-        window.dispatchEvent(
-          new CustomEvent("lupi:inventory-updated", {
-            detail: { userId, itemId, equipped: willEquip, source: instanceId.current },
-          })
-        );
-
-      if (usingFallback) {
-        notify();
-        return;
+      try {
+        const { error } = await supabase.rpc("equip_aura_item", {
+          p_item_id: itemId, p_equip: willEquip,
+        });
+        if (error) throw error;
+        // Confirmar visualmente solo después de que el servidor acepta el cambio.
+        ++loadVersion.current;
+        setItems(prev => applyEquip(prev, itemId, willEquip));
+        window.dispatchEvent(new CustomEvent("lupi:inventory-updated", {
+          detail: { userId, itemId, equipped: willEquip, source: instanceId.current },
+        }));
+        return true;
+      } catch (error) {
+        const message = (error as { message?: string })?.message || "No se pudo guardar el equipamiento. Reintentá.";
+        setEquipError(message.includes("Item not owned")
+          ? "Esta prenda no figura en tu inventario. Actualizamos el armario para mostrar lo que tenés."
+          : message);
+        await load();
+        return false;
+      } finally {
+        equipLock.current = false;
+        setEquipping(false);
       }
-
-      const { error } = await supabase.rpc("equip_aura_item", {
-        p_item_id: itemId,
-        p_equip: willEquip,
-      });
-
-      if (error) {
-        console.error("Error equipando item:", error);
-        load();
-        return;
-      }
-
-      notify();
     },
-    [items, usingFallback, load, userId]
+    [items, loading, usingFallback, load, userId]
   );
 
-  return { items, loading, toggleEquip, usingFallback, refresh: load };
+  return { items, loading, toggleEquip, usingFallback, refresh: load, equipError, equipping };
 }

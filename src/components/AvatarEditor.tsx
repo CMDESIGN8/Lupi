@@ -33,6 +33,7 @@ type Props = {
 const SLOTS: { key: ItemSlot; label: string; tag: string }[] = [
   { key: "top", label: "REMERAS", tag: "REMERA" },
   { key: "bottom", label: "PANTALONES", tag: "PANTALÓN" },
+  { key: "socks", label: "MEDIAS", tag: "MEDIAS" },
   { key: "boots", label: "BOTINES", tag: "BOTINES" },
   { key: "accessory", label: "ACCESORIOS", tag: "ACCESORIO" },
 ];
@@ -91,20 +92,30 @@ function FaceOption({
 
 export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points, coins, sceneImage }: Props) {
   const { appearance, save, saving, error } = useAvatarAppearance(userId);
-  const { items, loading, toggleEquip, usingFallback, refresh } = useAuraInventory(userId, level);
+  const { items, loading, toggleEquip, usingFallback, refresh, equipError, equipping } = useAuraInventory(userId, level);
   const [shopPrices,setShopPrices] = useState<Record<string,number>>({});
   const [shopBusy,setShopBusy] = useState(false);
+  const [renewBusy,setRenewBusy] = useState<string | null>(null);
   const [shopMessage,setShopMessage] = useState("");
   const [shopCoins,setShopCoins] = useState<number | null>(null);
-  useEffect(() => { void supabase.from("shop_items").select("id,cost").in("id",["flores-club-camiseta-roja","flores-club-short-rojo","flores-club-8va-camiseta-verde","flores-club-8va-short-negro"]).eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
+  useEffect(() => { void supabase.from("shop_items").select("id,cost").eq("active",true).eq("available",true).then(({data}) => setShopPrices(Object.fromEntries((data ?? []).map(r=>[r.id,r.cost])))); },[]);
+  const renewEquipment = async (id: string) => {
+    if (renewBusy || usingFallback) return;
+    setRenewBusy(id); setShopMessage("");
+    try {
+      const { data, error } = await supabase.rpc("renew_equipment", { p_item_id: id });
+      if (error) throw error;
+      await refresh();
+      window.dispatchEvent(new CustomEvent("lupi:inventory-updated", { detail: { userId } }));
+      setShopMessage(`Equipo renovado por ${data} LupiCoins. Durabilidad 10/10.`);
+    } catch (e) { setShopMessage(e instanceof Error ? e.message : "No se pudo renovar."); }
+    finally { setRenewBusy(null); }
+  };
   const buyFlores = async (ids: string[]) => {
     if(shopBusy || usingFallback) return;
     setShopBusy(true);setShopMessage("");
     try {
-      const is8va = ids.every(id => id.startsWith("flores-club-8va-"));
-      const {data,error} = is8va
-        ? await supabase.rpc("purchase_flores_8va", {p_bundle: ids.length > 1, p_item_id: ids.length === 1 ? ids[0] : null})
-        : await supabase.rpc("purchase_flores_outfit", {p_item_ids: ids});
+      const {data,error} = await supabase.rpc("purchase_flores_uniform", {p_item_ids: ids});
       if(error) throw error;
       setShopCoins(data?.newCoins ?? null);
       await refresh();
@@ -179,7 +190,11 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
       // Cada RPC se ejecuta por separado; no se presenta como transacción atómica.
       for (const id of ids) {
         const item = items.find(entry => entry.id === id);
-        if (item && !item.equipped) { triggerEquipFx(); await toggleEquip(id); }
+        if (item && !item.equipped) {
+          const success = await toggleEquip(id);
+          if (!success) { setOutfitError("No se pudo completar el conjunto. Revisá tu inventario y reintentá."); break; }
+          triggerEquipFx();
+        }
       }
     } catch (error) {
       setOutfitError(error instanceof Error ? error.message : "No se pudo equipar el conjunto.");
@@ -191,8 +206,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const equip = async (id: string) => {
     setBusyId(id);
     try {
-      triggerEquipFx();
-      await toggleEquip(id);
+      if (await toggleEquip(id)) triggerEquipFx();
     } finally {
       setBusyId(null);
     }
@@ -448,7 +462,9 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                 const complete = progress.owned === progress.total;
                 const missingCount = collection.itemIds.filter(id => !items.find(i => i.id === id)?.owned).length;
                 const subtotal = collection.itemIds.reduce((sum, id) => sum + (items.find(i => i.id === id)?.owned ? 0 : (shopPrices[id] ?? 0)), 0);
-                const remaining = collection.theme === "green" && missingCount === 2 ? Math.max(0, subtotal - 50) : subtotal;
+                const missingIds = collection.itemIds.filter(id => !items.find(i => i.id === id)?.owned);
+                const discount = missingCount === 3 || (collection.theme === "green" && missingCount === 2 && !missingIds.includes("flores-club-medias-verdes")) ? Math.min(50, subtotal) : 0;
+                const remaining = subtotal - discount;
                 const unavailable = collection.itemIds.some(id => !items.find(i => i.id === id)?.owned && shopPrices[id] == null);
                 return <div className="lupi-collections__shop-card lupi-flores-store" key={collection.id}>
                   <div className="lupi-flores-store__banner">
@@ -461,7 +477,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                       const item = items.find(i => i.id === id);
                       const price = shopPrices[id];
                       const owned = !!item?.owned;
-                      const label = collection.theme === 'green' ? (id.includes('camiseta') ? 'CAMISETA VERDE' : 'SHORT NEGRO') : (id.includes('camiseta') ? 'CAMISETA ROJA' : 'SHORT ROJO');
+                      const label = collection.theme === 'green' ? (id.includes('camiseta') ? 'CAMISETA VERDE' : id.includes('medias') ? 'MEDIAS VERDES' : 'SHORT NEGRO') : (id.includes('camiseta') ? 'CAMISETA ROJA' : id.includes('medias') ? 'MEDIAS ROJAS' : 'SHORT ROJO');
                       return <article className={`lupi-flores-store__product ${owned ? 'is-owned' : ''}`} key={id}>
                         <div className="lupi-flores-store__product-art">{item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span aria-hidden="true">👕</span>}{owned && <span className="lupi-flores-store__check" aria-label="Obtenido">✓</span>}</div>
                         <div className="lupi-flores-store__product-info"><span>FLORES CLUB · 2026</span><strong>{label}</strong><small>{owned ? 'EN TU ARMARIO' : price == null ? 'NO DISPONIBLE' : `${price} LUPICOINS`}</small></div>
@@ -520,8 +536,8 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                         <div className="lupi-collection-tile__visual" aria-label={`Uniforme ${category}`}>
                           {collection.itemIds.length ? collection.itemIds.map((id, index) => {
                             const item = items.find(entry => entry.id === id);
-                            const preview = collection.theme === "green" ? (index === 0 ? flores8vaCamisetaPreview : flores8vaShortPreview) : undefined;
-                            return item?.imageUrl || preview ? <img key={id} src={item?.imageUrl || preview} alt={index === 0 ? `Camiseta ${category}` : `Short ${category}`} /> :
+                            const preview = collection.theme === "green" ? (index === 0 ? flores8vaCamisetaPreview : index === 1 ? flores8vaShortPreview : undefined) : undefined;
+                            return item?.imageUrl || preview ? <img key={id} src={item?.imageUrl || preview} alt={index === 0 ? `Camiseta ${category}` : index === 1 ? `Short ${category}` : `Medias ${category}`} /> :
                               <span className="lupi-collection-tile__placeholder" key={id} aria-hidden="true">♟</span>;
                           }) : <span className="lupi-collection-tile__placeholder" aria-hidden="true">♟</span>}
                         </div>
@@ -551,7 +567,8 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
               </div>
 
               <div className="lw-id__scroll">
-                {usingFallback && <p className="lw-id__hint">Catálogo de demostración: equipamiento local.</p>}
+                {usingFallback && <p className="lw-id__hint">No pudimos cargar tu inventario. Las prendas están deshabilitadas hasta recuperar la conexión.</p>}
+                {equipError && <p role="alert" className="lw-id__hint">{equipError}</p>}
                 {loading ? (
                   <p className="lw-id__hint">Cargando ítems…</p>
                 ) : shown.length === 0 ? (
@@ -571,6 +588,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                 ) : (
                   <div className="lw-id__items">
                     {shown.map((item) => (
+                      <div className="lw-id__inventory-entry" key={item.id}>
                       <button
                         type="button"
                         key={item.id}
@@ -579,7 +597,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                         data-equipped={item.equipped}
                         data-locked={!item.owned}
                         aria-pressed={item.equipped}
-                        disabled={!item.owned || busyId === item.id}
+                        disabled={loading || usingFallback || equipping || outfitBusy || !item.owned || busyId !== null || (item.durability != null && item.durability <= 0 && !item.equipped)}
                         onClick={() => void equip(item.id)}
                       >
                         <span className="lw-id__item-art">
@@ -604,12 +622,26 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                         )}
                         <strong>{item.name}</strong>
                         <small>{RARITY_LABEL[item.rarity]}</small>
+                        {item.owned && item.durability === 0 && <small role="status" className="lw-id__wear-alert">AGOTADO · RENOVÁ PARA JUGAR</small>}
+                        {item.owned && item.durability != null && item.durability > 0 && item.durability <= 3 && <small className="lw-id__wear-alert">POCA DURABILIDAD</small>}
+                        {item.owned && item.durability != null && (
+                          <span className="lw-id__durability" aria-label={`Durabilidad ${item.durability} de ${item.maxDurability ?? 10} partidos`}>
+                            <span>RESISTENCIA {item.durability}/{item.maxDurability ?? 10}</span>
+                            <span className="lw-id__durability-track"><i style={{ width: `${item.durability * 10}%`, background: item.durability <= 3 ? "#ffb33b" : "#17d9b2" }} /></span>
+                          </span>
+                        )}
                         {!item.owned && (
                           <em>
-                            <LockIcon /> NIV. {item.requiredLevel}
+                            <LockIcon /> {level < item.requiredLevel ? `NIV. ${item.requiredLevel}` : "NO LO TENÉS"}
                           </em>
                         )}
                       </button>
+                      {item.owned && item.durability != null && item.durability <= 3 && (
+                        <button type="button" className="lw-id__renew" disabled={!!renewBusy || usingFallback || shopPrices[item.id] == null} onClick={() => void renewEquipment(item.id)}>
+                          {renewBusy === item.id ? "RENOVANDO…" : `RENOVAR 10/10 · ${shopPrices[item.id] ?? "—"} 🪙`}
+                        </button>
+                      )}
+                      </div>
                     ))}
                   </div>
                 )}

@@ -18,11 +18,12 @@ type AuraDressingRoomProps = {
 const SLOT_META: Record<ItemSlot, { label: string; icon: string; side: "left" | "right"; row: "top" | "mid" | "bottom" }> = {
   top:       { label: "TOP",     icon: "👕", side: "left",  row: "top"    },
   bottom:    { label: "BOTTOM",  icon: "🩳", side: "left",  row: "mid"    },
+  socks:     { label: "MEDIAS", icon: "🧦", side: "right", row: "mid" },
   boots:     { label: "BOTINES", icon: "👟", side: "right", row: "bottom" },
   accessory: { label: "EXTRA",   icon: "🧢", side: "right", row: "top"    },
 };
 
-const MODEL_PRIORITY: ItemSlot[] = ["top", "bottom", "boots", "accessory"];
+const MODEL_PRIORITY: ItemSlot[] = ["top", "bottom", "socks", "boots", "accessory"];
 
 const colorVar = (color: string) =>
   ({ "--item-color": color } as CSSProperties);
@@ -99,7 +100,7 @@ const modelUrl = useMemo(() => {
   const [justEquipped, setJustEquipped] = useState<ItemSlot | null>(null);
 
   const handleToggle = async (item: InventoryItem) => {
-  await toggleEquip(item.id);
+  if (!await toggleEquip(item.id)) return;
   setFlashKey((k) => k + 1);
   setPreviewId(null);
   setJustEquipped(item.slot);

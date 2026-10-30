@@ -96,3 +96,9 @@ export function getRarityColor(ovr: number): string {
   if (ovr >= 65) return '#C0C0C0';
   return '#CD7F32';
 }
+/** Display shape for the shared card renderer, independent of API operations. */
+export type DisplayPlayerCard = Omit<BaseCard, "photo_url" | "category"> & {
+  category: string;
+  photo_url: string | null;
+  rarity: "bronze" | "silver" | "gold" | "special";
+};

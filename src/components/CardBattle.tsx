@@ -1,4 +1,7 @@
+import { MatchCourt } from './match/MatchCourt';
+import { FORMATIONS, mirror, type Formation, type Pos } from './match/formations';
 import { MatchTutorial } from './MatchTutorial';
+import { createPortal } from 'react-dom';
 // src/components/CardBattle.tsx — v6 (con soporte para modo campaña)
 // Fix #1: arena-container width:10% removido
 // Fix #2: scoreboard top corregido en mobile
@@ -19,6 +22,7 @@ import {
   SkillGroup,
 } from '../utils/battleEngine';
 import { supabase } from '../lib/supabaseClient';
+import { verifiedMatchApi } from '../lib/verifiedMatchApi';
 import { AnimeEffects, AnimeEffectsHandle } from './AnimeEffects';
 
 
@@ -84,38 +88,6 @@ const BOTS: BotPlayer[] = [
   { name:'Bot Leyenda', overall_rating:78, category:'6ta', level:3, avatar:'🥇', color:'#ffd700', xpBase:50, reqWins:0 },
 ];
 
-type Pos = { x: number; y: number };
-type Formation = Record<number, Pos>;
-
-const USER_BASE: Formation = {
-  0:{ x:10, y:50 },
-  1:{ x:25, y:50 },
-  2:{ x:35, y:22 },
-  3:{ x:35, y:78 },
-  4:{ x:44, y:50 },
-};
-const RIVAL_BASE: Formation = {
-  0:{ x:90, y:50 },
-  1:{ x:75, y:50 },
-  2:{ x:65, y:22 },
-  3:{ x:65, y:78 },
-  4:{ x:56, y:50 },
-};
-
-const FORMATIONS: Record<string, Formation> = {
-  base:         { 0:{ x:10,y:50 }, 1:{ x:25,y:50 }, 2:{ x:35,y:22 }, 3:{ x:35,y:78 }, 4:{ x:44,y:50 } },
-  attack:       { 0:{ x:12,y:50 }, 1:{ x:32,y:50 }, 2:{ x:58,y:18 }, 3:{ x:58,y:82 }, 4:{ x:68,y:50 } },
-  counterAttack:{ 0:{ x:10,y:50 }, 1:{ x:30,y:50 }, 2:{ x:62,y:20 }, 3:{ x:62,y:80 }, 4:{ x:72,y:50 } },
-  defense:      { 0:{ x:8, y:50 }, 1:{ x:18,y:50 }, 2:{ x:24,y:28 }, 3:{ x:24,y:72 }, 4:{ x:32,y:50 } },
-  celebrate:    { 0:{ x:15,y:50 }, 1:{ x:60,y:48 }, 2:{ x:68,y:35 }, 3:{ x:68,y:65 }, 4:{ x:75,y:50 } },
-  mourn:        { 0:{ x:10,y:50 }, 1:{ x:22,y:50 }, 2:{ x:30,y:30 }, 3:{ x:30,y:70 }, 4:{ x:40,y:50 } },
-};
-
-function mirror(f: Formation): Formation {
-  return Object.fromEntries(Object.entries(f).map(([k, v]) => [k, { x: 100 - v.x, y: 100 - v.y }])) as Formation;
-}
-
-const LABELS = ['ARQ','CIE','ALA','ALA','PIV'];
 const TOTAL_TURNS = 6;
 const TURN_MS     = 400;
 const GOAL_MS     = 750;
@@ -372,23 +344,144 @@ export function CardBattle({
     const deckCards = (userDeck.cards ?? []) as UserCard[];
     if (deckCards.length < 5) { alert('Necesitás 5 cartas en el mazo'); return; }
     if (isRunning.current) return;
+    // Prevent double-start while asynchronous equipment checks are running.
     isRunning.current = true;
+    // UX preflight only. The trusted match server must enforce this again.
+    // Do not consume durability here: client-side matches are not verified.
+    const { data: wornItems, error: wornError } = await supabase
+      .from('user_items')
+      .select('item_id, aura_items!inner(slot)')
+      .eq('user_id', userId)
+      .eq('equipped', true);
+    if (wornError) {
+      alert('No se pudo comprobar el equipamiento. Intentá nuevamente.');
+      setPhase('select');
+      isRunning.current = false;
+      return;
+    }
+    const equipmentIds = (wornItems ?? [])
+      .filter((row) => {
+        const aura = row.aura_items as unknown as { slot?: string } | { slot?: string }[] | null;
+        const slot = Array.isArray(aura) ? aura[0]?.slot : aura?.slot;
+        return slot === 'boots' || slot === 'socks';
+      })
+      .map((row) => row.item_id);
+    if (equipmentIds.length) {
+      const { data: wear, error: wearError } = await supabase
+        .from('equipment_durability')
+        .select('item_id,remaining')
+        .eq('user_id', userId)
+        .in('item_id', equipmentIds);
+      if (wearError) {
+        alert('No se pudo comprobar la durabilidad. Intentá nuevamente.');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+      const exhausted = (wear ?? []).find((row) => row.remaining <= 0);
+      if (exhausted) {
+        alert('Tenés medias o botines agotados (0/10). Renoválos desde el armario antes de jugar.');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+      const lowDurability = (wear ?? []).filter((row) => row.remaining > 0 && row.remaining <= 3);
+      if (lowDurability.length) {
+        const uses = lowDurability.map((row) => `${row.remaining}/10`).join(', ');
+        if (!window.confirm(`⚠️ Tu equipamiento está por agotarse (${uses}). ¿Querés jugar igual?`)) {
+          setPhase('select');
+          isRunning.current = false;
+          return;
+        }
+      }
+    }
+    // Opt-in staging only until verified finalization and DB migrations pass E2E.
+    const serverMode = import.meta.env.VITE_VERIFIED_MATCHES === 'true';
+    let verifiedSession: { id: string; version: number } | null = null;
+    let resumedTurnIndex = 0;
+    let resumedPending: MomentContext | null = null;
+    let resumedScore: { user: number; rival: number } | null = null;
+    const recoveryKey = `lupi:verified-match:${userId}`;
+    if (serverMode) {
+      try {
+        // Server discovery also works after clearing storage or switching devices.
+        const active = await verifiedMatchApi.active();
+        const saved = active?.id ?? null;
+        if (saved) {
+          window.localStorage.setItem(recoveryKey, saved);
+          const session = await verifiedMatchApi.resume(saved);
+          if (session.state === 'completed' || session.state === 'expired') {
+            window.localStorage.removeItem(recoveryKey);
+            if (session.state === 'expired')
+              throw new Error('El partido anterior venció. Volvé a iniciar el partido.');
+          } else {
+            if (session.opponent_key !== bot.name)
+              throw new Error(`Tenés un partido pendiente contra ${session.opponent_key}. Seleccioná ese rival para continuar.`);
+            resumedTurnIndex = session.turn_index;
+            resumedPending = session.pending_decision as MomentContext | null;
+            resumedScore = { user: session.user_score, rival: session.opponent_score };
+            if (resumedPending && !session.simulation_state?.last_turn)
+              throw new Error('No se pudo reconstruir la decisión pendiente.');
+            verifiedSession = { id: session.id, version: session.state_version };
+          }
+        }
+        if (!verifiedSession) {
+          verifiedSession = await verifiedMatchApi.start(bot.name);
+          window.localStorage.setItem(recoveryKey, verifiedSession.id);
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'No se pudo iniciar el partido verificado');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+    }
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
-    let ug = 0, rg = 0;
+    let ug = resumedScore?.user ?? 0, rg = resumedScore?.rival ?? 0;
 
-    setLog([]); setShowFullLog(false); setUGoals(0); setRGoals(0); setMinute(0);
+    setLog([]); setShowFullLog(false); setUGoals(ug); setRGoals(rg);
+    setMinute(resumedTurnIndex * 5);
     resetAll(); setPhase('battle');
 
     addLog('⚽ ¡Silbato inicial! Arrancan los equipos.', 'event');
     moveBall(50, 50, 'user'); setBallVis(true);
     await delay(500);
 
-    for (let t = 1; t <= TOTAL_TURNS; t++) {
-      const min = Math.round((t / TOTAL_TURNS) * 40);
+    try {
+    // Verified SQL finalization requires exactly eight completed turns.
+    // Preserve the six-turn recreational mode unchanged.
+    const totalTurns = verifiedSession ? 8 : TOTAL_TURNS;
+    let authoritativeScore: { user: number; rival: number } | null = resumedScore;
+    // If a turn was committed before the tab closed, do not request it twice.
+    // A pending decision is resolved from the server's stored moment first.
+    if (verifiedSession && resumedPending) {
+      addLog('↩️ Retomamos la decisión pendiente.', 'event');
+      const chosen = await waitForDecision(resumedPending);
+      const decision = await verifiedMatchApi.decision(
+        verifiedSession.id, verifiedSession.version, chosen.id,
+      );
+      verifiedSession.version = decision.version;
+      ug = decision.userScore;
+      rg = decision.opponentScore;
+      authoritativeScore = { user: ug, rival: rg };
+      setUGoals(ug); setRGoals(rg);
+      addLog(decision.result.narrative, decision.result.goalFor === 'user' ? 'goal' : 'event');
+    } else if (verifiedSession && resumedTurnIndex > 0) {
+      addLog(`↩️ Partido recuperado desde el turno ${resumedTurnIndex}.`, 'event');
+    }
+    for (let t = resumedTurnIndex + 1; t <= totalTurns; t++) {
+      const min = Math.round((t / totalTurns) * 40);
       setMinute(min);
       await delay(TURN_MS);
 
-      const turn = generateTurn(deckCards, min, adv, bot.name);
+      const serverTurn = verifiedSession
+        ? await verifiedMatchApi.turn(verifiedSession.id, verifiedSession.version)
+        : null;
+      if (serverTurn && verifiedSession) {
+        verifiedSession.version = serverTurn.version;
+        authoritativeScore = { user: serverTurn.userScore, rival: serverTurn.opponentScore };
+      }
+      const turn = serverTurn?.turn ?? generateTurn(deckCards, min, adv, bot.name);
 
       // FASE USUARIO
       {
@@ -411,7 +504,14 @@ export function CardBattle({
           const chosen = await waitForDecision(ctx);
           await delay(200);
 
-          const res = resolveDecision(chosen, ctx.mainCard, ctx.type, min);
+          const serverDecision = verifiedSession
+            ? await verifiedMatchApi.decision(verifiedSession.id, verifiedSession.version, chosen.id)
+            : null;
+          if (serverDecision && verifiedSession) {
+            verifiedSession.version = serverDecision.version;
+            authoritativeScore = { user: serverDecision.userScore, rival: serverDecision.opponentScore };
+          }
+          const res = serverDecision?.result ?? resolveDecision(chosen, ctx.mainCard, ctx.type, min);
           addLog(res.narrative, res.goalFor === 'user' ? 'goal' : res.success ? 'good' : 'neutral');
 
           if (res.goalFor === 'user') {
@@ -474,13 +574,49 @@ export function CardBattle({
         await backToMidfield();
         await delay(300);
       }
+      // Animations are cosmetic: the server is the source of truth for scores.
+      if (verifiedSession && authoritativeScore) {
+        ug = authoritativeScore.user;
+        rg = authoritativeScore.rival;
+        setUGoals(ug);
+        setRGoals(rg);
+      }
     }
 
     addLog('📯 ¡Silbato final! Terminó el partido.', 'event');
     setMinute(40); setBallVis(false);
     await delay(600);
-    await handleMatchEnd(ug, rg, deckCards);
-    isRunning.current = false;
+    if (verifiedSession) {
+      // The verified endpoint must confirm completion before displaying rewards.
+      // It currently fails closed until the server transcript is fully validated.
+      try {
+        const final = await verifiedMatchApi.finish(verifiedSession.id);
+        window.localStorage.removeItem(recoveryKey);
+        // The server has finalized the match and consumed equipped wear once.
+        // Tell every inventory hook instance to reload the authoritative values.
+        window.dispatchEvent(new CustomEvent('lupi:inventory-updated', {
+          detail: { userId, source: 'verified-match-finalized' },
+        }));
+        if (typeof final.user_score === 'number' && typeof final.opponent_score === 'number') {
+          ug = final.user_score;
+          rg = final.opponent_score;
+          setUGoals(ug); setRGoals(rg);
+        }
+      } catch (error) {
+        alert(error instanceof Error ? error.message : 'El servidor no pudo validar el partido');
+        setPhase('select');
+        isRunning.current = false;
+        return;
+      }
+    }
+    await handleMatchEnd(ug, rg, deckCards, Boolean(verifiedSession));
+    } catch (error) {
+      console.error('Partido interrumpido:', error);
+      alert(error instanceof Error ? error.message : 'No se pudo completar el partido');
+      setPhase('select');
+    } finally {
+      isRunning.current = false;
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bot, userDeck]);
 
@@ -489,7 +625,7 @@ export function CardBattle({
   // No llamar a update_daily_progress desde el cliente.
   // Los desafíos diarios competitivos quedan pendientes de un validador del servidor.
 
-  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[]) {
+  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[], verified = false) {
     const won   = ug > rg;
     const tied  = ug === rg;
 
@@ -527,17 +663,22 @@ export function CardBattle({
       streak:     newStreak,
     };
 
+    // A verified result does not authorize browser-written card XP.
+    // Verified rewards must be granted atomically by the server in a later step.
+    if (verified) xpGained = 0;
     const leveledUpCards: string[] = [];
     const cardMap = new Map<string, UserCard>();
     for (const c of deckCards) {
-      const { card, leveledUp } = addExperienceToCard(c, xpGained);
+      const { card, leveledUp } = verified
+        ? { card: c, leveledUp: false }
+        : addExperienceToCard(c, xpGained);
       if (leveledUp) leveledUpCards.push(getCardData(card).name);
       cardMap.set(card.id, card);
     }
     const updatedCards = Array.from(cardMap.values());
 
     try {
-      for (const card of updatedCards) {
+      for (const card of verified ? [] : updatedCards) {
         await supabase
           .from('user_cards')
           .update({ level: card.level, experience: card.experience })
@@ -546,7 +687,9 @@ export function CardBattle({
 
       // El trigger on_match_finished ya NO acredita XP/puntos/stats.
       // El partido se registra como resultado recreativo, no verificable.
-      const { error: matchError } = await supabase.from('matches').insert({
+      const { error: matchError } = verified
+        ? { error: null }
+        : await supabase.from('matches').insert({
         user_id: userId,
         user_deck_id: userDeck.id,
         user_score: ug,
@@ -566,7 +709,7 @@ export function CardBattle({
       console.error('Error en persistencia:', err);
     }
 
-    setUserStats(newStats);
+    if (!verified) setUserStats(newStats);
     onBattleComplete(updatedCards);
 
     setMatchResult({
@@ -574,7 +717,7 @@ export function CardBattle({
       userScore:  ug,
       rivalScore: rg,
       xpGained,
-      streakBonus,
+      streakBonus: verified ? 0 : streakBonus,
       leveledUpCards,
       skillUpgrade,
       newStreak,
@@ -635,42 +778,25 @@ export function CardBattle({
     <div className="arena-container">
 
       {/* ── Header ── */}
-      <div className="arena-header">
-        <div className="arena-title">
-          <span>⚽</span><span>FLORES CLUB ARENA</span>
-          <span className="arena-badge">FUTSAL</span>
-        </div>
-        {phase === 'select' && <button className="deck-link-btn" onClick={onNavigateToDeck}>
-          📋 Ver mi equipo <span className="deck-count">{deckCards.length}/5</span>
-        </button>}
-      </div>
+      
 
       {/* ════════════════════════ CANCHA ════════════════════════ */}
       <div className="arena-match-core">
         <AnimeEffects ref={animeRef} />
-        <div className={`futsal-court ${moment ? 'court-tension' : ''} ${flash?.type === 'goal' ? 'flash-futsal-gol' : ''}`}>
+        <MatchCourt
+          className={`futsal-court ${moment ? 'court-tension' : ''} ${flash?.type === 'goal' ? 'flash-futsal-gol' : ''}`}
+          home={deckCards.slice(0,5).map(card => ({ id:card.id, name:getCardData(card).name ?? 'Jugador', rating:getCardData(card).overall_rating || 50 }))}
+          away={[0,1,2,3,4].map(i => ({id:`bot-${i}`,name:bot.name.split(' ')[1] ?? bot.name,badge:`Nv.${bot.level}`,icon:'/images/bot.png'}))}
+          homePositions={uPos} awayPositions={rPos} homeHighlight={uHL} awayHighlight={rHL}
+          ball={ballVisible ? ball : null} ballTeam={ballTeam}
+        >
 
-          {/* Marcador */}
+          {/* Marcador integrado en el Centro de Partido; en móvil se ve en el encabezado. */}
           {phase === 'battle' && (
-            <div className="court-scoreboard">
-              <div className="csb-side">
-                <span className="csb-label">VOS</span>
-                <span className="csb-score user-sc">{uGoals}</span>
-              </div>
-              <div className="csb-center">
-                <span className="csb-min">MIN {minute}'</span>
-                <div className="csb-prog"><div className="csb-prog-fill" style={{ width:`${(minute/40)*100}%` }}/></div>
-              </div>
-              <div className="csb-side csb-right">
-                <span className="csb-score rival-sc">{rGoals}</span>
-                <span className="csb-label">{bot.avatar}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Pelota */}
-          {ballVisible && (
-            <div className="ball-token" style={{ left:`${ball.x}%`, top:`${ball.y}%` }}>⚽</div>
+            <button type="button" className="mobile-relato-trigger" onClick={() => setShowFullLog(true)}
+              aria-label={`Abrir relato del partido, ${log.length} eventos`}>
+              <span className="mobile-relato-pulse" /> RELATO <strong>{log.length}</strong>
+            </button>
           )}
 
           {/* Flash */}
@@ -757,62 +883,7 @@ export function CardBattle({
             </div>
           )}
 
-          {/* ── Fichas usuario ── */}
-          {deckCards.slice(0, 5).map((card, idx) => {
-            const key = `u_slot${idx}_${card.id}`;
-            const d   = getCardData(card);
-            const pos = uPos[idx] ?? USER_BASE[idx];
-            const hl  = uHL === idx;
-            const hasBall = ballTeam === 'user' && hl;
-            return (
-              <div key={key}
-                className={`player-on-court${hl?' token-active':''}`}
-                style={{
-                  left:`${pos.x}%`, top:`${pos.y}%`,
-                  transition:'left 0.5s cubic-bezier(0.4,0,0.2,1),top 0.5s cubic-bezier(0.4,0,0.2,1)',
-                  zIndex: hl ? 10 : 6,
-                }}
-              >
-                <div className={`player-token user-token${hl?' token-glow-user':''}`}>
-                  {hasBall && <div className="ball-on-token">⚽</div>}
-                  <div className="token-icon">
-                    <img src="/images/player.png" alt="u" style={{ width:24, height:24, objectFit:'contain' }}/>
-                  </div>
-                  <div className="token-name">{d.name?.substring(0,9) || 'Jugador'}</div>
-                  <span className="token-overall user-overall">{d.overall_rating||50}</span>
-                </div>
-                <div className="pos-label">{LABELS[idx]}</div>
-              </div>
-            );
-          })}
-
-          {/* ── Fichas rival ── */}
-          {[0,1,2,3,4].map(i => {
-            const pos = rPos[i] ?? RIVAL_BASE[i];
-            const hl  = rHL === i;
-            const hasBall = ballTeam === 'rival' && hl;
-            return (
-              <div key={`r_slot${i}`}
-                className={`player-on-court${hl?' token-active':''}`}
-                style={{
-                  left:`${pos.x}%`, top:`${pos.y}%`,
-                  transition:'left 0.5s cubic-bezier(0.4,0,0.2,1),top 0.5s cubic-bezier(0.4,0,0.2,1)',
-                  zIndex: hl ? 10 : 6,
-                }}
-              >
-                <div className={`player-token rival-token${hl?' token-glow-rival':''}`}>
-                  {hasBall && <div className="ball-on-token">⚽</div>}
-                  <div className="token-icon">
-                    <img src="/images/bot.png" alt="r" style={{ width:24, height:24, objectFit:'contain' }}/>
-                  </div>
-                  <div className="token-name">{bot.name.split(' ')[1]?.substring(0,6) ?? bot.name.substring(0,6)}</div>
-                  <div className="token-level rival-level">Nv.{bot.level}</div>
-                </div>
-                <div className="pos-label">{LABELS[i]}</div>
-              </div>
-            );
-          })}
-        </div>
+        </MatchCourt>
 
         {/* ════════════════════════ FASE SELECT ════════════════════════ */}
         {phase === 'select' && (
@@ -917,62 +988,65 @@ export function CardBattle({
   </div>
 )}
 
-        {/* ════════════════════════ BATTLE LOG — sin Tailwind ════════════════════════ */}
+        {/* ════════════════════════ CENTRO DE PARTIDO ════════════════════════ */}
+        {phase === 'battle' && showFullLog && <button type="button" className="mobile-relato-backdrop" aria-label="Cerrar relato" onClick={() => setShowFullLog(false)} />}
         {phase === 'battle' && (
-          <div className="battle-log-strip">
-            {/* Header: EN DIRECTO + barra de posesión */}
+          <aside className={`battle-log-strip${showFullLog ? ' mobile-relato-open' : ''}`} aria-label="Centro de partido">
             <div className="live-header">
-              <div className="live-badge">
-                <span className="live-dot" />
-                En Directo
-              </div>
-              <div className="possession-bar">
-                <div
-                  className="pos-fill pos-user"
-                  style={{ width: ballTeam === 'user' ? '58%' : '42%' }}
-                >
-                  {ballTeam === 'user' ? '58%' : '42%'}
-                </div>
-                <div
-                  className="pos-fill pos-rival"
-                  style={{ width: ballTeam === 'rival' ? '58%' : '42%' }}
-                >
-                  {ballTeam === 'rival' ? '58%' : '42%'}
-                </div>
+              <div className="live-badge"><span className="live-dot" /> EN VIVO</div>
+              <span className="match-center-minute">MIN {minute}' · FUTSAL</span>
+              <button type="button" className="mobile-relato-close" onClick={() => setShowFullLog(false)} aria-label="Cerrar relato">✕</button>
+            </div>
+
+            <div className="match-center-score">
+              <div className="match-center-team"><span>LOCAL</span><strong>{uGoals}</strong></div>
+              <div className="match-center-divider">VS</div>
+              <div className="match-center-team match-center-rival"><span>VISITANTE</span><strong>{rGoals}</strong></div>
+            </div>
+
+            <div className="match-center-possession">
+              <div className="match-center-section-label">POSESIÓN ESTIMADA</div>
+              <div className="match-center-pos-values"><span>VOS · {ballTeam === 'user' ? 58 : 42}%</span><span>{ballTeam === 'rival' ? 58 : 42}% · RIVAL</span></div>
+              <div className="match-center-pos-track">
+                <span style={{width: ballTeam === 'user' ? '58%' : '42%'}} />
               </div>
             </div>
 
-            {/* Líneas de log */}
-            <div className={`log-lines${showFullLog ? ' log-expanded' : ''}`} ref={logRef}>
-              {log.length === 0 && (
-                <div className="log-empty">⏳ El partido está por comenzar…</div>
-              )}
-              {log.slice(showFullLog ? -25 : -3).map((l) => (
+            <div className="match-center-feed-title">
+              <span><span className="match-center-feed-pulse" /> RELATO EN DIRECTO</span>
+              <span>{log.length} EVENTOS</span>
+            </div>
+            <div className={`log-lines${showFullLog ? ' log-expanded' : ''}`} ref={logRef} aria-live="polite" aria-relevant="additions">
+              {log.length === 0 && <div className="log-empty">⏳ El partido está por comenzar…</div>}
+              {log.slice(showFullLog ? -25 : -2).map((l) => (
                 <div key={l.id} className={`log-line log-${l.type}`}>
-                  {l.type === 'goal' && <span style={{ marginRight: 4 }}>⚽</span>}
-                  {l.text}
+                  <span className="match-center-event-dot" />
+                  <span>{l.type === 'goal' && '⚽ '}{l.text}</span>
                 </div>
               ))}
             </div>
-            {log.length > 3 && (
+            {log.length > 2 && (
               <button type="button" className="log-toggle" onClick={() => setShowFullLog(v => !v)}>
-                {showFullLog ? 'MOSTRAR MENOS' : `VER RELATO (${log.length})`}
+                {showFullLog ? 'OCULTAR HISTORIAL' : `VER TODO EL RELATO (${log.length})`}
               </button>
             )}
-          </div>
+            <div className="match-center-footer">⚡ CADA JUGADA CUENTA</div>
+          </aside>
         )}
 
         {/* ════════════════════════ MODAL RESULTADO ════════════════════════ */}
-        {phase === 'result' && matchResult && (
+        {phase === 'result' && matchResult && createPortal(
           <div className="result-modal-overlay" onClick={handleCloseResult}>
             <div
               className={`result-modal ${matchResult.winner === 'user' ? 'win' : matchResult.winner === 'draw' ? 'draw' : 'lose'}`}
               onClick={e => e.stopPropagation()}
             >
+              <div className="rm-topline"><span className="rm-live-dot" /> LUPI WORLD <span>·</span> MATCH COMPLETE</div>
+              <div className="rm-trophy" aria-hidden="true">{matchResult.winner === 'user' ? '🏆' : matchResult.winner === 'draw' ? '🤝' : '⚽'}</div>
               <div className="rm-title">
-                {matchResult.winner === 'user'  && '🏆 ¡VICTORIA!'}
-                {matchResult.winner === 'draw'  && '🤝 ¡EMPATE!'}
-                {matchResult.winner === 'rival' && '💔 DERROTA'}
+                {matchResult.winner === 'user'  && '¡VICTORIA!'}
+                {matchResult.winner === 'draw'  && '¡EMPATE!'}
+                {matchResult.winner === 'rival' && 'DERROTA'}
               </div>
 
               <div className="rm-score">
@@ -987,7 +1061,7 @@ export function CardBattle({
                 </div>
               </div>
 
-              <div className="rm-rewards-title">RECOMPENSAS</div>
+              <div className="rm-rewards-title"><span>RECOMPENSAS DEL PARTIDO</span></div>
               <div className="rm-rewards">
                 <div className="rm-reward-box">
                   <div className="rm-reward-icon">✨</div>
@@ -1040,7 +1114,8 @@ export function CardBattle({
                 {isCampaignMode ? 'CONTINUAR' : 'JUGAR DE NUEVO'}
               </button>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </div>
 
@@ -1266,9 +1341,9 @@ export function CardBattle({
         .deck-btn{background:rgba(61,255,160,0.1);border:1px solid #3dffa0!important;color:#3dffa0;}
 
         /* Modal resultado */
-        .result-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fi 0.25s ease;}
+        .result-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:clamp(12px,3vw,24px);box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain;animation:fi 0.25s ease;}
         @keyframes fi{from{opacity:0}to{opacity:1}}
-        .result-modal{background:linear-gradient(145deg,#0e1a10,#0a1208);border-radius:24px;padding:28px 24px;max-width:380px;width:100%;border:1px solid rgba(255,255,255,0.1);animation:mp 0.35s cubic-bezier(0.34,1.2,0.64,1);box-shadow:0 20px 60px rgba(0,0,0,0.6);max-height:90vh;overflow-y:auto;scrollbar-width:none;}
+        .result-modal{background:linear-gradient(145deg,#0e1a10,#0a1208);border-radius:24px;padding:28px 24px;max-width:380px;width:100%;border:1px solid rgba(255,255,255,0.1);animation:mp 0.35s cubic-bezier(0.34,1.2,0.64,1);box-shadow:0 20px 60px rgba(0,0,0,0.6);max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;margin:auto;box-sizing:border-box;}
         @keyframes mp{from{transform:scale(0.88) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
         .result-modal.win {border-color:rgba(61,255,160,0.3);}
         .result-modal.lose{border-color:rgba(255,100,60,0.3);}
@@ -1488,6 +1563,176 @@ export function CardBattle({
           .arena-container .token-overall { font-size:10px; }
           .arena-container .pos-label { font-size:7px; }
         }
+
+        /* LUPI MATCH CENTER V2 — panel completo, sin espacio muerto */
+        .arena-match-core { min-width:0; }
+        .arena-match-core > .battle-log-strip {
+          min-width:0; display:flex; flex-direction:column; gap:0;
+          background:linear-gradient(165deg,#101d2b 0%,#07121c 58%,#07150f 100%);
+          border:1px solid rgba(57,229,208,.23); padding:16px;
+          border-radius:16px; box-shadow:inset 0 1px rgba(255,255,255,.05);
+        }
+        .battle-log-strip .live-header {margin-bottom:14px; padding-bottom:12px;}
+        .match-center-minute {font-size:11px; font-weight:900; letter-spacing:1px; color:#90b8bd;}
+        .match-center-score {display:grid;grid-template-columns:1fr 40px 1fr;align-items:center;gap:5px;margin-bottom:14px;padding:13px 10px;background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.07);border-radius:12px;}
+        .match-center-team {display:flex;flex-direction:column;align-items:center;gap:4px;}
+        .match-center-team span {font-size:10px;letter-spacing:1.2px;font-weight:900;color:#85b6ae;}
+        .match-center-team strong {font-size:clamp(28px,3vw,42px);line-height:1;font-weight:1000;color:#3dffa0;font-variant-numeric:tabular-nums;}
+        .match-center-rival strong {color:#ff805e;}
+        .match-center-divider {font-size:11px;text-align:center;font-weight:900;color:#66848b;}
+        .match-center-possession {padding:0 2px 15px;border-bottom:1px solid rgba(255,255,255,.08);}
+        .match-center-section-label {font-size:10px;letter-spacing:1.2px;font-weight:900;color:#8aadb5;margin-bottom:9px;}
+        .match-center-pos-values {display:flex;justify-content:space-between;font-size:11px;font-weight:900;color:#c3ebdf;margin-bottom:7px;}
+        .match-center-pos-track {height:8px;background:linear-gradient(90deg,#ff805e,#b54836);border-radius:10px;overflow:hidden;}
+        .match-center-pos-track span {display:block;height:100%;background:linear-gradient(90deg,#29e6ce,#3dffa0);border-radius:10px;transition:width .5s ease;}
+        .match-center-feed-title {display:flex;justify-content:space-between;gap:8px;align-items:center;padding:17px 0 12px;font-size:10px;letter-spacing:.8px;font-weight:900;color:#d5f9ef;}
+        .match-center-feed-title > span:first-child {display:flex;align-items:center;gap:7px;}
+        .match-center-feed-title > span:last-child {color:#7b9da6;font-size:9px;white-space:nowrap;}
+        .match-center-feed-pulse {width:7px;height:7px;background:#35f4bd;box-shadow:0 0 10px #35f4bd;border-radius:50%;}
+        .arena-container .battle-log-strip .log-lines {display:flex;flex-direction:column;gap:7px;flex:1;min-height:180px;max-height:none;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#22544e transparent;padding-right:3px;}
+        .arena-container .battle-log-strip .log-line {display:flex;gap:9px;align-items:flex-start;padding:10px 11px;border-radius:9px;font-size:clamp(12px,1.1vw,14px);line-height:1.45;font-weight:600;}
+        .match-center-event-dot {width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.85;flex:none;margin-top:6px;}
+        .match-center-footer {padding-top:13px;margin-top:12px;border-top:1px solid rgba(255,255,255,.07);font-size:10px;letter-spacing:1.5px;text-align:center;font-weight:900;color:#6f9b9b;}
+        .arena-container .battle-log-strip .log-toggle {font-size:11px;padding:10px;margin-top:10px;}
+        @media(min-width:901px) {
+          .arena-match-core {grid-template-columns:minmax(0,1.85fr) minmax(285px,.75fr);gap:12px;align-items:stretch;}
+          .arena-match-core > .battle-log-strip {height:100%;max-height:100%;margin:0;}
+          .arena-container .battle-log-strip .log-lines {min-height:0;max-height:none;}
+        }
+        @media(max-width:900px) {
+          .arena-match-core > .battle-log-strip {margin-top:12px;}
+          .arena-container .battle-log-strip .log-lines {min-height:140px;max-height:330px;flex:none;}
+        }
+        @media(max-width:640px) {
+          .arena-match-core > .battle-log-strip {padding:12px;}
+          .arena-container .battle-log-strip .log-lines:not(.log-expanded) {max-height:240px;overflow-y:auto;}
+          .arena-container .battle-log-strip .log-lines.log-expanded {max-height:440px;overflow-y:auto;}
+          .arena-container .battle-log-strip .log-line {font-size:12px;padding:9px;}
+        }
+
+
+        /* LUPI MATCH CENTER V4 — marcador único y relato móvil accesible */
+        .mobile-arena-score,.mobile-relato-trigger,.mobile-relato-close,.mobile-relato-backdrop{display:none;}
+        .arena-container .battle-log-strip .log-lines {scroll-behavior:smooth;}
+        @media(max-width:900px){
+          .arena-container .arena-title {display:flex;align-items:center;flex-wrap:wrap;gap:7px;}
+          .mobile-arena-score{display:inline-flex;align-items:center;gap:6px;margin-left:auto;padding:5px 8px;border:1px solid rgba(44,230,219,.35);border-radius:8px;background:rgba(4,17,26,.92);font-variant-numeric:tabular-nums;}
+          .mobile-arena-score b{font-size:16px;line-height:1;color:#44f1c6;}
+          .mobile-arena-score b:nth-of-type(2){color:#ff806c;}
+          .mobile-arena-score i{font-style:normal;color:#6c9da6;}
+          .mobile-arena-score small{font-size:9px;color:#9ac6c9;white-space:nowrap;}
+          .mobile-relato-trigger{display:flex;align-items:center;gap:7px;position:absolute;bottom:12px;right:12px;z-index:24;border:1px solid rgba(63,240,221,.75);border-radius:12px;background:rgba(3,19,29,.94);color:#b9fff4;padding:10px 12px;font-size:11px;letter-spacing:1px;font-weight:900;box-shadow:0 0 18px rgba(28,215,208,.22);cursor:pointer;}
+          .mobile-relato-trigger strong{border-radius:7px;background:#21dcca;color:#03151a;padding:2px 6px;}
+          .mobile-relato-pulse{width:7px;height:7px;background:#25f5d2;border-radius:50%;box-shadow:0 0 8px #25f5d2;}
+          .arena-match-core > .battle-log-strip{display:none!important;}
+          .mobile-relato-backdrop{display:block;position:fixed;inset:0;z-index:2147482000;background:rgba(0,8,13,.72);border:0;backdrop-filter:blur(5px);}
+          .arena-match-core > .battle-log-strip.mobile-relato-open{display:flex!important;position:fixed;bottom:0;left:0;right:0;z-index:2147482001;width:100%;max-width:650px;height:auto;max-height:min(76dvh,720px);margin:0 auto!important;border-radius:20px 20px 0 0;padding:18px!important;box-sizing:border-box;overflow:hidden;box-shadow:0 -24px 80px rgba(0,0,0,.7);animation:lupiSheetUp .28s ease-out;}
+          .arena-match-core > .battle-log-strip.mobile-relato-open .log-lines{flex:1;min-height:80px;max-height:45dvh;overflow-y:auto;}
+          .mobile-relato-close{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);color:#c7f7f2;font-size:16px;cursor:pointer;margin-left:auto;}
+          .arena-match-core > .battle-log-strip.mobile-relato-open .live-header{display:flex;align-items:center;gap:12px;}
+          .arena-match-core > .battle-log-strip.mobile-relato-open .match-center-minute{margin-left:auto;}
+          @keyframes lupiSheetUp{from{transform:translateY(45px);opacity:0}to{transform:translateY(0);opacity:1}}
+        }
+        /* LUPI MOBILE MATCH CENTER V5: resultado grande debajo de la cancha.
+           El historial vive dentro del panel; no hay boton flotante sin contenido. */
+        @media(max-width:900px){
+          .arena-container .mobile-arena-score,
+          .arena-container .mobile-relato-trigger{display:none!important;}
+          .arena-container .arena-match-core{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:12px!important;}
+          .arena-container .arena-match-core > .battle-log-strip,
+          .arena-container .arena-match-core > .battle-log-strip.mobile-relato-open{
+            display:flex!important;position:relative!important;inset:auto!important;
+            width:100%!important;max-width:none!important;height:auto!important;
+            max-height:none!important;margin:0!important;padding:15px!important;
+            border-radius:15px!important;transform:none!important;animation:none!important;
+            box-shadow:none!important;overflow:visible!important;
+          }
+          .arena-container .battle-log-strip .match-center-score{display:flex!important;}
+          .arena-container .battle-log-strip .match-center-score strong{font-size:clamp(32px,10vw,48px)!important;}
+          .arena-container .battle-log-strip .log-lines{min-height:0!important;max-height:190px!important;overflow-y:auto!important;flex:none!important;}
+          .arena-container .battle-log-strip .log-lines.log-expanded{max-height:360px!important;}
+          .arena-container .battle-log-strip .log-toggle{display:block!important;}
+          .arena-container .mobile-relato-backdrop,
+          .arena-container .mobile-relato-close{display:none!important;}
+        }
+        /* LUPI MOBILE MATCH CENTER V6: panel debajo de la cancha, sin cortes.
+           El relato siempre muestra dos eventos; el botón expande el historial. */
+        @media (max-width:900px) {
+          .arena-container .arena-match-core {
+            display:flex!important; flex-direction:column!important;
+            height:auto!important; min-height:0!important; max-height:none!important;
+            overflow:visible!important; gap:8px!important;
+          }
+          .arena-container .arena-match-core > .futsal-court {
+            flex:none!important; margin-bottom:0!important;
+          }
+          .arena-container .arena-match-core > .battle-log-strip {
+            position:relative!important; display:flex!important; flex:none!important;
+            width:100%!important; height:auto!important; min-height:0!important;
+            max-height:none!important; overflow:visible!important;
+            margin:0!important; padding:12px!important;
+            border:1px solid rgba(45,225,210,.45)!important;
+            border-radius:14px!important;
+            background:linear-gradient(160deg,#102333,#06141c)!important;
+          }
+          .arena-container .battle-log-strip .live-header {margin-bottom:8px!important;padding-bottom:7px!important;}
+          .arena-container .battle-log-strip .match-center-score {
+            width:100%!important; display:grid!important;
+            grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr)!important;
+            align-items:center!important; justify-items:stretch!important;
+            margin:0 auto 8px!important; padding:10px 12px!important;
+          }
+          .arena-container .battle-log-strip .match-center-team {align-items:center!important; text-align:center!important;}
+          .arena-container .battle-log-strip .match-center-score strong {font-size:clamp(34px,11vw,48px)!important;}
+          .arena-container .battle-log-strip .match-center-possession,
+          .arena-container .battle-log-strip .match-center-footer {display:none!important;}
+          .arena-container .battle-log-strip .match-center-feed-title {padding:7px 0!important;}
+          .arena-container .battle-log-strip .log-lines:not(.log-expanded) {
+            display:flex!important; flex-direction:column!important;
+            flex:none!important; min-height:0!important; max-height:none!important;
+            height:auto!important; overflow:visible!important; gap:5px!important;
+          }
+          .arena-container .battle-log-strip .log-lines.log-expanded {
+            display:flex!important; flex:none!important; min-height:0!important;
+            max-height:260px!important; height:auto!important; overflow-y:auto!important;
+          }
+          .arena-container .battle-log-strip .log-line {
+            font-size:12px!important; line-height:1.35!important; padding:8px 10px!important;
+          }
+          .arena-container .battle-log-strip .log-toggle {
+            display:block!important; width:100%!important; margin-top:8px!important;
+            padding:10px!important; border:1px solid rgba(45,225,210,.35)!important;
+            color:#62f8e6!important; background:rgba(10,56,65,.55)!important;
+            border-radius:9px!important; cursor:pointer!important;
+          }
+        }
+        /* Cinematic AAA results: Lupi cyan/teal + deep navy, not the old black/amber box */
+        .result-modal-overlay{background:radial-gradient(ellipse at 50% 35%,rgba(0,66,72,.36),rgba(0,5,12,.94) 68%);backdrop-filter:blur(13px);}
+        .result-modal{position:relative;isolation:isolate;max-width:460px;padding:30px 28px 26px;background:linear-gradient(153deg,#102c3c 0%,#071b2c 44%,#04101c 100%);border:1px solid rgba(69,241,227,.47)!important;border-radius:24px;box-shadow:0 0 0 1px rgba(12,211,220,.12),0 0 75px rgba(0,227,209,.15),0 35px 95px rgba(0,0,0,.78);color:#f4ffff;}
+        .result-modal::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(130deg,rgba(82,249,235,.13),transparent 30%,transparent 75%,rgba(0,167,195,.08));z-index:-1;}
+        .result-modal::after{content:'';position:absolute;top:0;left:16%;right:16%;height:2px;background:linear-gradient(90deg,transparent,#4bf7e7,transparent);box-shadow:0 0 22px #39f1e4;}
+        .rm-topline{display:flex;justify-content:center;align-items:center;gap:8px;font-size:10px;letter-spacing:2.5px;font-weight:900;color:#85cfd4;margin:2px 0 14px;}
+        .rm-live-dot{width:6px;height:6px;background:#38e8d5;border-radius:50%;box-shadow:0 0 12px #38e8d5;}
+        .rm-trophy{text-align:center;font-size:47px;line-height:1.15;margin:0 auto 5px;filter:drop-shadow(0 0 18px rgba(55,240,217,.45));animation:rmTrophy .65s cubic-bezier(.2,1.4,.4,1) both;}
+        @keyframes rmTrophy{from{transform:translateY(15px) scale(.6);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+        .rm-title{font-size:clamp(29px,5vw,38px);line-height:1.08;letter-spacing:1.3px;margin-bottom:19px;text-shadow:0 0 28px rgba(47,239,218,.23);}
+        .result-modal.win .rm-title{color:#43f7c7;}.result-modal.draw .rm-title{color:#56e9f4;}.result-modal.lose .rm-title{color:#b7d5f2;}
+        .rm-score{padding:16px 12px;margin-bottom:22px;background:linear-gradient(100deg,rgba(31,221,195,.09),rgba(8,20,38,.55),rgba(34,148,196,.08));border:1px solid rgba(82,221,221,.18);border-radius:16px;gap:24px;}
+        .rm-score-side{min-width:76px;}.rm-score-label{font-size:11px;font-weight:800;color:#a6c8d2;letter-spacing:1.2px;}.rm-score-num{font-size:clamp(48px,9vw,65px);}.user-color{color:#42f4c5;}.rival-color{color:#ff8777;}
+        .rm-rewards-title{display:flex;align-items:center;gap:12px;font-size:10px;color:#81cbd4;letter-spacing:1.8px;font-weight:900;margin-bottom:13px;}
+        .rm-rewards-title::before,.rm-rewards-title::after{content:'';height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(62,229,219,.3));}.rm-rewards-title::after{transform:rotate(180deg);}
+        .rm-rewards{display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:10px;margin-bottom:18px;}
+        .rm-reward-box{min-width:0;position:relative;overflow:hidden;border-radius:15px;padding:16px 9px;background:linear-gradient(165deg,rgba(30,105,120,.33),rgba(4,20,35,.7));border:1px solid rgba(65,221,222,.27);box-shadow:inset 0 1px rgba(255,255,255,.07);animation:rmRewardIn .5s ease both;}
+        .rm-reward-box:nth-child(2){animation-delay:.12s;}.rm-reward-box:nth-child(3){animation-delay:.24s;}
+        @keyframes rmRewardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        .rm-reward-icon{font-size:25px;filter:drop-shadow(0 0 10px rgba(60,235,226,.35));}.rm-reward-val{font-size:27px;color:#ecffff;}.rm-reward-lbl{font-size:11px;color:#91c5cd;font-weight:700;}
+        .rm-reward-box.streak-box{background:linear-gradient(165deg,rgba(218,126,39,.16),rgba(6,26,38,.7));border-color:rgba(255,191,94,.42);}
+        .rm-skill-upgrade{background:linear-gradient(95deg,rgba(14,53,65,.86),rgba(7,23,36,.9));border-color:color-mix(in srgb,var(--sc,#41e4db) 60%,transparent);box-shadow:inset 3px 0 var(--sc,#41e4db);}
+        .rm-skill-label{font-size:13px;}.rm-skill-desc{color:#9bbac4;font-size:12px;line-height:1.35;}
+        .rm-btn{width:100%;min-height:51px;border-radius:13px!important;background:linear-gradient(105deg,#50f2e3,#1cc6e4)!important;color:#03222c!important;font-size:13px;font-weight:1000;letter-spacing:1.4px;box-shadow:0 8px 30px rgba(28,214,216,.23);transition:filter .2s,transform .2s;}
+        .rm-btn:hover{filter:brightness(1.1);transform:translateY(-2px);}
+        @media(max-width:480px){.result-modal{padding:22px 17px 18px;max-width:390px;border-radius:20px;}.rm-topline{font-size:9px;letter-spacing:1.6px;}.rm-trophy{font-size:40px;}.rm-score{padding:12px 8px;margin-bottom:15px;}.rm-reward-box{padding:11px 6px;}.rm-reward-val{font-size:23px;}.rm-rewards{gap:7px;}.rm-title{margin-bottom:14px;}.rm-skill-upgrade{padding:11px 12px;}.rm-btn{min-height:48px;}}
+        @media(prefers-reduced-motion:reduce){.rm-trophy,.rm-reward-box,.result-modal{animation:none!important;}}
       `}</style>
     </div>
   );

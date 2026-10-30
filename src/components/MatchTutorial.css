@@ -93,3 +93,104 @@
 .gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial>footer{
  padding:12px 0 4px;
 }
+
+
+/* LUPI · Previa de partido V1 — escritorio compacto, quinteto en una sola vista.
+   Solo presentación: no altera lógica de partidas ni recompensas. */
+.gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial.mt-cinematic {
+  width: min(100%, 640px) !important;
+  max-width: 640px !important;
+  margin: clamp(12px, 3vh, 30px) auto 28px !important;
+  padding: clamp(20px, 3vw, 32px) !important;
+  border-radius: 24px;
+}
+.gh-root--playing .gh-match:has(.mt-lineup) .match-tutorial.mt-cinematic {
+  width: min(100%, 920px) !important;
+  max-width: 920px !important;
+}
+.mt-cinematic:not(:has(.mt-lineup)) .mt-content {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.mt-cinematic:not(:has(.mt-lineup)) h1 {
+  margin: 8px 0 4px;
+  font-size: clamp(26px, 3vw, 36px);
+}
+.mt-cinematic:not(:has(.mt-lineup)) .mt-symbol {
+  margin: 16px auto 12px;
+  font-size: clamp(42px, 5vw, 60px);
+  line-height: 1.2;
+}
+.mt-cinematic:not(:has(.mt-lineup)) .mt-content > p {
+  margin: 12px 0 16px;
+  max-width: 56ch;
+  font-size: 14px;
+}
+.mt-cinematic:not(:has(.mt-lineup)) .mt-example {
+  padding: 16px 18px;
+  gap: 7px;
+}
+.mt-cinematic:not(:has(.mt-lineup)) > footer { margin-top: 18px; }
+.mt-cinematic:has(.mt-lineup) .mt-content > h1 {
+  text-align: center;
+  font-size: clamp(26px, 3vw, 36px);
+  margin: 6px 0 4px;
+}
+.mt-cinematic:has(.mt-lineup) .mt-lineup-subtitle { margin: 2px 0 10px; }
+.mt-cinematic:has(.mt-lineup) .mt-lineup {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(8px, 1.6vw, 18px);
+  width: 100%;
+  max-width: 790px;
+  padding: 12px 0 14px;
+  margin: 0 auto;
+}
+.mt-cinematic:has(.mt-lineup) .mt-lineup-slot,
+.mt-cinematic:has(.mt-lineup) .mt-lineup-slot:last-child:nth-child(odd) {
+  grid-column: auto;
+  width: 100%;
+  justify-self: stretch;
+}
+.mt-cinematic:has(.mt-lineup) .mt-card-button {
+  width: 100%;
+  max-width: 150px;
+  margin-inline: auto;
+}
+.mt-cinematic:has(.mt-lineup) .mt-role { margin-top: 6px; font-size: 9px; }
+.mt-cinematic:has(.mt-lineup) .mt-dt {
+  max-width: 790px;
+  margin: 4px auto 10px;
+  padding: 10px 14px;
+}
+.mt-cinematic:has(.mt-lineup) .mt-team-button {
+  display: block;
+  max-width: 790px;
+  margin: 8px auto 0;
+}
+.mt-cinematic:has(.mt-lineup) > footer { max-width: 790px; margin: 14px auto 0; }
+@media (max-width: 680px) {
+  .gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial.mt-cinematic {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 8px auto 18px !important;
+    padding: 18px 14px !important;
+    border-radius: 18px;
+  }
+  .mt-cinematic:has(.mt-lineup) .mt-lineup {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px 10px;
+    max-width: 440px;
+  }
+  .mt-cinematic:has(.mt-lineup) .mt-lineup-slot:nth-child(4) { grid-column: 1 / 2; }
+  .mt-cinematic:has(.mt-lineup) .mt-lineup-slot:nth-child(5) { grid-column: 3 / 4; }
+  .mt-cinematic:has(.mt-lineup) .mt-card-button { max-width: 145px; }
+  .mt-cinematic:has(.mt-lineup) .mt-role { font-size: 9px; }
+}
+@media (max-width: 380px) {
+  .mt-cinematic:has(.mt-lineup) .mt-lineup { gap: 10px 7px; }
+  .mt-cinematic:has(.mt-lineup) .mt-card-hint { font-size: 7px; letter-spacing: 0; }
+}

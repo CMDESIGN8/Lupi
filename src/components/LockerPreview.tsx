@@ -31,6 +31,10 @@ const SLOT_META: Record<
     label: "BOTTOM",
     icon: "🩳",
   },
+  socks: {
+    label: "MEDIAS",
+    icon: "🧦",
+  },
   boots: {
     label: "BOTINES",
     icon: "👟",
@@ -44,6 +48,7 @@ const SLOT_META: Record<
 const SLOT_ORDER: ItemSlot[] = [
   "top",
   "bottom",
+  "socks",
   "boots",
   "accessory",
 ];
@@ -101,13 +106,14 @@ export function LockerPreview({
   } = useAuraInventory(userId, level);
 
   const [guideComplete, setGuideComplete] = useState(false);
+  const [recentlyEquipped, setRecentlyEquipped] = useState<ItemSlot | null>(null);
   const [selectedSlot, setSelectedSlot] =
     useState<ItemSlot | null>(null);
 
   // El CTA del tutorial abre realmente el selector de prendas.
   useEffect(() => {
     if (!onboardingEquipRequest || loading) return;
-    const preferred: ItemSlot[] = ["top", "bottom", "boots", "accessory"];
+    const preferred: ItemSlot[] = ["top", "bottom", "socks", "boots", "accessory"];
     const slot = preferred.find(candidate => items.some(item => item.slot === candidate && item.owned && !item.equipped))
       ?? preferred.find(candidate => items.some(item => item.slot === candidate && item.owned))
       ?? "top";
@@ -177,9 +183,13 @@ export function LockerPreview({
     );
 
     const target = items.find(item => item.id === itemId);
-    if (!target?.owned || target.equipped) return;
+    if (!target?.owned) return;
     try {
-      await toggleEquip(itemId);
+      if (!await toggleEquip(itemId)) return;
+      if (target) {
+        setRecentlyEquipped(target.slot);
+        window.setTimeout(() => setRecentlyEquipped(current => current === target.slot ? null : current), 650);
+      }
       if (onboardingActive) {
         setGuideComplete(true);
         setSelectedSlot(null);
@@ -279,9 +289,8 @@ export function LockerPreview({
               className={[
                 "locker-slot",
                 item ? "equipped" : "empty locker-slot--pending",
-                isSelected
-                  ? "selected"
-                  : "",
+                isSelected ? "selected" : "",
+                recentlyEquipped === slot ? "locker-slot--just-equipped" : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -300,7 +309,8 @@ export function LockerPreview({
       : "none",
   } as React.CSSProperties
 }
-              aria-label={`${meta.label}: ${item ? item.name : "elegir prenda"}`}
+              aria-label={`${meta.label}: ${item ? item.name : "elegir prenda"}${item?.durability != null ? `, resistencia ${item.durability} de ${item.maxDurability ?? 10}` : ""}`}
+              title={`${meta.label}: ${item?.name ?? "Equipar"}${item?.durability != null ? ` · Resistencia ${item.durability}/${item.maxDurability ?? 10}` : ""}`}
               onClick={() =>
                 handleSlotClick(slot)
               }
@@ -315,6 +325,12 @@ export function LockerPreview({
   )}
 </div>
 
+              {item && (slot === "socks" || slot === "boots") && item.durability != null && (
+                <span className={`locker-slot-durability ${item.durability <= 2 ? "locker-slot-durability--low" : ""}`} aria-hidden="true" style={{ "--durability-progress": `${Math.max(0, Math.min(100, item.durability / Math.max(1, item.maxDurability ?? 10) * 100))}%` } as React.CSSProperties}>
+                  <span>{item.durability}/{item.maxDurability ?? 10}</span>
+                </span>
+              )}
+              {!item && slot === "accessory" && <span className="locker-extra-label" aria-hidden="true">EXTRA</span>}
               <span className="locker-slot-guided-label">{meta.icon} {meta.label}</span>
               <div className="locker-slot-info">
                 <span>{meta.label}</span>
@@ -417,11 +433,12 @@ export function LockerPreview({
                         {item.name}
                       </strong>
 
+                      {item.durability != null && <span className="locker-item-durability">⚡ RESISTENCIA {item.durability}/{item.maxDurability ?? 10}</span>}
                       <small>
                         {locked
                           ? `LV ${item.requiredLevel}`
                           : equipped
-                            ? "EQUIPADO"
+                            ? "TOCÁ PARA DESEQUIPAR"
                             : onboardingActive ? "TOCÁ PARA EQUIPAR →" : "EQUIPAR"}
                       </small>
                     </div>
@@ -454,7 +471,7 @@ export function LockerPreview({
           <span>EQUIPAMIENTO</span>
 
           <strong>
-            {equippedCount}/4
+            {equippedCount}/{SLOT_ORDER.length}
           </strong>
         </div>
 

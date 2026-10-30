@@ -1,0 +1,7 @@
+import type { FutsalChoice } from "../../hooks/useFutsalPvp";
+export function TacticalIcon({choice,defending,stage}:{choice:FutsalChoice;defending:boolean;stage?:string}){
+ return <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+  {defending && <path d="M24 5 41 12v12c0 10-17 18-17 18S7 34 7 24V12Z" opacity=".45"/>}
+  {stage==='build' ? choice==='angle' ? <><path d="M9 39V12h12M17 7l6 5-6 5M30 37c-9-6-9-14 0-21M30 16h8v8"/><circle cx="10" cy="37" r="4" fill="currentColor"/></> : choice==='power' ? <><circle cx="10" cy="34" r="4"/><circle cx="36" cy="14" r="4"/><path d="m15 31 16-13M31 29 19 13M19 13h8M19 13v8"/><path d="m14 40 24-19" strokeDasharray="3 4" opacity=".4"/></> : <><circle cx="31" cy="24" r="8"/><path d="M6 24h16M16 18l6 6-6 6M31 10V5M31 43v-5"/><path d="M39 18h4M39 30h4" opacity=".4"/></> : choice==="angle" ? <><path d="M11 36 36 11M24 11h12v12"/><path d="M9 14V8h6M33 40h7v-7" opacity=".4"/><circle cx="13" cy="34" r="5" fill="currentColor" stroke="none"/></> : choice==="power" ? <><path d="m28 5-16 22h12l-4 16 17-23H25Z" fill="currentColor" fillOpacity=".16"/><path d="M6 20h5M4 27h5M7 34h5" opacity=".5"/></> : <><path d="M15 13 6 22l9 9M7 22h21a12 12 0 0 1 12 12v3"/><circle cx="34" cy="11" r="5" fill="currentColor" fillOpacity=".2"/><path d="M21 37h7" opacity=".5"/></>}
+ </svg>;
+}

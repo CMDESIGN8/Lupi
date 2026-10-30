@@ -1,8 +1,8 @@
-import { useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
+import { useRef, useEffect, useCallback, useImperativeHandle, forwardRef } from 'react';
 
 export interface AnimeEffectsHandle {
   triggerGoal: (side: 'user' | 'rival') => void;
-  triggerSave: () => void;
+  triggerSave: (side?: 'user' | 'rival') => void;
   triggerDanger: () => void;
   triggerKeyMoment: () => void;
 }
@@ -10,7 +10,22 @@ export interface AnimeEffectsHandle {
 export const AnimeEffects = forwardRef<AnimeEffectsHandle>((_, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef   = useRef<number>(0);
-  const courtRef  = useRef<HTMLElement | null>(null);
+  const shakeRef = useRef<number>(0);
+  const delayed = useRef(new Set<ReturnType<typeof setTimeout>>());
+  useEffect(() => {
+    const parent = canvasRef.current?.parentElement;
+    return () => {
+      cancelAnimationFrame(animRef.current);
+      cancelAnimationFrame(shakeRef.current);
+      delayed.current.forEach(timer => clearTimeout(timer));
+      delayed.current.clear();
+      if (parent) parent.style.transform = '';
+    };
+  }, []);
+  const schedule = useCallback((callback: () => void, ms: number) => {
+    const timer = setTimeout(() => { delayed.current.delete(timer); callback(); }, ms);
+    delayed.current.add(timer);
+  }, []);
 
   // ── helpers internos ──────────────────────────────────────────────
 
@@ -19,11 +34,12 @@ export const AnimeEffects = forwardRef<AnimeEffectsHandle>((_, ref) => {
   const screenShake = useCallback((mag: number, frames: number) => {
     const el = canvasRef.current?.parentElement;
     if (!el) return;
+    cancelAnimationFrame(shakeRef.current);
     let f = frames;
     const tick = () => {
       if (f-- <= 0) { el.style.transform = ''; return; }
       el.style.transform = `translate(${(Math.random()-.5)*mag}px,${(Math.random()-.5)*mag}px)`;
-      requestAnimationFrame(tick);
+      shakeRef.current = requestAnimationFrame(tick);
     };
     tick();
   }, []);
@@ -128,12 +144,13 @@ export const AnimeEffects = forwardRef<AnimeEffectsHandle>((_, ref) => {
   useImperativeHandle(ref, () => ({
 
     triggerGoal(side) {
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
       const canvas = canvasRef.current; if (!canvas) return;
       const cx = canvas.width  * (side === 'user' ? .88 : .12);
       const cy = canvas.height * .5;
       screenShake(10, 18);
       [0, 60, 120].forEach(delay =>
-        setTimeout(() => drawSpeedLines(cx, cy, '#ffd700', .6, 32, 60, 160), delay)
+        schedule(() => drawSpeedLines(cx, cy, '#ffd700', .6, 32, 60, 160), delay)
       );
       const ripples = [
         { x:cx, y:cy, r:10, maxR:130, life:1, color:'#ffd700' },
@@ -143,12 +160,13 @@ export const AnimeEffects = forwardRef<AnimeEffectsHandle>((_, ref) => {
       runLoop(parts, ripples);
     },
 
-    triggerSave() {
+    triggerSave(side = 'user') {
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
       const canvas = canvasRef.current; if (!canvas) return;
-      const cx = canvas.width * .08, cy = canvas.height * .4;
+      const cx = canvas.width * (side === 'user' ? .08 : .92), cy = canvas.height * .4;
       screenShake(6, 10);
       [0, 80].forEach(d =>
-        setTimeout(() => drawSpeedLines(cx, cy, '#3dffa0', .5, 24, 40, 120), d)
+        schedule(() => drawSpeedLines(cx, cy, '#3dffa0', .5, 24, 40, 120), d)
       );
       const ripples = [{ x:cx, y:cy, r:10, maxR:110, life:1, color:'#3dffa0' }];
       const parts   = spawnParticles(cx, cy, ['#3dffa0','#00ffcc','#fff'], 30);
@@ -156,11 +174,12 @@ export const AnimeEffects = forwardRef<AnimeEffectsHandle>((_, ref) => {
     },
 
     triggerDanger() {
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
       const canvas = canvasRef.current; if (!canvas) return;
       const cx = canvas.width * .5, cy = canvas.height * .5;
       screenShake(5, 8);
       [0, 70].forEach(d =>
-        setTimeout(() => drawSpeedLines(cx, cy, '#ff6b6b', .45, 20, 50, 130), d)
+        schedule(() => drawSpeedLines(cx, cy, '#ff6b6b', .45, 20, 50, 130), d)
       );
       const ripples = [{ x:cx, y:cy, r:10, maxR:120, life:1, color:'#ff6b6b' }];
       const parts   = spawnParticles(cx, cy, ['#ff6b6b','#ff4d6d','#ff9060'], 25);
@@ -168,11 +187,12 @@ export const AnimeEffects = forwardRef<AnimeEffectsHandle>((_, ref) => {
     },
 
     triggerKeyMoment() {
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
       const canvas = canvasRef.current; if (!canvas) return;
       const cx = canvas.width * .5, cy = canvas.height * .45;
       screenShake(4, 6);
       [0, 60].forEach(d =>
-        setTimeout(() => drawSpeedLines(cx, cy, '#a78bfa', .5, 28, 50, 140), d)
+        schedule(() => drawSpeedLines(cx, cy, '#a78bfa', .5, 28, 50, 140), d)
       );
       const ripples = [
         { x:cx, y:cy, r:10, maxR:130, life:1, color:'#a78bfa' },
@@ -182,7 +202,7 @@ export const AnimeEffects = forwardRef<AnimeEffectsHandle>((_, ref) => {
       runLoop(parts, ripples);
     },
 
-  }), [drawSpeedLines, runLoop, screenShake, spawnParticles]);
+  }), [drawSpeedLines, runLoop, screenShake, spawnParticles, schedule]);
 
   return (
     <canvas

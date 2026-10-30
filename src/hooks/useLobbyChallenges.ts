@@ -216,7 +216,7 @@ export function useLobbyChallenges({
   const challenge = useCallback(
     (target: { userId: string; username: string }, botIndex = 1, gameType: ChallengeGame = "futsal", communityId?: string) => {
       const channel = channelRef.current;
-      if (!channel || !ready || outgoingRef.current || target.userId === meId) return false;
+      if (!channel || !ready || !availableRef.current || incomingRef.current || outgoingRef.current || target.userId === meId) return false;
 
       const c: Challenge = {
         id: makeId(),

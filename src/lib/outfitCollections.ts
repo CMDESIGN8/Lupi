@@ -18,14 +18,14 @@ export const OUTFIT_COLLECTIONS: readonly OutfitCollection[] = [
     season: "TEMPORADA 2026",
     description: "Arqueros · Temporada 2026",
     theme: "red",
-    itemIds: ["flores-club-camiseta-roja", "flores-club-short-rojo"],
+    itemIds: ["flores-club-camiseta-roja", "flores-club-short-rojo", "flores-club-medias-rojas"],
   },
   {
     id: "flores-club-8va-2026",
     title: "FLORES CLUB · 8.ª DIVISIÓN",
     season: "TEMPORADA 2026",
     description: "Camiseta verde · Short negro · Sponsor LupiApp",
-    itemIds: ["flores-club-8va-camiseta-verde", "flores-club-8va-short-negro"],
+    itemIds: ["flores-club-8va-camiseta-verde", "flores-club-8va-short-negro", "flores-club-medias-verdes"],
     theme: "green",
   },
   ...[7, 6, 5].map(division => ({

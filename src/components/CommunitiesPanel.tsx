@@ -198,8 +198,16 @@ export function CommunitiesPanel({ userId, onClose, onMembershipChange, onlineMe
                 if (sent) { setChallengeTarget(null); onClose(); }
                 else setMemberError("No se pudo enviar el desafío. Verificá que ambos estén en el lobby.");
               }}>✊ Piedra, papel o tijera <small>Duelo PvP sincronizado · Mejor de 3 →</small></button>
-              <div className="lupi-community-duel-locked">⚽ Futsal PvP <small>En desarrollo: el partido actual es contra la máquina.</small></div>
-              <div className="lupi-community-duel-locked">🧠 Preguntados <small>Próximamente</small></div>
+              <button type="button" className="lupi-community-duel-option" disabled={!!challengePendingToId} onClick={() => {
+                const sent = onChallengeMember?.(challengeTarget, "futsal", selected.id);
+                if (sent) { setChallengeTarget(null); onClose(); }
+                else setMemberError("No se pudo enviar el desafío. Verificá que ambos estén disponibles en el lobby.");
+              }}>⚽ Futsal PvP <small>Ataque y defensa secretos · Cinco ataques por jugador →</small></button>
+              <button type="button" className="lupi-community-duel-option" disabled={!!challengePendingToId} onClick={() => {
+                const sent = onChallengeMember?.(challengeTarget, "trivia", selected.id);
+                if (sent) { setChallengeTarget(null); onClose(); }
+                else setMemberError("No se pudo enviar el desafío. Verificá que ambos estén disponibles en el lobby.");
+              }}>🧠 Preguntados <small>Trivia de fútbol · 5 preguntas · Duelo amistoso →</small></button>
               <div className="lupi-community-duel-locked">🃏 Truco <small>Próximamente</small></div>
             </div>
           )}

@@ -2020,7 +2020,7 @@
 
   /* Posiciones desktop */
   .gh-locker-zone .locker-slot:nth-child(1) {
-    left: -40px;
+    left: 240px;
     top: 100px;
     width: 80px;
     height: auto;
@@ -2029,7 +2029,7 @@
 
   .gh-locker-zone .locker-slot:nth-child(2) {
     left: -40px;
-    top: 230px;
+    top: 190px;
     width: 70px;
     height: auto;
     transform: translateY(-50%);
@@ -2044,8 +2044,8 @@
   }
 
   .gh-locker-zone .locker-slot:nth-child(4) {
-    right: -20px;
-    top: 85px;
+    right: 250px;
+    top: 345px;
     width: 80px;
     height: 65px;
     transform: translateY(-50%);
@@ -4176,3 +4176,171 @@
 .gh-root .gh-hud .gh-back.gh-back--home span{font-size:19px;color:#66dcf0}
 .gh-root .gh-hud .gh-back.gh-back--home:hover{background:#62d6eb0d;color:#fff}
 @media(max-width:600px){.gh-root:has(.gh-world) .gh-hud{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:6px 10px!important;clip-path:none!important}.gh-root:has(.gh-world) .gh-hud .gh-back--home{grid-column:1/-1;grid-row:1;justify-self:start}.gh-root:has(.gh-world) .gh-hud .gh-brand{grid-column:1;grid-row:2}.gh-root:has(.gh-world) .gh-hud .gh-hud__right{grid-column:2;grid-row:2;gap:5px}.gh-root:has(.gh-world) .gh-hud .gh-wallet{padding:5px 7px;font-size:12px;min-width:0}}
+
+/* V7 — Misión centrada y slot EXTRA separado de la camiseta. */
+@media (max-width: 700px) {
+  .gh-world .gh-world__next {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(310px, calc(100% - 44px)) !important;
+    max-width: calc(100% - 44px) !important;
+    top: calc(78px + env(safe-area-inset-top, 0px)) !important;
+    box-sizing: border-box !important;
+    align-items: stretch !important;
+    text-align: left;
+  }
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(5) {
+    position: absolute !important;
+    left: max(5px, calc(50% - 145px)) !important;
+    right: auto !important;
+    top: 23% !important;
+    transform: translateY(-50%) !important;
+    pointer-events: auto !important;
+    z-index: 3 !important;
+  }
+}
+@media (min-width: 701px) {
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(5) {
+    position: absolute !important;
+    left: max(4px, calc(50% - 240px)) !important;
+    right: auto !important;
+    top: 29% !important;
+    transform: translateY(-50%) !important;
+    z-index: 3 !important;
+  }
+}
+
+/* V8 — separacion de notificacion y mision; EXTRA lejos del CTA.
+   Devtools flotante no forma parte del layout publico. */
+@media (max-width:700px) {
+  .gh-world .gh-world__next {
+    left:50% !important;right:auto !important;
+    transform:translateX(-50%) !important;
+    top:calc(110px + env(safe-area-inset-top,0px)) !important;
+    width:min(285px,calc(100% - 40px)) !important;
+    max-width:calc(100% - 40px) !important;
+    max-height:125px !important;
+    z-index:180 !important;
+  }
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(5) {
+    left:4px !important;right:auto !important;
+    top:31% !important;transform:translateY(-50%) !important;
+  }
+}
+@media (min-width:701px) {
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(5) {
+    left:max(12px,calc(50% - 260px)) !important;
+    top:42% !important;transform:translateY(-50%) !important;
+  }
+}
+
+/* V9 — EXTRA alineado verticalmente encima de la camiseta (slot 1).
+   Solo posicionamiento; no altera interacciones ni equipamiento. */
+@media (max-width:700px) {
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(5) {
+    left:max(5px, calc(50% - 145px)) !important;
+    right:auto !important;
+    top:calc(32% - 22px) !important;
+    transform:translateY(-50%) !important;
+  }
+}
+@media (min-width:701px) {
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(5) {
+    left:8px !important;
+    right: auto !important;
+    top:calc(40% - 180px) !important;
+    transform:translateY(-50%) !important;
+  }
+}
+
+/* LUPI — Equipamiento alineado con el cuerpo del avatar */
+@media (max-width: 700px) {
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot {
+    transform: translateY(-50%) !important;
+  }
+
+  /* Camiseta — torso */
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(1) {
+    top: 43% !important;
+    left: 76% !important;
+    right: auto !important;
+  }
+
+  /* Pantalón — cintura */
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(2) {
+    top: 60% !important;
+    left: 17% !important;
+    right: auto !important;
+  }
+
+  /* Medias — pantorrillas */
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(3) {
+    top: 70% !important;
+    right: 10% !important;
+    left: auto !important;
+  }
+
+  /* Botines — pies */
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(4) {
+    top: 79% !important;
+    right: 75% !important;
+    left: auto !important;
+  }
+
+  /* EXTRA — cabeza, misma columna que camiseta y pantalón */
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:nth-child(5) {
+    position: absolute !important;
+    top: 35% !important;
+    left: 20% !important;
+    right: auto !important;
+    transform: translateY(-50%) !important;
+  }
+}
+/* LUPI equipment polish: effects without changing carefully tuned slot positions. */
+.gh-world .gh-locker-zone .locker-equipment .locker-slot {
+  transition: box-shadow .28s ease, border-color .28s ease, filter .28s ease, scale .28s ease !important;
+  isolation: isolate;
+}
+.gh-world .gh-locker-zone .locker-equipment .locker-slot:focus-visible {
+  outline: 2px solid #53e8e8; outline-offset: 4px;
+}
+@media (hover:hover) {
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot:hover {
+    scale: 1.065; filter: brightness(1.15);
+    box-shadow: 0 0 0 1px #5cebe288, 0 0 22px #31d7e155 !important;
+  }
+}
+.gh-world .gh-locker-zone .locker-slot--just-equipped::after {
+  content: ''; position: absolute; inset: -5px; border-radius: inherit;
+  border: 2px solid #4df7d5; pointer-events: none;
+  animation: locker-equip-flash .65s ease-out both;
+}
+@keyframes locker-equip-flash {
+  from { opacity: 1; transform: scale(.85); box-shadow: 0 0 24px #5bffeaaa; }
+  to { opacity: 0; transform: scale(1.3); box-shadow: 0 0 0 transparent; }
+}
+.gh-world .gh-locker-zone .locker-slot-durability {
+  position: absolute; left: 5px; right: 5px; bottom: 3px; height: 3px;
+  border-radius: 5px; background: #ffffff38; pointer-events: none;
+}
+.gh-world .gh-locker-zone .locker-slot-durability::before {
+  content: ''; display: block; width: var(--durability-progress); height: 100%;
+  border-radius: inherit; background: #48eabf; box-shadow: 0 0 7px #48eabf88;
+}
+.gh-world .gh-locker-zone .locker-slot-durability--low::before {background: #ffbc49; box-shadow: 0 0 7px #ffbc4988;}
+.gh-world .gh-locker-zone .locker-slot-durability > span {
+  position: absolute; bottom: 3px; right: 0; color: #f1fff9;
+  font-size: 8px; font-weight: 800; text-shadow: 0 1px 3px #000;
+}
+.gh-world .gh-locker-zone .locker-extra-label {
+  position: absolute; bottom: 3px; left: 0; right: 0;
+  font-size: 8px; font-weight: 900; color: #75edff; letter-spacing: .6px;
+}
+.locker-selector-overlay .locker-item-durability {
+  display: block; font-size: 10px; font-weight: 800; color: #63e9c0; margin-top: 4px;
+}
+@media (prefers-reduced-motion:reduce) {
+  .gh-world .gh-locker-zone .locker-slot--just-equipped::after { animation: none; display: none; }
+  .gh-world .gh-locker-zone .locker-equipment .locker-slot { transition: none !important; }
+}

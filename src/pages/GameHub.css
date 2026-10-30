@@ -2882,3 +2882,90 @@
 @media(max-width:600px) {
  .rps-screen-overlay { padding:0; overflow-x:hidden; overflow-y:auto; }
 }
+
+
+/* ================================================================
+   LUPI V3 — MATCH VIEWPORT ALIGNMENT
+   El layout principal conserva un sidebar en escritorio. La vista
+   de partido debe ocupar el viewport real, no empezar tras el sidebar.
+   ================================================================ */
+.gh-root.main-content.gh-root--playing {
+  position: fixed !important;
+  inset: 0 !important;
+  left: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 100dvh;
+  min-height: 100dvh;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  z-index: 2100;
+}
+.gh-root--playing > .gh-shell {
+  width: 100% !important;
+  max-width: none !important;
+  margin-inline: auto !important;
+  box-sizing: border-box;
+}
+.gh-root--playing .gh-match {
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+/* En el tutorial, la tarjeta sigue centrada dentro del viewport. */
+.gh-root--playing .match-tutorial,
+.gh-root--playing .match-tutorial-container {
+  margin-inline: auto;
+}
+
+/* V7 — Partido móvil: el panel no puede quedar fuera del viewport fijo. */
+@media (max-width: 900px) {
+  .gh-root--playing .gh-match {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .gh-root--playing .gh-match > .gh-panel {
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  .gh-root--playing .arena-container {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+  .gh-root--playing .arena-match-core {
+    flex: none !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .gh-root--playing .arena-match-core > .futsal-court {
+    flex: 0 0 auto !important;
+    height: clamp(410px, 60dvh, 590px) !important;
+    min-height: 410px !important;
+  }
+  .gh-root--playing .arena-match-core > .battle-log-strip {
+    flex: 0 0 auto !important;
+    display: flex !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    margin-bottom: 16px !important;
+  }
+}
+

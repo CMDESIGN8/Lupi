@@ -1,6 +1,6 @@
 // src/utils/battleEngine.ts — v4
 
-import { UserCard } from '../types/cards';
+import type { UserCard } from '../types/cards.ts';
 
 export type SkillGroup = 'attack' | 'defense' | 'technique';
 
@@ -97,9 +97,9 @@ export function getCardData(card: UserCard) {
   };
 }
 
-function pickCard(cards: UserCard[], pos?: string): UserCard {
+function pickCard(cards: UserCard[], pos?: string, random: () => number = Math.random): UserCard {
   if (pos) { const m = cards.find(c => getCardData(c).position === pos); if (m) return m; }
-  return cards[Math.floor(Math.random() * cards.length)];
+  return cards[Math.floor(random() * cards.length)];
 }
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
@@ -175,13 +175,14 @@ export function resolveDecision(
   card: UserCard,
   momentType: MomentType,
   _minute: number,
+  random: () => number = Math.random,
 ): MomentResult {
   const d = getCardData(card);
   const primary   = ((d as any)[option.primaryStat]   ?? 50) as number;
   const secondary = option.secondaryStat ? (((d as any)[option.secondaryStat]) ?? 50) as number : primary;
   const combined  = primary * 0.7 + secondary * 0.3;
   const finalChance = clamp01(option.baseChance + ((combined - 50) / 50) * 0.22);
-  const success = Math.random() < finalChance;
+  const success = random() < finalChance;
   const n = d.name;
 
   const ok: Partial<Record<string, string[]>> = {
@@ -238,15 +239,15 @@ export function resolveDecision(
   let goalFor: 'user' | 'rival' | null = null;
   if (success) {
     if (GOAL_IDS.has(option.id)) goalFor = 'user';
-    else if (ASSIST_IDS.has(option.id) && Math.random() < 0.55) goalFor = 'user';
+    else if (ASSIST_IDS.has(option.id) && random() < 0.55) goalFor = 'user';
   } else {
-    if (['counter_pass','counter_hold'].includes(option.id) && Math.random() < 0.60) goalFor = 'rival';
-    else if (DEF_FAIL.has(option.id) && Math.random() < 0.42) goalFor = 'rival';
+    if (['counter_pass','counter_hold'].includes(option.id) && random() < 0.60) goalFor = 'rival';
+    else if (DEF_FAIL.has(option.id) && random() < 0.42) goalFor = 'rival';
   }
 
   const pool = success ? (ok[option.id] ?? [`✅ ${n} ejecuta bien.`]) : undefined;
   const narrative = success
-    ? pool![Math.floor(Math.random() * pool!.length)]
+    ? pool![Math.floor(random() * pool!.length)]
     : (fail[option.id] ?? `❌ ${n} no pudo concretar.`);
 
   return { success, optionChosen: option, narrative, goalFor, statGroupUsed: option.skillGroup };
@@ -286,8 +287,8 @@ const INTROS: Record<MomentType, string[]> = {
   block:   ['¡Mano a mano con el goleador rival!','¡Última línea de defensa!'],
 };
 
-function pickRandom<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+function pickRandom<T>(arr: T[], random: () => number = Math.random): T {
+  return arr[Math.floor(random() * arr.length)];
 }
 
 // ─── Generar fase (user o rival) ──────────────────────────────────────────────
@@ -296,17 +297,18 @@ function generateUserPhase(
   userCards: UserCard[],
   minute: number,
   advantage: number,
+  random: () => number = Math.random,
 ): PhaseResult {
-  const atk = clamp01(0.38 + advantage * 0.5 + Math.random() * 0.38);
+  const atk = clamp01(0.38 + advantage * 0.5 + random() * 0.38);
 
   // 2 eventos de build-up antes del momento
   const events: TurnEvent[] = [
-    pickRandom(USER_BUILD_EVENTS),
-    pickRandom(USER_BUILD_EVENTS),
+    pickRandom(USER_BUILD_EVENTS, random),
+    pickRandom(USER_BUILD_EVENTS, random),
   ];
 
   if (atk > 0.58) {
-    const r = Math.random();
+    const r = random();
     const type: MomentType =
       r < 0.28 ? 'shot'    :
       r < 0.44 ? 'dribble' :
@@ -324,7 +326,7 @@ function generateUserPhase(
       block:   { pos:'arquero', zone:'user_defense'    },
     };
     const { pos, zone } = zoneMap[type];
-    const mainCard = pickCard(userCards, pos);
+    const mainCard = pickCard(userCards, pos, random);
 
     return {
       events,
@@ -334,7 +336,7 @@ function generateUserPhase(
         options: buildOptions(type, mainCard),
         timeLimit: calcDecisionTime(mainCard),
         zone,
-        intro: pickRandom(INTROS[type]),
+        intro: pickRandom(INTROS[type], random),
       },
     };
   }
@@ -347,7 +349,7 @@ function generateUserPhase(
       'La defensa rival despeja el peligro.',
       'La pelota sale al fondo, saque de arco rival.',
       'El intento no prospera, recupera el rival.',
-    ]),
+    ], random),
   };
 }
 
@@ -356,27 +358,28 @@ function generateRivalPhase(
   minute: number,
   advantage: number,
   rivalName: string,
+  random: () => number = Math.random,
 ): PhaseResult {
-  const atk = clamp01(0.32 - advantage * 0.4 + Math.random() * 0.42);
+  const atk = clamp01(0.32 - advantage * 0.4 + random() * 0.42);
 
   const events: TurnEvent[] = [
-    pickRandom(RIVAL_BUILD_EVENTS),
-    pickRandom(RIVAL_BUILD_EVENTS),
+    pickRandom(RIVAL_BUILD_EVENTS, random),
+    pickRandom(RIVAL_BUILD_EVENTS, random),
   ];
 
   if (atk > 0.58) {
-    const defCard = pickCard(userCards, 'cierre');
+    const defCard = pickCard(userCards, 'cierre', random);
     const defVal  = calcGroupValue(defCard, 'defense');
     const defOk   = clamp01(0.44 + advantage * 0.28 + (defVal - 50) / 180);
 
-    if (Math.random() < defOk) {
+    if (random() < defOk) {
       const msgs = [
         `🛡️ ${getCardData(defCard).name} corta el avance del rival!`,
         `🧤 Gran tapada — el balón sale al córner.`,
         `🦵 Entrada limpia, el rival pierde la pelota.`,
         `💪 ${getCardData(defCard).name} gana el duelo y despeja.`,
       ];
-      return { events, narrative: pickRandom(msgs) };
+      return { events, narrative: pickRandom(msgs, random) };
     } else {
       const fns = [
         (r: string) => `💔 ¡${r} la manda adentro de contraataque!`,
@@ -399,7 +402,7 @@ function generateRivalPhase(
       'El arquero sale y corta el avance rival.',
       'El cierre cierra el pasillo, sin daño.',
       'El rival pierde la pelota en campo propio.',
-    ]),
+    ], random),
   };
 }
 
@@ -410,10 +413,12 @@ export function generateTurn(
   minute: number,
   advantage: number,
   rivalName: string,
+  randomUser: () => number = Math.random,
+  randomRival: () => number = Math.random,
 ): TurnResult {
   return {
-    userPhase:  generateUserPhase(userCards, minute, advantage),
-    rivalPhase: generateRivalPhase(userCards, minute, advantage, rivalName),
+    userPhase:  generateUserPhase(userCards, minute, advantage, randomUser),
+    rivalPhase: generateRivalPhase(userCards, minute, advantage, rivalName, randomRival),
   };
 }
 
