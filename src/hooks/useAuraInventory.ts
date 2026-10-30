@@ -272,4 +272,3 @@ export function useAuraInventory(userId: string, _level: number) {
 
   return { items, loading, toggleEquip, usingFallback, refresh: load, equipError, equipping };
 }
-

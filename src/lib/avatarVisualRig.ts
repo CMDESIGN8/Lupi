@@ -59,4 +59,3 @@
       "--item-scale":v.scale, "--item-rotation":`${v.rotation}deg`, "--item-z":v.z,
     } as CSSProperties;
   }
-
