@@ -136,3 +136,9 @@
 @keyframes duel-fighter-left{from{opacity:0;transform:translateX(-80px) skewX(8deg)}to{opacity:1;transform:none}}@keyframes duel-fighter-right{from{opacity:0;transform:translateX(80px) skewX(-8deg)}to{opacity:1;transform:none}}@keyframes duel-lines-in{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
 @media(max-width:600px){.duel-vs{padding:14px}.duel-vs__arena{padding:28px 14px}.duel-vs__eyebrow{font-size:8px}.duel-vs__heading{font-size:32px;margin:12px 0 20px}.duel-vs__fighters{gap:8px;padding:10px 0}.duel-vs__avatar{width:85px;height:108px;padding:20px 12px 6px}.duel-vs__versus{font-size:48px}.duel-vs__name{font-size:22px}.duel-vs__fighter small{font-size:8px}.duel-vs__status{font-size:8px;margin-top:24px}}
 @media(prefers-reduced-motion:reduce){.duel-vs *,.duel-vs *::before,.duel-vs *::after{animation:none!important;transition:none!important}}
+
+/* Match handoff shares the club atmosphere of the invitation and briefing. */
+.duel-vs{background:radial-gradient(ellipse at center,#0c43545c,transparent 70%),#020d16ed;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+.duel-vs__arena{border-color:#28d9ff88;border-radius:20px 5px;background:linear-gradient(180deg,#041a25e8,#03141ae6),url('../assets/futsal-club-entry.webp') center/cover;box-shadow:0 25px 80px #000a,0 0 45px #28d9ff24;animation:duel-vs-enter .45s ease-out both}
+.duel-vs__heading{color:#ffdb51;text-shadow:2px 3px #020f19}.duel-vs__eyebrow{color:#6ee6f9}.duel-vs__fighter:first-child .duel-vs__avatar{border-color:#28d9ff;box-shadow:0 4px 0 #28d9ff,0 0 24px #28d9ff24}.duel-vs__fighter:last-child .duel-vs__avatar{border-color:#ff9865;box-shadow:0 4px 0 #ff9865,0 0 24px #ff986524}.duel-vs__progress{background:#143947}.duel-vs__progress:after{background:linear-gradient(90deg,#28d9ff,#68ffe0,#ffdb51)}
+@media(prefers-reduced-motion:reduce){.duel-vs__arena{animation:none}}

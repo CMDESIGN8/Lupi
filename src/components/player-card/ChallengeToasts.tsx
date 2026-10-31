@@ -1,9 +1,14 @@
 // src/components/player-card/ChallengeToasts.tsx
+import { AvatarFace } from "../AvatarFace";
+import { ArenaSymbol } from "../match/ArenaSymbol";
+import type { LobbyPlayer } from "../../hooks/useLobbyPresence";
 import type { Challenge, ChallengeGame, ChallengeOutcome } from "../../hooks/useLobbyChallenges";
 import type { DailyChallengeToast } from "./types";
 import "./challenge-toasts.css";
+import "./ChallengeCinema.css";
 
 type Props = {
+  players?: LobbyPlayer[];
   incoming: Challenge | null;
   outgoing: Challenge | null;
   outcome: ChallengeOutcome | null;
@@ -33,6 +38,7 @@ const gameName = (type?: string) => (GAME_NAMES[type as ChallengeGame] ?? GAME_N
 export function ChallengeToasts({
   incoming,
   outgoing,
+  players = [],
   outcome,
   respond,
   cancel,
@@ -40,16 +46,24 @@ export function ChallengeToasts({
   onDismissDaily,
 }: Props) {
   if (!incoming && !outgoing && !outcome && dailyChallenges.length === 0) return null;
+  const active = incoming ?? outgoing;
+  const contender = (id:string,name:string,away:boolean) => {
+    const player=players.find(p=>p.userId===id);
+    return <div className={`pc-duel-contender${away?' pc-duel-contender--away':''}`}><div className="pc-duel-face">{player?.appearance ? <AvatarFace appearance={player.appearance}/> : <span>{name.slice(0,1).toUpperCase()}</span>}</div><strong>{name}</strong><small>{away?'RIVAL':'VOS'}</small></div>;
+  };
   return (
     <>
       {(incoming || outgoing) && (
         <div className="pc-challenge-overlay">
-          <section className="pc-challenge-modal" role="dialog" aria-modal="true" aria-label="Desafío de Lupi World">
+          <section key={active?.id} className={`pc-challenge-modal pc-challenge-cinema ${incoming?"is-incoming":"is-outgoing"}`} role="dialog" aria-modal="true" aria-labelledby="pc-duel-title">
+            <div className="pc-duel-flare" aria-hidden="true"/>
+            <div className="pc-duel-chapter"><span>ARENA SOCIAL</span><b>01 / EL DESAFÍO</b></div>
             <div className="pc-challenge-modal__icon" aria-hidden="true">
-              ⚔
+              <ArenaSymbol kind="elaborated"/>
             </div>
             <span className="pc-challenge-modal__eyebrow">LUPI WORLD · {gameName((incoming ?? outgoing)?.gameType)}</span>
-            <h2 className="pc-challenge-modal__title">{incoming ? "¡TE DESAFÍAN!" : "DESAFÍO ENVIADO"}</h2>
+            <h2 id="pc-duel-title" className="pc-challenge-modal__title">{incoming ? "¡TE DESAFÍAN!" : "DESAFÍO ENVIADO"}</h2>
+            {active && <div className="pc-duel-versus">{contender(incoming?active.toId:active.fromId,incoming?active.toName:active.fromName,false)}<b className="pc-duel-vs" aria-hidden="true">VS</b>{contender(incoming?active.fromId:active.toId,incoming?active.fromName:active.toName,true)}</div>}
             <p className="pc-challenge-modal__description">
               {incoming ? (
                 <>
@@ -68,11 +82,12 @@ export function ChallengeToasts({
                 <span />
               </div>
             )}
+            <div className="pc-duel-signal" aria-hidden="true"><i/><i/><i/><i/><i/></div>
             <div className="pc-challenge-modal__actions">
               {incoming ? (
                 <>
                   <button type="button" className="pc-btn pc-btn--primary" onClick={() => respond(true)}>
-                    ⚔ ACEPTAR
+                    ACEPTAR DESAFÍO →
                   </button>
                   <button type="button" className="pc-btn" onClick={() => respond(false)}>
                     RECHAZAR
@@ -84,6 +99,7 @@ export function ChallengeToasts({
                 </button>
               )}
             </div>
+            <small className="pc-duel-footer">LEÉ AL RIVAL · ELEGÍ TU JUGADA</small>
           </section>
         </div>
       )}

@@ -1039,6 +1039,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 )}
 
   <ChallengeToasts
+    players={lobbyPlayers}
     incoming={incoming}
     outgoing={outgoing}
     outcome={outcome}
