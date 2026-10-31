@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { ArenaSymbol } from "./match/ArenaSymbol";
-import { FifaCard } from "./FifaCard";
+import { DeckPlayerCard } from "./DeckPlayerCard";
 import { AvatarFace } from "./AvatarFace";
 import type { LobbyPlayer } from "../hooks/useLobbyPresence";
 import { tacticalOptions, eventChoiceLabel, routeName, actorIndex, scenarioName } from "./match/futsalTactics";
@@ -11,6 +11,7 @@ import type { Deck } from "../types/cards";
 import "./TriviaDuel.css";
 import "./FutsalPvp.css";
 import "./FutsalArenaPresentation.css";
+import "./FutsalResultCinema.css";
 import { PvpSimulatorCourt } from "./match/PvpSimulatorCourt";
 type Props = { challenge: Challenge; meId: string; deck: Deck; players?: LobbyPlayer[]; onExit: () => void };
 export function FutsalPvp({ challenge, meId, deck, players = [], onExit }: Props) {
@@ -24,7 +25,7 @@ export function FutsalPvp({ challenge, meId, deck, players = [], onExit }: Props
   const [selected, setSelected] = useState<{ version: number; choice: FutsalChoice } | null>(null);
   useEffect(() => { const id = window.setInterval(() => setNow(Date.now()), 250); return () => window.clearInterval(id); }, []);
   const ownedCards = [...deck.cards].sort((a,b) => (a.position ?? 0)-(b.position ?? 0));
-  const renderCard = (userCard: Deck["cards"][number]) => { const c=userCard.card; if(!c) return <div className="fp-card-unavailable"><b>{userCard.position}</b><span>Datos de carta no disponibles</span></div>; return <FifaCard size="sm" card={{...c,photo_url:c.photo_url ?? null,rarity:c.overall_rating>=85?"special":c.overall_rating>=75?"gold":c.overall_rating>=65?"silver":"bronze"}}/>; };
+  const renderCard = (userCard: Deck["cards"][number]) => <DeckPlayerCard card={userCard} slot={userCard.position}/>;
   const host = meId === challenge.fromId;
   const mine = host ? challenge.fromName : challenge.toName;
   const rival = host ? challenge.toName : challenge.fromName;
@@ -98,7 +99,7 @@ export function FutsalPvp({ challenge, meId, deck, players = [], onExit }: Props
         <div className="fp-center-foot">⚡ CADA JUGADA CUENTA</div>
       </aside>
     </div>}
-    {state && ended && <><div className="fp-final" role="status"><div className="fp-final-rays" aria-hidden="true"/><small className="fp-final-kicker">SILBATAZO FINAL · FUTSAL PvP</small><span className="fp-result-medal"><ArenaSymbol kind={won?"trophy":"shield"}/></span><h3>{verdict}</h3><div className="fp-result-duel">{scoreSide(meId,mine,ownScore,true)}<span className="fp-result-separator">FINAL</span>{scoreSide(host?challenge.toId:challenge.fromId,rival,otherScore,false)}</div><div className="fp-final-stats"><span><b>{attackResults(meId).filter(e=>e.goal).length}</b>GOLES TUYOS</span><span><b>{attackResults(meId).length}/{totalAttacks}</b>ATAQUES JUGADOS</span><span><b>{state.history.filter(e=>e.attackerId!==meId&&e.defended).length}</b>CIERRES ACERTADOS</span></div><p>{state.status === "finished" ? `Ambos equipos completaron sus ${totalAttacks===3?"tres":"cinco"} ataques.` : state.status === "abandoned" ? "El partido terminó por salida o falta de respuesta. El marcador muestra los goles jugados." : "El tiempo de espera terminó o alguien salió. Sin ganador."}</p><button type="button" className="fp-primary" onClick={onExit}>VOLVER AL LOBBY</button></div>
+    {state && ended && <><div className="fp-final" role="status"><div className="fp-cinema-backdrop" aria-hidden="true"><i/><i/><i/><i/><i/><i/><i/><i/></div><div className="fp-cinema-strike" aria-hidden="true"><span>{won?"VICTORIA":state.winnerId===null?"DUELO PAREJO":"HASTA LA PRÓXIMA"}</span></div><div className="fp-result-particles" aria-hidden="true">{Array.from({length:14},(_,i)=><i key={i} style={{"--spark":i} as React.CSSProperties}/>)}</div><div className="fp-final-rays" aria-hidden="true"/><small className="fp-final-kicker">PARTIDO COMPLETADO · FUTSAL PvP</small><span className="fp-result-medal"><ArenaSymbol kind={won?"trophy":"shield"}/></span><h3>{verdict}</h3><div className="fp-result-duel">{scoreSide(meId,mine,ownScore,true)}<span className="fp-result-separator"><b>VS</b>FINAL</span>{scoreSide(host?challenge.toId:challenge.fromId,rival,otherScore,false)}</div><div className="fp-final-stats"><span><b>{attackResults(meId).filter(e=>e.goal).length}</b>GOLES TUYOS</span><span><b>{attackResults(meId).length}/{totalAttacks}</b>ATAQUES JUGADOS</span><span><b>{state.history.filter(e=>e.attackerId!==meId&&e.defended).length}</b>CIERRES ACERTADOS</span></div><p>{state.status === "finished" ? `Ambos equipos completaron sus ${totalAttacks===3?"tres":"cinco"} ataques.` : state.status === "abandoned" ? "El partido terminó por salida o falta de respuesta. El marcador muestra los goles jugados." : "El tiempo de espera terminó o alguien salió. Sin ganador."}</p><button type="button" className="fp-primary" onClick={onExit}>VOLVER AL LOBBY</button></div>
       <div className="fp-result-layout"><details className="trivia-summary fp-final-court"><summary><span>VER LA CANCHA<small>Equipos que disputaron el partido</small></span><b>⌄</b></summary><PvpSimulatorCourt state={state} meId={meId} mine={mine} rival={rival} now={now} receivedAt={receivedAt} isHost={host}/></details></div>
       {state.history.length > 0 && <details className="trivia-summary"><summary><span>RELATO DEL PARTIDO<small>{state.history.length} decisiones resueltas · Ver jugadas</small></span><b>⌄</b></summary><ol className="fp-history">{state.history.map(event=><li key={event.version}><b>{Math.ceil(event.turn/2)}. {event.attackerId===meId?"Tu ataque":"Ataque rival"}{(event.rulesVersion??1)>=2 ? ` · ${event.stage==="build" ? "Construcción" : "Definición"}` : ""}</b><p>{event.narrative}</p><small>{eventChoiceLabel(event,true)} / {eventChoiceLabel(event,false)}{event.hostAuto || event.guestAuto ? " · Elección automática" : ""}</small></li>)}</ol></details>}
     </>}

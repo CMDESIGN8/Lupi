@@ -2,6 +2,7 @@
 // Mejoras: onboarding, progreso por pasos, celebración al completar,
 // filtro automático por posición, tooltips, lenguaje simple, badges animados
 
+import { DeckPlayerCard } from './DeckPlayerCard';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { UserCard, Deck } from '../types/cards';
@@ -27,12 +28,6 @@ function getRarityColor(ovr: number): string {
   return '#CD7F32';
 }
 
-function getRarityGradient(ovr: number): string {
-  if (ovr >= 85) return 'linear-gradient(135deg, #9B59B6, #7D3C98)';
-  if (ovr >= 75) return 'linear-gradient(135deg, #FFD700, #DAA520)';
-  if (ovr >= 65) return 'linear-gradient(135deg, #C0C0C0, #A9A9A9)';
-  return 'linear-gradient(135deg, #CD7F32, #B87333)';
-}
 
 function getRarityLabel(ovr: number): string {
   if (ovr >= 85) return '👑 LEGENDARIO';
@@ -392,31 +387,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
         </div>
       );
     }
-    const data = getCardData(card);
-    const gradient = getRarityGradient(data?.overall_rating);
-    return (
-      <div className="fifa-card" onClick={onClick} style={{ background: gradient }}>
-        <div className="card-pattern"></div>
-        <div className="card-header">
-          <span className="card-position-icon">{POSITION_NAMES[slot || 1]?.icon || '⚽'}</span>
-          <span className="card-rating">{data?.overall_rating}</span>
-        </div>
-        <div className="card-body">
-          <div className="card-name">{data?.name || 'Sin nombre'}</div>
-          <div className="card-badge">
-            <span className="badge-level">⭐ NIVEL {card.level}</span>
-          </div>
-        </div>
-        <div className="card-stats">
-          <div className="stat"><span className="stat-label">VEL</span><span className="stat-value">{data?.pace || 0}</span></div>
-          <div className="stat"><span className="stat-label">DEF</span><span className="stat-value">{data?.defending || 0}</span></div>
-          <div className="stat"><span className="stat-label">GOL</span><span className="stat-value">{data?.finishing || 0}</span></div>
-        </div>
-        {onRemove && (
-          <button className="card-remove" onClick={(e) => { e.stopPropagation(); onRemove(); }} title="Quitar jugador">✕</button>
-        )}
-      </div>
-    );
+    return <DeckPlayerCard card={card} slot={slot} onClick={onClick} onRemove={onRemove}/>;
   };
 
   // ===== ONBOARDING =====
