@@ -18,7 +18,7 @@ export function ChallengeSelector({ player, canChallenge, statusNote, onChalleng
         Elegí la modalidad <span>{player.username}</span>
       </h4>
       <div className="lw-games">
-        {CHALLENGE_OPTIONS.map((option) => (
+        {[...CHALLENGE_OPTIONS].sort((a,b)=>Number(b.game==="futsal")-Number(a.game==="futsal")).map((option) => (
           <button
             key={option.game}
             type="button"

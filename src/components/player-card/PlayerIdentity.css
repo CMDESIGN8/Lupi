@@ -9,3 +9,10 @@
 @media(prefers-reduced-motion:reduce){.lw-scene *{transition:none!important}}
 
 @media(min-width:861px){.lw-scene .lw-stage{--lw-feet:32%}.lw-scene .lw-plate__name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+
+/* Featured game comes first in DOM and visual order; no orphaned half row. */
+.lw-scene .lw-games{grid-auto-rows:auto;align-content:start}
+.lw-scene .lw-game{min-height:105px}
+.lw-scene .lw-game[data-game=futsal]{min-height:135px}
+@media(min-width:861px){.lw-scene .lw-game[data-game=truco]{grid-column:1/-1;min-height:66px;display:grid;grid-template-columns:30px 1fr;grid-template-areas:'icon title' 'icon desc';align-content:center;gap:3px 10px}.lw-scene .lw-game[data-game=truco] .lw-game__icon{position:static;grid-area:icon;align-self:center}.lw-scene .lw-game[data-game=truco] .lw-game__title{grid-area:title}.lw-scene .lw-game[data-game=truco] .lw-game__desc{grid-area:desc}}
+@media(max-width:860px){.lw-scene .lw-game[data-game=rps]{grid-column:1/-1}.lw-scene .lw-game[data-game=futsal]{min-height:104px}.lw-scene .lw-game{min-height:90px}.lw-scene .lw-game__desc{font-size:10px}.lw-scene .lw-games{gap:9px}}
