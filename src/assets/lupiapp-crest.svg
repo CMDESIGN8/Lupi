@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 190" fill="none">
+<defs><linearGradient id="ink" x1="20" y1="10" x2="145" y2="170" gradientUnits="userSpaceOnUse"><stop stop-color="#12495b"/><stop offset="1" stop-color="#04131e"/></linearGradient><linearGradient id="edge" x1="20" y1="30" x2="140" y2="170" gradientUnits="userSpaceOnUse"><stop stop-color="#70fff0"/><stop offset=".5" stop-color="#28d9ff"/><stop offset="1" stop-color="#147b9f"/></linearGradient></defs>
+<path d="M80 5 150 29v62c0 44-32 73-70 94C42 164 10 135 10 91V29Z" fill="url(#ink)" stroke="url(#edge)" stroke-width="6"/>
+<path d="m80 16 59 21v54c0 35-25 62-59 82-34-20-59-47-59-82V37Z" stroke="#9cfff2" stroke-opacity=".23" stroke-width="2"/>
+<path d="M28 56h104v44H28z" fill="#041925" fill-opacity=".8"/>
+<text x="80" y="87" fill="#efffff" text-anchor="middle" font-family="Arial,sans-serif" font-weight="900" font-size="34" letter-spacing="1">LUPI</text>
+<path d="m87 106-25 30h17l-6 24 27-34H83Z" fill="#ffd43f"/>
+<path d="m80 26 3.5 7.5 8.5 1-6.2 5.7 1.8 8.3-7.6-4.2-7.6 4.2 1.8-8.3-6.2-5.7 8.5-1Z" fill="#ffd43f"/>
+<path d="M32 112h18M110 112h18" stroke="#28d9ff" stroke-width="3"/>
+</svg>

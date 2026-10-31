@@ -23,3 +23,8 @@
 .lw-trophy__description{font-size:10px;color:#b5d1da;line-height:1.45}
 .lw-trophy__date{font-size:8px;color:#76a3b3;margin-top:auto}
 @media(max-width:480px){.lw-scene .lw-trophies{gap:9px}.lw-scene .lw-trophy{padding:15px 8px}.lw-scene .lw-trophy__title{font-size:13px}}
+
+/* Real club mark, with a LupiApp fallback instead of unexplained initials. */
+.lw-scene .lw-crest{display:grid;place-items:center;width:60px;height:70px;min-width:0;padding:0;border:0;border-radius:0;clip-path:none;background:none;box-shadow:none;overflow:visible}
+.lw-scene .lw-crest>img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 8px #0008)}
+@media(max-width:860px){.lw-scene .lw-crest{width:48px;height:57px}}

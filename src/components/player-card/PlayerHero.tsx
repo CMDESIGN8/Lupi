@@ -4,6 +4,7 @@ import type { InventoryItem } from "../../hooks/useAuraInventory";
 import type { LobbyPlayer } from "../../hooks/useLobbyPresence";
 import { POSITION_LABEL, RARITY_LABEL } from "./constants";
 import { useCountUp, usePrefersReducedMotion } from "./hooks";
+import { ClubCrest } from "./ClubCrest";
 import { PlayerAvatar } from "./PlayerAvatar";
 import type { PlayerProfile } from "./types";
 
@@ -19,17 +20,6 @@ type Props = {
   /** Placa de nombre, abajo a la izquierda. */
   plate?: ReactNode;
 };
-
-function crestText(club?: string | null): string {
-  const letters = (club ?? "")
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => word[0])
-    .join("")
-    .slice(0, 3)
-    .toUpperCase();
-  return letters || "LW";
-}
 
 const AVATAR_HEIGHT = 190;
 const AVATAR_WIDTH = 135;
@@ -96,9 +86,7 @@ export function PlayerHero({ player, worn, rarityKey, profile, top, plate, compa
           {profile.position}
         </span>
       )}
-      <div className="lw-crest" aria-hidden="true">
-        {crestText(player.club)}
-      </div>
+      <ClubCrest club={player.club}/>
       <div className="lw-stage__rarity">✦ {worn.length ? RARITY_LABEL[rarityKey].toUpperCase() : "JUGADOR"}</div>
 
       {plate != null && <div className="lw-plate">{plate}</div>}
