@@ -12,3 +12,8 @@
 @media(min-width:901px) and (max-height:760px){.fp-finale{padding:10px 24px 5px}.fp-finale__headline>svg{height:24px;width:24px;margin-top:4px}.fp-finale__headline h3{font-size:48px;margin:2px 0 5px}.fp-finale__headline>span{font-size:8px}.fp-finale__player .arena-avatar{height:178px}.fp-finale__player .arena-avatar__rig{top:-51px;transform:translateX(-50%) scale(.45)}.fp-finale__score b{font-size:65px}.fp-finale__score{padding:10px}.fp-finale__player strong{font-size:18px}.fp-finale__bottom{margin:10px auto 8px}.fp-finale__bottom .fp-primary{min-height:42px}.fp-finale__stats summary{padding:9px}.fp-arena--result .trivia-header{margin-bottom:4px}.fp-arena--result .trivia-summary summary{padding-block:8px;min-height:34px}}
 @media(max-width:600px){.fp-finale__player .arena-avatar{height:163px}.fp-finale__player .arena-avatar__rig{top:-39px}.fp-finale__headline h3{font-size:40px}.fp-finale__stage{margin-top:16px}.fp-finale__bottom{margin-top:17px}.fp-finale__player:before{bottom:28px;left:4%;right:4%}.fp-finale__bottom .fp-primary{min-height:46px}.fp-finale__headline>span{font-size:6px}}
 @media(prefers-reduced-motion:reduce){.fp-finale__player.is-winner:after{animation:none}}
+
+/* Mobile briefing: go straight from the club scene to the real starting deck. */
+@media (max-width:700px) {
+  .fp-arena--waiting .fp-briefing > .fp-scenario-schedule { display:none; }
+}
