@@ -5,10 +5,11 @@ import type { ChallengeGame } from "../../hooks/useLobbyChallenges";
 import type { ReportReason } from "../../hooks/useLobbyModeration";
 import type { LupiAttributes, PlayerPosition } from "./types";
 
-export const SLOT_ORDER: ItemSlot[] = ["top", "bottom", "boots", "accessory"];
+export const SLOT_ORDER: ItemSlot[] = ["top", "bottom", "socks", "boots", "accessory"];
 export const SLOT_LABEL: Record<string, string> = {
   top: "Remera",
   bottom: "Short",
+  socks: "Medias",
   boots: "Botines",
   accessory: "Accesorio",
 };
@@ -69,7 +70,7 @@ export const CHALLENGE_OPTIONS: {
   available: boolean;
 }[] = [
   { game: "rps", icon: "✊", title: "Piedra, papel o tijera", description: "Duelo por rondas", available: true },
-  { game: "futsal", icon: "⚽", title: "Futsal", description: "Ataque y defensa · Duelo PvP amistoso", available: true },
+  { game: "futsal", icon: "⚽", title: "Futsal", description: "Duelo relámpago · 3 ataques · Decisiones secretas", available: true },
   { game: "trivia", icon: "🧠", title: "Preguntados", description: "Trivia de fútbol · 5 preguntas PvP", available: true },
   { game: "truco", icon: "🃏", title: "Truco", description: "Próximamente", available: false },
 ];

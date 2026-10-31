@@ -18,6 +18,7 @@ import type { PlayerCardTab, PlayerCompetitiveStats, PlayerProfile } from "./pla
 import { XpBar } from "./player-card/XpBar";
 import "./player-card/challenge-toasts.css";
 import "./player-card/player-card.css";
+import "./player-card/PlayerIdentity.css";
 
 export type PlayerCardProps = {
   /** Jugador seleccionado; null = pantalla cerrada. */
@@ -185,6 +186,7 @@ function PlayerCardView({
         }
         plate={
           <>
+            <span className="lw-plate__chapter">FICHA DE JUGADOR <b>NIVEL {player.level}</b></span>
             <h3 className="lw-plate__name">{player.username}</h3>
             <p className="lw-plate__club">{player.club || "Jugador de Lupi World"}</p>
             <div className="lw-chips">

@@ -13,7 +13,7 @@ export function LockerPanel({ worn, isMe, onOpenLocker }: Props) {
   return (
     <>
       <h4 className="lw-heading">
-        Equipamiento <span>{worn.length}/4</span>
+        Equipamiento <span>{worn.length}/{SLOT_ORDER.length}</span>
       </h4>
       <div className="lw-slots">
         {SLOT_ORDER.map((slot) => {

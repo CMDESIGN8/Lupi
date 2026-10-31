@@ -49,7 +49,7 @@ export function PlayerHero({ player, worn, rarityKey, profile, top, plate, compa
     const apply = () => {
       const height = el.clientHeight;
       const width = el.clientWidth;
-      const share = width < 600 ? 0.58 : 0.66;
+      const share = width < 600 ? 0.58 : 0.52;
       const scale = Math.max(0.5, Math.min(2.7, (height * share) / AVATAR_HEIGHT, (width * 0.5) / AVATAR_WIDTH));
       el.style.setProperty("--lw-h", `${height}px`);
       el.style.setProperty("--lw-avatar-s", scale.toFixed(3));

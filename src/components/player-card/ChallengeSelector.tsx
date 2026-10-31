@@ -23,6 +23,7 @@ export function ChallengeSelector({ player, canChallenge, statusNote, onChalleng
             key={option.game}
             type="button"
             className="lw-game"
+            data-game={option.game}
             disabled={!canChallenge || !option.available || !onChallengeGame}
             onClick={() => onChallengeGame?.(player, option.game)}
           >
