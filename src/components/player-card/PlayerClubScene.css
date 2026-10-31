@@ -11,3 +11,15 @@
 @keyframes club-panel-reveal{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}@keyframes club-kit-reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @media(max-width:860px){.lw-scene .lw-scene__bg{background:linear-gradient(0deg,#02131bf5 0%,#02131baa 35%,#02131b22 75%),url('../../assets/futsal-club-entry.webp') center 52%/cover}.lw-scene .lw-menu{background:linear-gradient(0deg,#03162099,transparent);padding:10px 14px max(10px,env(safe-area-inset-bottom,0px));gap:9px}.lw-club-chapter{font-size:6px}.lw-club-chapter>b{font-size:6px}.lw-scene .lw-tabs{gap:6px}.lw-scene .lw-tab{min-height:62px;gap:5px;font-size:10px}.lw-scene .lw-tab>svg{width:22px;height:22px}.lw-scene .lw-player-passport{padding:14px 4px;min-height:240px}.lw-scene .lw-player-passport__identity h4{font-size:31px}.lw-scene .lw-player-passport__identity{margin:20px 0}.lw-scene .lw-player-passport__facts strong{font-size:18px}.lw-scene .lw-player-passport__identity>svg{height:43px;width:43px}.lw-scene .lw-slots{gap:13px 8px;padding-top:0}.lw-scene .lw-slot__frame{height:108px;padding:6px 5px 18px}.lw-scene .lw-slot__name{font-size:8px}.lw-scene .lw-trophy-empty{min-height:245px;padding:12px 5px}.lw-scene .lw-trophy-empty__podium{height:125px}.lw-scene .lw-trophy-empty__podium>svg{width:75px;height:75px}.lw-scene .lw-trophy-empty h4{font-size:24px}.lw-scene .lw-plate{padding:10px;}}
 @media(prefers-reduced-motion:reduce){.lw-scene .lw-panel,.lw-scene .lw-slot{animation:none}}
+
+/* Bound the image itself; intrinsic sprite size must not enlarge its grid track. */
+.lw-scene .lw-slot__frame{display:block;box-sizing:border-box;overflow:visible;min-height:0;min-width:0;padding:0}
+.lw-scene .lw-slot__frame img{position:absolute;inset:8px 8px 24px;width:calc(100% - 16px);height:calc(100% - 32px);max-width:none;max-height:none;object-fit:contain;object-position:center;display:block}
+.lw-scene .lw-slot__frame>span{position:absolute;inset:0 0 20px;display:grid;place-items:center}
+.lw-scene .lw-trophies{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;padding:8px 0 22px;list-style:none}
+.lw-scene .lw-trophy{padding:20px 12px 15px;min-height:150px;text-align:center;display:flex;align-items:center;flex-direction:column;gap:9px;background:radial-gradient(ellipse at top,#ffdc5112,transparent 75%);border-bottom:1px solid #ffdc5166}
+.lw-scene .lw-trophy__icon{font-size:37px;filter:drop-shadow(0 4px 12px #ffdc5133)}
+.lw-scene .lw-trophy__title{color:#ffdf82;font-size:15px;line-height:1.2}
+.lw-trophy__description{font-size:10px;color:#b5d1da;line-height:1.45}
+.lw-trophy__date{font-size:8px;color:#76a3b3;margin-top:auto}
+@media(max-width:480px){.lw-scene .lw-trophies{gap:9px}.lw-scene .lw-trophy{padding:15px 8px}.lw-scene .lw-trophy__title{font-size:13px}}
