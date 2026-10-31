@@ -24,39 +24,60 @@ export function useFutsalPvp(challenge: Challenge) {
   const lock = useRef(false);
   const generation = useRef(0);
   const actionLock = useRef(false);
-  const pollDone = useRef<Promise<void> | null>(null);
+  const actionRevision = useRef(0);
+  const refreshSoon = useRef<(() => void) | null>(null);
+  const changedChannel = useRef<ReturnType<typeof supabase.channel> | null>(null);
   useEffect(() => {
     const token = ++generation.current;
     let disposed = false;
     let timer: ReturnType<typeof setTimeout>;
-    lock.current = false; actionLock.current = false; pollDone.current = null; actionError.current = false; current.current = null; setState(null); setError(""); setBusy(false);
+    lock.current = false; actionLock.current = false; actionRevision.current++; actionError.current = false; current.current = null; setState(null); setError(""); setBusy(false);
+    let refreshPending=false;
+    let failures=0;
+    const schedule = (ms:number) => {clearTimeout(timer);timer=setTimeout(()=>void poll(),ms);};
+    const wake = () => {
+      if(disposed || (current.current && !["waiting","playing"].includes(current.current.status)))return;
+      if(lock.current || actionLock.current){refreshPending=true;return;}
+      schedule(120);
+    };
+    refreshSoon.current=wake;
     const poll = async () => {
       if (disposed) return;
-      if (lock.current || actionLock.current) { timer = setTimeout(() => void poll(), 900); return; }
+      if (lock.current || actionLock.current) { refreshPending=true; return; }
       lock.current = true;
-      let releasePoll!: () => void;
-      const pending = new Promise<void>(resolve => { releasePoll = resolve; });
-      pollDone.current = pending;
+      const revision=actionRevision.current;
       try {
         const { data, error: e } = await supabase.rpc(current.current ? "futsal_state" : "futsal_open", current.current
           ? { p_id: challenge.id }
           : { p_id: challenge.id, p_host: challenge.fromId, p_guest: challenge.toId });
-        if (disposed) return;
+        if (disposed || revision!==actionRevision.current) return;
         if (e) throw e;
+        failures=0;
         current.current = data as FutsalState; setState(current.current); setReceivedAt(Date.now());
         if (!actionError.current) setError("");
-      } catch (e) { if (!disposed) setError(String((e as { message?: string })?.message || "No se pudo conectar con la cancha.")); }
+      } catch (e) { if (!disposed && revision===actionRevision.current) {failures++;setError(String((e as { message?: string })?.message || "No se pudo conectar con la cancha."));} }
       finally {
-        releasePoll();
-        if (pollDone.current === pending) pollDone.current = null;
         if (!disposed) {
           lock.current = false;
-          if (!current.current || ["waiting", "playing"].includes(current.current.status)) timer = setTimeout(() => void poll(), 900);
+          if (!current.current || ["waiting", "playing"].includes(current.current.status)) {
+            const waiting=current.current?.status==='waiting';
+            const deadline=current.current?Date.parse(current.current.deadline)-Date.parse(current.current.serverNow):Infinity;
+            schedule(failures?Math.min(10000,1500*2**Math.min(failures,3)):refreshPending?120:Math.min(waiting?1800:1500,Math.max(150,deadline+60)));
+            refreshPending=false;
+          }
         }
       }
     };
+    // Broadcast is a wake-up hint only. Every state/result still comes from an authenticated RPC.
+    // No choices or scores are transmitted on this channel; polling remains the fallback.
+    let channel:ReturnType<typeof supabase.channel>|null=null;
+    if(typeof supabase.channel==='function'){
+      channel=supabase.channel(`futsal-wake:${challenge.id}`,{config:{broadcast:{self:false}}});
+      changedChannel.current=channel;
+      channel.on('broadcast',{event:'changed'},wake).subscribe(status=>{if(status==='SUBSCRIBED')wake();});
+    }
     void poll();
-    return () => { disposed = true; clearTimeout(timer); if (generation.current === token) generation.current++; };
+    return () => { disposed = true; if(refreshSoon.current===wake)refreshSoon.current=null; if(changedChannel.current===channel)changedChannel.current=null; if(channel)void supabase.removeChannel(channel).catch(()=>{}); clearTimeout(timer); if (generation.current === token) generation.current++; };
   }, [challenge.id, challenge.fromId, challenge.toId, retry]);
   // Best effort on browser close/navigation. Visibility changes alone do not abandon.
   useEffect(() => {
@@ -80,15 +101,9 @@ export function useFutsalPvp(challenge: Challenge) {
     if (actionLock.current || !current.current) return false;
     const token = generation.current;
     const version = current.current.version;
-    actionLock.current = true; actionError.current = false; setBusy(true); setError("");
+    actionLock.current = true; actionRevision.current++; actionError.current = false; setBusy(true); setError("");
     try {
-      // Keep the first tap while a background poll is running; do not discard it.
-      await pollDone.current;
-      if (generation.current !== token) return false;
-      if (name === "futsal_play" && current.current.version !== version) {
-        if (current.current.history.some(event => event.version === version)) return true;
-        throw new Error("La jugada cambió. Elegí para la situación actual.");
-      }
+      // Send immediately. An older background response is ignored by its revision.
       if (name === "futsal_play" && current.current.mineSubmitted) return true;
       const { data, error: e } = await supabase.rpc(name, name === "futsal_play"
         ? { p_id: challenge.id, p_version: version, p_choice: choice }
@@ -96,11 +111,13 @@ export function useFutsalPvp(challenge: Challenge) {
       if (generation.current !== token) return false;
       if (e) throw e;
       current.current = data as FutsalState; setState(current.current); setReceivedAt(Date.now());
+      const channel=changedChannel.current;
+      if(channel)void channel.send({type:'broadcast',event:'changed',payload:{}}).catch(()=>{});
       return true;
     } catch (e) {
       if (generation.current === token) { actionError.current = true; setError(String((e as { message?: string })?.message || "No se pudo guardar tu decisión. Reintentá.")); }
       return false;
-    } finally { if (generation.current === token) { actionLock.current = false; setBusy(false); } }
+    } finally { if (generation.current === token) { actionLock.current = false; setBusy(false); refreshSoon.current?.(); } }
   };
   return { state, receivedAt, error, busy, join: () => action("futsal_join"), play: (choice: FutsalChoice) => action("futsal_play", choice), leave: () => action("futsal_leave"), reconnect: () => setRetry(n => n + 1) };
 }

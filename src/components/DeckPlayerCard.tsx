@@ -1,8 +1,9 @@
+import { memo } from 'react';
 import type { UserCard } from '../types/cards';
 import './DeckPlayerCard.css';
 const slots:Record<number,string>={1:'🧤',2:'🛡️',3:'⚡',4:'⚡',5:'🎯'};
 /** Same owned-card presentation in the deck builder and in the PvP arena. */
-export function DeckPlayerCard({card,slot,onClick,onRemove}:{card:UserCard;slot?:number;onClick?:()=>void;onRemove?:()=>void}){
+export const DeckPlayerCard = memo(function DeckPlayerCard({card,slot,onClick,onRemove}:{card:UserCard;slot?:number;onClick?:()=>void;onRemove?:()=>void}){
  const data=card.card ?? (card as UserCard & {player?:UserCard['card']}).player;
  const rating=data?.overall_rating ?? 0;
  const background=rating>=85?'linear-gradient(135deg,#9B59B6,#7D3C98)':rating>=75?'linear-gradient(135deg,#FFD700,#DAA520)':rating>=65?'linear-gradient(135deg,#C0C0C0,#A9A9A9)':'linear-gradient(135deg,#CD7F32,#B87333)';
@@ -13,4 +14,4 @@ export function DeckPlayerCard({card,slot,onClick,onRemove}:{card:UserCard;slot?
   <div className="deck-player-card__stats">{[['VEL',data?.pace],['DEF',data?.defending],['GOL',data?.finishing]].map(([label,value])=><span key={String(label)}><small>{label}</small><b>{value??0}</b></span>)}</div>
   {onRemove&&<button type="button" className="deck-player-card__remove" onClick={e=>{e.stopPropagation();onRemove();}} aria-label={`Quitar a ${data?.name??'jugador'}`}>✕</button>}
  </div>;
-}
+});

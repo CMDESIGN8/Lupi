@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { memo, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { DEFAULT_APPEARANCE, HAIR_COLORS, HAIRS, type AvatarAppearance } from '../lib/avatarAppearance';
 import { getHairFit, HAIR_FIT_EVENT, type HairFit } from './hairFit';
 import './AvatarFace.css';
@@ -50,7 +50,7 @@ function HairTexture({ hair, color }: { hair: string; color: string }) {
   return <div className="lw-face__hair"><canvas ref={canvasRef} className="lw-face__hair-canvas" aria-hidden="true" /></div>;
 }
 
-export function AvatarFace({ appearance=DEFAULT_APPEARANCE, className='' }: { appearance?:AvatarAppearance; className?:string }) {
+export const AvatarFace = memo(function AvatarFace({ appearance=DEFAULT_APPEARANCE, className='' }: { appearance?:AvatarAppearance; className?:string }) {
   const hair=HAIRS.includes(appearance.hair as typeof HAIRS[number])?appearance.hair:DEFAULT_APPEARANCE.hair;
   const color=HAIR_COLORS.includes(appearance.hairColor)?appearance.hairColor:DEFAULT_APPEARANCE.hairColor;
   const [fit,setFit]=useState<HairFit>(()=>getHairFit(hair));
@@ -75,4 +75,4 @@ export function AvatarFace({ appearance=DEFAULT_APPEARANCE, className='' }: { ap
     <div className="lw-face__eyes"><i/><i/></div><span className="lw-face__nose"/>
     <div className={`lw-face__mouth lw-face__mouth--${appearance.expression}`}/>
   </div>;
-}
+});

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArenaSymbol } from "./match/ArenaSymbol";
+import { ClubArrival } from "./match/ClubArrival";
 import { DeckPlayerCard } from "./DeckPlayerCard";
 import { AvatarFace } from "./AvatarFace";
 import type { LobbyPlayer } from "../hooks/useLobbyPresence";
@@ -12,6 +13,7 @@ import "./TriviaDuel.css";
 import "./FutsalPvp.css";
 import "./FutsalArenaPresentation.css";
 import "./FutsalResultCinema.css";
+import "./FutsalClub.css";
 import { PvpSimulatorCourt } from "./match/PvpSimulatorCourt";
 type Props = { challenge: Challenge; meId: string; deck: Deck; players?: LobbyPlayer[]; onExit: () => void };
 export function FutsalPvp({ challenge, meId, deck, players = [], onExit }: Props) {
@@ -23,8 +25,17 @@ export function FutsalPvp({ challenge, meId, deck, players = [], onExit }: Props
   const sendingChoice = useRef(false);
   const lastTouch = useRef(0);
   const [selected, setSelected] = useState<{ version: number; choice: FutsalChoice } | null>(null);
-  useEffect(() => { const id = window.setInterval(() => setNow(Date.now()), 250); return () => window.clearInterval(id); }, []);
-  const ownedCards = [...deck.cards].sort((a,b) => (a.position ?? 0)-(b.position ?? 0));
+  useEffect(() => {
+    setNow(Date.now());
+    if(state && !['waiting','playing'].includes(state.status)){
+      const delay=Math.max(0,Date.parse(state.nextAt)-Date.parse(state.serverNow)-(Date.now()-receivedAt));
+      if(!delay)return;
+      const id=window.setTimeout(()=>setNow(Date.now()),delay+20);return()=>window.clearTimeout(id);
+    }
+    const id=window.setInterval(()=>setNow(Date.now()),state?.status==='playing'?250:1000);
+    return()=>window.clearInterval(id);
+  },[state?.status,state?.nextAt,receivedAt]);
+  const ownedCards = useMemo(()=>[...deck.cards].sort((a,b) => (a.position ?? 0)-(b.position ?? 0)),[deck.cards]);
   const renderCard = (userCard: Deck["cards"][number]) => <DeckPlayerCard card={userCard} slot={userCard.position}/>;
   const host = meId === challenge.fromId;
   const mine = host ? challenge.fromName : challenge.toName;
@@ -80,11 +91,11 @@ export function FutsalPvp({ challenge, meId, deck, players = [], onExit }: Props
     {!live && !ended && (<div className="trivia-score fp-score">{scoreSide(meId,mine,state ? host ? state.hostScore : state.guestScore : 0,true)}<span className="fp-score-mid"><small>AMISTOSO</small>VS<small>{totalAttacks} ATAQUES</small></span>{scoreSide(host?challenge.toId:challenge.fromId,rival,state ? host ? state.guestScore : state.hostScore : 0,false)}</div>)}
     {error && <div className="trivia-error" role="alert"><p>{error}</p><button type="button" disabled={busy} onClick={reconnect}>Reconectar</button></div>}
     {!state && <p role="status">Conectando con la cancha…</p>}
-    {state?.status === "waiting" && <div className="fp-briefing"><div className="fp-prebattle-label"><span>ARENA SOCIAL</span><b>FUTSAL · 1 VS 1</b></div><div className="fp-briefing-versus"><div data-ready={ready}>{portrait(meId,mine)}<strong>{mine}</strong><small>{ready ? "✓ LISTO PARA JUGAR" : "TU EQUIPO"}</small></div><b>VS</b><div data-ready={host?state.guestReady:state.hostReady}>{portrait(host?challenge.toId:challenge.fromId,rival)}<strong>{rival}</strong><small>RIVAL</small></div></div><span className="fp-kicker">ANTES DEL SILBATAZO</span><h3>LA CANCHA TE ESPERA</h3><div className="fp-match-rules"><span><b>{totalAttacks}</b> ATAQUES</span><span><b>{decisionSeconds}s</b> POR ELECCIÓN</span><span>DECISIONES <b>SECRETAS</b></span></div>{!quick && <p>Cuando atacás, elegís cómo definir. Cuando defendés, elegís qué jugada cubrir. Las respuestas se revelan al mismo tiempo.</p>}
+    {state?.status === "waiting" && <div className="fp-briefing"><div className="fp-prebattle-label"><span>ARENA SOCIAL</span><b>FUTSAL · 1 VS 1</b></div><ClubArrival mine={mine} rival={rival} ownFace={portrait(meId,mine)} rivalFace={portrait(host?challenge.toId:challenge.fromId,rival)} ownReady={ready} rivalReady={host?state.guestReady:state.hostReady} club={players.find(p=>p.userId===meId)?.club || 'CLUB LUPI'}/><span className="fp-kicker">ANTES DEL SILBATAZO</span><h3>EL EQUIPO ESTÁ LLEGANDO</h3><div className="fp-match-rules"><span><b>{totalAttacks}</b> ATAQUES</span><span><b>{decisionSeconds}s</b> POR ELECCIÓN</span><span>DECISIONES <b>SECRETAS</b></span></div>{!quick && <p>Cuando atacás, elegís cómo definir. Cuando defendés, elegís qué jugada cubrir. Las respuestas se revelan al mismo tiempo.</p>}
       {quick ? <><div className="fp-scenario-schedule">{state.scenarioOrder?.map((scenario,i)=><span key={scenario} data-scenario={scenario}><ArenaSymbol kind={scenario==="counter"?"counter":scenario==="setpiece"?"setpiece":"elaborated"}/><b>0{i+1}</b><strong>{scenarioName(scenario)}</strong><small>{scenario==="elaborated"?"Construcción + definición":"Una decisión"}</small></span>)}</div><p className="fp-quick-instruction">Leé al rival. Elegí tu jugada. Hacé la diferencia.</p></> : (state.rulesVersion ?? 1) >= 2 ? <><div className="fp-briefing-steps"><span><b>01</b><strong>CONSTRUÍ</strong><small>Desborde, pared o pase al pívot.</small></span><span><b>02</b><strong>DEFINÍ</strong><small>Tres opciones según cómo llegaste.</small></span></div><p>Ambos eligen en secreto. Si la defensa acierta en construcción, recupera; si la superás, llegás a definir. En la definición, acertar frena el tiro y otra cobertura concede el gol.</p><p>5 ataques por jugador · Hasta 2 decisiones por ataque · {decisionSeconds} segundos para elegir. Si no respondés, se elige automáticamente.</p></> : <p>Partida con reglas anteriores: tiro al ángulo, remate fuerte o pase atrás.</p>}
       <details className="fp-briefing-help"><summary>CÓMO SE JUEGA <b>⌄</b></summary><p>Ambos eligen en secreto. Acertar la cobertura frena la jugada; otra cobertura permite avanzar o marcar. Tenés {decisionSeconds} segundos por elección y, si no respondés, se elige automáticamente. Confirmá cinco cartas propias y distintas. El mazo se fija al confirmar; las estadísticas todavía no cambian los cruces. Las opciones indican qué defensa las frena.</p></details>
       <div className="fp-lineup-heading"><span>TUS TITULARES</span><small>Tu mazo activo · Cinco cartas, un equipo</small></div><div className="fp-real-roster">{ownedCards.map(c => <div className="fp-lineup-card" key={c.id} style={{"--slot":c.position ?? 1} as React.CSSProperties}><div className="fp-card-display">{renderCard(c)}</div><strong className="fp-lineup-name">{c.card?.name ?? "Jugador"}</strong><span>{c.position === 1 ? "ARQUERO" : c.position === 2 ? "CIERRE" : c.position === 5 ? "PÍVOT" : "ALA"}</span></div>)}</div>
-      <div className="trivia-actions"><button type="button" className="fp-primary" disabled={busy || ready || !state} onClick={() => void join()}>{ready ? "✓ EQUIPO CONFIRMADO" : busy ? "VALIDANDO EQUIPO…" : "⚡ SALIR A LA CANCHA"}</button></div>
+      <div className="trivia-actions"><button type="button" className="fp-primary" disabled={busy || ready || !state} onClick={() => void join()}>{ready ? "✓ EQUIPO CONFIRMADO" : busy ? "VALIDANDO EQUIPO…" : "CONFIRMAR Y ENTRAR A LA CANCHA"}</button></div>
       <p role="status">{ready ? "Esperando que el rival confirme su equipo…" : "Confirmá tu equipo para empezar."} · {remaining}s</p>
     </div>}
     {state && live && <div className={`fp-broadcast ${showDecision ? "is-deciding" : ""}`}><div className="fp-mobile-score" aria-label="Marcador en vivo"><span className="fp-mobile-team">{portrait(meId,mine)}<strong>{mine}</strong></span><b key={`m-${state.hostScore}-${state.guestScore}`}>{host ? state.hostScore : state.guestScore}<i>:</i>{host ? state.guestScore : state.hostScore}</b><span className="fp-mobile-team fp-mobile-team--rival">{portrait(host?challenge.toId:challenge.fromId,rival)}<strong>{rival}</strong></span><small>{attacking ? "ATACÁS" : "DEFENDÉS"} · {isBuild ? "CONSTRUCCIÓN" : isFinish ? "DEFINICIÓN" : "ATAQUE"} {Math.min(totalAttacks,Math.ceil(state.turn/2))}/{totalAttacks}</small></div>
