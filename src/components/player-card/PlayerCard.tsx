@@ -240,7 +240,7 @@ function PlayerCardView({
           ) : tab === "vestuario" ? (
             <LockerPanel worn={worn} isMe={isMe} onOpenLocker={onOpenLocker} />
           ) : tab === "vitrina" ? (
-            <TrophyCase achievements={competitiveStats?.achievements} />
+            <TrophyCase userId={player.userId} achievements={competitiveStats?.achievements} />
           ) : (
             <ChallengeSelector
               player={player}
