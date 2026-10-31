@@ -3,9 +3,9 @@ import { supabase } from "../lib/supabaseClient";
 import type { Challenge } from "./useLobbyChallenges";
 export type FutsalChoice = "angle" | "power" | "back";
 export type FutsalTeamCard = { id: string; position: number; name: string; role: string };
-export type FutsalEvent = { rulesVersion?: number; stage?: "build" | "finish"; route?: string | null; hostAuto?: boolean; guestAuto?: boolean; version: number; turn: number; attackerId: string; attack: FutsalChoice; defense: FutsalChoice; defended: boolean; goal: boolean; support: boolean; keepAttack: boolean; narrative: string };
+export type FutsalEvent = { scenario?: string | null; scenarioOrder?: string[]; totalAttacks?: number; decisionSeconds?: number; resolutionMs?: number; rulesVersion?: number; stage?: "build" | "finish"; route?: string | null; hostAuto?: boolean; guestAuto?: boolean; version: number; turn: number; attackerId: string; attack: FutsalChoice; defense: FutsalChoice; defended: boolean; goal: boolean; support: boolean; keepAttack: boolean; narrative: string };
 export type FutsalState = {
-  rulesVersion?: number; stage?: "build" | "finish"; route?: string | null;
+  scenario?: string | null; scenarioOrder?: string[]; totalAttacks?: number; decisionSeconds?: number; resolutionMs?: number; rulesVersion?: number; stage?: "build" | "finish"; route?: string | null;
   id: string; status: "waiting" | "playing" | "finished" | "expired" | "abandoned" | "cancelled";
   turn: number; version: number; support: boolean; attackerId: string;
   hostScore: number; guestScore: number; hostReady: boolean; guestReady: boolean;

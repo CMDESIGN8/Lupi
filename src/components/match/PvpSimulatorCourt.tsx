@@ -13,7 +13,8 @@ export function PvpSimulatorCourt({state,meId,mine,rival,now,receivedAt,isHost,o
   const event=state.history[state.history.length - 1];
   const serverNow=Date.parse(state.serverNow)+Math.max(0,now-receivedAt);
   const next=Date.parse(state.nextAt);
-  const revealAge=event && serverNow<next?Math.max(0,4000-(next-serverNow)):null;
+  const resolutionMs=state.resolutionMs ?? 4000;
+  const revealAge=event && serverNow<next?Math.max(0,resolutionMs-(next-serverNow)):null;
   const ended=!["waiting","playing"].includes(state.status) && revealAge===null;
   const a=isHost?state.hostTeam:state.guestTeam;
   const b=isHost?state.guestTeam:state.hostTeam;
@@ -22,13 +23,13 @@ export function PvpSimulatorCourt({state,meId,mine,rival,now,receivedAt,isHost,o
     if(!event || seen.current===event.version) return;
     seen.current=event.version;
     if(window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    const age=4000-(Date.parse(state.nextAt)-Date.parse(state.serverNow));
-    if(age<0 || age>=4000)return;
+    const age=resolutionMs-(Date.parse(state.nextAt)-Date.parse(state.serverNow));
+    if(age<0 || age>=resolutionMs)return;
     const timer=window.setTimeout(()=>{
       if(event.goal)fx.current?.triggerGoal(event.attackerId===meId?"user":"rival");
       else if(event.defended && event.stage!=="build")fx.current?.triggerSave(event.attackerId===meId?"rival":"user");
       else fx.current?.triggerKeyMoment();
-    },Math.max(0,850-age));
+    },Math.max(0,(state.rulesVersion===3?500:850)-age));
     return ()=>window.clearTimeout(timer);
   },[event?.version,meId]);
   return <div className="pvp-simulator-stage">
