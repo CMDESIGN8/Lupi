@@ -13,7 +13,7 @@ export function LockerPanel({ worn, isMe, onOpenLocker }: Props) {
   return (
     <>
       <h4 className="lw-heading">
-        Equipamiento <span>{worn.length}/{SLOT_ORDER.length}</span>
+        LISTO PARA SALIR <span>{worn.length}/{SLOT_ORDER.length}</span>
       </h4>
       <div className="lw-slots">
         {SLOT_ORDER.map((slot) => {
@@ -28,10 +28,10 @@ export function LockerPanel({ worn, isMe, onOpenLocker }: Props) {
               style={{ "--slot-rarity": RARITY_COLOR[item?.rarity ?? "common"] } as CSSProperties}
             >
               <div className="lw-slot__frame">
-                {src ? <img src={src} alt="" draggable={false} /> : <span aria-hidden="true">{item?.icon || "＋"}</span>}
+                {src ? <img src={src} alt="" draggable={false} /> : <span aria-hidden="true">{item?.icon || "—"}</span>}
               </div>
               <span className="lw-slot__label">{SLOT_LABEL[slot]}</span>
-              <span className="lw-slot__name">{item?.name ?? "Vacío"}</span>
+              <span className="lw-slot__name">{item?.name ?? "Sin equipar"}</span>
             </div>
           );
         })}

@@ -2,6 +2,8 @@
 import type { CSSProperties } from "react";
 import type { LobbyPlayer } from "../../hooks/useLobbyPresence";
 import { AttributeRadar } from "./AttributeRadar";
+import { ArenaSymbol } from "../match/ArenaSymbol";
+import { ACTIVITY_LABEL } from "./constants";
 import { ATTRIBUTE_META } from "./constants";
 import { DailyMission } from "./DailyMission";
 import type { PlayerCompetitiveStats, PlayerProfile } from "./types";
@@ -48,16 +50,21 @@ export function ProfilePanel({ player, profile, stats, showDailyMission }: Props
           </ul>
         </section>
       ) : (
-        <p className="lw-note">Todavía no hay atributos públicos disponibles.</p>
+        <section className="lw-player-passport" aria-label="Identidad pública del jugador">
+          <span className="lw-player-passport__kicker">EL JUGADOR DETRÁS DEL EQUIPO</span>
+          <div className="lw-player-passport__identity"><ArenaSymbol kind="shield"/><div><h4>{player.username}</h4><p>{player.club || "Lupi World"}</p></div><b>NIVEL {player.level}</b></div>
+          <div className="lw-player-passport__facts"><span><small>ESTADO</small><strong>{ACTIVITY_LABEL[player.activity]}</strong></span><span><small>VESTUARIO ACTUAL</small><strong>{Object.values(player.look).filter(Boolean).length} equipables</strong></span></div>
+          <p className="lw-player-passport__note">La identidad se construye dentro y fuera de la cancha.</p>
+        </section>
       )}
-      <dl className="lw-stats">
+      {(profile || entries.length > 1) && <dl className="lw-stats">
         {entries.map((entry) => (
           <div key={entry.label}>
             <dt>{entry.label}</dt>
             <dd>{entry.value}</dd>
           </div>
         ))}
-      </dl>
+      </dl>}
     </>
   );
 }

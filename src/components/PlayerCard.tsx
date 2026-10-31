@@ -15,10 +15,12 @@ import { ProfilePanel } from "./player-card/ProfilePanel";
 import { mockProfileFor } from "./player-card/profile-utils";
 import { TrophyCase } from "./player-card/TrophyCase";
 import type { PlayerCardTab, PlayerCompetitiveStats, PlayerProfile } from "./player-card/types";
+import { ArenaSymbol } from "./match/ArenaSymbol";
 import { XpBar } from "./player-card/XpBar";
 import "./player-card/challenge-toasts.css";
 import "./player-card/player-card.css";
 import "./player-card/PlayerIdentity.css";
+import "./player-card/PlayerClubScene.css";
 
 export type PlayerCardProps = {
   /** Jugador seleccionado; null = pantalla cerrada. */
@@ -157,6 +159,7 @@ function PlayerCardView({
   return createPortal(
     <div
       className="lw-scene"
+      data-tab={tab}
       data-rarity={rarityKey}
       data-compact={compact}
       role="dialog"
@@ -222,6 +225,7 @@ function PlayerCardView({
       />
 
       <section className="lw-menu" aria-label="Detalle del jugador">
+        <div className="lw-club-chapter" aria-hidden="true"><span>VESTUARIO · LUPI WORLD</span><b>{tab==="perfil"?"01 / IDENTIDAD":tab==="vestuario"?"02 / EQUIPAMIENTO":tab==="vitrina"?"03 / RECONOCIMIENTOS":"04 / ELEGÍ TU DUELO"}</b></div>
         <svg className="lw-menu__edge" viewBox="0 0 46 100" preserveAspectRatio="none" aria-hidden="true">
           <line x1="46" y1="0" x2="0" y2="100" />
         </svg>
@@ -244,7 +248,7 @@ function PlayerCardView({
                 setReporting(false);
               }}
             >
-              {entry.label}
+              <ArenaSymbol kind={entry.id==="perfil"?"shield":entry.id==="vestuario"?"setpiece":entry.id==="vitrina"?"trophy":"elaborated"}/><span>{entry.label}</span>
             </button>
           ))}
         </div>
