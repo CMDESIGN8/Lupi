@@ -23,15 +23,20 @@ export function useFutsalPvp(challenge: Challenge) {
   const current = useRef<FutsalState | null>(null);
   const lock = useRef(false);
   const generation = useRef(0);
+  const actionLock = useRef(false);
+  const pollDone = useRef<Promise<void> | null>(null);
   useEffect(() => {
     const token = ++generation.current;
     let disposed = false;
     let timer: ReturnType<typeof setTimeout>;
-    lock.current = false; actionError.current = false; current.current = null; setState(null); setError(""); setBusy(false);
+    lock.current = false; actionLock.current = false; pollDone.current = null; actionError.current = false; current.current = null; setState(null); setError(""); setBusy(false);
     const poll = async () => {
       if (disposed) return;
-      if (lock.current) { timer = setTimeout(() => void poll(), 900); return; }
+      if (lock.current || actionLock.current) { timer = setTimeout(() => void poll(), 900); return; }
       lock.current = true;
+      let releasePoll!: () => void;
+      const pending = new Promise<void>(resolve => { releasePoll = resolve; });
+      pollDone.current = pending;
       try {
         const { data, error: e } = await supabase.rpc(current.current ? "futsal_state" : "futsal_open", current.current
           ? { p_id: challenge.id }
@@ -42,6 +47,8 @@ export function useFutsalPvp(challenge: Challenge) {
         if (!actionError.current) setError("");
       } catch (e) { if (!disposed) setError(String((e as { message?: string })?.message || "No se pudo conectar con la cancha.")); }
       finally {
+        releasePoll();
+        if (pollDone.current === pending) pollDone.current = null;
         if (!disposed) {
           lock.current = false;
           if (!current.current || ["waiting", "playing"].includes(current.current.status)) timer = setTimeout(() => void poll(), 900);
@@ -70,12 +77,21 @@ export function useFutsalPvp(challenge: Challenge) {
     return () => { disposed = true; listener.subscription.unsubscribe(); window.removeEventListener("pagehide", exitPage); window.removeEventListener("popstate", exitPage); };
   }, [challenge.id]);
   const action = async (name: "futsal_join" | "futsal_play" | "futsal_leave", choice?: FutsalChoice) => {
-    if (lock.current || !current.current) return false;
+    if (actionLock.current || !current.current) return false;
     const token = generation.current;
-    lock.current = true; actionError.current = false; setBusy(true); setError("");
+    const version = current.current.version;
+    actionLock.current = true; actionError.current = false; setBusy(true); setError("");
     try {
+      // Keep the first tap while a background poll is running; do not discard it.
+      await pollDone.current;
+      if (generation.current !== token) return false;
+      if (name === "futsal_play" && current.current.version !== version) {
+        if (current.current.history.some(event => event.version === version)) return true;
+        throw new Error("La jugada cambió. Elegí para la situación actual.");
+      }
+      if (name === "futsal_play" && current.current.mineSubmitted) return true;
       const { data, error: e } = await supabase.rpc(name, name === "futsal_play"
-        ? { p_id: challenge.id, p_version: current.current.version, p_choice: choice }
+        ? { p_id: challenge.id, p_version: version, p_choice: choice }
         : { p_id: challenge.id });
       if (generation.current !== token) return false;
       if (e) throw e;
@@ -84,7 +100,7 @@ export function useFutsalPvp(challenge: Challenge) {
     } catch (e) {
       if (generation.current === token) { actionError.current = true; setError(String((e as { message?: string })?.message || "No se pudo guardar tu decisión. Reintentá.")); }
       return false;
-    } finally { if (generation.current === token) { lock.current = false; setBusy(false); } }
+    } finally { if (generation.current === token) { actionLock.current = false; setBusy(false); } }
   };
   return { state, receivedAt, error, busy, join: () => action("futsal_join"), play: (choice: FutsalChoice) => action("futsal_play", choice), leave: () => action("futsal_leave"), reconnect: () => setRetry(n => n + 1) };
 }
