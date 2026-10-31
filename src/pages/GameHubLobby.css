@@ -4344,3 +4344,45 @@
   .gh-world .gh-locker-zone .locker-slot--just-equipped::after { animation: none; display: none; }
   .gh-world .gh-locker-zone .locker-equipment .locker-slot { transition: none !important; }
 }
+
+/* World Events have their own toast lane, clear of the mission rail. */
+.gh-root .gh-world > .gh-world-event {
+  z-index: 190;
+  background: linear-gradient(135deg,#072a38,#061820);
+  border: 1px solid #28d9ff80;
+  box-shadow: 0 12px 32px #0009, inset 3px 0 #28d9ff;
+  opacity: 1;
+  animation: world-event-in .3s ease-out both, world-event-out .35s ease 5s forwards;
+}
+.gh-root .gh-world > .gh-world-event .gh-world-event__content {min-width:0;}
+.gh-root .gh-world > .gh-world-event .gh-world-event__content strong {
+  white-space:normal;
+  overflow-wrap:anywhere;
+  line-height:1.35;
+  color:#ecfbff;
+}
+@media (max-width:700px) {
+  .gh-root .gh-world > .gh-world-event {
+    position:fixed;
+    top:auto !important;
+    bottom:calc(176px + env(safe-area-inset-bottom,0px));
+    left:50%;
+    right:auto;
+    width:min(340px,calc(100vw - 32px));
+    min-width:0;
+    max-width:calc(100vw - 32px);
+    padding:10px 12px;
+    gap:10px;
+    transform:translateX(-50%);
+    transform-origin:center;
+    box-sizing:border-box;
+    border-radius:12px;
+    backdrop-filter:none;
+  }
+  .gh-root .gh-world > .gh-world-event .gh-world-event__content strong {font-size:12px;}
+  .gh-root .gh-world > .gh-world-event .gh-world-event__label {font-size:9px;letter-spacing:.13em;color:#69eaff;}
+  .gh-root .gh-world > .gh-world-event .gh-world-event__icon {width:30px;height:30px;flex:0 0 30px;font-size:17px;}
+}
+@media (prefers-reduced-motion:reduce) {
+  .gh-root .gh-world > .gh-world-event {animation:world-event-out .01s 5s forwards;}
+}
