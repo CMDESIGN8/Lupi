@@ -40,7 +40,8 @@ export function PlayerHero({ player, worn, rarityKey, profile, top, plate, compa
       const height = el.clientHeight;
       const width = el.clientWidth;
       const share = width < 600 ? 0.58 : 0.52;
-      const scale = Math.max(0.5, Math.min(2.7, (height * share) / AVATAR_HEIGHT, (width * 0.5) / AVATAR_WIDTH));
+      const availableHeight = height * share;
+      const scale = Math.max(0.45, Math.min(2.7, availableHeight / AVATAR_HEIGHT, (width * 0.5) / AVATAR_WIDTH));
       el.style.setProperty("--lw-h", `${height}px`);
       el.style.setProperty("--lw-avatar-s", scale.toFixed(3));
     };
@@ -86,10 +87,9 @@ export function PlayerHero({ player, worn, rarityKey, profile, top, plate, compa
           {profile.position}
         </span>
       )}
-      <ClubCrest club={player.club}/>
       <div className="lw-stage__rarity">✦ {worn.length ? RARITY_LABEL[rarityKey].toUpperCase() : "JUGADOR"}</div>
 
-      {plate != null && <div className="lw-plate">{plate}</div>}
+      {plate != null && <div className="lw-plate"><ClubCrest club={player.club}/><div className="lw-plate__details">{plate}</div></div>}
     </section>
   );
 }

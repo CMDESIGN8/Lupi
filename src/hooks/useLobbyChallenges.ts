@@ -149,6 +149,14 @@ export function useLobbyChallenges({
           return;
         }
 
+        // Two rematch requests crossing in transit resolve to one invitation.
+        const sent = outgoingRef.current;
+        if (sent?.toId === c.fromId && sent.gameType === c.gameType) {
+          if (sent.id < c.id) return;
+          window.clearTimeout(outTimer.current);
+          setOutgoing(null);
+          void channel.send({ type: "broadcast", event: "cancel", payload: { id: sent.id, fromId: meId, toId: sent.toId } });
+        }
         setIncoming(c);
         window.clearTimeout(inTimer.current);
         inTimer.current = window.setTimeout(() => setIncoming(null), INCOMING_TTL);

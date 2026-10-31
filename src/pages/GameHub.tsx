@@ -424,10 +424,17 @@ import { useAchievements } from "../hooks/useAchievements";
   const [activeTrivia, setActiveTrivia] = useState<Challenge | null>(null);
   const [activeRps, setActiveRps] = useState<Challenge | null>(null);
   const [versusChallenge, setVersusChallenge] = useState<Challenge | null>(null);
-  const versusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => {
-    if (versusTimerRef.current) clearTimeout(versusTimerRef.current);
-  }, []);
+  const [duelFinished, setDuelFinished] = useState(false);
+  const [rematchTarget, setRematchTarget] = useState<Challenge | null>(null);
+  const startAcceptedDuel = (c: Challenge) => {
+    setVersusChallenge(null); setGameTab("play"); setView("lobby");
+    if (c.gameType === "rps") setActiveRps(c);
+    if (c.gameType === "trivia") setActiveTrivia(c);
+    if (c.gameType === "futsal") setActiveFutsal(c);
+  };
+  const requestSocialRematch = (c: Challenge) => {
+    setActiveRps(null); setActiveFutsal(null); setDuelFinished(false); setRematchTarget(c);
+  };
 
       const { data: heroData, refetch: refreshHeroData } = useUserHeroData(user.id);
       const [showAchievements, setShowAchievements] = useState(false);
@@ -669,29 +676,22 @@ const {
       room: "global",
       meId: user.id,
       meName: user.username || "Jugador",
-      available: view === "lobby" && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge,
+      available: view === "lobby" && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
       isMuted,
-      onAccepted: (challengeData, role) => {
-        console.log("DUEL ACCEPTED", { challengeData, role });
-        if (versusTimerRef.current) clearTimeout(versusTimerRef.current);
+      onAccepted: (challengeData) => {
+        setActiveRps(null); setActiveTrivia(null); setActiveFutsal(null);
+        setDuelFinished(false); setRematchTarget(null); setChallengeTarget(null);
         setVersusChallenge(challengeData);
-        versusTimerRef.current = setTimeout(() => {
-          setVersusChallenge(null);
-          versusTimerRef.current = null;
-          setGameTab("play");
-          if (challengeData.gameType === "rps") {
-            setView("lobby");
-            setActiveRps(challengeData);
-          } else if (challengeData.gameType === "trivia") {
-            setView("lobby");
-            setActiveTrivia(challengeData);
-          } else if (challengeData.gameType === "futsal") {
-            setView("lobby");
-            setActiveFutsal(challengeData);
-          }
-        }, 2200);
       },
     });
+
+    useEffect(() => {
+      if (!rematchTarget || activeRps || activeFutsal || versusChallenge) return;
+      const c = rematchTarget;
+      const target = c.fromId === user.id ? { userId: c.toId, username: c.toName } : { userId: c.fromId, username: c.fromName };
+      challenge(target, c.botIndex, c.gameType, c.communityId);
+      setRematchTarget(null);
+    }, [rematchTarget, activeRps, activeFutsal, versusChallenge, challenge, user.id]);
 
     const handleLobbyChallenge = (
   target: { userId: string; username: string },
@@ -1574,19 +1574,22 @@ onChallengeGame={(player, game) => {
               void refreshPackCount();
             }}
           />
-          {activeFutsal && <div className="rps-screen-overlay trivia-screen-overlay"><FutsalPvp key={activeFutsal.id} challenge={activeFutsal} meId={user.id} deck={activeDeck} players={lobbyPlayers} catalog={auraItems} onExit={() => setActiveFutsal(null)} /></div>}
+          {activeFutsal && <div className="rps-screen-overlay trivia-screen-overlay"><FutsalPvp key={activeFutsal.id} challenge={activeFutsal} meId={user.id} deck={activeDeck} players={lobbyPlayers} catalog={auraItems} onFinished={setDuelFinished} onRematch={() => requestSocialRematch(activeFutsal)} onExit={() => { setActiveFutsal(null); setDuelFinished(false); }} /></div>}
           {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
           {activeRps && (
-            <div className="rps-screen-overlay">
+            <div className="rps-screen-overlay rps-cinema-screen">
               <RockPaperScissors
                 challenge={activeRps}
+                players={lobbyPlayers}
                 meId={user.id}
-                onExit={() => setActiveRps(null)}
+                onFinished={setDuelFinished}
+                onRematch={() => requestSocialRematch(activeRps)}
+                onExit={() => { setActiveRps(null); setDuelFinished(false); }}
               />
             </div>
           )}
           {versusChallenge && (
-            <DuelVersus challenge={versusChallenge} meId={user.id} players={lobbyPlayers} />
+            <DuelVersus key={versusChallenge.id} onStart={() => startAcceptedDuel(versusChallenge)} onExit={() => setVersusChallenge(null)} challenge={versusChallenge} meId={user.id} players={lobbyPlayers} catalog={auraItems} />
           )}
           {showAchievements && (
   <AchievementsModal

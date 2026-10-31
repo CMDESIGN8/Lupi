@@ -1,5 +1,5 @@
 import floresCrest from '../../assets/flores-club.png';
-import lupiCrest from '../../assets/lupiapp-crest.svg';
+import lupiCrest from '../../assets/lupifc-crest.png';
 
 /** Club identity comes from the player's club, independently of equipped clothing. */
 export function isFloresClub(club?:string|null):boolean {
@@ -8,5 +8,5 @@ export function isFloresClub(club?:string|null):boolean {
 }
 export function ClubCrest({club}:{club?:string|null}) {
  const flores=isFloresClub(club);
- return <div className="lw-crest" title={flores?'Flores Club Futsal':'LupiApp · Escudo predeterminado'}><img src={flores?floresCrest:lupiCrest} alt={flores?'Escudo de Flores Club Futsal':'Escudo de LupiApp, predeterminado'}/></div>;
+ return <div className="lw-crest" title={flores?'Flores Club Futsal':'LupiFC · Escudo provisional del jugador'}><img src={flores?floresCrest:lupiCrest} alt={flores?'Escudo de Flores Club Futsal':'Escudo de LupiFC, provisional'}/><small>{flores?'Flores Futsal':'LupiFC'}</small></div>;
 }

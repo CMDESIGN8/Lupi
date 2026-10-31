@@ -1,4 +1,7 @@
-import { AvatarFace } from "./AvatarFace";
+import { useState } from "react";
+import { useDuelEntrance } from "../hooks/useDuelEntrance";
+import { ArenaAvatar } from "./match/ArenaAvatar";
+import type { InventoryItem } from "../hooks/useAuraInventory";
 import type { LobbyPlayer } from "../hooks/useLobbyPresence";
 import type { Challenge } from "../hooks/useLobbyChallenges";
 import "./DuelVersus.css";
@@ -7,20 +10,26 @@ type DuelVersusProps = {
   challenge: Challenge;
   meId: string;
   players?: LobbyPlayer[];
+  catalog?: InventoryItem[];
+  onStart: () => void;
+  onExit: () => void;
 };
 
-export function DuelVersus({ challenge, meId, players = [] }: DuelVersusProps) {
+export function DuelVersus({ challenge, meId, players = [], catalog = [], onStart, onExit }: DuelVersusProps) {
+  const [portraits] = useState(() => players);
+  const entry = useDuelEntrance(challenge, meId, onStart);
+  const instructions = challenge.gameType === "futsal" ? ["FUTSAL", "Confirmá tu cinco y leé al rival. 3 ataques por equipo · 15 segundos para elegir."] : challenge.gameType === "trivia" ? ["PREGUNTADOS", "5 preguntas de fútbol. Respondé a tiempo y superá al rival en aciertos."] : ["PIEDRA, PAPEL O TIJERA", "Elegí tu mano en secreto. Ganá más rondas que tu rival en 3 enfrentamientos."];
   const amHost = challenge.fromId === meId;
 
   const myName = amHost ? challenge.fromName : challenge.toName;
   const opponentName = amHost ? challenge.toName : challenge.fromName;
 
-  const face = (id: string, name: string) => { const p=players.find(p=>p.userId===id);return <span className="duel-vs__avatar">{p?.appearance ? <AvatarFace appearance={p.appearance} className="lw-face--game"/> : <b>{name.slice(0,1).toUpperCase()}</b>}</span>; };
+  const face = (id: string, name: string) => { const p=players.find(p=>p.userId===id) ?? portraits.find(p=>p.userId===id);return p ? <ArenaAvatar player={p} catalog={catalog} isMe={id===meId} name={name}/> : <span className="duel-vs__avatar"><b>{name.slice(0,1).toUpperCase()}</b></span>; };
   return (
     <div
-      className="duel-vs"
-      role="status"
-      aria-live="polite"
+      className={`duel-vs duel-vs--cinema ${entry.seconds !== null ? "is-counting" : ""}`}
+      role="dialog"
+      aria-modal="true"
       aria-label="Preparando enfrentamiento"
     >
       <div className="duel-vs__speedlines" aria-hidden="true"/><div className="duel-vs__arena">
@@ -28,7 +37,7 @@ export function DuelVersus({ challenge, meId, players = [] }: DuelVersusProps) {
           LUPI WORLD · RIVAL ENCONTRADO
         </span>
 
-        <h2 className="duel-vs__heading">DESAFÍO ACEPTADO</h2>
+        <h2 className="duel-vs__heading">{instructions[0]}</h2>
 
         <div className="duel-vs__fighters">
           <div className="duel-vs__fighter">
@@ -46,8 +55,11 @@ export function DuelVersus({ challenge, meId, players = [] }: DuelVersusProps) {
           </div>
         </div>
 
-        <p className="duel-vs__status">{challenge.gameType === "trivia" ? "PREPARANDO LAS PREGUNTAS..." : challenge.gameType === "rps" ? "PREPARANDO EL DUELO..." : "PREPARANDO EL PARTIDO..."}</p>
-        <div className="duel-vs__progress" />
+        <div className="duel-vs__brief"><p>{instructions[1]}</p></div>
+        <div className="duel-vs__readiness"><span>{entry.ready ? "✓ VOS LISTO" : "VOS · PREPARANDO"}</span><span>{entry.rivalReady ? "✓ RIVAL LISTO" : "RIVAL · PREPARANDO"}</span></div>
+        {entry.seconds !== null ? <div className="duel-vs__countdown" key={entry.seconds}>{entry.seconds || "¡VAMOS!"}</div> : <p className="duel-vs__status">{entry.cancelled ? "El rival volvió al club." : !entry.connected ? "Conectando con el rival…" : entry.ready ? "Esperando que el rival esté listo…" : "LA ARENA TE ESPERA"}</p>}
+        {!entry.cancelled && entry.seconds === null && <button className="duel-vs__ready" type="button" disabled={!entry.connected || entry.ready} onClick={entry.confirm}>{entry.ready ? "ESTÁS LISTO ✓" : "¡VAMOS A JUGAR! →"}</button>}
+        <button type="button" className="duel-vs__back" onClick={() => { entry.cancel(); onExit(); }}>VOLVER AL CLUB</button>
       </div>
     </div>
   );

@@ -19,8 +19,8 @@ import "./FutsalClub.css";
 import "./FutsalFinale.css";
 import "./FutsalFormation.css";
 import { PvpSimulatorCourt } from "./match/PvpSimulatorCourt";
-type Props = { challenge: Challenge; meId: string; deck: Deck; players?: LobbyPlayer[]; catalog?: InventoryItem[]; onExit: () => void };
-export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], onExit }: Props) {
+type Props = { challenge: Challenge; meId: string; deck: Deck; players?: LobbyPlayer[]; catalog?: InventoryItem[]; onExit: () => void; onFinished?: (finished: boolean) => void; onRematch?: () => void };
+export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], onExit, onFinished, onRematch }: Props) {
   const { state, receivedAt, error, busy, join, play, leave, reconnect } = useFutsalPvp(challenge);
   const [portraits] = useState(() => players.filter(p => p.userId === challenge.fromId || p.userId === challenge.toId));
   const portrait = (id: string, name: string) => { const player = players.find(p => p.userId === id) ?? portraits.find(p => p.userId === id); return <span className="fp-avatar trivia-portrait" aria-hidden="true">{player?.appearance ? <AvatarFace appearance={player.appearance} className="lw-face--game" /> : <span>{name.slice(0,1).toUpperCase()}</span>}</span>; };
@@ -52,6 +52,7 @@ export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], o
   const countdown = until(state?.nextAt);
   const remaining = until(state?.deadline);
   const ended = !!state && !["waiting", "playing"].includes(state.status) && (state.status !== "finished" || countdown === 0);
+  useEffect(() => { onFinished?.(ended); }, [ended, onFinished]);
   const quick = state?.rulesVersion === 3;
   const totalAttacks = state?.totalAttacks ?? 5;
   const decisionSeconds = state?.decisionSeconds ?? 30;
@@ -119,6 +120,7 @@ export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], o
       <div className="fp-finale__speed" aria-hidden="true"/><div className="fp-finale__sparks" aria-hidden="true">{Array.from({length:14},(_,i)=><i key={i} style={{"--spark":i} as React.CSSProperties}/>)}</div>
       <div className="fp-finale__headline"><small>SILBATAZO FINAL · CLUB LUPI</small><ArenaSymbol kind={won?"trophy":"shield"}/><h3>{verdict}</h3><span>{state.status==="finished" ? "SE DEJÓ TODO EN LA CANCHA" : "EL ENCUENTRO TERMINÓ"}</span></div>
       <div className="fp-finale__stage"><div className={`fp-finale__player${won?' is-winner':''}`}>{fullAvatar(meId,mine)}<strong>{mine}</strong><small>TU EQUIPO</small></div><div className="fp-finale__score" aria-label={`Resultado final: ${mine} ${ownScore}, ${rival} ${otherScore}`}><small>FINAL</small><div><b>{ownScore}</b><em>:</em><b>{otherScore}</b></div><span>FUTSAL · 1 VS 1</span></div><div className={`fp-finale__player fp-finale__player--away${!won&&state.winnerId!==null?' is-winner':''}`}>{fullAvatar(host?challenge.toId:challenge.fromId,rival)}<strong>{rival}</strong><small>RIVAL</small></div></div>
+      {onRematch && state.status === "finished" && <button className="duel-rematch" type="button" onClick={onRematch}>PEDIR REVANCHA ↻</button>}
       <div className="fp-finale__bottom"><span>{state.winnerId===null?"Un duelo a la altura del club.":won?"Esta cancha ya conoce tu nombre.":"La revancha empieza en el próximo partido."}</span><button type="button" className="fp-primary" onClick={onExit}>VOLVER AL CLUB <span aria-hidden="true"> →</span></button></div>
       <details className="fp-finale__stats"><summary>RESUMEN DEL DUELO</summary><div><span><b>{ownScore}</b>GOLES TUYOS</span><span><b>{attackResults(meId).length}/{totalAttacks}</b>ATAQUES JUGADOS</span><span><b>{state.history.filter(e=>e.attackerId!==meId&&e.defended).length}</b>CIERRES ACERTADOS</span></div></details>
       </div>

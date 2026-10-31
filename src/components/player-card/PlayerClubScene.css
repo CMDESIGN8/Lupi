@@ -28,3 +28,72 @@
 .lw-scene .lw-crest{display:grid;place-items:center;width:60px;height:70px;min-width:0;padding:0;border:0;border-radius:0;clip-path:none;background:none;box-shadow:none;overflow:visible}
 .lw-scene .lw-crest>img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 8px #0008)}
 @media(max-width:860px){.lw-scene .lw-crest{width:48px;height:57px}}
+
+/* Mobile finishing: preserve the club backdrop, give text a quiet reading zone. */
+@media(max-width:860px){
+ .lw-scene,.lw-scene[data-compact=true]{grid-template-rows:clamp(245px,35dvh,300px) minmax(0,1fr)}
+ .lw-scene .lw-menu{background:linear-gradient(180deg,#031620c9,#031620f2 38%);padding:12px 14px max(12px,env(safe-area-inset-bottom,0px));gap:10px}
+ .lw-scene .lw-panel{padding-top:8px;scrollbar-color:#4ac1d1 #051a25;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+ .lw-scene .lw-tabs{gap:5px}.lw-scene .lw-tab{min-height:62px;font-size:11px;letter-spacing:.025em;gap:5px}
+ .lw-scene .lw-heading{font-size:23px;line-height:1.15;margin-bottom:12px}.lw-scene .lw-heading>span{font-size:11px}
+ .lw-scene .lw-club-chapter{font-size:7px}.lw-scene .lw-club-chapter>b{font-size:7px}
+ .lw-scene .lw-game__title{font-size:19px;line-height:1.1}.lw-scene .lw-game__desc{font-size:12px;line-height:1.4;color:#c0dce4}
+ .lw-scene .lw-game[data-game=futsal]{min-height:112px;background:linear-gradient(100deg,#061b24ed,#04131b99),url('../../assets/futsal-club-entry.webp') center 52%/cover}
+ .lw-scene .lw-game[data-game=futsal] .lw-game__title{font-size:25px}.lw-scene .lw-game[data-game=trivia],.lw-scene .lw-game[data-game=truco]{min-height:112px}
+ .lw-scene .lw-note{font-size:12px;line-height:1.45;color:#a8c9d4}.lw-scene .lw-more{font-size:11px;min-height:40px}
+ .lw-scene .lw-slots{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 14px}.lw-scene .lw-slot__frame{height:143px}
+ .lw-scene .lw-slot__label{font-size:9px}.lw-scene .lw-slot__name{font-size:11px;line-height:1.4;color:#d9eef3}
+ .lw-scene .lw-trophy__title{font-size:17px}.lw-scene .lw-trophy__description{font-size:12px;line-height:1.45;color:#c0d8e1}.lw-scene .lw-trophy__date{font-size:10px;color:#9bbdca}
+ .lw-scene .lw-player-passport__facts small{font-size:9px}.lw-scene .lw-player-passport__note{font-size:12px}.lw-scene .lw-trophy-empty p{font-size:13px}.lw-scene .lw-trophy-empty>small{font-size:11px}
+ .lw-scene .lw-plate{background:linear-gradient(90deg,#02141bef,#041b26bf);padding:10px 11px}.lw-scene .lw-plate__club{font-size:11px}.lw-scene .lw-chip{font-size:9px}
+ .lw-scene .lw-crest{width:56px;height:56px;right:12px}.lw-scene .lw-stage__rarity{font-size:7px;bottom:8px}
+}
+@media(max-width:360px){.lw-scene .lw-game[data-game=trivia],.lw-scene .lw-game[data-game=truco]{grid-column:1/-1;min-height:86px}.lw-scene .lw-tab{font-size:10px}.lw-scene .lw-tabs{gap:3px}}
+@media(max-width:860px) and (max-height:620px){.lw-scene,.lw-scene[data-compact=true]{grid-template-rows:245px minmax(360px,auto);overflow-y:auto}.lw-scene .lw-menu{min-height:360px}.lw-scene .lw-panel{overflow:visible}}
+
+/* Crest is identity, not an unexplained floating control. */
+.lw-scene .lw-plate{display:grid;grid-template-columns:76px minmax(0,1fr);align-items:center;gap:16px}
+.lw-scene .lw-plate__details{display:grid;gap:6px;min-width:0}
+.lw-scene .lw-plate>.lw-crest{position:static;inset:auto;width:76px;height:auto;display:flex;flex-direction:column;gap:6px;align-items:center;transform:none;cursor:default}
+.lw-scene .lw-plate>.lw-crest>img{width:65px;height:65px;object-fit:contain}
+.lw-scene .lw-plate>.lw-crest>small{font:700 8px/1.4 Barlow,system-ui;color:#96c8d2;letter-spacing:.08em;text-align:center;white-space:normal}
+@media(max-width:860px){.lw-scene .lw-plate{grid-template-columns:48px minmax(0,1fr);gap:8px}.lw-scene .lw-plate>.lw-crest{width:48px;gap:4px}.lw-scene .lw-plate>.lw-crest>img{width:39px;height:39px}.lw-scene .lw-plate>.lw-crest>small{font-size:7px;letter-spacing:0}.lw-scene .lw-plate__name{font-size:clamp(18px,5vw,27px)}.lw-scene .lw-plate__details{gap:5px}.lw-scene .lw-plate__club{font-size:10px}}
+
+/* Compact phone framing: identity beside the player, all four duels visible. */
+@media(max-width:860px){
+ .lw-scene,.lw-scene[data-compact=true]{grid-template-rows:clamp(230px,35dvh,300px) minmax(0,1fr)}
+ .lw-scene .lw-stage{--lw-cx:72%;--lw-feet:12%}
+ .lw-scene .lw-plate{left:12px;right:auto;bottom:12px;width:53%;max-width:53%}
+ .lw-scene .lw-menu{gap:8px;padding-top:9px;padding-bottom:max(8px,env(safe-area-inset-bottom,0px))}
+ .lw-scene[data-tab=desafiar] .lw-heading{margin:0 0 10px;font-size:22px}
+ .lw-scene[data-tab=desafiar] .lw-games{gap:8px;grid-auto-rows:auto}
+ .lw-scene[data-tab=desafiar] .lw-game[data-game=futsal]{min-height:100px}
+ .lw-scene[data-tab=desafiar] .lw-game[data-game=rps]{min-height:78px}
+ .lw-scene[data-tab=desafiar] .lw-game[data-game=trivia],.lw-scene[data-tab=desafiar] .lw-game[data-game=truco]{grid-column:auto;min-height:94px}
+ .lw-scene[data-tab=desafiar] .lw-game__title{font-size:17px}
+ .lw-scene[data-tab=desafiar] .lw-game[data-game=futsal] .lw-game__title{font-size:24px}
+ .lw-scene[data-tab=desafiar] .lw-game__desc{font-size:11px;line-height:1.25}
+ .lw-scene[data-tab=desafiar] .lw-note{font-size:10px;line-height:1.3;margin:8px 0 0}
+ .lw-scene .lw-more{min-height:30px}
+}
+@media(max-width:860px) and (max-height:740px){
+ .lw-scene .lw-tab{min-height:52px;gap:3px}
+ .lw-scene .lw-tab>svg{width:18px;height:18px}
+ .lw-scene[data-tab=desafiar] .lw-game[data-game=futsal]{min-height:86px}
+ .lw-scene[data-tab=desafiar] .lw-game[data-game=rps]{min-height:68px}
+ .lw-scene[data-tab=desafiar] .lw-game[data-game=trivia],.lw-scene[data-tab=desafiar] .lw-game[data-game=truco]{min-height:82px}
+}
+/* Short landscape screens retain scrolling instead of clipping actions. */
+@media(max-width:860px) and (max-height:620px){.lw-scene,.lw-scene[data-compact=true]{grid-template-rows:230px minmax(360px,auto);overflow-y:auto}}
+
+/* Anime mode artwork: one navy/cyan palette, quiet text area, panoramic framing. */
+.lw-scene .lw-game[data-game=rps]{background:linear-gradient(90deg,#031722d9 0%,#03172280 42%,#03172215 100%),url('../../assets/challenge-rps-anime.webp') 78% 50%/cover}
+.lw-scene .lw-game[data-game=trivia]{background:linear-gradient(90deg,#031722d9 0%,#03172280 42%,#03172215 100%),url('../../assets/challenge-trivia-anime.webp') 78% 50%/cover}
+.lw-scene .lw-game[data-game=truco]{background:linear-gradient(90deg,#031722d9 0%,#03172280 42%,#03172215 100%),url('../../assets/challenge-truco-anime.webp') 78% 50%/cover}
+.lw-scene .lw-game[data-game=futsal]{background:linear-gradient(90deg,#031722d9 0%,#03172280 42%,#03172215 100%),url('../../assets/challenge-futsal-anime.webp') 78% 50%/cover}
+.lw-scene .lw-game__title,.lw-scene .lw-game__desc,.lw-scene .lw-game__icon,.lw-scene .lw-game__state{z-index:1;text-shadow:0 2px 5px #000c}
+.lw-scene .lw-game[data-game=truco]:disabled{opacity:.65;filter:saturate(.65)}
+@media(max-width:860px){
+ .lw-scene .lw-game[data-game=trivia],.lw-scene .lw-game[data-game=truco]{background-position:center,80% center}
+ .lw-scene .lw-game[data-game=trivia] .lw-game__desc,.lw-scene .lw-game[data-game=truco] .lw-game__desc{color:#c0dce4}
+}
