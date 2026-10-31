@@ -1573,7 +1573,7 @@ onChallengeGame={(player, game) => {
               void refreshPackCount();
             }}
           />
-          {activeFutsal && <div className="rps-screen-overlay trivia-screen-overlay"><FutsalPvp key={activeFutsal.id} challenge={activeFutsal} meId={user.id} deck={activeDeck} players={lobbyPlayers} onExit={() => setActiveFutsal(null)} /></div>}
+          {activeFutsal && <div className="rps-screen-overlay trivia-screen-overlay"><FutsalPvp key={activeFutsal.id} challenge={activeFutsal} meId={user.id} deck={activeDeck} players={lobbyPlayers} catalog={auraItems} onExit={() => setActiveFutsal(null)} /></div>}
           {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
           {activeRps && (
             <div className="rps-screen-overlay">
