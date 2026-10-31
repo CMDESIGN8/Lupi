@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { Challenge } from "../hooks/useLobbyChallenges";
 import { useTriviaMatch } from "../hooks/useTriviaMatch";
+import { useDuelReward } from "../hooks/useDuelReward";
+import { DuelRewardCard } from "./DuelRewardCard";
+import { duelFx } from "../lib/duelFx";
 import { AvatarFace } from "./AvatarFace";
 import type { LobbyPlayer } from "../hooks/useLobbyPresence";
 import "./TriviaDuel.css";
@@ -17,6 +20,7 @@ export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }:
   const finished = state?.status === "finished";
   const expired = state?.status === "expired";
   const ended = finished || expired;
+  const { reward, error: rewardError } = useDuelReward("trivia", challenge.id, !!finished, { rivalId: host ? challenge.toId : challenge.fromId });
   useEffect(() => {
     if (!state) return;
     const end = Date.now() + Math.max(0, Date.parse(state.deadline) - Date.parse(state.serverNow));
@@ -30,6 +34,7 @@ export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }:
     onRematch({ ...challenge, id: state.rematch.id, at: Date.now() });
   }, [state?.rematch?.status, state?.rematch?.id, challenge, onRematch]);
   const result = state?.lastResult;
+  useEffect(() => { if (result) duelFx.answer(host ? result.hostCorrect : result.guestCorrect); }, [result?.round]); // eslint-disable-line react-hooks/exhaustive-deps
   const summary = state?.history?.length ? state.history : result ? [result] : [];
   const verdict = expired ? "DUELO VENCIDO" : state?.winnerId === meId ? "¡GANASTE!" : state?.winnerId === null ? "¡EMPATE!" : "¡BUEN DUELO!";
   const pending = state?.rematch?.status === "pending";
@@ -51,13 +56,14 @@ export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }:
         <progress value={state.round - 1} max={state.total} aria-label="Preguntas completadas" />
         <h3 id="trivia-current-question">{state.question.prompt}</h3>
         <p className="trivia-wait" role="status">{state.mineSubmitted ? "✓ Respuesta enviada. Esperando al rival…" : state.opponentSubmitted ? "Tu rival ya respondió. ¡Es tu turno!" : "Elegí tu respuesta. La revelamos cuando contesten ambos."}</p>
-        <div className="trivia-options">{state.question.options.map((option, index) => <button key={index} type="button" data-selected={selectedAnswer?.round === state.round && selectedAnswer.index === index} aria-pressed={selectedAnswer?.round === state.round && selectedAnswer.index === index} style={{ "--choice-index": index } as React.CSSProperties} disabled={busy || state.mineSubmitted || remaining === 0} onClick={async () => { const round = state.round; if (await answer(index)) setSelectedAnswer({ round, index }); }}><b>{String.fromCharCode(65 + index)}</b><span>{option}</span></button>)}</div>
+        <div className="trivia-options">{state.question.options.map((option, index) => <button key={index} type="button" data-selected={selectedAnswer?.round === state.round && selectedAnswer.index === index} aria-pressed={selectedAnswer?.round === state.round && selectedAnswer.index === index} style={{ "--choice-index": index } as React.CSSProperties} disabled={busy || state.mineSubmitted || remaining === 0} onClick={async () => { const round = state.round; if (await answer(index)) { duelFx.tap(); setSelectedAnswer({ round, index }); } }}><b>{String.fromCharCode(65 + index)}</b><span>{option}</span></button>)}</div>
       </div>}
       {!ended && result && <details key={result.round} className="trivia-reveal">
         <summary><span className={(host ? result.hostCorrect : result.guestCorrect) ? "trivia-round-hit" : "trivia-round-miss"}>{(host ? result.hostCorrect : result.guestCorrect) ? "✓" : "✕"}</span><span>RONDA {result.round} · {(host ? result.hostCorrect : result.guestCorrect) ? "ACERTASTE" : "NO ACERTASTE"}<small>Ver respuesta anterior</small></span><b aria-hidden="true">⌄</b></summary>
         <div className="trivia-reveal-body"><p>{result.prompt}</p><strong>✓ {result.correct}</strong><p>{(host ? result.guestCorrect : result.hostCorrect) ? "Tu rival acertó." : "Tu rival no acertó."}</p></div>
       </details>}
       {ended && <>
+        {finished && <DuelRewardCard reward={reward} error={rewardError} rivalName={host ? challenge.toName : challenge.fromName} gameLabel="Preguntados" />}
         <div className="trivia-rematch">
           {pending ? mine ? <><p role="status">Revancha enviada. Esperando al rival…</p><button type="button" disabled={busy} onClick={() => void rematch("cancel")}>CANCELAR SOLICITUD</button></> : <><p role="status">Tu rival pide revancha. ¿Jugamos otra?</p><div className="trivia-actions"><button type="button" className="trivia-primary" disabled={busy} onClick={() => void rematch("accept")}>ACEPTAR REVANCHA</button><button type="button" disabled={busy} onClick={() => void rematch("decline")}>AHORA NO</button></div></> : <>
             <div className="trivia-actions"><button type="button" className="trivia-primary" disabled={busy || state.rematch?.status === "accepted"} onClick={() => void rematch("request")}>🔁 PEDIR REVANCHA</button><button type="button" onClick={onExit}>VOLVER AL LOBBY</button></div>

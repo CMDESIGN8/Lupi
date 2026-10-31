@@ -1,5 +1,5 @@
 // src/hooks/useLobbyChallenges.ts
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MutableRefObject } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabaseClient";
 
@@ -16,6 +16,10 @@ export type Challenge = {
   toName: string;
   /** Índice del bot rival del duelo (los dos juegan contra el mismo). */
   botIndex: number;
+  /** Duelo contra un bot local. Nunca viaja por la red ni se parsea de mensajes entrantes. */
+  vsBot?: boolean;
+  /** Duelo rápido: si el rival está buscando el mismo juego, acepta solo. */
+  quick?: boolean;
   at: number;
 };
 
@@ -39,6 +43,8 @@ type Options = {
   available: boolean;
   /** Los desafíos de gente silenciada se ignoran. */
   isMuted: (userId: string) => boolean;
+  /** Juego que estoy buscando en la cola de duelo rápido (null = no busco). */
+  quickGameRef?: MutableRefObject<ChallengeGame | null>;
   /**
    * Alguien aceptó. "host" = el que desafió, "guest" = el que aceptó.
    * Acá es donde GameHub arranca la partida (c.id es el id de la partida).
@@ -76,7 +82,7 @@ function parseChallenge(raw: any): Challenge | null {
   const botIndex = Number.isFinite(botRaw) ? Math.min(Math.max(botRaw, 0), MAX_BOT_INDEX) : 1;
   const allowed: ChallengeGame[] = ["futsal", "trivia", "rps", "truco", "physical"];
   const gameType: ChallengeGame = allowed.includes(raw?.gameType) ? raw.gameType : "futsal";
-  return { id, fromId, fromName, toId, toName: str(raw?.toName, 24), botIndex, gameType, communityId: typeof raw?.communityId === "string" && /^[0-9a-f-]{36}$/i.test(raw.communityId) ? raw.communityId : undefined, at: Date.now() };
+  return { id, fromId, fromName, toId, toName: str(raw?.toName, 24), botIndex, gameType, communityId: typeof raw?.communityId === "string" && /^[0-9a-f-]{36}$/i.test(raw.communityId) ? raw.communityId : undefined, quick: raw?.quick === true, at: Date.now() };
 }
 
 export function useLobbyChallenges({
@@ -86,6 +92,7 @@ export function useLobbyChallenges({
   enabled = true,
   available,
   isMuted,
+  quickGameRef,
   onAccepted,
 }: Options) {
   const [incoming, setIncomingState] = useState<Challenge | null>(null);
@@ -139,6 +146,13 @@ export function useLobbyChallenges({
         const now = Date.now();
         if (now - (lastFrom.current.get(c.fromId) ?? 0) < FROM_COOLDOWN) return;
         lastFrom.current.set(c.fromId, now);
+
+        // Duelo rápido: si yo también estoy buscando este juego, acepto sin preguntar.
+        if (c.quick && quickGameRef?.current === c.gameType && availableRef.current && !incomingRef.current && !outgoingRef.current) {
+          void channel.send({ type: "broadcast", event: "reply", payload: { id: c.id, fromId: meId, toId: c.fromId, accept: true } });
+          onAcceptedRef.current(c, "guest");
+          return;
+        }
 
         if (!availableRef.current || incomingRef.current) {
           void channel.send({
@@ -222,7 +236,7 @@ export function useLobbyChallenges({
 
   /** Devuelve true si el desafío salió. */
   const challenge = useCallback(
-    (target: { userId: string; username: string }, botIndex = 1, gameType: ChallengeGame = "futsal", communityId?: string) => {
+    (target: { userId: string; username: string }, botIndex = 1, gameType: ChallengeGame = "futsal", communityId?: string, quick = false) => {
       const channel = channelRef.current;
       if (!channel || !ready || !availableRef.current || incomingRef.current || outgoingRef.current || target.userId === meId) return false;
 
@@ -235,6 +249,7 @@ export function useLobbyChallenges({
         botIndex: Math.min(Math.max(Math.trunc(botIndex), 0), MAX_BOT_INDEX),
         gameType,
         communityId,
+        quick,
         at: Date.now(),
       };
 

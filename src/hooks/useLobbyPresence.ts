@@ -18,6 +18,8 @@ export type LobbyPlayer = {
   level: number;
   look: LobbyLook;
   appearance?: AvatarAppearance;
+  /** Racha de victorias en duelos (informativa; viene de otro cliente, se recorta a 0-99). */
+  streak?: number;
   activity: LobbyActivity;
   joinedAt: number;
 };
@@ -59,6 +61,7 @@ function sanitize(raw: any): LobbyPlayer | null {
     level: Number.isFinite(level) ? Math.min(Math.max(Math.trunc(level), 1), 999) : 1,
     look,
     appearance: raw.appearance ? sanitizeAppearance(raw.appearance) : undefined,
+    streak: Number.isFinite(Number(raw.streak)) ? Math.min(Math.max(Math.trunc(Number(raw.streak)), 0), 99) : 0,
     activity: raw.activity === "in-match" ? "in-match" : "lobby",
     joinedAt: Number(raw.joinedAt) || 0,
   };
@@ -88,6 +91,7 @@ export function useLobbyPresence({ room, me, activity = "lobby", enabled = true 
     me.level,
     me.look,
     me.appearance,
+    me.streak ?? 0,
     effectiveActivity,
   ]);
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDuelEntrance } from "../hooks/useDuelEntrance";
 import { ArenaAvatar } from "./match/ArenaAvatar";
 import type { InventoryItem } from "../hooks/useAuraInventory";
@@ -18,6 +18,7 @@ type DuelVersusProps = {
 export function DuelVersus({ challenge, meId, players = [], catalog = [], onStart, onExit }: DuelVersusProps) {
   const [portraits] = useState(() => players);
   const entry = useDuelEntrance(challenge, meId, onStart);
+  useEffect(() => { if (challenge.quick && entry.connected && !entry.ready && !entry.cancelled) entry.confirm(); }, [challenge.quick, entry.connected, entry.ready, entry.cancelled]); // eslint-disable-line react-hooks/exhaustive-deps
   const instructions = challenge.gameType === "futsal" ? ["FUTSAL", "Confirmá tu cinco y leé al rival. 3 ataques por equipo · 15 segundos para elegir."] : challenge.gameType === "trivia" ? ["PREGUNTADOS", "5 preguntas de fútbol. Respondé a tiempo y superá al rival en aciertos."] : ["PIEDRA, PAPEL O TIJERA", "Elegí tu mano en secreto. Ganá más rondas que tu rival en 3 enfrentamientos."];
   const amHost = challenge.fromId === meId;
 

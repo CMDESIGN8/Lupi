@@ -24,6 +24,10 @@ import { ChallengeGameSelector } from "../components/ChallengeGameSelector";
 import { FutsalPvp } from "../components/FutsalPvp";
 import { TriviaDuel } from "../components/TriviaDuel";
 import { RockPaperScissors } from "../components/RockPaperScissors";
+import { QuickDuelPanel } from "../components/QuickDuelPanel";
+import { useQuickDuel } from "../hooks/useQuickDuel";
+import { useDuelStreak } from "../hooks/useDuelStreak";
+import { BOT_NAMES } from "../hooks/useRpsBotMatch";
 import { DuelVersus } from "../components/DuelVersus";
     import { LockerPreview } from "../components/LockerPreview";
     import {
@@ -433,6 +437,7 @@ import { useAchievements } from "../hooks/useAchievements";
     if (c.gameType === "futsal") setActiveFutsal(c);
   };
   const requestSocialRematch = (c: Challenge) => {
+    if (c.vsBot && c.gameType === "rps") { startBotRps(c.botIndex); return; }
     setActiveRps(null); setActiveFutsal(null); setDuelFinished(false); setRematchTarget(c);
   };
 
@@ -643,6 +648,7 @@ const {
         return l;
       }, [auraItems]);
 
+      const duelStreak = useDuelStreak(user.id);
       const { players: lobbyPlayers, status: lobbyStatus } = useLobbyPresence({
       room: "global",
       activity: view === "match" || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
@@ -653,6 +659,7 @@ const {
         level,
         look,
         appearance: myAppearance,
+        streak: duelStreak,
       },
     });
 
@@ -662,6 +669,8 @@ const {
       toggleMute,
       report,
     } = useLobbyModeration(user.id);
+
+    const quickGameRef = useRef<ChallengeGame | null>(null);
 
     const {
       incoming,
@@ -678,11 +687,29 @@ const {
       meName: user.username || "Jugador",
       available: view === "lobby" && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
       isMuted,
+      quickGameRef,
       onAccepted: (challengeData) => {
         setActiveRps(null); setActiveTrivia(null); setActiveFutsal(null);
         setDuelFinished(false); setRematchTarget(null); setChallengeTarget(null);
         setVersusChallenge(challengeData);
       },
+    });
+
+    /** Duelo de práctica contra un bot local (premio reducido y con tope diario). */
+    const startBotRps = (botIndex = Math.floor(Math.random() * BOT_NAMES.length)) => {
+      const i = Math.min(Math.max(botIndex, 0), BOT_NAMES.length - 1);
+      const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      setVersusChallenge(null); setActiveTrivia(null); setActiveFutsal(null); setDuelFinished(false); setRematchTarget(null); setChallengeTarget(null);
+      setActiveRps({ id, gameType: "rps", fromId: user.id, fromName: user.username || "Jugador", toId: `bot-${i}`, toName: BOT_NAMES[i], botIndex: i, vsBot: true, at: Date.now() });
+    };
+
+    const quick = useQuickDuel({
+      room: "global", meId: user.id, meName: user.username || "Jugador",
+      available: view === "lobby" && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
+      quickGameRef,
+      send: (target, game) => challenge(target, 1, game, undefined, true),
+      cancelOutgoing: cancel,
+      onBot: () => startBotRps(),
     });
 
     useEffect(() => {
@@ -1027,6 +1054,10 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
             {gameTab === "deck" && view === "match" && <button type="button" className="gh-return-preview" onClick={() => setGameTab("play")}>← Volver a la previa del partido</button>}
             <div className="gh-scene" key={sceneKey}>
+              {view === "lobby" && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && (
+                <QuickDuelPanel variant="pill" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
+                  onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
+              )}
               {challengeTarget && (
   <ChallengeGameSelector
     player={challengeTarget}
@@ -1137,6 +1168,11 @@ onChallengeGame={(player, game) => {
             </button>
           </header>
 
+          <QuickDuelPanel variant="inline" streak={duelStreak} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
+            disabled={!!outgoing || !!incoming}
+            onStart={(g) => { setShowPlayersSheet(false); quick.start(g); }}
+            onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
+
           <div className="gh-world__players-sheet-list">
             {lobbyPlayers
               .filter((p) => p.userId !== user.id)
@@ -1173,7 +1209,7 @@ onChallengeGame={(player, game) => {
                     </span>
 
                     <span className="gh-world__players-sheet-info">
-                      <strong>{player.username}</strong>
+                      <strong>{player.username}{(player.streak ?? 0) >= 2 && <em title="Racha de victorias en duelos" style={{ marginLeft: 6, fontStyle: "normal", color: "#ffd23f", fontSize: ".78em" }}>🔥{player.streak}</em>}</strong>
                       <small>
                         <i aria-hidden />
                         {skin?.name || "Sin skin equipada"}
