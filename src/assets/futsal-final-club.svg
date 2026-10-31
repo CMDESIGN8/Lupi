@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 800" preserveAspectRatio="xMidYMid slice">
+<defs><linearGradient id="wall" x2="0" y2="1"><stop stop-color="#020a12"/><stop offset="1" stop-color="#13323c"/></linearGradient><linearGradient id="floor" x2="0" y2="1"><stop stop-color="#16434b"/><stop offset="1" stop-color="#03161f"/></linearGradient><radialGradient id="light"><stop stop-color="#72fff1" stop-opacity=".26"/><stop offset="1" stop-color="#72fff1" stop-opacity="0"/></radialGradient><pattern id="net" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0H0V22" fill="none" stroke="#88ced0" stroke-opacity=".18"/></pattern><pattern id="seats" width="52" height="32" patternUnits="userSpaceOnUse"><rect x="8" y="8" width="34" height="17" rx="5" fill="#23606b" fill-opacity=".35"/></pattern></defs>
+<path fill="url(#wall)" d="M0 0h1600v800H0z"/>
+<path d="M0 0 800 140 1600 0M0 110l800 65 800-65M0 205h1600" stroke="#3e6570" stroke-opacity=".38" stroke-width="8" fill="none"/>
+<path d="M250 0v205M560 0v205M1040 0v205M1350 0v205" stroke="#263c49" stroke-width="12"/>
+<path d="M0 280h440v230H0zM1160 280h440v230h-440z" fill="url(#seats)"/>
+<path d="M0 485h1600v50H0z" fill="#0a1b25"/>
+<path d="M0 525h1600v275H0z" fill="url(#floor)"/>
+<path d="M0 535h1600M800 525v275M400 525 0 800M1200 525l400 275M0 740h1600" stroke="#9de6df" stroke-opacity=".28" stroke-width="3" fill="none"/>
+<ellipse cx="800" cy="694" rx="325" ry="65" fill="none" stroke="#9de6df" stroke-opacity=".2" stroke-width="3"/>
+<path d="M588 520V337h424v183" fill="url(#net)" stroke="#acdfdc" stroke-opacity=".5" stroke-width="7"/>
+<path d="M603 520V351h394v169" fill="none" stroke="#c7ede4" stroke-opacity=".16" stroke-width="3"/>
+<g fill="#b8fff0"><rect x="260" y="145" width="150" height="8" rx="4"/><rect x="680" y="145" width="240" height="8" rx="4"/><rect x="1190" y="145" width="150" height="8" rx="4"/></g>
+<ellipse cx="330" cy="400" rx="350" ry="430" fill="url(#light)"/><ellipse cx="1270" cy="400" rx="350" ry="430" fill="url(#light)"/>
+<path d="m260 155-220 520h590L410 155Zm930 0-220 520h590l-220-520Z" fill="#98ffe5" fill-opacity=".025"/>
+<path d="M0 535h1600" stroke="#42dcca" stroke-opacity=".6" stroke-width="3"/>
+</svg>
