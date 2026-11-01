@@ -2,6 +2,7 @@
 // Mejoras: onboarding, progreso por pasos, celebración al completar,
 // filtro automático por posición, tooltips, lenguaje simple, badges animados
 
+import './DeckBuilderScene.css';
 import { DeckPlayerCard } from './DeckPlayerCard';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
@@ -14,6 +15,7 @@ interface DeckBuilderProps {
   userCards: UserCard[];
   activeDeck: Deck;
   onDeckUpdate: (deck: Deck) => void;
+  onPlay?: () => void;
 }
 
 function getCardData(card: UserCard): any {
@@ -70,7 +72,7 @@ function findBestMoves(deck: UserCard[], allCards: UserCard[]) {
 }
 
 // ===== COMPONENTE PRINCIPAL =====
-export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: DeckBuilderProps) {
+export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPlay }: DeckBuilderProps) {
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [showCards, setShowCards] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -407,7 +409,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
   ];
 
   return (
-    <div className="deck-builder-fifa">
+    <div className="deck-builder-fifa deck-team-scene">
 
       {/* ===== ONBOARDING OVERLAY ===== */}
       {showOnboarding && (
@@ -463,18 +465,19 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
       <div className="fifa-header">
         <div className="team-info">
           <span className="team-icon">⚽</span>
-          <span className="team-name">MI EQUIPO FUTSAL</span>
+          <span className="team-name">MI QUINTETO</span>
         </div>
         <div className="team-power">
-          <span className="power-label">PODER</span>
+          <span className="power-label">VALORACIÓN</span>
           <span className="power-value">{totalWithBonus}</span>
-          {totalBonusPercent > 0 && <span className="power-bonus">+{totalBonusPercent}%</span>}
+          {totalBonusPercent > 0 && <span className="power-bonus" title="Bonificaciones por composición del equipo">Bono +{totalBonusPercent}%</span>}
         </div>
         <button className="help-btn" onClick={() => { setOnboardingStep(0); setShowOnboarding(true); }} title="Ayuda">❓</button>
       </div>
 
+      <div className="team-save-state" role="status">{saving ? 'Guardando…' : saveError ? 'Cambios sin guardar' : JSON.stringify(localDeck.cards.map(c => [c.id,c.position])) === JSON.stringify(activeDeck.cards.map(c => [c.id,c.position])) ? '✓ Equipo guardado' : 'Cambios sin guardar'} · {localDeck.cards.length}/5 jugadores</div>
       {/* ===== BARRA DE PROGRESO ===== */}
-      <div className="progress-bar-container">
+      <div className={`progress-bar-container ${isComplete ? 'is-complete' : ''}`}>
         <div className="progress-bar-track">
           <div className="progress-bar-fill" style={{ width: `${(localDeck.cards.length / 5) * 100}%` }} />
         </div>
@@ -537,13 +540,17 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
                   card={getCardInSlot(slot)}
                   slot={slot}
                   onClick={() => openCardSelector(slot)}
-                  onRemove={getCardInSlot(slot) ? () => removeCard(slot) : undefined}
                 />
               </div>
             );
           })}
         </div>
 
+        <div className="team-match-action">
+          <small>Tocá un jugador para ver sus datos o cambiarlo</small>
+          {onPlay && <button disabled={!isComplete || saving || autoBuilding} onClick={async () => { if (await persistDeck(localDeck, false)) onPlay(); }}>{saving ? 'GUARDANDO…' : isComplete ? 'JUGAR CON ESTE EQUIPO →' : `COMPLETÁ TU QUINTETO · ${localDeck.cards.length}/5`}</button>}
+          {saveError && <p role="alert">{saveError}</p>}
+        </div>
         {/* PANEL LATERAL */}
         <div className="bonus-panel-fifa">
 
@@ -744,6 +751,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate }: Dec
               <button className="modal-enhanced-close" onClick={() => setShowCards(false)}>✕</button>
             </div>
 
+            {selectedSlot && getCardInSlot(selectedSlot) && <div className="team-current-player"><DeckPlayerCard card={getCardInSlot(selectedSlot)!} slot={selectedSlot}/><div><strong>En cancha · {getCardData(getCardInSlot(selectedSlot)!)?.name}</strong><p>Elegí un reemplazo abajo o dejá la posición libre.</p><button onClick={() => { removeCard(selectedSlot); setShowCards(false); setSelectedSlot(null); }}>Quitar del quinteto</button></div></div>}
             {/* FILTROS */}
             <div className="modal-filters">
               <div className="filter-section">

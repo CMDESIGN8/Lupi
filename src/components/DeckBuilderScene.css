@@ -1,0 +1,54 @@
+/* Quinteto: the first screen presents the team; management follows below. */
+.gh-root .deck-team-scene .fifa-header{padding:10px 12px;gap:8px;background:linear-gradient(110deg,#061e29ee,#082e38ee);border:1px solid #31d9e346;border-bottom:2px solid #ffda54;border-radius:6px}
+.gh-root .deck-team-scene .team-name{font-size:22px}
+.gh-root .deck-team-scene .team-power{flex-wrap:wrap;gap:4px 8px;background:none;padding:0}
+.gh-root .deck-team-scene .power-label{font-size:9px;letter-spacing:1px;color:#a3d6dc}
+.gh-root .deck-team-scene .power-value{font-size:30px}
+.gh-root .deck-team-scene .power-bonus{font-size:10px;color:#60e0bb}
+.gh-root .deck-team-scene .team-save-state{color:#9ed6d9;font-size:11px;padding:6px 10px}
+.gh-root .deck-team-scene .progress-bar-container.is-complete{display:none}
+.gh-root .deck-team-scene .fifa-layout{gap:10px;grid-template-columns:minmax(0,1fr) 300px;align-items:start}
+.gh-root .deck-team-scene .futsal-pitch-fifa{grid-column:1;grid-row:1;min-height:0;height:clamp(380px,63dvh,540px);width:100%;max-width:600px;box-sizing:border-box;margin:auto;background:radial-gradient(ellipse at 50% 10%,#2eb58a45,transparent 65%),repeating-linear-gradient(180deg,#124e43 0 55px,#10463f 55px 110px);border:1px solid #55d9d080;border-radius:12px;box-shadow:inset 0 0 40px #001c2ba8,0 8px 25px #0006}
+.gh-root .deck-team-scene .slot-1{top:14%;left:50%}
+.gh-root .deck-team-scene .slot-2{top:38%;left:50%}
+.gh-root .deck-team-scene .slot-3{top:60%;left:23%}
+.gh-root .deck-team-scene .slot-4{top:60%;left:77%}
+.gh-root .deck-team-scene .slot-5{top:85%;left:50%}
+.gh-root .deck-team-scene .slot-label{font-size:8px;gap:3px;padding:2px 6px;margin-bottom:3px;white-space:nowrap;color:#d2f2ed;background:#031e2acc}
+.gh-root .deck-team-scene .slot-number{width:13px;height:13px;font-size:8px}
+.gh-root .deck-team-scene .slot-icon{display:none}
+.gh-root .deck-team-scene .pitch-slot .deck-player-card,.gh-root .deck-team-scene .pitch-slot .fifa-card{width:80px;height:92px;padding:6px;border-radius:8px}
+.gh-root .deck-team-scene .deck-player-card__head{margin-bottom:4px}
+.gh-root .deck-team-scene .deck-player-card__head>span{font-size:18px}
+.gh-root .deck-team-scene .deck-player-card__head>b{font-size:11px;padding:3px 5px}
+.gh-root .deck-team-scene .deck-player-card__body{margin:4px 0}
+.gh-root .deck-team-scene .deck-player-card__body>strong{font-size:10px}
+.gh-root .deck-team-scene .deck-player-card__body>span{font-size:8px}
+.gh-root .deck-team-scene .deck-player-card__stats{gap:3px}
+.gh-root .deck-team-scene .deck-player-card__stats small{font-size:7px}
+.gh-root .deck-team-scene .deck-player-card__stats b{font-size:9px}
+.gh-root .deck-team-scene .chem-legend{display:none}
+.gh-root .deck-team-scene .bonus-panel-fifa{grid-column:2;grid-row:1 / span 2;background:#061e29e6;border-color:#36cee339}
+.gh-root .deck-team-scene .team-match-action{grid-column:1;text-align:center;display:grid;gap:6px}
+.team-match-action small{color:#a8cdd2;font-size:11px}
+.team-match-action>button{width:100%;min-height:44px;border:1px solid #ffe88b;background:linear-gradient(110deg,#ffed92,#ffce35);color:#08202a;font-weight:900;font-size:15px;cursor:pointer;border-radius:4px}
+.team-match-action>button:disabled{opacity:.55;cursor:default}
+.team-match-action p{color:#ffadad;font-size:12px;margin:0}
+.team-current-player{display:flex;align-items:center;gap:16px;padding:12px 20px;color:#d5edf1;flex-shrink:0;background:#071e29}
+.team-current-player p{font-size:12px}
+.team-current-player button{min-height:36px;border:1px solid #eab17e88;background:#392921;color:#ffd7bd;padding:6px 12px;border-radius:4px;cursor:pointer}
+.team-current-player .deck-player-card{flex-shrink:0;width:90px;height:122px;padding:7px}
+@media(max-width:900px){
+.gh-root .deck-team-scene .fifa-layout{grid-template-columns:minmax(0,1fr)}
+.gh-root .deck-team-scene .bonus-panel-fifa{grid-column:1;grid-row:3}
+.gh-root .deck-team-scene .futsal-pitch-fifa{height:clamp(350px,49dvh,420px)}
+.gh-root .deck-team-scene .team-name{font-size:18px}
+.gh-root .deck-team-scene .team-icon{display:none}
+.gh-root .deck-team-scene .power-label{font-size:8px}
+.gh-root .deck-team-scene .power-value{font-size:27px}
+.gh-root .deck-team-scene .fifa-header{margin-bottom:0}
+.gh-root .deck-team-scene .pitch-slot .deck-player-card,.gh-root .deck-team-scene .pitch-slot .fifa-card{width:76px;height:78px;padding:5px}
+.gh-root .deck-team-scene .deck-player-card__head{margin-bottom:1px}
+.gh-root .deck-team-scene .deck-player-card__body{margin:2px 0}
+.gh-root .deck-team-scene .deck-player-card__stats{margin-top:2px}
+}

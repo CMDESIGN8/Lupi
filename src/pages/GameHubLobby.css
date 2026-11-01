@@ -4391,3 +4391,19 @@
 @media(max-width:700px){
  .gh-world .gh-locker-zone > .gh-avatar-customize-trigger {translate:0 -20px !important;}
 }
+
+/* Search + mission must grow together; legacy 110/125px caps clipped the CTA. */
+.gh-root .gh-world .gh-world__next.gh-world__next--searching{
+ height:auto!important;min-height:max-content!important;max-height:none!important;
+ overflow:visible!important;overflow-y:visible!important;clip-path:none!important;
+ contain:none!important;gap:6px!important;
+}
+.gh-root .gh-world .gh-world__next.gh-world__next--searching>*{flex-shrink:0!important}
+.gh-root .gh-world .gh-world__next.gh-world__next--searching>p{
+ display:block!important;max-height:none!important;overflow:visible!important;
+ margin:0!important;font-size:10px!important;line-height:1.35!important;
+}
+.gh-root .gh-world .gh-world__next.gh-world__next--searching>button:not(.gh-world__next-secondary){
+ height:auto!important;min-height:32px!important;white-space:normal!important;
+ overflow:visible!important;line-height:1.2!important;padding:8px 10px!important;
+}

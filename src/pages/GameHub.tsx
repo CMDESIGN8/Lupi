@@ -24,6 +24,7 @@ import { ChallengeGameSelector } from "../components/ChallengeGameSelector";
 import { FutsalPvp } from "../components/FutsalPvp";
 import { TriviaDuel } from "../components/TriviaDuel";
 import { RockPaperScissors } from "../components/RockPaperScissors";
+import { ExploreWorld } from "../components/ExploreWorld";
 import { QuickDuelPanel } from "../components/QuickDuelPanel";
 import { useQuickDuel } from "../hooks/useQuickDuel";
 import { useDuelStreak } from "../hooks/useDuelStreak";
@@ -745,6 +746,7 @@ const {
       const [showPlayersSheet, setShowPlayersSheet] = useState(false);
       const [showSocialChat, setShowSocialChat] = useState(false);
       const [showExploreWorld, setShowExploreWorld] = useState(false);
+      useEffect(()=>{if(incoming||outgoing||versusChallenge||activeRps||activeTrivia||activeFutsal)setShowExploreWorld(false);},[incoming,outgoing,versusChallenge,activeRps,activeTrivia,activeFutsal]);
     
       const worldPlayers = lobbyPlayers.map((player) => {
       const skin = getPlayerSkin(player, auraItems);
@@ -1334,7 +1336,8 @@ onChallengeGame={(player, game) => {
                     </div>
                   )}
                   <aside className="gh-world__left-rail" aria-label="Lupi y comunidad">
-                  <section ref={rewardCardRef} className={`gh-world__next ${highlightNext ? "gh-world__next--highlight" : ""}`} aria-label="Recomendación personalizada de Lupi">
+                  <section ref={rewardCardRef} className={`gh-world__next ${quick.game?"gh-world__next--searching":""} ${highlightNext ? "gh-world__next--highlight" : ""}`} aria-label="Recomendación personalizada de Lupi">
+                    <QuickDuelPanel variant="status" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice}/>
                     {pendingFirstReward ? (
                       <>
                         <span className="gh-world__next-kicker">✦ LUPI WORLD · PREMIO DESBLOQUEADO</span>
@@ -1478,27 +1481,10 @@ onChallengeGame={(player, game) => {
                   </div>
 
                   <div className="gh-world__discover" aria-label="Exploración y comunidad">
-                    <button type="button" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
+                    <button type="button" className="gh-explore-trigger" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
                     <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice}/>
-                    <button type="button" onClick={() => setShowPlayersSheet(true)}>♧ SOCIAL</button>
                   </div>
-                  {showExploreWorld && (
-                    <div className="gh-world__explore-overlay" role="presentation" onClick={() => setShowExploreWorld(false)}>
-                      <section className="gh-world__explore-panel" role="dialog" aria-modal="true" aria-label="Explorar Lupi World" onClick={event => event.stopPropagation()}>
-                        <button type="button" className="gh-world__explore-close" onClick={() => setShowExploreWorld(false)} aria-label="Cerrar exploración">×</button>
-                        <span className="gh-world__next-kicker">LUPI WORLD</span>
-                        <h2>Elegí tu aventura</h2>
-                        <p>Jugá, personalizá tu personaje o descubrí tus logros.</p>
-                        <div className="gh-world__explore-options">
-                          <button type="button" onClick={() => {setShowExploreWorld(false);handleGameNavigate("battle");}}>⚡ <strong>Partida rápida</strong><small>Entrá a jugar</small></button>
-                          <button type="button" onClick={() => {setShowExploreWorld(false);handleGameNavigate("deck");}}>👕 <strong>Mi equipo</strong><small>Personalizá tu equipo</small></button>
-                          <button type="button" onClick={() => {setShowExploreWorld(false);handleGameNavigate("album");}}>▦ <strong>Álbum</strong><small>Explorá tus cartas</small></button>
-                          <button type="button" onClick={() => {setShowExploreWorld(false);setShowAchievements(true);}}>🏆 <strong>Mis logros</strong><small>Revisá tu progreso</small></button>
-                        </div>
-                        <span className="gh-world__explore-soon">Próximamente: Academy y nuevas habilidades.</span>
-                      </section>
-                    </div>
-                  )}
+                  {showExploreWorld && <ExploreWorld deck={activeDeck} unlocked={unlockedAchievements.length} onClose={()=>setShowExploreWorld(false)} onMatch={()=>handleGameNavigate("battle")} onDeck={()=>handleGameNavigate("deck")} onAlbum={()=>handleGameNavigate("album")} onAchievements={()=>setShowAchievements(true)}/>}
 
                   <div className="gh-world__dock">
                     <button type="button" onClick={() => setShowCommunities(true)}><span>♧</span><strong>CLUBES</strong></button>
@@ -1590,7 +1576,7 @@ onChallengeGame={(player, game) => {
 
               {gameTab === "deck" && (
                 <section className="gh-panel gh-panel--bare">
-                  <DeckBuilder userId={user.id} userCards={userCards} activeDeck={activeDeck} onDeckUpdate={setActiveDeck} />
+                  <DeckBuilder userId={user.id} userCards={userCards} activeDeck={activeDeck} onDeckUpdate={setActiveDeck} onPlay={() => handleGameNavigate("battle")} />
                 </section>
               )}
 
