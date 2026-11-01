@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { Challenge } from "../hooks/useLobbyChallenges";
 import { useTriviaMatch } from "../hooks/useTriviaMatch";
-import { useDuelReward } from "../hooks/useDuelReward";
-import { DuelRewardCard } from "./DuelRewardCard";
-import { duelFx } from "../lib/duelFx";
 import { AvatarFace } from "./AvatarFace";
 import type { LobbyPlayer } from "../hooks/useLobbyPresence";
 import "./TriviaDuel.css";
+import "./DuelResolution.css";
+import { useDuelReward } from "../hooks/useDuelReward";
+import { DuelRewardCard } from "./DuelRewardCard";
+import { duelFx } from "../lib/duelFx";
 
 type Props = { challenge: Challenge; meId: string; players?: LobbyPlayer[]; onExit: () => void; onRematch: (challenge: Challenge) => void };
 export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }: Props) {
@@ -20,7 +21,7 @@ export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }:
   const finished = state?.status === "finished";
   const expired = state?.status === "expired";
   const ended = finished || expired;
-  const { reward, error: rewardError } = useDuelReward("trivia", challenge.id, !!finished, { rivalId: host ? challenge.toId : challenge.fromId });
+  const {reward,error:rewardError}=useDuelReward("trivia",challenge.id,!!finished,{rivalId:host?challenge.toId:challenge.fromId});
   useEffect(() => {
     if (!state) return;
     const end = Date.now() + Math.max(0, Date.parse(state.deadline) - Date.parse(state.serverNow));
@@ -34,7 +35,17 @@ export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }:
     onRematch({ ...challenge, id: state.rematch.id, at: Date.now() });
   }, [state?.rematch?.status, state?.rematch?.id, challenge, onRematch]);
   const result = state?.lastResult;
-  useEffect(() => { if (result) duelFx.answer(host ? result.hostCorrect : result.guestCorrect); }, [result?.round]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [revealRound, setRevealRound] = useState<number | null>(null);
+  useEffect(() => {
+    if (!result) return;
+    setRevealRound(result.round);
+    duelFx.answer(host ? result.hostCorrect : result.guestCorrect);
+    const timer = window.setTimeout(() => setRevealRound(null), 2400);
+    return () => window.clearTimeout(timer);
+  }, [result?.round]);
+  const celebrating = !!result && revealRound === result.round;
+  const myHit = !!result && (host ? result.hostCorrect : result.guestCorrect);
+  const rivalHit = !!result && (host ? result.guestCorrect : result.hostCorrect);
   const summary = state?.history?.length ? state.history : result ? [result] : [];
   const verdict = expired ? "DUELO VENCIDO" : state?.winnerId === meId ? "¡GANASTE!" : state?.winnerId === null ? "¡EMPATE!" : "¡BUEN DUELO!";
   const pending = state?.rematch?.status === "pending";
@@ -47,8 +58,9 @@ export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }:
     <section className={`trivia-arena${ended ? " trivia-arena--ended" : " trivia-arena--playing"}`} aria-label="Preguntados: duelo de fútbol">
       <header className="trivia-header"><button type="button" onClick={() => ended ? onExit() : setConfirmExit(true)}>← Lobby</button><span>LUPI WORLD · ARENA SOCIAL</span><b className="trivia-brand-mark" aria-hidden="true">✦</b></header>
       <div className="trivia-title"><small>ARENA DE CONOCIMIENTO</small><h2>PREGUNTADOS</h2><p>Fútbol · 5 preguntas · 1 punto por acierto</p></div>
-      {ended && <div className={`trivia-result-banner ${expired ? "is-expired" : state.winnerId === meId ? "is-win" : ""}`} role="status"><span aria-hidden="true">{expired ? "⌛" : state.winnerId === meId ? "🏆" : state.winnerId === null ? "🤝" : "👏"}</span><small>RESULTADO FINAL</small><h3>{verdict}</h3><p>{expired ? "Faltó una respuesta. Sin ganador." : "Cada acierto sumó un punto. ¿Sale otra?"}</p><div className="trivia-confetti" aria-hidden="true">{Array.from({length:12},(_,i)=><i key={i} style={{"--particle":i} as React.CSSProperties} />)}</div></div>}
-      <div className="trivia-score"><div>{ended && portrait(meId, host ? challenge.fromName : challenge.toName)}<small>VOS</small><strong>{host ? challenge.fromName : challenge.toName}</strong><b key={`mine-${state?.hostScore}-${state?.guestScore}`}>{state ? host ? state.hostScore : state.guestScore : 0}</b></div><span>VS</span><div>{ended && portrait(host ? challenge.toId : challenge.fromId, host ? challenge.toName : challenge.fromName)}<small>RIVAL</small><strong>{host ? challenge.toName : challenge.fromName}</strong><b key={`rival-${state?.hostScore}-${state?.guestScore}`}>{state ? host ? state.guestScore : state.hostScore : 0}</b></div></div>
+      {ended && <div className={`trivia-result-banner ${expired ? "is-expired" : state.winnerId === meId ? "is-win" : ""}`} role="status"><span aria-hidden="true">{expired ? "⌛" : state.winnerId === meId ? "🏆" : state.winnerId === null ? "🤝" : "👏"}</span><small>RESULTADO FINAL</small><h3>{verdict}</h3><p>{expired ? "Faltó una respuesta. Sin ganador." : state.winnerId === null ? "Igualados hasta el final. ¿Desempatamos?" : `${state.winnerId === meId ? (host ? challenge.fromName : challenge.toName) : (host ? challenge.toName : challenge.fromName)} se lleva el duelo. ¿Sale otra?`}</p><div className="trivia-confetti" aria-hidden="true">{Array.from({length:12},(_,i)=><i key={i} style={{"--particle":i} as React.CSSProperties} />)}</div></div>}
+      <div className="trivia-score"><div className={finished && state.winnerId===meId ? "is-winner" : ""}>{ended && portrait(meId, host ? challenge.fromName : challenge.toName)}{celebrating && myHit && <i key={`point-me-${result.round}`} className="trivia-flying-point" aria-hidden="true">+1</i>}<small>VOS</small><strong>{host ? challenge.fromName : challenge.toName}</strong><b key={`mine-${state?.hostScore}-${state?.guestScore}`}>{state ? host ? state.hostScore : state.guestScore : 0}</b></div><span>VS</span><div className={finished && state.winnerId===(host?challenge.toId:challenge.fromId) ? "is-winner" : ""}>{celebrating && rivalHit && <i key={`point-rival-${result.round}`} className="trivia-flying-point" aria-hidden="true">+1</i>}{ended && portrait(host ? challenge.toId : challenge.fromId, host ? challenge.toName : challenge.fromName)}<small>RIVAL</small><strong>{host ? challenge.toName : challenge.fromName}</strong><b key={`rival-${state?.hostScore}-${state?.guestScore}`}>{state ? host ? state.guestScore : state.hostScore : 0}</b></div></div>
+      {celebrating && <div key={`answer-flash-${result.round}`} className={`trivia-answer-flash ${myHit?"is-hit":"is-miss"}`} role="status"><small>PREGUNTA {result.round} · {myHit?"¡ACERTASTE! +1":"ESTA VEZ NO SUMASTE"}</small><strong>✓ {result.correct}</strong></div>}
       {!state && !error && <p role="status">Preparando las mismas preguntas para ambos…</p>}
       {error && <div className="trivia-error" role="alert"><p>{error}</p><button type="button" onClick={reconnect}>Reconectar</button></div>}
       {state && !ended && state.question && <div className="trivia-question" key={state.round} aria-labelledby="trivia-current-question">
@@ -63,7 +75,7 @@ export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }:
         <div className="trivia-reveal-body"><p>{result.prompt}</p><strong>✓ {result.correct}</strong><p>{(host ? result.guestCorrect : result.hostCorrect) ? "Tu rival acertó." : "Tu rival no acertó."}</p></div>
       </details>}
       {ended && <>
-        {finished && <DuelRewardCard reward={reward} error={rewardError} rivalName={host ? challenge.toName : challenge.fromName} gameLabel="Preguntados" />}
+        {finished && <DuelRewardCard reward={reward} error={rewardError} rivalName={host?challenge.toName:challenge.fromName} gameLabel="Preguntados"/>}
         <div className="trivia-rematch">
           {pending ? mine ? <><p role="status">Revancha enviada. Esperando al rival…</p><button type="button" disabled={busy} onClick={() => void rematch("cancel")}>CANCELAR SOLICITUD</button></> : <><p role="status">Tu rival pide revancha. ¿Jugamos otra?</p><div className="trivia-actions"><button type="button" className="trivia-primary" disabled={busy} onClick={() => void rematch("accept")}>ACEPTAR REVANCHA</button><button type="button" disabled={busy} onClick={() => void rematch("decline")}>AHORA NO</button></div></> : <>
             <div className="trivia-actions"><button type="button" className="trivia-primary" disabled={busy || state.rematch?.status === "accepted"} onClick={() => void rematch("request")}>🔁 PEDIR REVANCHA</button><button type="button" onClick={onExit}>VOLVER AL LOBBY</button></div>
@@ -78,7 +90,7 @@ export function TriviaDuel({ challenge, meId, players = [], onExit, onRematch }:
           {summary.length === 0 && <p>No llegaron a completar ninguna pregunta.</p>}
         </details>
       </>}
-      <p className="trivia-footnote">Duelo amistoso · Sin puntos para el ranking comunitario.</p>
+      <p className="trivia-footnote">Duelo global · Premios y rachas de Lupi · Sin puntos para el ranking comunitario.</p>
       {confirmExit && <div className="trivia-confirm"><div role="dialog" aria-modal="true" aria-labelledby="trivia-exit-title"><h3 id="trivia-exit-title">¿Salir del duelo?</h3><p>El rival quedará esperando. Si falta una respuesta, la partida vencerá sin ganador al terminar el tiempo.</p><button autoFocus type="button" onClick={() => setConfirmExit(false)}>SEGUIR JUGANDO</button><button type="button" onClick={onExit}>SALIR AL LOBBY</button></div></div>}
     </section>
   );

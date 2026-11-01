@@ -31,20 +31,25 @@ export function useRpsBotMatch(challenge: Challenge, enabled: boolean) {
   const current = useRef<RpsState | null>(null);
   const history = useRef<{ mine: Move[]; bot: Move[]; lastBotWon: boolean | null }>({ mine: [], bot: [], lastBotWon: null });
   const timer = useRef(0);
+  const generation = useRef(0), locked = useRef(false);
+  const settle = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
+    const token = ++generation.current; locked.current = false;
     window.clearTimeout(timer.current);
     history.current = { mine: [], bot: [], lastBotWon: null };
     current.current = fresh(); setState(current.current); setBusy(false);
-    return () => window.clearTimeout(timer.current);
+    return () => { window.clearTimeout(timer.current); if (generation.current === token) generation.current++; settle.current?.(); settle.current = null; };
   }, [enabled, fresh]);
 
   const play = useCallback(async (choice: Move) => {
     const s = current.current;
-    if (!enabled || !s || s.status !== "playing" || busy) return false;
-    setBusy(true);
-    await new Promise<void>(resolve => { timer.current = window.setTimeout(resolve, 650); }); // suspenso: “sellando tu mano…”
+    if (!enabled || !s || s.status !== "playing" || locked.current) return false;
+    const token = generation.current; locked.current = true; setBusy(true);
+    await new Promise<void>(resolve => { settle.current = resolve; timer.current = window.setTimeout(resolve, 650); });
+    settle.current = null;
+    if (generation.current !== token) return false; // suspenso: “sellando tu mano…”
     const h = history.current;
     const bot = botMove(challenge.botIndex, h.mine, h.bot, h.lastBotWon);
     const meWins = counter(bot) === choice, tie = bot === choice;
@@ -57,7 +62,7 @@ export function useRpsBotMatch(challenge: Challenge, enabled: boolean) {
       lastMoves: { host: choice, guest: bot }, status: finished ? "finished" : "playing",
       winnerId: finished ? (hostWins > guestWins ? challenge.fromId : guestWins > hostWins ? challenge.toId : null) : null,
     };
-    current.current = next; setState(next); setBusy(false);
+    current.current = next; setState(next); locked.current = false; setBusy(false);
     return true;
   }, [enabled, busy, challenge.botIndex, challenge.fromId, challenge.toId]);
 

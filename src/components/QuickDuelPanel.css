@@ -8,7 +8,7 @@
 .qd-card__buttons button:disabled{opacity:.45;cursor:not-allowed}
 
 /* Pastilla flotante mientras se busca: chica, arriba y sin tapar jugadores ni el botón de jugar */
-.qd-pill{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);left:50%;transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 24px);padding:6px 8px 6px 12px;border-radius:999px;background:rgba(6,16,26,.92);border:1px solid rgba(40,217,255,.55);color:#e8f6ff;font-size:.72rem;box-shadow:0 4px 18px rgba(0,0,0,.45)}
+.qd-pill{position:fixed;top:calc(env(safe-area-inset-top,0px) + 6px);left:50%;transform:translateX(-50%);z-index:9000;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 24px);padding:6px 8px 6px 12px;border-radius:999px;background:rgba(6,16,26,.92);border:1px solid rgba(40,217,255,.55);color:#e8f6ff;font-size:.72rem;box-shadow:0 4px 18px rgba(0,0,0,.45)}
 .qd-pill b{color:#ffd23f;letter-spacing:.06em}
 .qd-pill__text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .qd-pill--notice .qd-pill__text{white-space:normal}
@@ -17,3 +17,9 @@
 @keyframes qd-ping{from{box-shadow:0 0 0 0 rgba(40,217,255,.7)}to{box-shadow:0 0 0 10px rgba(40,217,255,0)}}
 @media (prefers-reduced-motion:reduce){.qd-pill__radar{animation:none}}
 .qd-card__fx{margin-top:8px;width:100%;cursor:pointer;border:0;background:none;color:#e8f6ff;opacity:.7;font-size:.7rem;text-align:left;padding:2px 0}
+.qd-card__searching{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.74rem}
+.qd-card__searching b{color:#28d9ff}
+.qd-card__searching button{flex:none;cursor:pointer;border:1px solid #ff6b6b;background:#3a1620;color:#ffd7d7;font-weight:800;font-size:.7rem;padding:7px 10px;border-radius:9px}
+/* Escritorio: el botón SOCIAL no existe, así que la tarjeta vive en la columna izquierda, bajo "Jugadores en línea" */
+.gh-world__quick{display:none}
+@media (min-width:701px){.gh-world__quick{display:block;flex:none;width:100%}.gh-world__quick .qd-card{margin:0}}

@@ -18,3 +18,5 @@
 .duel-shake{animation:duel-shake .45s cubic-bezier(.36,.07,.19,.97) both}
 @keyframes duel-shake{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(4px,0,0)}30%,50%,70%{transform:translate3d(-6px,0,0)}40%,60%{transform:translate3d(6px,0,0)}}
 @media (prefers-reduced-motion:reduce){.duel-shake{animation:none}}
+/* Match the cinematic result HUD rather than adding another dashboard panel. */
+.drc{width:min(420px,100%);box-sizing:border-box;border:0;border-left:2px solid #4fe1eb;border-bottom:1px solid #4fe1eb33;border-radius:9px 2px;background:linear-gradient(110deg,#062a39e8,#03172399);font-family:Barlow,system-ui}.drc--win{border-left-color:#ffdc65}.drc__pill{border-radius:6px 2px;font:italic 900 23px 'Barlow Condensed',sans-serif;background:#29d9ff0d}.drc__share{min-height:36px;border-radius:7px 2px}.drc__chest{animation-iteration-count:3}

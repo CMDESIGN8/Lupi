@@ -1730,7 +1730,7 @@ async getAlbumStatsByCategory(userId: string): Promise<{
     const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
     
     // Guardar en user_cards
-    const newCard = {
+    const newCard: { user_id: string; card_type: 'npc' | 'socio'; player_id?: string; socio_id?: string; level: number; experience: number; obtained_at: Date } = {
       user_id: userId,
       card_type: randomCard.card_type,
       ...(randomCard.card_type === 'npc' 

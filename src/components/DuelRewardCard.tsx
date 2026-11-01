@@ -18,9 +18,9 @@ export function DuelRewardCard({ reward, error, rivalName, gameLabel }: Props) {
     if (reward.chest) { const tier = reward.chest; const t = window.setTimeout(() => duelFx.chest(tier), 650); return () => window.clearTimeout(t); }
   }, [reward]);
 
-  if (error) return <p className="drc drc--soft" role="status">No pudimos acreditar el premio ahora. Tu resultado quedó registrado.</p>;
+  if (error) return <p className="drc drc--soft" role="status">No pudimos confirmar la acreditación del premio.</p>;
   if (!reward) return <p className="drc drc--soft" role="status">Contando tu botín…</p>;
-  if (reward.duplicate) return null;
+  if (reward.duplicate) return <p className="drc drc--soft" role="status">Premio de esta partida ya acreditado.</p>;
 
   const win = reward.result === "win";
   const h2h = reward.h2h;

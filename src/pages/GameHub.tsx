@@ -705,7 +705,7 @@ const {
 
     const quick = useQuickDuel({
       room: "global", meId: user.id, meName: user.username || "Jugador",
-      available: view === "lobby" && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
+      available: view === "lobby" && !incoming && (!outgoing || !!outgoing.quick) && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
       quickGameRef,
       send: (target, game) => challenge(target, 1, game, undefined, true),
       cancelOutgoing: cancel,
@@ -1404,7 +1404,7 @@ onChallengeGame={(player, game) => {
                               {skin?.imageUrl ? <img src={skin.imageUrl} alt="" loading="lazy" /> : <span aria-hidden="true">👤</span>}
                             </span>
                             <span className="gh-online__details">
-                              <strong>{player.username}</strong>
+                              <strong>{player.username}{(player.streak ?? 0) >= 2 && <em title="Racha de victorias en duelos" style={{ marginLeft: 6, fontStyle: "normal", color: "#ffd23f", fontSize: ".85em" }}>🔥{player.streak}</em>}</strong>
                               <small><i className={`gh-online__activity gh-online__activity--${player.activity}`} aria-hidden="true" /> {activityLabel} · NIV. {player.level}</small>
                             </span>
                             <span className="gh-online__action" aria-hidden="true">{player.activity === "lobby" ? "⚔" : "›"}</span>
@@ -1420,6 +1420,11 @@ onChallengeGame={(player, game) => {
                         </button>
                       )}
                     </div>
+                  </section>
+
+                  <section className="gh-world__quick" aria-label="Duelo rápido">
+                    <QuickDuelPanel variant="inline" streak={duelStreak} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
+                      disabled={!!outgoing || !!incoming} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
                   </section>
 
                   </aside>
@@ -1477,7 +1482,7 @@ onChallengeGame={(player, game) => {
 
                   <div className="gh-world__discover" aria-label="Exploración y comunidad">
                     <button type="button" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
-                    <button type="button" onClick={() => setShowPlayersSheet(true)}>♧ SOCIAL</button>
+                    <button type="button" onClick={() => setShowPlayersSheet(true)}>{quick.game ? "⚡ BUSCANDO…" : "♧ SOCIAL"}</button>
                   </div>
                   {showExploreWorld && (
                     <div className="gh-world__explore-overlay" role="presentation" onClick={() => setShowExploreWorld(false)}>
@@ -1614,7 +1619,7 @@ onChallengeGame={(player, game) => {
           {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
           {activeRps && (
             <div className="rps-screen-overlay rps-cinema-screen">
-              <RockPaperScissors
+              <RockPaperScissors key={activeRps.id}
                 challenge={activeRps}
                 players={lobbyPlayers}
                 meId={user.id}
