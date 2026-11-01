@@ -689,6 +689,7 @@ const {
       isMuted,
       quickGameRef,
       onAccepted: (challengeData) => {
+        if(challengeData.quick)quick.matched(challengeData.id);
         setActiveRps(null); setActiveTrivia(null); setActiveFutsal(null);
         setDuelFinished(false); setRematchTarget(null); setChallengeTarget(null);
         setVersusChallenge(challengeData);
@@ -698,7 +699,8 @@ const {
     /** Duelo de práctica contra un bot local (premio reducido y con tope diario). */
     const startBotRps = (botIndex = Math.floor(Math.random() * BOT_NAMES.length)) => {
       const i = Math.min(Math.max(botIndex, 0), BOT_NAMES.length - 1);
-      const id = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const nonce = typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const id = `bot-${nonce}`;
       setVersusChallenge(null); setActiveTrivia(null); setActiveFutsal(null); setDuelFinished(false); setRematchTarget(null); setChallengeTarget(null);
       setActiveRps({ id, gameType: "rps", fromId: user.id, fromName: user.username || "Jugador", toId: `bot-${i}`, toName: BOT_NAMES[i], botIndex: i, vsBot: true, at: Date.now() });
     };
@@ -1054,6 +1056,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
             {gameTab === "deck" && view === "match" && <button type="button" className="gh-return-preview" onClick={() => setGameTab("play")}>← Volver a la previa del partido</button>}
             <div className="gh-scene" key={sceneKey}>
+              {view === "lobby" && gameTab === "play" && !showPlayersSheet && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice}/>}
               {view === "lobby" && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && (
                 <QuickDuelPanel variant="pill" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
                   onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
@@ -1168,10 +1171,7 @@ onChallengeGame={(player, game) => {
             </button>
           </header>
 
-          <QuickDuelPanel variant="inline" streak={duelStreak} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
-            disabled={!!outgoing || !!incoming}
-            onStart={(g) => { setShowPlayersSheet(false); quick.start(g); }}
-            onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
+          
 
           <div className="gh-world__players-sheet-list">
             {lobbyPlayers
@@ -1422,10 +1422,7 @@ onChallengeGame={(player, game) => {
                     </div>
                   </section>
 
-                  <section className="gh-world__quick" aria-label="Duelo rápido">
-                    <QuickDuelPanel variant="inline" streak={duelStreak} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
-                      disabled={!!outgoing || !!incoming} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
-                  </section>
+                  
 
                   </aside>
                   <button className="gh-world__play" type="button" onClick={() => handleGameNavigate("battle")}>
@@ -1482,7 +1479,8 @@ onChallengeGame={(player, game) => {
 
                   <div className="gh-world__discover" aria-label="Exploración y comunidad">
                     <button type="button" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
-                    <button type="button" onClick={() => setShowPlayersSheet(true)}>{quick.game ? "⚡ BUSCANDO…" : "♧ SOCIAL"}</button>
+                    <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice}/>
+                    <button type="button" onClick={() => setShowPlayersSheet(true)}>♧ SOCIAL</button>
                   </div>
                   {showExploreWorld && (
                     <div className="gh-world__explore-overlay" role="presentation" onClick={() => setShowExploreWorld(false)}>

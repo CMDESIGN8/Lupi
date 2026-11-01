@@ -58,7 +58,7 @@ export function DuelVersus({ challenge, meId, players = [], catalog = [], onStar
 
         <div className="duel-vs__brief"><p>{instructions[1]}</p></div>
         <div className="duel-vs__readiness"><span>{entry.ready ? "✓ VOS LISTO" : "VOS · PREPARANDO"}</span><span>{entry.rivalReady ? "✓ RIVAL LISTO" : "RIVAL · PREPARANDO"}</span></div>
-        {entry.seconds !== null ? <div className="duel-vs__countdown" key={entry.seconds}>{entry.seconds || "¡VAMOS!"}</div> : <p className="duel-vs__status">{entry.cancelled ? "El rival volvió al club." : !entry.connected ? "Conectando con el rival…" : entry.ready ? "Esperando que el rival esté listo…" : "LA ARENA TE ESPERA"}</p>}
+        {entry.seconds !== null ? <div className="duel-vs__countdown" key={entry.seconds}>{entry.seconds || "¡VAMOS!"}</div> : <p className="duel-vs__status">{entry.timedOut ? "El rival no confirmó a tiempo. Volvé al lobby y buscá otro duelo." : entry.cancelled ? "El rival volvió al club." : !entry.connected ? "Conectando con el rival…" : entry.ready ? "Esperando que el rival esté listo…" : "LA ARENA TE ESPERA"}</p>}
         {!entry.cancelled && entry.seconds === null && <button className="duel-vs__ready" type="button" disabled={!entry.connected || entry.ready} onClick={entry.confirm}>{entry.ready ? "ESTÁS LISTO ✓" : "¡VAMOS A JUGAR! →"}</button>}
         <button type="button" className="duel-vs__back" onClick={() => { entry.cancel(); onExit(); }}>VOLVER AL CLUB</button>
       </div>

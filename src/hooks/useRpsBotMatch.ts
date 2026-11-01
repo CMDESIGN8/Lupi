@@ -1,70 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 import type { Challenge } from "./useLobbyChallenges";
 import type { RpsState } from "./useRpsMatch";
-
-type Move = "rock" | "paper" | "scissors";
-const MOVES: Move[] = ["rock", "paper", "scissors"];
-/** La jugada que le gana a `m`. */
-const counter = (m: Move): Move => (m === "rock" ? "paper" : m === "paper" ? "scissors" : "rock");
-const rand = (): Move => MOVES[Math.floor(Math.random() * 3)];
-
-export const BOT_NAMES = ["Pibe Cebollita", "El Tano", "La Bruja"] as const;
-export const BOT_BLURBS = ["Tira lo que se le ocurre", "Repite lo que le funciona", "Te lee la última mano"] as const;
-
-/** Tres personalidades, todas vencibles: leerlas es parte de la gracia. */
-function botMove(botIndex: number, mine: Move[], bots: Move[], lastBotWon: boolean | null): Move {
-  if (botIndex === 1 && bots.length) {            // El Tano: gana y repite, pierde y cambia
-    const last = bots[bots.length - 1];
-    return lastBotWon ? last : Math.random() < 0.7 ? counter(last) : rand();
-  }
-  if (botIndex === 2 && mine.length) {            // La Bruja: apuesta a que repetís o la sacás
-    return Math.random() < 0.55 ? counter(mine[mine.length - 1]) : rand();
-  }
-  return rand();                                   // Pibe Cebollita
-}
-
-/** Misma forma que useRpsMatch, pero sin servidor: el rival es un bot local (el jugador siempre es host). */
-export function useRpsBotMatch(challenge: Challenge, enabled: boolean) {
-  const fresh = useCallback((): RpsState => ({ id: challenge.id, round: 1, hostWins: 0, guestWins: 0, status: "playing", winnerId: null, mineSubmitted: false, opponentSubmitted: false, lastMoves: null }), [challenge.id]);
-  const [state, setState] = useState<RpsState | null>(null);
-  const [busy, setBusy] = useState(false);
-  const current = useRef<RpsState | null>(null);
-  const history = useRef<{ mine: Move[]; bot: Move[]; lastBotWon: boolean | null }>({ mine: [], bot: [], lastBotWon: null });
-  const timer = useRef(0);
-  const generation = useRef(0), locked = useRef(false);
-  const settle = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    if (!enabled) return;
-    const token = ++generation.current; locked.current = false;
-    window.clearTimeout(timer.current);
-    history.current = { mine: [], bot: [], lastBotWon: null };
-    current.current = fresh(); setState(current.current); setBusy(false);
-    return () => { window.clearTimeout(timer.current); if (generation.current === token) generation.current++; settle.current?.(); settle.current = null; };
-  }, [enabled, fresh]);
-
-  const play = useCallback(async (choice: Move) => {
-    const s = current.current;
-    if (!enabled || !s || s.status !== "playing" || locked.current) return false;
-    const token = generation.current; locked.current = true; setBusy(true);
-    await new Promise<void>(resolve => { settle.current = resolve; timer.current = window.setTimeout(resolve, 650); });
-    settle.current = null;
-    if (generation.current !== token) return false; // suspenso: “sellando tu mano…”
-    const h = history.current;
-    const bot = botMove(challenge.botIndex, h.mine, h.bot, h.lastBotWon);
-    const meWins = counter(bot) === choice, tie = bot === choice;
-    h.mine.push(choice); h.bot.push(bot); h.lastBotWon = tie ? null : !meWins;
-    const hostWins = s.hostWins + (meWins ? 1 : 0), guestWins = s.guestWins + (!meWins && !tie ? 1 : 0);
-    const played = h.mine.length;
-    const finished = hostWins === 2 || guestWins === 2 || played >= 3;
-    const next: RpsState = {
-      ...s, hostWins, guestWins, round: finished ? played : played + 1, mineSubmitted: false, opponentSubmitted: false,
-      lastMoves: { host: choice, guest: bot }, status: finished ? "finished" : "playing",
-      winnerId: finished ? (hostWins > guestWins ? challenge.fromId : guestWins > hostWins ? challenge.toId : null) : null,
-    };
-    current.current = next; setState(next); locked.current = false; setBusy(false);
-    return true;
-  }, [enabled, busy, challenge.botIndex, challenge.fromId, challenge.toId]);
-
-  return { state, error: "", busy, play, refresh: async () => {} };
+export const BOT_NAMES=["Pibe Cebollita","El Tano","La Bruja"] as const;
+export const BOT_BLURBS=["Tira lo que se le ocurre","Repite lo que le funciona","Te lee la última mano"] as const;
+/** Same presentation contract, but all moves and rewards are verified by the server. */
+export function useRpsBotMatch(challenge:Challenge,enabled:boolean){
+ const [state,setState]=useState<RpsState|null>(null),[error,setError]=useState(""),[busy,setBusy]=useState(false);
+ const current=useRef<RpsState|null>(null),locked=useRef(false),generation=useRef(0);
+ const refresh=useCallback(async()=>{
+  if(!enabled||locked.current)return;const token=generation.current;
+  try{const {data,error:e}=await supabase.rpc("duel_bot_open",{p_id:challenge.id,p_bot:challenge.botIndex});if(token!==generation.current)return;if(e)throw e;current.current=data as RpsState;setState(current.current);setError("");}
+  catch(e){if(token===generation.current)setError(String((e as {message?:string})?.message||"No pudimos abrir la práctica. Reconectá."));}
+ },[enabled,challenge.id,challenge.botIndex]);
+ useEffect(()=>{const token=++generation.current;locked.current=false;current.current=null;setState(null);setError("");setBusy(false);if(enabled)void refresh();return()=>{if(token===generation.current)generation.current++;};},[enabled,refresh]);
+ const play=useCallback(async(choice:"rock"|"paper"|"scissors")=>{
+  const s=current.current;if(!enabled||locked.current||!s||s.status!=="playing")return false;
+  const token=generation.current;locked.current=true;setBusy(true);
+  try{const {data,error:e}=await supabase.rpc("duel_bot_play",{p_id:challenge.id,p_round:s.round,p_choice:choice});if(token!==generation.current)return false;if(e)throw e;current.current=data as RpsState;setState(current.current);setError("");return true;}
+  catch(e){if(token===generation.current)setError(String((e as {message?:string})?.message||"No se pudo enviar. Reintentá."));return false;}
+  finally{if(token===generation.current){locked.current=false;setBusy(false);}}
+ },[enabled,challenge.id]);
+ return {state,error,busy,play,refresh};
 }

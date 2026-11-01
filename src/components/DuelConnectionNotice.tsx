@@ -1,0 +1,4 @@
+export function DuelConnectionNotice({stopped,waiting,networkError,onRetry,onExit}:{stopped:boolean;waiting:boolean;networkError:boolean;onRetry:()=>void;onExit:()=>void}){
+ if(!stopped&&!waiting&&!networkError)return null;
+ return <div className="duel-connection" role="status"><strong>{stopped?"DUELO INTERRUMPIDO":networkError?"RECUPERANDO CONEXIÓN…":"ESPERANDO AL RIVAL…"}</strong><p>{stopped?"La espera terminó. Esta interrupción no otorga premios; el resultado de una partida finalizada sigue siendo válido.":networkError?"Tus elecciones confirmadas siguen guardadas. Podés volver a conectar.":"Si el rival no vuelve, la espera vence automáticamente."}</p><div>{!stopped&&<button type="button" onClick={onRetry}>RECONECTAR</button>}<button type="button" onClick={onExit}>{stopped?"VOLVER AL LOBBY →":"SALIR AL LOBBY"}</button></div></div>;
+}

@@ -46,7 +46,8 @@ export function DuelRewardCard({ reward, error, rivalName, gameLabel }: Props) {
       {reward.chest && <p className="drc__chest">🎁 {CHEST[reward.chest]} · monedas extra</p>}
       {h2h && <p className="drc__h2h">VS {(rivalName || "RIVAL").toUpperCase()} · <b>{h2h.wins}</b> ganadas · <b>{h2h.losses}</b> perdidas{h2h.draws ? ` · ${h2h.draws} empates` : ""}</p>}
       {reward.rivalCapped && <p className="drc__note">Ya jugaste mucho contra este rival hoy: el premio baja. ¡Probá con otro!</p>}
-      {reward.capped && !reward.rivalCapped && <p className="drc__note">Llegaste al tope diario: los premios bajan hasta mañana.</p>}
+      {reward.hardCapped && <p className="drc__note">Completaste tus 6 premios de práctica de hoy. Podés seguir entrenando sin premio hasta mañana.</p>}
+      {reward.capped && !reward.hardCapped && !reward.rivalCapped && <p className="drc__note">Llegaste al tope diario: los premios bajan hasta mañana.</p>}
       {canShare && <button type="button" className="drc__share" onClick={() => void share()}>{copied ? "¡COPIADO!" : "↗ COMPARTIR VICTORIA"}</button>}
     </section>
   );
