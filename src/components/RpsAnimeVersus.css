@@ -28,7 +28,7 @@
 .rps-anime-player .arena-avatar__rig{transform:translateX(-50%) scale(.168)}
 .rps-arena .rps-scoreboard>b{font-size:40px}
 .rps-arena .rps-scoreboard i{margin:0 7px;font-size:20px}
-.rps-arena .rps-score strong{font-size:15px,}
+.rps-arena .rps-score strong{font-size:15px}
 .rps-arena .rps-clash{min-height:160px}
 }
 @media(prefers-reduced-motion:reduce){.rps-arena .rps-score:before,.rps-score .rps-anime-player,.rps-arena .rps-clash.is-revealed{animation:none!important}}
@@ -104,6 +104,19 @@
  .rps-arena.rps-anime-duel .lp-reward-summary-info>strong{font-size:27px}
  .rps-arena.rps-anime-duel .lp-reward-summary-info>em{font-size:10px}
 }
-.rps-arena.rps-anime-duel .rps-anime-player .arena-avatar__rig {
-  bottom: -20px;
+
+/* Preserve the approved avatar placement; reserve its visible foot area. */
+.rps-arena.rps-anime-duel .rps-anime-player .arena-avatar__rig{bottom:-20px}
+.rps-arena.rps-anime-duel .rps-score .rps-anime-player{box-sizing:content-box;padding-bottom:20px}
+.rps-arena.rps-anime-duel .rps-score .rps-anime-base{left:50%;right:auto;width:58px;height:7px;bottom:20px;transform:translateX(-50%);z-index:0;box-shadow:0 0 12px #39e0e344}
+.rps-arena.rps-anime-duel .rps-score .rps-anime-player:has(.arena-avatar) .rps-anime-base{bottom:0}
+.rps-arena.rps-anime-duel .rps-score>div:not(.rps-scoreboard){gap:4px;min-width:0}
+.rps-arena.rps-anime-duel .rps-score>div>strong{position:relative;z-index:2;display:block;width:100%;box-sizing:border-box;margin:0;padding:3px 4px;color:#f1fff8;background:linear-gradient(90deg,transparent,#031a28c9,transparent);font:900 italic 17px/1.15 'Barlow Condensed',sans-serif;text-align:center;overflow-wrap:anywhere;text-shadow:1px 2px #00111d}
+.rps-arena.rps-anime-duel .rps-score>.is-winner>strong{color:#ffe16b}
+.rps-arena.rps-anime-duel .rps-score>div>small{position:relative;margin:0;font-size:8px;line-height:1.2}
+.rps-arena.rps-anime-duel .rps-score{height:200px;min-height:200px}
+@media(max-width:899px){
+ .rps-arena.rps-anime-duel .rps-score{height:185px;min-height:185px}
+ .rps-arena.rps-anime-duel .rps-score>div>strong{font-size:15px}
+ .rps-arena.rps-anime-duel .rps-score .rps-anime-base{width:50px;height:6px}
 }

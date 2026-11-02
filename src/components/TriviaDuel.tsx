@@ -1,3 +1,4 @@
+import {DuelGameHeader} from './DuelGameHeader';
 import { SkillMatchReward } from './SkillMatchReward';
 import { ArenaAvatar } from './match/ArenaAvatar';
 import type { InventoryItem } from '../hooks/useAuraInventory';
@@ -76,10 +77,25 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
   return (
     <section className={`trivia-arena${ended ? " trivia-arena--ended trivia-result-scene" : " trivia-arena--playing trivia-question-scene"}`} data-outcome={finished ? state.winnerId===meId?"win":state.winnerId===null?"draw":"loss" : undefined} aria-label="Preguntados: duelo de fútbol">
       {finished && <DuelResultEffects key={challenge.id} outcome={state.winnerId===meId?"win":state.winnerId===null?"draw":"loss"}/> }
-      <header className="trivia-header"><button type="button" onClick={() => ended ? exit() : setConfirmExit(true)}>← Lobby</button><span>LUPI WORLD · ARENA SOCIAL</span><b className="trivia-brand-mark" aria-hidden="true">✦</b></header>
-      <div className="trivia-title"><small>ARENA DE CONOCIMIENTO</small><h2>PREGUNTADOS</h2><p>Fútbol · 5 preguntas · 1 punto por acierto</p></div>
+      <DuelGameHeader game="trivia" onBack={()=>ended?exit():setConfirmExit(true)} mode={challenge.vsBot?'VS BOT':'1 VS 1'} subtitle="FÚTBOL · 5 PREGUNTAS · 1 PUNTO POR ACIERTO" title={<>PREGUN<em>TADOS</em></>}/>
+
       {state && ended && <div className={`trivia-result-banner ${expired || connection.stopped ? "is-expired" : state.winnerId === meId ? "is-win" : ""}`} role="status"><span aria-hidden="true">{expired || connection.stopped ? "⌛" : state.winnerId === meId ? "🏆" : state.winnerId === null ? "🤝" : "👏"}</span><small>{connection.stopped?"ESPERA FINALIZADA":"RESULTADO FINAL"}</small><h3>{verdict}</h3><p>{connection.stopped ? "La espera terminó sin resolver el duelo." : expired ? "Faltó una respuesta. Sin ganador." : state.winnerId === null ? "Igualados hasta el final. ¿Desempatamos?" : `${state.winnerId === meId ? (host ? challenge.fromName : challenge.toName) : (host ? challenge.toName : challenge.fromName)} se lleva el duelo. ¿Sale otra?`}</p><div className="trivia-confetti" aria-hidden="true">{Array.from({length:12},(_,i)=><i key={i} style={{"--particle":i} as React.CSSProperties} />)}</div></div>}
-      <div className="trivia-score"><div className={finished && state.winnerId===meId ? "is-winner" : ""}>{portrait(meId, host ? challenge.fromName : challenge.toName)}{celebrating && myHit && <i key={`point-me-${result.round}`} className="trivia-flying-point" aria-hidden="true">+1</i>}<small>VOS</small><strong>{host ? challenge.fromName : challenge.toName}</strong><b key={`mine-${state?.hostScore}-${state?.guestScore}`}>{state ? host ? state.hostScore : state.guestScore : 0}</b></div><span>VS</span><div className={finished && state.winnerId===(host?challenge.toId:challenge.fromId) ? "is-winner" : ""}>{celebrating && rivalHit && <i key={`point-rival-${result.round}`} className="trivia-flying-point" aria-hidden="true">+1</i>}{portrait(host ? challenge.toId : challenge.fromId, host ? challenge.toName : challenge.fromName)}<small>RIVAL</small><strong>{host ? challenge.toName : challenge.fromName}</strong><b key={`rival-${state?.hostScore}-${state?.guestScore}`}>{state ? host ? state.guestScore : state.hostScore : 0}</b></div></div>
+      <div className="trivia-score lupi-duel-score">
+        <div className={finished && state.winnerId===meId?'is-winner':''}>
+          {portrait(meId,host?challenge.fromName:challenge.toName)}
+          {celebrating && myHit && <i key={`point-me-${result.round}`} className="trivia-flying-point" aria-hidden="true">+1</i>}
+          <strong>{host?challenge.fromName:challenge.toName}</strong><small>VOS</small>
+        </div>
+        <div className="lupi-duel-scoreboard" aria-label={`Marcador: ${state?(host?state.hostScore:state.guestScore):0} a ${state?(host?state.guestScore:state.hostScore):0}`}>
+          <b key={`score-${state?.hostScore}-${state?.guestScore}`}>{state?(host?state.hostScore:state.guestScore):0}<i>:</i>{state?(host?state.guestScore:state.hostScore):0}</b>
+          {ended && <span>FINAL</span>}
+        </div>
+        <div className={finished && state.winnerId===(host?challenge.toId:challenge.fromId)?'is-winner':''}>
+          {celebrating && rivalHit && <i key={`point-rival-${result.round}`} className="trivia-flying-point" aria-hidden="true">+1</i>}
+          {portrait(host?challenge.toId:challenge.fromId,host?challenge.toName:challenge.fromName)}
+          <strong>{host?challenge.toName:challenge.fromName}</strong><small>RIVAL</small>
+        </div>
+      </div>
       {celebrating && !ended && <div key={`answer-flash-${result.round}`} className={`trivia-answer-flash ${myHit?"is-hit":"is-miss"}`} role="status"><small>PREGUNTA {result.round} · {myHit?"¡ACERTASTE! +1":"ESTA VEZ NO SUMASTE"}</small><strong>✓ {result.correct}</strong></div>}
       <DuelConnectionNotice {...connection} onRetry={()=>{void connection.ping();reconnect();}} onExit={exit}/>
       {!state && !error && <p role="status">Preparando las mismas preguntas para ambos…</p>}

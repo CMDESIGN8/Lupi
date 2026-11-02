@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-export type LupiActivity = "play" | "deck" | "album" | "pack" | "achievements" | "explore" | "social";
+export type LupiActivity = "play" | "deck" | "album" | "pack" | "achievements" | "explore" | "social" | "rps" | "trivia";
 export type LupiAction = LupiActivity | "claim";
 type History = {
   counts: Partial<Record<LupiActivity, number>>;
@@ -94,6 +94,13 @@ export function useLupiRecommendation(userId: string, options: {
     if (!options.hasDeck) candidates.push({ title: "Prepará tu primer equipo", description: "Elegí tus cartas para empezar a jugar.", button: "VER EQUIPO", action: "deck", reason: "Primeros pasos" });
     if (options.hasEquipped === false) candidates.push({ title: "Dale estilo a tu personaje", description: "Entrá al equipo y descubrí cómo personalizarte.", button: "PERSONALIZAR", action: "deck", reason: "Tu personaje" });
     if (options.packsAvailable > 0) candidates.push({ title: "Tenés un pack disponible", description: "Descubrí nuevas cartas para tu equipo.", button: "ABRIR PACK", action: "pack", reason: "Pack disponible" });
+    // Alternate the least-used minigame; onboarding and pending rewards stay first.
+    const minigames: Recommendation[] = [
+      {title:"¿Entrenamos tus reflejos?",description:"Desafiá a un rival en Piedra, papel o tijera. Las primeras 5 prácticas del día suman EXP en Defensa.",button:"JUGAR PPT",action:"rps",reason:"Entrená tu Defensa"},
+      {title:"¿Cuánto sabés de fútbol?",description:"Jugá Preguntados. Las primeras 5 prácticas del día suman EXP en Pase.",button:"JUGAR PREGUNTADOS",action:"trivia",reason:"Entrená tu Pase"},
+    ];
+    minigames.sort((a,b)=>(history.counts[a.action as LupiActivity]||0)-(history.counts[b.action as LupiActivity]||0));
+    candidates.push(...minigames);
     if (history.lastMatchAt && Date.now() - history.lastMatchAt < 7 * 86400000) candidates.push({ title: "¿Vamos por otra partida?", description: "Ya terminaste un partido. Seguí sumando experiencia.", button: "JUGAR", action: "play", reason: "Por tu última partida" });
     if (["deck", "album", "pack"].includes(history.last || "")) candidates.push({ title: "¿Probamos tu equipo?", description: "Jugá una partida rápida con tus cartas.", button: "JUGAR", action: "play", reason: "Continuá tu aventura" });
     if (!history.last) candidates.push({ title: "Tu primera aventura", description: "Probá una partida rápida o descubrí el mundo.", button: "JUGAR", action: "play", reason: "Para empezar" });

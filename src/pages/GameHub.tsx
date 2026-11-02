@@ -934,6 +934,15 @@ const {
               void handleLobbyMissionClaim(lobbyMission.id);
             }
             break;
+          case "rps":
+          case "trivia":
+            if (quick.game || incoming || outgoing) break;
+            trackLupiActivity(action);
+            dismissLupiRecommendation(action);
+            setGameTab("play");setView("lobby");setShowExploreWorld(false);setShowPlayersSheet(false);
+            quick.start(action);
+            window.scrollTo({top:0});
+            break;
           case "play": handleGameNavigate("battle"); break;
           case "deck": handleGameNavigate("deck"); break;
           case "album": handleGameNavigate("album"); break;

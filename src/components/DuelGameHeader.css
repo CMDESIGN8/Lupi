@@ -1,0 +1,34 @@
+/* Shared social arena identity. Existing game class names retain layout slots. */
+.rps-arena .lupi-game-header,.trivia-arena .lupi-game-header{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:36px;color:#89c9d6;font:800 9px/1.3 Barlow,system-ui,sans-serif;letter-spacing:.7px}
+.lupi-game-header>span{flex:1;text-align:center;min-width:0}.lupi-game-header>b{font:900 9px/1 Barlow,system-ui,sans-serif;white-space:nowrap;color:#ffe16b}
+.rps-arena .lupi-game-header>button,.trivia-arena .lupi-game-header>button{min-height:40px;padding:8px 12px;border:1px solid #68dee66b;border-radius:6px 2px;background:#052432;color:#dbfff5;font:900 11px/1 Barlow,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.lupi-game-header>button:focus-visible{outline:3px solid #ffe16b;outline-offset:3px}
+.rps-arena .lupi-game-title,.trivia-arena .lupi-game-title{margin:12px 0 9px;text-align:center}
+.rps-arena .lupi-game-title>small,.trivia-arena .lupi-game-title>small{display:block;font:800 8px/1.4 Barlow,system-ui,sans-serif;color:#83e8df;letter-spacing:1.2px}
+.rps-arena .lupi-game-title h2,.trivia-arena .lupi-game-title h2{margin:6px 0;font:1000 italic clamp(28px,4vw,42px)/1 'Barlow Condensed',Impact,sans-serif;color:#edfff8;letter-spacing:.3px;text-shadow:2px 3px #021520}
+.lupi-game-title h2 em{font-style:inherit;color:#ffe16b}
+/* Preguntados uses the same versus strip, with room left for the question. */
+.trivia-arena>.trivia-score.lupi-duel-score{display:grid;grid-template-columns:minmax(0,1fr) 86px minmax(0,1fr);align-items:center;gap:6px;height:165px;min-height:165px;padding:6px 10px;box-sizing:border-box;margin:8px auto 12px;width:100%;max-width:760px;isolation:isolate;position:relative;overflow:hidden;clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);border-block:2px solid #64e7f2;background:linear-gradient(112deg,#07536ce8 0 42%,#02111cf5 42% 58%,#7a601cce 58% 100%)}
+.trivia-arena>.trivia-score.lupi-duel-score>div{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;position:relative}
+.trivia-arena>.trivia-score.lupi-duel-score .trivia-full-player,.trivia-arena>.trivia-score.lupi-duel-score .trivia-full-player .arena-avatar{position:relative;width:84px;height:95px;flex:none;min-height:0;padding:0;overflow:visible}
+.trivia-arena>.trivia-score.lupi-duel-score .trivia-full-player{box-sizing:content-box;padding-bottom:20px}
+.trivia-arena>.trivia-score.lupi-duel-score .arena-avatar__rig{position:absolute;top:auto;bottom:-20px;left:50%;width:390px;height:520px;transform:translateX(-50%) scale(.28);transform-origin:center bottom}
+.trivia-arena>.trivia-score.lupi-duel-score .arena-avatar__rig>.avatar2d{position:relative;inset:auto;width:390px;height:520px;transform:none}
+.trivia-arena>.trivia-score.lupi-duel-score .avatar2d__aura,.trivia-arena>.trivia-score.lupi-duel-score .avatar2d__level,.trivia-arena>.trivia-score.lupi-duel-score .trivia-bot-tag{display:none}
+.trivia-arena>.trivia-score.lupi-duel-score .trivia-full-player>img{position:relative;inset:auto;width:84px;height:95px;max-height:none;object-fit:contain;object-position:center bottom;transform:none;filter:drop-shadow(2px 3px #00111d)}
+.trivia-arena>.trivia-score.lupi-duel-score .trivia-player-base{position:absolute;left:50%;right:auto;bottom:20px;width:50px;height:6px;transform:translateX(-50%);border:1px solid #63eaf0;border-radius:50%;background:#45dee51a;box-shadow:0 0 12px #39e0e344}
+.trivia-arena>.trivia-score.lupi-duel-score .trivia-full-player:has(.arena-avatar) .trivia-player-base{bottom:0}
+.trivia-arena>.trivia-score.lupi-duel-score>div:last-child .trivia-player-base{border-color:#ffdd65}
+.trivia-arena>.trivia-score.lupi-duel-score>div>strong{order:initial;display:block;width:100%;box-sizing:border-box;padding:3px 4px;margin:0;font:900 italic 15px/1.1 'Barlow Condensed',sans-serif;color:#edfff8;overflow-wrap:anywhere;text-align:center;background:linear-gradient(90deg,transparent,#031a28c9,transparent);text-shadow:1px 2px #00111d}
+.trivia-arena>.trivia-score.lupi-duel-score>div>small{order:initial;font-size:8px;line-height:1.2;letter-spacing:1px;margin:0;color:#9ccbd1}
+.trivia-arena>.trivia-score.lupi-duel-score>.lupi-duel-scoreboard>b{font:1000 italic 43px/1 'Barlow Condensed',sans-serif;letter-spacing:-1px;color:#ffe16b;text-shadow:3px 4px #00111d;white-space:nowrap}
+.lupi-duel-scoreboard>b>i{font-style:normal;font-size:23px;margin:0 4px;color:#8ca5a9}
+.trivia-arena>.trivia-score.lupi-duel-score>.lupi-duel-scoreboard>span{font:800 8px/1.3 Barlow,system-ui,sans-serif;color:#d9f5ed;letter-spacing:.8px;text-align:center}
+.trivia-arena>.trivia-score.lupi-duel-score>.is-winner>strong{color:#ffe16b}
+@media(max-width:600px){.rps-arena .lupi-game-header,.trivia-arena .lupi-game-header{font-size:7px;gap:7px}.lupi-game-header>b{font-size:7px}.rps-arena .lupi-game-header>button,.trivia-arena .lupi-game-header>button{font-size:10px;padding:8px 10px}.rps-arena .lupi-game-title h2,.trivia-arena .lupi-game-title h2{font-size:29px}.trivia-arena .lupi-game-title{margin:8px 0}.trivia-arena .lupi-game-title>small{font-size:7px;letter-spacing:.6px}}
+@media(prefers-reduced-motion:reduce){.trivia-arena>.trivia-score.lupi-duel-score .trivia-full-player{animation:none}}
+
+/* Keep the central score clear; question progress lives beside the timer. */
+.trivia-arena>.trivia-score.lupi-duel-score::before,
+.trivia-arena>.trivia-score.lupi-duel-score::after{content:none;display:none}
+.trivia-arena>.trivia-score.lupi-duel-score>.lupi-duel-scoreboard{position:relative;z-index:2;isolation:isolate}

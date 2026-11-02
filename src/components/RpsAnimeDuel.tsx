@@ -1,3 +1,4 @@
+import {DuelGameHeader} from './DuelGameHeader';
 import { SkillMatchReward } from './SkillMatchReward';
 import { DuelResultEffects } from './DuelResultEffects';
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
@@ -64,9 +65,9 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
  };
  return <section className={`rps-arena rps-anime-duel ${shake?"duel-shake":""} ${chant?"is-chanting":""} ${finished&&!chant?"is-complete":""}`} data-outcome={finished ? state.winnerId===meId?"win":state.winnerId===null?"draw":"loss" : undefined} aria-label="Piedra, papel o tijera">
  {finished&&!chant&&<DuelResultEffects key={challenge.id} outcome={state.winnerId===meId?"win":state.winnerId===null?"draw":"loss"}/> }
-  <header className="rps-header"><button type="button" onClick={exit}>← CLUB</button><span>LUPI WORLD · DUELO DE MANOS</span><span>{isBot?"VS BOT":"1 VS 1"}</span></header>
-  <div className="rps-title"><small>DUELO ANIME · LEÉ AL RIVAL</small><h2>PIEDRA, PAPEL <em>O TIJERA</em></h2></div>
-  <div className="rps-score"><div className={finished&&!chant&&state.winnerId===meId?"is-winner":""}>{face(meId,myName)}<strong>{myName}</strong><small>VOS</small></div><div className="rps-scoreboard"><b>{myWins}<i>:</i>{rivalWins}</b><span>{chant?"MANOS SELLADAS":finished?"FINAL":`RONDA ${state?.round??1} / 3`}</span></div><div className={finished&&!chant&&state.winnerId===rivalId?"is-winner":""}>{face(rivalId,rivalName)}<strong>{rivalName}</strong><small>RIVAL</small></div></div>
+  <DuelGameHeader game="rps" onBack={exit} mode={isBot?'VS BOT':'1 VS 1'} subtitle="DUELO ANIME · LEÉ AL RIVAL" title={<>PIEDRA, PAPEL <em>O TIJERA</em></>}/>
+
+  <div className="rps-score lupi-duel-score"><div className={finished&&!chant&&state.winnerId===meId?"is-winner":""}>{face(meId,myName)}<strong>{myName}</strong><small>VOS</small></div><div className="rps-scoreboard"><b>{myWins}<i>:</i>{rivalWins}</b><span>{chant?"MANOS SELLADAS":finished?"FINAL":`RONDA ${state?.round??1} / 3`}</span></div><div className={finished&&!chant&&state.winnerId===rivalId?"is-winner":""}>{face(rivalId,rivalName)}<strong>{rivalName}</strong><small>RIVAL</small></div></div>
   <div data-round-outcome={reveal ? mine===theirs?"draw":roundWin==="¡RONDA TUYA!"?"win":"loss" : undefined} className={`rps-clash ${reveal?'is-revealed':''} ${finished?'is-final':''} ${chant?'is-chanting':''} ${selected&&!reveal&&!chant?"is-selected":""}`} key={reveal?revealKey:'secret'}>
    <div className="rps-clash__side">{chant?<RpsHand move="rock"/>:reveal?<RpsHand move={mine as Move}/>:selected?<RpsHand move={selected}/>:<RpsHand move="rock"/>}<small>{reveal?label(mine!):selected?"TU MANO · SECRETA":"TU PRÓXIMA JUGADA"}</small></div>
    <div className="rps-clash__center"><b key={chant}>{chant|| (reveal?"⚡":"VS")}</b><span>{chant?"LAS DOS MANOS ESTÁN SELLADAS":reveal?roundWin:state?.opponentSubmitted?"RIVAL LISTO":"ELECCIÓN SECRETA"}</span></div>
