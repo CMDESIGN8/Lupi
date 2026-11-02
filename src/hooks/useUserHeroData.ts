@@ -62,6 +62,7 @@ export function useUserHeroData(userId: string | undefined) {
   nextRewardDescription: "Ganar un partido",
 });
   const [loading, setLoading] = useState(true);
+  const [loadedUserId,setLoadedUserId] = useState<string|null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const refetch = useCallback(() => {
@@ -97,9 +98,8 @@ export function useUserHeroData(userId: string | undefined) {
           .eq("id", userId)
           .single();
 
-        if (profileError && profileError.code !== "PGRST116") {
-          console.error("Error fetching profile:", profileError);
-        }
+        if (profileError) throw profileError;
+        if (!profile) throw new Error("No se pudo cargar el perfil del jugador");
 
         const points = profile?.points || 0;
         const level = profile?.user_card_level || 1;      // ⬅️ CAMBIADO
@@ -148,6 +148,7 @@ const stats = {
         }
 
         if (isMounted) {
+          setLoadedUserId(userId);
           setData({
             level,
             exp: currentExp,
@@ -189,5 +190,5 @@ const stats = {
     window.addEventListener("lupi:progression-updated", onProgress);
     return () => window.removeEventListener("lupi:progression-updated", onProgress);
   }, [refetch]);
-  return { data, loading, refetch };
+  return { data, loading, ready: !loading && loadedUserId === userId, refetch };
 }

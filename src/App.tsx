@@ -302,7 +302,7 @@ if (user && needsPlayerOnboarding(user)) {
             <OnboardingTour onComplete={handleTourComplete} />
           )}
 
-          {appRoute === "home" && <><header className="app-masthead"><BottomNav activeTab={tab} onTabChange={handleTabChange} onEnterGame={()=>enterGame("game")} pendingRewards={pendingRewards}/></header><div className="app-content-intro"><div className="masthead-top"><div className="masthead-identity"><AppHeader userId={user.id}/></div>{tab === "home" && <div className="masthead-greeting"><div><span>TU PUNTO DE PARTIDA</span><h1>Hola, {user.username} <em>✦</em></h1></div><p>Un paso para vos. Un lugar para tu gente.</p></div>}</div></div></>}
+          {appRoute === "home" && <><header className="app-masthead"><BottomNav activeTab={tab} onTabChange={handleTabChange} onEnterGame={()=>enterGame("game")} pendingRewards={pendingRewards}/></header><div className="app-content-intro"><div className="masthead-top"><div className="masthead-identity"><AppHeader userId={user.id}/></div>{tab === "home" && <div className="masthead-greeting"><div><span>TU PUNTO DE PARTIDA</span><h1>Hola, {user.username} <em>✦</em></h1></div></div>}</div></div></>}
 
           {appRoute === "home" ? (
             <>
@@ -321,7 +321,7 @@ if (user && needsPlayerOnboarding(user)) {
               )}
               {tab === "ranking" && <LeaderboardTab user={user} />}
               {tab === "profile" && (
-                <><div className="profile-dashboard-links"><button type="button" onClick={()=>handleNavigate("benefits")}>🎁 Mis beneficios{pendingRewards > 0 ? ` · ${pendingRewards} pendientes` : ""}</button><button type="button" onClick={()=>handleNavigate("ticket")}>🎟 Mis entradas</button></div><button type="button" className="profile-character-link" onClick={()=>handleNavigate("character")}>👕 Mi personaje · Avatar y equipamiento →</button><ProfileTab
+                <><ProfileTab
                   user={user}
                   onLogout={handleLogout}
                   onRestartTour={handleRestartTour}

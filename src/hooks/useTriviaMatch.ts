@@ -29,7 +29,7 @@ export function useTriviaMatch(challenge: Challenge) {
       if (lock.current) { timer = setTimeout(() => void read(), 1200); return; }
       lock.current = true;
       try {
-        const { data, error: e } = await supabase.rpc(start ? "trivia_start" : "trivia_state", start
+        const { data, error: e } = await supabase.rpc(challenge.vsBot ? (start ? "trivia_bot_open" : "trivia_bot_state") : (start ? "trivia_start" : "trivia_state"), start && !challenge.vsBot
           ? { p_id: challenge.id, p_host: challenge.fromId, p_guest: challenge.toId }
           : { p_id: challenge.id });
         if (stopped) return;
@@ -53,7 +53,7 @@ export function useTriviaMatch(challenge: Challenge) {
     const token = session.current;
     lock.current = true; setBusy(true);
     try {
-      const { data, error: e } = await supabase.rpc("trivia_answer", { p_id: challenge.id, p_round: current.round, p_answer: index });
+      const { data, error: e } = await supabase.rpc(challenge.vsBot ? "trivia_bot_answer" : "trivia_answer", { p_id: challenge.id, p_round: current.round, p_answer: index });
       if (session.current !== token) return false;
       if (e) throw e;
       latest.current = data as TriviaState; setState(latest.current); setError("");

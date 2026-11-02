@@ -1,5 +1,5 @@
 import { calculateSeededTurn, calculateSeededDecision } from "./engine.ts";
-import type { UserCard } from "../../../src/types/cards.ts";
+import type { UserCard } from "./cards.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const headers = {
@@ -7,6 +7,7 @@ const headers = {
   "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Content-Type": "application/json",
+  "Access-Control-Expose-Headers": "Server-Timing, X-Lupi-Region",
 };
 const reply = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers });
@@ -14,13 +15,27 @@ const reply = (body: unknown, status = 200) =>
 Deno.serve(async (request) => {
   if (request.method === "OPTIONS") return new Response(null, { headers });
   if (request.method !== "POST") return reply({ error: "Method not allowed" }, 405);
+  const began=performance.now();
+  const timings:Record<string,number>={auth:0,read:0,write:0};
+  const measuredFetch:typeof fetch=async(input,init)=>{
+    const raw=input instanceof Request?input.url:String(input);
+    const path=new URL(raw).pathname;
+    const group=path.startsWith('/auth/')?'auth':(init?.method??(input instanceof Request?input.method:'GET')).toUpperCase()==='GET'?'read':'write';
+    const started=performance.now();
+    try{const response=await fetch(input,init);await response.clone().arrayBuffer();return response;}
+    finally{timings[group]+=performance.now()-started;}
+  };
+  const reply=(body:unknown,status=200)=>new Response(JSON.stringify(body),{status,headers:{...headers,
+    'Server-Timing':Object.entries({...timings,total:performance.now()-began}).map(([name,duration])=>`${name};dur=${duration.toFixed(1)}`).join(', '),
+    'X-Lupi-Region':Deno.env.get('SB_REGION')??'unknown',
+  }});
   try {
     const auth = request.headers.get("Authorization");
     if (!auth?.startsWith("Bearer ")) return reply({ error: "Unauthorized" }, 401);
     const url = Deno.env.get("SUPABASE_URL");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     if (!url || !serviceKey) return reply({ error: "Server not configured" }, 500);
-    const admin = createClient(url, serviceKey, { auth: { persistSession: false } });
+    const admin = createClient(url, serviceKey, { auth: { persistSession: false }, global:{fetch:measuredFetch} });
     const { data: { user }, error: authError } = await admin.auth.getUser(auth.slice(7));
     if (authError || !user) return reply({ error: "Invalid session" }, 401);
     const body = await request.json();
@@ -174,9 +189,12 @@ Deno.serve(async (request) => {
         .select("user_id,created_at,state,turn_index,pending_decision,user_score,opponent_score,match_id")
         .eq("id", body.session_id).eq("user_id", user.id).single();
       if (error || !session) return reply({ error: "Session not found" }, 404);
-      if (session.state === "completed" && session.match_id)
-        return reply({ match_id: session.match_id, user_score: session.user_score,
-          opponent_score: session.opponent_score });
+      const finishResponse = async (matchId: string) => {
+        const {data: reward,error: rewardError} = await admin.rpc('verified_match_reward',{p_session_id:body.session_id});
+        if(rewardError) return reply({error:'Match completed but reward could not be confirmed; retry finish'},503);
+        return reply({match_id:matchId,user_score:session.user_score,opponent_score:session.opponent_score,reward});
+      };
+      if (session.state === "completed" && session.match_id) return await finishResponse(session.match_id);
       if (session.state !== "started" || session.turn_index !== 8 ||
           session.pending_decision !== null)
         return reply({ error: "Match has unfinished turns or decisions" }, 409);
@@ -188,8 +206,7 @@ Deno.serve(async (request) => {
         .rpc("finalize_verified_match", { p_session_id: body.session_id });
       if (finalizeError || !matchId)
         return reply({ error: "Match finalization failed" }, 409);
-      return reply({ match_id: matchId, user_score: session.user_score,
-        opponent_score: session.opponent_score });
+      return await finishResponse(matchId);
     }
     return reply({ error: "Invalid action" }, 400);
   } catch (error) {

@@ -24,3 +24,32 @@
 @media(max-width:600px){.trivia-arena{min-height:100dvh;max-width:none;border:0;border-radius:0;padding:calc(12px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom))}.trivia-header{font-size:8px;letter-spacing:.07em;gap:8px}.trivia-header button{padding:8px 12px;font-size:11px}.trivia-brand-mark{font-size:24px;width:28px}.trivia-title{margin:10px 0 12px}.trivia-title>small{display:none}.trivia-title h2{font-size:30px}.trivia-title p{font-size:11px}.trivia-score{margin:12px auto 18px;padding:10px 14px;gap:12px}.trivia-score b{font-size:28px}.trivia-score strong{font-size:14px}.trivia-progress{font-size:10px}.trivia-question h3{font-size:23px;margin:18px auto 9px}.trivia-wait{font-size:11px;margin:8px 0 12px;line-height:1.5}.trivia-options{grid-template-columns:1fr;gap:9px;margin:14px 0}.trivia-options button{min-height:60px;padding:12px;gap:12px}.trivia-options button>span{font-size:14px}.trivia-options button>b{width:30px;height:30px;flex-basis:30px;font-size:13px}.trivia-reveal,.trivia-summary{padding:8px 12px}.trivia-reveal summary{font-size:11px}.trivia-reveal summary small{font-size:10px}.trivia-arena--ended .trivia-title h2{font-size:28px}.trivia-result-banner h3{font-size:36px}.trivia-result-banner>span{font-size:28px}.trivia-arena--ended .trivia-score{margin:8px auto 12px;padding:10px 12px}.trivia-arena--ended .trivia-score b{font-size:32px}.trivia-actions{flex-direction:column;gap:8px}.trivia-actions button{width:100%}.trivia-summary th:not(:first-child),.trivia-summary td:not(:first-child){min-width:38px}.trivia-summary>summary{font-size:14px}.trivia-footnote{font-size:9px;margin-top:14px}}
 @media(max-height:720px) and (min-width:601px){.trivia-arena{padding-top:12px}.trivia-title{margin:8px 0}.trivia-title h2{font-size:30px}.trivia-score{margin:8px auto 14px;padding:8px 16px}.trivia-question h3{margin-top:14px;font-size:25px}.trivia-options button{min-height:65px}.trivia-arena--ended .trivia-portrait{height:72px}.trivia-arena--ended .trivia-portrait>.lw-face{height:62px}}
 @media(prefers-reduced-motion:reduce){.trivia-arena *,.trivia-arena *::after{animation:none!important;transition:none!important}.trivia-confetti{display:none}}
+/* Desktop arena: keep the question and the final actions inside the first screen. */
+@media(min-width:900px) and (min-height:580px){
+.trivia-arena{min-height:calc(100dvh - 32px);padding:14px 28px}
+.trivia-title{margin:6px 0 8px}
+.trivia-title>small{display:none}
+.trivia-title h2{font-size:30px;margin:4px 0}
+.trivia-title p{margin:4px 0;font-size:11px}
+.trivia-score{margin:8px auto 10px;padding:7px 16px}
+.trivia-score b{font-size:27px}
+.trivia-question h3{margin:12px auto 6px;font-size:clamp(20px,2vw,26px);line-height:1.25}
+.trivia-wait{margin:5px 0 8px;min-height:16px;font-size:11px}
+.trivia-options{margin:10px 0;gap:9px}
+.trivia-options button{min-height:58px;padding:10px 14px}
+.trivia-reveal,.trivia-summary{margin-top:8px;padding:4px 12px}
+.trivia-footnote{margin:9px 0 0;font-size:9px}
+.trivia-arena--ended{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 22px;align-content:start;align-items:center}
+.trivia-arena--ended>.trivia-header,.trivia-arena--ended>.trivia-title{grid-column:1 / -1}
+.trivia-arena--ended .trivia-title{margin:0}
+.trivia-arena--ended>.trivia-result-banner{grid-column:1;grid-row:3;padding:10px 4px}
+.trivia-arena--ended .trivia-result-banner h3{font-size:38px;margin:7px 0}
+.trivia-arena--ended>.trivia-score{grid-column:1;grid-row:4;margin:0 auto;padding:9px 14px}
+.trivia-arena--ended>.drc{grid-column:2;grid-row:3 / span 2;width:100%;max-width:100%;margin:0}
+.trivia-arena--ended>.trivia-rematch{grid-column:2;grid-row:5;margin:0;width:100%}
+.trivia-arena--ended>.trivia-summary{grid-column:1 / -1;width:100%;max-width:100%}
+.trivia-arena--ended>.trivia-footnote{grid-column:1 / -1}
+.trivia-arena--ended .trivia-portrait{width:56px;height:66px}
+.trivia-arena--ended .trivia-portrait>.lw-face{width:42px;height:56px}
+.trivia-summary-scroll,.trivia-reveal-body{max-height:180px;overflow-y:auto;scrollbar-width:thin}
+}

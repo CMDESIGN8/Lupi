@@ -1,3 +1,5 @@
+import { SkillMatchReward } from './SkillMatchReward';
+import { DuelResultEffects } from './DuelResultEffects';
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArenaSymbol } from "./match/ArenaSymbol";
 import { ArenaAvatar } from "./match/ArenaAvatar";
@@ -92,6 +94,7 @@ export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], o
     </div></div><div className="fp-secret-note">◇ Sin elegir a tiempo: jugada automática.</div>
   </section></div> : undefined;
   return <section data-outcome={ended ? won ? "win" : state?.winnerId ? "loss" : "draw" : undefined} className={`trivia-arena fp-arena ${quick ? "fp-arena--quick" : ""} ${ended ? "trivia-arena--ended fp-arena--result" : state?.status === "playing" || state?.status === "finished" ? "fp-arena--live fp-arena--broadcast" : "fp-arena--waiting"}`} aria-label="Partido Futsal PvP">
+    {state?.status === "finished" && <DuelResultEffects key={challenge.id} outcome={won?"win":state.winnerId?"loss":"draw"}/> }
     <header className="trivia-header"><button type="button" onClick={() => ended || !state ? onExit() : setConfirmExit(true)}>← Lobby</button><span>LUPI WORLD · FUTSAL PvP</span><b className="trivia-brand-mark">⚽</b></header>
     <div className="trivia-title"><small>LEÉ AL RIVAL · ELEGÍ TU JUGADA</small><h2>{quick ? "DUELO RELÁMPAGO" : "DUELO EN LA CANCHA"}</h2><p>{totalAttacks} ataques por jugador · {quick ? `Tres situaciones · ${decisionSeconds} segundos para decidir` : "Construcción y definición"}</p></div>
     {!live && !ended && (<div className="trivia-score fp-score">{scoreSide(meId,mine,state ? host ? state.hostScore : state.guestScore : 0,true)}<span className="fp-score-mid"><small>AMISTOSO</small>VS<small>{totalAttacks} ATAQUES</small></span>{scoreSide(host?challenge.toId:challenge.fromId,rival,state ? host ? state.guestScore : state.hostScore : 0,false)}</div>)}
@@ -120,6 +123,7 @@ export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], o
       <div className="fp-finale__speed" aria-hidden="true"/><div className="fp-finale__sparks" aria-hidden="true">{Array.from({length:14},(_,i)=><i key={i} style={{"--spark":i} as React.CSSProperties}/>)}</div>
       <div className="fp-finale__headline"><small>SILBATAZO FINAL · CLUB LUPI</small><ArenaSymbol kind={won?"trophy":"shield"}/><h3>{verdict}</h3><span>{state.status==="finished" ? "SE DEJÓ TODO EN LA CANCHA" : "EL ENCUENTRO TERMINÓ"}</span></div>
       <div className="fp-finale__stage"><div className={`fp-finale__player${won?' is-winner':''}`}>{fullAvatar(meId,mine)}<strong>{mine}</strong><small>TU EQUIPO</small></div><div className="fp-finale__score" aria-label={`Resultado final: ${mine} ${ownScore}, ${rival} ${otherScore}`}><small>FINAL</small><div><b>{ownScore}</b><em>:</em><b>{otherScore}</b></div><span>FUTSAL · 1 VS 1</span></div><div className={`fp-finale__player fp-finale__player--away${!won&&state.winnerId!==null?' is-winner':''}`}>{fullAvatar(host?challenge.toId:challenge.fromId,rival)}<strong>{rival}</strong><small>RIVAL</small></div></div>
+      {state.status==="finished"&&<SkillMatchReward game="futsal" matchId={challenge.id}/>}
       {onRematch && state.status === "finished" && <button className="duel-rematch" type="button" onClick={onRematch}>PEDIR REVANCHA ↻</button>}
       <div className="fp-finale__bottom"><span>{state.winnerId===null?"Un duelo a la altura del club.":won?"Esta cancha ya conoce tu nombre.":"La revancha empieza en el próximo partido."}</span><button type="button" className="fp-primary" onClick={onExit}>VOLVER AL CLUB <span aria-hidden="true"> →</span></button></div>
       <details className="fp-finale__stats"><summary>RESUMEN DEL DUELO</summary><div><span><b>{ownScore}</b>GOLES TUYOS</span><span><b>{attackResults(meId).length}/{totalAttacks}</b>ATAQUES JUGADOS</span><span><b>{state.history.filter(e=>e.attackerId!==meId&&e.defended).length}</b>CIERRES ACERTADOS</span></div></details>
@@ -127,7 +131,7 @@ export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], o
       <div className="fp-result-layout"><details className="trivia-summary fp-final-court fp-match-extra"><summary><i className="fp-match-extra__icon"><ArenaSymbol kind="setpiece"/></i><span>VER LA CANCHA<small>Equipos que disputaron el partido</small></span><b>⌄</b></summary><PvpSimulatorCourt state={state} meId={meId} mine={mine} rival={rival} now={now} receivedAt={receivedAt} isHost={host}/></details></div>
       {state.history.length > 0 && <details className="trivia-summary fp-match-extra fp-match-extra--replay"><summary><i className="fp-match-extra__icon"><ArenaSymbol kind="elaborated"/></i><span>RELATO DEL PARTIDO<small>{state.history.length} decisiones resueltas · Ver jugadas</small></span><b>⌄</b></summary><ol className="fp-history">{state.history.map(event=><li key={event.version}><b>{Math.ceil(event.turn/2)}. {event.attackerId===meId?"Tu ataque":"Ataque rival"}{(event.rulesVersion??1)>=2 ? ` · ${event.stage==="build" ? "Construcción" : "Definición"}` : ""}</b><p>{event.narrative}</p><small>{eventChoiceLabel(event,true)} / {eventChoiceLabel(event,false)}{event.hostAuto || event.guestAuto ? " · Elección automática" : ""}</small></li>)}</ol></details>}
     </>}
-    <p className="trivia-footnote">Amistoso · Sin XP, monedas ni puntos de ranking{!ended && <> · {decisionSeconds}s por elección · Jugada automática al vencer el tiempo</>}</p>
+    <p className="trivia-footnote">Amistoso · Entrena habilidades · Sin XP de cuenta, monedas ni puntos de ranking{!ended && <> · {decisionSeconds}s por elección · Jugada automática al vencer el tiempo</>}</p>
     {confirmExit && <div className="trivia-confirm"><div role="dialog" aria-modal="true" aria-labelledby="fp-exit"><h3 id="fp-exit">¿Salir del partido?</h3><p>{state?.status === "playing" ? "Salir cuenta como abandono y el rival gana el duelo amistoso." : "Se cancelará la preparación de ambos equipos."}</p><button type="button" autoFocus onClick={() => setConfirmExit(false)}>SEGUIR JUGANDO</button><button type="button" disabled={busy} onClick={() => void finishExit()}>SALIR DEL PARTIDO</button></div></div>}
   </section>;
 }

@@ -41,3 +41,6 @@
 .gh-world .gh-world__next>.qd-search-status>button{grid-column:2;grid-row:1;align-self:center;width:auto;min-height:32px;padding:6px 7px;border:1px solid #75dce955;border-radius:5px;background:#073041;color:#bcecf1;font:800 8px Barlow,system-ui;letter-spacing:0;box-shadow:none}
 .gh-world__next--searching>p,.gh-world__next--searching>.gh-world__next-secondary{display:none!important}
 @media(max-width:360px){.gh-world__next>.qd-search-status .qd-search-status__head strong{font-size:16px}.gh-world__next>.qd-search-status .qd-search-status__radar{width:15px;height:15px}.gh-world .gh-world__next>.qd-search-status>button{font-size:7px;padding-inline:5px}}
+.qd-mode--futsal{background-image:linear-gradient(90deg,#031925ee,#03192577),url('../assets/challenge-futsal-anime.webp')}
+.qd-mode--futsal{background-size:cover;background-position:80% center}
+.qd-chooser{max-height:calc(100dvh - 28px);overflow-y:auto;scrollbar-width:thin}

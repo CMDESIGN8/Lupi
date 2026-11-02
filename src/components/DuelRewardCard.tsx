@@ -22,6 +22,10 @@ export function DuelRewardCard({ reward, error, rivalName, gameLabel }: Props) {
   if (!reward) return <p className="drc drc--soft" role="status">Contando tu botín…</p>;
   if (reward.duplicate) return <p className="drc drc--soft" role="status">Premio de esta partida ya acreditado.</p>;
 
+  if (reward.hardCapped) return <section className="drc drc--practice-complete" role="status" aria-label="Premios diarios completados">
+    <span className="drc-practice-icon" aria-hidden="true">✓</span><div><small>MODO PRÁCTICA</small><h3>¡BOTÍN DIARIO COMPLETADO!</h3><div className="drc-practice-stamps" aria-hidden="true">{Array.from({length:6},(_,i)=><i key={i}>✓</i>)}</div><p>Ya recibiste tus 6 premios de hoy entre PPT y Preguntados.</p><strong>Podés seguir jugando. La XP y las monedas vuelven mañana.</strong><small className="drc-practice-reset">Reinicio: 00:00 · hora argentina</small></div>
+  </section>;
+
   const win = reward.result === "win";
   const h2h = reward.h2h;
   const canShare = win && !reward.vsBot;
@@ -46,7 +50,7 @@ export function DuelRewardCard({ reward, error, rivalName, gameLabel }: Props) {
       {reward.chest && <p className="drc__chest">🎁 {CHEST[reward.chest]} · monedas extra</p>}
       {h2h && <p className="drc__h2h">VS {(rivalName || "RIVAL").toUpperCase()} · <b>{h2h.wins}</b> ganadas · <b>{h2h.losses}</b> perdidas{h2h.draws ? ` · ${h2h.draws} empates` : ""}</p>}
       {reward.rivalCapped && <p className="drc__note">Ya jugaste mucho contra este rival hoy: el premio baja. ¡Probá con otro!</p>}
-      {reward.hardCapped && <p className="drc__note">Completaste tus 6 premios de práctica de hoy. Podés seguir entrenando sin premio hasta mañana.</p>}
+      {reward.hardCapped && <p className="drc__note">Completaste tus 6 premios de práctica de hoy. La práctica de habilidades tiene su propio límite de 5 partidas por juego.</p>}
       {reward.capped && !reward.hardCapped && !reward.rivalCapped && <p className="drc__note">Llegaste al tope diario: los premios bajan hasta mañana.</p>}
       {canShare && <button type="button" className="drc__share" onClick={() => void share()}>{copied ? "¡COPIADO!" : "↗ COMPARTIR VICTORIA"}</button>}
     </section>

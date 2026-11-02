@@ -1,3 +1,10 @@
+import {PlayerArtwork} from './SigningWelcome';
+import {OwnedCardPortrait} from './OwnedCardPortrait';
+import {AvatarEditor} from './AvatarEditor';
+import {useEquipmentNotice} from './EquipmentNotice';
+import { SkillMatchReward } from './SkillMatchReward';
+import { DuelResultEffects } from './DuelResultEffects';
+import './BotMatchScene.css';
 import { MatchCourt } from './match/MatchCourt';
 import { FORMATIONS, mirror, type Formation, type Pos } from './match/formations';
 import { MatchTutorial } from './MatchTutorial';
@@ -74,6 +81,8 @@ interface MatchResult {
   userScore: number;
   rivalScore: number;
   xpGained: number;
+  serverVerified: boolean;
+  rewardConfirmed: boolean;
   streakBonus: number;
   leveledUpCards: string[];
   skillUpgrade: { group: SkillGroup; label: string; icon: string; delta: number } | null;
@@ -93,6 +102,22 @@ const TURN_MS     = 400;
 const GOAL_MS     = 750;
 
 function delay(ms: number) { return new Promise<void>(r => setTimeout(r, Math.round(ms * 0.55))); }
+
+// SQL requires at least 3 seconds between committed turns. Start the safe
+// window after receiving confirmation; animations consume this time naturally.
+// Do not use delay(): that helper intentionally speeds up cosmetic animation.
+function createVerifiedTurnPacer(resuming: boolean) {
+  let nextAllowedAt = resuming ? performance.now() + 3100 : 0;
+  return {
+    async wait() {
+      while (performance.now() < nextAllowedAt) {
+        await new Promise<void>(resolve => setTimeout(resolve, Math.ceil(nextAllowedAt - performance.now())));
+      }
+    },
+    committed() { nextAllowedAt = performance.now() + 3100; },
+  };
+}
+
 function calcOvr(cards: UserCard[]) {
   if (!cards.length) return 50;
   return Math.round(cards.reduce((s, c) => s + getCardData(c).overall_rating, 0) / cards.length);
@@ -115,6 +140,17 @@ export function CardBattle({
   onDailyChallengesUpdated,
 }: CardBattleProps) {
 
+  const {ask:askEquipment,dialog:equipmentDialog}=useEquipmentNotice();
+  const [pausedMatch,setPausedMatch]=useState<string|null>(null);
+  useEffect(()=>{if(!pausedMatch)return;const old=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=old;};},[pausedMatch]);
+  const [skillMatchId,setSkillMatchId] = useState<string|null>(null);
+  const [equipmentSlot,setEquipmentSlot]=useState<'socks'|'boots'|null>(null);
+  const equipmentEditor=equipmentSlot?<AvatarEditor userId={userId} initialSlot={equipmentSlot} onClose={()=>setEquipmentSlot(null)}/>:null;
+  const [pendingChoice,setPendingChoice]=useState<{label:string;icon:string;player:string;automatic:boolean;card:UserCard;color:string;effect:string}|null>(null);
+  const [networkStatus,setNetworkStatus]=useState('');
+  const [networkSeconds,setNetworkSeconds]=useState(0);
+  useEffect(()=>{setNetworkSeconds(0);if(!networkStatus)return;const started=Date.now();const timer=window.setInterval(()=>setNetworkSeconds(Math.floor((Date.now()-started)/1000)),1000);return()=>window.clearInterval(timer);},[networkStatus]);
+  const networkNotice=networkStatus && !pendingChoice?<div className="lp-match-network" role="status"><strong>{networkStatus}</strong><span>{networkSeconds>=4?`El servidor está tardando · ${networkSeconds} s. Tu partido sigue activo.`:'Confirmando la jugada con el servidor…'}</span></div>:null;
   const [phase, setPhase] = useState<'select'|'battle'|'result'>(
   autoStart && isCampaignMode && forcedOpponent ? 'battle' : 'select'
 );
@@ -186,8 +222,8 @@ export function CardBattle({
   }
 
   function addLog(text: string, type: LogLine['type'] = 'neutral') {
-    logId.current++;
-    setLog(prev => [...prev.slice(-50), { id: logId.current, text, type }]);
+    const id=++logId.current;
+    setLog(prev => [...prev.slice(-50), { id, text, type }]);
   }
 
   function calculateTeamStats(deckCards: UserCard[]) {
@@ -289,11 +325,11 @@ export function CardBattle({
   }
 
   async function backToMidfield() {
-    await delay(400);
-    resetAll();
+    applyUFormation('base'); applyRFormation('base');
+    setUHL(null); setRHL(null);
     moveBall(50, 50, null);
-    await delay(200);
-    setBallVis(false);
+    setBallTeam(null);
+    await delay(180);
   }
 
   // ── Timer ──────────────────────────────────────────────────────────────────
@@ -318,22 +354,35 @@ export function CardBattle({
       setMoment(ctx); setDecidedId(null);
       animeRef.current?.triggerKeyMoment();
       const safe = ctx.options.find(o => o.isSafe) ?? ctx.options[ctx.options.length - 1];
-      startTimer(Math.min(ctx.timeLimit, 3), () => {
-        decisionResolve.current = null;
-        setDecidedId(safe.id);
-        setTimeout(() => { setMoment(null); resolve(safe); }, 500);
-      });
+      startTimer(Math.min(ctx.timeLimit, 3), () => acceptDecision(safe, ctx, true));
     });
   }
 
-  function handleDecision(opt: DecisionOption) {
+  function acceptDecision(opt: DecisionOption, ctx: MomentContext, automatic = false) {
+    // Clear the resolver synchronously: a second tap or timeout cannot submit twice.
+    const resolve = decisionResolve.current;
+    if (!resolve) return;
+    decisionResolve.current = null;
     clearTimer();
     setDecidedId(opt.id);
-    setTimeout(() => {
-      decisionResolve.current?.(opt);
-      decisionResolve.current = null;
-      setMoment(null);
-    }, 380);
+    setPendingChoice({label:opt.label,icon:opt.icon,player:getCardData(ctx.mainCard).name,automatic,card:ctx.mainCard,color:SKILL_GROUP_INFO[opt.skillGroup].color,effect:opt.primaryStat==='finishing'?'shot':opt.primaryStat==='pace'?'speed':'flow'});
+    setNetworkStatus('Preparando tu jugada…');
+    setMoment(null);
+    resolve(opt);
+  }
+
+  function handleDecision(opt: DecisionOption) {
+    if (moment) acceptDecision(opt, moment);
+  }
+
+  async function confirmDecision(session: {id:string;version:number}|null, chosen: DecisionOption) {
+    try {
+      return session ? await verifiedMatchApi.decision(session.id, session.version, chosen.id) : null;
+    } finally {
+      // Outcomes and scores are revealed only after the authoritative response.
+      setPendingChoice(null);
+      setNetworkStatus('');
+    }
   }
 
   // ── Loop ───────────────────────────────────────────────────────────────────
@@ -344,17 +393,21 @@ export function CardBattle({
     const deckCards = (userDeck.cards ?? []) as UserCard[];
     if (deckCards.length < 5) { alert('Necesitás 5 cartas en el mazo'); return; }
     if (isRunning.current) return;
+    setPausedMatch(null);
     // Prevent double-start while asynchronous equipment checks are running.
     isRunning.current = true;
     // UX preflight only. The trusted match server must enforce this again.
     // Do not consume durability here: client-side matches are not verified.
-    const { data: wornItems, error: wornError } = await supabase
-      .from('user_items')
-      .select('item_id, aura_items!inner(slot)')
-      .eq('user_id', userId)
-      .eq('equipped', true);
+    setNetworkStatus('Revisando tu equipamiento…');
+    const equipmentStarted=performance.now();
+    const [{data:wornItems,error:wornError},durabilityResult]=await Promise.all([
+      supabase.from('user_items').select('item_id, aura_items!inner(slot)').eq('user_id',userId).eq('equipped',true),
+      supabase.from('equipment_durability').select('item_id,remaining').eq('user_id',userId),
+    ]);
+    performance.measure('lupi:match:equipment',{start:equipmentStarted,end:performance.now()});
+    setNetworkStatus('');
     if (wornError) {
-      alert('No se pudo comprobar el equipamiento. Intentá nuevamente.');
+      await askEquipment({title:'No pudimos revisar tu equipo',message:'No se pudo comprobar el equipamiento. Intentá nuevamente antes de entrar a la cancha.',allowPlay:false});
       setPhase('select');
       isRunning.current = false;
       return;
@@ -367,20 +420,17 @@ export function CardBattle({
       })
       .map((row) => row.item_id);
     if (equipmentIds.length) {
-      const { data: wear, error: wearError } = await supabase
-        .from('equipment_durability')
-        .select('item_id,remaining')
-        .eq('user_id', userId)
-        .in('item_id', equipmentIds);
+      const wear=(durabilityResult.data??[]).filter(row=>equipmentIds.includes(row.item_id));
+      const wearError=durabilityResult.error;
       if (wearError) {
-        alert('No se pudo comprobar la durabilidad. Intentá nuevamente.');
+        await askEquipment({title:'Falta revisar el equipamiento',message:'No pudimos consultar la durabilidad. Reintentá para empezar el partido.',allowPlay:false});
         setPhase('select');
         isRunning.current = false;
         return;
       }
       const exhausted = (wear ?? []).find((row) => row.remaining <= 0);
       if (exhausted) {
-        alert('Tenés medias o botines agotados (0/10). Renoválos desde el armario antes de jugar.');
+        await askEquipment({title:'Tu equipo necesita un cambio',message:'Tenés medias o botines agotados (0/10). Renovalos desde el armario antes de jugar.',allowPlay:false,onChangeEquipment:()=>{const sockIds=(wornItems??[]).filter(row=>{const aura=row.aura_items as unknown as {slot?:string}|{slot?:string}[];return (Array.isArray(aura)?aura[0]?.slot:aura?.slot)==='socks';}).map(row=>row.item_id);setEquipmentSlot((wear??[]).some(row=>row.remaining<=0&&sockIds.includes(row.item_id))?'socks':'boots');}});
         setPhase('select');
         isRunning.current = false;
         return;
@@ -388,13 +438,14 @@ export function CardBattle({
       const lowDurability = (wear ?? []).filter((row) => row.remaining > 0 && row.remaining <= 3);
       if (lowDurability.length) {
         const uses = lowDurability.map((row) => `${row.remaining}/10`).join(', ');
-        if (!window.confirm(`⚠️ Tu equipamiento está por agotarse (${uses}). ¿Querés jugar igual?`)) {
+        if (!await askEquipment({title:'¡Últimos partidos con este equipo!',message:`Durabilidad restante de tus medias o botines: ${uses}. Podés jugar este partido; después revisá el equipamiento en el armario.`,allowPlay:true,onChangeEquipment:()=>setEquipmentSlot('socks')})) {
           setPhase('select');
           isRunning.current = false;
           return;
         }
       }
     }
+    setPhase('battle');
     // Opt-in staging only until verified finalization and DB migrations pass E2E.
     const serverMode = import.meta.env.VITE_VERIFIED_MATCHES === 'true';
     let verifiedSession: { id: string; version: number } | null = null;
@@ -404,6 +455,11 @@ export function CardBattle({
     const recoveryKey = `lupi:verified-match:${userId}`;
     if (serverMode) {
       try {
+        setNetworkStatus('Conectando con el árbitro…');
+        // Fast path: one start call; discovery is only needed to recover an existing game.
+        let startError:unknown;
+        try {verifiedSession=await verifiedMatchApi.start(bot.name);window.localStorage.setItem(recoveryKey,verifiedSession.id);} catch(error){startError=error;}
+        if(!verifiedSession){
         // Server discovery also works after clearing storage or switching devices.
         const active = await verifiedMatchApi.active();
         const saved = active?.id ?? null;
@@ -425,18 +481,19 @@ export function CardBattle({
             verifiedSession = { id: session.id, version: session.state_version };
           }
         }
-        if (!verifiedSession) {
-          verifiedSession = await verifiedMatchApi.start(bot.name);
-          window.localStorage.setItem(recoveryKey, verifiedSession.id);
+        if (!verifiedSession) throw startError instanceof Error?startError:new Error('No se pudo iniciar el partido. Reintentá desde la previa.');
         }
       } catch (error) {
+        setNetworkStatus('');
         alert(error instanceof Error ? error.message : 'No se pudo iniciar el partido verificado');
         setPhase('select');
         isRunning.current = false;
         return;
       }
     }
+    setNetworkStatus('');
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
+    const turnPacer = createVerifiedTurnPacer(Boolean(verifiedSession && resumedTurnIndex > 0));
     let ug = resumedScore?.user ?? 0, rg = resumedScore?.rival ?? 0;
 
     setLog([]); setShowFullLog(false); setUGoals(ug); setRGoals(rg);
@@ -457,9 +514,8 @@ export function CardBattle({
     if (verifiedSession && resumedPending) {
       addLog('↩️ Retomamos la decisión pendiente.', 'event');
       const chosen = await waitForDecision(resumedPending);
-      const decision = await verifiedMatchApi.decision(
-        verifiedSession.id, verifiedSession.version, chosen.id,
-      );
+      const decision = await confirmDecision(verifiedSession, chosen);
+      if (!decision) throw new Error('No se pudo confirmar la decisión pendiente');
       verifiedSession.version = decision.version;
       ug = decision.userScore;
       rg = decision.opponentScore;
@@ -472,12 +528,15 @@ export function CardBattle({
     for (let t = resumedTurnIndex + 1; t <= totalTurns; t++) {
       const min = Math.round((t / totalTurns) * 40);
       setMinute(min);
-      await delay(TURN_MS);
-
-      const serverTurn = verifiedSession
-        ? await verifiedMatchApi.turn(verifiedSession.id, verifiedSession.version)
-        : null;
+      setNetworkStatus(verifiedSession?'Preparando la próxima jugada…':'');
+      if (verifiedSession) await turnPacer.wait();
+      const [serverTurn]=await Promise.all([
+        verifiedSession?verifiedMatchApi.turn(verifiedSession.id,verifiedSession.version):Promise.resolve(null),
+        delay(TURN_MS),
+      ]);
+      setNetworkStatus('');
       if (serverTurn && verifiedSession) {
+        turnPacer.committed();
         verifiedSession.version = serverTurn.version;
         authoritativeScore = { user: serverTurn.userScore, rival: serverTurn.opponentScore };
       }
@@ -502,11 +561,7 @@ export function CardBattle({
           await animateBuildUp(pIdx);
 
           const chosen = await waitForDecision(ctx);
-          await delay(200);
-
-          const serverDecision = verifiedSession
-            ? await verifiedMatchApi.decision(verifiedSession.id, verifiedSession.version, chosen.id)
-            : null;
+          const serverDecision = await confirmDecision(verifiedSession, chosen);
           if (serverDecision && verifiedSession) {
             verifiedSession.version = serverDecision.version;
             authoritativeScore = { user: serverDecision.userScore, rival: serverDecision.opponentScore };
@@ -539,7 +594,6 @@ export function CardBattle({
 
         setUHL(null); setRHL(null);
         await backToMidfield();
-        await delay(300);
       }
 
       // FASE RIVAL
@@ -572,7 +626,6 @@ export function CardBattle({
 
         setUHL(null); setRHL(null);
         await backToMidfield();
-        await delay(300);
       }
       // Animations are cosmetic: the server is the source of truth for scores.
       if (verifiedSession && authoritativeScore) {
@@ -583,6 +636,7 @@ export function CardBattle({
       }
     }
 
+    let confirmedXp: number | null = null;
     addLog('📯 ¡Silbato final! Terminó el partido.', 'event');
     setMinute(40); setBallVis(false);
     await delay(600);
@@ -591,6 +645,8 @@ export function CardBattle({
       // It currently fails closed until the server transcript is fully validated.
       try {
         const final = await verifiedMatchApi.finish(verifiedSession.id);
+        setSkillMatchId(`bot:${verifiedSession.id}`);
+        if(final.reward?.credited && Number.isSafeInteger(final.reward.xp) && final.reward.xp >= 0) confirmedXp=final.reward.xp;
         window.localStorage.removeItem(recoveryKey);
         // The server has finalized the match and consumed equipped wear once.
         // Tell every inventory hook instance to reload the authoritative values.
@@ -603,16 +659,21 @@ export function CardBattle({
           setUGoals(ug); setRGoals(rg);
         }
       } catch (error) {
-        alert(error instanceof Error ? error.message : 'El servidor no pudo validar el partido');
+        setNetworkStatus('');
+        setPausedMatch(error instanceof Error ? error.message : 'El servidor no pudo validar el partido');
         setPhase('select');
         isRunning.current = false;
         return;
       }
     }
-    await handleMatchEnd(ug, rg, deckCards, Boolean(verifiedSession));
+    await handleMatchEnd(ug, rg, deckCards, Boolean(verifiedSession), confirmedXp);
     } catch (error) {
+      setNetworkStatus('');
       console.error('Partido interrumpido:', error);
-      alert(error instanceof Error ? error.message : 'No se pudo completar el partido');
+      setPendingChoice(null);
+      setMoment(null);
+      clearTimer();
+      setPausedMatch(error instanceof Error ? error.message : 'No se pudo completar el partido');
       setPhase('select');
     } finally {
       isRunning.current = false;
@@ -625,7 +686,7 @@ export function CardBattle({
   // No llamar a update_daily_progress desde el cliente.
   // Los desafíos diarios competitivos quedan pendientes de un validador del servidor.
 
-  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[], verified = false) {
+  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[], verified = false, confirmedXp: number | null = null) {
     const won   = ug > rg;
     const tied  = ug === rg;
 
@@ -665,7 +726,7 @@ export function CardBattle({
 
     // A verified result does not authorize browser-written card XP.
     // Verified rewards must be granted atomically by the server in a later step.
-    if (verified) xpGained = 0;
+    if (verified) xpGained = confirmedXp ?? 0;
     const leveledUpCards: string[] = [];
     const cardMap = new Map<string, UserCard>();
     for (const c of deckCards) {
@@ -717,10 +778,12 @@ export function CardBattle({
       userScore:  ug,
       rivalScore: rg,
       xpGained,
+      serverVerified: verified,
+      rewardConfirmed: !verified || confirmedXp !== null,
       streakBonus: verified ? 0 : streakBonus,
       leveledUpCards,
-      skillUpgrade,
-      newStreak,
+      skillUpgrade: verified ? null : skillUpgrade,
+      newStreak: verified ? 0 : newStreak,
     });
     setPhase('result');
   }
@@ -728,6 +791,7 @@ export function CardBattle({
   // ─── Manejar cierre del modal en modo campaña ───────────────────────────────
   
   const handleCloseResult = () => {
+    setNetworkStatus('');
     setMatchResult(null);
     setPhase('select');
     onResultClosed?.();
@@ -737,11 +801,27 @@ export function CardBattle({
   // ─── Iniciar batalla desde el selector (modo campaña o rápido) ──────────────
   
   const handleStartBattle = () => {
-  setPhase('battle'); // Oculta el selector inmediatamente
-  startBattle();
+  return startBattle();
 };
 
   // ─── Render ───────────────────────────────────────────────────────────────────
+
+  const pausedDialog = pausedMatch ? createPortal(
+    <div className="lp-paused-overlay"><section className="lp-paused-dialog" onKeyDown={event=>{
+      if(event.key==='Escape'){event.preventDefault();setPausedMatch(null);}
+      if(event.key==='Tab'){
+        const buttons=event.currentTarget.querySelectorAll<HTMLButtonElement>('button');
+        if(event.shiftKey && document.activeElement===buttons[0]){event.preventDefault();buttons[buttons.length-1]?.focus();}
+        else if(!event.shiftKey && document.activeElement===buttons[buttons.length-1]){event.preventDefault();buttons[0]?.focus();}
+      }
+    }} role="alertdialog" aria-modal="true" aria-labelledby="lp-paused-title" aria-describedby="lp-paused-description">
+      <small>LUPI · PARTIDO PAUSADO</small>
+      <h2 id="lp-paused-title">El árbitro necesita revisar la jugada</h2>
+      <p id="lp-paused-description">El servidor no pudo confirmar el avance. Al retomar, consultaremos el estado guardado antes de continuar.</p>
+      <p className="lp-paused-reason">{pausedMatch}</p>
+      <button type="button" autoFocus onClick={()=>{setPausedMatch(null);void startBattle();}}>Retomar partido →</button>
+      <button type="button" onClick={()=>setPausedMatch(null)}>Volver a la previa</button>
+    </section></div>,document.body) : null;
 
   const deckCards   = (userDeck.cards ?? []) as UserCard[];
   const teamStats   = calculateTeamStats(deckCards); // <-- Agrega esta línea
@@ -771,11 +851,15 @@ export function CardBattle({
   };
 
   if (phase === 'select' && !autoStart) {
-    return <MatchTutorial cards={deckCards} opponent={bot.name} onTeam={onNavigateToDeck} onStart={handleStartBattle} />;
+    return <>{pausedDialog}{equipmentEditor}{networkNotice}<MatchTutorial userId={userId} cards={deckCards} opponent={bot.name} onTeam={onNavigateToDeck} onStart={handleStartBattle} />{equipmentDialog}</>;
   }
 
   return (
     <div className="arena-container">
+      {pausedDialog}
+      {equipmentDialog}
+      {equipmentEditor}
+      {networkNotice}
 
       {/* ── Header ── */}
       
@@ -784,12 +868,65 @@ export function CardBattle({
       <div className="arena-match-core">
         <AnimeEffects ref={animeRef} />
         <MatchCourt
-          className={`futsal-court ${moment ? 'court-tension' : ''} ${flash?.type === 'goal' ? 'flash-futsal-gol' : ''}`}
+          className={`futsal-court ${moment || pendingChoice ? 'court-tension' : ''} ${pendingChoice ? 'court-preparing' : ''} ${flash?.type === 'goal' ? 'flash-futsal-gol' : ''}`}
           home={deckCards.slice(0,5).map(card => ({ id:card.id, name:getCardData(card).name ?? 'Jugador', rating:getCardData(card).overall_rating || 50 }))}
           away={[0,1,2,3,4].map(i => ({id:`bot-${i}`,name:bot.name.split(' ')[1] ?? bot.name,badge:`Nv.${bot.level}`,icon:'/images/bot.png'}))}
           homePositions={uPos} awayPositions={rPos} homeHighlight={uHL} awayHighlight={rHL}
           ball={ballVisible ? ball : null} ballTeam={ballTeam}
         >
+
+          {pendingChoice && phase === 'battle' && (
+            <div className={`lp-choice-preparation lp-choice-preparation--anime lp-technique--${pendingChoice.effect}`} style={{'--technique-color':pendingChoice.color} as React.CSSProperties} role="status" aria-live="polite" aria-atomic="true">
+              <div className="lp-technique-burst" aria-hidden="true" />
+              <div className="lp-choice-preparation__panel">
+                <span className="lp-choice-preparation__eyebrow">{pendingChoice.automatic ? 'INSTINTO AUTOMÁTICO' : '¡ES TU MOMENTO!'}</span>
+                <div className="lp-technique-face-strip" aria-hidden="true">
+                  <div className="lp-technique-face-art">{pendingChoice.card.socio_id===userId?<OwnedCardPortrait userId={userId}/>:pendingChoice.card.card?<PlayerArtwork card={pendingChoice.card.card}/>:null}</div>
+                  <span>¡AHORA!</span>
+                </div>
+                <div className="lp-technique-scene">
+                  <span className="lp-technique-word" aria-hidden="true">¡VAMOS!</span>
+                  <div className="lp-technique-aura" aria-hidden="true" />
+                  <div className="lp-technique-hero" aria-hidden="true">
+                    {pendingChoice.card.socio_id===userId?<OwnedCardPortrait userId={userId}/>:pendingChoice.card.card?<PlayerArtwork card={pendingChoice.card.card}/>:null}
+                  </div>
+                  <div className="lp-technique-orbit" aria-hidden="true" />
+                  <span className="lp-technique-ball lp-technique-ball--drawn" aria-hidden="true">
+                    <svg viewBox="0 0 100 100" focusable="false">
+                      <g className="lp-shot-trails" fill="currentColor">
+                        <path d="M-155 22 37 34 39 47-105 40-46 33Z" opacity=".7"/>
+                        <path d="M-195 56 36 48 40 62-140 75-70 58Z" opacity=".5"/>
+                        <path d="M-112 91 40 63 46 75-57 91-17 76Z" opacity=".8"/>
+                      </g>
+                      <g className="lp-shot-sphere" strokeLinejoin="round">
+                        <circle cx="50" cy="50" r="44" fill="#e9f8ff" stroke="#071b30" strokeWidth="3"/>
+                        <path d="M17 26Q46 1 77 21Q49 10 25 43Z" fill="#fff"/>
+                        <path d="M84 25Q110 73 60 93Q22 98 9 62Q45 99 76 64Q88 48 84 25Z" fill="#83acc3" opacity=".65"/>
+                        <g fill="none" stroke="#688397" strokeWidth="1.5">
+                          <path d="M40 32 31 15M61 34 76 21M67 57 87 65M48 70 44 91M30 54 11 60"/>
+                          <path d="M31 15 55 7 76 21 91 44 87 65 68 84 44 91 20 78 11 60 10 36Z"/>
+                        </g>
+                        <g fill="#10273b" stroke="#071729" strokeWidth="1.5">
+                          <path d="m40 32 21 2 8 23-21 14-19-17Z"/>
+                          <path d="m22 15 9 0-2 14-19 7 2-9Z"/>
+                          <path d="m76 21 10 6 5 17-11-2-10-12Z"/>
+                          <path d="m87 65-5 13-14 6-6-12 13-12Z"/>
+                          <path d="m20 78-9-18 12-4 10 14-3 15Z"/>
+                          <path d="m44 91 3-11 15 0 6 4-10 9Z"/>
+                        </g>
+                        <path d="M19 31Q32 13 50 14" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity=".85"/>
+                        <circle cx="50" cy="50" r="44" fill="none" stroke="#cafff4" strokeWidth="1"/>
+                      </g>
+                    </svg>
+                  </span>
+                  <span className="lp-technique-sfx" aria-hidden="true">{pendingChoice.effect==='shot'?'¡BOOM!':pendingChoice.effect==='speed'?'¡FSSSH!':'¡ZAS!'}</span>
+                </div>
+                <span className="lp-choice-preparation__player">{pendingChoice.player}</span>
+                <strong>{pendingChoice.label}</strong>
+                {networkSeconds >= 4 && <span className="lp-technique-delay">La jugada sigue en revisión · {networkSeconds} s. Tu elección está enviada.</span>}
+              </div>
+            </div>
+          )}
 
           {/* Marcador integrado en el Centro de Partido; en móvil se ve en el encabezado. */}
           {phase === 'battle' && (
@@ -1038,9 +1175,10 @@ export function CardBattle({
         {phase === 'result' && matchResult && createPortal(
           <div className="result-modal-overlay" onClick={handleCloseResult}>
             <div
-              className={`result-modal ${matchResult.winner === 'user' ? 'win' : matchResult.winner === 'draw' ? 'draw' : 'lose'}`}
+              className={`result-modal bot-match-result ${matchResult.winner === 'user' ? 'win' : matchResult.winner === 'draw' ? 'draw' : 'lose'}`}
               onClick={e => e.stopPropagation()}
             >
+              <DuelResultEffects outcome={matchResult.winner==='user'?'win':matchResult.winner==='draw'?'draw':'loss'}/>
               <div className="rm-topline"><span className="rm-live-dot" /> LUPI WORLD <span>·</span> MATCH COMPLETE</div>
               <div className="rm-trophy" aria-hidden="true">{matchResult.winner === 'user' ? '🏆' : matchResult.winner === 'draw' ? '🤝' : '⚽'}</div>
               <div className="rm-title">
@@ -1061,19 +1199,13 @@ export function CardBattle({
                 </div>
               </div>
 
+              {!matchResult.rewardConfirmed ? <div className="rm-unconfirmed" role="status"><strong>PARTIDO VALIDADO</strong><p>La XP de este partido no tiene acreditación confirmada. No está relacionada con los 6 premios diarios de PPT y Preguntados.</p></div> : <>
               <div className="rm-rewards-title"><span>RECOMPENSAS DEL PARTIDO</span></div>
               <div className="rm-rewards">
                 <div className="rm-reward-box">
                   <div className="rm-reward-icon">✨</div>
                   <div className="rm-reward-val">+{matchResult.xpGained}</div>
                   <div className="rm-reward-lbl">XP</div>
-                </div>
-                <div className="rm-reward-box points-box">
-                  <div className="rm-reward-icon">💰</div>
-                  <div className="rm-reward-val">
-                    +{matchResult.winner === 'user' ? 15 : matchResult.winner === 'draw' ? 7 : 5}
-                  </div>
-                  <div className="rm-reward-lbl">Puntos</div>
                 </div>
                 {matchResult.streakBonus > 0 && (
                   <div className="rm-reward-box streak-box">
@@ -1084,6 +1216,8 @@ export function CardBattle({
                 )}
               </div>
 
+              </>}
+              {skillMatchId&&<SkillMatchReward game="futsal" matchId={skillMatchId} userId={userId} card={userCards.find(c=>c.socio_id===userId)}/>}
               {matchResult.winner === 'user' && matchResult.newStreak > 1 && (
                 <div className="rm-streak-banner">🔥 Racha {matchResult.newStreak} — ¡seguí así!</div>
               )}
@@ -1111,8 +1245,9 @@ export function CardBattle({
               )}
 
               <button className="cta-btn start-btn rm-btn" onClick={handleCloseResult}>
-                {isCampaignMode ? 'CONTINUAR' : 'JUGAR DE NUEVO'}
+                SEGUIR JUGANDO →
               </button>
+              {onNavigateToDeck&&<button className="lp-result-player-link" type="button" onClick={()=>{setMatchResult(null);setPhase('select');onNavigateToDeck();}}>VER MI JUGADOR ↗</button>}
             </div>
           </div>,
           document.body

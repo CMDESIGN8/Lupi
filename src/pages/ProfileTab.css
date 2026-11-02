@@ -1,0 +1,412 @@
+/* src/pages/ProfileTab.css */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+
+/* --- VARIABLES CYBERPUNK GAMING --- */
+:root {
+  --cyber-bg: #050a15; /* Azul marino casi negro */
+  --cyber-grid: rgba(0, 255, 255, 0.05); /* Líneas de grid */
+  
+  --cyber-card-bg: #0d162a; /* Azul marino profundo para tarjetas */
+  --cyber-card-border: #1e3a8a; /* Borde azul */
+  
+  --cyber-text: #ffffff; /* Blanco puro para resaltar */
+  --cyber-cyan: #00f3ff; /* Cyan eléctrico */
+  --cyber-cyan-dark: #0891b2; /* Cyan oscuro para sombras 3D */
+  --cyber-blue: #3b82f6; /* Azul brillante */
+  
+  --border-radius-game: 16px;
+}
+
+/* --- CONTENEDOR PRINCIPAL --- */
+.game-screen {
+  background-color: var(--cyber-bg);
+  min-height: 100vh;
+  padding: 16px 16px 100px 16px;
+  display: flex;
+  justify-content: center;
+  font-family: 'Nunito', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Efecto de Rejilla (Grid) de fondo Cyberpunk */
+.game-bg-grid {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    linear-gradient(var(--cyber-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cyber-grid) 1px, transparent 1px);
+  background-size: 30px 30px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Resplandor superior (Glow) */
+.game-bg-glow {
+  position: absolute;
+  top: -100px; left: 50%;
+  transform: translateX(-50%);
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(0, 243, 255, 0.15) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.game-container {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* --- TARJETAS BASE (Estilo Cristal/Neón) --- */
+.game-card {
+  background: var(--cyber-card-bg);
+  border-radius: var(--border-radius-game);
+  padding: 20px;
+  border: 2px solid var(--cyber-card-border);
+  box-shadow: 0 4px 0 #000000, inset 0 0 20px rgba(0, 243, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brillo sutil en el borde superior de las tarjetas */
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyber-cyan), transparent);
+  opacity: 0.5;
+}
+
+/* --- HERO PERFIL --- */
+.profile-header-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 20px;
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+}
+
+.profile-avatar-game {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #00f3ff 0%, #0055ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 900;
+  color: #fff;
+  border: 2px solid #00f3ff;
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.4), 0 4px 0 #000;
+}
+
+.level-badge {
+  position: absolute;
+  bottom: -8px;
+  right: -12px;
+  background: #000;
+  color: var(--cyber-cyan);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 2px solid var(--cyber-cyan);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+  transform: rotate(5deg);
+}
+
+.profile-name-game {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--cyber-text);
+  margin: 0;
+  letter-spacing: -0.5px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.profile-email-game {
+  font-size: 14px;
+  color: #94a3b8; /* Gris azulado */
+  font-weight: 700;
+}
+
+.profile-club-tag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(0, 243, 255, 0.1);
+  color: var(--cyber-cyan);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  margin-top: 8px;
+  border: 1px solid var(--cyber-cyan);
+  box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
+}
+
+/* --- STATS GRID --- */
+.stats-grid-game {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-card-game {
+  background: var(--cyber-card-bg);
+  border-radius: 12px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: 1px solid #1e3a8a;
+  box-shadow: 0 4px 0 #000;
+  transition: transform 0.1s;
+}
+
+.stat-card-game:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 #000;
+}
+
+.stat-icon-game {
+  font-size: 28px;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 6px rgba(0, 243, 255, 0.5));
+}
+
+.stat-data-game strong {
+  display: block;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--cyber-text);
+  line-height: 1;
+}
+
+.stat-data-game small {
+  font-size: 10px;
+  color: var(--cyber-cyan);
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-top: 6px;
+  display: block;
+  opacity: 0.8;
+}
+
+/* Colores específicos de stats (Neones) */
+.stat-card-game.coins { border-color: #fbbf24; box-shadow: 0 4px 0 #b45309, 0 0 10px rgba(251, 191, 36, 0.2); }
+.stat-card-game.coins small { color: #fbbf24; }
+
+.stat-card-game.points { border-color: #34d399; box-shadow: 0 4px 0 #047857, 0 0 10px rgba(52, 211, 153, 0.2); }
+.stat-card-game.points small { color: #34d399; }
+
+.stat-card-game.entries { border-color: var(--cyber-cyan); box-shadow: 0 4px 0 var(--cyber-cyan-dark), 0 0 10px rgba(0, 243, 255, 0.2); }
+.stat-card-game.entries small { color: var(--cyber-cyan); }
+
+.stat-card-game.rank { border-color: #f87171; box-shadow: 0 4px 0 #b91c1c, 0 0 10px rgba(248, 113, 113, 0.2); }
+.stat-card-game.rank small { color: #f87171; }
+
+/* --- SECCIONES DE ACCIÓN --- */
+.section-title-game {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--cyber-cyan);
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+}
+
+.section-subtitle-game {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 0 16px 0;
+  font-weight: 700;
+}
+
+/* --- BOTONES ESTILO CYBERPUNK (3D) --- */
+.game-btn-wrapper > button,
+.game-btn-secondary,
+.game-btn-logout {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.1s ease;
+  position: relative;
+}
+
+/* Botón Compartir (Cyan Neón) */
+.game-btn-wrapper > button {
+  background: var(--cyber-cyan);
+  color: #000;
+  box-shadow: 0 6px 0 var(--cyber-cyan-dark), 0 0 15px rgba(0, 243, 255, 0.4);
+  border: 1px solid #fff;
+}
+
+.game-btn-wrapper > button:active {
+  transform: translateY(6px);
+  box-shadow: 0 0 0 var(--cyber-cyan-dark), 0 0 0 transparent;
+}
+
+/* Botón Secundario (Azul Profundo) */
+.game-btn-secondary {
+  background: #1e293b;
+  color: var(--cyber-cyan);
+  border: 1px solid #334155;
+  box-shadow: 0 6px 0 #000;
+}
+
+.game-btn-secondary:active {
+  transform: translateY(6px);
+  box-shadow: 0 0 0 #000;
+}
+
+/* Botón Logout (Rojo/Rosa Neón) */
+.game-btn-logout {
+  background: #e11d48;
+  color: #fff;
+  box-shadow: 0 6px 0 #881337, 0 0 15px rgba(225, 29, 72, 0.3);
+  border: 1px solid #fda4af;
+  margin-top: 16px;
+}
+
+.game-btn-logout:active {
+  transform: translateY(6px);
+  box-shadow: 0 0 0 #881337, 0 0 0 transparent;
+}
+
+.game-btn-logout:disabled {
+  filter: grayscale(100%);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* --- ANIMACIONES (Iguales, pero adaptadas al neón) --- */
+.animate-pop-in {
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 3s ease-in-out 1.5s infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-wiggle {
+  display: inline-block;
+  animation: wiggle 2s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(5deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 4s linear infinite;
+}
+
+@keyframes spinSlow {
+  to { transform: rotate(360deg); }
+}
+
+.spinner-game {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- AJUSTES PARA COMPONENTES HIJOS (Logros, Referidos) --- */
+.achievements-wrapper-game {
+  margin-top: 8px;
+}
+
+/* Forzar que los items de logros se adapten al tema oscuro */
+.achievements-wrapper-game > div > div {
+  background: #111c33 !important; /* Fondo ligeramente más claro que la tarjeta */
+  border: 1px solid #1e3a8a !important;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  padding: 12px;
+  transition: all 0.2s;
+}
+
+.achievements-wrapper-game > div > div:hover {
+  transform: scale(1.02);
+  border-color: var(--cyber-cyan) !important;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+}
+
+/* Si el componente ReferralPanel tiene inputs, los adaptamos */
+.game-card input {
+  background: #0a1224 !important;
+  border: 1px solid #1e3a8a !important;
+  color: var(--cyber-cyan) !important;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+}
+
+.game-card input:focus {
+  outline: none;
+  border-color: var(--cyber-cyan) !important;
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+/* Contenedor de Toasts */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}

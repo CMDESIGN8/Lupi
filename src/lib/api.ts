@@ -133,19 +133,19 @@ function profileToCard(profile: any): UnifiedCard {
         position: profile.position || 'ala',
         category: category, 
         overall_rating: calculateOVR({
-            pace: profile.user_card_pace || 10,
-            dribbling: profile.user_card_dribbling || 10,
-            passing: profile.user_card_passing || 10,
-            defending: profile.user_card_defending || 10,
-            finishing: profile.user_card_finishing || 10,
-            physical: profile.user_card_physical || 10,
+            pace: profile.user_card_pace ?? 10,
+            dribbling: profile.user_card_dribbling ?? 10,
+            passing: profile.user_card_passing ?? 10,
+            defending: profile.user_card_defending ?? 10,
+            finishing: profile.user_card_finishing ?? 10,
+            physical: profile.user_card_physical ?? 10,
         }),
-        pace: profile.user_card_pace || 10,
-        dribbling: profile.user_card_dribbling || 10,
-        passing: profile.user_card_passing || 10,
-        defending: profile.user_card_defending || 10,
-        finishing: profile.user_card_finishing || 10,
-        physical: profile.user_card_physical || 10,
+        pace: profile.user_card_pace ?? 10,
+        dribbling: profile.user_card_dribbling ?? 10,
+        passing: profile.user_card_passing ?? 10,
+        defending: profile.user_card_defending ?? 10,
+        finishing: profile.user_card_finishing ?? 10,
+        physical: profile.user_card_physical ?? 10,
         card_type: 'socio',
         profile_id: profile.id,
         total_wins_lifetime: profile.total_wins_lifetime || 0,
@@ -1266,12 +1266,12 @@ export const cardApi = {
     if (error || !profile) return null;
     
     // Calcular OVR
-    const pace = profile.user_card_pace || 40;
-    const dribbling = profile.user_card_dribbling || 40;
-    const passing = profile.user_card_passing || 40;
-    const defending = profile.user_card_defending || 40;
-    const finishing = profile.user_card_finishing || 40;
-    const physical = profile.user_card_physical || 40;
+    const pace = profile.user_card_pace ?? 10;
+    const dribbling = profile.user_card_dribbling ?? 10;
+    const passing = profile.user_card_passing ?? 10;
+    const defending = profile.user_card_defending ?? 10;
+    const finishing = profile.user_card_finishing ?? 10;
+    const physical = profile.user_card_physical ?? 10;
     
     const overall_rating = calcOVR({ pace, dribbling, passing, defending, finishing, physical });
     
@@ -1343,12 +1343,12 @@ export const cardApi = {
     
     // Convertir Socios a PlayerCard
     (socios || []).forEach(socio => {
-      const pace = socio.user_card_pace || 40;
-      const dribbling = socio.user_card_dribbling || 40;
-      const passing = socio.user_card_passing || 40;
-      const defending = socio.user_card_defending || 40;
-      const finishing = socio.user_card_finishing || 40;
-      const physical = socio.user_card_physical || 40;
+      const pace = socio.user_card_pace ?? 10;
+      const dribbling = socio.user_card_dribbling ?? 10;
+      const passing = socio.user_card_passing ?? 10;
+      const defending = socio.user_card_defending ?? 10;
+      const finishing = socio.user_card_finishing ?? 10;
+      const physical = socio.user_card_physical ?? 10;
       
       const overall_rating = calcOVR({ pace, dribbling, passing, defending, finishing, physical });
       

@@ -20,3 +20,13 @@
 @media (prefers-reduced-motion:reduce){.duel-shake{animation:none}}
 /* Match the cinematic result HUD rather than adding another dashboard panel. */
 .drc{width:min(420px,100%);box-sizing:border-box;border:0;border-left:2px solid #4fe1eb;border-bottom:1px solid #4fe1eb33;border-radius:9px 2px;background:linear-gradient(110deg,#062a39e8,#03172399);font-family:Barlow,system-ui}.drc--win{border-left-color:#ffdc65}.drc__pill{border-radius:6px 2px;font:italic 900 23px 'Barlow Condensed',sans-serif;background:#29d9ff0d}.drc__share{min-height:36px;border-radius:7px 2px}.drc__chest{animation-iteration-count:3}
+.drc.drc--practice-complete{display:flex;align-items:flex-start;gap:12px;text-align:left;padding:16px;border:1px solid #53d5db60;border-left:3px solid #ffdb58;background:linear-gradient(120deg,#0b3543f5,#061c2af2);box-shadow:inset 0 1px #b8ffff12}
+.drc-practice-icon{display:grid;place-items:center;flex:0 0 34px;height:34px;background:#ffdb58;color:#06222c;border-radius:50%;font-weight:900;font-size:21px}
+.drc--practice-complete h3{font:900 italic 21px/1.1 'Barlow Condensed',sans-serif;color:#ffe17b;margin:6px 0}
+.drc--practice-complete small{color:#69e3eb;font-size:9px;letter-spacing:.12em}
+.drc--practice-complete p{font-size:12px;line-height:1.5;color:#cae4e9;margin:8px 0}
+.drc--practice-complete strong{display:block;font-size:12px;line-height:1.4;color:#f3fafc}
+.drc-practice-stamps{display:flex;gap:5px;margin-top:9px}
+.drc-practice-stamps i{display:grid;place-items:center;width:22px;height:22px;color:#07242d;background:#6ddfc2;border-radius:3px;font-style:normal;font-weight:900}
+.drc--practice-complete .drc-practice-reset{display:block;margin-top:7px;font-size:9px;letter-spacing:0;color:#95bfc7}
+@media(max-width:600px){.drc.drc--practice-complete{padding:12px;gap:8px}.drc--practice-complete h3{font-size:19px}.drc-practice-icon{flex-basis:26px;height:26px;font-size:16px}}

@@ -14,7 +14,10 @@ export async function claimDuelReward(game: DuelGame, matchId: string, opts: Cla
   const { data, error } = await supabase.rpc("duel_claim_reward", {
     p_game: game, p_match_id: matchId, p_vs_bot: !!opts.vsBot, p_bot_result: null, p_rival_id: opts.rivalId ?? null,
   });
-  if (error) throw error;
+  if (error) {
+    console.error('[duel_claim_reward]', {game,matchId,vsBot:!!opts.vsBot,code:error.code,message:error.message,details:error.details,hint:error.hint});
+    throw error;
+  }
   const result = data as DuelRewardResult;
   // Refresca HUD/XP/monedas y la racha visible (mismo evento que usa el resto de la progresión).
   window.dispatchEvent(new CustomEvent("lupi:progression-updated", { detail: { actionType: "duel", result } }));

@@ -1,3 +1,5 @@
+import { createPortal } from "react-dom";
+import "./LobbyChatFullscreen.css";
 // src/components/LobbyChat.tsx
 import {
   useEffect,
@@ -177,6 +179,9 @@ export function LobbyChat({
  
 const [unread, setUnread] = useState(0);
 const [mobileChatOpen, setMobileChatOpen] = useState(false);
+const [smallScreen,setSmallScreen] = useState(()=>window.matchMedia('(max-width:900px)').matches);
+useEffect(()=>{const media=window.matchMedia('(max-width:900px)');const update=()=>setSmallScreen(media.matches);media.addEventListener('change',update);return()=>media.removeEventListener('change',update);},[]);
+useEffect(()=>{if(!smallScreen||!mobileChatOpen)return;const before=document.body.style.overflow;document.body.style.overflow='hidden';const key=(event:KeyboardEvent)=>{if(event.key==='Escape')setMobileChatOpen(false);};document.addEventListener('keydown',key);return()=>{document.body.style.overflow=before;document.removeEventListener('keydown',key);};},[smallScreen,mobileChatOpen]);
 const [mobileUnread, setMobileUnread] = useState(0);
   useEffect(() => {
     if (tutorialOpen) {
@@ -546,9 +551,9 @@ const closeMobileChat = () => {
   setMobileChatOpen(false);
 };
 
-  return (
+  const chatContent = (
   <section
-    className={`lc ${mobileChatOpen || tutorialOpen ? "lc--mobile-open" : "lc--mobile-closed"}`}
+    className={`lc ${smallScreen&&mobileChatOpen&&!tutorialOpen?"lc--fullscreen":""} ${mobileChatOpen || tutorialOpen ? "lc--mobile-open" : "lc--mobile-closed"}`}
     aria-label="Chat del lobby"
   >
     <button
@@ -781,4 +786,5 @@ const closeMobileChat = () => {
       </footer>
     </section>
   );
+  return smallScreen && mobileChatOpen && !tutorialOpen ? createPortal(chatContent,document.body) : chatContent;
 }

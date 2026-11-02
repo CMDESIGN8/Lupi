@@ -1,0 +1,29 @@
+/* Pantalla de Preguntados por turnos (reutiliza trivia-*) */
+.trivia-options button.tad-opt--correct{border-color:#3dff9e;background:rgba(61,255,158,.18)}
+.trivia-options button.tad-opt--wrong{border-color:#ff6b6b;background:rgba(255,107,107,.16)}
+.trivia-options button.tad-opt--dim{opacity:.45}
+.tad-progress-row{display:flex;justify-content:space-between;gap:8px;margin:6px 0 2px;font-size:.72rem;letter-spacing:.06em;opacity:.85}
+.tad-feedback{margin:8px 0;font-weight:800}
+.tad-feedback.is-hit{color:#3dff9e}.tad-feedback.is-miss{color:#ff9a9a}
+.tad-wait{margin:18px auto;max-width:420px;text-align:center;padding:18px;border-radius:16px;background:rgba(8,20,32,.82);border:1px solid rgba(40,217,255,.35)}
+.tad-wait>span{font-size:2rem}
+.tad-actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:12px 0}
+.tad-note{text-align:center;opacity:.8;font-size:.8rem}
+
+/* Bandeja de duelos pendientes (hoja Social / columna de escritorio) */
+.tai{margin:0 0 12px;padding:12px;border-radius:14px;background:rgba(11,53,69,.55);border:1px solid rgba(255,210,63,.45);color:#e8f6ff}
+.tai header{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.tai header b{color:#ffd23f;letter-spacing:.08em;font-size:.78rem}
+.tai header small{opacity:.7;font-size:.7rem}
+.tai ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tai li{display:flex;flex-direction:column;gap:6px;padding:8px;border-radius:10px;background:rgba(6,16,26,.6);font-size:.74rem}
+.tai li.is-action{border:1px solid #ffd23f}.tai li.is-win{border:1px solid #3dff9e}
+.tai li div{display:flex;gap:6px}
+.tai button{cursor:pointer;border:1px solid #28d9ff;background:#0b3545;color:#e8f6ff;font-weight:800;font-size:.7rem;padding:7px 10px;border-radius:9px}
+.tai li.is-action>div>button:first-child{background:#ffd23f;color:#1a1400;border-color:#ffd23f}
+.tai .tai-decline{border-color:#ff6b6b;background:#3a1620;color:#ffd7d7}
+.tai-toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 90px);transform:translateX(-50%);z-index:9000;max-width:calc(100vw - 24px);padding:10px 14px;border-radius:12px;background:rgba(58,22,32,.95);border:1px solid #ff6b6b;color:#ffe3e3;font-size:.8rem;box-shadow:0 4px 18px rgba(0,0,0,.45)}
+
+/* Escritorio: la bandeja vive en la columna izquierda, bajo "Jugadores en línea" (el lanzador inferior no se muestra ahí) */
+.gh-world__async{display:none}
+@media (min-width:701px){.gh-world__async{display:block;flex:none;width:100%}.gh-world__async .tai{margin:0}}

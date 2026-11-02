@@ -496,7 +496,6 @@
               0 24px 50px rgba(0, 0, 0, 0.35);
 }
 
-.gh-panel { background: linear-gradient(180deg, rgba(14, 52, 43, 0.7), rgba(8, 30, 25, 0.88)); }
 
 /* Entrada escalonada del lobby */
 .gh-lobby > * { animation: gh-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }

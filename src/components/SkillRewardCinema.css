@@ -1,0 +1,82 @@
+.lp-reward-cinema{display:grid;grid-template-columns:126px minmax(0,1fr);gap:16px;align-items:center;margin:18px auto;width:100%;max-width:700px;box-sizing:border-box;padding:16px;background:radial-gradient(ellipse at 0 50%,#28d6e72b,transparent 65%),linear-gradient(120deg,#092a3aee,#051a27f5);border-top:2px solid #75eddd;color:#e7faff;text-align:left;font-family:Barlow,system-ui,sans-serif}.lp-reward-player{min-width:0;filter:drop-shadow(0 8px 15px #0007)}.lp-reward-player>.starter-card{width:126px;height:auto;aspect-ratio:5/7;max-width:100%;animation:none;transform:none;container-type:inline-size}.lp-reward-player>span{display:block;font-size:8px;font-weight:800;letter-spacing:.7px;line-height:1.5;text-align:center;margin-top:10px;color:#92e9df}.lp-reward-cinema>.lp-skill-match-reward{margin:0;max-width:none;width:100%;min-width:0;border:0;border-radius:0;padding:0;background:none;box-shadow:none}.lp-reward-cinema .lp-earned-skills{gap:8px}.lp-reward-cinema .lp-earned-skill{background:#10435755;border:0;border-bottom:1px solid #70ccdf33;padding:9px;border-radius:0}.lp-reward-cinema .lp-earned-skill strong{font-size:12px}.lp-reward-cinema .lp-earned-skill b{font-size:14px}.lp-reward-cinema .lp-skill-track{height:7px}.lp-reward-cinema .lp-skill-track>i{animation-duration:1.6s}.lp-reward-cinema .is-upgraded{background:linear-gradient(120deg,#b49a383f,#123e48);border-bottom:2px solid #ffe16b;box-shadow:0 0 22px #ffe16b26}.lp-reward-cinema .is-upgraded b{color:#ffe16b;font-size:21px}.lp-reward-cinema .is-upgraded .lp-skill-track>i{animation:lp-reward-cross 2s .15s ease-in-out both}.lp-reward-cinema .lp-skill-up-tag{font-size:9px;letter-spacing:.4px}.lp-reward-coach{grid-column:1/-1;padding:10px 0 0;border-top:1px solid #6dd6d62b}.lp-reward-coach small{color:#ffe16b;font-size:9px;font-weight:900;letter-spacing:1px}.lp-reward-coach p{color:#d2edf1;font-size:12px;line-height:1.5;margin:5px 0 0}.lp-result-player-link{display:block;min-height:44px;width:100%;margin:10px 0 0;padding:12px;border:1px solid #6ee8de88;background:#082b3c;color:#a7fff0;font:900 14px Barlow,system-ui,sans-serif;cursor:pointer}.lp-result-player-link:focus-visible{outline:3px solid #ffe16b;outline-offset:3px}@keyframes lp-reward-cross{0%{width:var(--skill-from)}45%{width:100%;filter:brightness(1.8)}55%{width:100%}56%{width:0;filter:none}100%{width:var(--skill-to)}}
+@media(max-width:600px){.lp-reward-cinema{grid-template-columns:1fr;padding:12px;gap:12px}.lp-reward-player{display:flex;align-items:center;justify-content:center;gap:14px}.lp-reward-player>.starter-card{width:102px;flex:none}.lp-reward-player>span{max-width:100px;text-align:left;font-size:10px;line-height:1.7}.lp-reward-cinema .lp-earned-skill strong{font-size:11px}.lp-reward-cinema .lp-earned-skill b{font-size:13px}.lp-reward-cinema .is-upgraded b{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.lp-reward-cinema .lp-skill-track>i,.lp-reward-cinema .is-upgraded{animation:none!important}}
+.lp-reward-cinema:not(:has(.lp-reward-player)){grid-template-columns:1fr}.lp-reward-sound{float:right;background:#ffe16b;color:#082c37;border:0;padding:8px 10px;margin:0 0 8px 8px;font-size:11px;font-weight:800;cursor:pointer;border-radius:3px}.lp-reward-sound:focus-visible{outline:3px solid #fff;outline-offset:3px}
+/* Card padding uses its own size, not a percentage of the wide reward container. */
+.lp-reward-cinema .lp-reward-player>.starter-card{box-sizing:border-box;width:126px;height:177px;aspect-ratio:5/7;min-height:0;padding:7px;flex-shrink:0;margin:0}.lp-reward-player .starter-card__portrait{inset:13% 0 31%}.lp-reward-player .starter-card__bottom{padding:5px 0 0}.lp-reward-player .starter-card__bottom h3{font-size:14px;line-height:1;margin:0}.lp-reward-player .starter-card__rarity{font-size:6px;letter-spacing:.7px;margin:3px 0 4px}.lp-reward-player .starter-card__stats{grid-template-columns:repeat(3,minmax(0,1fr));font-size:7px;gap:2px}.lp-reward-player .starter-card__stats span{padding:3px 2px;gap:1px;min-width:0}.lp-reward-player .starter-card__stats b{font-size:9px}.lp-reward-player .starter-card__top strong{font-size:28px}.lp-reward-player .starter-card__position{font-size:7px}.lp-reward-player .starter-card__crest{font-size:13px}
+@media(max-width:600px){.lp-reward-cinema .lp-reward-player>.starter-card{width:112px;height:157px;padding:6px}.lp-reward-cinema{margin:12px 0;padding:10px}.bot-match-result .lp-reward-cinema>.lp-skill-match-reward{padding:0;margin:0}}
+/* Card and progression headline share the same row; six gains follow below. */
+.lp-reward-cinema{display:block;padding:12px;margin:12px auto}.lp-reward-cinema>.lp-skill-match-reward>summary{display:grid;grid-template-columns:112px minmax(0,1fr);gap:16px;align-items:center;list-style:none}.lp-reward-cinema .lp-reward-player{display:block;min-width:0}.lp-reward-cinema .lp-reward-player>span{display:none}.lp-reward-summary-info{display:grid;gap:7px;min-width:0}.lp-reward-cinema summary .lp-reward-summary-info .lp-skill-reward-kicker{float:none;margin:0;font-size:10px;line-height:1.5;color:#a4ffeb;letter-spacing:.5px}.lp-reward-summary-info>strong{font:900 italic 34px/1 'Barlow Condensed',sans-serif;color:#76ffda}.lp-reward-summary-info>strong small{display:block;font:700 11px Barlow,sans-serif;margin-top:5px;color:#d7f5ee}.lp-reward-summary-info>em{font-size:10px;font-style:normal;color:#b4d5df;line-height:1.4}.lp-reward-cinema .lp-reward-player>.starter-card{width:112px;height:157px;padding:6px}.lp-reward-cinema .lp-earned-skills{margin-top:10px}.lp-reward-coach{padding-top:8px;margin-top:8px}.lp-reward-coach p{font-size:11px;margin-top:3px}
+@media(max-width:600px){.lp-reward-cinema{padding:10px;margin:10px 0}.lp-reward-cinema>.lp-skill-match-reward>summary{grid-template-columns:92px minmax(0,1fr);gap:12px}.lp-reward-cinema .lp-reward-player>.starter-card{width:92px;height:129px;padding:5px}.lp-reward-summary-info>strong{font-size:30px}.lp-reward-cinema summary .lp-reward-summary-info .lp-skill-reward-kicker{font-size:9px}.lp-reward-player .starter-card__bottom h3{font-size:12px}.lp-reward-player .starter-card__stats{font-size:6px}.lp-reward-player .starter-card__stats b{font-size:8px}.lp-reward-player .starter-card__stats span{padding:2px 1px}.bot-match-result .lp-reward-cinema .lp-earned-skills{gap:4px;margin-top:9px}.bot-match-result .lp-reward-cinema .lp-earned-skill{padding:6px}.lp-reward-cinema .lp-earned-skill>small{font-size:9px}.lp-reward-cinema .lp-reward-coach{padding-top:6px}.lp-reward-cinema .lp-reward-coach p{font-size:10px}.lp-reward-cinema .lp-reward-coach>small{font-size:8px}}
+.lp-reward-status{border-top-color:#ffe16b;background:linear-gradient(120deg,#123b48ee,#071e30f5)}.lp-reward-status-head{display:grid;grid-template-columns:100px minmax(0,1fr);gap:16px;align-items:center}.lp-reward-status-head:not(:has(.lp-reward-player)){grid-template-columns:1fr}.lp-reward-status-head .lp-reward-player>.starter-card{width:100px;height:140px;padding:5px}.lp-reward-status-head small{color:#92e8df;font-size:9px;font-weight:800;letter-spacing:.7px}.lp-reward-status-head h3{font:900 italic 25px/1.1 'Barlow Condensed',sans-serif;margin:7px 0;color:#ffe16b}.lp-reward-status-head p{font-size:12px;line-height:1.5;color:#edf7fb;margin:0}.lp-reward-status-head button{min-height:40px;background:#ffe16b;color:#0b2834;border:0;padding:8px 12px;margin-top:8px;font-weight:800;cursor:pointer}.lp-reward-current-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:14px}.lp-reward-current-stats>div{display:grid;grid-template-columns:1fr auto;padding:8px;background:#23607444;gap:4px;align-items:center}.lp-reward-current-stats span{font-size:11px}.lp-reward-current-stats strong{font:900 italic 23px/1 'Barlow Condensed',sans-serif;color:#fff}.lp-reward-current-stats small{grid-column:1/-1;font-size:9px;color:#afcdd7}.lp-reward-status-foot{font-size:11px;line-height:1.5;color:#d0e8eb;border-top:1px solid #7edbc42b;padding-top:9px;margin:12px 0 0}
+@media(max-width:600px){.lp-reward-status-head{grid-template-columns:92px minmax(0,1fr);gap:12px}.lp-reward-status-head .lp-reward-player>.starter-card{width:92px;height:129px}.lp-reward-status-head h3{font-size:23px}.lp-reward-status-head p{font-size:11px}.lp-reward-current-stats span{font-size:10px}.lp-reward-current-stats>div{padding:7px}.lp-reward-status-foot{font-size:10px}}
+/* The card sits in summary; prevent accordion text rules reaching its labels. */
+.lp-reward-cinema .lp-reward-player .starter-card span{float:none;margin-left:0;letter-spacing:normal}
+.lp-reward-cinema .lp-reward-player .starter-card__stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;min-width:0;width:100%;font-size:6px;line-height:1}
+.lp-reward-cinema .lp-reward-player .starter-card__stats span{display:flex;align-items:center;justify-content:space-between;gap:1px;min-width:0;padding:3px 1px;margin:0;font:700 6px/1 Barlow,system-ui,sans-serif;color:#e2eef5;white-space:nowrap}
+.lp-reward-cinema .lp-reward-player .starter-card__stats b{font:900 7px/1 Barlow,system-ui,sans-serif;color:#fff;letter-spacing:-.2px}
+.lp-reward-cinema .lp-reward-player .starter-card__position{display:inline-block;width:fit-content;font-size:6px;line-height:1.1;margin-top:3px;padding:1px 3px}
+.lp-reward-cinema .lp-reward-player .starter-card__crest{font-size:12px;line-height:1;margin:0}
+.lp-reward-cinema .lp-reward-player .starter-card__bottom h3{font:900 11px/1 'Barlow Condensed',sans-serif;margin:0;color:#fff}
+.lp-reward-cinema .lp-reward-player .starter-card__rarity{font-size:5px;line-height:1.2;margin:3px 0;letter-spacing:.4px}
+
+/* Desktop player sheet: a full-sized collectible beside a clear attribute HUD. */
+@media(min-width:901px){
+ .bot-match-result .lp-reward-cinema.lp-reward-status{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px 20px;align-content:center;align-items:center;padding:20px;background:radial-gradient(ellipse at 10% 40%,#339bb73b,transparent 65%),linear-gradient(120deg,#0c2d3ef2,#061c2bee)}
+ .lp-reward-status .lp-reward-status-head{display:contents}
+ .lp-reward-status .lp-reward-status-head>.lp-reward-player{grid-column:1;grid-row:1/3;align-self:center;filter:drop-shadow(0 10px 20px #0009)}
+ .bot-match-result .lp-reward-status .lp-reward-status-head .lp-reward-player>.starter-card{width:150px;height:210px;padding:8px}
+ .lp-reward-status .lp-reward-status-head>div[role=status]{grid-column:2;grid-row:1;min-width:0;text-align:left}
+ .lp-reward-status .lp-reward-status-head h3{font-size:30px;line-height:1.05;margin:7px 0 10px}
+ .lp-reward-status .lp-reward-status-head p{font-size:13px;line-height:1.6;color:#d5eaf1}
+ .lp-reward-status .lp-reward-current-stats{grid-column:2;grid-row:2;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;margin:0;gap:8px;box-sizing:border-box}
+ .lp-reward-status .lp-reward-current-stats>div{padding:8px 0;background:none;border-bottom:1px solid #7dd7d62b;gap:5px}
+ .lp-reward-status .lp-reward-current-stats span{font-size:12px;font-weight:700;color:#d4eaf3}
+ .lp-reward-status .lp-reward-current-stats strong{font-size:30px;color:#8effe1}
+ .lp-reward-status .lp-reward-current-stats small{font-size:9px;color:#9cbfce}
+ .lp-reward-status .lp-reward-status-foot{grid-column:1/-1;width:100%;box-sizing:border-box;margin:0;padding-top:12px;font-size:11px;line-height:1.6;text-align:left}
+ .lp-reward-status:not(:has(.lp-reward-player)){grid-template-columns:1fr}
+ .lp-reward-status:not(:has(.lp-reward-player)) .lp-reward-status-head>div[role=status]{grid-column:1}
+ .bot-match-result .lp-reward-cinema .lp-reward-player .starter-card__stats span{font-size:8px;padding:4px 2px}
+ .bot-match-result .lp-reward-cinema .lp-reward-player .starter-card__stats b{font-size:10px}
+ .bot-match-result .lp-reward-cinema .lp-reward-player .starter-card__bottom h3{font-size:17px}
+ .bot-match-result .lp-reward-cinema .lp-reward-player .starter-card__top strong{font-size:36px}
+ .bot-match-result .lp-reward-cinema .lp-reward-player .starter-card__rarity{font-size:7px;margin:4px 0 5px}
+ .bot-match-result .lp-reward-cinema .lp-reward-player .starter-card__crest{font-size:16px}
+ .bot-match-result .lp-reward-cinema .lp-reward-player .starter-card__position{font-size:8px}
+ .bot-match-result .lp-reward-cinema:not(.lp-reward-status)>.lp-skill-match-reward>summary{grid-template-columns:140px minmax(0,1fr);gap:20px}
+ .bot-match-result .lp-reward-cinema:not(.lp-reward-status) .lp-reward-player>.starter-card{width:140px;height:196px;padding:7px}
+ .bot-match-result .lp-reward-summary-info>strong{font-size:40px}
+}
+@media(min-width:901px) and (max-width:1050px){.bot-match-result .lp-reward-cinema.lp-reward-status{grid-template-columns:125px minmax(0,1fr);padding:14px;gap:12px}.bot-match-result .lp-reward-status .lp-reward-status-head .lp-reward-player>.starter-card{width:125px;height:175px;padding:6px}.lp-reward-status .lp-reward-status-head h3{font-size:25px}.lp-reward-status .lp-reward-status-head p{font-size:12px}.lp-reward-status .lp-reward-current-stats span{font-size:11px}}
+
+/* Football attribute HUD: clear rating, compact code and a truthful 0–99 scale. */
+.lp-reward-cinema .lp-reward-current-stats{gap:7px}
+.lp-reward-cinema .lp-reward-current-stats>div{position:relative;isolation:isolate;padding:10px 9px;background:linear-gradient(120deg,#1a4558bb,#0b2637cc);border:0;border-bottom:2px solid #5cebd56b;gap:6px;min-width:0}
+.lp-reward-cinema .lp-reward-current-stats>div:before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(125deg,transparent 65%,#6acfe609 65%);pointer-events:none}
+.lp-reward-cinema .lp-reward-current-stats span{display:grid;gap:3px;font-size:11px;font-weight:700;color:#dcecf3;letter-spacing:.1px}
+.lp-reward-current-stats em,.lp-earned-code{font:900 italic 17px/1 'Barlow Condensed',sans-serif;color:#89f5db;font-style:italic;letter-spacing:.5px}
+.lp-reward-cinema .lp-reward-current-stats strong{font:900 italic 34px/1 'Barlow Condensed',sans-serif;color:#fff;white-space:nowrap;font-variant-numeric:tabular-nums;text-shadow:0 2px 0 #051524}
+.lp-reward-cinema .lp-reward-current-stats strong small{display:inline;font:600 8px/1 Barlow,system-ui,sans-serif;color:#95b9ca;margin-left:2px}
+.lp-reward-current-stats .lp-rating-track{display:block;grid-column:1/-1;width:100%;height:4px;background:#8ab6cd30;overflow:hidden}
+.lp-rating-track i{display:block;height:100%;background:linear-gradient(90deg,#1ba8c7,#95ffe2);box-shadow:0 0 8px #7affe34d}
+.lp-reward-cinema .lp-earned-skill{background:linear-gradient(120deg,#173e52a8,#092535);border-bottom:2px solid #72e7d34d;padding:10px}
+.lp-reward-cinema .lp-earned-skill>div:first-child{align-items:center;gap:6px}
+.lp-reward-cinema .lp-earned-skill strong{display:grid;gap:4px;font-size:12px;color:#e3f2f7}
+.lp-reward-cinema .lp-earned-skill b{font:900 italic 19px/1 'Barlow Condensed',sans-serif;color:#9bffe2;white-space:nowrap}
+.lp-reward-cinema .lp-earned-skill .lp-skill-track{height:5px;border-radius:0;background:#90bbcf30}
+.lp-reward-cinema .lp-earned-skill .lp-skill-track>i{border-radius:0}
+.lp-reward-cinema .lp-earned-skill>small{color:#bed8e4;line-height:1.4;font-size:10px}
+.lp-reward-cinema .lp-earned-skill.is-upgraded{border-color:#ffe16b;background:linear-gradient(120deg,#947e333b,#103747)}
+.lp-reward-cinema .lp-earned-skill.is-upgraded b{color:#ffe16b;font-size:23px}
+@media(max-width:600px){
+ .lp-reward-cinema .lp-reward-current-stats>div{padding:8px 6px;gap:5px}
+ .lp-reward-cinema .lp-reward-current-stats span{font-size:10px}
+ .lp-reward-current-stats em,.lp-earned-code{font-size:14px}
+ .lp-reward-cinema .lp-reward-current-stats strong{font-size:28px}
+ .lp-reward-cinema .lp-reward-current-stats strong small{font-size:7px}
+ .bot-match-result .lp-reward-cinema .lp-earned-skill{padding:7px}
+ .lp-reward-cinema .lp-earned-skill strong{font-size:10px;gap:3px}
+ .lp-reward-cinema .lp-earned-skill b{font-size:17px}
+ .lp-reward-cinema .lp-earned-skill>small{font-size:9px}
+}

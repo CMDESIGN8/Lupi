@@ -1,0 +1,3 @@
+.lp-owned-portrait{position:absolute;inset:0;overflow:hidden;pointer-events:none}.lp-owned-portrait__rig{position:absolute;left:50%;bottom:16%;width:390px;height:520px;transform:translateX(-50%) scale(var(--own-card-scale,.24));transform-origin:center bottom}.lp-owned-portrait__rig>.avatar2d{position:relative;inset:auto;width:390px;height:520px;transform:none}.lp-owned-portrait .avatar2d__aura,.lp-owned-portrait .avatar2d__level,.lp-owned-portrait .avatar2d__badge,.lp-owned-portrait .avatar2d__info{display:none}
+
+.starter-card__portrait:has(.lp-owned-portrait)>.starter-card__sun{display:none}

@@ -17,13 +17,15 @@ type WeeklyChallenge = { goal: number; completed: number; total_completed: numbe
 type WeeklyRank = { user_id: string; username: string | null; level: number | null; weekly_points: number; missions_count: number };
 type View = "mine" | "explore" | "clubs" | "community" | "inside";
 
-export function CommunitiesPanel({ userId, onClose, onMembershipChange, onlineMemberIds = [], challengePendingToId, onChallengeMember }: {
+export function CommunitiesPanel({ userId, onClose, onMembershipChange, onlineMemberIds = [], challengePendingToId, onChallengeMember, onAsyncChallenge }: {
   userId: string;
   onClose: () => void;
   onMembershipChange?: () => void;
   onlineMemberIds?: string[];
   challengePendingToId?: string | null;
   onChallengeMember?: (member: { userId: string; username: string }, game: ChallengeGame, communityId: string) => boolean;
+  /** Preguntados por turnos: sirve también para miembros desconectados. */
+  onAsyncChallenge?: (member: { userId: string; username: string }) => void;
 }) {
   const [view, setView] = useState<View>("mine");
   const [clubEntering, setClubEntering] = useState(false);
@@ -157,6 +159,7 @@ export function CommunitiesPanel({ userId, onClose, onMembershipChange, onlineMe
   const profileFor = (id: string) => memberProfiles.find(p => p.id === id);
   const onlineMembers = new Set(onlineMemberIds);
   const openDuelPicker = (opponentId: string, username: string) => {
+    if (!onlineMembers.has(opponentId) && onAsyncChallenge) { onAsyncChallenge({ userId: opponentId, username }); onClose(); return; }
     if (!selected || !onChallengeMember || challengePendingToId || !onlineMembers.has(opponentId)) {
       setMemberError("El rival debe estar conectado al lobby y no debe haber otra invitación pendiente.");
       return;
@@ -181,10 +184,10 @@ export function CommunitiesPanel({ userId, onClose, onMembershipChange, onlineMe
         </nav>
         <div className="lupi-community-inside-body" key={`${selected.id}-${insideTab}`}>
           {insideTab === "inicio" && <><div className="lupi-club-welcome">{isFlores && <div className="lupi-club-kicker">✦ TU CLUB · TU COMUNIDAD ✦</div>}{isFlores && <img src={crestFor(selected) || floresCrest} alt="" />}<h3>{isFlores ? "BIENVENIDO AL CLUB" : `Bienvenido a ${selected.name}`}</h3><p>{isFlores ? "La cancha está lista. Conectate con otros miembros, competí en el ranking y aceptá nuevos desafíos." : "Ya formás parte de esta comunidad. Acá vas a encontrar novedades, desafíos y la actividad de sus miembros."}</p><div className="lupi-community-info-tile">👥 {members.length} {members.length === 1 ? "miembro" : "miembros"} en la comunidad</div>{isFlores && <div className="lupi-club-actions"><a href="/futsal" className="lupi-community-futsal-link">⚽ TABLAS Y RESULTADOS</a><button type="button" onClick={() => setInsideTab("ranking")}>🏆 VER CLASIFICACIÓN</button><button type="button" onClick={() => setInsideTab("desafios")}>⚔ IR A DESAFÍOS</button></div>}</div></>}
-          {insideTab === "miembros" && !challengeTarget && <><h3>Miembros</h3><p>{members.length} {members.length === 1 ? "jugador forma" : "jugadores forman"} parte de la comunidad.</p>{memberError && <p role="alert" className="lupi-community-error">{memberError}</p>}{members.map(m => { const profile = profileFor(m.user_id); return <div className="lupi-community-member" key={m.user_id}><div className="lupi-community-member-avatar">{(profile?.username || "J").slice(0, 1).toUpperCase()}</div><div><strong>{profile?.username || "Jugador"}{m.user_id === userId ? " · Vos" : ""}</strong><small>Nivel {profile?.level ?? "—"} · {profile?.points ?? "—"} XP/puntos</small><small>{m.user_id === userId ? "Tu perfil" : onlineMembers.has(m.user_id) ? "● Conectado" : "○ Desconectado"}</small></div>{m.user_id !== userId && <button type="button" className="lupi-community-member-challenge" disabled={!onlineMembers.has(m.user_id) || !onChallengeMember || !!challengePendingToId} title={!onlineMembers.has(m.user_id) ? "El jugador debe estar conectado al lobby" : "Elegir modalidad de desafío"} onClick={() => {
+          {insideTab === "miembros" && !challengeTarget && <><h3>Miembros</h3><p>{members.length} {members.length === 1 ? "jugador forma" : "jugadores forman"} parte de la comunidad.</p>{memberError && <p role="alert" className="lupi-community-error">{memberError}</p>}{members.map(m => { const profile = profileFor(m.user_id); return <div className="lupi-community-member" key={m.user_id}><div className="lupi-community-member-avatar">{(profile?.username || "J").slice(0, 1).toUpperCase()}</div><div><strong>{profile?.username || "Jugador"}{m.user_id === userId ? " · Vos" : ""}</strong><small>Nivel {profile?.level ?? "—"} · {profile?.points ?? "—"} XP/puntos</small><small>{m.user_id === userId ? "Tu perfil" : onlineMembers.has(m.user_id) ? "● Conectado" : "○ Desconectado"}</small></div>{m.user_id !== userId && <button type="button" className="lupi-community-member-challenge" disabled={(!onlineMembers.has(m.user_id) && !onAsyncChallenge) || !onChallengeMember || !!challengePendingToId} title={!onlineMembers.has(m.user_id) ? (onAsyncChallenge ? "Desafiar por turnos: responde cuando se conecte" : "El jugador debe estar conectado al lobby") : "Elegir modalidad de desafío"} onClick={() => {
             if (!profile?.username || !onChallengeMember) { setMemberError("No se pudo identificar al jugador."); return; }
             openDuelPicker(m.user_id, profile.username);
-          }}>{challengePendingToId === m.user_id ? "Pendiente" : onlineMembers.has(m.user_id) ? "⚔ Desafiar" : "Sin conexión"}</button>}</div>; })}</>}
+          }}>{challengePendingToId === m.user_id ? "Pendiente" : onlineMembers.has(m.user_id) ? "⚔ Desafiar" : onAsyncChallenge ? "🧠 Por turnos" : "Sin conexión"}</button>}</div>; })}</>}
           {insideTab === "miembros" && challengeTarget && (
             <div className="lupi-community-duel-picker" role="group" aria-label="Elegir modalidad de desafío">
               <div className="lupi-community-duel-picker-head">
@@ -208,6 +211,7 @@ export function CommunitiesPanel({ userId, onClose, onMembershipChange, onlineMe
                 if (sent) { setChallengeTarget(null); onClose(); }
                 else setMemberError("No se pudo enviar el desafío. Verificá que ambos estén disponibles en el lobby.");
               }}>🧠 Preguntados <small>Trivia de fútbol · 5 preguntas · Duelo amistoso →</small></button>
+              {onAsyncChallenge && <button type="button" className="lupi-community-duel-option" onClick={() => { onAsyncChallenge(challengeTarget); setChallengeTarget(null); onClose(); }}>🧠 Preguntados por turnos <small>Jugás ahora · tu rival responde en 24 h →</small></button>}
               <div className="lupi-community-duel-locked">🃏 Truco <small>Próximamente</small></div>
             </div>
           )}

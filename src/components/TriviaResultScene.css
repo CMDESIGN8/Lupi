@@ -1,0 +1,115 @@
+/* Same club and anime artwork as Lupi's challenge selection. */
+.trivia-arena.trivia-question-scene{background:linear-gradient(180deg,#031722ed,#041c26ed),url('../assets/challenge-trivia-anime.webp') center/cover}
+.trivia-arena.trivia-result-scene{background:linear-gradient(180deg,#02131de8 0%,#031a23a6 48%,#02131de8 100%),url('../assets/challenge-trivia-anime.webp') 62% center/cover}
+.trivia-result-scene>.trivia-score{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(180deg,#04243244,#031923b8);border:0;border-bottom:1px solid #50dbe870;border-radius:5px;box-shadow:none}
+.trivia-full-player{position:relative;display:flex;justify-content:center;align-items:flex-end;align-self:center;width:110px;height:150px;margin-bottom:2px}
+.trivia-full-player .arena-avatar{position:relative;z-index:1;width:110px;height:150px;pointer-events:none;filter:drop-shadow(0 8px 7px #0008)}
+.trivia-full-player .arena-avatar__rig{position:absolute;top:0;left:50%;width:390px;height:520px;transform:translateX(-50%) scale(.285);transform-origin:top center}
+.trivia-full-player .arena-avatar__rig .avatar2d{width:390px;height:520px;background:none;border:0;box-shadow:none}
+.trivia-full-player .avatar2d__label{display:none}
+.trivia-player-base{position:absolute;bottom:0;left:0;right:0;height:12px;border:1px solid #54dbe885;border-radius:50%;background:#3ddddb15;box-shadow:0 0 16px #38dfe32b}
+.trivia-bot-tag{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:2;white-space:nowrap;font-size:7px!important;letter-spacing:.08em!important;color:#a1e1e4!important;background:#031d2bd9;padding:2px 5px}
+.trivia-result-scene .is-winner .arena-avatar{filter:drop-shadow(0 0 12px #ffd65265)}
+.trivia-result-scene .is-winner .trivia-player-base{border-color:#ffda58;box-shadow:0 0 18px #ffda5845}
+.trivia-result-scene .trivia-score>div>strong{font-family:'Barlow Condensed',Barlow,sans-serif;font-size:18px}
+@media(max-width:899px){
+.trivia-arena.trivia-result-scene{padding-top:12px;padding-bottom:14px}
+.trivia-result-scene .trivia-title{margin:5px 0 2px}
+.trivia-result-scene .trivia-result-banner{padding:3px}
+.trivia-result-scene .trivia-result-banner>span{font-size:23px;margin-bottom:2px}
+.trivia-result-scene .trivia-result-banner h3{font-size:34px;margin:6px 0}
+.trivia-result-scene>.trivia-score{margin:6px auto 8px;padding:5px 10px}
+.trivia-result-scene .trivia-score b{font-size:28px}
+.trivia-result-scene>.trivia-summary{margin-top:8px;padding:5px 12px}
+.trivia-result-scene>.trivia-footnote{margin-top:8px;font-size:9px}
+}
+@media(max-width:899px) and (max-height:750px){
+.trivia-full-player,.trivia-full-player .arena-avatar{height:120px;width:95px}
+.trivia-full-player .arena-avatar__rig{transform:translateX(-50%) scale(.23)}
+}
+
+/* Lupi's established welcome character, dressed and recognisable. */
+.trivia-lupi-coach{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 7px 9px #0008)}
+@media(min-width:900px){
+.trivia-result-scene .trivia-full-player,.trivia-result-scene .trivia-full-player .arena-avatar{width:150px;height:190px}
+.trivia-result-scene .trivia-full-player .arena-avatar__rig{transform:translateX(-50%) scale(.365)}
+.trivia-result-scene>.trivia-score{padding-top:5px;padding-bottom:8px}
+.trivia-result-scene .trivia-result-banner>span{font-size:24px}
+.trivia-result-scene .trivia-result-banner{padding:3px}
+.trivia-result-scene .trivia-score>div>strong{font-size:20px}
+.trivia-result-scene .trivia-score b{font-size:30px}
+}
+/* Anime split-screen scoreboard, without taking space away from the answers. */
+.trivia-question-scene>.trivia-score{position:relative;isolation:isolate;max-width:760px;padding:6px 18px;margin:8px auto 12px;border:0;border-block:1px solid #5ce7ee70;border-radius:2px;background:linear-gradient(112deg,#08465ce8 0 46%,#04151ef0 46% 54%,#68551ae0 54% 100%);box-shadow:0 8px 25px #0004;overflow:hidden}
+.trivia-question-scene>.trivia-score:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:repeating-linear-gradient(165deg,transparent 0 13px,#b2efff0a 14px 15px);animation:trivia-versus-enter .5s ease-out both}
+.trivia-question-scene .trivia-score>div{position:relative;display:grid;grid-template-columns:80px minmax(0,1fr);grid-template-rows:auto auto auto;gap:1px 10px;align-items:center;text-align:left}
+.trivia-question-scene .trivia-score>div:last-child{grid-template-columns:minmax(0,1fr) 80px;text-align:right}
+.trivia-question-scene .trivia-score>div>.trivia-full-player{grid-column:1;grid-row:1 / span 3;width:80px;height:92px;margin:0}
+.trivia-question-scene .trivia-score>div:last-child>.trivia-full-player{grid-column:2}
+.trivia-question-scene .trivia-full-player .arena-avatar{width:80px;height:92px}
+.trivia-question-scene .trivia-full-player .arena-avatar__rig{transform:translateX(-50%) scale(.176)}
+.trivia-question-scene .trivia-score>div>small,.trivia-question-scene .trivia-score>div>strong,.trivia-question-scene .trivia-score>div>b{grid-column:2}
+.trivia-question-scene .trivia-score>div:last-child>small,.trivia-question-scene .trivia-score>div:last-child>strong,.trivia-question-scene .trivia-score>div:last-child>b{grid-column:1}
+.trivia-question-scene .trivia-score>span{font:900 italic 34px/1 'Barlow Condensed',sans-serif;color:#ffe27b;transform:rotate(-9deg);text-shadow:2px 3px #00131d,0 0 18px #ffe27b50}
+.trivia-question-scene .trivia-player-base{height:6px}
+.trivia-question-scene .trivia-bot-tag{display:none}
+.trivia-question-scene .trivia-score strong{font:900 italic 19px/1.1 'Barlow Condensed',sans-serif}
+@keyframes trivia-versus-enter{from{opacity:0;transform:translateX(-25px)}to{opacity:1;transform:none}}
+@media(max-width:600px){
+.trivia-question-scene>.trivia-score{padding:5px 8px;gap:7px;margin:8px auto}
+.trivia-question-scene .trivia-score>div{grid-template-columns:48px minmax(0,1fr);gap:1px 4px}
+.trivia-question-scene .trivia-score>div:last-child{grid-template-columns:minmax(0,1fr) 48px}
+.trivia-question-scene .trivia-score>div>.trivia-full-player,.trivia-question-scene .trivia-full-player .arena-avatar{width:48px;height:70px}
+.trivia-question-scene .trivia-full-player .arena-avatar__rig{transform:translateX(-50%) scale(.134)}
+.trivia-question-scene .trivia-score strong{font-size:15px}
+.trivia-question-scene .trivia-score b{font-size:24px}
+.trivia-question-scene .trivia-score>span{font-size:25px}
+.trivia-question-scene .trivia-score small{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){.trivia-question-scene>.trivia-score:before{animation:none}}
+/* Sports-anime cut-in: diagonal framing, ink edges and a brief speed burst. */
+.trivia-question-scene>.trivia-score{border-block:2px solid #69eaf6;clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);background:linear-gradient(112deg,#07536ce8 0 46%,#02111cf5 46% 54%,#7a601cdd 54% 100%);box-shadow:inset 0 3px #b6f9ff33,inset 0 -3px #00131dbb}
+.trivia-question-scene>.trivia-score:before{background:repeating-linear-gradient(166deg,transparent 0 8px,#a7f2ff12 9px 10px,transparent 11px 22px),linear-gradient(0deg,#00152288,transparent 35% 65%,#00152288);animation:trivia-speed-burst .65s ease-out both}
+.trivia-question-scene>.trivia-score:after{content:'';position:absolute;z-index:-1;inset:0;pointer-events:none;background:linear-gradient(112deg,transparent 45.4%,#bbf7ffb0 45.7%,#002338 46.2%,transparent 46.5% 53.5%,#ffed98a0 53.8%,transparent 54.3%);opacity:.8}
+.trivia-question-scene .trivia-score>span{font-size:42px;letter-spacing:-2px;transform:rotate(-12deg) skew(-7deg);color:#fff0a5;-webkit-text-stroke:1px #0b202a;paint-order:stroke fill;text-shadow:3px 4px #000b,0 0 20px #ffe27b66;animation:trivia-vs-impact .6s cubic-bezier(.2,.8,.25,1.25) both}
+.trivia-question-scene .trivia-score>div>strong{font-style:italic;text-shadow:2px 2px #001723;letter-spacing:.03em}
+.trivia-question-scene .trivia-score>div>b{text-shadow:2px 3px #001723;font-style:italic}
+.trivia-question-scene .trivia-full-player .arena-avatar{filter:drop-shadow(2px 2px 0 #00111d) drop-shadow(0 0 8px #4bd9ef44)}
+.trivia-question-scene .trivia-lupi-coach{filter:drop-shadow(2px 2px 0 #00111d) drop-shadow(0 0 8px #ffda5840)}
+.trivia-question-scene .trivia-full-player{animation:trivia-player-cutin .55s cubic-bezier(.15,.8,.3,1) both}
+.trivia-question-scene .trivia-score>div:last-child .trivia-full-player{animation-name:trivia-rival-cutin}
+@keyframes trivia-speed-burst{from{opacity:0;transform:translateX(-50px)}to{opacity:1;transform:none}}
+@keyframes trivia-vs-impact{0%{opacity:0;transform:rotate(-12deg) skew(-7deg) scale(1.65)}70%{opacity:1;transform:rotate(-12deg) skew(-7deg) scale(.93)}100%{opacity:1;transform:rotate(-12deg) skew(-7deg) scale(1)}}
+@keyframes trivia-player-cutin{from{opacity:0;translate:-22px 0}to{opacity:1;translate:0 0}}
+@keyframes trivia-rival-cutin{from{opacity:0;translate:22px 0}to{opacity:1;translate:0 0}}
+@media(max-width:600px){.trivia-question-scene .trivia-score>span{font-size:30px}.trivia-question-scene>.trivia-score{clip-path:polygon(1% 0,100% 0,99% 100%,0 100%)}}
+@media(prefers-reduced-motion:reduce){.trivia-question-scene>.trivia-score:before,.trivia-question-scene .trivia-score>span,.trivia-question-scene .trivia-full-player{animation:none!important}}
+/* Mobile final: reserve room for a capped-prize explanation and both actions. */
+@media(max-width:899px){
+.trivia-arena.trivia-result-scene{min-height:calc(100dvh - 16px);padding:9px 14px 10px}
+.trivia-result-scene>.trivia-header{min-height:36px}
+.trivia-result-scene .trivia-header button{min-height:36px;padding:6px 12px}
+.trivia-result-scene .trivia-title h2{font-size:26px;margin:3px 0}
+.trivia-result-scene .trivia-title p{font-size:10px;margin:3px 0}
+.trivia-result-scene .trivia-result-banner>span{font-size:20px;margin-bottom:0}
+.trivia-result-scene .trivia-result-banner>small{font-size:8px}
+.trivia-result-scene .trivia-result-banner h3{font-size:31px;margin:4px 0}
+.trivia-result-scene .trivia-result-banner p{font-size:10px;margin:3px 0}
+.trivia-result-scene .trivia-full-player,.trivia-result-scene .trivia-full-player .arena-avatar{width:96px;height:105px}
+.trivia-result-scene .trivia-full-player .arena-avatar__rig{transform:translateX(-50%) scale(.2)}
+.trivia-result-scene>.trivia-score{padding:3px 8px;margin:4px auto}
+.trivia-result-scene .trivia-score>div{gap:1px}
+.trivia-result-scene .trivia-score strong{font-size:16px}
+.trivia-result-scene .trivia-score b{font-size:26px}
+.trivia-result-scene>.drc{margin:5px auto;padding:9px 11px}
+.trivia-result-scene .drc--practice-complete h3{font-size:17px;margin:3px 0}
+.trivia-result-scene .drc--practice-complete p{font-size:10px;margin:5px 0;line-height:1.3}
+.trivia-result-scene .drc--practice-complete strong{font-size:10px;line-height:1.3}
+.trivia-result-scene .drc-practice-stamps{margin-top:5px}
+.trivia-result-scene .drc-practice-stamps i{width:18px;height:18px;font-size:12px}
+.trivia-result-scene .trivia-rematch{margin:6px auto}
+.trivia-result-scene .trivia-actions{gap:6px}
+.trivia-result-scene .trivia-actions button{min-height:40px;padding:8px 10px}
+.trivia-result-scene>.trivia-summary{margin-top:5px;padding:2px 10px}
+.trivia-result-scene>.trivia-footnote{margin-top:5px;font-size:8px}
+}

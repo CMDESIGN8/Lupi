@@ -1,0 +1,109 @@
+/* Lupi sports-anime duel: cyan challenger / gold rival, secret hands untouched. */
+.rps-arena .rps-score{position:relative;isolation:isolate;overflow:hidden;border-block:2px solid #64e7f2;clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);padding:7px 15px;background:linear-gradient(112deg,#07536ce8 0 42%,#02111cf5 42% 58%,#7a601cce 58% 100%);box-shadow:inset 0 3px #b6f9ff22,inset 0 -3px #00131d99;max-width:760px}
+.rps-arena .rps-score:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:repeating-linear-gradient(166deg,transparent 0 9px,#a7f2ff14 10px 11px,transparent 12px 23px),linear-gradient(112deg,transparent 41%,#bbf7ff70 41.5%,transparent 42.5% 57.5%,#ffe98c70 58%,transparent 59%);animation:rps-speed-enter .6s ease-out both}
+.rps-anime-player{position:relative;display:block;width:105px;height:116px;flex-shrink:0}
+.rps-anime-player .arena-avatar{position:relative;z-index:1;width:105px;height:116px;filter:drop-shadow(2px 3px #00111d) drop-shadow(0 0 10px #48ddeb30)}
+.rps-anime-player .arena-avatar__rig{position:absolute;top:0;left:50%;width:390px;height:520px;transform:translateX(-50%) scale(.22);transform-origin:top center}
+.rps-anime-player .arena-avatar__rig .avatar2d{width:390px;height:520px;background:none;border:0;box-shadow:none}
+.rps-anime-player .avatar2d__label{display:none}
+.rps-anime-player>img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(2px 3px #00111d)}
+.rps-anime-base{position:absolute;bottom:0;left:6%;right:6%;height:8px;border:1px solid #63eaf0;border-radius:50%;background:#45dee51a;box-shadow:0 0 15px #39e0e333}
+.rps-score>div:last-child .rps-anime-base{border-color:#ffdd65}
+.rps-arena .rps-scoreboard>b{text-shadow:3px 4px #00111d;transform:skew(-7deg);font-size:50px}
+.rps-arena .rps-score strong{font-style:italic;text-shadow:2px 2px #00131d}
+.rps-score>div:first-child .rps-anime-player{animation:rps-player-enter .55s ease-out both}
+.rps-score>div:last-child .rps-anime-player{animation:rps-rival-enter .55s ease-out both}
+.rps-arena .rps-clash{position:relative;isolation:isolate;border-block:1px solid #56e5ee35;background:radial-gradient(ellipse at 50% 50%,#29d8ed20,transparent 66%)}
+.rps-arena .rps-clash:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:repeating-conic-gradient(from 8deg at 50% 50%,transparent 0deg 18deg,#78edff09 19deg 20deg,transparent 21deg 30deg);mask-image:radial-gradient(ellipse,transparent 10%,#000 45%,transparent 75%)}
+.rps-arena .rps-clash__center>b{font-style:italic;text-shadow:3px 4px #00101c,0 0 22px #ffdd6555;transform:rotate(-8deg)}
+.rps-arena .rps-clash.is-revealed{animation:rps-impact-light .5s ease-out}
+@keyframes rps-speed-enter{from{opacity:0;translate:-35px 0}to{opacity:1;translate:0 0}}
+@keyframes rps-player-enter{from{opacity:0;translate:-25px 0}to{opacity:1;translate:0 0}}
+@keyframes rps-rival-enter{from{opacity:0;translate:25px 0}to{opacity:1;translate:0 0}}
+@keyframes rps-impact-light{0%{box-shadow:inset 0 0 50px #67e9ff44}100%{box-shadow:inset 0 0 0 transparent}}
+@media(max-width:600px){
+.rps-arena .rps-title{margin:10px 0 8px}
+.rps-arena .rps-score{padding:5px 9px;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);gap:5px;margin:8px auto}
+.rps-anime-player,.rps-anime-player .arena-avatar{width:76px;height:88px}
+.rps-anime-player .arena-avatar__rig{transform:translateX(-50%) scale(.168)}
+.rps-arena .rps-scoreboard>b{font-size:40px}
+.rps-arena .rps-scoreboard i{margin:0 7px;font-size:20px}
+.rps-arena .rps-score strong{font-size:15px,}
+.rps-arena .rps-clash{min-height:160px}
+}
+@media(prefers-reduced-motion:reduce){.rps-arena .rps-score:before,.rps-score .rps-anime-player,.rps-arena .rps-clash.is-revealed{animation:none!important}}
+/* Desktop reserves the actual height of the full-body versus strip. */
+@media(min-width:900px) and (min-height:540px){
+.rps-cinema-screen>.rps-arena.rps-anime-duel{box-sizing:border-box;height:calc(100dvh - 32px);min-height:0;grid-template-columns:minmax(0,1fr) minmax(300px,370px);grid-template-rows:36px 58px 180px minmax(100px,1fr) auto 22px;gap:6px 24px;padding:12px 28px}
+.rps-anime-duel .rps-score{height:180px;min-height:180px;align-self:start;align-items:center;box-sizing:border-box;padding:7px 15px;overflow:hidden}
+.rps-anime-duel .rps-score>div{gap:3px}
+.rps-anime-duel .rps-anime-player,.rps-anime-duel .rps-anime-player .arena-avatar{width:105px;height:110px}
+.rps-anime-duel .rps-anime-player .arena-avatar__rig{transform:translateX(-50%) scale(.21)}
+.rps-anime-duel .rps-scoreboard>b{font-size:46px}
+.rps-anime-duel .rps-live{align-self:center}
+.rps-anime-duel .rps-clash{min-height:100px}
+.rps-anime-duel .rps-clash__side>.rps-hand{width:clamp(95px,17dvh,140px)}
+.rps-anime-duel .rps-mystery{height:115px;font-size:85px}
+}
+@media(min-width:900px) and (min-height:540px) and (max-height:680px){
+.rps-cinema-screen>.rps-arena.rps-anime-duel{height:auto;min-height:calc(100dvh - 32px);grid-template-rows:36px 48px 165px minmax(100px,1fr) auto 22px}
+.rps-anime-duel .rps-score{height:165px;min-height:165px}
+.rps-anime-duel .rps-anime-player,.rps-anime-duel .rps-anime-player .arena-avatar{height:95px}
+.rps-anime-duel .rps-anime-player .arena-avatar__rig{transform:translateX(-50%) scale(.18)}
+}
+/* A chosen hand steps forward; both hands collide only on the server reveal. */
+.rps-anime-duel .rps-clash.is-selected .rps-clash__side:first-child>.rps-hand{animation:rps-hand-lock .35s ease-out both;filter:drop-shadow(0 0 14px #47e6ed66)}
+.rps-anime-duel .rps-clash.is-revealed .rps-clash__side:first-child>.rps-hand{animation:rps-strike-left .48s cubic-bezier(.16,.8,.3,1) both}
+.rps-anime-duel .rps-clash.is-revealed .rps-clash__side--rival>.rps-hand{animation:rps-strike-right .48s cubic-bezier(.16,.8,.3,1) both}
+.rps-anime-duel .rps-clash[data-round-outcome=win]{background:radial-gradient(ellipse,#ffdc5438,transparent 70%)}
+.rps-anime-duel .rps-clash[data-round-outcome=draw]{background:radial-gradient(ellipse,#50e4ed38,transparent 70%)}
+.rps-anime-duel .rps-clash[data-round-outcome=loss]{background:radial-gradient(ellipse,#bb7d8130,transparent 70%)}
+.rps-anime-duel .rps-clash.is-revealed:after{content:'';position:absolute;left:50%;top:50%;width:85px;height:85px;border:2px solid #ffe48b;border-radius:50%;pointer-events:none;animation:rps-round-ring .65s ease-out both}
+.rps-anime-duel .rps-clash[data-round-outcome=draw]:after{border-color:#77eff5}
+.rps-anime-duel .rps-clash[data-round-outcome=loss]:after{border-color:#dba6a4}
+@keyframes rps-hand-lock{from{translate:0 15px;scale:.85}to{translate:10px 0;scale:1.05}}
+@keyframes rps-strike-left{0%{translate:-25px 0;rotate:-12deg}55%{translate:22px 0;rotate:7deg}100%{translate:0 0;rotate:0deg}}
+@keyframes rps-strike-right{0%{translate:25px 0;rotate:12deg}55%{translate:-22px 0;rotate:-7deg}100%{translate:0 0;rotate:0deg}}
+@keyframes rps-round-ring{from{opacity:.8;transform:translate(-50%,-50%) scale(.2)}to{opacity:0;transform:translate(-50%,-50%) scale(2)}}
+@media(prefers-reduced-motion:reduce){.rps-anime-duel .rps-clash .rps-hand,.rps-anime-duel .rps-clash.is-revealed:after{animation:none!important}}
+@media(max-width:899px){
+.rps-anime-duel.is-complete .rps-title{margin:7px 0}
+.rps-anime-duel.is-complete .rps-clash{min-height:115px}
+.rps-anime-duel.is-complete .rps-clash__side>.rps-hand{width:94px}
+.rps-anime-duel.is-complete .rps-live{margin:7px auto;min-height:0}
+.rps-anime-duel.is-complete .rps-live h3{font-size:29px;margin:4px 0}
+.rps-anime-duel.is-complete>.drc{margin:7px auto;padding:10px 12px}
+.rps-anime-duel.is-complete .drc--practice-complete h3{font-size:18px;margin:4px 0}
+.rps-anime-duel.is-complete .drc--practice-complete p{font-size:10px;line-height:1.3;margin:5px 0}
+.rps-anime-duel.is-complete .drc--practice-complete strong{font-size:10px}
+.rps-anime-duel.is-complete .rps-finish{margin:7px 0}
+.rps-anime-duel.is-complete .rps-finish .duel-rematch{min-height:40px;margin:5px auto;padding:8px;font-size:19px}
+.rps-anime-duel.is-complete .rps-exit{min-height:36px;padding:7px 12px;margin:5px auto}
+.rps-anime-duel.is-complete .rps-rule,.rps-anime-duel.is-complete .rps-last{margin:5px auto;font-size:7px}
+}
+
+/* Match visible body height, rather than the transparent rig's outer box. */
+.rps-arena.rps-anime-duel .rps-anime-player,.rps-arena.rps-anime-duel .rps-anime-player .arena-avatar{width:105px;height:110px}
+.rps-arena.rps-anime-duel .rps-anime-player .arena-avatar__rig{top:auto;bottom:10px;left:50%;transform:translateX(-50%) scale(.32);transform-origin:center bottom}
+.rps-arena.rps-anime-duel .rps-anime-player .arena-avatar__rig>.avatar2d{position:relative;inset:auto;transform:none;width:390px;height:520px}
+.rps-arena.rps-anime-duel .rps-anime-player .avatar2d__aura,.rps-arena.rps-anime-duel .rps-anime-player .avatar2d__level,.rps-arena.rps-anime-duel .rps-anime-player .avatar2d__badge{display:none}
+.rps-arena.rps-anime-duel .rps-anime-player>img{object-position:center bottom}
+/* RPS has no player card here: do not reserve an empty card column. */
+.rps-arena.rps-anime-duel>.lp-reward-cinema{display:block;grid-column:1/-1;width:100%;min-width:0;box-sizing:border-box;margin:8px auto;padding:12px}
+.rps-arena.rps-anime-duel>.lp-reward-cinema>.lp-skill-match-reward>summary{grid-template-columns:minmax(0,1fr);gap:0}
+.rps-arena.rps-anime-duel .lp-reward-summary-info{gap:5px}
+.rps-arena.rps-anime-duel .lp-reward-summary-info>strong{font-size:30px}
+.rps-arena.rps-anime-duel .lp-reward-summary-info>strong small{display:inline;margin-left:5px}
+.rps-arena.rps-anime-duel .lp-earned-skills{grid-template-columns:minmax(0,1fr);margin-top:8px}
+.rps-arena.rps-anime-duel .lp-earned-skill{width:100%;box-sizing:border-box;padding:9px}
+.rps-arena.rps-anime-duel .lp-reward-coach{margin-top:7px;padding-top:7px}
+@media(max-width:899px){
+ .rps-arena.rps-anime-duel .rps-anime-player,.rps-arena.rps-anime-duel .rps-anime-player .arena-avatar{width:84px;height:95px}
+ .rps-arena.rps-anime-duel .rps-anime-player .arena-avatar__rig{bottom:9px;transform:translateX(-50%) scale(.28)}
+ .rps-arena.rps-anime-duel>.lp-reward-cinema{padding:10px}
+ .rps-arena.rps-anime-duel .lp-reward-summary-info>strong{font-size:27px}
+ .rps-arena.rps-anime-duel .lp-reward-summary-info>em{font-size:10px}
+}
+.rps-arena.rps-anime-duel .rps-anime-player .arena-avatar__rig {
+  bottom: -20px;
+}

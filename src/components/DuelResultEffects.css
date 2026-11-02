@@ -1,0 +1,42 @@
+/* Finite, non-blocking result choreography. Navy remains the base in every mood. */
+.duel-result-fx{--result-accent:#ffda58;position:absolute;inset:0;overflow:hidden;pointer-events:none!important;z-index:-1;border-radius:inherit;contain:paint}
+.duel-result-fx--draw{--result-accent:#50e4ed}
+.duel-result-fx--loss{--result-accent:#d58c8a}
+.duel-result-fx__aura{position:absolute;inset:-20%;background:radial-gradient(ellipse at 50% 36%,color-mix(in srgb,var(--result-accent) 22%,transparent),transparent 58%);animation:result-aura 2.3s ease-out both}
+.duel-result-fx__ring{position:absolute;left:50%;top:36%;width:220px;height:220px;border:2px solid var(--result-accent);border-radius:50%;box-shadow:0 0 30px color-mix(in srgb,var(--result-accent) 35%,transparent);animation:result-ring 1.5s .12s ease-out both}
+.duel-result-fx__ring--second{animation-delay:.4s}
+.duel-result-fx__streaks{position:absolute;inset:0;background:repeating-conic-gradient(from 0deg at 50% 36%,transparent 0deg 16deg,#ffda5812 17deg 18deg,transparent 19deg 30deg);mask-image:radial-gradient(ellipse,transparent 8%,#000 40%,transparent 75%);animation:result-rays 2s ease-out both}
+.duel-result-fx__particle{position:absolute;width:5px;height:10px;border-radius:1px;background:var(--result-accent);opacity:0;animation:result-confetti 2.5s cubic-bezier(.1,.6,.5,1) both}
+.duel-result-fx__particle:nth-child(3n){background:#39d8df;width:4px;height:6px}
+.duel-result-fx--draw .duel-result-fx__particle{width:3px;height:3px;border-radius:50%;animation-name:result-motes}
+.duel-result-fx--draw .duel-result-fx__streaks{background:linear-gradient(105deg,transparent 30%,#50e4ed18 50%,transparent 70%);animation:result-balance 1.8s ease-out both}
+.duel-result-fx--loss .duel-result-fx__particle{height:2px;width:3px;animation-name:result-embers;background:#d58c8a}
+.duel-result-fx--loss .duel-result-fx__ring--second,.duel-result-fx--loss .duel-result-fx__streaks{display:none}
+.duel-result-fx--loss .duel-result-fx__ring{animation-name:result-settle}
+.trivia-arena--ended[data-outcome=win]>.trivia-result-banner h3{color:#ffe379;animation:result-title-win .8s .12s cubic-bezier(.2,.8,.25,1.25) both;text-shadow:0 0 32px #ffd55465}
+.trivia-arena--ended[data-outcome=draw]>.trivia-result-banner h3{color:#7eeef4;animation:result-title-draw .9s .12s ease-out both;text-shadow:0 0 25px #41dfed50}
+.trivia-arena--ended[data-outcome=loss]>.trivia-result-banner h3{color:#e8c3bd;animation:result-title-loss .9s ease-out both;text-shadow:0 0 20px #b7696125}
+.trivia-arena--ended[data-outcome]>.trivia-score{animation:result-score-in .65s .18s ease-out both}
+.trivia-arena--ended[data-outcome]>.drc{animation:result-score-in .65s .36s ease-out both}
+.trivia-arena--ended[data-outcome]>.trivia-rematch{animation:result-score-in .5s .48s ease-out both}
+.trivia-arena--ended[data-outcome=win] .trivia-score .is-winner .trivia-portrait{border-color:#ffe379;box-shadow:0 0 26px #ffd55445}
+.trivia-arena--ended[data-outcome=draw]>.trivia-score{border-color:#50e4ed70;box-shadow:0 0 24px #50e4ed12}
+.trivia-arena--ended[data-outcome=loss]>.trivia-score{border-color:#d58c8a45}
+.trivia-arena--ended[data-outcome] .trivia-confetti{display:none}
+@keyframes result-aura{0%{opacity:0;transform:scale(.8)}35%{opacity:1}100%{opacity:.65;transform:scale(1)}}
+@keyframes result-ring{0%{opacity:.8;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(3)}}
+@keyframes result-settle{0%{opacity:.45;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(.7)}}
+@keyframes result-rays{0%{opacity:0;transform:scale(.7) rotate(-6deg)}35%{opacity:1}100%{opacity:0;transform:scale(1.1) rotate(3deg)}}
+@keyframes result-confetti{0%{opacity:0;transform:translateY(-30px) rotate(0)}12%{opacity:1}100%{opacity:0;transform:translate(var(--drift),430px) rotate(var(--turn))}}
+@keyframes result-motes{0%{opacity:0;transform:translateX(0) scale(.3)}30%{opacity:.8}100%{opacity:0;transform:translate(var(--drift),-80px) scale(1.3)}}
+@keyframes result-embers{0%{opacity:0}25%{opacity:.5}100%{opacity:0;transform:translate(12px,140px)}}
+@keyframes result-balance{0%{opacity:0;transform:translateX(-40%)}45%{opacity:1}100%{opacity:0;transform:translateX(40%)}}
+@keyframes result-title-win{0%{opacity:0;transform:scale(1.3) translateY(6px);filter:blur(4px)}65%{opacity:1;transform:scale(.98)}100%{opacity:1;transform:none;filter:none}}
+@keyframes result-title-draw{0%{opacity:0;letter-spacing:.15em;transform:translateY(8px)}100%{opacity:1;letter-spacing:normal;transform:none}}
+@keyframes result-title-loss{0%{opacity:0;transform:translateY(-10px)}100%{opacity:1;transform:none}}
+@keyframes result-score-in{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.duel-result-fx__ring,.duel-result-fx__streaks,.duel-result-fx__particle{display:none}.duel-result-fx__aura,.trivia-arena--ended[data-outcome]>.trivia-result-banner h3,.trivia-arena--ended[data-outcome]>.trivia-score,.trivia-arena--ended[data-outcome]>.drc,.trivia-arena--ended[data-outcome]>.trivia-rematch{animation:none!important}}
+.rps-arena.is-complete[data-outcome=win] .rps-live h3{color:#ffe379;animation:result-title-win .8s ease-out both}
+.rps-arena.is-complete[data-outcome=draw] .rps-live h3{color:#7eeef4;animation:result-title-draw .9s ease-out both}
+.rps-arena.is-complete[data-outcome=loss] .rps-live h3{color:#e8c3bd;animation:result-title-loss .9s ease-out both}
+@media(prefers-reduced-motion:reduce){.rps-arena.is-complete[data-outcome] .rps-live h3{animation:none!important}}

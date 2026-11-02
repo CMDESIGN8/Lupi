@@ -10,6 +10,9 @@ export function useUserCards(user: AppUser | null) {
   const loadUserCards = useCallback(async () => {
     if (!user) return;
 
+    // Server owns creation and deduplication; never fabricate an owned card.
+    const ownCard = await supabase.rpc("lupi_ensure_my_card");
+    if(ownCard.error) console.warn("Own card requires lupi_skills_trial.sql", ownCard.error.message);
     const { data, error } = await supabase
       .from("user_cards")
       .select("*")
@@ -53,12 +56,12 @@ export function useUserCards(user: AppUser | null) {
         const socio = socioMap.get(uc.socio_id);
         if (socio) {
           const stats = {
-            pace: socio.user_card_pace || 40,
-            dribbling: socio.user_card_dribbling || 40,
-            passing: socio.user_card_passing || 40,
-            defending: socio.user_card_defending || 40,
-            finishing: socio.user_card_finishing || 40,
-            physical: socio.user_card_physical || 40,
+            pace: socio.user_card_pace ?? 10,
+            dribbling: socio.user_card_dribbling ?? 10,
+            passing: socio.user_card_passing ?? 10,
+            defending: socio.user_card_defending ?? 10,
+            finishing: socio.user_card_finishing ?? 10,
+            physical: socio.user_card_physical ?? 10,
           };
           return {
             id: uc.id,
@@ -130,5 +133,6 @@ export function useUserCards(user: AppUser | null) {
     void loadUserCards();
   }, [loadUserCards]);
 
+  useEffect(()=>{const refresh=()=>void loadUserCards();window.addEventListener('lupi:progression-updated',refresh);window.addEventListener('lupi:avatar-appearance-updated',refresh);return()=>{window.removeEventListener('lupi:progression-updated',refresh);window.removeEventListener('lupi:avatar-appearance-updated',refresh);};},[loadUserCards]);
   return { userCards, loadUserCards };
 }

@@ -11,6 +11,7 @@ type MatchResponse = {
   turn?: TurnResult;
   result?: MomentResult;
   match_id?: string;
+  reward?: {xp:number;coins:number;credited:boolean} | null;
   error?: string;
   active_session?: { id: string; opponent_key: string } | null;
   session?: {
@@ -28,12 +29,42 @@ type MatchResponse = {
 };
 
 async function invokeMatch(payload: Record<string, unknown>): Promise<MatchResponse> {
-  const { data, error } = await supabase.functions.invoke<MatchResponse>(
-    'verified-match', { body: payload },
+  const started=performance.now();
+  let serverTiming:string|null=null;let region:string|null=null;
+  try {
+  const configuredRegion=import.meta.env.VITE_MATCH_FUNCTION_REGION?.trim();
+  const { data, error, response } = await supabase.functions.invoke<MatchResponse>(
+    'verified-match', { body: payload, ...(configuredRegion?{headers:{'x-region':configuredRegion}}:{}) },
   );
-  if (error) throw new Error(error.message || 'No se pudo conectar con el partido');
+  serverTiming=response?.headers.get('Server-Timing')??null;region=response?.headers.get('X-Lupi-Region')??null;
+  if (error) {
+    // Supabase keeps the JSON rejection body on the HTTP error response.
+    const context = (error as {context?: Response}).context;
+    const rejection = response ?? (context instanceof Response ? context : undefined);
+    let reason: string | undefined;
+    if (rejection) {
+      try {
+        const body: unknown = await rejection.clone().json();
+        if (body && typeof body === 'object' && 'error' in body && typeof body.error === 'string')
+          reason = body.error;
+      } catch { /* A gateway may return HTML or an empty body. */ }
+    }
+    const status = rejection?.status;
+    const detail = reason || error.message || 'No se pudo conectar con el partido';
+    throw new Error(`${String(payload.action)}${status ? ` · HTTP ${status}` : ''}: ${detail}`);
+  }
   if (!data || data.error) throw new Error(data?.error || 'Respuesta inválida del partido');
   return data;
+  } finally {
+    const elapsed=performance.now()-started;
+    performance.measure(`lupi:match:${String(payload.action)}`,{start:started,end:performance.now()});
+    if(import.meta.env.DEV){
+      const breakdown=Object.fromEntries((serverTiming??'').split(',').flatMap(part=>{const match=part.trim().match(/^(auth|read|write|total);dur=([0-9.]+)$/);return match?[[match[1],Number(match[2])]]:[];}));
+      const metrics={action:String(payload.action),clientMs:Math.round(elapsed),region:region??'sin diagnóstico de servidor',...Object.fromEntries(Object.entries(breakdown).map(([key,value])=>[`${key}Ms`,Math.round(value as number)]))};
+      console.info('[Lupi match timing]',metrics);
+      if(elapsed>1500)console.warn(`[Lupi match] ${String(payload.action)}: ${Math.round(elapsed)} ms`,serverTiming??'Actualizar verified-match para separar autenticación y consultas');
+    }
+  }
 }
 
 export const verifiedMatchApi = {

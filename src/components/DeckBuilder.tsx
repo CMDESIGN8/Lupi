@@ -2,12 +2,21 @@
 // Mejoras: onboarding, progreso por pasos, celebración al completar,
 // filtro automático por posición, tooltips, lenguaje simple, badges animados
 
-import './DeckBuilderScene.css';
-import { DeckPlayerCard } from './DeckPlayerCard';
+import './TeamStudio.css';
+import './OwnCardBanner.css';
+import {CardFace} from './SigningWelcome';
+import {OwnedCardPortrait} from './OwnedCardPortrait';
+import { HeroSkills } from './HeroSkills';
+import { PlayerAttributes } from './PlayerAttributes';
+import { TeamPlayerDialog } from './TeamPlayerDialog';
+import { useAvatarAppearance } from '../hooks/useAvatarAppearance';
+import { AvatarFace } from './AvatarFace';
+import { TeamPitchCard } from './TeamPitchCard';
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { UserCard, Deck } from '../types/cards';
 import { calculateChemistry } from '../utils/chemistryEngine';
+import {rankRoleCards,roleScore,roleForSlot} from '../utils/teamRecommendations';
 import { ChemistrySuggestion } from '../utils/chemistryEngine';
 
 interface DeckBuilderProps {
@@ -16,6 +25,7 @@ interface DeckBuilderProps {
   activeDeck: Deck;
   onDeckUpdate: (deck: Deck) => void;
   onPlay?: () => void;
+  onPractice?: (game:"rps"|"trivia") => void;
 }
 
 function getCardData(card: UserCard): any {
@@ -48,31 +58,24 @@ const POSITION_NAMES: Record<number, { short: string; long: string; kid: string;
 };
 
 function findBestMoves(deck: UserCard[], allCards: UserCard[]) {
-  const moves: ChemistrySuggestion[] = [];
-  for (const benchCard of allCards) {
-    for (const slot of [1, 2, 3, 4, 5]) {
-      const newDeck = deck.map(c =>
-        c.position === slot ? { ...benchCard, position: slot } : c
-      );
-      const newChem = calculateChemistry(newDeck).totalBonus;
-      const currentChem = calculateChemistry(deck).totalBonus;
-      const diff = newChem - currentChem;
-      if (diff > 2) {
-        const data = getCardData(benchCard);
-        moves.push({
-          type: 'swap',
-          description: `Ponés a ${data?.name || 'este jugador'} de ${POSITION_NAMES[slot]?.long} y tu equipo mejora`,
-          bonus: diff,
-          action: { cardIn: benchCard, position: slot }
-        });
-      }
-    }
+  const moves: ChemistrySuggestion[]=[];
+  for(const slot of [1,2,3,4,5]){
+    const current=deck.find(c=>c.position===slot);const best=rankRoleCards(allCards,slot,deck)[0];
+    if(!best?.card||best.id===current?.id||best.card.position!==roleForSlot(slot))continue;
+    const diff=roleScore(best.card,slot)-roleScore(current?.card,slot);
+    if(diff<=0)continue;
+    moves.push({type:'swap',description:`${best.card.name} ofrece mejores atributos clave de ${POSITION_NAMES[slot].long.toLowerCase()}.`,bonus:Math.round(diff),action:{cardIn:best,position:slot}});
   }
-  return moves.sort((a, b) => b.bonus - a.bonus).slice(0, 3);
+  return moves.sort((a,b)=>b.bonus-a.bonus).slice(0,3);
 }
 
 // ===== COMPONENTE PRINCIPAL =====
-export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPlay }: DeckBuilderProps) {
+export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPlay, onPractice }: DeckBuilderProps) {
+  const {appearance:ownAppearance}=useAvatarAppearance(userId);
+  const ownCard=userCards.find(c=>c.socio_id===userId);
+  const [chemistryExpanded,setChemistryExpanded]=useState(()=>typeof window!=='undefined'&&window.innerWidth>900);
+  const [comparisonCandidate,setComparisonCandidate]=useState<string|undefined>();
+  const [placingOwn, setPlacingOwn] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
   const [showCards, setShowCards] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -82,7 +85,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationShown, setCelebrationShown] = useState(false);
-  const [activePositionTab, setActivePositionTab] = useState<'arquero' | 'cierre' | 'ala' | 'pivot'>('arquero');
+  const [activePositionTab, setActivePositionTab] = useState<'all' | 'arquero' | 'cierre' | 'ala' | 'pivot'>('all');
   const [filterPosition, setFilterPosition] = useState<'all' | 'arquero' | 'cierre' | 'ala' | 'pivot'>('all');
   const [sortBy, setSortBy] = useState<'rating' | 'level' | 'name'>('rating');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -93,6 +96,8 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
   const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => { setLocalDeck(activeDeck); }, [activeDeck]);
+
+  useEffect(()=>{setLocalDeck(previous=>({...previous,cards:previous.cards.map(c=>{const fresh=userCards.find(item=>item.id===c.id);return fresh?{...fresh,position:c.position}:c;})}));},[userCards]);
 
   // Mostrar onboarding la primera vez
   useEffect(() => {
@@ -171,6 +176,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
     .filter(card => !localDeck.cards.some(deckCard => deckCard.id === card.id));
 
   const cardsByPos = {
+    all: sortedAvailableCards,
     arquero: sortedAvailableCards.filter(c => getCardData(c)?.position === 'arquero'),
     cierre: sortedAvailableCards.filter(c => getCardData(c)?.position === 'cierre'),
     ala: sortedAvailableCards.filter(c => getCardData(c)?.position === 'ala'),
@@ -236,11 +242,17 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
 
   const openCardSelector = (slot: number) => {
     setSelectedSlot(slot);
+    setComparisonCandidate(undefined);
     const posName = getPositionNameFromSlot(slot) as any;
     setFilterPosition(posName || 'all');
     setShowCards(true);
   };
 
+  const compareOwnedCard=(card:UserCard)=>{
+    const role=card.card?.position;const slot=role==='arquero'?1:role==='cierre'?2:role==='pivot'?5:
+      [3,4].sort((a,b)=>roleScore(getCardInSlot(a)?.card,a)-roleScore(getCardInSlot(b)?.card,b))[0];
+    openCardSelector(slot);setComparisonCandidate(card.id);
+  };
   const selectCard = (card: UserCard) => {
     if (!selectedSlot) return;
     const newCards = localDeck.cards.filter(c => c.id !== card.id);
@@ -268,8 +280,8 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
     for (const slot of [1, 2, 3, 4, 5]) {
       const expected = getPositionNameFromSlot(slot);
       const best = pool.filter(c => !used.has(c.id)).sort((a, b) => {
-        const score = (c: UserCard) => (getCardData(c)?.overall_rating ?? 0) +
-          (getCardData(c)?.position === expected ? 100 : 0);
+        const score = (c: UserCard) => roleScore(getCardData(c),slot) +
+          (getCardData(c)?.position === expected ? 1000 : 0);
         return score(b) - score(a);
       })[0];
       if (best) { used.add(best.id); chosen.push({ ...best, position: slot }); }
@@ -343,28 +355,18 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
       return '#ef4444';
     };
     return (
-      <svg className="chemistry-lines">
+      <svg className="chemistry-lines" aria-hidden="true">
         {links.map(([from, to], i) => {
           const cardA = deck.cards.find(c => c.position === from);
           const cardB = deck.cards.find(c => c.position === to);
           if (!cardA || !cardB) return null;
-          const elA = document.querySelector(`.slot-${from}`);
-          const elB = document.querySelector(`.slot-${to}`);
-          if (!elA || !elB) return null;
-          const parent = elA.closest('.futsal-pitch-fifa');
-          if (!parent) return null;
-          const rectA = elA.getBoundingClientRect();
-          const rectB = elB.getBoundingClientRect();
-          const parentRect = parent.getBoundingClientRect();
-          const x1 = rectA.left + rectA.width / 2 - parentRect.left;
-          const y1 = rectA.top + rectA.height / 2 - parentRect.top;
-          const x2 = rectB.left + rectB.width / 2 - parentRect.left;
-          const y2 = rectB.top + rectB.height / 2 - parentRect.top;
-          const midX = (x1 + x2) / 2;
-          const midY = (y1 + y2) / 2 - 40;
+          // Shared percentage coordinates stay aligned through resize and first render.
+          const positions: Record<number, [number, number]> = {1:[50,14],2:[50,38],3:[23,60],4:[77,60],5:[50,85]};
+          const [x1,y1] = positions[from];
+          const [x2,y2] = positions[to];
           const color = getChemColor(getCardData(cardA), getCardData(cardB));
           return (
-            <path key={i} d={`M ${x1} ${y1} Q ${midX} ${midY} ${x2} ${y2}`}
+            <line key={i} x1={`${x1}%`} y1={`${y1}%`} x2={`${x2}%`} y2={`${y2}%`}
               fill="none" stroke={color}
               strokeWidth={color === '#4ade80' ? 4 : color === '#facc15' ? 3 : 2}
               strokeLinecap="round" className="chem-line" />
@@ -389,7 +391,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
         </div>
       );
     }
-    return <DeckPlayerCard card={card} slot={slot} onClick={onClick} onRemove={onRemove}/>;
+    return <TeamPitchCard card={card} onClick={onClick} portrait={card.socio_id===userId?<OwnedCardPortrait userId={userId}/>:undefined}/>;
   };
 
   // ===== ONBOARDING =====
@@ -401,7 +403,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
 
   const BONUS_INFO = [
     { key: 'complete', active: isComplete, icon: '👥', label: '5 jugadores en cancha', tip: 'Necesitás tener los 5 lugares llenos', percent: '+10%', points: Math.floor(totalPower * 10 / 100) },
-    { key: 'positions', active: hasAllPositions, icon: '🗂️', label: 'Una posición por número', tip: 'Cada jugador en su posición correcta', percent: '+8%', points: Math.floor(totalPower * 8 / 100) },
+    { key: 'positions', active: hasAllPositions, icon: '🗂️', label: 'Cada jugador en su posición', tip: 'Cada jugador en su posición correcta', percent: '+8%', points: Math.floor(totalPower * 8 / 100) },
     { key: 'real', active: hasRealPlayers, icon: '🔴', label: '3+ jugadores reales', tip: 'Tener 3 o más jugadores reales (socios)', percent: '+10%', points: Math.floor(totalPower * 10 / 100) },
     { key: 'mixed', active: hasMixedTeam, icon: '👩', label: '2+ jugadoras mujeres', tip: 'Incluir al menos 2 jugadoras femeninas', percent: '+6%', points: Math.floor(totalPower * 6 / 100) },
     { key: 'promo', active: hasPromo, icon: '⭐', label: '1 carta Promocional', tip: 'Tener al menos una carta especial promocional', percent: '+5%', points: Math.floor(totalPower * 5 / 100) },
@@ -461,6 +463,17 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
         </div>
       )}
 
+      <section className="lp-own-card-banner" aria-label="Tu carta de jugador">
+        <div className="lp-own-card-banner__card">{ownCard?.card?<CardFace item={ownCard} index={0} variant="full" portrait={<OwnedCardPortrait userId={userId}/>}/>:<div className="lp-own-card-banner__empty">TU CARTA<small>Cargando jugador…</small></div>}</div>
+        <div className="lp-own-card-banner__info"><small>TU PERSONAJE TAMBIÉN JUEGA</small><h2>{ownCard?.card?.name??'Mi personaje'}</h2><p>Estos son tus atributos actuales. Poné tu carta en el quinteto y llevá tu personaje a la cancha.</p>
+          {ownCard&&<span className="lp-own-card-banner__status">{localDeck.cards.some(c=>c.id===ownCard.id)?'✓ Tu carta está en el quinteto':'✦ Lista para entrar al equipo'}</span>}
+          <button type="button" aria-expanded={placingOwn} onClick={()=>setPlacingOwn(v=>!v)} disabled={!ownCard}>{ownCard&&localDeck.cards.some(c=>c.id===ownCard.id)?'Elegir mi puesto →':'Poner mi carta →'}</button>
+          <small className="lp-own-card-banner__hint">Elegí el puesto y después guardá tu equipo.</small>
+        </div>
+        {!ownCard&&<p className="lp-own-card-pending">Tu carta todavía no está disponible. <button type="button" onClick={()=>window.dispatchEvent(new CustomEvent("lupi:progression-updated"))}>Reintentar</button></p>}
+        {placingOwn&&<div className="lp-own-positions" aria-label="Elegí el puesto para tu carta">{[1,2,3,4,5].map(slot=><button type="button" key={slot} onClick={()=>{if(!ownCard)return;setLocalDeck(previous=>({...previous,cards:[...previous.cards.filter(c=>c.id!==ownCard.id&&c.position!==slot),{...ownCard,position:slot}]}));setPlacingOwn(false);}}>{POSITION_NAMES[slot].long}{getCardInSlot(slot)?` · reemplaza a ${getCardData(getCardInSlot(slot)!)?.name}`:' · libre'}</button>)}</div>}
+        <details className="lp-hero-details"><summary><span className="lp-growth-icon" aria-hidden="true">↗</span><span><strong>MEJORÁ TU JUGADOR</strong><small>Ver habilidades y progreso</small></span><span className="lp-growth-toggle" aria-hidden="true"/></summary><HeroSkills userId={userId} practiceDisabled={saving || autoBuilding} onPractice={onPractice ? async game => { if(game === "futsal") { if(await persistDeck(localDeck,false)) onPlay?.(); } else onPractice(game); } : undefined}/></details>
+      </section>
       {/* ===== HEADER ===== */}
       <div className="fifa-header">
         <div className="team-info">
@@ -502,9 +515,9 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
       </div>
 
       {/* ===== LAYOUT PRINCIPAL ===== */}
-      <div className="fifa-layout">
+      <div className="fifa-layout lp-illustrated-layout">
         {/* CANCHA */}
-        <div className="futsal-pitch-fifa">
+        <div className="futsal-pitch-fifa lp-illustrated-pitch">
           <ChemistryLines deck={localDeck} />
           <div className="pitch-background"></div>
           <div className="center-circle"></div>
@@ -552,13 +565,10 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
           {saveError && <p role="alert">{saveError}</p>}
         </div>
         {/* PANEL LATERAL */}
-        <div className="bonus-panel-fifa">
+        <details className="bonus-panel-fifa" open={chemistryExpanded} onToggle={e=>setChemistryExpanded(e.currentTarget.open)}><summary className="lp-chemistry-summary">🏆 QUÍMICA DEL EQUIPO <b>+{totalBonusPercent}%</b><span>⌄</span></summary>
 
           {/* BONIFICACIONES */}
-          <div className="bonus-header-fifa">
-            <span>🏆</span>
-            <h3>LOGROS Y BONIFICACIONES</h3>
-          </div>
+
 
           <div className="bonus-list-fifa">
             {BONUS_INFO.map(b => (
@@ -617,7 +627,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
               {benchCards.map(card => {
                 const data = getCardData(card);
                 return (
-                  <div key={card.id} className="bench-card-fifa-banco" onClick={() => { if (selectedSlot) selectCard(card); else openCardSelector(nextEmptySlot || 1); }} title={`Usar a ${data?.name}`}>
+                  <div key={card.id} className="bench-card-fifa-banco" onClick={() => compareOwnedCard(card)} title={`Usar a ${data?.name}`}>
                     <div className="bench-card-rating" style={{ background: getRarityColor(data?.overall_rating) }}>{data?.overall_rating}</div>
                     <div className="bench-card-pos-icon">{POSITION_NAMES[data?.position === 'arquero' ? 1 : data?.position === 'cierre' ? 2 : data?.position === 'ala' ? 3 : 5]?.icon}</div>
                     <div className="bench-card-name-banco">{data?.name}</div>
@@ -632,21 +642,21 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
           {/* SUGERENCIAS DE QUÍMICA */}
           {bestMoves.length > 0 && (
             <div className="chemistry-recommendations">
-              <div className="chemistry-rec-title">💡 SUGERENCIAS PARA MEJORAR</div>
+              <div className="chemistry-rec-title">✦ RECOMENDACIONES POR PUESTO</div>
               {bestMoves.map((move, i) => (
                 <div key={i} className="chem-rec-card">
                   <div className="chem-rec-left">
-                    <div className="chem-rec-bonus">+{move.bonus}</div>
+                    <div className="chem-rec-bonus">VER OPCIÓN</div>
                     <div className="chem-rec-text">{move.description}</div>
                   </div>
-                  <button className="chem-rec-action" onClick={() => { if (move.action) applyMove(move.action.cardIn!, move.action.position!); }}>
-                    Aplicar
+                  <button className="chem-rec-action" onClick={() => { if (move.action) {openCardSelector(move.action.position!);setComparisonCandidate(move.action.cardIn!.id);} }}>
+                    Comparar
                   </button>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </details>
       </div>
 
       {/* ===== COLECCIÓN ===== */}
@@ -655,7 +665,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
           <div className="bench-header-enhanced">
             <div className="header-left">
               <span className="header-icon">📚</span>
-              <span className="header-title">MI COLECCIÓN</span>
+              <span className="header-title">MIS CARTAS DISPONIBLES</span>
             </div>
             <div className="header-stats">
               <span className="stat-badge"><span className="stat-icon">⭐</span>{sortedAvailableCards.length} cartas</span>
@@ -664,6 +674,7 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
           </div>
           <div className="position-tabs">
             {[
+              { key: 'all', icon:'▦', label:'TODAS', color:'#1f98aa', desc:'Todo tu banco' },
               { key: 'arquero', icon: '🧤', label: 'ARQ', color: '#4a90d9', desc: 'El que ataja' },
               { key: 'cierre', icon: '🛡️', label: 'CIE', color: '#e67e22', desc: 'El defensor' },
               { key: 'ala', icon: '⚡', label: 'ALA', color: '#2ecc71', desc: 'Los veloces' },
@@ -688,27 +699,19 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
               const isSocio = card.card_type === 'socio';
               const rarity = getRarityColor(data?.overall_rating);
               return (
-                <div key={card.id} className={`enhanced-card ${isSocio ? 'socio-card' : ''}`} onClick={() => { if (selectedSlot) selectCard(card); else openCardSelector(nextEmptySlot || 1); }}>
+                <div key={card.id} className={`enhanced-card ${isSocio ? 'socio-card' : ''}`} onClick={() => compareOwnedCard(card)}>
                   <div className="card-rarity-badge" style={{ background: rarity }}>{data?.overall_rating}</div>
                   {isSocio && <div className="card-type-badge">🔴 REAL</div>}
                   <div className="card-rarity-label">{getRarityLabel(data?.overall_rating)}</div>
-                  <div className="card-position-icon">
-                    {activePositionTab === 'arquero' && '🧤'}
-                    {activePositionTab === 'cierre' && '🛡️'}
-                    {activePositionTab === 'ala' && '⚡'}
-                    {activePositionTab === 'pivot' && '🎯'}
+                  <div className={`card-position-icon ${card.socio_id===userId?'lp-collection-own-face':''}`}>
+                    {card.socio_id===userId?<AvatarFace appearance={ownAppearance}/>:data?.position==='arquero'?'🧤':data?.position==='cierre'?'🛡️':data?.position==='pivot'?'🎯':'⚡'}
                   </div>
                   <div className="card-name-enhanced" title={data?.name}>
-                    {data?.name?.length > 12 ? data?.name?.slice(0, 10) + '...' : data?.name}
+                    {data?.name}
                   </div>
                   <div className="card-level-enhanced"><span className="level-icon">⭐</span><span className="level-value">{card.level}</span></div>
-                  <div className="card-stats-enhanced">
-                    {activePositionTab === 'arquero' && (<><span>🧤 {data?.defending}</span><span>💪 {data?.physical}</span></>)}
-                    {activePositionTab === 'cierre' && (<><span>🛡️ {data?.defending}</span><span>💪 {data?.physical}</span></>)}
-                    {activePositionTab === 'ala' && (<><span>⚡ {data?.pace}</span><span>✨ {data?.dribbling}</span></>)}
-                    {activePositionTab === 'pivot' && (<><span>🎯 {data?.finishing}</span><span>💪 {data?.physical}</span></>)}
-                  </div>
-                  <div className="card-action-btn"><span>➕ SELECCIONAR</span></div>
+                  <PlayerAttributes data={data ?? {}}/>
+                  <div className="card-action-btn"><span>↔ COMPARAR Y ELEGIR</span></div>
                   <div className="card-shine-effect"></div>
                 </div>
               );
@@ -727,129 +730,12 @@ export function DeckBuilder({ userId, userCards, activeDeck, onDeckUpdate, onPla
       {sortedAvailableCards.length === 0 && (
         <div className="no-cards-fifa">
           <span>📭</span>
-          <p>¡No tenés cartas!</p>
+          <p>{userCards.length?'Todos tus jugadores están en el quinteto':'Todavía no tenés cartas'}</p>
           <small>🎁 Abrí la Caja Misteriosa para conseguir jugadores</small>
         </div>
       )}
 
-      {/* ===== MODAL MEJORADO ===== */}
-      {showCards && (
-        <div className="modal-enhanced" onClick={() => setShowCards(false)}>
-          <div className="modal-enhanced-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-enhanced-header">
-              <div className="position-badge" style={{
-                background: selectedSlot ?
-                  (selectedSlot === 1 ? '#4a90d9' : selectedSlot === 2 ? '#e67e22' :
-                    selectedSlot === 3 || selectedSlot === 4 ? '#2ecc71' : '#e74c3c') : '#888'
-              }}>
-                <span className="position-icon">{selectedSlot ? POSITION_NAMES[selectedSlot].icon : '⚽'}</span>
-                <div>
-                  <span className="position-name">{selectedSlot ? POSITION_NAMES[selectedSlot].long : ''}</span>
-                  <span className="position-kid-desc">{selectedSlot ? POSITION_NAMES[selectedSlot].kid : ''}</span>
-                </div>
-              </div>
-              <button className="modal-enhanced-close" onClick={() => setShowCards(false)}>✕</button>
-            </div>
-
-            {selectedSlot && getCardInSlot(selectedSlot) && <div className="team-current-player"><DeckPlayerCard card={getCardInSlot(selectedSlot)!} slot={selectedSlot}/><div><strong>En cancha · {getCardData(getCardInSlot(selectedSlot)!)?.name}</strong><p>Elegí un reemplazo abajo o dejá la posición libre.</p><button onClick={() => { removeCard(selectedSlot); setShowCards(false); setSelectedSlot(null); }}>Quitar del quinteto</button></div></div>}
-            {/* FILTROS */}
-            <div className="modal-filters">
-              <div className="filter-section">
-                <label className="filter-label">Filtrar por posición</label>
-                <div className="filter-buttons">
-                  {[
-                    { val: 'all', label: '📋 Todas' },
-                    { val: 'arquero', label: '🧤 ARQ' },
-                    { val: 'cierre', label: '🛡️ CIE' },
-                    { val: 'ala', label: '⚡ ALA' },
-                    { val: 'pivot', label: '🎯 PIV' },
-                  ].map(f => (
-                    <button key={f.val} className={`filter-btn ${filterPosition === f.val ? 'active' : ''}`}
-                      onClick={() => setFilterPosition(f.val as any)}>{f.label}</button>
-                  ))}
-                </div>
-              </div>
-              {availableCategories.length > 0 && (
-                <div className="filter-section">
-                  <label className="filter-label">Filtrar por categoría</label>
-                  <div className="filter-buttons category-buttons">
-                    <button className={`filter-btn ${filterCategory === 'all' ? 'active' : ''}`} onClick={() => setFilterCategory('all')}>🏆 Todas</button>
-                    {availableCategories.map(cat => (
-                      <button key={cat} className={`filter-btn ${filterCategory === cat ? 'active' : ''}`} onClick={() => setFilterCategory(cat)}>
-                        {cat === 'femenino' ? '👩' : cat === 'Promocionales' ? '⭐' : cat === 'socios' ? '🔴' : '🏆'} {cat}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <div className="filter-section">
-                <label className="filter-label">Ordenar por</label>
-                <div className="filter-buttons sort-buttons">
-                  {[{ val: 'rating', label: '⭐ Rating' }, { val: 'level', label: '📈 Nivel' }, { val: 'name', label: '🔤 Nombre' }].map(s => (
-                    <button key={s.val} className={`sort-btn ${sortBy === s.val ? 'active' : ''}`} onClick={() => setSortBy(s.val as any)}>{s.label}</button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="modal-results-count">
-              <span>📚 {filteredCards.length} jugadores encontrados</span>
-              {(filterPosition !== 'all' || filterCategory !== 'all') && (
-                <button className="clear-filters-btn" onClick={() => { setFilterPosition('all'); setFilterCategory('all'); }}>✕ Limpiar filtros</button>
-              )}
-            </div>
-
-            <div className="modal-cards-grid">
-              {filteredCards.map(card => {
-                const data = getCardData(card);
-                const isSocio = card.card_type === 'socio';
-                const isSamePosition = data?.position === getPositionNameFromSlot(selectedSlot);
-                return (
-                  <div key={card.id} className={`modal-card-enhanced ${isSocio ? 'socio' : ''}`}
-                    onClick={() => { if (navigator.vibrate) navigator.vibrate(50); selectCard(card); }}>
-                    <div className="card-rarity" style={{ background: getRarityColor(data?.overall_rating) }}>{data?.overall_rating}</div>
-                    {isSamePosition && <div className="card-recommended">⭐ MEJOR OPCIÓN</div>}
-                    <div className="card-position-large">
-                      {data?.position === 'arquero' && '🧤'}
-                      {data?.position === 'cierre' && '🛡️'}
-                      {data?.position === 'ala' && '⚡'}
-                      {data?.position === 'pivot' && '🎯'}
-                    </div>
-                    <div className="card-info">
-                      <div className="card-name">{data?.name}</div>
-                      <div className="card-category">
-                        {data?.category === 'femenino' && '👩 Femenino'}
-                        {data?.category === 'Promocionales' && '⭐ Promocional'}
-                        {data?.category === 'socios' && '🔴 Socio Real'}
-                        {!['femenino', 'Promocionales', 'socios'].includes(data?.category || '') && `🏆 ${data?.category}`}
-                      </div>
-                    </div>
-                    <div className="card-stats-grid">
-                      <div className="stat-item"><span className="stat-label">NIVEL</span><span className="stat-value">⭐{card.level}</span></div>
-                      <div className="stat-item"><span className="stat-label">POSICIÓN</span><span className="stat-value">{data?.position?.toUpperCase()}</span></div>
-                      <div className="stat-item"><span className="stat-label">VELOCIDAD</span><span className="stat-value">⚡{data?.pace}</span></div>
-                      <div className="stat-item"><span className="stat-label">GOL</span><span className="stat-value">🎯{data?.finishing}</span></div>
-                      <div className="stat-item"><span className="stat-label">DEFENSA</span><span className="stat-value">🛡️{data?.defending}</span></div>
-                      <div className="stat-item"><span className="stat-label">FÍSICO</span><span className="stat-value">💪{data?.physical}</span></div>
-                    </div>
-                    <div className="card-select-btn"><span>➕ SELECCIONAR</span></div>
-                    <div className="card-shine"></div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {filteredCards.length === 0 && (
-              <div className="modal-empty">
-                <span>📭</span>
-                <p>No hay jugadores que coincidan</p>
-                <button className="clear-all-btn" onClick={() => { setFilterPosition('all'); setFilterCategory('all'); setSortBy('rating'); }}>Limpiar filtros</button>
-              </div>
-            )}
-            <button className="modal-fab-close" onClick={() => setShowCards(false)}>✕ CERRAR</button>
-          </div>
-        </div>
-      )}
+      {showCards && selectedSlot && <TeamPlayerDialog deck={localDeck.cards} initialCandidateId={comparisonCandidate} cards={userCards} current={getCardInSlot(selectedSlot)} slot={selectedSlot} userId={userId} onSelect={selectCard} onRemove={()=>{removeCard(selectedSlot);setShowCards(false);setSelectedSlot(null);}} onClose={()=>setShowCards(false)}/>}
 
       <style>{`
         /* ============================================================

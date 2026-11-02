@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, type AppUser } from "../lib/api";
 import type { UserCard } from "../types/cards";
 import "./SigningWelcome.css";
@@ -204,7 +204,7 @@ function playerArtUrl(card: NonNullable<UserCard["card"]>): string | null {
   return PLAYER_ART_BY_ID[id] ?? PLAYER_ART_BY_NAME[playerSlug(String(card.name ?? ""))] ?? null;
 }
 
-function PlayerArtwork({ card }: { card: NonNullable<UserCard["card"]> }) {
+export function PlayerArtwork({ card }: { card: NonNullable<UserCard["card"]> }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const url = playerArtUrl(card);
   const variant = stableVariant(playerIdentity(card));
@@ -231,7 +231,7 @@ function preloadArt(items: UserCard[]) {
   }
 }
 
-export const CardFace = memo(function CardFace({ item, index, variant = "full" }: { item: Pick<UserCard, "card">; index: number; variant?: Variant }) {
+export const CardFace = memo(function CardFace({ item, index, variant = "full", portrait }: { item: Pick<UserCard, "card">; index: number; variant?: Variant; portrait?:ReactNode }) {
   const card = item.card;
   if (!card) return null;
   const rarity = rarityFor(Number(card.overall_rating) || 0);
@@ -246,7 +246,7 @@ export const CardFace = memo(function CardFace({ item, index, variant = "full" }
       </div>
       <div className="starter-card__portrait">
         <span className="starter-card__sun" aria-hidden="true" />
-        <PlayerArtwork key={playerIdentity(card)} card={card} />
+        {portrait??<PlayerArtwork key={playerIdentity(card)} card={card} />}
       </div>
       <div className="starter-card__bottom">
         <h3>{card.name}</h3>

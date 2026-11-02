@@ -17,6 +17,7 @@ import "./OutfitCollections.css";
 
 type Props = {
   userId: string;
+  initialSlot?: ItemSlot;
   onClose: () => void;
   /** Nivel real del jugador: define qué ítems ya están desbloqueados. */
   level?: number;
@@ -90,7 +91,7 @@ function FaceOption({
   );
 }
 
-export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points, coins, sceneImage }: Props) {
+export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points, coins, sceneImage, initialSlot }: Props) {
   const { appearance, save, saving, error } = useAvatarAppearance(userId);
   const { items, loading, toggleEquip, usingFallback, refresh, equipError, equipping } = useAuraInventory(userId, level);
   const [shopPrices,setShopPrices] = useState<Record<string,number>>({});
@@ -126,7 +127,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
   const [draft, setDraft] = useState(appearance);
   const [done, setDone] = useState(false);
   const [previewMode, setPreviewMode] = useState<"full" | "face">("full");
-  const [mobileTab, setMobileTab] = useState<"character" | "wardrobe">("character");
+  const [mobileTab, setMobileTab] = useState<"character" | "wardrobe">(initialSlot?"wardrobe":"character");
   const [isMobileViewport, setIsMobileViewport] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 860px)").matches);
   useEffect(() => {
     const media = window.matchMedia("(max-width: 860px)");
@@ -136,7 +137,7 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
     return () => media.removeEventListener("change", update);
   }, []);
   const [wardrobeTab, setWardrobeTab] = useState<WardrobeTab>("wardrobe");
-  const [slot, setSlot] = useState<ItemSlot | "all">("all");
+  const [slot, setSlot] = useState<ItemSlot | "all">(initialSlot??"all");
   const [rarity, setRarity] = useState<"all" | ItemRarity>("all");
   const [busyId, setBusyId] = useState<string | null>(null);
   const [outfitBusy, setOutfitBusy] = useState(false);

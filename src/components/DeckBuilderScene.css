@@ -52,3 +52,16 @@
 .gh-root .deck-team-scene .deck-player-card__body{margin:2px 0}
 .gh-root .deck-team-scene .deck-player-card__stats{margin-top:2px}
 }
+/* A tall bonus panel must not stretch and vertically center the pitch row. */
+.gh-root .deck-team-scene .fifa-layout{padding:10px;align-items:start}
+.gh-root .deck-team-scene .futsal-pitch-fifa{margin:0 auto;align-self:start}
+.gh-root .deck-team-scene .chemistry-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.45}
+.gh-root .deck-team-scene .chem-line{stroke-width:2;stroke-dasharray:5 5}
+@media(min-width:901px){
+.gh-root .deck-team-scene .fifa-layout{--team-pitch-height:clamp(350px,calc(100dvh - 295px),520px);grid-template-rows:var(--team-pitch-height) auto;column-gap:20px}
+.gh-root .deck-team-scene .futsal-pitch-fifa{height:var(--team-pitch-height)}
+.gh-root .deck-team-scene .bonus-panel-fifa{max-height:calc(var(--team-pitch-height) + 65px);overflow-y:auto;box-sizing:border-box;scrollbar-width:thin;scrollbar-color:#31b9c2 #08242d}
+.gh-root .deck-team-scene .pitch-slot .deck-player-card{height:78px;width:80px;padding:5px}
+.gh-root .deck-team-scene .deck-player-card__body{margin:2px 0}
+.gh-root .deck-team-scene .deck-player-card__head{margin-bottom:2px}
+}

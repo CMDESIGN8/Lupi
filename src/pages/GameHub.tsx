@@ -23,12 +23,16 @@ import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { ChallengeGameSelector } from "../components/ChallengeGameSelector";
 import { FutsalPvp } from "../components/FutsalPvp";
 import { TriviaDuel } from "../components/TriviaDuel";
-import { RockPaperScissors } from "../components/RockPaperScissors";
+import { RockPaperScissors } from "../components/RpsAnimeDuel";
 import { ExploreWorld } from "../components/ExploreWorld";
 import { QuickDuelPanel } from "../components/QuickDuelPanel";
 import { useQuickDuel } from "../hooks/useQuickDuel";
 import { useDuelStreak } from "../hooks/useDuelStreak";
 import { BOT_NAMES } from "../hooks/useRpsBotMatch";
+import { TriviaAsyncDuel } from "../components/TriviaAsyncDuel";
+import { TriviaAsyncInbox, AsyncToast } from "../components/TriviaAsyncInbox";
+import { useTriviaAsyncInbox } from "../hooks/useTriviaAsyncInbox";
+import { asyncDecline, asyncStart, newAsyncId, type AsyncTriviaListItem } from "../lib/triviaAsync";
 import { DuelVersus } from "../components/DuelVersus";
     import { LockerPreview } from "../components/LockerPreview";
     import {
@@ -427,6 +431,8 @@ import { useAchievements } from "../hooks/useAchievements";
   const [challengeTarget, setChallengeTarget] = useState<LobbyPlayer | null>(null);
   const [activeFutsal, setActiveFutsal] = useState<Challenge | null>(null);
   const [activeTrivia, setActiveTrivia] = useState<Challenge | null>(null);
+  const [asyncMatch, setAsyncMatch] = useState<{ id: string; rivalName: string; rivalId?: string } | null>(null);
+  const [asyncNotice, setAsyncNotice] = useState("");
   const [activeRps, setActiveRps] = useState<Challenge | null>(null);
   const [versusChallenge, setVersusChallenge] = useState<Challenge | null>(null);
   const [duelFinished, setDuelFinished] = useState(false);
@@ -442,7 +448,7 @@ import { useAchievements } from "../hooks/useAchievements";
     setActiveRps(null); setActiveFutsal(null); setDuelFinished(false); setRematchTarget(c);
   };
 
-      const { data: heroData, refetch: refreshHeroData } = useUserHeroData(user.id);
+      const { data: heroData, ready: heroReady, refetch: refreshHeroData } = useUserHeroData(user.id);
       const [showAchievements, setShowAchievements] = useState(false);
       const { data: userDivision, loading: divisionLoading } = useUserDivision(user.id);
       const { count: packCount, refresh: refreshPackCount } = usePacksCount(user.id);
@@ -468,13 +474,19 @@ const {
       const previousLevelRef = useRef<{ userId: string; level: number } | null>(null);
       const [levelUp, setLevelUp] = useState<{ from: number; to: number } | null>(null);
       useEffect(() => {
-        if (!heroData) return;
+        if (!heroReady || !Number.isSafeInteger(level) || level < 1) return;
         const previous = previousLevelRef.current;
         if (previous?.userId === user.id && level > previous.level) {
           setLevelUp({ from: previous.level, to: level });
         }
-        previousLevelRef.current = { userId: user.id, level };
-      }, [heroData, level, user.id]);
+        previousLevelRef.current = { userId: user.id, level: previous?.userId === user.id ? Math.max(previous.level, level) : level };
+      }, [heroReady, level, user.id]);
+      useEffect(()=>{
+        if (!levelUp) return;
+        const oldOverflow=document.body.style.overflow;
+        document.body.style.overflow='hidden';
+        return()=>{document.body.style.overflow=oldOverflow;};
+      },[levelUp]);
 
 
       const { items: auraItems } = useAuraInventory(user.id, level);
@@ -652,7 +664,7 @@ const {
       const duelStreak = useDuelStreak(user.id);
       const { players: lobbyPlayers, status: lobbyStatus } = useLobbyPresence({
       room: "global",
-      activity: view === "match" || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
+      activity: view === "match" || asyncMatch || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
       me: {
         userId: user.id,
         username: user.username,
@@ -686,7 +698,7 @@ const {
       room: "global",
       meId: user.id,
       meName: user.username || "Jugador",
-      available: view === "lobby" && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
+      available: view === "lobby" && !asyncMatch && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
       isMuted,
       quickGameRef,
       onAccepted: (challengeData) => {
@@ -708,12 +720,38 @@ const {
 
     const quick = useQuickDuel({
       room: "global", meId: user.id, meName: user.username || "Jugador",
-      available: view === "lobby" && !incoming && (!outgoing || !!outgoing.quick) && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
+      available: view === "lobby" && !incoming && (!outgoing || !!outgoing.quick) && !versusChallenge && !asyncMatch && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
       quickGameRef,
       send: (target, game) => challenge(target, 1, game, undefined, true),
       cancelOutgoing: cancel,
-      onBot: () => startBotRps(),
+      onBot: (game) => {
+        if(game === 'futsal') { setShowPlayersSheet(false);setShowExploreWorld(false);openMatch('quick');return; }
+        if(game === 'rps') { startBotRps(); return; }
+        const id = `triviabot-${crypto.randomUUID()}`;
+        setDuelFinished(false); setShowPlayersSheet(false); setChallengeTarget(null);
+        setActiveTrivia({id,gameType:'trivia',fromId:user.id,fromName:user.username||'Jugador',toId:'bot-trivia',toName:'Profe Lupi',botIndex:0,vsBot:true,at:Date.now()});
+      },
     });
+
+    /** Preguntados por turnos: crear, abrir y rechazar desafíos. */
+    const asyncInbox = useTriviaAsyncInbox(view === "lobby");
+    const startAsyncTrivia = async (target: { userId: string; username: string }) => {
+      try {
+        const st = await asyncStart(newAsyncId(), target.userId);
+        setAsyncMatch({ id: st.id, rivalName: target.username, rivalId: target.userId });
+        setChallengeTarget(null); setShowPlayersSheet(false); void asyncInbox.refresh();
+      } catch (e) {
+        setAsyncNotice(e instanceof Error ? e.message : "No pudimos crear el desafío por turnos.");
+      }
+    };
+    const openAsyncItem = (item: AsyncTriviaListItem) => {
+      setAsyncMatch({ id: item.id, rivalName: item.rivalName, rivalId: item.rivalId });
+      setShowPlayersSheet(false);
+    };
+    const declineAsyncItem = async (item: AsyncTriviaListItem) => {
+      try { await asyncDecline(item.id); } catch { /* ya no estaba disponible */ }
+      void asyncInbox.refresh();
+    };
 
     useEffect(() => {
       if (!rematchTarget || activeRps || activeFutsal || versusChallenge) return;
@@ -746,7 +784,7 @@ const {
       const [showPlayersSheet, setShowPlayersSheet] = useState(false);
       const [showSocialChat, setShowSocialChat] = useState(false);
       const [showExploreWorld, setShowExploreWorld] = useState(false);
-      useEffect(()=>{if(incoming||outgoing||versusChallenge||activeRps||activeTrivia||activeFutsal)setShowExploreWorld(false);},[incoming,outgoing,versusChallenge,activeRps,activeTrivia,activeFutsal]);
+      useEffect(()=>{if(asyncMatch||incoming||outgoing||versusChallenge||activeRps||activeTrivia||activeFutsal)setShowExploreWorld(false);},[asyncMatch,incoming,outgoing,versusChallenge,activeRps,activeTrivia,activeFutsal]);
     
       const worldPlayers = lobbyPlayers.map((player) => {
       const skin = getPlayerSkin(player, auraItems);
@@ -872,7 +910,9 @@ const {
             break;
           case "battle":
           case "play":
-            openMatch("quick");
+            if(quick.game) break;
+            setGameTab("play");setShowExploreWorld(false);setShowPlayersSheet(false);
+            quick.start("futsal");
             break;
           case "deck":
             trackLupiActivity("deck");
@@ -977,7 +1017,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
         <>
         {missionBriefing && <MissionBriefing mission={missionBriefing} onStart={()=>{setMissionBriefing(null);openMatch("quick");}} onTeam={()=>{setMissionBriefing(null);setGameTab("deck");}} onClose={()=>setMissionBriefing(null)}/>}
         {showAvatarEditor && <AvatarEditor userId={user.id} onClose={() => setShowAvatarEditor(false)} />}
-        <div className={`main-content gh-root ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""} ${gameTab === "deck" && view === "match" ? "gh-root--team-preview" : ""}`}>
+        <div className={`main-content gh-root ${gameTab === "deck" ? "gh-root--team" : ""} ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""} ${gameTab === "deck" && view === "match" ? "gh-root--team-preview" : ""}`}>
           {showFirstWelcome && (
             <div className={`lupi-first-welcome lupi-anime-intro${welcomeExiting ? " is-exiting" : ""}`} role="presentation">
               <section className="lupi-anime-intro__scene" role="dialog" aria-modal="true" aria-labelledby="lupi-anime-title">
@@ -1066,6 +1106,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
               {challengeTarget && (
   <ChallengeGameSelector
     player={challengeTarget}
+    onAsyncTrivia={() => void startAsyncTrivia({ userId: challengeTarget.userId, username: challengeTarget.username })}
     onClose={() => setChallengeTarget(null)}
     onSelect={(game) => {
       handleLobbyChallenge(challengeTarget, 1, game);
@@ -1175,6 +1216,8 @@ onChallengeGame={(player, game) => {
 
           
 
+          <TriviaAsyncInbox items={asyncInbox.items} meId={user.id} onOpen={openAsyncItem} onDecline={(item) => void declineAsyncItem(item)} />
+
           <div className="gh-world__players-sheet-list">
             {lobbyPlayers
               .filter((p) => p.userId !== user.id)
@@ -1277,7 +1320,7 @@ onChallengeGame={(player, game) => {
   }}
 />
                   </div>
-                  {showCommunities && <CommunitiesPanel
+                  {showCommunities && <CommunitiesPanel onAsyncChallenge={(member) => void startAsyncTrivia(member)}
                     userId={user.id}
                     onClose={() => setShowCommunities(false)}
                     onMembershipChange={() => void refreshLobbyCommunity()}
@@ -1291,7 +1334,7 @@ onChallengeGame={(player, game) => {
                     }}
                   />}
                   <div className="gh-locker-zone">
-        <button type="button" onClick={() => setShowAvatarEditor(true)} className="gh-avatar-customize-trigger" style={{width:"100%",marginBottom:8,background:"#0b3545",color:"#ffd23f",border:"1px solid #28d9ff",borderRadius:8,padding:"9px",cursor:"pointer",fontWeight:800}}>✦ PERSONALIZAR MI PERSONAJE</button>
+        <div className="gh-avatar-customize-trigger gh-avatar-actionbar" role="group" aria-label="Mi personaje"><button type="button" onClick={()=>setShowAvatarEditor(true)}>✦ PERSONALIZAR</button><button type="button" onClick={()=>setGameTab("deck")}>MI CARTA Y SKILLS →</button></div>
         <LockerPreview
           userId={user.id}
           level={level}
@@ -1305,13 +1348,15 @@ onChallengeGame={(player, game) => {
 
                   {levelUp && (
                     <div className="gh-world__levelup-overlay" role="presentation">
-                      <div className="gh-world__levelup-dialog" role="dialog" aria-modal="true" aria-labelledby="lupi-levelup-title">
+                      <div className="gh-world__levelup-dialog" role="dialog" aria-modal="true" aria-labelledby="lupi-levelup-title" aria-describedby="lupi-levelup-description" onKeyDown={event=>{if(event.key==='Escape')setLevelUp(null);if(event.key==='Tab'){event.preventDefault();event.currentTarget.querySelector<HTMLButtonElement>('button')?.focus();}}}>
+                        <div className="gh-levelup-rays" aria-hidden="true"/>
+                        <div className="gh-levelup-sparks" aria-hidden="true">{Array.from({length:8},(_,i)=><i key={i} style={{left:`${8+i*12}%`,animationDelay:`${i*.12}s`}}/>)}</div>
                         <span>✦ LUPI WORLD · PROGRESIÓN ✦</span>
-                        <div className="gh-world__levelup-crown">👑</div>
-                        <h2 id="lupi-levelup-title">¡LEVEL UP!</h2>
-                        <div className="gh-world__levelup-numbers"><b>{levelUp.from}</b><strong>➜</strong><b>{levelUp.to}</b></div>
-                        <h3>¡SUBISTE DE NIVEL!</h3>
-                        <p>Tu jugador sigue creciendo. ¡Seguí sumando XP!</p>
+                        <div className="gh-world__levelup-crown" aria-hidden="true"><svg viewBox="0 0 80 60" focusable="false"><path d="M12 43 6 13 26 25 40 5 54 25 74 13 68 43Z" fill="currentColor" stroke="#fff0b3" strokeWidth="2"/><path d="M13 49H67V56H13Z" fill="currentColor"/><path d="m40 20 6 10-6 9-6-9Z" fill="#092d42"/></svg></div>
+                        <h2 id="lupi-levelup-title">¡NUEVO NIVEL!</h2>
+                        <div className="gh-world__levelup-numbers" aria-label={`Subiste del nivel ${levelUp.from} al ${levelUp.to}`}><b>{levelUp.from}</b><strong>➜</strong><b>{levelUp.to}<small>NIVEL</small></b></div>
+                        <h3>¡TU HISTORIA SIGUE CRECIENDO!</h3>
+                        <p id="lupi-levelup-description">Tu esfuerzo se convierte en progreso. ¡A la próxima jugada!</p>
                         <button type="button" autoFocus onClick={() => setLevelUp(null)}>CONTINUAR →</button>
                       </div>
                     </div>
@@ -1425,7 +1470,9 @@ onChallengeGame={(player, game) => {
                     </div>
                   </section>
 
-                  
+                  <section className="gh-world__async" aria-label="Preguntados por turnos">
+                    <TriviaAsyncInbox items={asyncInbox.items} meId={user.id} onOpen={openAsyncItem} onDecline={(item) => void declineAsyncItem(item)} />
+                  </section>
 
                   </aside>
                   <button className="gh-world__play" type="button" onClick={() => handleGameNavigate("battle")}>
@@ -1483,6 +1530,7 @@ onChallengeGame={(player, game) => {
                   <div className="gh-world__discover" aria-label="Exploración y comunidad">
                     <button type="button" className="gh-explore-trigger" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
                     <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice}/>
+                    {asyncInbox.badge > 0 && <button type="button" className="gh-explore-trigger" onClick={() => setShowPlayersSheet(true)}>🧠 {asyncInbox.badge} POR JUGAR</button>}
                   </div>
                   {showExploreWorld && <ExploreWorld deck={activeDeck} unlocked={unlockedAchievements.length} onClose={()=>setShowExploreWorld(false)} onMatch={()=>handleGameNavigate("battle")} onDeck={()=>handleGameNavigate("deck")} onAlbum={()=>handleGameNavigate("album")} onAchievements={()=>setShowAchievements(true)}/>}
 
@@ -1576,7 +1624,7 @@ onChallengeGame={(player, game) => {
 
               {gameTab === "deck" && (
                 <section className="gh-panel gh-panel--bare">
-                  <DeckBuilder userId={user.id} userCards={userCards} activeDeck={activeDeck} onDeckUpdate={setActiveDeck} onPlay={() => handleGameNavigate("battle")} />
+                  <DeckBuilder userId={user.id} userCards={userCards} activeDeck={activeDeck} onDeckUpdate={setActiveDeck} onPlay={() => handleGameNavigate("battle")} onPractice={game => {setGameTab("play");setView("lobby");setShowExploreWorld(false);setShowPlayersSheet(false);quick.start(game);window.scrollTo({top:0});}} />
                 </section>
               )}
 
@@ -1600,10 +1648,14 @@ onChallengeGame={(player, game) => {
             }}
           />
           {activeFutsal && <div className="rps-screen-overlay trivia-screen-overlay"><FutsalPvp key={activeFutsal.id} challenge={activeFutsal} meId={user.id} deck={activeDeck} players={lobbyPlayers} catalog={auraItems} onFinished={setDuelFinished} onRematch={() => requestSocialRematch(activeFutsal)} onExit={() => { setActiveFutsal(null); setDuelFinished(false); }} /></div>}
-          {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
+          <AsyncToast message={asyncNotice} onDone={() => setAsyncNotice("")} />
+          {asyncMatch && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaAsyncDuel key={asyncMatch.id} matchId={asyncMatch.id} meId={user.id} meName={user.username || "Vos"} rivalName={asyncMatch.rivalName} rivalId={asyncMatch.rivalId}
+            onChanged={() => void asyncInbox.refresh()} onExit={() => { setAsyncMatch(null); void asyncInbox.refresh(); }}
+            onRematch={(rival) => { setAsyncMatch(null); void startAsyncTrivia(rival); }} /></div>}
+          {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} catalog={auraItems} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
           {activeRps && (
             <div className="rps-screen-overlay rps-cinema-screen">
-              <RockPaperScissors key={activeRps.id}
+              <RockPaperScissors key={activeRps.id} catalog={auraItems}
                 challenge={activeRps}
                 players={lobbyPlayers}
                 meId={user.id}

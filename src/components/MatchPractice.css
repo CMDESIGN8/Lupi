@@ -1,0 +1,19 @@
+.gh-root--playing .match-tutorial.mt-cinematic{width:100%;max-width:980px;min-height:calc(100dvh - 100px);display:flex;flex-direction:column;padding:24px clamp(16px,4vw,42px)}
+.match-tutorial .mt-content{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+.match-tutorial .mt-practice-prompt{margin:8px 0 15px;font-size:14px;max-width:620px}
+.mt-practice-court{position:relative;isolation:isolate;min-height:180px;flex:1;max-height:290px;width:100%;background:linear-gradient(0deg,#04313b9e,#05202c44),url('../assets/challenge-futsal-anime.webp') center/cover;border:1px solid #58e0e760;overflow:hidden;box-shadow:inset 0 0 50px #00111d}
+.mt-practice-goal{position:absolute;left:40%;right:12%;top:12%;height:35%;border:3px solid #b1ebed;background:repeating-linear-gradient(90deg,transparent 0 18px,#d1f7ff22 19px 20px),repeating-linear-gradient(0deg,transparent 0 18px,#d1f7ff22 19px 20px);transform:skew(-8deg)}
+.mt-practice-keeper,.mt-practice-player,.mt-practice-ball,.mt-practice-partner{position:absolute;display:block;font-size:36px;transition:transform .65s cubic-bezier(.2,.8,.3,1)}
+.mt-practice-keeper{left:60%;top:30%}.mt-practice-player{left:24%;top:60%}.mt-practice-ball{left:34%;top:66%;font-size:25px}.mt-practice-partner{left:76%;top:58%;color:#ffe173}
+.mt-practice-court>small{position:absolute;bottom:8px;left:10px;right:10px;font-size:8px;letter-spacing:.1em;color:#9ddce1}
+.mt-practice-court[data-choice=shoot] .mt-practice-ball{transform:translate(90px,-75px) scale(.65)}
+.mt-practice-court[data-choice=pass] .mt-practice-ball{transform:translate(115px,-10px) rotate(180deg)}
+.mt-practice-court[data-choice=press] .mt-practice-player{transform:translate(65px,-25px)}
+.mt-practice-court[data-choice=cover] .mt-practice-player{transform:translate(90px,-65px)}
+.mt-practice-choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.mt-practice-choices button{min-height:66px;text-align:left;padding:12px;border:1px solid #5de5ed75;border-left:3px solid #53e8f0;background:#052939e8;color:#edfcff;cursor:pointer}
+.mt-practice-choices strong{display:block;font:900 italic 21px 'Barlow Condensed',sans-serif}.mt-practice-choices small{display:block;font-size:10px;color:#aacdd4;margin-top:4px}
+.mt-practice-choices button[aria-pressed=true]{border-color:#ffe078;background:#55471ddd}.mt-practice-choices button:disabled:not([aria-pressed=true]){opacity:.45}
+.mt-practice-feedback{margin:14px 0 0;padding:12px;border-left:2px solid #ffdc62;background:#031b29c9;min-height:65px}.mt-practice-feedback strong{color:#ffe078;font:900 italic 20px 'Barlow Condensed',sans-serif}.match-tutorial .mt-practice-feedback p{margin:5px 0 0;font-size:12px;line-height:1.45}
+@media(max-width:600px){.gh-root--playing .match-tutorial.mt-cinematic{min-height:calc(100dvh - 96px);padding:16px}.match-tutorial .mt-content{justify-content:flex-start}.mt-practice-court{min-height:170px;max-height:250px}.match-tutorial footer{margin-top:15px}.mt-practice-choices strong{font-size:18px}}
+@media(prefers-reduced-motion:reduce){.mt-practice-court span{transition:none}}

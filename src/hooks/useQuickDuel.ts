@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabaseClient";
 import { trackDuel } from "../lib/duelTelemetry";
 import type { ChallengeGame } from "./useLobbyChallenges";
 
-export type QuickGame = "rps" | "trivia";
+export type QuickGame = "rps" | "trivia" | "futsal";
 type Searcher = { userId: string; name: string; ts: number };
 
 const BOT_AFTER_MS = 8_000;     // Piedra-Papel-Tijera: si nadie aparece, entrenás contra un bot
@@ -82,12 +82,11 @@ export function useQuickDuel({ room, meId, meName, available, quickGameRef, send
       trySend();                             // reintenta si el canal de desafíos recién estaba listo o venció la invitación
       if ((pairedAt && Date.now()-pairedAt>=15000) || elapsed>=30000) {
         stopped=true;quickGameRef.current=null;if(lastSent)latest.current.cancelOutgoing();setGame(null);trackDuel("search_timeout",game,elapsed);
-        if(game==='rps'){trackDuel("bot_started",game,elapsed);latest.current.onBot("rps");}
-        else setNotice(hasMate?"El rival no confirmó a tiempo. Podés buscar otra vez.":"No encontramos rival ahora. Podés volver a buscar.");
+        trackDuel("bot_started",game,elapsed);latest.current.onBot(game);
         return;
       }
       if (hasMate) return;                   // hay pareja armada: esperá la respuesta
-      if (game === "rps" && elapsed >= BOT_AFTER_MS) { stopped = true; setGame(null); quickGameRef.current=null;trackDuel("bot_started",game,elapsed); latest.current.onBot("rps"); }
+      if (elapsed >= BOT_AFTER_MS) { stopped = true; setGame(null); quickGameRef.current=null;trackDuel("bot_started",game,elapsed); latest.current.onBot(game); }
 
     }, 500);
 

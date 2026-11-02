@@ -116,5 +116,6 @@ export function useActiveDeck(user: AppUser | null) {
     void loadActiveDeck();
   }, [loadActiveDeck]);
 
+  useEffect(()=>{const refresh=()=>void loadActiveDeck();window.addEventListener('lupi:progression-updated',refresh);return()=>window.removeEventListener('lupi:progression-updated',refresh);},[loadActiveDeck]);
   return { activeDeck, setActiveDeck, loadActiveDeck, loadingDeck, deckError };
 }

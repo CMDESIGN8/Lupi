@@ -5,6 +5,8 @@ import "./ChallengeGameSelector.css";
 type Props = {
   player: LobbyPlayer;
   onSelect: (game: ChallengeGame) => void;
+  /** Preguntados por turnos: jugás ahora y tu rival responde cuando pueda (24 h). */
+  onAsyncTrivia?: () => void;
   onClose: () => void;
 };
 
@@ -16,7 +18,7 @@ const games = [
   { id: "physical", icon: "💪", name: "RETO FÍSICO", description: "Desafíos de la vida real", available: false },
 ] as const;
 
-export function ChallengeGameSelector({ player, onSelect, onClose }: Props) {
+export function ChallengeGameSelector({ player, onSelect, onAsyncTrivia, onClose }: Props) {
   return (
     <div
       className="cgs-overlay"
@@ -52,6 +54,13 @@ export function ChallengeGameSelector({ player, onSelect, onClose }: Props) {
               </span>
             </button>
           ))}
+          {onAsyncTrivia && (
+            <button type="button" className="cgs-game is-available" onClick={onAsyncTrivia}>
+              <span className="cgs-icon">🧠</span>
+              <span className="cgs-info"><strong>PREGUNTADOS POR TURNOS</strong><small>Jugás ahora · tu rival responde en 24 h</small></span>
+              <span className="cgs-status">DESAFIAR →</span>
+            </button>
+          )}
         </div>
       </section>
     </div>
