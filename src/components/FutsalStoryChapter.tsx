@@ -11,6 +11,9 @@ export function FutsalStoryChapter({story,userId,deck,cards,onClose,onTeam,onBat
  const [playing,setPlaying]=useState(false),[endingStep,setEndingStep]=useState(0);const root=useRef<HTMLElement>(null);
  const p=story.progress;const step=p?.intro_step??0;const completed=p?.status==='completed';const ending=p?.status==='ending'||completed;
  const activeMatch=playing;
+ const sceneKey=`${p?.status??'intro'}-${step}-${endingStep}`;
+ const speaker=ending ? (endingStep===1&&!completed?'rival':'coach') : step===2&&p?.status==='intro'?'player':step===1&&p?.status==='intro'?'rival':'coach';
+ const speakerName=speaker==='player'?'TU RESPUESTA':speaker==='rival'?'JUGADOR DEL EQUIPO':'LUPI · TU ENTRENADOR';
  const act=(action:Parameters<typeof story.run>[0],choice?:StoryChoice)=>{void story.run(action,choice).catch(()=>{});};
  const close=()=>{if(!story.busy)onClose();};
  useEffect(()=>{const old=document.body.style.overflow;const focused=document.activeElement as HTMLElement|null;document.body.style.overflow='hidden';root.current?.focus();return()=>{document.body.style.overflow=old;focused?.focus();};},[]);
@@ -33,14 +36,17 @@ export function FutsalStoryChapter({story,userId,deck,cards,onClose,onTeam,onBat
       onResultClosed={()=>{setPlaying(false);void story.run('get').catch(()=>{});}}
       onNavigateToDeck={()=>{setPlaying(false);onTeam();}}/>
    </div>:story.loading?<p role="status">Abriendo tu historia…</p>:<>
-    <div className={`lp-story-stage ${step===1&&!ending?'lp-story-stage--rival':''}`}>
+    <div className={`lp-story-stage lp-story-stage--cinema lp-story-speaker--${speaker} ${step===1&&!ending?'lp-story-stage--rival':''}`}>
       <div className="lp-story-lights" aria-hidden="true"/>
+      <div className="lp-story-atmosphere" aria-hidden="true">{Array.from({length:16},(_,i)=><i key={i} style={{left:`${(i*23+7)%100}%`,top:`${(i*17+11)%100}%`,animationDelay:`-${i*.67}s`,animationDuration:`${5+i%4}s`}}/>)}</div>
       <div className="lp-story-player"><OwnedCardPortrait userId={userId}/></div>
       <img className="lp-story-coach" src="/images/lupi-welcome.png" alt="Lupi, tu entrenador"/>
-      <span className="lp-story-panel-tag">VIÑETA {ending ? 'FINAL' : String(Math.min(step + 1, 3)).padStart(2, '0')}</span>
+      <div key={sceneKey} className="lp-story-scene-cut" aria-hidden="true"/>
+      <div className="lp-story-speaker-caption"><i aria-hidden="true"/>{speakerName}</div>
+      <span className="lp-story-panel-tag">{ending ? 'DESPUÉS DEL PARTIDO' : 'LA PRIMERA OPORTUNIDAD'}</span>
       <span className="lp-story-location">{ending?'DESPUÉS DEL SILBATO':'CLUB DE BARRIO · CANCHA DE ENTRENAMIENTO'}</span>
     </div>
-    <div className="lp-story-dialogue" key={`${step}-${ending}-${endingStep}`}>
+    <div className="lp-story-dialogue" key={sceneKey}>
       {ending ? <>
        <small>{completed||endingStep===2?'CAPÍTULO 01 COMPLETADO':endingStep===1?'TU PRIMER RIVAL':'LUPI · TU ENTRENADOR'}</small>
        {completed||endingStep===2?<><h2>Diste el primer paso.</h2><p>Lupi te alcanza una pechera de entrenamiento.</p><blockquote>“Todavía no te ganaste la camiseta. Pero ya tenés un lugar en la práctica.”</blockquote><div className="lp-story-next"><small>PRÓXIMO CAPÍTULO · EN PREPARACIÓN</small><h3>Ganarse un lugar</h3><p>El sábado hay partido. Quedan cinco puestos… y alguien va a quedarse afuera.</p></div><button type="button" onClick={close}>VOLVER AL CLUB →</button></>

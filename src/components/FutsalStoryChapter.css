@@ -10,3 +10,36 @@
 @media(max-width:600px){.lp-story{padding:12px 14px calc(14px + env(safe-area-inset-bottom))}.lp-story-nav>span{font-size:8px;letter-spacing:.6px}.lp-story-heading{margin:16px 0 14px}.lp-story-stage{min-height:235px;box-shadow:5px 5px 0 #071924}.lp-story-stage:after{inset:7px}.lp-story-player{height:240px}.lp-story-coach{height:165px;right:4%;width:31%}.lp-story-dialogue{padding:21px 15px 17px;box-shadow:5px 5px 0 #071924}.lp-story-dialogue blockquote{font-size:14px;line-height:1.45}.lp-story-dialogue p{font-size:12px}.lp-story-dialogue h2{font-size:28px}}
 @keyframes lp-story-enter{from{opacity:0;transform:translateY(7px) scale(.985)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.lp-story-dialogue{animation:none}.lp-story-choices button:hover:not(:disabled){transform:none}}
+
+/* Dirección de escena: luz del interlocutor, polvo suspendido y corte de cámara. */
+.lp-story:before{opacity:.07}
+.lp-story-stage--cinema{background-color:#02131c;box-shadow:0 0 0 1px #5de4ce66,0 15px 50px #0008;border:2px solid #102d38}
+.lp-story-stage--cinema:after{inset:0;border:0;opacity:1;background:linear-gradient(#010d1fba,transparent 23%,transparent 65%,#010d1fe8),radial-gradient(ellipse at center,transparent 32%,#0008);z-index:3}
+.lp-story-stage--cinema .lp-story-player,.lp-story-stage--cinema .lp-story-coach{transition:filter .75s ease,opacity .75s ease,transform 1.1s cubic-bezier(.2,.7,.2,1);will-change:filter,transform}
+.lp-story-stage--cinema .lp-story-player{filter:brightness(.42) saturate(.55);opacity:.85;transform:translateX(-4px) scale(.98);transform-origin:50% 85%}
+.lp-story-stage--cinema .lp-story-coach{filter:brightness(.4) saturate(.5);opacity:.8;transform:translateX(5px) scale(.97);transform-origin:50% 85%}
+.lp-story-speaker--player .lp-story-player{filter:brightness(1.16) saturate(1.12) drop-shadow(0 -8px 19px #8affdb70);opacity:1;transform:translateX(0) scale(1.035)}
+.lp-story-speaker--coach .lp-story-coach{filter:brightness(1.18) saturate(1.15) drop-shadow(0 -7px 20px #77ffe18a);opacity:1;transform:translateX(0) scale(1.04)}
+.lp-story-stage--cinema .lp-story-lights{z-index:1;background:radial-gradient(ellipse at 76% 30%,#9bffe339,transparent 42%),linear-gradient(115deg,transparent 25%,#a0ffdf13 44%,transparent 57%);transition:background .7s;animation:lp-story-light-drift 9s ease-in-out infinite alternate}
+.lp-story-speaker--player .lp-story-lights{background:radial-gradient(ellipse at 34% 26%,#b8ffe750,transparent 40%)}
+.lp-story-speaker--rival .lp-story-lights{background:radial-gradient(ellipse at 50% 15%,#ffe09030,transparent 55%)}
+.lp-story-atmosphere{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
+.lp-story-atmosphere i{position:absolute;width:3px;height:3px;border-radius:50%;background:#d0ffe9;box-shadow:0 0 9px #8cffd8;opacity:0;animation:lp-story-mote 7s linear infinite}
+.lp-story-atmosphere i:nth-child(3n){width:2px;height:2px;background:#ffe690;box-shadow:0 0 8px #ffe27d}
+.lp-story-scene-cut{position:absolute;inset:-2px;z-index:7;pointer-events:none;background:linear-gradient(110deg,#02121e 35%,#72f3d68c 49%,#dffff450 50%,#02121e 63%);animation:lp-story-cut .8s cubic-bezier(.2,.7,.2,1) both}
+.lp-story-speaker-caption{position:absolute;bottom:36px;left:18px;z-index:5;display:flex;align-items:center;gap:7px;font:900 10px/1.2 Barlow,system-ui,sans-serif;letter-spacing:1.2px;color:#edfff5;text-shadow:0 2px 5px #000}
+.lp-story-speaker-caption i{width:6px;height:6px;background:#84ffe0;box-shadow:0 0 10px #65ffdc;border-radius:50%}
+.lp-story-stage--cinema .lp-story-panel-tag{background:#031522a6;border:1px solid #91f7dd55;color:#aaf2db;transform:none;font-size:8px;letter-spacing:1.4px}
+.lp-story-dialogue{background:linear-gradient(135deg,#103643f5,#041824fa);color:#eafff5;border:1px solid #64e6ce50;border-top:2px solid #ffe17c;box-shadow:0 15px 45px #0005;animation:lp-story-dialogue-cut .65s cubic-bezier(.2,.7,.2,1) both}
+.lp-story-dialogue:before{opacity:.035}.lp-story-dialogue>small{color:#91f2d9}.lp-story-dialogue h2{color:#fff0a6;text-shadow:2px 3px #03121d}.lp-story-dialogue p{color:#cee5e7}
+.lp-story-dialogue blockquote{background:#f0fff5;border:2px solid #082631;box-shadow:3px 4px 0 #58c7ad66;line-height:1.5}
+.lp-story-dialogue blockquote:after{background:#f0fff5;border-color:#082631}
+.lp-story-dialogue .lp-story-objective,.lp-story-next{background:#103a42;border:1px solid #7fe6cb55;border-left:3px solid #7fe6cb;color:#eafff4}
+.lp-story-next h3{color:#fff0a6}.lp-story-next small{color:#94f5da}.lp-story-choice-hint{color:#9bc6cd!important}.lp-story-score{color:#a3d6d5}.lp-story-score b{color:#84ffe0}
+.lp-story-heading p{display:none}.lp-story-heading{margin-top:12px}.lp-story-nav>button{background:#092b37;color:#d9fff1;border:1px solid #71d7c56b;box-shadow:none}
+@keyframes lp-story-mote{0%{opacity:0;transform:translate3d(0,20px,0)}20%,70%{opacity:.65}100%{opacity:0;transform:translate3d(24px,-90px,0)}}
+@keyframes lp-story-light-drift{from{transform:translateX(-12px);opacity:.65}to{transform:translateX(12px);opacity:1}}
+@keyframes lp-story-cut{0%{transform:translateX(-105%);opacity:1}35%{transform:translateX(0);opacity:1}100%{transform:translateX(105%);opacity:0}}
+@keyframes lp-story-dialogue-cut{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:none}}
+@media(max-width:600px){.lp-story-heading h1{font-size:29px}.lp-story-heading{margin:12px 0 16px;padding-bottom:9px}.lp-story-stage--cinema{min-height:270px}.lp-story-stage--cinema .lp-story-player{height:275px}.lp-story-stage--cinema .lp-story-coach{height:190px}.lp-story-dialogue{padding:18px 15px}.lp-story-dialogue h2{font-size:27px}.lp-story-speaker-caption{font-size:8px;left:13px}.lp-story-nav{min-height:34px}.lp-story-nav>button{min-height:34px;font-size:10px}}
+@media(prefers-reduced-motion:reduce){.lp-story-atmosphere i,.lp-story-stage--cinema .lp-story-lights,.lp-story-dialogue{animation:none}.lp-story-atmosphere i{opacity:.25}.lp-story-scene-cut{display:none}.lp-story-stage--cinema .lp-story-player,.lp-story-stage--cinema .lp-story-coach{transition:none;will-change:auto}}
