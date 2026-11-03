@@ -1,0 +1,3 @@
+.lupi-story-pose{display:flex;align-items:flex-end;justify-content:center;pointer-events:none}
+.lupi-story-pose>i{display:block;height:100%;aspect-ratio:399.67/656;max-width:none;flex-shrink:0;background:url('../assets/lupi-story-expressions.png') 0 0/300% 200% no-repeat}
+.lupi-story-pose--welcome>i{background-position:0 0}.lupi-story-pose--explain>i{background-position:50% 0}.lupi-story-pose--surprised>i{background-position:100% 0}.lupi-story-pose--determined>i{background-position:0 100%}.lupi-story-pose--sad>i{background-position:50% 100%}.lupi-story-pose--celebrate>i{background-position:100% 100%}

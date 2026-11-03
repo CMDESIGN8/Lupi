@@ -4,13 +4,18 @@ import type {Deck,UserCard} from '../types/cards';
 import type {FutsalStoryState,StoryChoice} from '../hooks/useFutsalStory';
 import {CardBattle} from './CardBattle';
 import {OwnedCardPortrait} from './OwnedCardPortrait';
+import {StoryMotionPage,StoryMotionReplay} from './StoryMotionPage';
+import {LupiStoryPose} from './LupiStoryPose';
 import './FutsalStoryChapter.css';
+import './StoryTutorialPolish.css';
 const RESPONSES:Record<StoryChoice,string>={confident:'Esa confianza me gusta. Ahora acompañala con juego.',team:'Entonces mirá también al que corre al lado tuyo.',nervous:'Perfecto. Significa que te importa.'};
 const ENDINGS={win:'Buen debut. Ahora viene lo difícil: demostrar que podés hacerlo otra vez.',draw:'No regalaste nada. Hay equipo para construir acá.',loss:'El resultado no te dio, pero terminaste la prueba. Mañana trabajamos lo que faltó.'};
-export function FutsalStoryChapter({story,userId,deck,cards,onClose,onTeam,onBattleComplete,onMatchRecorded}:{story:FutsalStoryState;userId:string;deck:Deck;cards:UserCard[];onClose:()=>void;onTeam:()=>void;onBattleComplete:()=>void;onMatchRecorded:()=>void}){
+export function FutsalStoryChapter({story,userId,playerName,deck,cards,onClose,onTeam,onBattleComplete,onMatchRecorded}:{story:FutsalStoryState;userId:string;playerName?:string;deck:Deck;cards:UserCard[];onClose:()=>void;onTeam:()=>void;onBattleComplete:()=>void;onMatchRecorded:()=>void}){
  const [playing,setPlaying]=useState(false),[endingStep,setEndingStep]=useState(0);const root=useRef<HTMLElement>(null);
  const p=story.progress;const step=p?.intro_step??0;const completed=p?.status==='completed';const ending=p?.status==='ending'||completed;
  const activeMatch=playing;
+ const [replaying,setReplaying]=useState(false);
+ const motionIntro=replaying||(!activeMatch&&!ending&&!story.loading&&!!p);
  const sceneKey=`${p?.status??'intro'}-${step}-${endingStep}`;
  const speaker=ending ? (endingStep===1&&!completed?'rival':'coach') : step===2&&p?.status==='intro'?'player':step===1&&p?.status==='intro'?'rival':'coach';
  const speakerName=speaker==='player'?'TU RESPUESTA':speaker==='rival'?'JUGADOR DEL EQUIPO':'LUPI · TU ENTRENADOR';
@@ -19,15 +24,18 @@ export function FutsalStoryChapter({story,userId,deck,cards,onClose,onTeam,onBat
  useEffect(()=>{const old=document.body.style.overflow;const focused=document.activeElement as HTMLElement|null;document.body.style.overflow='hidden';root.current?.focus();return()=>{document.body.style.overflow=old;focused?.focus();};},[]);
  useEffect(()=>{root.current?.focus();},[step,endingStep,ending]);
  const verifiedEnabled=import.meta.env.VITE_VERIFIED_MATCHES==='true';
+ useEffect(()=>{
+  if(!replaying&&!story.loading&&!story.busy&&!story.error&&verifiedEnabled&&(p?.status==='ready'||p?.status==='match')&&(deck.cards?.length??0)>=5)setPlaying(true);
+ },[replaying,p?.status,story.loading,story.busy,story.error,verifiedEnabled,deck.cards?.length]);
  const footer=<p className="lp-story-save">Tu historia se guarda con tu cuenta. Los premios del partido se acreditan una sola vez.</p>;
- return createPortal(<section className={`lp-story ${activeMatch?'lp-story--playing':''}`} role="dialog" aria-modal="true" aria-labelledby="lp-story-title" tabIndex={-1} ref={root} onKeyDown={e=>{
+ return createPortal(<section className={`lp-story ${activeMatch?'lp-story--playing':''} ${motionIntro?'lp-story--motion-page':''}`} role="dialog" aria-modal="true" aria-labelledby="lp-story-title" tabIndex={-1} ref={root} onKeyDown={e=>{
   if(e.key==='Escape'&&!activeMatch){e.preventDefault();close();}
   if(e.key==='Tab'&&!activeMatch){const items=Array.from(root.current?.querySelectorAll<HTMLElement>('button:not(:disabled),[tabindex="0"]')??[]);if(!items.length)return;if(e.shiftKey&&(document.activeElement===items[0]||document.activeElement===root.current)){e.preventDefault();items[items.length-1]?.focus();}else if(!e.shiftKey&&document.activeElement===items[items.length-1]){e.preventDefault();items[0]?.focus();}}
  }}>
-  <header className="lp-story-nav"><button type="button" disabled={story.busy} onClick={close}>‹ VOLVER AL CLUB</button><span>MANGA · CAPÍTULO 01</span></header>
+  <header className="lp-story-nav"><button type="button" disabled={story.busy} onClick={close}>‹ VOLVER AL CLUB</button><button className="lp-story-replay" type="button" disabled={story.busy||activeMatch} onClick={()=>setReplaying(value=>!value)}>{replaying?'SALIR DE REPRODUCCIÓN':'↻ VOLVER A VER INTRO'}</button><span>MANGA · CAPÍTULO 01</span></header>
   <div className="lp-story-heading"><small>LUPI WORLD · HISTORIA ORIGINAL</small><h1 id="lp-story-title">La primera oportunidad</h1><p>Leé la escena. Elegí la respuesta. Entrá a la cancha.</p></div>
   {story.error&&<div className="lp-story-error" role="alert"><strong>No pudimos sincronizar tu historia</strong><p>{story.error}</p><button type="button" disabled={story.busy} onClick={()=>act('get')}>Reintentar sincronización</button></div>}
-  {activeMatch?<div className="lp-story-match"><p className="lp-story-objective">OBJETIVO · Completá la prueba. No necesitás ganar para avanzar.</p>
+  {replaying?<StoryMotionReplay userId={userId} playerName={playerName} onDone={()=>setReplaying(false)}/>:activeMatch?<div className="lp-story-match"><p className="lp-story-objective lp-mobile-objective">OBJETIVO · Completá la prueba. No necesitás ganar para avanzar.</p>
     <CardBattle userCards={cards} userDeck={deck} userId={userId} isCampaignMode autoStart={false}
       forcedOpponent={{name:'Bot Novato',overall_rating:55,category:'8va',level:1,avatar:'🥉',color:'#7a7a9a',xpBase:10,reqWins:0}}
       onBattleComplete={onBattleComplete} onMatchRecorded={onMatchRecorded}
@@ -35,12 +43,12 @@ export function FutsalStoryChapter({story,userId,deck,cards,onClose,onTeam,onBat
       onVerifiedMatchCompleted={async id=>{await story.run('complete',undefined,id);}}
       onResultClosed={()=>{setPlaying(false);void story.run('get').catch(()=>{});}}
       onNavigateToDeck={()=>{setPlaying(false);onTeam();}}/>
-   </div>:story.loading?<p role="status">Abriendo tu historia…</p>:<>
+   </div>:story.loading?<p role="status">Abriendo tu historia…</p>:motionIntro?<StoryMotionPage story={story} userId={userId} playerName={playerName} canPlay={(deck.cards?.length??0)>=5} onPlay={()=>setPlaying(true)} onTeam={onTeam}/>:<>
     <div className={`lp-story-stage lp-story-stage--cinema lp-story-speaker--${speaker} ${step===1&&!ending?'lp-story-stage--rival':''}`}>
       <div className="lp-story-lights" aria-hidden="true"/>
       <div className="lp-story-atmosphere" aria-hidden="true">{Array.from({length:16},(_,i)=><i key={i} style={{left:`${(i*23+7)%100}%`,top:`${(i*17+11)%100}%`,animationDelay:`-${i*.67}s`,animationDuration:`${5+i%4}s`}}/>)}</div>
       <div className="lp-story-player"><OwnedCardPortrait userId={userId}/></div>
-      <img className="lp-story-coach" src="/images/lupi-welcome.png" alt="Lupi, tu entrenador"/>
+      <LupiStoryPose className="lp-story-coach" pose={completed?'celebrate':p?.result==='loss'?'sad':p?.result==='win'?'celebrate':'explain'}/>
       <div key={sceneKey} className="lp-story-scene-cut" aria-hidden="true"/>
       <div className="lp-story-speaker-caption"><i aria-hidden="true"/>{speakerName}</div>
       <span className="lp-story-panel-tag">{ending ? 'DESPUÉS DEL PARTIDO' : 'LA PRIMERA OPORTUNIDAD'}</span>

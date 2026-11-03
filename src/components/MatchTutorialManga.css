@@ -1,0 +1,14 @@
+.match-tutorial .mt-manga-scene{position:relative;isolation:isolate;overflow:hidden;grid-column:1/-1;min-height:185px;margin:5px 0 14px;border:3px solid #03121d;background:linear-gradient(120deg,#0e3344,#175858);box-shadow:0 0 0 1px #72d9c5;animation:mt-manga-reveal .5s ease both}
+.mt-manga-traces{position:absolute;inset:0;background:repeating-conic-gradient(from 5deg at 18% 60%,transparent 0deg 10deg,#bdffe422 10deg 11deg,transparent 11deg 16deg),radial-gradient(ellipse at 18% 45%,#8affdd55,transparent 65%);pointer-events:none}
+.mt-manga-lupi{position:absolute;left:-6px;bottom:-70px;height:260px;width:39%;filter:drop-shadow(0 0 13px #7dffe080);transform:rotate(-4deg);z-index:2;transition:filter .4s}
+.mt-manga-speech{position:relative;z-index:3;margin:15px 13px 37px 36%;padding:12px 14px;border:2px solid #041c27;border-radius:18px;background:#effff3;color:#062432;box-shadow:4px 4px #041c27}
+.mt-manga-speech:after{content:"";position:absolute;left:-9px;top:36px;width:16px;height:16px;background:#effff3;border-left:2px solid #041c27;border-bottom:2px solid #041c27;transform:rotate(45deg)}
+.mt-manga-speech>small{color:#126b61;font:1000 8px/1.3 Barlow,sans-serif;letter-spacing:1px}
+.match-tutorial .mt-manga-speech h1{color:#082633!important;text-shadow:none!important;font:1000 italic clamp(24px,3vw,37px)/1 'Barlow Condensed',Impact,sans-serif!important;margin:5px 0 8px!important}
+.match-tutorial .mt-manga-speech p{color:#24434b;font:700 12px/1.4 Barlow,system-ui,sans-serif;margin:0}
+.mt-manga-sfx{position:absolute;bottom:8px;right:22px;z-index:3;color:#ffe783;font:1000 italic 28px/.9 'Barlow Condensed',Impact,sans-serif;letter-spacing:1px;transform:rotate(-7deg);text-shadow:2px 2px #03121d,-1px -1px #03121d}
+.mt-manga-scene--1{background:linear-gradient(115deg,#082339,#194951)}
+@media(min-width:901px){.match-tutorial .mt-manga-scene{min-height:180px}.mt-manga-lupi{height:310px;bottom:-120px;width:28%;left:2%}.mt-manga-speech{margin-left:28%;margin-right:40px;margin-bottom:30px}.lp-story--playing .mt-content .mt-practice-court{grid-row:2/4}.lp-story--playing .mt-content .mt-practice-choices{grid-row:2}.lp-story--playing .mt-content .mt-practice-feedback{grid-row:3}}
+@media(max-width:420px){.match-tutorial .mt-manga-scene{min-height:183px}.mt-manga-lupi{height:235px;bottom:-46px;width:37%;left:-5px}.mt-manga-speech{margin-left:33%;margin-right:9px;padding:10px}.match-tutorial .mt-manga-speech p{font-size:11px}.match-tutorial .mt-manga-speech h1{font-size:25px!important}}
+@keyframes mt-manga-reveal{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.match-tutorial .mt-manga-scene{animation:none}}

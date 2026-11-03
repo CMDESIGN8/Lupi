@@ -72,3 +72,52 @@
 .lw-face--mouth-full .lw-face__mouth { height:4%; border-radius:50%; opacity:.7; }
 /* Mantener las expresiones por encima de la geometría de la boca. */
 .lw-face--mouth-full .lw-face__mouth--smile { background:transparent; height:9%; }
+
+/* Anime: conserva el rig, los identificadores guardados y el cabello calibrado. */
+.lw-face.lw-face{background:linear-gradient(112deg,transparent 0 70%,#42252024 70% 100%),var(--lw-skin);box-shadow:inset 0 -2px #40251c33,0 1px 0 1px #281c21a6}
+.lw-face.lw-face:before{inset:0;z-index:1;background:linear-gradient(165deg,#34212b25 0 22%,transparent 22% 100%),linear-gradient(105deg,#fff1d218 0 21%,transparent 21% 100%);border-radius:inherit}
+.lw-face.lw-face--game{filter:none}
+.lw-face.lw-face--game:after{background:linear-gradient(100deg,transparent 0 76%,#291b2314 76%);z-index:1}
+.lw-face.lw-face .lw-face__ear{box-shadow:inset -2px -1px #40251c33;outline:1px solid #40251c44}
+.lw-face.lw-face .lw-face__eyes{top:49%;left:16%;width:68%;height:15%;align-items:center}
+.lw-face.lw-face .lw-face__eyes i{box-sizing:border-box;display:block;width:31%;height:100%;aspect-ratio:auto;background:#fffaf0;border-radius:60% 35% 48% 40%;border:1px solid #35232b;border-top-width:2px;overflow:hidden;box-shadow:0 -1px #35232b;transform:rotate(4deg)}
+.lw-face.lw-face .lw-face__eyes i:last-child{transform:scaleX(-1) rotate(4deg)}
+.lw-face.lw-face .lw-face__eyes i:before{content:'';position:absolute;left:29%;top:-8%;width:48%;height:109%;border-radius:48%;background:radial-gradient(ellipse at 50% 45%,#101722 0 23%,transparent 25%),radial-gradient(ellipse at 50% 55%,color-mix(in srgb,var(--lw-eye-color,#38c6b3),white 28%) 0 17%,transparent 19%),linear-gradient(to bottom,var(--lw-eye-color,#38c6b3) 0 44%,color-mix(in srgb,var(--lw-eye-color,#38c6b3),#211923 32%) 46% 78%,#d1a75d 80%);box-shadow:0 0 0 1px #1d2028, inset 0 0 3px #1118}
+.lw-face.lw-face .lw-face__eyes i:after{left:36%;top:10%;width:16%;height:23%;background:#fff;border-radius:45%;box-shadow:2px 5px #ffffff66}
+.lw-face.lw-face .lw-face__eyes i{filter:drop-shadow(0 1px 1px #1d101955)}
+.lw-face.lw-face .lw-face__eyes i:after{box-shadow:2px 5px #ffffff66,-2px 23px 0 -1px #ffffff55}
+.lw-face.lw-face--eyes-large .lw-face__eyes{top:47%;height:19%}
+.lw-face.lw-face--eyes-large .lw-face__eyes i{width:34%;border-radius:55% 36% 45% 45%}
+.lw-face.lw-face--eyes-almond .lw-face__eyes{top:51%;height:12%}
+.lw-face.lw-face--eyes-almond .lw-face__eyes i{width:34%;border-radius:65% 12% 60% 22%;transform:rotate(1deg)}
+.lw-face.lw-face--eyes-almond .lw-face__eyes i:last-child{transform:scaleX(-1) rotate(1deg)}
+.lw-face.lw-face--eyes-bright .lw-face__eyes{top:48%;height:17%}
+.lw-face.lw-face--eyes-bright .lw-face__eyes i{width:33%}
+.lw-face.lw-face--eyes-bright .lw-face__eyes i:before{background:radial-gradient(ellipse at 50% 45%,#101722 0 21%,transparent 24%),radial-gradient(ellipse at 50% 54%,#ffffffcc 0 12%,transparent 14%),linear-gradient(to bottom,color-mix(in srgb,var(--lw-eye-color,#38c6b3),white 26%) 0 35%,var(--lw-eye-color,#38c6b3) 37% 66%,color-mix(in srgb,var(--lw-eye-color,#38c6b3),white 38%) 68% 78%,#d1a75d 80%)}
+.lw-face.lw-face .lw-face__brows{left:16%;top:41%;width:68%;height:5%;align-items:center}
+.lw-face.lw-face .lw-face__brows i{height:47%;width:33%;min-height:1px;background:var(--lw-hair);border-radius:12% 75% 10% 15%;opacity:1;box-shadow:0 1px #2a202333;transform:rotate(8deg)}
+.lw-face.lw-face .lw-face__brows i:last-child{transform:scaleX(-1) rotate(8deg)}
+.lw-face.lw-face--brows-straight .lw-face__brows i{height:38%;border-radius:0;transform:none}
+.lw-face.lw-face--brows-arched .lw-face__brows i{height:43%;border-radius:80% 80% 0 0;transform:rotate(-8deg)}
+.lw-face.lw-face--brows-arched .lw-face__brows i:last-child{transform:scaleX(-1) rotate(-8deg)}
+.lw-face.lw-face--brows-bold .lw-face__brows i{height:73%}
+.lw-face.lw-face .lw-face__nose{left:48%;top:64%;width:5%;height:8%;background:linear-gradient(120deg,transparent 0 48%,#69433166 50% 72%,transparent 74%);border-radius:0;box-shadow:none}
+.lw-face.lw-face--nose-small .lw-face__nose{width:3%;height:5%;top:66%;left:49%}
+.lw-face.lw-face--nose-round .lw-face__nose{width:7%;height:6%;top:65%;left:47%;border-bottom:1px solid #69433177;border-radius:0 0 60% 50%}
+.lw-face.lw-face--nose-defined .lw-face__nose{height:12%;top:61%;width:6%;border-bottom:1px solid #69433177}
+.lw-face.lw-face .lw-face__mouth{top:80%;height:1.5%;background:#4a2c31;opacity:1;box-shadow:none;border-radius:15% 15% 60% 30%}
+.lw-face.lw-face--mouth-full .lw-face__mouth{height:3%;background:#8b5050;opacity:.85}
+.lw-face.lw-face .lw-face__mouth--smile{height:7%;background:linear-gradient(#fff7df 0 30%,#4a2531 32% 100%);border:1px solid #4a2531;border-radius:10% 10% 65% 65%}
+.lw-face.lw-face .lw-face__mouth--focused{height:1.5%;background:#4a2c31;border:0;transform:rotate(-3deg)}
+.lw-face:has(.lw-face__mouth--focused) .lw-face__brows i{transform:rotate(15deg)}
+.lw-face:has(.lw-face__mouth--focused) .lw-face__brows i:last-child{transform:scaleX(-1) rotate(15deg)}
+.lw-face:has(.lw-face__mouth--focused) .lw-face__eyes{height:12%;top:51%}
+.lw-face--expression-surprised .lw-face__eyes{top:47%!important;height:19%!important}
+.lw-face--expression-surprised .lw-face__eyes i{border-radius:50%!important;transform:none!important}
+.lw-face--expression-surprised .lw-face__mouth{top:79%;left:45%;width:10%;height:8%;border:1px solid #4a2531;border-radius:50%;background:#522b31}
+.lw-face--expression-determined .lw-face__brows{top:42%;transform:skewY(-6deg)}
+.lw-face--expression-determined .lw-face__brows i{height:66%;background:#443038}
+.lw-face--expression-determined .lw-face__eyes i{border-top-width:3px}
+.lw-face--expression-happy .lw-face__eyes i{height:47%!important;align-self:flex-end;border-radius:8% 8% 65% 65%!important;transform:rotate(4deg)!important;background:#fffaf0}
+.lw-face--expression-happy .lw-face__eyes i:last-child{transform:scaleX(-1) rotate(4deg)!important}
+.lw-face--expression-happy .lw-face__mouth{height:8%;background:linear-gradient(#fff7df 0 30%,#4a2531 32% 100%);border:1px solid #4a2531;border-radius:10% 10% 65% 65%}

@@ -3,15 +3,16 @@ import { supabase } from "../lib/supabaseClient";
 import { DEFAULT_APPEARANCE, sanitizeAppearance, type AvatarAppearance } from "../lib/avatarAppearance";
 export function useAvatarAppearance(userId: string) {
  const [appearance, setAppearance] = useState<AvatarAppearance>(DEFAULT_APPEARANCE);
+ const [loading, setLoading] = useState(true);
  const [saving, setSaving] = useState(false);
  const [error, setError] = useState<string | null>(null);
- useEffect(() => { let alive = true; setAppearance(DEFAULT_APPEARANCE);
-  if (!userId) return;
+ useEffect(() => { let alive = true; setLoading(true); setAppearance(DEFAULT_APPEARANCE); setError(null);
+  if (!userId) { setLoading(false); return () => { alive = false; }; }
   supabase.from("avatar_appearances").select("appearance").eq("user_id", userId).maybeSingle().then(({data,error}) => {
    if (!alive) return;
-   if (error) { setError("Aplicá primero la migración SQL del avatar."); return; }
-   if (data?.appearance) setAppearance(sanitizeAppearance(data.appearance));
-  }); return () => { alive = false; };
+   if (error) setError("Aplicá primero la migración SQL del avatar.");
+   else if (data?.appearance) setAppearance(sanitizeAppearance(data.appearance));
+  }).finally(() => { if (alive) setLoading(false); }); return () => { alive = false; };
  }, [userId]);
  useEffect(() => {
   const onUpdated = (event: Event) => {
@@ -29,5 +30,5 @@ export function useAvatarAppearance(userId: string) {
   if (error) {setError(error.message); return false;}
   setAppearance(clean); window.dispatchEvent(new CustomEvent("lupi:avatar-appearance-updated", { detail: { userId, appearance: clean } })); return true;
  },[userId]);
- return {appearance, save, saving, error};
+ return {appearance, save, saving, error, loading};
 }

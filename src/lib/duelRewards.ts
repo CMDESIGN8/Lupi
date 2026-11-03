@@ -1,6 +1,6 @@
 import { supabase } from "./supabaseClient";
 
-export type DuelGame = "rps" | "trivia";
+export type DuelGame = "rps" | "trivia" | "truco";
 export type DuelRewardResult = {
   ok: boolean; duplicate?: boolean; result?: "win" | "loss" | "draw";
   xp?: number; coins?: number; chest?: "comun" | "raro" | "epico" | null;

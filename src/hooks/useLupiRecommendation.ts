@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-export type LupiActivity = "play" | "deck" | "album" | "pack" | "achievements" | "explore" | "social" | "rps" | "trivia";
+export type LupiActivity = "play" | "deck" | "album" | "pack" | "achievements" | "explore" | "social" | "rps" | "trivia" | "truco";
 export type LupiAction = LupiActivity | "claim";
 type History = {
   counts: Partial<Record<LupiActivity, number>>;
@@ -96,6 +96,7 @@ export function useLupiRecommendation(userId: string, options: {
     if (options.packsAvailable > 0) candidates.push({ title: "Tenés un pack disponible", description: "Descubrí nuevas cartas para tu equipo.", button: "ABRIR PACK", action: "pack", reason: "Pack disponible" });
     // Alternate the least-used minigame; onboarding and pending rewards stay first.
     const minigames: Recommendation[] = [
+      {title:'¿Sale un Truco?',description:'Practicá contra un bot a 15 puntos. Sin flor. Esta práctica no otorga premios.',button:'JUGAR TRUCO',action:'truco',reason:'Cartas y estrategia'},
       {title:"¿Entrenamos tus reflejos?",description:"Desafiá a un rival en Piedra, papel o tijera. Las primeras 5 prácticas del día suman EXP en Defensa.",button:"JUGAR PPT",action:"rps",reason:"Entrená tu Defensa"},
       {title:"¿Cuánto sabés de fútbol?",description:"Jugá Preguntados. Las primeras 5 prácticas del día suman EXP en Pase.",button:"JUGAR PREGUNTADOS",action:"trivia",reason:"Entrená tu Pase"},
     ];

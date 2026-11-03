@@ -64,11 +64,11 @@ export const AvatarFace = memo(function AvatarFace({ appearance=DEFAULT_APPEARAN
     return()=>window.removeEventListener(HAIR_FIT_EVENT,update);
   },[hair]);
   const style={
-    '--lw-skin':appearance.skin,'--lw-hair':color,
+    '--lw-skin':appearance.skin,'--lw-hair':color,'--lw-eye-color':appearance.eyeColor ?? DEFAULT_APPEARANCE.eyeColor,
     '--hair-top':`${fit.y}%`,'--hair-x':`${fit.x}%`,
     '--hair-width':`${fit.width}%`,'--hair-height':`${fit.height}%`,
   } as CSSProperties;
-  return <div className={`lw-face lw-face--hair-${hair} lw-face--${appearance.face} lw-face--eyes-${appearance.eyes ?? "normal"} lw-face--brows-${appearance.brows ?? "natural"} lw-face--nose-${appearance.nose ?? "soft"} lw-face--mouth-${appearance.mouth ?? "normal"} ${className}`} style={style} aria-label="Rostro personalizado" role="img">
+  return <div className={`lw-face lw-face--hair-${hair} lw-face--${appearance.face} lw-face--eyes-${appearance.eyes ?? "normal"} lw-face--brows-${appearance.brows ?? "natural"} lw-face--nose-${appearance.nose ?? "soft"} lw-face--mouth-${appearance.mouth ?? "normal"} lw-face--expression-${appearance.expression ?? "neutral"} ${className}`} style={style} aria-label="Rostro personalizado" role="img">
     <span className="lw-face__ear lw-face__ear--left"/><span className="lw-face__ear lw-face__ear--right"/>
     <HairTexture hair={hair} color={color}/>
     <div className="lw-face__brows"><i/><i/></div>

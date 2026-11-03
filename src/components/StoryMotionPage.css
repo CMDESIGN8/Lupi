@@ -1,0 +1,70 @@
+.lp-story.lp-story--motion-page:not(.lp-story--playing){display:flex;flex-direction:column;align-content:initial;align-items:stretch;gap:0;height:100dvh;padding:10px max(10px,calc((100vw - 1200px)/2));overflow:auto;background:radial-gradient(ellipse at top,#143b42,#020e18 75%)}
+.lp-story--motion-page .lp-story-nav{min-height:32px;flex-shrink:0}.lp-story--motion-page .lp-story-nav>button{min-height:32px;padding:7px 10px;font-size:10px}.lp-story--motion-page .lp-story-nav>span{font-size:8px}
+.lp-story--motion-page .lp-story-heading{margin:7px 0 9px;padding-bottom:6px;flex-shrink:0}.lp-story--motion-page .lp-story-heading>small{display:none}.lp-story--motion-page .lp-story-heading h1{font-size:clamp(23px,3vw,34px);margin:3px 0}
+.motion-page{flex:1;min-height:0;display:flex;flex-direction:column;gap:7px;color:#effff6;font-family:Barlow,system-ui,sans-serif}.motion-page__controls,.motion-page__transport{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-shrink:0;min-height:28px}.motion-page__controls>span{font:900 8px/1.3 Barlow,sans-serif;letter-spacing:1.3px;color:#91ead4}.motion-page__controls button,.motion-page__transport button{background:#0b2c36;border:1px solid #6acbb563;color:#e2fff4;padding:6px 9px;font:800 10px/1.2 Barlow,sans-serif;min-height:30px;cursor:pointer}.motion-page__transport>span{font-size:10px;color:#a0c8ca;line-height:1.3}.motion-page button:disabled{opacity:.5;cursor:default}
+.motion-page__panels{position:relative;isolation:isolate;flex:1;min-height:460px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(110px,1fr) minmax(140px,1.2fr) minmax(190px,1.5fr);gap:6px;padding:5px;background:#b1cab5;border:2px solid #061922;overflow:hidden;box-shadow:0 10px 35px #0008}
+.motion-panel{position:relative;isolation:isolate;overflow:hidden;border:2px solid #02101a;background:#051b27;filter:brightness(.23) saturate(.15);transition:filter 1s ease,box-shadow .8s ease;min-width:0;min-height:0}
+.motion-panel.is-read{filter:brightness(.52) saturate(.4)}.motion-panel.is-lit{filter:brightness(1) saturate(1.05);box-shadow:inset 0 0 0 2px #96ffe699,0 0 18px #63ffdf55;z-index:2}
+.motion-panel:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;background:linear-gradient(0deg,#02121eda,transparent 55%),radial-gradient(ellipse at center,transparent 40%,#0007)}
+.motion-panel__art{position:absolute;inset:-5%;background:linear-gradient(#06262b38,#03171a55),url('../assets/futsal-club-entry.webp') center/cover;transform:scale(1.03)}
+.motion-panel.is-lit .motion-panel__art{animation:motion-camera 10s ease-out both}.motion-panel--arrival{grid-column:1/-1}.motion-panel--arrival .motion-panel__art{background-position:50% 42%}.motion-caption{position:absolute;left:8px;top:7px;z-index:4;background:#efffe9;color:#0a2330;box-shadow:2px 2px #02111c;padding:5px 7px;font:900 9px/1.2 Barlow,sans-serif;max-width:85%}
+.motion-arrival-player{position:absolute;height:260px;width:145px;left:30%;bottom:-105px;z-index:1;filter:brightness(.7)}.motion-sfx{position:absolute;right:7%;top:45%;z-index:3;color:#f1ffe5;font:1000 italic clamp(19px,4vw,36px)/1 'Barlow Condensed',Impact,sans-serif;transform:rotate(-9deg);text-shadow:3px 3px #03101c;letter-spacing:2px}.motion-location{position:absolute;bottom:8px;left:10px;z-index:4;font:800 9px/1.3 Barlow,sans-serif;color:#c5ffdf}
+.motion-panel--coach .motion-panel__art{background-position:80% 45%}.motion-coach{position:absolute;height:185%;width:100%;object-fit:contain;object-position:bottom;bottom:-52%;left:-22%;z-index:1;filter:drop-shadow(0 0 10px #89ffe87d)}
+.motion-bubble{position:relative;z-index:4;margin:0;background:#effff3;color:#09222e;border:2px solid #09222e;border-radius:17px;padding:10px 11px;box-shadow:3px 3px #02121c;font:800 12px/1.35 Barlow,system-ui,sans-serif}.motion-bubble b{display:block;font-size:8px;color:#097b6d;letter-spacing:1px;margin-bottom:4px}.motion-bubble:after{content:"";position:absolute;left:19px;bottom:-9px;width:13px;height:13px;transform:rotate(45deg);background:#effff3;border-right:2px solid #09222e;border-bottom:2px solid #09222e}
+.motion-panel--coach>.motion-bubble{position:absolute;right:7px;top:10px;width:53%;box-sizing:border-box}.motion-panel--rival .motion-panel__art{background-image:repeating-conic-gradient(from 4deg at 50% 60%,#a2ffe833 0deg 1deg,transparent 1deg 12deg),linear-gradient(#09253466,#040d17c9),url('../assets/challenge-futsal-anime.webp');background-position:center}.motion-rival-call{position:absolute;top:25%;left:9%;z-index:3;transform:rotate(-8deg);font:1000 italic clamp(19px,3vw,30px)/.95 'Barlow Condensed',Impact,sans-serif;color:#fff1a1;text-shadow:3px 3px #02121e}.motion-panel--rival>.motion-bubble{position:absolute;bottom:9px;left:8px;right:8px;font-size:11px;padding:8px}
+.motion-panel--decision{grid-column:1/-1}.motion-panel--decision .motion-panel__art{background-position:50% 80%}.motion-decision-player,.motion-decision-coach{position:absolute;z-index:1;bottom:-30px;height:270px;transition:filter .8s,transform 1s;filter:brightness(.3) saturate(.3)}.motion-decision-player{left:-3%;width:37%}.motion-decision-coach{right:-5%;width:34%;object-fit:contain;object-position:bottom}.motion-decision-player.is-speaking,.motion-decision-coach.is-speaking{filter:brightness(1.18) saturate(1.1) drop-shadow(0 0 14px #80ffe077);transform:scale(1.03)}
+.motion-decision-copy{position:relative;z-index:4;width:67%;margin:0 auto;padding:9px 0 11px;box-sizing:border-box;animation:motion-dialogue .7s ease both}.motion-decision-copy>.motion-caption{position:relative;display:table;left:auto;top:auto;margin:0 auto 7px;font-size:8px}.motion-decision-copy .motion-bubble{font-size:12px;padding:9px 12px}.motion-choices{display:grid;gap:5px;margin-top:10px}.motion-choices button,.motion-play{display:flex;justify-content:space-between;align-items:center;gap:6px;cursor:pointer;width:100%;min-height:31px;padding:6px 10px;background:#092a34ef;color:#e5fff1;border:1px solid #8bf5d5;font:800 11px/1.2 Barlow,sans-serif;box-shadow:2px 2px #02101a}.motion-choices button:hover{background:#23534f}.motion-play{background:#ffe073;color:#08232c;border-color:#fff0ac;margin-top:14px;min-height:38px;font-weight:1000}.motion-message{color:#f5ffef;font-size:11px;background:#09232d;padding:8px}
+.motion-dust{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden}.motion-dust i{position:absolute;bottom:-8px;width:2px;height:2px;background:#d8ffe4;box-shadow:0 0 7px #7cffd5;border-radius:50%;animation:motion-dust 8s linear infinite;opacity:0}.motion-ink-cut{position:absolute;inset:0;z-index:6;pointer-events:none;background:linear-gradient(115deg,transparent 30%,#93ffe644 48%,#ecfff588 50%,transparent 67%);animation:motion-ink .75s ease-out both}
+.motion-page.is-paused *{animation-play-state:paused!important}
+@keyframes motion-camera{from{transform:scale(1.03) translateX(-1%)}to{transform:scale(1.14) translateX(1%)}}
+@keyframes motion-dialogue{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes motion-ink{from{transform:translateX(-110%);opacity:1}to{transform:translateX(110%);opacity:0}}
+@keyframes motion-dust{0%{opacity:0;transform:translateY(0)}20%,70%{opacity:.7}100%{opacity:0;transform:translate(20px,-500px)}}
+@media(min-width:800px){.motion-page__panels{grid-template-columns:1fr 1fr 1.2fr;grid-template-rows:1fr 1fr;min-height:400px;max-height:680px}.motion-panel--arrival{grid-column:1/3}.motion-panel--coach{grid-column:1;grid-row:2}.motion-panel--rival{grid-column:2;grid-row:2}.motion-panel--decision{grid-column:3;grid-row:1/3}.motion-decision-copy{width:88%;padding-top:22px}.motion-decision-player,.motion-decision-coach{height:360px}.motion-decision-player{width:70%;left:-17%}.motion-decision-coach{width:70%;right:-18%}.motion-arrival-player{height:380px;bottom:-160px}.motion-choices{margin-top:20px;gap:10px}.motion-choices button{min-height:42px}.motion-decision-copy .motion-bubble{font-size:15px}.motion-coach{height:155%;bottom:-25%}}
+@media(max-width:420px){.motion-page__panels{min-height:470px;grid-template-rows:1fr 1.2fr 1.75fr}.motion-decision-copy{width:74%}.motion-panel--coach>.motion-bubble{font-size:10px;width:59%;padding:8px}.motion-coach{left:-29%;width:115%}.motion-panel--rival>.motion-bubble{font-size:10px}.motion-decision-copy .motion-bubble{font-size:11px}.motion-caption{font-size:8px}.motion-page__transport>span{max-width:55%}}
+@media(prefers-reduced-motion:reduce){.motion-page *{animation:none!important;transition:none!important}.motion-ink-cut{display:none}.motion-dust i{opacity:.3}}
+.motion-mystery-player{position:absolute;right:-8%;bottom:-40%;height:136%;width:88%;object-fit:cover;object-position:50% 8%;z-index:1;filter:brightness(.7) drop-shadow(0 0 10px #6effd333)}
+.motion-panel--rival.is-lit .motion-mystery-player{filter:brightness(.9) drop-shadow(0 0 13px #6effd366)}
+.motion-panel--rival .motion-rival-call{top:21%;left:5%;font-size:clamp(17px,2.5vw,28px);max-width:50%}
+.motion-panel--rival>.motion-bubble{left:6px;right:6px;bottom:7px;background:#effff3ed}
+.motion-coach.lupi-story-pose{object-fit:initial;left:0;height:100%;bottom:-7px;width:49%}
+.motion-decision-coach.lupi-story-pose{object-fit:initial}
+.motion-panel .motion-panel__art{inset:0;background-image:url('../assets/story-manga-scenes.png');background-size:200% 200%;background-repeat:no-repeat;transform:none}
+.motion-panel--arrival .motion-panel__art{background-position:0 0}
+.motion-panel--coach .motion-panel__art{background-position:100% 0}
+.motion-panel--rival .motion-panel__art{background-position:0 100%}
+.motion-panel--decision .motion-panel__art{background-position:100% 100%}
+.lp-story-nav .lp-story-replay{margin-left:auto;font-size:9px;padding:7px 9px;white-space:normal;line-height:1.25}
+.lp-story-nav .lp-story-replay:disabled{opacity:.4;cursor:default}
+@media(max-width:600px){.lp-story-nav{gap:6px;flex-wrap:wrap}.lp-story-nav>span{display:none}.lp-story-nav .lp-story-replay{max-width:48%;font-size:8px}.lp-story-nav>button:first-child{font-size:9px}}
+@media(min-width:800px){
+ .lp-story.lp-story--motion-page .motion-page__panels{min-height:520px}
+ .motion-panel--decision .motion-decision-copy{position:absolute;inset:16px 16px 14px;width:auto;margin:0;padding:0;display:flex;flex-direction:column;align-items:center;animation:none}
+ .motion-panel--decision .motion-decision-copy>.motion-caption{flex-shrink:0;margin:0 auto 9px}
+ .motion-panel--decision .motion-decision-copy>.motion-bubble{width:100%;box-sizing:border-box;flex-shrink:0;font-size:14px;line-height:1.4}
+ .motion-panel--decision .motion-choices{width:100%;margin-top:auto;padding-top:14px;gap:8px;flex-shrink:0}
+ .motion-panel--decision .motion-choices button{min-height:38px;box-sizing:border-box;background:#082731f5}
+ .motion-panel--decision .motion-play{margin-top:auto;flex-shrink:0}
+ .motion-panel--decision.is-choosing .motion-decision-player{height:clamp(190px,29vh,250px);width:57%;left:-4%;bottom:146px}
+ .motion-panel--decision.is-choosing .motion-decision-coach{height:clamp(185px,28vh,240px);width:54%;right:-3%;bottom:146px}
+}
+.lp-story--motion-page .motion-panel--coach>.motion-bubble{width:51%;right:9px;top:14px}
+.motion-panel--rival .motion-rival-call{left:6%;top:23%;max-width:46%;font-size:clamp(17px,2.1vw,26px)}
+@media(max-width:799px){
+ .motion-page__panels{grid-template-rows:minmax(110px,1fr) minmax(150px,1.2fr) minmax(280px,1.8fr);min-height:560px}
+ .motion-panel--decision .motion-decision-copy{position:absolute;inset:9px 10px 10px;width:auto;margin:0;padding:0;display:flex;flex-direction:column;align-items:center;animation:none}
+ .motion-decision-copy>.motion-caption{flex-shrink:0;margin:0 auto 7px}
+ .motion-decision-copy>.motion-bubble{width:65%;box-sizing:border-box;flex-shrink:0;padding:8px 10px;font-size:11px}
+ .motion-decision-copy .motion-choices{width:100%;margin-top:auto;padding-top:12px;gap:6px}
+ .motion-decision-copy .motion-choices button{min-height:34px;background:#082731f5;box-sizing:border-box}
+ .motion-decision-copy .motion-play{margin-top:auto;flex-shrink:0}
+ .motion-panel--decision .motion-decision-player{height:190px;width:37%;left:-5%;bottom:66px}
+ .motion-panel--decision .motion-decision-coach{height:177px;width:35%;right:-5%;bottom:76px}
+ .motion-panel--decision:not(.is-choosing) .motion-decision-player{bottom:8px;height:230px}
+ .motion-panel--decision:not(.is-choosing) .motion-decision-coach{bottom:8px;height:205px}
+ .motion-coach.lupi-story-pose{height:100%;width:48%;left:0;bottom:-5px}
+ .lp-story--motion-page .motion-panel--coach>.motion-bubble{width:53%;right:5px;top:10px;padding:7px;font-size:10px}
+ .motion-panel--rival>.motion-bubble{font-size:10px;padding:7px}
+ .motion-mystery-player{width:85%;right:-12%;height:132%;bottom:-37%}
+}
+.motion-page--loading{display:grid;place-items:center;min-height:min(72vh,680px);color:#b9f7ee;font-weight:800;letter-spacing:.12em;text-transform:uppercase}

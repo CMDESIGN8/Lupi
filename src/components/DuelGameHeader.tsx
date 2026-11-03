@@ -1,8 +1,8 @@
 import type {ReactNode} from 'react';
 import './DuelGameHeader.css';
 /** Shared navigation and title for Lupi's social minigames. */
-export function DuelGameHeader({game,onBack,title,subtitle,mode}:{game:'rps'|'trivia';onBack:()=>void;title:ReactNode;subtitle:string;mode:string}){
- const prefix=game==='rps'?'rps':'trivia';
+export function DuelGameHeader({game,onBack,title,subtitle,mode}:{game:'rps'|'trivia'|'truco';onBack:()=>void;title:ReactNode;subtitle:string;mode:string}){
+ const prefix=game==='trivia'?'trivia':'rps';
  return <>
   <header className={`${prefix}-header lupi-game-header`}>
    <button type="button" onClick={onBack} aria-label="Volver al club">← CLUB</button>

@@ -1,0 +1,49 @@
+.lp-story.lp-story--motion-page .motion-page--cinema .motion-page__panels{display:block;position:relative;flex:1;min-height:360px;max-height:none;padding:0;border:2px solid #8adeca66;background:#02131e;cursor:pointer;overflow:hidden;box-shadow:0 16px 50px #0008}
+.motion-page--cinema .motion-panel{display:none;position:absolute;inset:0;filter:none;box-shadow:none;border:0;animation:none}
+.motion-page--cinema .motion-panel.is-lit{display:block;animation:fullscreen-panel-in .22s ease-out both}
+.motion-page--cinema .motion-panel .motion-panel__art{animation:fullscreen-camera 6s ease-out both}
+.motion-page--cinema .motion-panel:after{background:linear-gradient(0deg,#02121ee6,transparent 40%,transparent 70%,#02121e66),radial-gradient(ellipse,transparent 35%,#0008)}
+.motion-page--cinema .motion-caption{left:24px;top:22px;max-width:80%;padding:9px 12px;font-size:12px;border:2px solid #092432}
+.motion-page--cinema .motion-arrival-player{height:85%;width:32%;left:15%;bottom:-7%;filter:brightness(.95) drop-shadow(4px 5px 0 #09232dbb)}
+.motion-page--cinema .motion-sfx{font-size:clamp(30px,6vw,65px);right:8%;top:47%}
+.motion-page--cinema .motion-location{font-size:13px;bottom:25px;left:25px}
+.motion-page--cinema .motion-coach.lupi-story-pose{height:95%;width:43%;left:2%;bottom:-8%}
+.lp-story--motion-page .motion-page--cinema .motion-panel--coach>.motion-bubble{width:min(48%,500px);right:7%;top:24%;padding:24px;font-size:clamp(18px,2.5vw,29px);line-height:1.4;border-width:3px;border-radius:28px}
+.motion-page--cinema .motion-bubble>b{font-size:10px;margin-bottom:10px}
+.motion-page--cinema .motion-mystery-player{height:115%;width:62%;right:-3%;bottom:-17%;object-fit:contain;object-position:bottom;filter:brightness(.9) drop-shadow(0 0 22px #70ffde33)}
+.motion-page--cinema .motion-panel--rival .motion-rival-call{font-size:clamp(35px,6vw,65px);top:29%;left:6%;max-width:45%}
+.lp-story--motion-page .motion-page--cinema .motion-panel--rival>.motion-bubble{left:5%;right:auto;bottom:9%;width:43%;padding:18px;font-size:clamp(16px,2vw,23px);box-sizing:border-box}
+.motion-page--cinema .motion-panel--decision .motion-decision-copy{position:absolute;inset:18px 24px 20px;width:auto;display:flex;flex-direction:column;align-items:center;margin:0;padding:0}
+.motion-page--cinema .motion-decision-copy>.motion-caption{position:relative;left:auto;top:auto;margin:0 0 12px;flex-shrink:0;font-size:10px}
+.motion-page--cinema .motion-panel--decision .motion-decision-copy>.motion-bubble{width:min(75%,640px);padding:16px 20px;font-size:clamp(15px,2vw,22px);box-sizing:border-box;flex-shrink:0}
+.motion-page--cinema .motion-panel--decision .motion-choices{width:min(100%,600px);margin-top:auto;gap:8px;padding-top:12px;flex-shrink:0}
+.motion-page--cinema .motion-choices button{min-height:42px;font-size:14px;padding:9px 14px;background:#052733f5;box-sizing:border-box}
+.motion-page--cinema .motion-panel--decision .motion-play{width:min(100%,600px);margin-top:auto;min-height:44px;flex-shrink:0}
+.motion-page--cinema .motion-panel--decision .motion-decision-player{height:62%;max-height:350px;width:36%;left:4%;bottom:117px}
+.motion-page--cinema .motion-panel--decision .motion-decision-coach{height:57%;max-height:330px;width:35%;right:3%;bottom:125px}
+.motion-page--cinema .motion-panel--decision:not(.is-choosing) .motion-decision-player{bottom:10px;height:75%}
+.motion-page--cinema .motion-panel--decision:not(.is-choosing) .motion-decision-coach{bottom:10px;height:70%}
+.motion-page--cinema .motion-ink-cut{animation:fullscreen-ink .18s ease-out both}
+.motion-page--cinema .motion-page__transport{min-height:30px}.motion-page--cinema .motion-page__panels:focus-visible{outline:3px solid #ffe17c;outline-offset:2px}
+@media(max-width:600px){
+ .lp-story.lp-story--motion-page .motion-page--cinema .motion-page__panels{min-height:420px}
+ .motion-page--cinema .motion-caption{top:15px;left:13px;padding:7px;font-size:10px}
+ .motion-page--cinema .motion-arrival-player{height:66%;width:62%;left:2%;bottom:3%}
+ .motion-page--cinema .motion-sfx{font-size:32px;top:38%;right:5%}.motion-page--cinema .motion-location{left:13px;bottom:20px;font-size:11px;max-width:85%}
+ .motion-page--cinema .motion-coach.lupi-story-pose{height:66%;width:75%;left:-9%;bottom:-5%}
+ .lp-story--motion-page .motion-page--cinema .motion-panel--coach>.motion-bubble{width:74%;right:5%;top:9%;padding:15px;font-size:20px}
+ .motion-page--cinema .motion-mystery-player{height:81%;width:93%;right:-12%;bottom:1%}
+ .motion-page--cinema .motion-panel--rival .motion-rival-call{font-size:36px;top:19%;left:6%;max-width:70%}
+ .lp-story--motion-page .motion-page--cinema .motion-panel--rival>.motion-bubble{left:5%;bottom:6%;width:85%;font-size:17px;padding:13px}
+ .motion-page--cinema .motion-panel--decision .motion-decision-copy{inset:12px 12px 14px}
+ .motion-page--cinema .motion-panel--decision .motion-decision-copy>.motion-bubble{width:95%;padding:12px;font-size:16px}
+ .motion-page--cinema .motion-panel--decision .motion-choices button{font-size:12px;min-height:38px}
+ .motion-page--cinema .motion-panel--decision .motion-decision-player{height:48%;width:49%;left:-6%;bottom:121px}
+ .motion-page--cinema .motion-panel--decision .motion-decision-coach{height:44%;width:48%;right:-4%;bottom:125px}
+ .motion-page--cinema .motion-panel--decision:not(.is-choosing) .motion-decision-player{bottom:8px;height:64%}
+ .motion-page--cinema .motion-panel--decision:not(.is-choosing) .motion-decision-coach{bottom:8px;height:60%}
+}
+@keyframes fullscreen-panel-in{from{opacity:0;transform:scale(1.035)}to{opacity:1;transform:none}}
+@keyframes fullscreen-camera{from{transform:scale(1)}to{transform:scale(1.045)}}
+@keyframes fullscreen-ink{from{opacity:.55;transform:translateX(-30%)}to{opacity:0;transform:translateX(30%)}}
+@media(prefers-reduced-motion:reduce){.motion-page--cinema .motion-panel,.motion-page--cinema .motion-panel .motion-panel__art{animation:none}.motion-page--cinema .motion-ink-cut{display:none}}

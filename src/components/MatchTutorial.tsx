@@ -3,8 +3,10 @@ import type { UserCard } from '../types/cards';
 import { getCardData } from '../utils/battleEngine';
 import {OwnedCardPortrait} from './OwnedCardPortrait';
 import { CardFace } from './SigningWelcome';
+import {LupiStoryPose} from './LupiStoryPose';
 import './MatchTutorial.css';
 import './MatchPractice.css';
+import './MatchTutorialManga.css';
 
 type Props = { userId?:string; cards: UserCard[]; opponent: string; onTeam?: () => void; onStart: () => void | Promise<unknown> };
 export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Props) {
@@ -33,9 +35,14 @@ export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Prop
     <header><span>ANTES DE JUGAR</span><span>{step + 1} / 3</span></header>
     <div className="mt-dots" aria-hidden="true">{titles.map((title, i) => <i key={title} className={i === step ? 'active' : ''} />)}</div>
     <div className="mt-content" key={step} aria-live="polite">
-      <h1>{titles[step]}</h1>
+      <div className={`mt-manga-scene mt-manga-scene--${step}`}>
+        <div className="mt-manga-traces" aria-hidden="true"/>
+        <LupiStoryPose pose={step===2?'celebrate':practice?(step===0&&practice==='shoot'?'surprised':'celebrate'):step===1?'determined':'explain'} className="mt-manga-lupi"/>
+        <div className="mt-manga-speech"><small>LUPI · TU ENTRENADOR</small><h1>{titles[step]}</h1><p>{step===0?'Recibís cerca del arco. El arquero sale a achicar.':step===1?'El rival viene por el medio. Tu compañero cubre el pase.':'Cinco cartas. Un equipo. Ahora empieza tu partido.'}</p></div>
+        <span className="mt-manga-sfx" aria-hidden="true">{step===0?'¡TUM!':step===1?'¡AHORA!':'¡VAMOS!'}</span>
+      </div>
       {step < 2 ? <>
-        <p className="mt-practice-prompt">{step===0?'Recibís cerca del arco. El arquero sale a achicar.':'El rival viene por el medio. Tu compañero cubre el pase.'}</p>
+        <div className="lp-story-objective mt-desktop-objective"><strong>OBJETIVO</strong><span>Completá la prueba. No necesitás ganar para avanzar.</span></div>
         <div className={`mt-practice-court ${practice?'has-choice':''}`} data-choice={practice} key={step} aria-label="Cancha de práctica">
           <div className="mt-practice-goal"/><span className="mt-practice-keeper">🧤</span><span className="mt-practice-player">{step===0?'⚡':'🛡'}</span><span className="mt-practice-ball">⚽</span><span className="mt-practice-partner">↗</span>
           <small>PRÁCTICA · SIN PREMIOS NI PENALIZACIÓN</small>

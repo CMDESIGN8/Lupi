@@ -72,7 +72,7 @@ export const CHALLENGE_OPTIONS: {
   { game: "rps", icon: "✊", title: "Piedra, papel o tijera", description: "Duelo por rondas", available: true },
   { game: "futsal", icon: "⚽", title: "Futsal", description: "Duelo relámpago · 3 ataques · Decisiones secretas", available: true },
   { game: "trivia", icon: "🧠", title: "Preguntados", description: "Trivia de fútbol · 5 preguntas PvP", available: true },
-  { game: "truco", icon: "🃏", title: "Truco", description: "Próximamente", available: false },
+  { game: "truco", icon: "🃏", title: "Truco", description: "PvP próximamente · practicá vs bot", available: false },
 ];
 
 /** Imagen oficial del par de botines AURA XP: se usa siempre en lugar de la del ítem. */

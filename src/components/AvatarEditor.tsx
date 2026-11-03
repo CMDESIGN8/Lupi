@@ -6,7 +6,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { useAuraInventory, type ItemRarity, type ItemSlot } from "../hooks/useAuraInventory";
-import { HAIRS, HAIR_COLORS, SKINS, EYES, BROWS, NOSES, MOUTHS, type AvatarAppearance } from "../lib/avatarAppearance";
+import { HAIRS, HAIR_COLORS, SKINS, EYES, EYE_COLORS, BROWS, NOSES, MOUTHS, type AvatarAppearance } from "../lib/avatarAppearance";
 import { AvatarFace } from "./AvatarFace";
 import { CharacterStage } from "./CharacterStage";
 import { CheckIcon, GridIcon, LockIcon, SlotIcon } from "./EditorIcons";
@@ -65,6 +65,9 @@ const EXPRESSIONS: [string, string][] = [
   ["neutral", "Normal"],
   ["smile", "Sonrisa"],
   ["focused", "Competitivo"],
+  ["surprised", "Sorprendido"],
+  ["determined", "Decidido"],
+  ["happy", "Feliz"],
 ];
 
 type WardrobeTab = "wardrobe" | "inventory" | "shop";
@@ -91,8 +94,26 @@ function FaceOption({
   );
 }
 
-export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points, coins, sceneImage, initialSlot }: Props) {
-  const { appearance, save, saving, error } = useAvatarAppearance(userId);
+export function AvatarEditor(props: Props) {
+  const { appearance, save, saving, error, loading: appearanceLoading } = useAvatarAppearance(props.userId);
+  // No montamos el diálogo hasta conocer la apariencia guardada: evita mostrar
+  // el avatar estándar durante la consulta inicial a Supabase.
+  if (appearanceLoading) return null;
+  return <AvatarEditorReady {...props} initialAppearance={appearance} saveAppearance={save} appearanceSaving={saving} appearanceError={error} />;
+}
+
+type AvatarEditorReadyProps = Props & {
+  initialAppearance: AvatarAppearance;
+  saveAppearance: (next: AvatarAppearance) => Promise<boolean>;
+  appearanceSaving: boolean;
+  appearanceError: string | null;
+};
+
+function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, coins, sceneImage, initialSlot, initialAppearance, saveAppearance, appearanceSaving, appearanceError }: AvatarEditorReadyProps) {
+  const appearance = initialAppearance;
+  const save = saveAppearance;
+  const saving = appearanceSaving;
+  const error = appearanceError;
   const { items, loading, toggleEquip, usingFallback, refresh, equipError, equipping } = useAuraInventory(userId, level);
   const [shopPrices,setShopPrices] = useState<Record<string,number>>({});
   const [shopBusy,setShopBusy] = useState(false);
@@ -341,6 +362,14 @@ export function AvatarEditor({ userId, onClose, level = 1, xp, xpNeeded, points,
                       active={draft[key] === value} onPick={() => change(key,value)} />
                   ))}
                 </div>
+                {key === "eyes" && <>
+                  <h3 className="lw-id__label lw-id__label--sub">COLOR DE OJOS</h3>
+                  <div className="lw-id__swatches" role="group" aria-label="Color de ojos">
+                    {EYE_COLORS.map(color => <button key={color} type="button" className="lw-id__swatch"
+                      aria-label={`Ojos ${color}`} aria-pressed={draft.eyeColor === color}
+                      style={{ "--swatch": color } as CSSProperties} onClick={() => change("eyeColor", color)} />)}
+                  </div>
+                </>}
               </div>
             ))}
 

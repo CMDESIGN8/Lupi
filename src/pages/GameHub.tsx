@@ -28,6 +28,7 @@ import { TriviaDuel } from "../components/TriviaDuel";
 import { RockPaperScissors } from "../components/RpsAnimeDuel";
 import { ExploreWorld } from "../components/ExploreWorld";
 import { QuickDuelPanel } from "../components/QuickDuelPanel";
+import { TrucoDuel } from "../components/TrucoDuel";
 import { useQuickDuel } from "../hooks/useQuickDuel";
 import { useDuelStreak } from "../hooks/useDuelStreak";
 import { BOT_NAMES } from "../hooks/useRpsBotMatch";
@@ -405,7 +406,7 @@ import { useAchievements } from "../hooks/useAchievements";
     }: Props) {
       const story=useFutsalStory(user.id);
       const [storyOpen,setStoryOpen]=useState(false);
-      const enterStory=()=>{if(story.busy||story.loading||quick.game||incoming||outgoing||activeRps||activeTrivia||activeFutsal||versusChallenge)return;void story.run('begin').then(()=>{setStoryOpen(true);setShowExploreWorld(false);setShowPlayersSheet(false);}).catch(()=>{});};
+      const enterStory=()=>{if(story.busy||story.loading||quick.game||incoming||outgoing||activeTruco||activeRps||activeTrivia||activeFutsal||versusChallenge)return;void story.run('begin').then(()=>{setStoryOpen(true);setShowExploreWorld(false);setShowPlayersSheet(false);}).catch(()=>{});};
       const [view, setView] = useState<"lobby" | "match">(()=>new URLSearchParams(window.location.search).get("start")==="match"?"match":"lobby");
       const [showCommunities, setShowCommunities] = useState(false);
       const [lobbyCommunity, setLobbyCommunity] = useState<string | null>(null);
@@ -439,6 +440,7 @@ import { useAchievements } from "../hooks/useAchievements";
   const [asyncMatch, setAsyncMatch] = useState<{ id: string; rivalName: string; rivalId?: string } | null>(null);
   const [asyncNotice, setAsyncNotice] = useState("");
   const [activeRps, setActiveRps] = useState<Challenge | null>(null);
+  const [activeTruco,setActiveTruco]=useState<Challenge|null>(null);
   const [versusChallenge, setVersusChallenge] = useState<Challenge | null>(null);
   const [duelFinished, setDuelFinished] = useState(false);
   const [rematchTarget, setRematchTarget] = useState<Challenge | null>(null);
@@ -669,7 +671,7 @@ const {
       const duelStreak = useDuelStreak(user.id);
       const { players: lobbyPlayers, status: lobbyStatus } = useLobbyPresence({
       room: "global",
-      activity: view === "match" || asyncMatch || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
+      activity: view === "match" || asyncMatch || activeTruco || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
       me: {
         userId: user.id,
         username: user.username,
@@ -703,7 +705,7 @@ const {
       room: "global",
       meId: user.id,
       meName: user.username || "Jugador",
-      available: view === "lobby" && !asyncMatch && !versusChallenge && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
+      available: view === "lobby" && !storyOpen && !activeTruco && !asyncMatch && !versusChallenge && (duelFinished || (!activeTruco && !activeRps && !activeTrivia && !activeFutsal)),
       isMuted,
       quickGameRef,
       onAccepted: (challengeData) => {
@@ -725,7 +727,7 @@ const {
 
     const quick = useQuickDuel({
       room: "global", meId: user.id, meName: user.username || "Jugador",
-      available: view === "lobby" && !incoming && (!outgoing || !!outgoing.quick) && !versusChallenge && !asyncMatch && (duelFinished || (!activeRps && !activeTrivia && !activeFutsal)),
+      available: view === "lobby" && !storyOpen && !activeTruco && !incoming && (!outgoing || !!outgoing.quick) && !versusChallenge && !asyncMatch && (duelFinished || (!activeTruco && !activeRps && !activeTrivia && !activeFutsal)),
       quickGameRef,
       send: (target, game) => challenge(target, 1, game, undefined, true),
       cancelOutgoing: cancel,
@@ -737,6 +739,14 @@ const {
         setActiveTrivia({id,gameType:'trivia',fromId:user.id,fromName:user.username||'Jugador',toId:'bot-trivia',toName:'Profe Lupi',botIndex:0,vsBot:true,at:Date.now()});
       },
     });
+
+    const startBotTruco=(botIndex=1)=>{
+      if(quick.game||incoming||outgoing||storyOpen||activeRps||activeTrivia||activeFutsal||versusChallenge||asyncMatch)return;
+      const i=Number.isFinite(botIndex)?Math.min(2,Math.max(0,Math.trunc(botIndex))):1;
+      setActiveTruco({id:`truco-bot-${crypto.randomUUID()}`,gameType:'truco',fromId:user.id,fromName:user.username||'Jugador',toId:`bot-${i}`,toName:BOT_NAMES[i],botIndex:i,vsBot:true,at:Date.now()});
+      setDuelFinished(false);setRematchTarget(null);setChallengeTarget(null);setShowExploreWorld(false);setShowPlayersSheet(false);setGameTab('play');setView('lobby');
+      trackLupiActivity('truco');
+    };
 
     /** Preguntados por turnos: crear, abrir y rechazar desafíos. */
     const asyncInbox = useTriviaAsyncInbox(view === "lobby");
@@ -759,12 +769,12 @@ const {
     };
 
     useEffect(() => {
-      if (!rematchTarget || activeRps || activeFutsal || versusChallenge) return;
+      if (!rematchTarget || activeTruco || activeRps || activeFutsal || versusChallenge) return;
       const c = rematchTarget;
       const target = c.fromId === user.id ? { userId: c.toId, username: c.toName } : { userId: c.fromId, username: c.fromName };
       challenge(target, c.botIndex, c.gameType, c.communityId);
       setRematchTarget(null);
-    }, [rematchTarget, activeRps, activeFutsal, versusChallenge, challenge, user.id]);
+    }, [rematchTarget, activeTruco, activeRps, activeFutsal, versusChallenge, challenge, user.id]);
 
     const handleLobbyChallenge = (
   target: { userId: string; username: string },
@@ -789,7 +799,7 @@ const {
       const [showPlayersSheet, setShowPlayersSheet] = useState(false);
       const [showSocialChat, setShowSocialChat] = useState(false);
       const [showExploreWorld, setShowExploreWorld] = useState(false);
-      useEffect(()=>{if(asyncMatch||incoming||outgoing||versusChallenge||activeRps||activeTrivia||activeFutsal)setShowExploreWorld(false);},[asyncMatch,incoming,outgoing,versusChallenge,activeRps,activeTrivia,activeFutsal]);
+      useEffect(()=>{if(asyncMatch||incoming||outgoing||versusChallenge||activeTruco||activeRps||activeTrivia||activeFutsal)setShowExploreWorld(false);},[asyncMatch,incoming,outgoing,versusChallenge,activeTruco,activeRps,activeTrivia,activeFutsal]);
     
       const worldPlayers = lobbyPlayers.map((player) => {
       const skin = getPlayerSkin(player, auraItems);
@@ -938,6 +948,7 @@ const {
 
       const runLupiRecommendation = (action: LupiAction) => {
         switch (action) {
+          case 'truco': startBotTruco();dismissLupiRecommendation('truco');break;
           case "claim":
             if (lobbyMission?.isCompleted && !lobbyMission.isClaimed) {
               void handleLobbyMissionClaim(lobbyMission.id);
@@ -1033,7 +1044,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
       return (
         <>
-        {storyOpen&&<FutsalStoryChapter key={user.id} story={story} userId={user.id} deck={activeDeck} cards={userCards} onClose={()=>setStoryOpen(false)} onTeam={()=>{setStoryOpen(false);setGameTab("deck");}} onBattleComplete={onBattleComplete} onMatchRecorded={()=>{recordLupiMatchCompleted();adventureComplete("first_match");void updateMissionProgress("play_match");onMatchRecorded?.();}}/>}
+        {storyOpen&&<FutsalStoryChapter key={user.id} story={story} userId={user.id} playerName={user.username} deck={activeDeck} cards={userCards} onClose={()=>setStoryOpen(false)} onTeam={()=>{setStoryOpen(false);setGameTab("deck");}} onBattleComplete={onBattleComplete} onMatchRecorded={()=>{recordLupiMatchCompleted();adventureComplete("first_match");void updateMissionProgress("play_match");onMatchRecorded?.();}}/>}
         {missionBriefing && <MissionBriefing mission={missionBriefing} onStart={()=>{setMissionBriefing(null);openMatch("quick");}} onTeam={()=>{setMissionBriefing(null);setGameTab("deck");}} onClose={()=>setMissionBriefing(null)}/>}
         {showAvatarEditor && <AvatarEditor userId={user.id} onClose={() => setShowAvatarEditor(false)} />}
         <div className={`main-content gh-root ${gameTab === "deck" ? "gh-root--team" : ""} ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""} ${gameTab === "deck" && view === "match" ? "gh-root--team-preview" : ""}`}>
@@ -1117,8 +1128,8 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
             {gameTab === "deck" && view === "match" && <button type="button" className="gh-return-preview" onClick={() => setGameTab("play")}>← Volver a la previa del partido</button>}
             <div className="gh-scene" key={sceneKey}>
-              {view === "lobby" && gameTab === "play" && !showPlayersSheet && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice}/>}
-              {view === "lobby" && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && (
+              {view === "lobby" && gameTab === "play" && !showPlayersSheet && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>}
+              {view === "lobby" && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && (
                 <QuickDuelPanel variant="pill" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
                   onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
               )}
@@ -1346,7 +1357,7 @@ onChallengeGame={(player, game) => {
                     onlineMemberIds={lobbyPlayers.filter(p => p.userId !== user.id && p.activity === "lobby").map(p => p.userId)}
                     challengePendingToId={outgoing?.toId ?? null}
                     onChallengeMember={(member, game, communityId) => {
-                      if (view !== "lobby" || activeRps || activeTrivia || activeFutsal || versusChallenge || (game !== "rps" && game !== "trivia" && game !== "futsal")) return false;
+                      if (view !== "lobby" || activeTruco || activeRps || activeTrivia || activeFutsal || versusChallenge || (game !== "rps" && game !== "trivia" && game !== "futsal")) return false;
                       const sent = challenge(member, 1, game, communityId);
                       if (sent) updateMissionProgress("challenge");
                       return sent;
@@ -1401,7 +1412,7 @@ onChallengeGame={(player, game) => {
                   )}
                   <aside className="gh-world__left-rail" aria-label="Lupi y comunidad">
                   <section ref={rewardCardRef} className={`gh-world__next ${quick.game?"gh-world__next--searching":""} ${highlightNext ? "gh-world__next--highlight" : ""}`} aria-label="Recomendación personalizada de Lupi">
-                    <QuickDuelPanel variant="status" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice}/>
+                    <QuickDuelPanel variant="status" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>
                     {pendingFirstReward ? (
                       <>
                         <span className="gh-world__next-kicker">✦ LUPI WORLD · PREMIO DESBLOQUEADO</span>
@@ -1548,7 +1559,7 @@ onChallengeGame={(player, game) => {
 
                   <div className="gh-world__discover" aria-label="Exploración y comunidad">
                     <button type="button" className="gh-explore-trigger" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
-                    <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice}/>
+                    <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>
                     {asyncInbox.badge > 0 && <button type="button" className="gh-explore-trigger" onClick={() => setShowPlayersSheet(true)}>🧠 {asyncInbox.badge} POR JUGAR</button>}
                   </div>
                   {showExploreWorld && <ExploreWorld deck={activeDeck} unlocked={unlockedAchievements.length} onClose={()=>setShowExploreWorld(false)} onMatch={()=>handleGameNavigate("battle")} onDeck={()=>handleGameNavigate("deck")} onAlbum={()=>handleGameNavigate("album")} onAchievements={()=>setShowAchievements(true)}/>}
@@ -1672,6 +1683,7 @@ onChallengeGame={(player, game) => {
             onChanged={() => void asyncInbox.refresh()} onExit={() => { setAsyncMatch(null); void asyncInbox.refresh(); }}
             onRematch={(rival) => { setAsyncMatch(null); void startAsyncTrivia(rival); }} /></div>}
           {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} catalog={auraItems} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
+          {activeTruco&&<div className="rps-screen-overlay tr-screen"><TrucoDuel key={activeTruco.id} challenge={activeTruco} meId={user.id} onRematch={()=>startBotTruco(activeTruco.botIndex)} onExit={()=>{setActiveTruco(null);setDuelFinished(false);}}/></div>}
           {activeRps && (
             <div className="rps-screen-overlay rps-cinema-screen">
               <RockPaperScissors key={activeRps.id} catalog={auraItems}

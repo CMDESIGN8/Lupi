@@ -288,6 +288,7 @@
   font: 400 19px / 1 var(--id-font-display);
   letter-spacing: 0.1em;
 }
+.lw-id__label--sub { margin-top: 13px; font-size: 16px; }
 
 .lw-id__scroll > .lw-id__label:first-child {
   margin-top: 4px;
@@ -317,6 +318,15 @@
 
 .lw-id__swatches button[aria-pressed="true"] {
   box-shadow: 0 0 0 3px #071b29, 0 0 0 5px var(--id-gold);
+}
+
+.lw-id__swatches .lw-id__swatch {
+  background: var(--swatch);
+  border: 2px solid #c4eaf3;
+  box-shadow: inset 0 0 0 3px #071b2966, 0 2px 8px #0008;
+}
+.lw-id__swatches .lw-id__swatch[aria-pressed="true"] {
+  box-shadow: 0 0 0 3px #071b29, 0 0 0 5px var(--id-accent), inset 0 0 0 3px #071b2966;
 }
 
 .lw-id__opts {
