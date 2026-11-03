@@ -42,6 +42,8 @@ interface CardBattleProps {
   onBattleComplete: (updatedCards: UserCard[]) => void;
   onMatchRecorded?: () => void;
   onResultClosed?: () => void;
+  onVerifiedMatchStarted?: (sessionId:string) => Promise<void>;
+  onVerifiedMatchCompleted?: (sessionId:string) => Promise<void>;
   onNavigateToDeck?: () => void;
   forcedOpponent?: BotPlayer | null;
   isCampaignMode?: boolean;
@@ -132,6 +134,8 @@ export function CardBattle({
   onBattleComplete,
   onMatchRecorded,
   onResultClosed,
+  onVerifiedMatchStarted,
+  onVerifiedMatchCompleted,
   onNavigateToDeck,
   forcedOpponent = null,
   isCampaignMode = false,
@@ -483,6 +487,7 @@ export function CardBattle({
         }
         if (!verifiedSession) throw startError instanceof Error?startError:new Error('No se pudo iniciar el partido. Reintentá desde la previa.');
         }
+        if (verifiedSession) await onVerifiedMatchStarted?.(verifiedSession.id);
       } catch (error) {
         setNetworkStatus('');
         alert(error instanceof Error ? error.message : 'No se pudo iniciar el partido verificado');
@@ -646,6 +651,7 @@ export function CardBattle({
       try {
         const final = await verifiedMatchApi.finish(verifiedSession.id);
         setSkillMatchId(`bot:${verifiedSession.id}`);
+        try { await onVerifiedMatchCompleted?.(verifiedSession.id); } catch (storyError) { console.error('No se pudo sincronizar el capítulo:',storyError); }
         if(final.reward?.credited && Number.isSafeInteger(final.reward.xp) && final.reward.xp >= 0) confirmedXp=final.reward.xp;
         window.localStorage.removeItem(recoveryKey);
         // The server has finalized the match and consumed equipped wear once.
@@ -1173,7 +1179,7 @@ export function CardBattle({
 
         {/* ════════════════════════ MODAL RESULTADO ════════════════════════ */}
         {phase === 'result' && matchResult && createPortal(
-          <div className="result-modal-overlay" onClick={handleCloseResult}>
+          <div className="result-modal-overlay" style={onVerifiedMatchStarted?{zIndex:2147482850}:undefined} onClick={handleCloseResult}>
             <div
               className={`result-modal bot-match-result ${matchResult.winner === 'user' ? 'win' : matchResult.winner === 'draw' ? 'draw' : 'lose'}`}
               onClick={e => e.stopPropagation()}

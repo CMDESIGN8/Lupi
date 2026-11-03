@@ -1,3 +1,5 @@
+import {useFutsalStory} from '../hooks/useFutsalStory';
+import {FutsalStoryChapter} from '../components/FutsalStoryChapter';
 import { MissionBriefing } from "../components/MissionBriefing";
 import type { DailyMission } from "../types/campaignStory";
 import { supabase } from "../lib/supabaseClient";
@@ -401,6 +403,9 @@ import { useAchievements } from "../hooks/useAchievements";
       debutRequested = false,
       onMatchRecorded,
     }: Props) {
+      const story=useFutsalStory(user.id);
+      const [storyOpen,setStoryOpen]=useState(false);
+      const enterStory=()=>{if(story.busy||story.loading||quick.game||incoming||outgoing||activeRps||activeTrivia||activeFutsal||versusChallenge)return;void story.run('begin').then(()=>{setStoryOpen(true);setShowExploreWorld(false);setShowPlayersSheet(false);}).catch(()=>{});};
       const [view, setView] = useState<"lobby" | "match">(()=>new URLSearchParams(window.location.search).get("start")==="match"?"match":"lobby");
       const [showCommunities, setShowCommunities] = useState(false);
       const [lobbyCommunity, setLobbyCommunity] = useState<string | null>(null);
@@ -911,6 +916,10 @@ const {
           case "battle":
           case "play":
             if(quick.game) break;
+            if (story.progress?.status !== 'completed') {
+              enterStory();
+              break;
+            }
             setGameTab("play");setShowExploreWorld(false);setShowPlayersSheet(false);
             quick.start("futsal");
             break;
@@ -1024,6 +1033,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
       return (
         <>
+        {storyOpen&&<FutsalStoryChapter key={user.id} story={story} userId={user.id} deck={activeDeck} cards={userCards} onClose={()=>setStoryOpen(false)} onTeam={()=>{setStoryOpen(false);setGameTab("deck");}} onBattleComplete={onBattleComplete} onMatchRecorded={()=>{recordLupiMatchCompleted();adventureComplete("first_match");void updateMissionProgress("play_match");onMatchRecorded?.();}}/>}
         {missionBriefing && <MissionBriefing mission={missionBriefing} onStart={()=>{setMissionBriefing(null);openMatch("quick");}} onTeam={()=>{setMissionBriefing(null);setGameTab("deck");}} onClose={()=>setMissionBriefing(null)}/>}
         {showAvatarEditor && <AvatarEditor userId={user.id} onClose={() => setShowAvatarEditor(false)} />}
         <div className={`main-content gh-root ${gameTab === "deck" ? "gh-root--team" : ""} ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""} ${gameTab === "deck" && view === "match" ? "gh-root--team-preview" : ""}`}>
@@ -1484,11 +1494,11 @@ onChallengeGame={(player, game) => {
                   </section>
 
                   </aside>
-                  <button className="gh-world__play" type="button" onClick={() => handleGameNavigate("battle")}>
+                  <button className={`gh-world__play ${story.progress?.status !== 'completed' ? 'gh-world__play--story' : ''}`} type="button" disabled={story.loading || story.busy} onClick={() => handleGameNavigate("battle")}>
                     <span className="gh-world__play-icon" aria-hidden>⚡</span>
                     <span>
-                      <small>LISTO PARA JUGAR</small>
-                      <strong>JUGAR PARTIDO</strong>
+                      <small>{story.loading ? 'PREPARANDO TU DEBUT' : story.progress?.status !== 'completed' ? 'MODO HISTORIA · CAPÍTULO 01' : 'LISTO PARA JUGAR'}</small>
+                      <strong>{story.loading ? 'CARGANDO…' : story.progress?.status === 'match' ? 'CONTINUAR PARTIDO' : story.progress?.status === 'completed' ? 'JUGAR PARTIDO' : story.progress ? 'CONTINUAR HISTORIA' : 'EMPEZAR HISTORIA'}</strong>
                     </span>
                     <span className="gh-world__play-arrow" aria-hidden>→</span>
                   </button>
