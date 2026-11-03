@@ -20,14 +20,21 @@ const SUIT: Record<Card["suit"], { icon: string; name: string }> = {
   oro: { icon: "🪙", name: "oro" }, copa: { icon: "🏆", name: "copa" },
 };
 
+const TRUCO_CARD_ART = import.meta.glob("../assets/truco-cards/cards/*.webp", {
+  eager: true,
+  import: "default",
+  query: "?url",
+}) as Record<string, string>;
+
 function TrucoCard({ card, back, onClick, disabled, played }: { card?: Card | null; back?: boolean; onClick?: () => void; disabled?: boolean; played?: boolean }) {
   if (!card || back) return <span className={`tr-card tr-card--back${card === null ? " is-empty" : ""}`} aria-hidden="true" />;
   const s = SUIT[card.suit];
-  const body = <><b>{card.num}</b><i aria-hidden="true">{s.icon}</i><small>{s.name}</small></>;
+  const art = TRUCO_CARD_ART[`../assets/truco-cards/cards/${String(card.num).padStart(2, "0")}-${card.suit}.webp`];
+  const body = <>{art && <img className="tr-card__art" src={art} alt="" draggable={false} />}<b>{card.num}</b><i aria-hidden="true">{s.icon}</i><small>{s.name}</small></>;
   const label = `${card.num} de ${s.name}`;
   return onClick
-    ? <button type="button" className={`tr-card tr-card--${card.suit}`} onClick={onClick} disabled={disabled} aria-label={`Jugar ${label}`}>{body}</button>
-    : <span className={`tr-card tr-card--${card.suit}${played ? " is-played" : ""}`} role="img" aria-label={label}>{body}</span>;
+    ? <button type="button" className={`tr-card tr-card--${card.suit}${art ? " tr-card--illustrated" : ""}`} onClick={onClick} disabled={disabled} aria-label={`Jugar ${label}`}>{body}</button>
+    : <span className={`tr-card tr-card--${card.suit}${art ? " tr-card--illustrated" : ""}${played ? " is-played" : ""}`} role="img" aria-label={label}>{body}</span>;
 }
 
 function TrucoGuide({ onClose }: { onClose: () => void }) {
