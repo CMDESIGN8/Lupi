@@ -8,11 +8,19 @@ export function useAvatarAppearance(userId: string) {
  const [error, setError] = useState<string | null>(null);
  useEffect(() => { let alive = true; setLoading(true); setAppearance(DEFAULT_APPEARANCE); setError(null);
   if (!userId) { setLoading(false); return () => { alive = false; }; }
-  supabase.from("avatar_appearances").select("appearance").eq("user_id", userId).maybeSingle().then(({data,error}) => {
-   if (!alive) return;
-   if (error) setError("Aplicá primero la migración SQL del avatar.");
-   else if (data?.appearance) setAppearance(sanitizeAppearance(data.appearance));
-  }).finally(() => { if (alive) setLoading(false); }); return () => { alive = false; };
+  void (async () => {
+   try {
+    const { data, error } = await supabase.from("avatar_appearances").select("appearance").eq("user_id", userId).maybeSingle();
+    if (!alive) return;
+    if (error) setError("Aplicá primero la migración SQL del avatar.");
+    else if (data?.appearance) setAppearance(sanitizeAppearance(data.appearance));
+   } catch {
+    if (alive) setError("No se pudo cargar la apariencia del avatar.");
+   } finally {
+    if (alive) setLoading(false);
+   }
+  })();
+  return () => { alive = false; };
  }, [userId]);
  useEffect(() => {
   const onUpdated = (event: Event) => {
