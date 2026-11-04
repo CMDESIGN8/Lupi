@@ -182,22 +182,23 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
       </div>}
       {finished && <DuelResultEffects key={challenge.id} outcome={outcome} />}
       <DuelGameHeader game="truco" onBack={onExit} title={<>TRUCO <em>ARGENTINO</em></>} subtitle="CARTAS, CANTOS Y ESTRATEGIA" mode="VS BOT · PRÁCTICA"/>
-      <div className="tr-help"><span>A 15 · Sin flor · Sin premios</span><button type="button" aria-expanded={showRules} onClick={()=>setShowRules(value=>!value)}>¿Cómo se juega?</button></div>
+      <div className="tr-help"><button type="button" aria-label="Ayuda: cómo jugar al truco" title="Cómo jugar" aria-expanded={showRules} onClick={()=>setShowRules(value=>!value)}>?</button></div>
       {showRules&&<TrucoGuide onClose={()=>setShowRules(false)}/>} 
 
+      <div className="tr-table">
       <div className="tr-score" aria-live="polite">
         <div className="tr-score-player"><div className="tr-score-main"><div className="tr-score-identity"><div className="tr-avatar"><OwnedCardPortrait userId={meId}/></div><strong className="tr-score-name">{myName}</strong></div><b>{state.scores[0]}</b></div><span className="tr-dots">{dots(state.scores[0])}</span></div>
         <div className="tr-target">A {TARGET}<small>MANO {state.handNo}</small></div>
         <div className="tr-score-player"><div className="tr-score-main"><div className="tr-score-identity"><LupiStoryPose pose={finished&&state.winner===1?'celebrate':thinking?'determined':'explain'} className="tr-avatar"/><strong className="tr-score-name">{rivalName}</strong></div><b>{state.scores[1]}</b></div><span className="tr-dots tr-dots--rival">{dots(state.scores[1])}</span></div>
       </div>
 
-      <div className="tr-table">
+
         <div className="tr-row tr-row--rival">
           <div className="tr-hand" role="group" aria-label="Cartas ocultas del rival">{state.hands[1].map((_, i) => <TrucoCard key={i} back />)}</div>
           <div className="tr-played">{[0, 1, 2].map((i) => <div key={i} className="tr-slot"><TrucoCard card={state.table[1][i] ?? null} played />{trickBadge(i) && <em className={`tr-badge tr-badge--${state.trickResults[i] === 1 ? "w" : state.trickResults[i] === 0 ? "l" : "t"}`}>{trickBadge(i)}</em>}</div>)}</div>
           {bubble?.seat === 1 && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><span className="tr-bubble__avatar tr-bubble__avatar--lupi"><img src={lupiTrucoAvatar} alt="Lupi"/></span><span>{bubble.text}</span></div>}
         </div>
-        <div className="tr-felt" role="status"><span>{state.truco.level ? `${TRUCO_NAME[state.truco.level]} · vale ${state.truco.level + 1}` : "MANO · vale 1"}</span><h3>{status}</h3>{state.envidoResult && !finished && <div className={`tr-envido-live tr-envido-live--${state.envidoResult.winner === 0 ? "me" : "rival"}`}><b>ENVIDO</b><strong>{state.envidoResult.winner === 0 ? `Gana ${myName}` : `Gana ${rivalName}`}</strong><span>{state.envidoResult.points[0]} vos · {state.envidoResult.points[1]} rival · +{state.envidoResult.stake}</span></div>}</div>
+        <div className={`tr-felt tr-felt--${answering ? 'answer' : myTurn ? 'turn' : handOver ? 'result' : 'wait'}`} role="status"><div className="tr-director"><span className="tr-director__eyebrow">{answering ? '¡EL RIVAL SUBE LA APUESTA!' : handOver ? 'BAZA FINALIZADA' : myTurn ? 'VOS DECIDÍS LA JUGADA' : 'DUELO EN CURSO'}</span><img className="tr-director__lupi" src={lupiTrucoAvatar} alt=""/><span>{state.truco.level ? `${TRUCO_NAME[state.truco.level]} · vale ${state.truco.level + 1}` : "MANO · vale 1"}</span><h3>{status}</h3><p className="tr-director__instruction">{answering ? 'Elegí QUIERO para aceptar o NO QUIERO para rechazar en la botonera.' : myTurn ? 'Elegí una de tus cartas de abajo para jugarla. También podés cantar antes de tirar.' : handOver ? 'Revisá el resultado y continuá con la siguiente mano.' : waitingRival ? 'El rival está evaluando tu canto. Esperá su respuesta.' : 'Mirá la carta del rival y prepará tu próxima jugada.'}</p></div>{state.envidoResult && !finished && <div className={`tr-envido-live tr-envido-live--${state.envidoResult.winner === 0 ? "me" : "rival"}`}><b>ENVIDO</b><strong>{state.envidoResult.winner === 0 ? `Gana ${myName}` : `Gana ${rivalName}`}</strong><span>{state.envidoResult.points[0]} vos · {state.envidoResult.points[1]} rival · +{state.envidoResult.stake}</span></div>}</div>
         <div className="tr-row tr-row--me">
           <div className="tr-played">{[0, 1, 2].map((i) => <div key={i} className="tr-slot"><TrucoCard card={state.table[0][i] ?? null} played /></div>)}</div>
           {bubble?.seat === 0 && <div key={bubble.n} className="tr-bubble tr-bubble--me"><OwnedCardPortrait userId={meId}/><span>{bubble.text}</span></div>}
