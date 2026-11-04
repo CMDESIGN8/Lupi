@@ -147,3 +147,11 @@
 /* Lupi owns the coaching scene; the user appears only during the play. */
 .match-tutorial .mt-integrated-panel .mt-manga-lupi{left:20%!important;width:60%!important;justify-content:center}
 @media(max-width:900px){.match-tutorial .mt-integrated-panel .mt-manga-lupi{left:17%!important;width:66%!important}}
+
+/* Realistic indoor club court, shared by choice and cinematic views. */
+.match-tutorial .mt-practice-court{background:linear-gradient(0deg,#00192366,#00192318),url('../assets/tutorial-futsal-real.webp') center 57%/cover!important;box-shadow:inset 0 0 35px #00111d55}
+.match-tutorial .mt-practice-goal{display:none}
+.match-tutorial .mt-play-cinema{background:linear-gradient(110deg,#02233366,#03172722)}
+.match-tutorial .mt-play-cinema__lines{opacity:.4}
+.match-tutorial .mt-court-caption{background:#031725bb;padding:5px 8px;border-radius:3px}
+@media(max-width:900px){.match-tutorial .mt-practice-court{background-position:65% 57%!important}}
