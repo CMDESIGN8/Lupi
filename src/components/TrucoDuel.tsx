@@ -1,3 +1,4 @@
+import { SkillMatchReward } from "./SkillMatchReward";
 import { useEffect, useRef, useState } from "react";
 import type { Challenge } from "../hooks/useLobbyChallenges";
 import { useTrucoBotMatch } from "../hooks/useTrucoBotMatch";
@@ -110,10 +111,10 @@ function TrucoGuide({ onClose }: { onClose: () => void }) {
 
 export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Props) {
   const { appearance } = useAvatarAppearance(meId);
-  const { state, thinking, act } = useTrucoBotMatch(challenge.botIndex);
+  const { state, thinking, act, ready, busy, error: connectionError, reconnect } = useTrucoBotMatch(challenge.botIndex, challenge.id);
   const moves = movesFor(state, 0);
-  const finished = state.phase === "finished";
-  const handOver = state.phase === "hand-over";
+  const finished = ready && state.phase === "finished";
+  const handOver = ready && state.phase === "hand-over";
   const myName = challenge.fromId === meId ? challenge.fromName : challenge.toName;
   const rivalName = challenge.fromId === meId ? challenge.toName : challenge.fromName;
   const [bubble, setBubble] = useState<{ seat: 0 | 1; text: string; n: number } | null>(null);
@@ -140,7 +141,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
     ? /no quiero|mazo/i.test(bubble.text) ? "shy" : "compete"
     : reaction ?? (thinking ? "thinking" : "guide");
   const botResult = finished ? (state.winner === 0 ? 'win' : 'loss') as 'win'|'loss' : undefined;
-  const { reward, error: rewardError } = useDuelReward('truco', challenge.id, finished, { vsBot: true, botResult });
+  const { reward, error: rewardError, retry: retryReward } = useDuelReward('truco', challenge.id, finished, { vsBot: true, botResult });
   const [showRules,setShowRules]=useState(false);
   const [tableGlow, setTableGlow] = useState(0);
   const [intro, setIntro] = useState(true);
@@ -209,6 +210,8 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
 
   const dots = (n: number) => Array.from({ length: TARGET }, (_, i) => <i key={i} className={i < n ? "on" : ""} />);
 
+  if (!ready) return <div className="tr-bot-connection tr-loading" role="status" aria-live="polite"><div className="tr-loading__duel" aria-label={`${myName} contra ${rivalName}`}><div className="tr-loading__fighter tr-loading__fighter--me"><span className="tr-loading__label">VOS</span><div className="tr-loading__portrait"><AvatarFace appearance={appearance}/></div><strong>{myName}</strong></div><b className="tr-loading__versus" aria-hidden="true">VS</b><div className="tr-loading__fighter tr-loading__fighter--rival"><span className="tr-loading__label">RIVAL</span><div className="tr-loading__portrait"><LupiTrucoPose pose={connectionError ? "shy" : "compete"}/></div><strong>{rivalName}</strong></div></div><div className="tr-loading__copy"><small>LUPITRUCO · LA MESA TE ESPERA</small><h2>{connectionError ? "Pausa en la previa" : "¡Se viene el duelo!"}</h2><p>{connectionError ? "No pudimos conectar con la mesa. Volvé a intentarlo." : "Lupi está preparando las cartas. Enseguida jugás."}</p>{!connectionError && <div className="tr-loading__signal" aria-label="Conectando"><i/><i/><i/><span>CONECTANDO CON LA MESA</span></div>}</div><div className="tr-loading__actions">{connectionError && <button type="button" onClick={reconnect}>REINTENTAR</button>}<button type="button" onClick={onExit}>VOLVER AL CLUB</button></div></div>;
+
   return (
     <section className={`rps-arena tr-arena ${finished ? "is-complete" : ""}`} data-outcome={finished ? outcome : undefined} aria-label="Truco">
       {intro && <div className="tr-versus" role="status" aria-label="Comienza el duelo de truco">
@@ -244,8 +247,8 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
       {!finished && !handOver && (
         <div className="tr-mine">
           <span className="tr-envido-hint">TUS CARTAS · {envidoPoints(state.dealt[0])} DE ENVIDO</span>
-          <div className="tr-hand tr-hand--mine">{state.hands[0].map((c, i) => <TrucoCard key={`${c.suit}${c.num}`} card={c} onClick={() => play(i)} disabled={intro || !moves.play.includes(i)} />)}</div>
-          <div className="tr-actions">
+          <div className="tr-hand tr-hand--mine">{state.hands[0].map((c, i) => <TrucoCard key={`${c.suit}${c.num}`} card={c} onClick={() => play(i)} disabled={busy || !!connectionError || intro || !moves.play.includes(i)} />)}</div>
+          <div className="tr-actions">{connectionError && <div role="alert">No pudimos confirmar la jugada. <button type="button" onClick={reconnect}>RECONECTAR</button></div>}
             {answering && <>
               <button type="button" className="is-yes" onClick={() => act({ t: "accept" })}>QUIERO</button>
               <button type="button" className="is-no" onClick={() => act({ t: "decline" })}>NO QUIERO</button>
@@ -284,7 +287,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
         </div>
       </div>}
 
-      {finished && <TrucoMatchResult meId={meId} myName={myName} rivalName={rivalName} myScore={state.scores[0]} rivalScore={state.scores[1]} won={state.winner===0} onExit={onExit} onRematch={onRematch}><DuelRewardCard reward={reward} error={rewardError} rivalName={rivalName} gameLabel="Truco"/></TrucoMatchResult>}
+      {finished && <TrucoMatchResult meId={meId} myName={myName} rivalName={rivalName} myScore={state.scores[0]} rivalScore={state.scores[1]} won={state.winner===0} onExit={onExit} onRematch={onRematch}><DuelRewardCard reward={reward} error={rewardError} onRetry={retryReward} rivalName={rivalName} gameLabel="Truco"/>{reward?.ok && <SkillMatchReward game="truco" matchId={challenge.id} userId={meId}/>}</TrucoMatchResult>}
 
       <ul className="tr-log" aria-label="Historial">{state.log.slice(-3).map((l, i) => <li key={i} data-tone={l.tone}>{l.text}</li>)}</ul>
       <footer className="rps-rule">TRUCO · ENVIDO · SIN FLOR <span>A {TARGET} PUNTOS · 3 BAZAS POR MANO</span></footer>

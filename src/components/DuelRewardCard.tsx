@@ -5,9 +5,9 @@ import "./DuelRewardCard.css";
 
 const CHEST: Record<string, string> = { comun: "COFRE COMÚN", raro: "COFRE RARO", epico: "COFRE ÉPICO" };
 
-type Props = { reward: DuelRewardResult | null; error?: boolean; rivalName?: string; gameLabel?: string };
+type Props = { reward: DuelRewardResult | null; error?: boolean; rivalName?: string; gameLabel?: string; onRetry?: () => void };
 
-export function DuelRewardCard({ reward, error, rivalName, gameLabel }: Props) {
+export function DuelRewardCard({ reward, error, rivalName, gameLabel, onRetry }: Props) {
   const played = useRef(false);
   const [copied, setCopied] = useState(false);
 
@@ -18,12 +18,12 @@ export function DuelRewardCard({ reward, error, rivalName, gameLabel }: Props) {
     if (reward.chest) { const tier = reward.chest; const t = window.setTimeout(() => duelFx.chest(tier), 650); return () => window.clearTimeout(t); }
   }, [reward]);
 
-  if (error) return <p className="drc drc--soft" role="status">No pudimos confirmar la acreditación del premio.</p>;
+  if (error) return <p className="drc drc--soft" role="status">No pudimos confirmar la acreditación del premio. {onRetry && <button type="button" onClick={onRetry}>Reintentar acreditación</button>}</p>;
   if (!reward) return <p className="drc drc--soft" role="status">Contando tu botín…</p>;
   if (reward.duplicate) return <p className="drc drc--soft" role="status">Premio de esta partida ya acreditado.</p>;
 
   if (reward.hardCapped) return <section className="drc drc--practice-complete" role="status" aria-label="Premios diarios completados">
-    <span className="drc-practice-icon" aria-hidden="true">✓</span><div><small>MODO PRÁCTICA</small><h3>¡BOTÍN DIARIO COMPLETADO!</h3><div className="drc-practice-stamps" aria-hidden="true">{Array.from({length:6},(_,i)=><i key={i}>✓</i>)}</div><p>Ya recibiste tus 6 premios de hoy entre PPT y Preguntados.</p><strong>Podés seguir jugando. La XP y las monedas vuelven mañana.</strong><small className="drc-practice-reset">Reinicio: 00:00 · hora argentina</small></div>
+    <span className="drc-practice-icon" aria-hidden="true">✓</span><div><small>MODO PRÁCTICA</small><h3>¡BOTÍN DIARIO COMPLETADO!</h3><div className="drc-practice-stamps" aria-hidden="true">{Array.from({length:reward.dailyLimit ?? 6},(_,i)=><i key={i}>✓</i>)}</div><p>{reward.dailyLimit === 5 ? "Completaste tus 5 partidas premiadas de Truco de hoy." : "Ya recibiste tus 6 premios de hoy entre PPT y Preguntados."}</p><strong>Podés seguir jugando. La XP y las monedas vuelven mañana.</strong><small className="drc-practice-reset">Reinicio: 00:00 · hora argentina</small></div>
   </section>;
 
   const win = reward.result === "win";

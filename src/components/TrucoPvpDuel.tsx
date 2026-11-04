@@ -1,3 +1,6 @@
+import { useDuelReward } from "../hooks/useDuelReward";
+import { DuelRewardCard } from "./DuelRewardCard";
+import { SkillMatchReward } from "./SkillMatchReward";
 import { useEffect, useRef, useState } from "react";
 import type { Challenge } from "../hooks/useLobbyChallenges";
 import { useTrucoPvp } from "../hooks/useTrucoPvp";
@@ -28,6 +31,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
 
   const state    = gameState;
   const finished = pvpState?.status === "finished" || pvpState?.status === "abandoned";
+  const {reward, error: rewardError, retry: retryReward} = useDuelReward("truco", challenge.id, finished, {rivalId});
   const waiting  = pvpState?.status === "waiting";
   const myTurnNow = state ? actor(state) === mySeat : false;
   const moves    = state ? movesFor(state, mySeat) : { play: [], truco: null, envido: [], accept: false, decline: false, fold: false };
@@ -165,7 +169,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
         <div className="tr-hand-score" aria-label="Marcador actualizado"><div><span>VOS</span><b>{myScore}</b></div><span>A {TARGET}</span><div><span>{rivalName}</span><b>{rivalScore}</b></div></div>
         <button type="button" className="duel-rematch" disabled={busy} onClick={()=>doAct({t:"next"})}>{busy ? "CONFIRMANDO…" : "SIGUIENTE MANO →"}</button>
       </div></div>}
-      {finished && <TrucoMatchResult meId={meId} rivalId={rivalId} myName={myName} rivalName={rivalName} myScore={myScore} rivalScore={rivalScore} won={iWon} onExit={onExit}/>}
+      {finished && <TrucoMatchResult meId={meId} rivalId={rivalId} myName={myName} rivalName={rivalName} myScore={myScore} rivalScore={rivalScore} won={iWon} onExit={onExit}><DuelRewardCard reward={reward} error={rewardError} onRetry={retryReward} rivalName={rivalName} gameLabel="Truco"/>{reward?.ok && <SkillMatchReward game="truco" matchId={challenge.id} userId={meId}/>}</TrucoMatchResult>}
 
       <footer className="rps-rule">TRUCO · ENVIDO · SIN FLOR <span>A {TARGET} PUNTOS · 3 BAZAS POR MANO</span></footer>
     </section>

@@ -25,7 +25,7 @@ interface DeckBuilderProps {
   activeDeck: Deck;
   onDeckUpdate: (deck: Deck) => void;
   onPlay?: () => void;
-  onPractice?: (game:"rps"|"trivia") => void;
+  onPractice?: (game:"rps"|"trivia"|"truco") => void;
 }
 
 function getCardData(card: UserCard): any {
