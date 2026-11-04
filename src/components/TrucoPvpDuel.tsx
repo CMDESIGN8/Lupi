@@ -143,18 +143,18 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
           <span className="tr-envido-hint">TUS CARTAS · {envidoPoints(state.dealt[mySeat])} DE ENVIDO</span>
           <div className="tr-hand tr-hand--mine">
             {state.hands[mySeat].map((c, i) => (
-              <TrucoCard key={`${c.suit}${c.num}`} card={c} onClick={() => doAct({ t: "play", card: i })} disabled={!moves.play.includes(i) || busy} />
+              <TrucoCard key={`${c.suit}${c.num}`} card={c} onClick={() => doAct({ t: "play", card: i })} disabled={!moves.play.includes(i) || busy || !!pvpState?.mineReady} />
             ))}
           </div>
-          <div className="tr-actions">
-            {!answering && !myTurnNow && <p className="tr-pvp-wait" role="status">{busy ? "Enviando tu jugada…" : "Turno del rival. Tus opciones aparecerán cuando te toque."}</p>}
-            {answering && <>
+          <div className="tr-actions" aria-busy={busy || !!pvpState?.mineReady}>
+            {(busy || pvpState?.mineReady || (!answering && !myTurnNow)) && <p className="tr-pvp-wait" role="status">{busy || pvpState?.mineReady ? "Confirmando tu jugada…" : "Turno del rival. Tus opciones aparecerán cuando te toque."}</p>}
+            {answering && !busy && !pvpState?.mineReady && <>
               <button type="button" className="is-yes" onClick={() => doAct({ t: "accept" })}>QUIERO</button>
               <button type="button" className="is-no"  onClick={() => doAct({ t: "decline" })}>NO QUIERO</button>
               {moves.truco && <button type="button" onClick={() => doAct({ t: "truco" })}>QUIERO {TRUCO_NAME[moves.truco]}</button>}
               {moves.envido.map(k => <button type="button" key={k} onClick={() => call(k)}>{pend!.kind === "truco" ? "ENVIDO ESTÁ PRIMERO: " : ""}{ENVIDO_NAME[k]}</button>)}
             </>}
-            {!pend && myTurnNow && <>
+            {!pend && myTurnNow && !busy && !pvpState?.mineReady && <>
               {moves.truco && <button type="button" className="is-truco" onClick={() => doAct({ t: "truco" })}>{TRUCO_NAME[moves.truco]}</button>}
               {moves.envido.map(k => <button type="button" key={k} onClick={() => call(k)}>{ENVIDO_NAME[k]}</button>)}
               <button type="button" className="is-fold" onClick={() => doAct({ t: "fold" })}>IR AL MAZO</button>

@@ -161,7 +161,16 @@ export function useTrucoPvp(challenge: Challenge) {
 
   // ── act: aplicar una acción local + enviarla al servidor ─────────────────
   const act = useCallback(async (action: Action) => {
-    if (actionLock.current || !current.current || !game.current) return;
+    if (actionLock.current) return;
+    // The poller can also commit; never race it with a click.
+    const requestedGeneration = generation.current;
+    const deadline = Date.now() + 5000;
+    while (lock.current && Date.now() < deadline) {
+      await new Promise<void>(resolve => window.setTimeout(resolve, 50));
+      if (generation.current !== requestedGeneration) return;
+    }
+    if (lock.current || actionLock.current || !current.current || !game.current) return;
+    if (current.current.mineReady) { refreshSoon.current?.(); return; }
     if (current.current.status !== "playing") return;
 
     const s = current.current;
@@ -175,8 +184,7 @@ export function useTrucoPvp(challenge: Challenge) {
     // Aplicar motor localmente para feedback inmediato
     const nextGame = apply(g, mySeat, action, Math.random);
     if (nextGame === g) { actionLock.current = false; setBusy(false); return; } // acción ilegal
-    game.current = nextGame;
-    setGameState(nextGame);
+    // Keep the authoritative board until the pending action is committed.
 
     try {
       let { data, error: e, status: rpcStatus } = await supabase.rpc("truco_play", {
@@ -225,8 +233,7 @@ export function useTrucoPvp(challenge: Challenge) {
     if (freshState.guestAction) {
       resolved = apply(resolved, 1, freshState.guestAction, Math.random);
     }
-    game.current = resolved;
-    setGameState(resolved);
+
 
     const finished = resolved.phase === "finished";
     const { data: committed, error: commitErr } = await supabase.rpc("truco_commit", {
@@ -244,6 +251,9 @@ export function useTrucoPvp(challenge: Challenge) {
     if (commitErr) throw commitErr;
     current.current = committed as TrucoPvpState;
     setPvpState(committed as TrucoPvpState);
+    const confirmed = (committed as TrucoPvpState).matchState as TrucoState;
+    game.current = confirmed;
+    setGameState(confirmed);
     const ch = changedChannel.current;
     if (ch) void ch.send({ type: "broadcast", event: "changed", payload: {} }).catch(() => {});
   };
