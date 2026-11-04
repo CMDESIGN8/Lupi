@@ -149,9 +149,27 @@
 @media(max-width:900px){.match-tutorial .mt-integrated-panel .mt-manga-lupi{left:17%!important;width:66%!important}}
 
 /* Realistic indoor club court, shared by choice and cinematic views. */
-.match-tutorial .mt-practice-court{background:linear-gradient(0deg,#00192366,#00192318),url('../assets/tutorial-futsal-real.webp') center 57%/cover!important;box-shadow:inset 0 0 35px #00111d55}
+.match-tutorial .mt-practice-court{background:linear-gradient(0deg,#00192366,#00192318),url('../assets/tutorial-futsal-anime.webp') center 57%/cover!important;box-shadow:inset 0 0 35px #00111d55}
 .match-tutorial .mt-practice-goal{display:none}
 .match-tutorial .mt-play-cinema{background:linear-gradient(110deg,#02233366,#03172722)}
 .match-tutorial .mt-play-cinema__lines{opacity:.4}
 .match-tutorial .mt-court-caption{background:#031725bb;padding:5px 8px;border-radius:3px}
 @media(max-width:900px){.match-tutorial .mt-practice-court{background-position:65% 57%!important}}
+
+/* The preview actors yield to the cinematic actors, never two balls or keepers. */
+.mt-content--playing .mt-practice-court>.mt-practice-ball,
+.mt-content--playing .mt-practice-court>.mt-practice-keeper,
+.mt-content--playing .mt-practice-court>.mt-practice-partner{display:none!important}
+.mt-anime-gloves{display:block;width:90px;height:75px;filter:drop-shadow(2px 4px 2px #00172980)}
+.mt-play-cinema__rival .mt-anime-gloves{width:140px;height:115px}
+.match-tutorial .mt-integrated-panel .mt-manga-lupi{left:3%!important;width:67%!important;top:auto!important;height:300px!important;bottom:40px!important}
+@media(max-width:900px){
+ .match-tutorial .mt-integrated-panel{min-height:270px!important}
+ .match-tutorial .mt-integrated-panel .mt-manga-lupi{left:-4%!important;width:58%!important;top:auto!important;height:220px!important;bottom:28px!important}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech{left:43%;right:7px;top:10px;padding:9px;z-index:4}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech h1{font-size:21px!important}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech p{font-size:10px;line-height:1.35}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech:after{left:10px}
+ .mt-anime-gloves{width:65px;height:54px}
+ .mt-play-cinema__rival .mt-anime-gloves{width:100px;height:83px}
+}

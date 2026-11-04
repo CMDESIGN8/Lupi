@@ -8,6 +8,19 @@ import './MatchTutorial.css';
 import './MatchPractice.css';
 import './MatchTutorialManga.css';
 
+function AnimeKeeperGloves() {
+  return <svg className="mt-anime-gloves" viewBox="0 0 150 120" fill="none" aria-hidden="true">
+    <defs><linearGradient id="mt-glove-shade" x2="1" y2="1"><stop stopColor="#fffef4"/><stop offset="1" stopColor="#8db9d2"/></linearGradient></defs>
+    {[false,true].map((mirror)=><g key={String(mirror)} transform={mirror?'translate(150 5) scale(-1 1)':'translate(0 0)'}>
+      <path d="M31 95 23 66 13 45Q10 37 16 34Q21 32 25 40L31 51 19 23Q16 15 22 13Q28 10 31 19L40 43 33 12Q32 4 39 4Q45 4 46 12L51 40 50 13Q50 6 57 7Q63 8 62 16L61 47 66 34Q69 27 75 31Q79 34 76 42L69 64Q67 81 59 94Z" fill="url(#mt-glove-shade)" stroke="#082b44" strokeWidth="3" strokeLinejoin="round"/>
+      <path d="m31 94 28-1 2 19-26 3Z" fill="#e53f4f" stroke="#082b44" strokeWidth="3"/>
+      <path d="m34 65 23-4-3 21-17 1Z" fill="#173f6b" stroke="#082b44" strokeWidth="2"/>
+      <path d="m35 69 18-4M37 75l14-3M37 101l18-1M37 107l18-1" stroke="#fff9df" strokeWidth="3"/>
+      <path d="m33 50 7 11m4-17 3 14m8-12-1 12" stroke="#567c99" strokeWidth="2"/>
+    </g>)}
+  </svg>;
+}
+
 type Props = { userId?:string; cards: UserCard[]; opponent: string; onTeam?: () => void; onStart: () => void | Promise<unknown> };
 export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Props) {
   const [step, setStep] = useState(0);
@@ -50,13 +63,13 @@ export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Prop
       </div>
       {step < 2 ? <>
         <div className={`mt-practice-court ${practice?'has-choice':''}`} data-choice={practice} key={step} aria-label="Cancha de práctica">
-          <div className="mt-practice-goal"/><span className="mt-practice-keeper">🧤</span><span className="mt-practice-player">{step===0?'⚡':'🛡'}</span><span className="mt-practice-ball">⚽</span><span className="mt-practice-partner">↗</span>
+          <div className="mt-practice-goal"/><span className="mt-practice-keeper"><AnimeKeeperGloves/></span><span className="mt-practice-player">{step===0?'⚡':'🛡'}</span><span className="mt-practice-ball">⚽</span><span className="mt-practice-partner">↗</span>
           <span className="mt-court-caption">{step === 0 ? 'ATAQUE · ÚLTIMA JUGADA' : 'DEFENSA · CERRÁ EL CAMINO'}</span>
           {(cinema || practice) && <div key={cinema || practice} className={`mt-play-cinema mt-play-cinema--${cinema || practice} ${practice ? "is-resolved" : ""}`} aria-label="Jugada en curso">
             <div className="mt-play-cinema__lines" aria-hidden="true"/>
             <strong className="mt-play-cinema__call">{({shoot:'¡REMATÁ!',pass:'¡PASE AL COMPAÑERO!',press:'¡SALÍ A MARCAR!',cover:'¡CUBRÍ EL ARCO!'} as Record<string,string>)[cinema || practice!]}</strong>
             <div className="mt-play-cinema__player" aria-hidden="true">{userId ? <OwnedCardPortrait userId={userId}/> : <LupiStoryPose pose="determined"/>}</div>
-            <span className="mt-play-cinema__ball" aria-hidden="true">⚽</span><span className="mt-play-cinema__rival" aria-hidden="true">{(cinema || practice) === 'shoot' ? '🧤' : (cinema || practice) === 'pass' ? '↗' : '⚡'}</span>
+            <span className="mt-play-cinema__ball" aria-hidden="true">⚽</span><span className="mt-play-cinema__rival" aria-hidden="true">{(cinema || practice) === 'shoot' ? <AnimeKeeperGloves/> : (cinema || practice) === 'pass' ? '↗' : '⚡'}</span>
             <strong className="mt-play-cinema__result">{({shoot:'¡EL ARQUERO LA SACÓ!',pass:'¡LA JUGADA SIGUE!',press:'¡RECUPERASTE LA PELOTA!',cover:'¡CERRASTE EL CAMINO!'} as Record<string,string>)[cinema || practice!]}</strong>
           </div>}
           <small>PRÁCTICA · SIN PREMIOS NI PENALIZACIÓN</small>
