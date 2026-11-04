@@ -3,8 +3,9 @@ import type { Challenge } from "../hooks/useLobbyChallenges";
 import { useTrucoPvp } from "../hooks/useTrucoPvp";
 import { DuelResultEffects } from "./DuelResultEffects";
 import { duelFx } from "../lib/duelFx";
-import { ENVIDO_NAME, TARGET, TRUCO_NAME, actor, movesFor, type EnvidoCall } from "../utils/trucoEngine";
-import { OwnedCardPortrait } from "./OwnedCardPortrait";
+import { ENVIDO_NAME, TARGET, TRUCO_NAME, actor, movesFor, envidoPoints, type EnvidoCall } from "../utils/trucoEngine";
+import { AvatarFace } from "./AvatarFace";
+import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { TrucoCard } from "./TrucoDuel";
 import "./RockPaperScissors.css";
 import "./TrucoDuel.css";
@@ -19,6 +20,8 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
   const rivalId   = challenge.fromId === meId ? challenge.toId   : challenge.fromId;
   const rivalName = challenge.fromId === meId ? challenge.toName  : challenge.fromName;
 
+  const {appearance: myAppearance} = useAvatarAppearance(meId);
+  const {appearance: rivalAppearance} = useAvatarAppearance(rivalId);
   const mySeat    = pvpState?.seat === "host" ? 0 : 1;
   const rivalSeat = mySeat === 0 ? 1 : 0;
 
@@ -41,7 +44,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
     if (sh.seat !== mySeat) duelFx.tap();
     const t = window.setTimeout(() => setBubble(b => b?.n === sh.n ? null : b), 1800);
     return () => window.clearTimeout(t);
-  }, [state?.lastShout, mySeat]);
+  }, [state?.lastShout?.n, mySeat]);
   useEffect(() => {
     if (finished && pvpState?.winnerId) duelFx.result(pvpState.winnerId === meId ? "win" : "loss");
   }, [finished, pvpState?.winnerId, meId]);
@@ -63,6 +66,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
   if (waiting) status = "Esperando al rival…";
   else if (finished) status = iWon ? "¡GANASTE EL DUELO!" : "ESTA VEZ NO FUE";
   else if (!state) status = "Cargando partida…";
+  else if (state.phase === "hand-over") status = state.handResult?.winner === mySeat ? "¡GANASTE LA MANO!" : "MANO DEL RIVAL";
   else if (answering) status = pend!.kind === "truco" ? `Rival cantó ${TRUCO_NAME[pend!.level]}. ¿Qué respondés?` : `Rival cantó ${pend!.calls.map(c => ENVIDO_NAME[c]).join(" + ")}. ¿Qué respondés?`;
   else if (pvpState?.mineReady && !pvpState?.rivalReady) status = "Esperando al rival…";
   else if (myTurnNow) status = state.trick === 0 ? "Sos mano · tirá una carta" : "Tu turno";
@@ -88,7 +92,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
         <div className="tr-score-player">
           <div className="tr-score-main">
             <div className="tr-score-identity">
-              <div className="tr-avatar"><OwnedCardPortrait userId={meId} /></div>
+              <div className="tr-avatar"><AvatarFace appearance={myAppearance} className="tr-pvp-face"/></div>
               <strong className="tr-score-name">{myName}</strong>
             </div>
             <b>{myScore}</b>
@@ -99,7 +103,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
         <div className="tr-score-player">
           <div className="tr-score-main">
             <div className="tr-score-identity">
-              <div className="tr-avatar"><OwnedCardPortrait userId={rivalId} /></div>
+              <div className="tr-avatar"><AvatarFace appearance={rivalAppearance} className="tr-pvp-face"/></div>
               <strong className="tr-score-name">{rivalName}</strong>
             </div>
             <b>{rivalScore}</b>
@@ -117,7 +121,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
                 {trickBadge(i) && <em className={`tr-badge tr-badge--${state.trickResults[i] === mySeat ? "w" : state.trickResults[i] === rivalSeat ? "l" : "t"}`}>{trickBadge(i)}</em>}
               </div>
             ))}</div>
-            {bubble?.seat === rivalSeat && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><span>{bubble.text}</span></div>}
+            {bubble?.seat === rivalSeat && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><AvatarFace appearance={rivalAppearance} className="tr-speaking-face"/><span>{bubble.text}</span></div>}
           </div>
 
           <div className="tr-felt" role="status">
@@ -129,19 +133,21 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
             <div className="tr-played">{[0,1,2].map(i => (
               <div key={i} className="tr-slot"><TrucoCard card={state.table[mySeat][i] ?? null} played /></div>
             ))}</div>
-            {bubble?.seat === mySeat && <div key={bubble.n} className="tr-bubble tr-bubble--me"><span>{bubble.text}</span></div>}
+            {bubble?.seat === mySeat && <div key={bubble.n} className="tr-bubble tr-bubble--me"><AvatarFace appearance={myAppearance} className="tr-speaking-face"/><span>{bubble.text}</span></div>}
           </div>
         </div>
       )}
 
       {state && !finished && state.phase !== "hand-over" && (
         <div className="tr-mine">
+          <span className="tr-envido-hint">TUS CARTAS · {envidoPoints(state.dealt[mySeat])} DE ENVIDO</span>
           <div className="tr-hand tr-hand--mine">
             {state.hands[mySeat].map((c, i) => (
               <TrucoCard key={`${c.suit}${c.num}`} card={c} onClick={() => doAct({ t: "play", card: i })} disabled={!moves.play.includes(i) || busy} />
             ))}
           </div>
           <div className="tr-actions">
+            {!answering && !myTurnNow && <p className="tr-pvp-wait" role="status">{busy ? "Enviando tu jugada…" : "Turno del rival. Tus opciones aparecerán cuando te toque."}</p>}
             {answering && <>
               <button type="button" className="is-yes" onClick={() => doAct({ t: "accept" })}>QUIERO</button>
               <button type="button" className="is-no"  onClick={() => doAct({ t: "decline" })}>NO QUIERO</button>
@@ -157,9 +163,9 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
         </div>
       )}
 
-      {state?.phase === "hand-over" && !finished && <div className="tr-summary"><h3>{state.handResult?.winner === mySeat ? "¡MANO TUYA!" : "MANO DEL RIVAL"}</h3><button type="button" disabled={busy} onClick={()=>doAct({t:"next"})}>SIGUIENTE MANO →</button></div>}
+      {state?.phase === "hand-over" && !finished && <div className="tr-pvp-end" role="dialog" aria-modal="true" aria-label="Resultado de la mano"><div><h2>{state.handResult?.winner === mySeat ? "¡MANO TUYA!" : "MANO DEL RIVAL"}</h2><p>{state.handResult?.reason}</p><strong>Vos {myScore} · Rival {rivalScore}</strong><button type="button" disabled={busy} onClick={()=>doAct({t:"next"})}>SIGUIENTE MANO →</button></div></div>}
       {finished && (
-        <div className="rps-finish">
+        <div className="rps-finish tr-pvp-end">
           <p className="rps-winner-name">{pvpState?.winnerId === meId ? myName : rivalName} SE LLEVA EL DUELO · {myScore} a {rivalScore}</p>
           <button className="rps-exit" type="button" onClick={onExit}>VOLVER AL CLUB →</button>
         </div>
