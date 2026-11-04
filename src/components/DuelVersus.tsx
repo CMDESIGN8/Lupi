@@ -19,7 +19,7 @@ export function DuelVersus({ challenge, meId, players = [], catalog = [], onStar
   const [portraits] = useState(() => players);
   const entry = useDuelEntrance(challenge, meId, onStart);
   useEffect(() => { if (challenge.quick && entry.connected && !entry.ready && !entry.cancelled) entry.confirm(); }, [challenge.quick, entry.connected, entry.ready, entry.cancelled]); // eslint-disable-line react-hooks/exhaustive-deps
-  const instructions = challenge.gameType === "futsal" ? ["FUTSAL", "Confirmá tu cinco y leé al rival. 3 ataques por equipo · 15 segundos para elegir."] : challenge.gameType === "trivia" ? ["PREGUNTADOS", "5 preguntas de fútbol. Respondé a tiempo y superá al rival en aciertos."] : ["PIEDRA, PAPEL O TIJERA", "Elegí tu mano en secreto. Ganá más rondas que tu rival en 3 enfrentamientos."];
+  const instructions = challenge.gameType === "futsal" ? ["FUTSAL", "Confirmá tu cinco y leé al rival. 3 ataques por equipo · 15 segundos para elegir."] : challenge.gameType === "trivia" ? ["PREGUNTADOS", "5 preguntas de fútbol. Respondé a tiempo y superá al rival en aciertos."] : challenge.gameType === "truco" ? ["TRUCO", "Jugá tus cartas, cantá envido y desafiá al rival. Confirmá cuando estés listo."] : ["PIEDRA, PAPEL O TIJERA", "Elegí tu mano en secreto. Ganá más rondas que tu rival en 3 enfrentamientos."];
   const amHost = challenge.fromId === meId;
 
   const myName = amHost ? challenge.fromName : challenge.toName;
@@ -57,7 +57,7 @@ export function DuelVersus({ challenge, meId, players = [], catalog = [], onStar
         </div>
 
         <div className="duel-vs__brief"><p>{instructions[1]}</p></div>
-        <div className="duel-vs__readiness"><span>{entry.ready ? "✓ VOS LISTO" : "VOS · PREPARANDO"}</span><span>{entry.rivalReady ? "✓ RIVAL LISTO" : "RIVAL · PREPARANDO"}</span></div>
+        <div className="duel-vs__readiness"><span className={entry.ready ? "is-ready" : ""}>{entry.ready ? "✓ ESTOY LISTO" : "○ VOS · PREPARANDO"}</span><span className={entry.rivalReady ? "is-ready" : ""}>{entry.rivalReady ? "✓ RIVAL LISTO" : "○ RIVAL · PREPARANDO"}</span></div>
         {entry.seconds !== null ? <div className="duel-vs__countdown" key={entry.seconds}>{entry.seconds || "¡VAMOS!"}</div> : <p className="duel-vs__status">{entry.timedOut ? "El rival no confirmó a tiempo. Volvé al lobby y buscá otro duelo." : entry.cancelled ? "El rival volvió al club." : !entry.connected ? "Conectando con el rival…" : entry.ready ? "Esperando que el rival esté listo…" : "LA ARENA TE ESPERA"}</p>}
         {!entry.cancelled && entry.seconds === null && <button className="duel-vs__ready" type="button" disabled={!entry.connected || entry.ready} onClick={entry.confirm}>{entry.ready ? "ESTÁS LISTO ✓" : "¡VAMOS A JUGAR! →"}</button>}
         <button type="button" className="duel-vs__back" onClick={() => { entry.cancel(); onExit(); }}>VOLVER AL CLUB</button>

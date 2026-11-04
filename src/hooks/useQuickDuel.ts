@@ -3,10 +3,10 @@ import { supabase } from "../lib/supabaseClient";
 import { trackDuel } from "../lib/duelTelemetry";
 import type { ChallengeGame } from "./useLobbyChallenges";
 
-export type QuickGame = "rps" | "trivia" | "futsal";
+export type QuickGame = "rps" | "trivia" | "futsal" | "truco";
 type Searcher = { userId: string; name: string; ts: number };
 
-const BOT_AFTER_MS = 8_000;     // Piedra-Papel-Tijera: si nadie aparece, entrenás contra un bot
+const BOT_AFTER_MS = 7_000;     // Piedra-Papel-Tijera: si nadie aparece, entrenás contra un bot
 const RESEND_MS = 11_000;       // > FROM_COOLDOWN de useLobbyChallenges
 
 type Options = {

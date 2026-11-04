@@ -468,3 +468,8 @@
  .tr-versus__title{font-size:15vw;top:57%}
 }
 @media(prefers-reduced-motion:reduce){.tr-arena .tr-bubble{animation:none}}
+
+.tr-arena .tr-badge--w{background:#35eaa3;color:#03291b;border:1px solid #a5ffcf}.tr-arena .tr-badge--l{background:#ff6a70;color:#3d0710;border:1px solid #ffc0c3}.tr-arena .tr-badge--t{background:#b8c7ce;color:#14242d;border:1px solid #e2edf1}
+
+@media(min-width:901px){.tr-arena>.tr-table:before{background:none!important;border:1px solid #92ffdf33}.tr-arena>.tr-table:after{display:none!important}.tr-arena>.tr-table{background:radial-gradient(ellipse at 50% 45%,#075442,#032b2a 85%)!important}}
+.tr-arena .tr-badge--w{background:#35eaa3!important;color:#03291b!important}.tr-arena .tr-badge--l{background:#ff6a70!important;color:#3d0710!important}.tr-arena .tr-badge--t{background:#b8c7ce!important;color:#14242d!important}

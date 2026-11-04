@@ -14,7 +14,7 @@ const games = [
   { id: "futsal", icon: "⚽", name: "FUTSAL", description: "Ataque y defensa secretos · 5 ataques por jugador", available: true },
   { id: "trivia", icon: "🧠", name: "PREGUNTADOS", description: "Trivia de fútbol · 5 preguntas PvP", available: true },
   { id: "rps", icon: "✊", name: "PIEDRA, PAPEL O TIJERA", description: "PvP sincronizado · Mejor de 3", available: true },
-  { id: "truco", icon: "🃏", name: "TRUCO", description: "PvP próximamente · practicá desde Duelo rápido", available: false },
+  { id: "truco", icon: "🃏", name: "TRUCO", description: "PvP en vivo · también practicá vs bot", available: true },
   { id: "physical", icon: "💪", name: "RETO FÍSICO", description: "Desafíos de la vida real", available: false },
 ] as const;
 
