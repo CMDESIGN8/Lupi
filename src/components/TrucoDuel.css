@@ -208,3 +208,106 @@
   .tr-arena .tr-row--rival .tr-hand .tr-card:first-child{margin-left:0}
   .tr-arena .tr-row--rival .tr-played{position:relative;z-index:3;transform:translateY(12px)}
 }
+
+/* Numeral cards (2–7): classic, readable pips in Lupi's night-blue and gold palette. */
+.tr-card--pips{background:#f1e4c5!important;border-color:#fff2c9!important}
+.tr-pip-face{position:absolute;inset:2px;display:block;overflow:hidden;border-radius:inherit;background:linear-gradient(145deg,#0d3153,#06152e 68%,#102d4a);}
+.tr-pip-face:before{content:'';position:absolute;inset:8% 7%;border:1px solid #d6ad4d;border-radius:7px;background:repeating-conic-gradient(from 0deg at 50% 50%,#ffdc7320 0deg 1deg,transparent 1.5deg 14deg);opacity:.48}
+.tr-pip-face__frame{position:absolute;inset:5%;border:1px solid #e1bd5b;border-radius:7px;box-shadow:inset 0 0 0 2px #07172c,inset 0 0 0 3px #bd8d31;pointer-events:none}
+.tr-pip-face__corner{position:absolute;z-index:1;left:8%;display:flex;flex-direction:column;align-items:center;justify-content:center;width:21%;height:25%;border-radius:3px;background:#f4e8ca;color:#111b2b;box-shadow:0 0 0 1px #c8a552}
+.tr-pip-face__corner--top{top:7%}
+.tr-pip-face__corner--bottom{right:8%;left:auto;bottom:7%;transform:rotate(180deg)}
+.tr-pip-face__corner b{font:900 clamp(11px,2vw,22px)/.85 'Barlow Condensed',sans-serif}
+.tr-pip-face__corner svg{width:45%;height:44%;margin-top:2px}
+.tr-pip-face__marks{position:absolute;inset:18% 20%;display:grid;grid-template:repeat(3,minmax(0,1fr))/repeat(3,minmax(0,1fr));align-items:center;justify-items:center}
+.tr-pip-face__marks>span{display:flex;align-items:center;justify-content:center;width:72%;height:78%;filter:drop-shadow(0 2px 2px #0009)}
+.tr-pip-face__marks svg{display:block;width:100%;height:100%;overflow:visible}
+.tr-pip-face--espada .tr-pip-face__marks svg{filter:drop-shadow(0 0 3px #8df7ff77)}
+.tr-pip-face--oro .tr-pip-face__marks svg{filter:drop-shadow(0 0 4px #ffc94188)}
+.tr-pip-face--copa .tr-pip-face__marks svg{filter:drop-shadow(0 0 3px #61fff677)}
+.tr-pip-face--basto .tr-pip-face__marks svg{filter:drop-shadow(0 1px 2px #000b)}
+@media(min-width:901px){
+  .rps-screen-overlay.tr-screen{padding:0;overflow:hidden}
+  .tr-arena.rps-arena{display:flex!important;flex-direction:column;align-items:stretch;gap:10px;width:100%;max-width:none!important;height:100dvh;min-height:0;box-sizing:border-box;overflow:hidden;padding:14px clamp(24px,4vw,68px) 10px;background:linear-gradient(90deg,#020d18df,#061622a6 34%,#061622ad 66%,#020d18e8),linear-gradient(180deg,#03101b55,#04101dcc 100%),url('../assets/challenge-truco-anime.webp') center 43%/cover!important}
+  .tr-arena.rps-arena:before{position:absolute;inset:0;z-index:0;opacity:.42;background:radial-gradient(ellipse at 50% 46%,transparent 18%,#0009 100%),repeating-conic-gradient(from 7deg at 50% 47%,transparent 0deg 17deg,#41eaff16 17.2deg 17.6deg,transparent 18deg 29deg);animation:tr-desktop-energy 13s linear infinite;}
+  .tr-arena>.rps-header{flex:0 0 42px;min-height:42px;width:100%;}
+  .tr-arena .lupi-game-header .tr-lupitruco-brand{font-size:30px;text-shadow:0 0 22px #37e8ff77,2px 3px #03111a}
+  .tr-arena>.tr-help{flex:0 0 32px;min-height:32px;width:min(1220px,100%);max-width:none;align-self:center;font-size:12px;text-shadow:0 1px 5px #00101a}
+  .tr-arena .tr-help button{min-height:34px;padding:6px 16px;border-color:#ffe16b99;border-radius:9px 3px;color:#fff5ce;background:linear-gradient(140deg,#0a3444e8,#081a2eea);box-shadow:0 0 16px #35dffc22}
+  .tr-arena>.tr-score{flex:0 0 96px;max-width:1220px!important;width:100%;margin:0 auto!important;padding:7px 26px;border-radius:26px;background:linear-gradient(105deg,#031e31ec,#06283bd9 44%,#081c30dd 56%,#2e230fd9);box-shadow:inset 0 1px #c4faff33,0 12px 35px #0008,0 0 34px #37e9ff20}
+  .tr-arena .tr-score .tr-score-main .tr-avatar{width:74px;height:78px;filter:drop-shadow(0 0 15px #39eaff66)}
+  .tr-arena .tr-score .tr-score-main>b{font-size:56px;text-shadow:0 0 25px #ffda6380,2px 3px #04111b}
+  .tr-arena .tr-score .tr-score-name{font-size:17px;letter-spacing:.13em}
+  .tr-arena .tr-score .tr-target{min-height:68px;min-width:115px;border-color:#ffe16b77;font-size:19px;color:#d3fbff}
+  .tr-arena .tr-score .tr-target small{font-size:10px;letter-spacing:.16em}
+  .tr-arena .tr-score .tr-dots{max-width:200px;gap:4px}
+  .tr-arena .tr-score .tr-dots i{width:8px;height:8px;box-shadow:0 0 8px currentColor}
+  .tr-arena>.tr-table{position:relative;flex:1 1 0;align-self:stretch;max-width:1600px;width:100%;min-height:275px;height:auto;margin:0 auto;display:grid;grid-template-rows:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:0;padding:18px 28px 28px;border:2px solid #72ffe1a6;border-radius:38px;background:linear-gradient(180deg,#0327398c,#045a4591 48%,#022b2b99),url('../assets/truco-arena-neon.png') center/cover,radial-gradient(ellipse at 50% 45%,#08785b,#03251f 83%);box-shadow:inset 0 0 0 6px #031b1a9c,inset 0 0 70px #000b,0 18px 42px #000b,0 0 35px #26e7e544}
+  .tr-arena>.tr-table:before{inset:14px;border:1px solid #9affed55;border-radius:28px;background:linear-gradient(90deg,transparent calc(50% - 1px),#7ffff366 50%,transparent calc(50% + 1px)),linear-gradient(180deg,transparent calc(50% - 1px),#7ffff33f 50%,transparent calc(50% + 1px)),radial-gradient(circle at 50% 50%,transparent 0 88px,#a1fff13b 89px 91px,transparent 92px),linear-gradient(90deg,transparent 23%,#80ffdf22 23.2% 23.5%,transparent 23.7% 76.3%,#80ffdf22 76.5% 76.8%,transparent 77%),linear-gradient(180deg,transparent 8%,#80ffdf22 8.2% 8.5%,transparent 8.7% 91.3%,#80ffdf22 91.5% 91.8%,transparent 92%);}
+  .tr-arena>.tr-table:after{inset:28% 32%;border:1px solid #9bffe34a;box-shadow:0 0 0 1px #b8fff51a inset,0 0 55px #39ffdf21}
+  .tr-arena .tr-table .tr-row{width:100%;min-height:0;align-self:center;z-index:2}
+  .tr-arena .tr-table .tr-row--rival{min-height:145px;align-self:start;padding-top:16px}
+  .tr-arena .tr-table .tr-row--me{min-height:132px;align-self:end;transform:translateY(-36px)}
+  .tr-arena .tr-row--rival .tr-hand{display:flex;left:50%;top:2px;translate:-50% 0;z-index:1;gap:0}
+  .tr-arena .tr-row--rival .tr-hand .tr-card{width:58px;height:84px;margin-left:-17px;border-radius:10px}
+  .tr-arena .tr-row--rival .tr-hand .tr-card:first-child{margin-left:0}
+  .tr-arena .tr-row--rival .tr-played,.tr-arena .tr-row--me .tr-played{position:relative;z-index:3;gap:clamp(12px,2vw,30px)}
+  .tr-arena .tr-table .tr-slot{width:clamp(74px,7vw,108px);height:clamp(112px,21vh,158px)}
+  .tr-arena .tr-table .tr-card{width:100%;height:100%;border-radius:15px}
+  .tr-arena .tr-table .tr-card b{font-size:40px}
+  .tr-arena .tr-table .tr-card i{font-size:30px}
+  .tr-arena .tr-table .tr-felt{position:relative;z-index:4;justify-self:center;min-width:min(460px,60%);padding:12px 25px;border:1px solid #9effe56b;border-radius:16px;background:linear-gradient(110deg,#031923d9,#073b44e8,#031923d9);box-shadow:0 8px 24px #0008,0 0 25px #1bf4df27;backdrop-filter:blur(7px)}
+  .tr-arena .tr-table .tr-felt>span{font-size:12px;color:#98fff0;letter-spacing:.2em}
+  .tr-arena .tr-table .tr-felt h3{margin-top:7px;font-size:clamp(24px,2.5vw,38px);color:#ffe16b;text-shadow:0 0 20px #ffc64277,2px 3px #041219}
+  .tr-arena>.tr-mine{position:relative;z-index:12;flex:0 0 auto;align-self:center;width:min(1450px,100%);margin:-82px auto 0!important;padding:0 14px 2px;gap:8px;overflow:visible;text-shadow:0 2px 6px #00101a}
+  .tr-arena .tr-envido-hint{font-size:11px;letter-spacing:.2em;color:#b5fff0}
+  .tr-arena .tr-hand--mine{gap:clamp(10px,1.7vw,25px)}
+  .tr-arena .tr-hand--mine .tr-card{width:clamp(112px,9vw,150px);height:clamp(174px,28vh,218px);border-radius:17px;box-shadow:0 18px 35px #000d,0 0 0 3px #f8e7b6,0 0 34px #ffdc6860}
+  .tr-arena .tr-hand--mine .tr-card:nth-child(1){transform:rotate(-7deg) translateY(10px)}
+  .tr-arena .tr-hand--mine .tr-card:nth-child(2){transform:translateY(-8px);z-index:2}
+  .tr-arena .tr-hand--mine .tr-card:nth-child(3){transform:rotate(7deg) translateY(10px)}
+  .tr-arena .tr-hand--mine .tr-card:hover:not(:disabled){transform:translateY(-18px) rotate(0) scale(1.04);z-index:8;filter:brightness(1.1) drop-shadow(0 0 18px #55f4ff);}
+  .tr-arena .tr-hand--mine .tr-card:disabled{opacity:.88;filter:saturate(.9)}
+  .tr-arena>.tr-mine .tr-actions{gap:12px;min-height:42px}
+  .tr-arena>.tr-mine .tr-actions button{min-height:42px;padding:8px 22px;border-radius:9px 2px;font-size:19px;box-shadow:0 5px 0 #020c13,0 0 16px #21d5ff20;transition:transform .18s,box-shadow .18s,filter .18s}
+  .tr-arena>.tr-mine .tr-actions button:hover{transform:translateY(-3px);filter:brightness(1.18);box-shadow:0 8px 0 #020c13,0 0 24px #21d5ff55}
+  .tr-arena>.rps-rule{flex:0 0 auto;margin:0 auto;max-width:none;color:#87c8d3;font-size:9px;letter-spacing:.2em;text-shadow:0 1px 4px #00101a}
+  .tr-arena>.rps-rule>span{display:inline;margin-left:16px;color:#ffdf70;font-size:9px}
+  .tr-arena .tr-bubble{z-index:20;max-width:min(400px,35vw);padding:12px 24px;border:2px solid #fff0aa;border-radius:16px 3px 16px 16px;background:radial-gradient(ellipse at 35% 30%,#fff3a8,#ffb924 42%,#ed572a 90%);color:#1d1420;font-size:clamp(24px,2.2vw,36px);text-shadow:0 1px #fff8;box-shadow:0 0 0 4px #ffcf4b44,0 10px 30px #000b,0 0 35px #ff9b35a6}
+  .tr-arena .tr-bubble--rival{top:8px;right:2%}
+  .tr-arena .tr-bubble--me{bottom:28px;left:2%}
+  .tr-arena>.tr-cinema-result{position:absolute;z-index:40;bottom:18px;left:50%;transform:translateX(-50%)}
+  .tr-arena>.tr-log{display:none!important}
+}
+@keyframes tr-desktop-energy{0%{background-position:0 0,0 0}50%{background-position:0 0,8deg 0}100%{background-position:0 0,16deg 0}}
+@media(prefers-reduced-motion:reduce){.tr-arena.rps-arena:before{animation:none!important}}
+
+@media(min-width:901px){
+  .tr-arena>.tr-table{background:linear-gradient(180deg,#032739a6,#045a45a6 48%,#022b2bb8),radial-gradient(ellipse at 50% 45%,#07815e,#03251f 83%);}
+  .tr-arena.rps-arena:before{animation:tr-desktop-energy 8s ease-in-out infinite;}
+}
+@keyframes tr-desktop-energy{0%,100%{opacity:.30}50%{opacity:.55}}
+
+@media(min-width:901px){
+  .tr-arena .tr-pip-face__corner{width:19%;height:22%}
+  .tr-arena .tr-pip-face__corner b{font-size:clamp(16px,1.15vw,24px)}
+  .tr-arena .tr-pip-face__marks{inset:17% 18%}
+  .tr-arena .tr-pip-face__marks>span{width:70%;height:76%}
+}
+@media(max-width:900px){
+  .tr-arena .tr-pip-face__corner b{font-size:clamp(11px,4vw,16px)}
+  .tr-arena .tr-pip-face__marks{inset:18% 17%}
+  .tr-arena .tr-pip-face__marks>span{width:76%;height:80%}
+}
+
+/* The number cards share one ornate frame; only the suit pip changes. */
+.tr-pip-face:before{inset:5% 5%;opacity:.72;background:repeating-conic-gradient(from 0deg at 50% 50%,#ffe07828 0deg 1deg,transparent 1.3deg 12deg)}
+.tr-pip-face__frame{inset:4%;border:1px solid #ffd963;border-radius:9px;box-shadow:inset 0 0 0 2px #07172c,inset 0 0 0 3px #c18d26,0 0 6px #f8d45c55;background:radial-gradient(circle at 8% 8%,#ffdf77 0 1.5px,transparent 2px),radial-gradient(circle at 92% 8%,#ffdf77 0 1.5px,transparent 2px),radial-gradient(circle at 8% 92%,#ffdf77 0 1.5px,transparent 2px),radial-gradient(circle at 92% 92%,#ffdf77 0 1.5px,transparent 2px)}
+.tr-pip-face__corner{border:1px solid #b98730;background:linear-gradient(145deg,#fff9e8,#ebd7a9);box-shadow:0 1px 4px #0008}
+.tr-pip-face__marks{inset:16% 17%}
+.tr-pip-face__marks>span{width:78%;height:82%;filter:drop-shadow(0 2px 2px #000b)}
+.tr-pip-face--espada .tr-pip-face__marks svg{filter:drop-shadow(0 0 3px #7defffaa)}
+.tr-pip-face--basto .tr-pip-face__marks svg{filter:drop-shadow(0 0 2px #f2c56888)}
+.tr-pip-face--oro .tr-pip-face__marks svg{filter:drop-shadow(0 0 5px #ffc941bb)}
+.tr-pip-face--copa .tr-pip-face__marks svg{filter:drop-shadow(0 0 4px #61fff6aa)}
+@media(min-width:901px){.tr-arena .tr-pip-face__marks{inset:16% 16%}.tr-arena .tr-pip-face__marks>span{width:78%;height:82%}}

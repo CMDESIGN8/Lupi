@@ -1,0 +1,133 @@
+/* ── TrucoBattleIntro: pantalla VS de entrada estilo batalla Pokémon/SuperCampeones ── */
+.truco-intro {
+  position: fixed; inset: 0; z-index: 9000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at 50% 42%, #0e5c3e 0%, #021a12 55%, #000d08 100%);
+  overflow: hidden; isolation: isolate;
+  transition: opacity .35s ease-out;
+}
+.truco-intro--exit { opacity: 0; pointer-events: none; }
+
+/* ── Speed lines giratorias ── */
+.truco-intro__speedlines {
+  position: absolute; inset: -20%; z-index: 0; pointer-events: none;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0deg 7deg,
+    #48ffce09 7.3deg 7.6deg,
+    transparent 8deg 14deg
+  );
+  animation: ti-spin 1.4s linear infinite;
+}
+@keyframes ti-spin { to { transform: rotate(360deg); } }
+
+/* ── Flash de impacto en la fase clash ── */
+.truco-intro__flash {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 46%, #fff8 0%, transparent 65%);
+  opacity: 0; transition: opacity .08s;
+}
+.truco-intro--clash .truco-intro__flash { opacity: 1; animation: ti-flash .55s ease-out both; }
+@keyframes ti-flash { 0% { opacity: .9; } 100% { opacity: 0; } }
+
+/* ── Fighters ── */
+.truco-intro__fighters {
+  position: relative; z-index: 2;
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 0;
+  width: min(680px, 96vw); padding: 0 12px; box-sizing: border-box;
+}
+
+.truco-intro__fighter {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.truco-intro__fighter--me {
+  animation: ti-enter-left .55s cubic-bezier(.2, 1.2, .4, 1) both;
+}
+.truco-intro__fighter--rival {
+  animation: ti-enter-right .55s cubic-bezier(.2, 1.2, .4, 1) both;
+}
+.truco-intro--clash .truco-intro__fighter--me  { animation: ti-clash-left  .28s ease-out both; }
+.truco-intro--clash .truco-intro__fighter--rival { animation: ti-clash-right .28s ease-out both; }
+
+@keyframes ti-enter-left  { from { opacity: 0; transform: translateX(-80px) scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes ti-enter-right { from { opacity: 0; transform: translateX( 80px) scale(.85); } to { opacity: 1; transform: none; } }
+@keyframes ti-clash-left  { from { transform: none; } to { transform: translateX(14px) scale(1.06); } }
+@keyframes ti-clash-right { from { transform: none; } to { transform: translateX(-14px) scale(1.06); } }
+
+/* ── Avatares ── */
+.truco-intro__avatar {
+  width: 130px; height: 170px; position: relative; overflow: hidden;
+  filter: drop-shadow(0 10px 18px #000c) drop-shadow(0 0 22px #2cffb255);
+}
+.truco-intro__avatar--rival {
+  filter: drop-shadow(0 10px 18px #000c) drop-shadow(0 0 22px #ffdb5255);
+}
+.truco-intro__avatar .lp-owned-portrait__rig,
+.truco-intro__avatar .lupi-story-pose {
+  width: 100%; height: 100%; object-fit: contain; object-position: bottom center;
+}
+/* Escalar OwnedCardPortrait igual que en RPS */
+.truco-intro__avatar .lp-owned-portrait__rig { position: absolute; bottom: 0; }
+
+.truco-intro__name {
+  font: italic 900 clamp(16px, 3.5vw, 24px) / 1 'Barlow Condensed', sans-serif;
+  color: #e8fff8; text-shadow: 2px 3px #001a0f; text-align: center;
+  overflow-wrap: anywhere; max-width: 140px;
+}
+.truco-intro__fighter--rival .truco-intro__name { color: #ffee88; }
+
+/* ── Centro: VS + título ── */
+.truco-intro__center {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 0 8px;
+}
+.truco-intro__vs {
+  font: italic 900 clamp(52px, 11vw, 90px) / 1 'Barlow Condensed', sans-serif;
+  color: #ffdb51; text-shadow: 4px 6px #03130a, 0 0 40px #ffd84366;
+  transform: rotate(-6deg) skewX(-4deg); display: block;
+  animation: ti-vs-pop .5s cubic-bezier(.2, 1.6, .4, 1) .15s both;
+}
+.truco-intro__title {
+  font: italic 900 clamp(28px, 6vw, 50px) / 1 'Barlow Condensed', sans-serif;
+  color: #3dffc0; letter-spacing: .06em;
+  text-shadow: 2px 4px #001a0f, 0 0 24px #3dffc055;
+  animation: ti-title-pop .45s cubic-bezier(.2, 1.6, .4, 1) .55s both;
+}
+@keyframes ti-vs-pop    { from { opacity: 0; transform: rotate(-6deg) skewX(-4deg) scale(2.4); } to { opacity: 1; transform: rotate(-6deg) skewX(-4deg) scale(1); } }
+@keyframes ti-title-pop { from { opacity: 0; transform: scale(2) translateY(-10px); } to { opacity: 1; transform: none; } }
+
+/* ── Cartas cayendo al fondo ── */
+.truco-intro__deck {
+  position: absolute; bottom: 0; left: 50%; z-index: 1; pointer-events: none;
+  display: flex; gap: 10px; transform: translateX(-50%);
+}
+.truco-intro__card {
+  width: 44px; height: 66px; border-radius: 6px;
+  border: 2px solid #e8d279; box-sizing: border-box;
+  background: radial-gradient(circle at 50% 38%, #17497a, #071b3c 70%);
+  box-shadow: 0 8px 14px #000a, inset 0 0 0 2px #d3a84044;
+  transform-origin: bottom center;
+  animation: ti-card-fan .6s cubic-bezier(.2, 1.2, .4, 1) calc(var(--i) * 60ms) both;
+}
+.truco-intro__card::after {
+  content: '✦'; position: absolute; inset: 0; display: grid; place-items: center;
+  color: #ffdf75; font: 900 14px / 1 Barlow, sans-serif;
+  text-shadow: 0 0 8px #33dfff; letter-spacing: 0;
+}
+@keyframes ti-card-fan {
+  from { opacity: 0; transform: translateY(60px) rotate(calc((var(--i) - 2) * 14deg)) scale(.6); }
+  to   { opacity: 1; transform: translateY(0)   rotate(calc((var(--i) - 2) * 14deg)) scale(1); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .truco-intro__avatar { width: 100px; height: 134px; }
+  .truco-intro__vs { font-size: 52px; }
+  .truco-intro__title { font-size: 28px; }
+  .truco-intro__card { width: 36px; height: 54px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .truco-intro, .truco-intro * { animation: none !important; transition: none !important; }
+  .truco-intro--exit { display: none; }
+}
