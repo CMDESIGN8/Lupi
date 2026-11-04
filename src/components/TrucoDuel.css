@@ -491,3 +491,17 @@
 .tr-versus__player>.tr-speaking-face{width:120px!important;height:145px!important;max-width:100%;max-height:none!important;flex-shrink:0}.tr-versus__rival>.tr-lupi-portrait{width:140px;height:145px}.tr-versus__rival>.tr-lupi-portrait>span{width:140px;height:242px}.tr-versus__player,.tr-versus__rival{gap:10px;min-width:0}
 @media(min-width:901px){.tr-versus__player>.tr-speaking-face{width:190px!important;height:220px!important}.tr-versus__rival>.tr-lupi-portrait{width:210px;height:220px}.tr-versus__rival>.tr-lupi-portrait>span{width:210px;height:363px}}
 @media(max-width:900px){.tr-result__portrait,.tr-result__players .tr-lupi-portrait{width:105px;height:115px}.tr-result__players .tr-lupi-portrait>span{width:105px;height:182px}.tr-result__players .tr-result__portrait .lw-face{width:88px!important;height:105px!important}}
+
+/* Card motion stays inside the table; no camera movement. */
+.tr-table-slot{--baza-color:#42e6a0;isolation:isolate}
+.tr-row--me .tr-table-slot>.is-played{animation:tr-card-arrive-me .32s ease-out both}
+.tr-row--rival .tr-table-slot>.is-played{animation:tr-card-arrive-rival .32s ease-out both}
+.tr-table-slot--loss{--baza-color:#ff6b75}
+.tr-table-slot--tie{--baza-color:#b6ccd2}
+.tr-table-slot--winner::after{content:"";position:absolute;inset:-4px;border:2px solid var(--baza-color);border-radius:13px;pointer-events:none;box-shadow:0 0 13px color-mix(in srgb,var(--baza-color) 30%,transparent);animation:tr-baza-light .65s ease-out both;z-index:2}
+.tr-table-slot--winner>.tr-badge{background:var(--baza-color);color:#04222a;animation:tr-baza-badge .2s ease-out both;z-index:3}
+@keyframes tr-card-arrive-me{from{opacity:.2;transform:translateY(45px) scale(.93)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tr-card-arrive-rival{from{opacity:.2;transform:translateY(-35px) scale(.93)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes tr-baza-light{from{opacity:0;box-shadow:0 0 0 transparent}45%{opacity:1;box-shadow:0 0 20px color-mix(in srgb,var(--baza-color) 45%,transparent)}to{opacity:1}}
+@keyframes tr-baza-badge{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.tr-table-slot>.is-played,.tr-table-slot--winner::after,.tr-table-slot--winner>.tr-badge{animation:none!important}}

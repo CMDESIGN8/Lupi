@@ -6,7 +6,7 @@ import { duelFx } from "../lib/duelFx";
 import { ENVIDO_NAME, TARGET, TRUCO_NAME, actor, movesFor, envidoPoints, type EnvidoCall } from "../utils/trucoEngine";
 import { AvatarFace } from "./AvatarFace";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
-import { TrucoCard } from "./TrucoDuel";
+import { TrucoCard, TrucoTableSlot } from "./TrucoDuel";
 import "./RockPaperScissors.css";
 import "./TrucoDuel.css";
 import {TrucoMatchResult} from "./TrucoMatchResult";
@@ -55,10 +55,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
   const iWon       = finished && pvpState?.winnerId === meId;
   const outcome    = iWon ? "win" : "loss";
   const dots = (n: number) => Array.from({ length: TARGET }, (_, i) => <i key={i} className={i < n ? "on" : ""} />);
-  const trickBadge = (i: number) => {
-    const r = state?.trickResults[i];
-    return r === undefined ? "" : r === "tie" ? "=" : r === mySeat ? "✓" : "✗";
-  };
+
 
   const doAct = (a: Parameters<typeof act>[0]) => { duelFx.tap(); void act(a); };
   const call  = (kind: EnvidoCall) => doAct({ t: "envido", kind });
@@ -117,10 +114,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
           <div className="tr-row tr-row--rival">
             <div className="tr-hand">{(state.hands[rivalSeat] ?? []).map((_, i) => <TrucoCard key={i} back />)}</div>
             <div className="tr-played">{[0,1,2].map(i => (
-              <div key={i} className="tr-slot">
-                <TrucoCard card={state.table[rivalSeat][i] ?? null} played />
-                {trickBadge(i) && <em className={`tr-badge tr-badge--${state.trickResults[i] === mySeat ? "w" : state.trickResults[i] === rivalSeat ? "l" : "t"}`}>{trickBadge(i)}</em>}
-              </div>
+              <TrucoTableSlot key={`${state.handNo}:${i}`} card={state.table[rivalSeat][i] ?? null} result={state.trickResults[i]} seat={rivalSeat} mySeat={mySeat} handNo={state.handNo} />
             ))}</div>
             {bubble?.seat === rivalSeat && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><AvatarFace appearance={rivalAppearance} className="tr-speaking-face"/><span>{bubble.text}</span></div>}
           </div>
@@ -132,7 +126,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
 
           <div className="tr-row tr-row--me">
             <div className="tr-played">{[0,1,2].map(i => (
-              <div key={i} className="tr-slot"><TrucoCard card={state.table[mySeat][i] ?? null} played /></div>
+              <TrucoTableSlot key={`${state.handNo}:${i}`} card={state.table[mySeat][i] ?? null} result={state.trickResults[i]} seat={mySeat} mySeat={mySeat} handNo={state.handNo} />
             ))}</div>
             {bubble?.seat === mySeat && <div key={bubble.n} className="tr-bubble tr-bubble--me"><AvatarFace appearance={myAppearance} className="tr-speaking-face"/><span>{bubble.text}</span></div>}
           </div>
