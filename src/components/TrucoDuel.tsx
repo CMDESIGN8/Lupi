@@ -12,6 +12,7 @@ import lupiTrucoAvatar from '../assets/lupi-truco-avatar.png';
 import { ENVIDO_NAME, TARGET, TRUCO_NAME, movesFor, envidoPoints, type Card, type EnvidoCall } from "../utils/trucoEngine";
 import "./RockPaperScissors.css";
 import "./TrucoDuel.css";
+import {TrucoMatchResult} from "./TrucoMatchResult";
 import { AvatarFace } from "./AvatarFace";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { AnimeEffects, type AnimeEffectsHandle } from "./AnimeEffects";
@@ -250,14 +251,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
         </div>
       </div>}
 
-      {finished && (
-        <div className="rps-finish">
-          <p className="rps-winner-name">{state.winner === 0 ? myName : rivalName} SE LLEVA EL DUELO · {state.scores[0]} a {state.scores[1]}</p>
-          <DuelRewardCard reward={reward} error={rewardError} rivalName={rivalName} gameLabel="Truco"/>
-          {onRematch && <button className="duel-rematch" type="button" onClick={onRematch}>OTRA PARTIDA · REVANCHA ↻</button>}
-          <button className="rps-exit" type="button" onClick={onExit}>VOLVER AL CLUB →</button>
-        </div>
-      )}
+      {finished && <TrucoMatchResult meId={meId} myName={myName} rivalName={rivalName} myScore={state.scores[0]} rivalScore={state.scores[1]} won={state.winner===0} onExit={onExit} onRematch={onRematch}><DuelRewardCard reward={reward} error={rewardError} rivalName={rivalName} gameLabel="Truco"/></TrucoMatchResult>}
 
       <ul className="tr-log" aria-label="Historial">{state.log.slice(-3).map((l, i) => <li key={i} data-tone={l.tone}>{l.text}</li>)}</ul>
       <footer className="rps-rule">TRUCO · ENVIDO · SIN FLOR <span>A {TARGET} PUNTOS · 3 BAZAS POR MANO</span></footer>

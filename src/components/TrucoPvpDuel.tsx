@@ -9,6 +9,7 @@ import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { TrucoCard } from "./TrucoDuel";
 import "./RockPaperScissors.css";
 import "./TrucoDuel.css";
+import {TrucoMatchResult} from "./TrucoMatchResult";
 
 type Props = { challenge: Challenge; meId: string; onExit: () => void; onFinished?: (f: boolean) => void };
 
@@ -164,12 +165,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
       )}
 
       {state?.phase === "hand-over" && !finished && <div className="tr-pvp-end" role="dialog" aria-modal="true" aria-label="Resultado de la mano"><div><h2>{state.handResult?.winner === mySeat ? "¡MANO TUYA!" : "MANO DEL RIVAL"}</h2><p>{state.handResult?.reason}</p><strong>Vos {myScore} · Rival {rivalScore}</strong><button type="button" disabled={busy} onClick={()=>doAct({t:"next"})}>SIGUIENTE MANO →</button></div></div>}
-      {finished && (
-        <div className="rps-finish tr-pvp-end">
-          <p className="rps-winner-name">{pvpState?.winnerId === meId ? myName : rivalName} SE LLEVA EL DUELO · {myScore} a {rivalScore}</p>
-          <button className="rps-exit" type="button" onClick={onExit}>VOLVER AL CLUB →</button>
-        </div>
-      )}
+      {finished && <TrucoMatchResult meId={meId} rivalId={rivalId} myName={myName} rivalName={rivalName} myScore={myScore} rivalScore={rivalScore} won={iWon} onExit={onExit}/>}
 
       <footer className="rps-rule">TRUCO · ENVIDO · SIN FLOR <span>A {TARGET} PUNTOS · 3 BAZAS POR MANO</span></footer>
     </section>
