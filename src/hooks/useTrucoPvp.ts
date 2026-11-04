@@ -249,7 +249,9 @@ export function useTrucoPvp(challenge: Challenge) {
   };
 
   const leave = useCallback(async () => {
-    await supabase.rpc("truco_leave", { p_id: challenge.id }).catch(() => {});
+    try {
+      await supabase.rpc("truco_leave", { p_id: challenge.id });
+    } catch { /* La salida local sigue disponible si falla la conexión. */ }
   }, [challenge.id]);
 
   return { pvpState, gameState, error, busy, act, leave, isHost };
