@@ -151,9 +151,10 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
   useEffect(() => {
     setIntro(true);
     seenCards.current.clear(); seenTricks.current.clear(); seenHands.current.clear();
-    const t = window.setTimeout(() => setIntro(false), 1500);
+    if (!ready) return;
+    const t = window.setTimeout(() => setIntro(false), 3200);
     return () => window.clearTimeout(t);
-  }, [challenge.id]);
+  }, [challenge.id, ready]);
   useEffect(() => {
     if (intro) return;
     state.table.forEach((row, seat) => row.forEach((card, index) => {
@@ -214,10 +215,12 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
 
   return (
     <section className={`rps-arena tr-arena ${finished ? "is-complete" : ""}`} data-outcome={finished ? outcome : undefined} aria-label="Truco">
-      {intro && <div className="tr-versus" role="status" aria-label="Comienza el duelo de truco">
-        <div className="tr-versus__player"><AvatarFace appearance={appearance} className="tr-speaking-face"/><strong>{myName}</strong></div>
-        <b className="tr-versus__title">¡TRUCO!</b>
-        <div className="tr-versus__rival"><LupiTrucoPose pose="compete"/><strong>{rivalName}</strong></div>
+      {intro && <div className="tr-rivalry" role="dialog" aria-modal="true" aria-label="Previa del duelo de Truco">
+        <div className="tr-rivalry__rays" aria-hidden="true"/>
+        <div className="tr-rivalry__closeups" aria-hidden="true"><div><AvatarFace appearance={appearance}/></div><div><LupiTrucoPose pose="compete"/></div></div>
+        <div className="tr-rivalry__duel"><div className="tr-rivalry__panel tr-rivalry__panel--me"><span>EL DESAFÍO ES TUYO</span><div className="tr-rivalry__body"><OwnedCardPortrait userId={meId} appearanceOverride={appearance}/></div><strong>{myName}</strong></div><div className="tr-rivalry__panel tr-rivalry__panel--rival"><span>LA MESA TIENE RIVAL</span><div className="tr-rivalry__body"><LupiTrucoPose pose="compete"/></div><strong>{rivalName}</strong></div></div>
+        <div className="tr-rivalry__impact"><b>VS</b><strong>¡QUE HABLEN LAS CARTAS!</strong></div>
+        <button type="button" className="tr-rivalry__skip" onClick={()=>setIntro(false)}>SALTAR PREVIA →</button>
       </div>}
       <DuelGameHeader game="truco" onBack={onExit} title={<>TRUCO <em>ARGENTINO</em></>} subtitle="CARTAS, CANTOS Y ESTRATEGIA" mode="VS BOT · PRÁCTICA"/>
       <div className="tr-help"><button type="button" aria-label="Ayuda: cómo jugar al truco" title="Cómo jugar" aria-expanded={showRules} onClick={()=>setShowRules(value=>!value)}>?</button></div>
