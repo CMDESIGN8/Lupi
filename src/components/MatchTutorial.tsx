@@ -21,7 +21,7 @@ export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Prop
   const choosePractice = (choice: string) => {
     if (cinema || practice || transition !== 'idle') return;
     setCinema(choice);
-    timer.current = setTimeout(() => { setPractice(choice); setCinema(null); }, reducedMotion() ? 0 : 2100);
+    timer.current = setTimeout(() => { setPractice(choice); setCinema(null); }, reducedMotion() ? 0 : 4800);
   };
   const changeStep = (next: number) => {
     if (transition !== 'idle' || cinema) return;
@@ -40,10 +40,9 @@ export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Prop
     {transition === 'kickoff' && <div className="mt-kickoff" role="status"><span>LUPI WORLD</span><strong>A LA CANCHA</strong><small>Tu historia sigue en juego</small></div>}
     <header><span>ANTES DE JUGAR</span><span>{step + 1} / 3</span></header>
     <div className="mt-dots" aria-hidden="true">{titles.map((title, i) => <i key={title} className={i === step ? 'active' : ''} />)}</div>
-    <div className="mt-content" aria-live="polite">
+    <div className={`mt-content ${cinema || practice ? "mt-content--playing" : ""}`} aria-live="polite">
       <div className={`mt-manga-scene mt-integrated-panel mt-manga-scene--${step}`}>
         <div className="mt-manga-traces" aria-hidden="true"/>
-        {userId && <div className="mt-coach-user"><OwnedCardPortrait userId={userId}/><span>VOS · EL PRÓXIMO PROTAGONISTA</span></div>}
         <LupiStoryPose pose={step===2?'celebrate':practice?(step===0&&practice==='shoot'?'surprised':'celebrate'):step===1?'determined':'explain'} className="mt-manga-lupi"/>
         <div key={`${step}:${practice ?? "ready"}`} className="mt-manga-speech"><small>LUPI · TU ENTRENADOR</small><h1>{titles[step]}</h1><p>{step===0?'Recibís cerca del arco. El arquero sale a achicar.':step===1?'El rival viene por el medio. Tu compañero cubre el pase.':'Cinco cartas. Un equipo. Ahora empieza tu partido.'}</p></div>
         <div className="mt-panel-objective"><strong>{step < 2 ? "TU MISIÓN" : "A LA CANCHA"}</strong><span>{step < 2 ? "Completá la prueba. No necesitás ganar para avanzar." : "Revisá tu quinteto y preparate para jugar."}</span></div>
@@ -52,14 +51,13 @@ export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Prop
       {step < 2 ? <>
         <div className={`mt-practice-court ${practice?'has-choice':''}`} data-choice={practice} key={step} aria-label="Cancha de práctica">
           <div className="mt-practice-goal"/><span className="mt-practice-keeper">🧤</span><span className="mt-practice-player">{step===0?'⚡':'🛡'}</span><span className="mt-practice-ball">⚽</span><span className="mt-practice-partner">↗</span>
-          <div className="mt-match-player" aria-hidden="true">{userId ? <OwnedCardPortrait userId={userId}/> : <span>⚡</span>}</div>
           <span className="mt-court-caption">{step === 0 ? 'ATAQUE · ÚLTIMA JUGADA' : 'DEFENSA · CERRÁ EL CAMINO'}</span>
-          {cinema && <div key={cinema} className={`mt-play-cinema mt-play-cinema--${cinema}`} aria-label="Jugada en curso">
+          {(cinema || practice) && <div key={cinema || practice} className={`mt-play-cinema mt-play-cinema--${cinema || practice} ${practice ? "is-resolved" : ""}`} aria-label="Jugada en curso">
             <div className="mt-play-cinema__lines" aria-hidden="true"/>
-            <strong className="mt-play-cinema__call">{({shoot:'¡REMATÁ!',pass:'¡PASE AL COMPAÑERO!',press:'¡SALÍ A MARCAR!',cover:'¡CUBRÍ EL ARCO!'} as Record<string,string>)[cinema]}</strong>
+            <strong className="mt-play-cinema__call">{({shoot:'¡REMATÁ!',pass:'¡PASE AL COMPAÑERO!',press:'¡SALÍ A MARCAR!',cover:'¡CUBRÍ EL ARCO!'} as Record<string,string>)[cinema || practice!]}</strong>
             <div className="mt-play-cinema__player" aria-hidden="true">{userId ? <OwnedCardPortrait userId={userId}/> : <LupiStoryPose pose="determined"/>}</div>
-            <span className="mt-play-cinema__ball" aria-hidden="true">⚽</span><span className="mt-play-cinema__rival" aria-hidden="true">{cinema === 'shoot' ? '🧤' : cinema === 'pass' ? '↗' : '⚡'}</span>
-            <strong className="mt-play-cinema__result">{({shoot:'¡EL ARQUERO LA SACÓ!',pass:'¡LA JUGADA SIGUE!',press:'¡RECUPERASTE LA PELOTA!',cover:'¡CERRASTE EL CAMINO!'} as Record<string,string>)[cinema]}</strong>
+            <span className="mt-play-cinema__ball" aria-hidden="true">⚽</span><span className="mt-play-cinema__rival" aria-hidden="true">{(cinema || practice) === 'shoot' ? '🧤' : (cinema || practice) === 'pass' ? '↗' : '⚡'}</span>
+            <strong className="mt-play-cinema__result">{({shoot:'¡EL ARQUERO LA SACÓ!',pass:'¡LA JUGADA SIGUE!',press:'¡RECUPERASTE LA PELOTA!',cover:'¡CERRASTE EL CAMINO!'} as Record<string,string>)[cinema || practice!]}</strong>
           </div>}
           <small>PRÁCTICA · SIN PREMIOS NI PENALIZACIÓN</small>
         </div>

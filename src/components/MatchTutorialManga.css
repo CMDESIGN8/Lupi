@@ -122,3 +122,28 @@
  .mt-court-caption{font-size:8px;top:6px;left:8px}
 }
 @media(prefers-reduced-motion:reduce){.mt-play-cinema *{animation:none!important}}
+
+/* Give the play the entire vignette; only one user avatar is visible. */
+.match-tutorial .mt-content{position:relative}
+.match-tutorial .mt-content--playing>.mt-integrated-panel{visibility:hidden}
+.match-tutorial .mt-content--playing>.mt-practice-court{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-height:none!important;min-height:0!important;margin:0!important;z-index:12;box-sizing:border-box}
+.mt-content--playing .mt-practice-court>small{z-index:15}
+.mt-content--playing .mt-court-caption{z-index:15}
+.mt-play-cinema__call,.mt-play-cinema__player,.mt-play-cinema__ball,.mt-play-cinema__rival,.mt-play-cinema__result{animation-duration:4.8s!important}
+.mt-play-cinema__player{width:46%;height:90%}
+.mt-play-cinema__call{top:14%;font-size:clamp(26px,4vw,54px)}
+.mt-play-cinema__result{font-size:clamp(27px,4vw,50px)}
+.mt-play-cinema.is-resolved .mt-play-cinema__call,.mt-play-cinema.is-resolved .mt-play-cinema__ball,.mt-play-cinema.is-resolved .mt-play-cinema__rival,.mt-play-cinema.is-resolved .mt-play-cinema__player{display:none}
+.mt-play-cinema.is-resolved .mt-play-cinema__result{animation:none!important;opacity:1;transform:none;top:35%}
+.mt-play-cinema.is-resolved .mt-play-cinema__lines{animation:none}
+@media(max-width:900px){
+ .mt-content--playing .mt-play-cinema__player{width:65%;height:85%;left:0}
+ .mt-content--playing .mt-play-cinema__call{top:15%;font-size:30px}
+ .mt-content--playing .mt-play-cinema__result{font-size:30px;padding:18px 12px}
+ .mt-content--playing .mt-play-cinema__ball{font-size:38px}
+ .mt-content--playing .mt-play-cinema__rival{font-size:48px}
+}
+
+/* Lupi owns the coaching scene; the user appears only during the play. */
+.match-tutorial .mt-integrated-panel .mt-manga-lupi{left:20%!important;width:60%!important;justify-content:center}
+@media(max-width:900px){.match-tutorial .mt-integrated-panel .mt-manga-lupi{left:17%!important;width:66%!important}}
