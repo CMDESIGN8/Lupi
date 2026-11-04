@@ -443,3 +443,28 @@
  .tr-arena .tr-hand--mine .tr-card{height:clamp(140px,23vh,180px);width:clamp(100px,9vw,130px)}
  .tr-arena>.tr-mine{padding-top:7px;padding-bottom:8px;row-gap:7px}
 }
+
+/* Chapter-one style speaking cut-in, with the real customized face. */
+.tr-arena .tr-bubble{position:absolute;left:12%!important;right:12%!important;top:12%!important;bottom:auto!important;width:auto;max-width:none;min-height:150px;padding:16px 24px 16px 170px;box-sizing:border-box;display:flex;align-items:center;gap:20px;border:0;border-block:3px solid #83cbbd;border-radius:0;outline:0;background:repeating-linear-gradient(-12deg,transparent 0 23px,#b7fff119 24px 25px),#020e18;color:#fff09b;font-size:clamp(30px,4vw,60px);text-shadow:3px 3px #021823;box-shadow:0 9px 28px #000c;transform:rotate(-4deg);z-index:60;animation:tr-speaking-entry .35s ease-out both;overflow:visible}
+.tr-arena .tr-bubble .tr-speaking-face{position:absolute;left:25px;top:-12%;height:124%;width:135px;transform:rotate(4deg)}
+.tr-arena .tr-bubble__avatar--lupi{position:absolute;left:15px;top:-10%;width:150px;height:120%;background:none;border:0;border-radius:0;overflow:visible}
+.tr-arena .tr-bubble__avatar--lupi img{width:100%;height:100%;object-fit:contain}
+.tr-versus__player>.tr-speaking-face{width:clamp(110px,22vw,300px);height:clamp(150px,34vw,400px);max-height:55vh}
+.tr-versus__rival img{width:clamp(110px,23vw,320px);height:auto}
+@keyframes tr-versus-left{from{transform:translateX(-100vw)}to{transform:translateX(0)}}
+@keyframes tr-versus-right{from{transform:translateX(100vw)}to{transform:translateX(0)}}
+@keyframes tr-speaking-entry{from{opacity:0;transform:translateX(70%) rotate(-4deg)}to{opacity:1;transform:translateX(0) rotate(-4deg)}}
+@media(max-width:900px){
+ .tr-arena>.tr-table{margin-top:88px;overflow:visible}
+ .tr-arena .tr-table>.tr-score{position:absolute;top:-86px;left:0;right:0;height:78px;margin:0;padding:4px 10px;background:linear-gradient(110deg,#062738,#1d231c);border:1px solid #59d6c666;border-radius:16px;display:grid;grid-template-columns:1fr 64px 1fr;z-index:5}
+ .tr-arena .tr-table>.tr-score>div{min-height:0}
+ .tr-arena .tr-score .tr-score-main .tr-avatar{height:52px;width:48px}
+ .tr-arena .tr-table .tr-score .tr-score-main .tr-avatar .lp-owned-portrait__rig{transform:translateX(-50%) scale(.11)!important;bottom:0!important}
+ .tr-arena .tr-director__eyebrow{display:none}
+ .tr-arena .tr-bubble{left:0!important;right:0!important;min-height:110px;padding:12px 14px 12px 110px;font-size:32px}
+ .tr-arena .tr-bubble .tr-speaking-face{left:12px;width:90px;height:125%}
+ .tr-arena .tr-bubble__avatar--lupi{left:8px;width:98px}
+ .tr-versus{gap:18vw}.tr-versus__player,.tr-versus__rival{width:35vw}
+ .tr-versus__title{font-size:15vw;top:57%}
+}
+@media(prefers-reduced-motion:reduce){.tr-arena .tr-bubble{animation:none}}
