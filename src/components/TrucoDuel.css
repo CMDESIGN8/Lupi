@@ -311,3 +311,18 @@
 .tr-pip-face--oro .tr-pip-face__marks svg{filter:drop-shadow(0 0 5px #ffc941bb)}
 .tr-pip-face--copa .tr-pip-face__marks svg{filter:drop-shadow(0 0 4px #61fff6aa)}
 @media(min-width:901px){.tr-arena .tr-pip-face__marks{inset:16% 16%}.tr-arena .tr-pip-face__marks>span{width:78%;height:82%}}
+
+.tr-versus{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;gap:4vw;overflow:hidden;background:radial-gradient(ellipse,#153259,#02050c 75%);animation:tr-versus-out 1.5s both}
+.tr-versus:before{content:'';position:absolute;inset:-60%;background:repeating-conic-gradient(from 10deg,transparent 0deg 8deg,#56dfff44 8.4deg 9deg,transparent 9.4deg 17deg);animation:tr-versus-rays 1.5s ease-out both}
+.tr-versus__player,.tr-versus__rival{position:relative;display:flex;flex-direction:column;align-items:center;width:30vw;max-width:350px;height:65vh;justify-content:center;filter:drop-shadow(0 0 24px #28dfff88);animation:tr-versus-left .45s ease-out both}
+.tr-versus__rival{animation-name:tr-versus-right}
+.tr-versus__player>*,.tr-versus__rival img{max-height:52vh;max-width:100%;object-fit:contain}
+.tr-versus strong{font-size:clamp(16px,3vw,32px);color:#fff;letter-spacing:.1em}
+.tr-versus__title{position:absolute;z-index:2;color:#ffe46a;font:900 italic clamp(55px,13vw,180px)/1 'Barlow Condensed',sans-serif;text-shadow:4px 5px #060a19,0 0 40px #ffb629;animation:tr-shout-impact .6s .35s both;transform:rotate(-8deg)}
+.tr-bubble{animation:tr-shout-impact .5s both;outline:2px solid #fff2ab;outline-offset:3px}
+@keyframes tr-shout-impact{0%{opacity:0;transform:scale(.1) rotate(-14deg)}50%{opacity:1;transform:scale(1.18) rotate(4deg)}70%{transform:scale(.96) rotate(-3deg)}100%{opacity:1;transform:scale(1) rotate(-2deg)}}
+@keyframes tr-versus-left{from{transform:translateX(-110vw)}to{transform:translateX(-22vw)}}
+@keyframes tr-versus-right{from{transform:translateX(110vw)}to{transform:translateX(22vw)}}
+@keyframes tr-versus-rays{from{transform:scale(.7);opacity:.3}to{transform:scale(1.4);opacity:1}}
+@keyframes tr-versus-out{0%,85%{opacity:1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.tr-versus *,.tr-versus:before,.tr-bubble{animation:none!important}.tr-versus__player{transform:translateX(-15vw)}.tr-versus__rival{transform:translateX(15vw)}}

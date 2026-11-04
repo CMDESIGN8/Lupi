@@ -4,14 +4,15 @@ import { useTrucoBotMatch } from "../hooks/useTrucoBotMatch";
 import { DuelResultEffects } from "./DuelResultEffects";
 import { duelFx } from "../lib/duelFx";
 import {DuelGameHeader} from './DuelGameHeader';
+import { useDuelReward } from '../hooks/useDuelReward';
 import { DuelRewardCard } from './DuelRewardCard';
 import {OwnedCardPortrait} from './OwnedCardPortrait';
-import {TrucoBattleIntro} from './TrucoBattleIntro';
 import {LupiStoryPose} from './LupiStoryPose';
 import lupiTrucoAvatar from '../assets/lupi-truco-avatar.png';
 import { ENVIDO_NAME, TARGET, TRUCO_NAME, movesFor, envidoPoints, type Card, type EnvidoCall } from "../utils/trucoEngine";
 import "./RockPaperScissors.css";
 import "./TrucoDuel.css";
+import { AnimeEffects, type AnimeEffectsHandle } from "./AnimeEffects";
 
 type Props = { challenge: Challenge; meId: string; onExit: () => void; onFinished?: (finished: boolean) => void; onRematch?: () => void };
 
@@ -36,10 +37,10 @@ const TRUCO_PIP_LAYOUTS: Record<2 | 3 | 4 | 5 | 6 | 7, [number, number][]> = {
 };
 
 function TrucoPipIcon({ suit }: { suit: Card["suit"] }) {
-  if (suit === "espada") return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M24 3 34 29 27 27 27 44 21 44 21 27 14 29Z" fill="#ecfbff" stroke="#397d99" strokeWidth="2"/><path d="M12 43Q24 36 36 43L31 49 26 47 26 57 30 60 18 60 22 57 22 47 17 49Z" fill="#f1c64e" stroke="#80551b" strokeWidth="2"/><path d="m24 8 4 19-4-2-4 2Z" fill="#55d9eb"/></svg>;
-  if (suit === "basto") return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M22 60 25 11Q25 7 29 8L28 19 39 13Q43 12 42 17L29 26 28 39 38 33Q42 32 41 37L27 47 27 60Z" fill="#9a5a31" stroke="#57371f" strokeWidth="2"/><path d="M9 26Q8 21 13 20L22 25 21 32 14 30 12 44Q10 48 7 44Z" fill="#b9753f" stroke="#644022" strokeWidth="2"/><path d="M16 55h17v5H16z" fill="#e2bd56" stroke="#7b541c" strokeWidth="2"/></svg>;
-  if (suit === "oro") return <svg viewBox="0 0 48 64" aria-hidden="true"><circle cx="24" cy="31" r="20" fill="#e7a92e" stroke="#784912" strokeWidth="3"/><circle cx="24" cy="31" r="15" fill="#ffd75c" stroke="#fff0a0" strokeWidth="2"/><circle cx="24" cy="31" r="7" fill="#c47b19"/><path d="M24 17v5m0 18v5M10 31h5m18 0h5M14 21l4 4m12 12 4 4m0-20-4 4M18 37l-4 4" stroke="#fff1a1" strokeWidth="2" strokeLinecap="round"/></svg>;
-  return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M12 13Q9 10 7 14L8 20 17 28 19 42 14 51Q12 55 18 56H33Q39 55 36 51L30 42 32 28 41 20 41 14Q39 10 36 13L30 18H18Z" fill="#f0c64e" stroke="#815319" strokeWidth="2"/><path d="M17 23h14l-2 16H19Z" fill="#38c5bf" stroke="#16716f" strokeWidth="2"/><path d="M19 57h10v4H19z" fill="#e2b84a" stroke="#80541c" strokeWidth="2"/><circle cx="24" cy="30" r="3" fill="#fff1aa"/></svg>;
+  if (suit === "espada") return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M24 3 35 29 28 27 28 43 20 43 20 27 13 29Z" fill="#eafaff" stroke="#5ca8c0" strokeWidth="2"/><path d="m24 8 4 19-4-2-4 2Z" fill="#54eaff"/><path d="M11 42Q24 35 37 42L32 49 27 46 27 56 32 60 16 60 21 56 21 46 16 49Z" fill="#f6c943" stroke="#905f17" strokeWidth="2"/><path d="M20 43h8v4h-8z" fill="#fff0a1"/></svg>;
+  if (suit === "basto") return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M22 61 23 15Q24 8 29 8L28 20Q34 13 42 15 40 23 29 27L28 38Q34 31 41 33 39 42 28 46L28 61Z" fill="#a96431" stroke="#57351e" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 26Q9 20 14 20L22 25 21 32 14 30 12 44Q10 48 7 44Z" fill="#c48647" stroke="#694323" strokeWidth="2"/><path d="M17 55h15v6H17z" fill="#e3bb4f" stroke="#80541b" strokeWidth="2"/><path d="M25 12 24 56" stroke="#edc267" strokeWidth="1.5" opacity=".8"/></svg>;
+  if (suit === "oro") return <svg viewBox="0 0 48 64" aria-hidden="true"><circle cx="24" cy="31" r="20" fill="#e2a327" stroke="#70420f" strokeWidth="3"/><circle cx="24" cy="31" r="15.5" fill="#ffd95d" stroke="#fff0a0" strokeWidth="2"/><circle cx="24" cy="31" r="9" fill="#cf841b" stroke="#9a5c13"/><path d="m24 23 2.3 5 5.5.7-4 3.8 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.8 5.5-.7Z" fill="#fff0a0"/><circle cx="24" cy="31" r="2" fill="#fff9d4"/></svg>;
+  return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M12 12Q8 10 7 15L9 21 17 29 19 42 13 51Q11 56 18 57H30Q37 56 35 51L29 42 31 29 39 21 41 15Q40 10 36 12L29 18H19Z" fill="#f2c74e" stroke="#8a5a16" strokeWidth="2.5" strokeLinejoin="round"/><path d="M17 23h14l-2 16H19Z" fill="#31c9d1" stroke="#167879" strokeWidth="2"/><path d="M20 57h8v4h-8z" fill="#e4b943" stroke="#80541c" strokeWidth="2"/><path d="M17 22 12 16m19 6 5-6" stroke="#fff0a1" strokeWidth="2" strokeLinecap="round"/><circle cx="24" cy="30" r="3" fill="#fff7cf"/></svg>;
 }
 
 function TrucoPipFace({ card }: { card: Card & { num: 2 | 3 | 4 | 5 | 6 | 7 } }) {
@@ -92,16 +93,49 @@ function TrucoGuide({ onClose }: { onClose: () => void }) {
 }
 
 export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Props) {
-  const { state, thinking, act, finishResult, finishError } = useTrucoBotMatch(challenge.id, challenge.botIndex);
+  const { state, thinking, act } = useTrucoBotMatch(challenge.botIndex);
   const moves = movesFor(state, 0);
   const finished = state.phase === "finished";
   const handOver = state.phase === "hand-over";
   const myName = challenge.fromId === meId ? challenge.fromName : challenge.toName;
   const rivalName = challenge.fromId === meId ? challenge.toName : challenge.fromName;
-  const [showIntro, setShowIntro] = useState(true);
   const [bubble, setBubble] = useState<{ seat: 0 | 1; text: string; n: number } | null>(null);
+  const botResult = finished ? (state.winner === 0 ? 'win' : 'loss') as 'win'|'loss' : undefined;
+  const { reward, error: rewardError } = useDuelReward('truco', challenge.id, finished, { vsBot: true, botResult });
   const [showRules,setShowRules]=useState(false);
   const lastN = useRef(0);
+  const effects = useRef<AnimeEffectsHandle>(null);
+  const [intro, setIntro] = useState(true);
+  const seenCards = useRef(new Set<string>());
+  const seenTricks = useRef(new Set<string>());
+  const seenHands = useRef(new Set<number>());
+  useEffect(() => {
+    setIntro(true);
+    seenCards.current.clear(); seenTricks.current.clear(); seenHands.current.clear();
+    const t = window.setTimeout(() => setIntro(false), 1500);
+    return () => window.clearTimeout(t);
+  }, [challenge.id]);
+  useEffect(() => {
+    if (intro) { effects.current?.triggerKeyMoment(); return; }
+    state.table.forEach((row, seat) => row.forEach((card, index) => {
+      if (!card) return;
+      const key = `${state.handNo}:${seat}:${index}`;
+      if (seenCards.current.has(key)) return;
+      seenCards.current.add(key);
+      if (card.suit === 'espada' && (card.num === 1 || card.num === 7)) effects.current?.triggerKeyMoment();
+    }));
+    state.trickResults.forEach((result, index) => {
+      const key = `${state.handNo}:${index}`;
+      if (result === undefined || seenTricks.current.has(key)) return;
+      seenTricks.current.add(key);
+      duelFx.reveal(result === 'tie' ? 'tie' : result === 0 ? 'win' : 'lose');
+      if (result === 0) effects.current?.triggerSave('user');
+    });
+    if (handOver && state.handResult && !seenHands.current.has(state.handNo)) {
+      seenHands.current.add(state.handNo);
+      if (state.handResult.winner === 0) effects.current?.triggerGoal('user');
+    }
+  }, [intro, state.table, state.trickResults, state.handNo, handOver, state.handResult]);
   useEffect(()=>{const old=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=old;};},[]);
 
   useEffect(() => { onFinished?.(finished); }, [finished, onFinished]);
@@ -109,6 +143,8 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
     const sh = state.lastShout;
     if (!sh || sh.n === lastN.current) return;
     lastN.current = sh.n; setBubble(sh);
+    duelFx.shout();
+    if (/truco/i.test(sh.text)) effects.current?.triggerDanger();
     if (sh.seat === 1) duelFx.tap();
     const t = window.setTimeout(() => setBubble((b) => (b?.n === sh.n ? null : b)), 1800);
     return () => window.clearTimeout(t);
@@ -136,18 +172,14 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
   const trickBadge = (i: number) => { const r = state.trickResults[i]; return r === undefined ? "" : r === "tie" ? "=" : r === 0 ? "✓" : "✗"; };
   const dots = (n: number) => Array.from({ length: TARGET }, (_, i) => <i key={i} className={i < n ? "on" : ""} />);
 
-  if (showIntro) return (
-    <TrucoBattleIntro
-      meId={meId}
-      myName={myName}
-      rivalName={rivalName}
-      botIndex={challenge.botIndex}
-      onDone={() => setShowIntro(false)}
-    />
-  );
-
   return (
     <section className={`rps-arena tr-arena ${finished ? "is-complete" : ""}`} data-outcome={finished ? outcome : undefined} aria-label="Truco">
+      <AnimeEffects ref={effects}/>
+      {intro && <div className="tr-versus" role="status" aria-label="Comienza el duelo de truco">
+        <div className="tr-versus__player"><OwnedCardPortrait userId={meId}/><strong>{myName}</strong></div>
+        <b className="tr-versus__title">¡TRUCO!</b>
+        <div className="tr-versus__rival"><img src={lupiTrucoAvatar} alt="Lupi"/><strong>{rivalName}</strong></div>
+      </div>}
       {finished && <DuelResultEffects key={challenge.id} outcome={outcome} />}
       <DuelGameHeader game="truco" onBack={onExit} title={<>TRUCO <em>ARGENTINO</em></>} subtitle="CARTAS, CANTOS Y ESTRATEGIA" mode="VS BOT · PRÁCTICA"/>
       <div className="tr-help"><span>A 15 · Sin flor · Sin premios</span><button type="button" aria-expanded={showRules} onClick={()=>setShowRules(value=>!value)}>¿Cómo se juega?</button></div>
@@ -175,7 +207,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
       {!finished && !handOver && (
         <div className="tr-mine">
           <span className="tr-envido-hint">TUS CARTAS · {envidoPoints(state.dealt[0])} DE ENVIDO</span>
-          <div className="tr-hand tr-hand--mine">{state.hands[0].map((c, i) => <TrucoCard key={`${c.suit}${c.num}`} card={c} onClick={() => play(i)} disabled={!moves.play.includes(i)} />)}</div>
+          <div className="tr-hand tr-hand--mine">{state.hands[0].map((c, i) => <TrucoCard key={`${c.suit}${c.num}`} card={c} onClick={() => play(i)} disabled={intro || !moves.play.includes(i)} />)}</div>
           <div className="tr-actions">
             {answering && <>
               <button type="button" className="is-yes" onClick={() => act({ t: "accept" })}>QUIERO</button>
@@ -217,7 +249,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
       {finished && (
         <div className="rps-finish">
           <p className="rps-winner-name">{state.winner === 0 ? myName : rivalName} SE LLEVA EL DUELO · {state.scores[0]} a {state.scores[1]}</p>
-          <DuelRewardCard reward={finishResult} error={finishError} rivalName={rivalName} gameLabel="Truco"/>
+          <DuelRewardCard reward={reward} error={rewardError} rivalName={rivalName} gameLabel="Truco"/>
           {onRematch && <button className="duel-rematch" type="button" onClick={onRematch}>OTRA PARTIDA · REVANCHA ↻</button>}
           <button className="rps-exit" type="button" onClick={onExit}>VOLVER AL CLUB →</button>
         </div>

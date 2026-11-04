@@ -38,6 +38,7 @@ const NOTES = { c5: 523.25, e5: 659.25, g5: 783.99, c6: 1046.5, a4: 440, e4: 329
 export const duelFx = {
   isMuted: () => muted,
   setMuted(value: boolean) { muted = value; try { localStorage.setItem(KEY, value ? "1" : "0"); } catch { /* sin storage */ } },
+  shout() { tone(160, 0, 0.12, "sawtooth", 0.07); tone(440, 0.08, 0.18, "triangle", 0.08); vibrate([20, 20, 45]); },
   /** Toque al elegir una opción. */
   tap() { tone(NOTES.a4, 0, 0.06, "triangle", 0.06); vibrate(12); },
   /** Revelación de una ronda de Piedra-Papel-Tijera. */
