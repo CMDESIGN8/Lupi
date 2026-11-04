@@ -11,6 +11,7 @@ import lupiTrucoAvatar from '../assets/lupi-truco-avatar.png';
 import { ENVIDO_NAME, TARGET, TRUCO_NAME, movesFor, envidoPoints, type Card, type EnvidoCall } from "../utils/trucoEngine";
 import "./RockPaperScissors.css";
 import "./TrucoDuel.css";
+import {LupiTrucoPose} from "./LupiTrucoPose";
 import {TrucoMatchResult} from "./TrucoMatchResult";
 import { AvatarFace } from "./AvatarFace";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
@@ -178,7 +179,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
       {intro && <div className="tr-versus" role="status" aria-label="Comienza el duelo de truco">
         <div className="tr-versus__player"><AvatarFace appearance={appearance} className="tr-speaking-face"/><strong>{myName}</strong></div>
         <b className="tr-versus__title">¡TRUCO!</b>
-        <div className="tr-versus__rival"><img src={lupiTrucoAvatar} alt="Lupi"/><strong>{rivalName}</strong></div>
+        <div className="tr-versus__rival"><LupiTrucoPose pose="compete"/><strong>{rivalName}</strong></div>
       </div>}
       <DuelGameHeader game="truco" onBack={onExit} title={<>TRUCO <em>ARGENTINO</em></>} subtitle="CARTAS, CANTOS Y ESTRATEGIA" mode="VS BOT · PRÁCTICA"/>
       <div className="tr-help"><button type="button" aria-label="Ayuda: cómo jugar al truco" title="Cómo jugar" aria-expanded={showRules} onClick={()=>setShowRules(value=>!value)}>?</button></div>
