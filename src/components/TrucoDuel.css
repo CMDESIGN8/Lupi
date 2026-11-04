@@ -505,3 +505,28 @@
 @keyframes tr-baza-light{from{opacity:0;box-shadow:0 0 0 transparent}45%{opacity:1;box-shadow:0 0 20px color-mix(in srgb,var(--baza-color) 45%,transparent)}to{opacity:1}}
 @keyframes tr-baza-badge{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.tr-table-slot>.is-played,.tr-table-slot--winner::after,.tr-table-slot--winner>.tr-badge{animation:none!important}}
+
+/* Hand feedback always uses the current user's perspective. */
+.tr-hand-result-modal{--hand-tone:#63e9aa;max-height:calc(100dvh - 32px);overflow-y:auto;box-sizing:border-box}
+.tr-hand-result-modal--rival{--hand-tone:#ff8b91}
+.tr-hand-result-modal .tr-hand-result-points{color:var(--hand-tone);font:800 clamp(20px,4vw,28px)/1.25 Barlow,system-ui,sans-serif;margin:18px 0;text-wrap:balance}
+.tr-hand-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;padding:14px 8px;margin:12px 0 20px;border-block:1px solid #7ec9c444;background:#031b24;border-radius:12px}
+.tr-hand-score>div{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0}
+.tr-hand-score span{font:700 12px/1.3 Barlow,system-ui,sans-serif;color:#b7dddd;overflow-wrap:anywhere}
+.tr-hand-score b{font:900 42px/1 Barlow,system-ui,sans-serif;color:#fff2a2}
+.tr-hand-result-modal--me .tr-hand-score>div:first-child b,.tr-hand-result-modal--rival .tr-hand-score>div:last-child b{color:var(--hand-tone)}
+.tr-hand-result-modal .duel-rematch{min-height:52px;font-size:18px}
+
+/* Separate portrait, name and chant rows, including on narrow phones. */
+.tr-versus{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:auto auto;align-content:center;align-items:end;gap:26px 24px;padding:32px 6vw;box-sizing:border-box}
+.tr-versus__player,.tr-versus__rival{width:100%;max-width:none;height:auto;justify-content:flex-end;gap:16px;transform:none}
+.tr-versus__player{grid-column:1;grid-row:1}
+.tr-versus__rival{grid-column:2;grid-row:1}
+.tr-versus strong{display:block;min-height:2.6em;width:100%;text-align:center;font:800 clamp(15px,3vw,27px)/1.3 Barlow,system-ui,sans-serif;letter-spacing:.03em;overflow-wrap:anywhere}
+.tr-versus .tr-versus__title{position:relative;inset:auto;grid-column:1/-1;grid-row:2;justify-self:center;margin:0;font-size:clamp(52px,13vw,120px);line-height:1.1;transform:none}
+.tr-versus__player>.tr-speaking-face{width:90px!important;height:108px!important;margin:30px 0 0;max-width:80%!important}
+.tr-versus__rival>.tr-lupi-portrait{width:140px;height:140px;max-width:100%}
+.tr-versus__rival>.tr-lupi-portrait>span{width:140px;height:242px}
+@media(min-width:901px){.tr-versus{padding-inline:20vw;gap:30px 70px}.tr-versus__player>.tr-speaking-face{width:140px!important;height:168px!important;margin-top:52px}.tr-versus__rival>.tr-lupi-portrait{width:220px;height:220px}.tr-versus__rival>.tr-lupi-portrait>span{width:220px;height:380px}}
+@media(max-width:900px){.tr-arena>.tr-mine .tr-actions{grid-template-columns:repeat(2,minmax(0,1fr));width:100%!important;gap:10px!important}.tr-arena>.tr-mine .tr-actions .is-truco,.tr-arena>.tr-mine .tr-actions .is-fold{grid-column:auto}.tr-arena>.tr-mine .tr-actions button{min-height:56px!important;font-size:17px!important}.tr-hand-result-modal{width:min(440px,calc(100vw - 24px))}.tr-hand-result-modal .duel-rematch{min-height:52px;font-size:17px}}
+@media(max-height:520px){.tr-versus{gap:10px 24px;padding-block:12px}.tr-versus__player>.tr-speaking-face{width:70px!important;height:84px!important}.tr-versus__rival>.tr-lupi-portrait{width:110px;height:110px}.tr-versus__rival>.tr-lupi-portrait>span{width:110px;height:190px}.tr-versus .tr-versus__title{font-size:52px}.tr-versus strong{min-height:1.3em}}

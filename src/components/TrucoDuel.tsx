@@ -28,7 +28,7 @@ export function TrucoTableSlot({ card, result, seat, mySeat, handNo }: {
   return <div className={`tr-slot tr-table-slot ${resolved ? `tr-table-slot--${outcome}` : ""} ${winner ? "tr-table-slot--winner" : ""}`}
     aria-label={resolved ? result === "tie" ? "Baza empatada" : winner ? "Carta ganadora de la baza" : "Carta superada" : undefined}>
     <TrucoCard key={`${handNo}:${card ? `${card.suit}:${card.num}` : "empty"}`} card={card} played />
-    {winner && <em className={`tr-badge tr-badge--${outcome === "win" ? "w" : "l"}`} aria-hidden="true">✓</em>}
+    {winner && <em className={`tr-badge tr-badge--${outcome === "win" ? "w" : "l"}`} aria-hidden="true">{outcome === "win" ? "✓" : "✕"}</em>}
     {resolved && result === "tie" && <em className="tr-badge tr-badge--t" aria-hidden="true">=</em>}
   </div>;
 }
@@ -257,7 +257,8 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
           <h2 id="tr-hand-result-title">{state.handResult.winner === 0 ? "¡MANO TUYA!" : "MANO DEL RIVAL"}</h2>
           <p className="tr-hand-result-reason">{state.handResult.reason}</p>
           <div className="tr-hand-result-cards"><div><small>RIVAL</small>{state.table[1].filter(Boolean).map((c,i)=><TrucoCard key={i} card={c} played />)}</div><span>VS</span><div><small>VOS</small>{state.table[0].filter(Boolean).map((c,i)=><TrucoCard key={i} card={c} played />)}</div></div>
-          <div className="tr-hand-result-points">+{state.handResult.points} {state.handResult.points === 1 ? "PUNTO" : "PUNTOS"}</div>
+          <div className="tr-hand-result-points">{state.handResult.winner === 0 ? "Vos sumás" : `${rivalName} suma`} {state.handResult.points} {state.handResult.points === 1 ? "punto" : "puntos"}</div>
+          <div className="tr-hand-score" aria-label="Marcador actualizado"><div><span>VOS · {myName}</span><b>{state.scores[0]}</b></div><span>A {TARGET}</span><div><span>{rivalName}</span><b>{state.scores[1]}</b></div></div>
           {state.envidoResult && <div className="tr-hand-result-envido"><b>ENVIDO</b><span>{state.envidoResult.winner === 0 ? myName : rivalName} ganó con {state.envidoResult.points[state.envidoResult.winner]} tantos</span><small>{state.envidoResult.points[0]} vos · {state.envidoResult.points[1]} rival · +{state.envidoResult.stake}</small></div>}
           <button type="button" className="duel-rematch" onClick={() => act({ t: "next" })}>SIGUIENTE MANO →</button>
         </div>

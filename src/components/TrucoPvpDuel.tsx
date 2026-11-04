@@ -158,7 +158,13 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
         </div>
       )}
 
-      {state?.phase === "hand-over" && !finished && <div className="tr-pvp-end" role="dialog" aria-modal="true" aria-label="Resultado de la mano"><div><h2>{state.handResult?.winner === mySeat ? "¡MANO TUYA!" : "MANO DEL RIVAL"}</h2><p>{state.handResult?.reason}</p><strong>Vos {myScore} · Rival {rivalScore}</strong><button type="button" disabled={busy} onClick={()=>doAct({t:"next"})}>SIGUIENTE MANO →</button></div></div>}
+      {state?.phase === "hand-over" && state.handResult && !finished && <div className="tr-hand-result-overlay" role="dialog" aria-modal="true" aria-labelledby="tr-pvp-hand-title"><div className={`tr-hand-result-modal tr-hand-result-modal--${state.handResult.winner === mySeat ? "me" : "rival"}`}>
+        <span className="tr-hand-result-kicker">CIERRE DE LA MANO {state.handNo}</span>
+        <h2 id="tr-pvp-hand-title">{state.handResult.winner === mySeat ? "¡MANO TUYA!" : "MANO DEL RIVAL"}</h2><p className="tr-hand-result-reason">{state.handResult.reason}</p>
+        <div className="tr-hand-result-points">{state.handResult.winner === mySeat ? "Vos sumás" : `${rivalName} suma`} {state.handResult.points} {state.handResult.points === 1 ? "punto" : "puntos"}</div>
+        <div className="tr-hand-score" aria-label="Marcador actualizado"><div><span>VOS</span><b>{myScore}</b></div><span>A {TARGET}</span><div><span>{rivalName}</span><b>{rivalScore}</b></div></div>
+        <button type="button" className="duel-rematch" disabled={busy} onClick={()=>doAct({t:"next"})}>{busy ? "CONFIRMANDO…" : "SIGUIENTE MANO →"}</button>
+      </div></div>}
       {finished && <TrucoMatchResult meId={meId} rivalId={rivalId} myName={myName} rivalName={rivalName} myScore={myScore} rivalScore={rivalScore} won={iWon} onExit={onExit}/>}
 
       <footer className="rps-rule">TRUCO · ENVIDO · SIN FLOR <span>A {TARGET} PUNTOS · 3 BAZAS POR MANO</span></footer>
