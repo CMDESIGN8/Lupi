@@ -32,3 +32,6 @@
 .trivia-arena>.trivia-score.lupi-duel-score::before,
 .trivia-arena>.trivia-score.lupi-duel-score::after{content:none;display:none}
 .trivia-arena>.trivia-score.lupi-duel-score>.lupi-duel-scoreboard{position:relative;z-index:2;isolation:isolate}
+
+.rps-arena .lupi-game-header .tr-lupitruco-brand{font-size:clamp(19px,2.4vw,26px);font-style:italic;font-weight:1000;letter-spacing:-.03em;color:#f1f8ff;text-shadow:0 2px 12px #39d8ff55}
+.rps-arena .lupi-game-header .tr-lupitruco-brand em{color:#ffdc54;font-style:inherit}

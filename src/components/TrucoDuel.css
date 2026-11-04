@@ -131,43 +131,80 @@
 .tr-card--illustrated .tr-card__art{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;border-radius:inherit;pointer-events:none;user-select:none}
 .tr-card--illustrated>b,.tr-card--illustrated>i,.tr-card--illustrated>small{display:none}
 
-/* Lupi Truco: compact match header and a larger three-card hand. */
+
+/* LupiTruco: compact HUD, illuminated pitch and a prominent playable hand. */
 .tr-arena>.lupi-game-title{display:none!important}
 .tr-arena>.tr-help{margin-top:0}
-@media(max-width:900px){
-  .tr-arena.rps-arena{gap:5px!important;padding:7px 10px max(7px,env(safe-area-inset-bottom))!important}
-  .tr-arena .lupi-game-header{min-height:34px;flex:0 0 auto}
-  .tr-arena>.tr-help{flex:0 0 auto;min-height:30px;font-size:9px}
-  .tr-arena .tr-score{min-height:78px;padding:2px 7px 4px}
-  .tr-arena .tr-score .tr-avatar{height:47px;width:40px}
-  .tr-arena .tr-score b{font-size:31px}
-  .tr-arena .tr-table{min-height:205px;flex:1 1 0;gap:2px;padding:8px;border-radius:24px;overflow:hidden}
-  .tr-arena .tr-table .tr-row{min-height:0;align-self:center}
-  .tr-arena .tr-table .tr-row--rival,.tr-arena .tr-table .tr-row--me{min-height:88px}
-  .tr-arena .tr-table .tr-slot{width:62px;height:94px}
-  .tr-arena .tr-table .tr-card{width:62px;height:94px;border-radius:9px}
-  .tr-arena .tr-table .tr-card b{font-size:27px}
-  .tr-arena .tr-table .tr-card i{font-size:19px}
-  .tr-arena .tr-felt{padding:2px 4px}
-  .tr-arena .tr-felt h3{font-size:16px}
-  .tr-arena .tr-felt>span{font-size:8px}
-  .tr-arena .tr-row--me{transform:translateY(-18px)}
-  .tr-arena>.tr-mine{position:relative;z-index:8;flex:0 0 auto;gap:5px;margin:-42px auto 0!important;padding:0 0 2px;overflow:visible}
-  .tr-arena .tr-envido-hint{font-size:8px;text-shadow:0 2px 5px #001a18;}
-  .tr-arena .tr-hand--mine{gap:clamp(5px,2.6vw,11px);justify-content:center;overflow:visible;}
-  .tr-arena .tr-hand--mine .tr-card{width:clamp(66px,19vw,78px);height:clamp(108px,33vw,126px);border-radius:11px;box-shadow:0 12px 22px #000b,0 0 0 2px #f8e7b6,0 0 18px #ffdc6840;}
-  .tr-arena .tr-hand--mine .tr-card:nth-child(1){transform:rotate(-5deg) translateY(4px)}
-  .tr-arena .tr-hand--mine .tr-card:nth-child(2){transform:translateY(-3px);z-index:2}
-  .tr-arena .tr-hand--mine .tr-card:nth-child(3){transform:rotate(5deg) translateY(4px)}
-  .tr-arena .tr-hand--mine .tr-card:hover:not(:disabled){transform:translateY(-10px) rotate(0);z-index:4}
-  .tr-arena .tr-hand--mine .tr-card:disabled{opacity:.82;filter:saturate(.82)}
-  .tr-arena .tr-actions{gap:5px;min-height:32px}
-  .tr-arena .tr-actions button{min-height:32px;padding:5px 9px;font-size:11px}
+.tr-arena .lupi-game-header .tr-lupitruco-brand{display:flex;align-items:center;gap:0;color:#f1f8ff;font:italic 1000 22px/1 'Barlow Condensed',Impact,sans-serif;letter-spacing:-.02em;text-shadow:0 2px 8px #39d8ff55}
+.tr-arena .lupi-game-header .tr-lupitruco-brand em{font-style:inherit;color:#ffdc54}
+.tr-arena .lupi-game-header>b{color:#ffe16b!important}
+.tr-arena>.tr-score{max-width:none!important;width:100%;padding:7px 12px;box-sizing:border-box;border:1px solid #60e9ef4d;border-radius:20px;background:linear-gradient(115deg,#042b3ce8,#061b2cdd 49%,#2b210fbd);box-shadow:inset 0 1px #b5f9ff22,0 10px 28px #0005,0 0 22px #39e9ff12}
+.tr-arena .tr-target{min-height:56px;display:flex;flex-direction:column;justify-content:center;align-items:center;border-inline:1px solid #ffdf6b42}
+.tr-arena .tr-target small{color:#a5dbe1}
+.tr-arena .tr-score .tr-score-name{font-size:clamp(9px,2.5vw,13px);}
+.tr-arena .tr-table{border:2px solid #48d8bd99;border-radius:30px;background:linear-gradient(180deg,#062f42a8,#035949b8 40%,#023b34d9),radial-gradient(ellipse at 50% 45%,#08785b,#03251f 83%);box-shadow:inset 0 0 0 5px #031b1b99,inset 0 0 50px #0008,0 14px 34px #0007,0 0 24px #42e8d61f;}
+.tr-arena .tr-table:before{inset:12px;border:1px solid #83ffdf30;border-radius:22px;background:linear-gradient(90deg,transparent calc(50% - 1px),#5af5e256 50%,transparent calc(50% + 1px)),linear-gradient(180deg,transparent calc(50% - 1px),#5af5e236 50%,transparent calc(50% + 1px)),radial-gradient(circle at 50% 50%,transparent 0 50px,#7affdd38 51px 52px,transparent 53px),linear-gradient(90deg,transparent 24%,#5af5e219 24.2% 24.5%,transparent 24.7% 75.3%,#5af5e219 75.5% 75.8%,transparent 76%),linear-gradient(180deg,transparent 10%,#5af5e219 10.2% 10.5%,transparent 10.7% 89.3%,#5af5e219 89.5% 89.8%,transparent 90%);}
+.tr-arena .tr-table:after{inset:25% 21%;border:1px solid #78ffda2b;box-shadow:0 0 0 1px #b8fff508 inset,0 0 24px #37ffd41c}
+.tr-arena .tr-card--back{border:1px solid #e8d279;background:radial-gradient(circle at 50% 40%,#174970,#071b3c 70%);box-shadow:0 8px 16px #0008,inset 0 0 0 2px #d3a84055}
+.tr-arena .tr-card--back:after{content:'✦ LUPI ✦';color:#ffdf75;font:900 8px/1 Barlow,sans-serif;letter-spacing:.12em;text-shadow:0 0 10px #33dfff}
+.tr-arena .tr-card.tr-card--illustrated{border-color:#fff0c2;box-shadow:0 8px 18px #000b,0 0 0 1px #b88c2a}
+.tr-arena .tr-hand--mine .tr-card{cursor:pointer;transition:transform .18s,filter .18s,box-shadow .18s}
+.tr-arena .tr-hand--mine .tr-card:focus-visible{outline:3px solid #58f2ff;outline-offset:4px;z-index:6}
+@media(min-width:901px){
+ .tr-arena .tr-score{max-width:900px!important}
+ .tr-arena .tr-hand--mine .tr-card{width:98px;height:150px}
+ .tr-arena>.tr-table{border-radius:32px}
+ .tr-arena .tr-mine{padding:10px;border:1px solid #62e4d55c;border-radius:20px;background:linear-gradient(145deg,#052632dc,#041a25e8);box-shadow:0 10px 24px #0005}
 }
-@media(max-width:360px){
-  .tr-arena .tr-score{grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr)}
-  .tr-arena .tr-score-name{font-size:9px}
-  .tr-arena .tr-hand--mine .tr-card{width:64px;height:103px}
-  .tr-arena>.tr-mine{margin-top:-34px!important}
+@media(max-width:900px){
+ .tr-arena.rps-arena{gap:5px!important;padding:7px 10px max(7px,env(safe-area-inset-bottom))!important}
+ .tr-arena .lupi-game-header{min-height:36px;flex:0 0 auto}
+ .tr-arena .lupi-game-header .tr-lupitruco-brand{font-size:21px}
+ .tr-arena>.tr-help{flex:0 0 auto;min-height:27px;font-size:9px}
+ .tr-arena .tr-help button{min-height:29px;padding:5px 9px;font-size:10px}
+ .tr-arena .tr-score{min-height:74px;padding:5px 7px 6px;border-radius:20px}
+ .tr-arena .tr-score .tr-avatar{height:45px;width:39px}
+ .tr-arena .tr-score .tr-score-main>b{font-size:31px}
+ .tr-arena .tr-target{min-height:50px}
+ .tr-arena .tr-table{min-height:210px;flex:1 1 0;gap:2px;padding:8px 7px 12px;border-radius:26px;overflow:hidden}
+ .tr-arena .tr-table:before{inset:10px;border-radius:19px}
+ .tr-arena .tr-table:after{inset:27% 19%}
+ .tr-arena .tr-table .tr-row{min-height:0;align-self:center}
+ .tr-arena .tr-table .tr-row--rival,.tr-arena .tr-table .tr-row--me{min-height:85px}
+ .tr-arena .tr-table .tr-slot{width:62px;height:94px}
+ .tr-arena .tr-table .tr-card{width:62px;height:94px;border-radius:9px}
+ .tr-arena .tr-table .tr-card b{font-size:27px}
+ .tr-arena .tr-table .tr-card i{font-size:19px}
+ .tr-arena .tr-felt{padding:2px 4px}
+ .tr-arena .tr-felt h3{font-size:16px}
+ .tr-arena .tr-felt>span{font-size:8px}
+ .tr-arena .tr-row--me{transform:translateY(-13px)}
+ .tr-arena>.tr-mine{position:relative;z-index:8;flex:0 0 auto;gap:5px;margin:-49px auto 0!important;padding:0 0 2px;overflow:visible}
+ .tr-arena .tr-envido-hint{font-size:8px;text-shadow:0 2px 5px #001a18}
+ .tr-arena .tr-hand--mine{gap:clamp(5px,2.5vw,11px);justify-content:center;overflow:visible}
+ .tr-arena .tr-hand--mine .tr-card{width:clamp(84px,26vw,108px);height:clamp(135px,40vw,164px);border-radius:13px;box-shadow:0 13px 24px #000c,0 0 0 2px #f8e7b6,0 0 18px #ffdc6840}
+ .tr-arena .tr-hand--mine .tr-card:nth-child(1){transform:rotate(-4deg) translateY(5px)}
+ .tr-arena .tr-hand--mine .tr-card:nth-child(2){transform:translateY(-4px);z-index:2}
+ .tr-arena .tr-hand--mine .tr-card:nth-child(3){transform:rotate(4deg) translateY(5px)}
+ .tr-arena .tr-hand--mine .tr-card:hover:not(:disabled){transform:translateY(-12px) rotate(0);z-index:4;filter:brightness(1.08)}
+ .tr-arena .tr-hand--mine .tr-card:disabled{opacity:.9;filter:saturate(.9)}
+ .tr-arena .tr-actions{gap:5px;min-height:32px}
+ .tr-arena .tr-actions button{min-height:32px;padding:5px 9px;font-size:11px}
+ .tr-arena .rps-rule{margin:0 auto 2px;font-size:8px}
+}
+@media(max-width:370px){
+ .tr-arena .tr-score{grid-template-columns:minmax(0,1fr) 52px minmax(0,1fr)}
+ .tr-arena .tr-score .tr-score-name{font-size:9px}
+ .tr-arena .tr-hand--mine .tr-card{width:clamp(78px,25vw,94px);height:clamp(126px,38vw,145px)}
+ .tr-arena>.tr-mine{margin-top:-42px!important}
 }
 @media(prefers-reduced-motion:reduce){.tr-arena .tr-hand--mine .tr-card{transform:none!important}}
+
+@media(max-width:900px){
+  .tr-arena .tr-table{min-height:258px}
+  .tr-arena .tr-table .tr-row--rival{min-height:124px}
+  .tr-arena .tr-row--rival .tr-hand{display:flex!important;position:absolute;left:50%;top:-14px;translate:-50% 0;z-index:1;gap:0}
+  .tr-arena .tr-row--rival .tr-hand .tr-card{width:39px;height:57px;margin-left:-10px;border-radius:7px}
+  .tr-arena .tr-row--rival .tr-hand .tr-card:first-child{margin-left:0}
+  .tr-arena .tr-row--rival .tr-played{position:relative;z-index:3;transform:translateY(12px)}
+}

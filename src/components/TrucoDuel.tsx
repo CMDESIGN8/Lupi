@@ -125,7 +125,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
 
       <div className="tr-table">
         <div className="tr-row tr-row--rival">
-          <div className="tr-hand">{state.hands[1].map((_, i) => <TrucoCard key={i} back />)}</div>
+          <div className="tr-hand" role="group" aria-label="Cartas ocultas del rival">{state.hands[1].map((_, i) => <TrucoCard key={i} back />)}</div>
           <div className="tr-played">{[0, 1, 2].map((i) => <div key={i} className="tr-slot"><TrucoCard card={state.table[1][i] ?? null} played />{trickBadge(i) && <em className={`tr-badge tr-badge--${state.trickResults[i] === 1 ? "w" : state.trickResults[i] === 0 ? "l" : "t"}`}>{trickBadge(i)}</em>}</div>)}</div>
           {bubble?.seat === 1 && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><span className="tr-bubble__avatar tr-bubble__avatar--lupi"><img src={lupiTrucoAvatar} alt="Lupi"/></span><span>{bubble.text}</span></div>}
         </div>
