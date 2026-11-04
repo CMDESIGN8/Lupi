@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { Challenge } from "../hooks/useLobbyChallenges";
 import { useTrucoBotMatch } from "../hooks/useTrucoBotMatch";
-import { DuelResultEffects } from "./DuelResultEffects";
 import { duelFx } from "../lib/duelFx";
 import {DuelGameHeader} from './DuelGameHeader';
 import { useDuelReward } from '../hooks/useDuelReward';
@@ -15,7 +14,6 @@ import "./TrucoDuel.css";
 import {TrucoMatchResult} from "./TrucoMatchResult";
 import { AvatarFace } from "./AvatarFace";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
-import { AnimeEffects, type AnimeEffectsHandle } from "./AnimeEffects";
 
 type Props = { challenge: Challenge; meId: string; onExit: () => void; onFinished?: (finished: boolean) => void; onRematch?: () => void };
 
@@ -108,7 +106,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
   const { reward, error: rewardError } = useDuelReward('truco', challenge.id, finished, { vsBot: true, botResult });
   const [showRules,setShowRules]=useState(false);
   const lastN = useRef(0);
-  const effects = useRef<AnimeEffectsHandle>(null);
+  const [tableGlow, setTableGlow] = useState(0);
   const [intro, setIntro] = useState(true);
   const seenCards = useRef(new Set<string>());
   const seenTricks = useRef(new Set<string>());
@@ -120,24 +118,24 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
     return () => window.clearTimeout(t);
   }, [challenge.id]);
   useEffect(() => {
-    if (intro) { effects.current?.triggerKeyMoment(); return; }
+    if (intro) return;
     state.table.forEach((row, seat) => row.forEach((card, index) => {
       if (!card) return;
       const key = `${state.handNo}:${seat}:${index}`;
       if (seenCards.current.has(key)) return;
       seenCards.current.add(key);
-      if (card.suit === 'espada' && (card.num === 1 || card.num === 7)) effects.current?.triggerKeyMoment();
+      if (card.suit === 'espada' && (card.num === 1 || card.num === 7)) setTableGlow(value => value + 1);
     }));
     state.trickResults.forEach((result, index) => {
       const key = `${state.handNo}:${index}`;
       if (result === undefined || seenTricks.current.has(key)) return;
       seenTricks.current.add(key);
       duelFx.reveal(result === 'tie' ? 'tie' : result === 0 ? 'win' : 'lose');
-      if (result === 0) effects.current?.triggerSave('user');
+      if (result === 0) setTableGlow(value => value + 1);
     });
     if (handOver && state.handResult && !seenHands.current.has(state.handNo)) {
       seenHands.current.add(state.handNo);
-      if (state.handResult.winner === 0) effects.current?.triggerGoal('user');
+      if (state.handResult.winner === 0) setTableGlow(value => value + 1);
     }
   }, [intro, state.table, state.trickResults, state.handNo, handOver, state.handResult]);
   useEffect(()=>{const old=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=old;};},[]);
@@ -148,7 +146,6 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
     if (!sh || sh.n === lastN.current) return;
     lastN.current = sh.n; setBubble(sh);
     duelFx.shout();
-    if (/truco/i.test(sh.text)) effects.current?.triggerDanger();
     if (sh.seat === 1) duelFx.tap();
     const t = window.setTimeout(() => setBubble((b) => (b?.n === sh.n ? null : b)), 1800);
     return () => window.clearTimeout(t);
@@ -178,18 +175,17 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
 
   return (
     <section className={`rps-arena tr-arena ${finished ? "is-complete" : ""}`} data-outcome={finished ? outcome : undefined} aria-label="Truco">
-      <AnimeEffects ref={effects}/>
       {intro && <div className="tr-versus" role="status" aria-label="Comienza el duelo de truco">
         <div className="tr-versus__player"><AvatarFace appearance={appearance} className="tr-speaking-face"/><strong>{myName}</strong></div>
         <b className="tr-versus__title">¡TRUCO!</b>
         <div className="tr-versus__rival"><img src={lupiTrucoAvatar} alt="Lupi"/><strong>{rivalName}</strong></div>
       </div>}
-      {finished && <DuelResultEffects key={challenge.id} outcome={outcome} />}
       <DuelGameHeader game="truco" onBack={onExit} title={<>TRUCO <em>ARGENTINO</em></>} subtitle="CARTAS, CANTOS Y ESTRATEGIA" mode="VS BOT · PRÁCTICA"/>
       <div className="tr-help"><button type="button" aria-label="Ayuda: cómo jugar al truco" title="Cómo jugar" aria-expanded={showRules} onClick={()=>setShowRules(value=>!value)}>?</button></div>
       {showRules&&<TrucoGuide onClose={()=>setShowRules(false)}/>} 
 
       <div className="tr-table">
+        {tableGlow > 0 && <span key={tableGlow} className="tr-table-glow" aria-hidden="true"/>}
       <div className="tr-score" aria-live="polite">
         <div className="tr-score-player"><div className="tr-score-main"><div className="tr-score-identity"><div className="tr-avatar"><OwnedCardPortrait userId={meId}/></div><strong className="tr-score-name">{myName}</strong></div><b>{state.scores[0]}</b></div><span className="tr-dots">{dots(state.scores[0])}</span></div>
         <div className="tr-target">A {TARGET}<small>MANO {state.handNo}</small></div>
