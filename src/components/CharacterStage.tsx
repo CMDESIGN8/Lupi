@@ -49,7 +49,7 @@ export function CharacterStage({ items, appearance, mode, level, xp, xpNeeded }:
   const progress = xp != null && xpNeeded ? Math.max(0, Math.min(1, xp / xpNeeded)) : null;
 
   return (
-    <div ref={boxRef} className="lw-id__character">
+    <div ref={boxRef} className="lw-id__character" data-preview-mode={mode}>
       <div className="lw-id__spot" aria-hidden="true" />
       {mode === "full" ? (
         <div

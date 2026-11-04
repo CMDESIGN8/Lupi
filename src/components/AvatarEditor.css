@@ -1882,3 +1882,10 @@
 .lw-id__durability-track i{display:block;height:100%}
 
 .lw-id__wear-alert{color:#ffb33b;font-weight:800;font-size:10px;letter-spacing:.03em}
+
+/* Face editing honors the selected view on phones too. */
+.lw-id__character[data-preview-mode="face"] .lw-id__face-zoom{top:50%;left:50%;width:min(190px,42%);height:auto;aspect-ratio:155/200;transform:translate(-50%,-38%);z-index:4}
+.lw-id__character[data-preview-mode="face"] .lw-id__face-zoom>.lw-face{width:100%!important;height:100%!important;position:relative;inset:auto;transform:none}
+.lw-id__character[data-preview-mode="face"] .lw-id__ring{opacity:0}
+@media(max-width:860px){.lw-id__character[data-preview-mode="face"] .lw-id__face-zoom{width:min(145px,35vw,27dvh);top:52%;transform:translate(-50%,-34%)}.lw-id__character[data-preview-mode="face"] .lw-id__level{z-index:5}}
+@media(max-height:650px) and (max-width:860px){.lw-id__character[data-preview-mode="face"] .lw-id__face-zoom{width:min(110px,25dvh)}}

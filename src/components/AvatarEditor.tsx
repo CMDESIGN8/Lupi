@@ -68,6 +68,11 @@ const EXPRESSIONS: [string, string][] = [
   ["surprised", "Sorprendido"],
   ["determined", "Decidido"],
   ["happy", "Feliz"],
+  ["wink", "Guiño"],
+  ["laugh", "Risa"],
+  ["worried", "Preocupado"],
+  ["angry", "Enojado"],
+  ["sad", "Triste"],
 ];
 
 type WardrobeTab = "wardrobe" | "inventory" | "shop";
@@ -149,14 +154,6 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
   const [done, setDone] = useState(false);
   const [previewMode, setPreviewMode] = useState<"full" | "face">("full");
   const [mobileTab, setMobileTab] = useState<"character" | "wardrobe">(initialSlot?"wardrobe":"character");
-  const [isMobileViewport, setIsMobileViewport] = useState(() => typeof window !== "undefined" && window.matchMedia("(max-width: 860px)").matches);
-  useEffect(() => {
-    const media = window.matchMedia("(max-width: 860px)");
-    const update = () => setIsMobileViewport(media.matches);
-    update();
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
-  }, []);
   const [wardrobeTab, setWardrobeTab] = useState<WardrobeTab>("wardrobe");
   const [slot, setSlot] = useState<ItemSlot | "all">(initialSlot??"all");
   const [rarity, setRarity] = useState<"all" | ItemRarity>("all");
@@ -348,7 +345,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
             </div>
 
             {([
-              ["eyes", "OJOS", EYES, { normal:"Normales",large:"Grandes",almond:"Almendrados",bright:"Brillantes" }],
+              ["eyes", "OJOS", EYES, { normal:"Normales",large:"Grandes",almond:"Almendrados",bright:"Brillantes",sharp:"Afilados",relaxed:"Relajados",soft:"Dulces" }],
               ["brows", "CEJAS", BROWS, { natural:"Naturales",straight:"Rectas",arched:"Arqueadas",bold:"Marcadas" }],
               ["nose", "NARIZ", NOSES, { soft:"Suave",small:"Pequeña",round:"Redonda",defined:"Definida" }],
               ["mouth", "BOCA", MOUTHS, { normal:"Normal",small:"Pequeña",wide:"Ancha",full:"Carnosa" }],
@@ -426,7 +423,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
               );
             })}
           </div>
-          <CharacterStage items={items} appearance={draft} mode={isMobileViewport ? "full" : previewMode} level={level} xp={xp} xpNeeded={xpNeeded} />
+          <CharacterStage items={items} appearance={draft} mode={mobileTab === "character" ? previewMode : "full"} level={level} xp={xp} xpNeeded={xpNeeded} />
         </main>
 
         {/* ===== Pestañas de celular ===== */}

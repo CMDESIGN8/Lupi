@@ -121,3 +121,40 @@
 .lw-face--expression-happy .lw-face__eyes i{height:47%!important;align-self:flex-end;border-radius:8% 8% 65% 65%!important;transform:rotate(4deg)!important;background:#fffaf0}
 .lw-face--expression-happy .lw-face__eyes i:last-child{transform:scaleX(-1) rotate(4deg)!important}
 .lw-face--expression-happy .lw-face__mouth{height:8%;background:linear-gradient(#fff7df 0 30%,#4a2531 32% 100%);border:1px solid #4a2531;border-radius:10% 10% 65% 65%}
+
+/* Anime expressions drawn from the avatar's own eyes, brows and mouth. */
+.lw-face.lw-face--expression-wink .lw-face__eyes i:last-child,
+.lw-face.lw-face--expression-laugh .lw-face__eyes i,
+.lw-face.lw-face--expression-happy .lw-face__eyes i{height:45%!important;background:transparent!important;border:0!important;border-top:3px solid #392632!important;border-radius:65% 65% 0 0!important;box-shadow:none!important;overflow:visible;transform:rotate(-4deg)!important}
+.lw-face.lw-face--expression-wink .lw-face__eyes i:last-child::before,.lw-face.lw-face--expression-wink .lw-face__eyes i:last-child::after,
+.lw-face.lw-face--expression-laugh .lw-face__eyes i::before,.lw-face.lw-face--expression-laugh .lw-face__eyes i::after,
+.lw-face.lw-face--expression-happy .lw-face__eyes i::before,.lw-face.lw-face--expression-happy .lw-face__eyes i::after{display:none}
+.lw-face.lw-face--expression-wink .lw-face__mouth{left:37%;width:28%;height:7%;border:1px solid #5d2e3d;border-radius:10% 10% 65% 65%;background:linear-gradient(#fff4e2 0 25%,#813e51 27% 70%,#df8c96 72%)}
+.lw-face.lw-face--expression-laugh .lw-face__mouth{top:76%;left:34%;width:32%;height:13%;border:1px solid #582a3b;border-radius:10% 10% 65% 65%;background:linear-gradient(#fff4e2 0 23%,#542b3c 25% 70%,#e79aa3 72%)}
+.lw-face.lw-face--expression-worried .lw-face__brows i,.lw-face.lw-face--expression-sad .lw-face__brows i{transform:rotate(-18deg)!important}
+.lw-face.lw-face--expression-worried .lw-face__brows i:last-child,.lw-face.lw-face--expression-sad .lw-face__brows i:last-child{transform:scaleX(-1) rotate(-18deg)!important}
+.lw-face.lw-face--expression-worried .lw-face__eyes{height:17%;top:49%}
+.lw-face.lw-face--expression-worried .lw-face__mouth,.lw-face.lw-face--expression-sad .lw-face__mouth{top:80%;left:39%;width:22%;height:5%;background:transparent;border:0;border-top:2px solid #653b43;border-radius:60% 60% 0 0}
+.lw-face.lw-face--expression-angry .lw-face__brows i{transform:rotate(23deg)!important;height:58%}
+.lw-face.lw-face--expression-angry .lw-face__brows i:last-child{transform:scaleX(-1) rotate(23deg)!important}
+.lw-face.lw-face--expression-angry .lw-face__eyes{top:52%;height:11%}
+.lw-face.lw-face--expression-angry .lw-face__mouth{top:78%;left:35%;width:30%;height:8%;border:1px solid #542b3c;border-radius:50% 50% 15% 15%;background:linear-gradient(#fff4e2 0 42%,#633345 44%)}
+.lw-face.lw-face--expression-sad .lw-face__eyes{top:50%;height:16%}
+.lw-face.lw-face--expression-sad .lw-face__eyes i{border-bottom:2px solid #75cce5}
+
+/* Anime irises: dimensional color, crisp pupil and two catchlights. */
+.lw-face.lw-face .lw-face__eyes i::before{left:27%;top:-4%;width:51%;height:108%;border-radius:48%;background:radial-gradient(ellipse at 50% 40%,#101623 0 23%,transparent 26%),radial-gradient(ellipse at 50% 76%,color-mix(in srgb,var(--lw-eye-color,#38c6b3),white 68%) 0 12%,transparent 40%),repeating-conic-gradient(from 0deg at 50% 53%,transparent 0 16deg,#ffffff18 18deg 20deg,transparent 23deg 38deg),linear-gradient(to bottom,color-mix(in srgb,var(--lw-eye-color,#38c6b3),#10172b 68%) 0 22%,var(--lw-eye-color,#38c6b3) 50%,color-mix(in srgb,var(--lw-eye-color,#38c6b3),white 32%) 84%,color-mix(in srgb,var(--lw-eye-color,#38c6b3),#132839 38%) 100%);box-shadow:0 0 0 1px #172538,inset 0 2px 3px #06132299}
+.lw-face.lw-face .lw-face__eyes i::after{left:33%;top:9%;width:18%;height:25%;background:#fffef6;border-radius:48%;box-shadow:3px 6px 0 -1px #ffffff99,7px 12px 0 -2px #ffffffaa}
+.lw-face.lw-face--eyes-sharp .lw-face__eyes{top:52%;height:11%}
+.lw-face.lw-face--eyes-sharp .lw-face__eyes i{width:35%;border-radius:65% 12% 55% 22%;border-top-width:3px;transform:rotate(1deg)}
+.lw-face.lw-face--eyes-sharp .lw-face__eyes i:last-child{transform:scaleX(-1) rotate(1deg)}
+.lw-face.lw-face--eyes-relaxed .lw-face__eyes{top:52%;height:11%}
+.lw-face.lw-face--eyes-relaxed .lw-face__eyes i{width:33%;border-radius:18% 18% 55% 55%;transform:rotate(3deg);border-top-width:2px}
+.lw-face.lw-face--eyes-relaxed .lw-face__eyes i:last-child{transform:scaleX(-1) rotate(3deg)}
+.lw-face.lw-face--eyes-soft .lw-face__eyes{top:48%;height:18%}
+.lw-face.lw-face--eyes-soft .lw-face__eyes i{width:33%;border-radius:65% 50% 55% 50%;border-top-width:2px;transform:rotate(-3deg);box-shadow:0 -1px #46303b,1px -1px #46303b}
+.lw-face.lw-face--eyes-soft .lw-face__eyes i:last-child{transform:scaleX(-1) rotate(-3deg)}
+/* Closed-eye expressions keep their own silhouette and hide the iris. */
+.lw-face.lw-face--expression-wink .lw-face__eyes i:last-child::before,.lw-face.lw-face--expression-wink .lw-face__eyes i:last-child::after,
+.lw-face.lw-face--expression-laugh .lw-face__eyes i::before,.lw-face.lw-face--expression-laugh .lw-face__eyes i::after,
+.lw-face.lw-face--expression-happy .lw-face__eyes i::before,.lw-face.lw-face--expression-happy .lw-face__eyes i::after{display:none}
