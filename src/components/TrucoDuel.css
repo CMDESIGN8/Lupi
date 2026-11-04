@@ -130,3 +130,44 @@
 .tr-card.tr-card--illustrated{position:relative;overflow:hidden;padding:0;background:#06162a;border:1px solid #ffe7b4}
 .tr-card--illustrated .tr-card__art{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;border-radius:inherit;pointer-events:none;user-select:none}
 .tr-card--illustrated>b,.tr-card--illustrated>i,.tr-card--illustrated>small{display:none}
+
+/* Lupi Truco: compact match header and a larger three-card hand. */
+.tr-arena>.lupi-game-title{display:none!important}
+.tr-arena>.tr-help{margin-top:0}
+@media(max-width:900px){
+  .tr-arena.rps-arena{gap:5px!important;padding:7px 10px max(7px,env(safe-area-inset-bottom))!important}
+  .tr-arena .lupi-game-header{min-height:34px;flex:0 0 auto}
+  .tr-arena>.tr-help{flex:0 0 auto;min-height:30px;font-size:9px}
+  .tr-arena .tr-score{min-height:78px;padding:2px 7px 4px}
+  .tr-arena .tr-score .tr-avatar{height:47px;width:40px}
+  .tr-arena .tr-score b{font-size:31px}
+  .tr-arena .tr-table{min-height:205px;flex:1 1 0;gap:2px;padding:8px;border-radius:24px;overflow:hidden}
+  .tr-arena .tr-table .tr-row{min-height:0;align-self:center}
+  .tr-arena .tr-table .tr-row--rival,.tr-arena .tr-table .tr-row--me{min-height:88px}
+  .tr-arena .tr-table .tr-slot{width:62px;height:94px}
+  .tr-arena .tr-table .tr-card{width:62px;height:94px;border-radius:9px}
+  .tr-arena .tr-table .tr-card b{font-size:27px}
+  .tr-arena .tr-table .tr-card i{font-size:19px}
+  .tr-arena .tr-felt{padding:2px 4px}
+  .tr-arena .tr-felt h3{font-size:16px}
+  .tr-arena .tr-felt>span{font-size:8px}
+  .tr-arena .tr-row--me{transform:translateY(-18px)}
+  .tr-arena>.tr-mine{position:relative;z-index:8;flex:0 0 auto;gap:5px;margin:-42px auto 0!important;padding:0 0 2px;overflow:visible}
+  .tr-arena .tr-envido-hint{font-size:8px;text-shadow:0 2px 5px #001a18;}
+  .tr-arena .tr-hand--mine{gap:clamp(5px,2.6vw,11px);justify-content:center;overflow:visible;}
+  .tr-arena .tr-hand--mine .tr-card{width:clamp(66px,19vw,78px);height:clamp(108px,33vw,126px);border-radius:11px;box-shadow:0 12px 22px #000b,0 0 0 2px #f8e7b6,0 0 18px #ffdc6840;}
+  .tr-arena .tr-hand--mine .tr-card:nth-child(1){transform:rotate(-5deg) translateY(4px)}
+  .tr-arena .tr-hand--mine .tr-card:nth-child(2){transform:translateY(-3px);z-index:2}
+  .tr-arena .tr-hand--mine .tr-card:nth-child(3){transform:rotate(5deg) translateY(4px)}
+  .tr-arena .tr-hand--mine .tr-card:hover:not(:disabled){transform:translateY(-10px) rotate(0);z-index:4}
+  .tr-arena .tr-hand--mine .tr-card:disabled{opacity:.82;filter:saturate(.82)}
+  .tr-arena .tr-actions{gap:5px;min-height:32px}
+  .tr-arena .tr-actions button{min-height:32px;padding:5px 9px;font-size:11px}
+}
+@media(max-width:360px){
+  .tr-arena .tr-score{grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr)}
+  .tr-arena .tr-score-name{font-size:9px}
+  .tr-arena .tr-hand--mine .tr-card{width:64px;height:103px}
+  .tr-arena>.tr-mine{margin-top:-34px!important}
+}
+@media(prefers-reduced-motion:reduce){.tr-arena .tr-hand--mine .tr-card{transform:none!important}}
