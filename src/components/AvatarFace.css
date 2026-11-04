@@ -158,3 +158,17 @@
 .lw-face.lw-face--expression-wink .lw-face__eyes i:last-child::before,.lw-face.lw-face--expression-wink .lw-face__eyes i:last-child::after,
 .lw-face.lw-face--expression-laugh .lw-face__eyes i::before,.lw-face.lw-face--expression-laugh .lw-face__eyes i::after,
 .lw-face.lw-face--expression-happy .lw-face__eyes i::before,.lw-face.lw-face--expression-happy .lw-face__eyes i::after{display:none}
+
+/* SVG eyes replace the CSS eye primitives at all avatar sizes. */
+.lw-face>.lw-face__anime-eyes{position:absolute;left:10%;top:44%;width:80%;height:29%;overflow:visible;z-index:5;pointer-events:none}
+.lw-face--expression-worried>.lw-face__anime-eyes,.lw-face--expression-sad>.lw-face__anime-eyes{top:45%}
+.lw-face--expression-surprised>.lw-face__anime-eyes{top:42%;height:32%}
+
+/* Open silhouette and brows close enough to form one readable expression. */
+.lw-face>.lw-face__anime-eyes{left:9%;top:44%;width:82%;height:32%}
+.lw-face.lw-face .lw-face__brows{top:43%;height:4%;left:17%;width:66%}
+.lw-face.lw-face .lw-face__brows i{height:38%;border-radius:50% 65% 20% 20%}
+.lw-face.lw-face--eyes-sharp>.lw-face__anime-eyes,.lw-face.lw-face--eyes-anime-competitive>.lw-face__anime-eyes{top:47%;height:27%}
+.lw-face.lw-face--eyes-large>.lw-face__anime-eyes,.lw-face.lw-face--eyes-soft>.lw-face__anime-eyes,.lw-face.lw-face--eyes-anime-gentle>.lw-face__anime-eyes{top:43%;height:34%}
+.lw-face.lw-face--eyes-relaxed>.lw-face__anime-eyes,.lw-face.lw-face--eyes-anime-calm>.lw-face__anime-eyes{top:46%;height:29%}
+.lw-face.lw-face--expression-surprised>.lw-face__anime-eyes{top:42%;height:35%}

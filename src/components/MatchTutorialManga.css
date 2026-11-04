@@ -12,3 +12,113 @@
 @media(max-width:420px){.match-tutorial .mt-manga-scene{min-height:183px}.mt-manga-lupi{height:235px;bottom:-46px;width:37%;left:-5px}.mt-manga-speech{margin-left:33%;margin-right:9px;padding:10px}.match-tutorial .mt-manga-speech p{font-size:11px}.match-tutorial .mt-manga-speech h1{font-size:25px!important}}
 @keyframes mt-manga-reveal{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.match-tutorial .mt-manga-scene{animation:none}}
+
+/* One continuous coach panel. The character stays mounted across tutorial steps. */
+.match-tutorial .mt-integrated-panel{min-height:310px;background:radial-gradient(ellipse at 27% 65%,#45d2ce44,transparent 60%),linear-gradient(145deg,#071b31,#0d4655);border:2px solid #82e7de;border-radius:12px 3px;box-shadow:inset 0 0 30px #02101f88;margin:0;animation:none}
+.mt-integrated-panel::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(-15deg,transparent 0 28px,#a7e7ea0d 29px 30px,transparent 31px 55px);opacity:.6}
+.mt-integrated-panel .mt-manga-traces{opacity:.6;animation:mt-panel-light 4s ease-in-out infinite alternate}
+.mt-integrated-panel .mt-manga-lupi{width:48%;height:280px;left:0;bottom:36px;z-index:2;animation:mt-coach-breathe 3.4s ease-in-out infinite;transform-origin:50% 85%;filter:drop-shadow(0 5px 14px #001221aa)}
+.mt-integrated-panel .mt-manga-lupi>i{transition:filter .3s ease}
+.mt-integrated-panel .mt-manga-speech{margin:20px 14px 160px 34%;padding:15px;border-radius:16px 16px 16px 3px;animation:mt-speech-in .25s ease-out both}
+.mt-integrated-panel .mt-panel-objective{position:absolute;bottom:0;left:0;right:0;z-index:4;display:flex;align-items:center;gap:10px;padding:14px 16px;background:linear-gradient(90deg,#041a29ed,#0a3340dd);border-top:1px solid #79e5d666;box-sizing:border-box}
+.mt-panel-objective strong{color:#ffe17c;font:900 italic 17px/1.1 'Barlow Condensed',sans-serif;flex-shrink:0}
+.mt-panel-objective span{color:#ecfff7;font:600 13px/1.45 Barlow,system-ui,sans-serif}
+.mt-integrated-panel .mt-manga-sfx{bottom:80px;right:18px;font-size:32px;z-index:3}
+@media(min-width:901px){
+ .lp-story--playing .match-tutorial.mt-cinematic:not(:has(.mt-lineup)) .mt-content>.mt-integrated-panel{grid-column:1!important;grid-row:1/4!important;align-self:stretch;min-height:420px!important;margin:0!important}
+ .mt-integrated-panel .mt-manga-lupi{height:360px;width:60%;left:-2%;bottom:38px}
+ .mt-integrated-panel .mt-manga-speech{margin:20px 16px 210px 30%}
+ .match-tutorial:has(.mt-lineup) .mt-integrated-panel{min-height:250px}
+ .match-tutorial:has(.mt-lineup) .mt-integrated-panel .mt-manga-lupi{height:240px;width:27%;bottom:20px;left:3%}
+ .match-tutorial:has(.mt-lineup) .mt-integrated-panel .mt-manga-speech{margin:18px 24px 95px 29%}
+}
+@media(max-width:420px){.match-tutorial .mt-integrated-panel{min-height:285px}.mt-integrated-panel .mt-manga-lupi{height:245px;width:48%;bottom:32px}.mt-integrated-panel .mt-manga-speech{margin:14px 10px 140px 32%;padding:11px}.mt-panel-objective span{font-size:12px}.mt-integrated-panel .mt-panel-objective{padding:10px 12px;gap:8px}.mt-integrated-panel .mt-manga-sfx{bottom:75px;font-size:26px}}
+@keyframes mt-coach-breathe{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-4px) rotate(0)}}
+@keyframes mt-panel-light{from{opacity:.35}to{opacity:.7}}
+@keyframes mt-speech-in{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.mt-integrated-panel .mt-manga-lupi,.mt-integrated-panel .mt-manga-traces,.mt-integrated-panel .mt-manga-speech{animation:none!important}}
+
+/* Locker-room conversation: both characters share one scene. */
+.match-tutorial .mt-integrated-panel{background:linear-gradient(180deg,#03142144,#03142111 55%,#031421bb),url('../assets/flores-locker-room-desktop.webp') center/cover!important}
+.match-tutorial .mt-integrated-panel .mt-manga-traces{opacity:.18;mix-blend-mode:screen}
+.match-tutorial .mt-integrated-panel .mt-manga-lupi{height:330px!important;width:48%!important;left:0!important;bottom:34px!important;z-index:2}
+.mt-coach-user{position:absolute;right:0;bottom:38px;width:49%;height:70%;z-index:2;pointer-events:none}
+.mt-coach-user .lp-owned-portrait{inset:0 -8%;overflow:visible}
+.mt-coach-user .lp-owned-portrait__rig{bottom:3%}
+.mt-coach-user>span{position:absolute;bottom:0;left:0;right:0;text-align:center;color:#ffe79a;font:800 9px Barlow,system-ui,sans-serif;letter-spacing:.06em;text-shadow:1px 2px #00101d}
+.match-tutorial .mt-integrated-panel .mt-manga-speech{margin:12px 14px 260px!important;padding:12px 15px;max-width:none}
+.match-tutorial .mt-integrated-panel .mt-manga-speech:after{left:30px;top:auto;bottom:-9px}
+.match-tutorial .mt-integrated-panel .mt-manga-sfx{right:12px;bottom:85px;opacity:.85;font-size:25px}
+@media(min-width:901px){.lp-story--playing .match-tutorial.mt-cinematic:not(:has(.mt-lineup)) .mt-content>.mt-integrated-panel{min-height:440px!important}.match-tutorial .mt-integrated-panel .mt-manga-lupi{height:320px!important}.match-tutorial:has(.mt-lineup) .mt-integrated-panel{min-height:360px}.match-tutorial:has(.mt-lineup) .mt-integrated-panel .mt-manga-lupi{height:245px!important}.match-tutorial:has(.mt-lineup) .mt-integrated-panel .mt-manga-speech{margin-bottom:230px!important}}
+@media(max-width:900px){
+ .match-tutorial .mt-integrated-panel{min-height:235px!important;background-image:linear-gradient(180deg,#03142144,#03142111 55%,#031421bb),url('../assets/flores-locker-room.webp')!important}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech{margin:8px 8px 155px!important;padding:8px 10px}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech h1{font-size:25px!important;margin:3px 0 4px!important}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech p{font-size:11px;line-height:1.3}
+ .match-tutorial .mt-integrated-panel .mt-manga-lupi{height:170px!important;width:49%!important;bottom:25px!important}
+ .mt-coach-user{height:155px;bottom:30px}
+ .mt-coach-user>span{font-size:7px}
+ .mt-integrated-panel .mt-panel-objective{padding:7px 10px!important;gap:6px}
+ .mt-panel-objective span{font-size:10px;line-height:1.2}.mt-panel-objective strong{font-size:13px}
+ .match-tutorial .mt-integrated-panel .mt-manga-sfx{bottom:55px;font-size:20px}
+ .lp-story--playing .match-tutorial .mt-content{gap:7px!important}
+ .lp-story--playing .match-tutorial:not(:has(.mt-lineup)) .mt-practice-court{min-height:105px!important;height:13dvh!important;max-height:130px!important;margin:0!important}
+ .lp-story--playing .match-tutorial .mt-practice-choices button{min-height:52px!important;padding:8px!important}
+ .lp-story--playing .match-tutorial .mt-practice-feedback{min-height:0!important;padding:8px 10px!important;margin:0!important}
+ .lp-story--playing .match-tutorial .mt-practice-feedback p{margin:3px 0!important;font-size:11px!important}
+ .lp-story--playing .match-tutorial>footer{margin-top:7px!important}
+}
+
+/* Keep speech and characters in separate vertical zones within the vignette. */
+.match-tutorial .mt-integrated-panel{--coach-speech-height:126px}
+.match-tutorial .mt-integrated-panel .mt-manga-speech{position:absolute;top:10px;left:12px;right:12px;margin:0!important;min-height:0;box-sizing:border-box;padding:12px 15px;z-index:4}
+.match-tutorial .mt-integrated-panel .mt-manga-speech:after{left:42px;bottom:-9px;top:auto}
+.match-tutorial .mt-integrated-panel .mt-manga-lupi{top:var(--coach-speech-height)!important;bottom:46px!important;height:auto!important;width:49%!important;left:0!important;align-items:flex-end}
+.match-tutorial .mt-integrated-panel .mt-manga-lupi>i{height:100%;max-width:100%;background-size:300% 200%}
+.match-tutorial .mt-integrated-panel .mt-coach-user{top:var(--coach-speech-height);bottom:46px;height:auto;width:48%}
+.match-tutorial .mt-integrated-panel .mt-coach-user>span{bottom:0;font-size:8px;color:#c9efeb;background:#031a28aa;padding:3px}
+@media(min-width:901px){.match-tutorial:has(.mt-lineup) .mt-integrated-panel .mt-manga-speech{margin:0!important}.match-tutorial .mt-integrated-panel .mt-manga-speech h1{font-size:30px!important;margin:4px 0 6px!important}.match-tutorial .mt-integrated-panel .mt-manga-speech p{font-size:12px}}
+@media(max-width:900px){
+ .match-tutorial .mt-integrated-panel{--coach-speech-height:101px;min-height:260px!important}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech{top:7px;left:7px;right:7px;margin:0!important;padding:8px 10px}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech h1{font-size:24px!important;line-height:1.05!important;margin:3px 0 4px!important}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech p{font-size:11px;line-height:1.3}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech:after{left:26px}
+ .match-tutorial .mt-integrated-panel .mt-manga-lupi{top:var(--coach-speech-height)!important;bottom:28px!important;height:auto!important}
+ .match-tutorial .mt-integrated-panel .mt-coach-user{bottom:28px}
+ .match-tutorial .mt-integrated-panel .mt-coach-user>span{display:none}
+}
+
+/* Decision -> action -> reaction -> resolution, contained in the practice court. */
+.mt-practice-court>.mt-practice-player{display:none}
+.mt-match-player{position:absolute;left:7%;bottom:10%;width:25%;height:75%;pointer-events:none}
+.mt-court-caption{position:absolute;top:10px;left:12px;color:#ffe395;font:900 11px Barlow,system-ui,sans-serif;letter-spacing:.08em;text-shadow:1px 2px #00111c}
+.mt-play-cinema{position:absolute;inset:0;z-index:8;overflow:hidden;background:linear-gradient(115deg,#052838ef,#041c2a77);pointer-events:none;isolation:isolate}
+.mt-play-cinema__lines{position:absolute;inset:0;background:repeating-linear-gradient(-13deg,transparent 0 14px,#6fe6ff27 15px 16px,transparent 17px 29px);animation:mt-play-speed .6s linear infinite}
+.mt-play-cinema__call{position:absolute;top:12px;left:12px;right:12px;text-align:center;color:#ffe16b;font:900 italic clamp(19px,2.5vw,34px)/1 'Barlow Condensed',sans-serif;text-shadow:2px 3px #02101e;animation:mt-play-call 2.1s both}
+.mt-play-cinema__player{position:absolute;left:5%;bottom:0;width:36%;height:85%;animation:mt-play-run 2.1s both}
+.mt-play-cinema__player>.lupi-story-pose{height:100%}
+.mt-play-cinema__ball{position:absolute;left:30%;top:68%;font-size:35px;z-index:4;animation:mt-play-shot 2.1s ease-in-out both;filter:drop-shadow(-8px 2px 8px #72f2ff)}
+.mt-play-cinema__rival{position:absolute;right:15%;top:28%;font-size:50px;animation:mt-play-react 2.1s both}
+.mt-play-cinema__result{position:absolute;left:0;right:0;top:40%;padding:12px;text-align:center;background:#031725e8;color:#a6ffe2;font:900 italic clamp(20px,3vw,38px)/1.15 'Barlow Condensed',sans-serif;border-block:2px solid #77dcd9;animation:mt-play-result 2.1s both}
+.mt-play-cinema--shoot .mt-play-cinema__result{color:#ffe295}
+.mt-play-cinema--pass .mt-play-cinema__ball{animation-name:mt-play-pass}
+.mt-play-cinema--press .mt-play-cinema__ball,.mt-play-cinema--cover .mt-play-cinema__ball{animation-name:mt-play-intercept}
+@keyframes mt-play-speed{to{background-position:100px 0}}
+@keyframes mt-play-call{0%{opacity:0;transform:translateX(-25px)}12%,48%{opacity:1;transform:none}60%,100%{opacity:0}}
+@keyframes mt-play-run{0%{opacity:0;transform:translateX(-20px)}20%,45%{opacity:1;transform:none}65%,100%{opacity:.7;transform:translateX(25px)}}
+@keyframes mt-play-shot{0%,30%{left:30%;top:68%;transform:scale(1)}58%{left:74%;top:30%;transform:scale(.6) rotate(180deg)}75%,100%{left:62%;top:62%;transform:scale(.7) rotate(300deg)}}
+@keyframes mt-play-pass{0%,30%{left:30%;top:68%}65%,100%{left:85%;top:65%;transform:scale(.7) rotate(240deg)}}
+@keyframes mt-play-intercept{0%,25%{left:80%;top:45%}58%,100%{left:35%;top:68%;transform:rotate(-160deg)}}
+@keyframes mt-play-react{0%,42%{transform:none}58%,100%{transform:translate(-20px,12px) rotate(-10deg)}}
+@keyframes mt-play-result{0%,68%{opacity:0;transform:translateY(10px)}78%,100%{opacity:1;transform:none}}
+@media(max-width:900px){
+ .lp-story--playing .match-tutorial:not(:has(.mt-lineup)) .mt-practice-court{height:20dvh!important;min-height:135px!important;max-height:175px!important}
+ .match-tutorial .mt-integrated-panel{min-height:225px!important;--coach-speech-height:90px}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech{padding:7px 9px}
+ .match-tutorial .mt-integrated-panel .mt-manga-speech h1{font-size:22px!important}
+ .lp-story--playing .match-tutorial .mt-practice-feedback{padding:6px 9px!important}
+ .mt-play-cinema__call{font-size:20px;top:9px}.mt-play-cinema__result{font-size:23px;padding:8px}.mt-play-cinema__ball{font-size:25px}.mt-play-cinema__rival{font-size:32px}
+ .mt-court-caption{font-size:8px;top:6px;left:8px}
+}
+@media(prefers-reduced-motion:reduce){.mt-play-cinema *{animation:none!important}}

@@ -1,3 +1,4 @@
+import { AnimeEyes } from './AnimeEyes';
 import { memo, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { DEFAULT_APPEARANCE, HAIR_COLORS, HAIRS, type AvatarAppearance } from '../lib/avatarAppearance';
 import { getHairFit, HAIR_FIT_EVENT, type HairFit } from './hairFit';
@@ -72,7 +73,7 @@ export const AvatarFace = memo(function AvatarFace({ appearance=DEFAULT_APPEARAN
     <span className="lw-face__ear lw-face__ear--left"/><span className="lw-face__ear lw-face__ear--right"/>
     <HairTexture hair={hair} color={color}/>
     <div className="lw-face__brows"><i/><i/></div>
-    <div className="lw-face__eyes"><i/><i/></div><span className="lw-face__nose"/>
+    <AnimeEyes shape={appearance.eyes ?? "normal"} color={appearance.eyeColor ?? DEFAULT_APPEARANCE.eyeColor} expression={appearance.expression ?? "neutral"}/><span className="lw-face__nose"/>
     <div className={`lw-face__mouth lw-face__mouth--${appearance.expression}`}/>
   </div>;
 });

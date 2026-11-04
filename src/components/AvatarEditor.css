@@ -1889,3 +1889,7 @@
 .lw-id__character[data-preview-mode="face"] .lw-id__ring{opacity:0}
 @media(max-width:860px){.lw-id__character[data-preview-mode="face"] .lw-id__face-zoom{width:min(145px,35vw,27dvh);top:52%;transform:translate(-50%,-34%)}.lw-id__character[data-preview-mode="face"] .lw-id__level{z-index:5}}
 @media(max-height:650px) and (max-width:860px){.lw-id__character[data-preview-mode="face"] .lw-id__face-zoom{width:min(110px,25dvh)}}
+
+.lw-id__opt-eyes{display:flex;align-items:center;justify-content:center;width:100%;height:48px;padding:5px;box-sizing:border-box;border-radius:7px;background:linear-gradient(140deg,#f3d5b6,#c49379);overflow:hidden}
+.lw-id__opt-eyes>.lw-face__anime-eyes{position:static;width:100%;height:100%;max-width:110px;overflow:visible}
+@media(max-width:860px){.lw-id__opt-eyes{height:43px;padding:4px}}

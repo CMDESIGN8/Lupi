@@ -35,7 +35,7 @@ export function FutsalStoryChapter({story,userId,playerName,deck,cards,onClose,o
   <header className="lp-story-nav"><button type="button" disabled={story.busy} onClick={close}>‹ VOLVER AL CLUB</button><button className="lp-story-replay" type="button" disabled={story.busy||activeMatch} onClick={()=>setReplaying(value=>!value)}>{replaying?'SALIR DE REPRODUCCIÓN':'↻ VOLVER A VER INTRO'}</button><span>MANGA · CAPÍTULO 01</span></header>
   <div className="lp-story-heading"><small>LUPI WORLD · HISTORIA ORIGINAL</small><h1 id="lp-story-title">La primera oportunidad</h1><p>Leé la escena. Elegí la respuesta. Entrá a la cancha.</p></div>
   {story.error&&<div className="lp-story-error" role="alert"><strong>No pudimos sincronizar tu historia</strong><p>{story.error}</p><button type="button" disabled={story.busy} onClick={()=>act('get')}>Reintentar sincronización</button></div>}
-  {replaying?<StoryMotionReplay userId={userId} playerName={playerName} onDone={()=>setReplaying(false)}/>:activeMatch?<div className="lp-story-match"><p className="lp-story-objective lp-mobile-objective">OBJETIVO · Completá la prueba. No necesitás ganar para avanzar.</p>
+  {replaying?<StoryMotionReplay userId={userId} playerName={playerName} onDone={()=>setReplaying(false)}/>:activeMatch?<div className="lp-story-match">
     <CardBattle userCards={cards} userDeck={deck} userId={userId} isCampaignMode autoStart={false}
       forcedOpponent={{name:'Bot Novato',overall_rating:55,category:'8va',level:1,avatar:'🥉',color:'#7a7a9a',xpBase:10,reqWins:0}}
       onBattleComplete={onBattleComplete} onMatchRecorded={onMatchRecorded}

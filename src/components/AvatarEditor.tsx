@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { useAuraInventory, type ItemRarity, type ItemSlot } from "../hooks/useAuraInventory";
 import { HAIRS, HAIR_COLORS, SKINS, EYES, EYE_COLORS, BROWS, NOSES, MOUTHS, type AvatarAppearance } from "../lib/avatarAppearance";
+import { AnimeEyes } from "./AnimeEyes";
 import { AvatarFace } from "./AvatarFace";
 import { CharacterStage } from "./CharacterStage";
 import { CheckIcon, GridIcon, LockIcon, SlotIcon } from "./EditorIcons";
@@ -80,19 +81,21 @@ type WardrobeTab = "wardrobe" | "inventory" | "shop";
 /** Opción con miniatura en vivo: usa el mismo rostro del personaje, sin arte extra. */
 function FaceOption({
   appearance,
+  eyesOnly = false,
   label,
   active,
   onPick,
 }: {
   appearance: AvatarAppearance;
+  eyesOnly?: boolean;
   label: string;
   active: boolean;
   onPick: () => void;
 }) {
   return (
     <button type="button" className="lw-id__opt" aria-pressed={active} onClick={onPick}>
-      <span className="lw-id__opt-face" aria-hidden="true">
-        <AvatarFace appearance={appearance} />
+      <span className={eyesOnly ? "lw-id__opt-eyes" : "lw-id__opt-face"} aria-hidden="true">
+        {eyesOnly ? <AnimeEyes shape={appearance.eyes} color={appearance.eyeColor} expression="neutral"/> : <AvatarFace appearance={appearance} />}
       </span>
       <span className="lw-id__opt-label">{label}</span>
     </button>
@@ -345,7 +348,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
             </div>
 
             {([
-              ["eyes", "OJOS", EYES, { normal:"Normales",large:"Grandes",almond:"Almendrados",bright:"Brillantes",sharp:"Afilados",relaxed:"Relajados",soft:"Dulces" }],
+              ["eyes", "OJOS", EYES, { normal:"Normales",large:"Grandes",almond:"Almendrados",bright:"Brillantes",sharp:"Afilados",relaxed:"Relajados",soft:"Dulces","anime-classic":"Anime clásico","anime-competitive":"Anime rival","anime-gentle":"Anime dulce","anime-calm":"Anime sereno" }],
               ["brows", "CEJAS", BROWS, { natural:"Naturales",straight:"Rectas",arched:"Arqueadas",bold:"Marcadas" }],
               ["nose", "NARIZ", NOSES, { soft:"Suave",small:"Pequeña",round:"Redonda",defined:"Definida" }],
               ["mouth", "BOCA", MOUTHS, { normal:"Normal",small:"Pequeña",wide:"Ancha",full:"Carnosa" }],
@@ -354,7 +357,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
                 <h3 className="lw-id__label">{title}</h3>
                 <div className="lw-id__opts">
                   {values.map(value => (
-                    <FaceOption key={value} appearance={{...draft,[key]:value}}
+                    <FaceOption key={value} eyesOnly={key === "eyes"} appearance={{...draft,[key]:value}}
                       label={(labels as Record<string,string>)[value]}
                       active={draft[key] === value} onPick={() => change(key,value)} />
                   ))}
