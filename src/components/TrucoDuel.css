@@ -530,3 +530,14 @@
 @media(min-width:901px){.tr-versus{padding-inline:20vw;gap:30px 70px}.tr-versus__player>.tr-speaking-face{width:140px!important;height:168px!important;margin-top:52px}.tr-versus__rival>.tr-lupi-portrait{width:220px;height:220px}.tr-versus__rival>.tr-lupi-portrait>span{width:220px;height:380px}}
 @media(max-width:900px){.tr-arena>.tr-mine .tr-actions{grid-template-columns:repeat(2,minmax(0,1fr));width:100%!important;gap:10px!important}.tr-arena>.tr-mine .tr-actions .is-truco,.tr-arena>.tr-mine .tr-actions .is-fold{grid-column:auto}.tr-arena>.tr-mine .tr-actions button{min-height:56px!important;font-size:17px!important}.tr-hand-result-modal{width:min(440px,calc(100vw - 24px))}.tr-hand-result-modal .duel-rematch{min-height:52px;font-size:17px}}
 @media(max-height:520px){.tr-versus{gap:10px 24px;padding-block:12px}.tr-versus__player>.tr-speaking-face{width:70px!important;height:84px!important}.tr-versus__rival>.tr-lupi-portrait{width:110px;height:110px}.tr-versus__rival>.tr-lupi-portrait>span{width:110px;height:190px}.tr-versus .tr-versus__title{font-size:52px}.tr-versus strong{min-height:1.3em}}
+
+/* Bot expressions stay in the avatar space and never move the table. */
+.tr-score-identity .tr-bot-expression{display:block;width:76px;height:82px;overflow:hidden;flex-shrink:0}
+.tr-bot-expression>.tr-lupi-portrait{width:76px;height:82px;filter:drop-shadow(0 0 5px #35d6d533)}
+.tr-bot-expression>.tr-lupi-portrait>span{width:76px;height:132px}
+.tr-bubble__avatar--lupi>.tr-lupi-portrait{width:90px;height:96px}
+.tr-bubble__avatar--lupi>.tr-lupi-portrait>span{width:90px;height:156px}
+.tr-envido-live{pointer-events:none;animation:tr-envido-notice 2.8s ease both}
+@keyframes tr-envido-notice{0%{opacity:0}10%,82%{opacity:1}100%{opacity:0}}
+@media(max-width:900px){.tr-score-identity .tr-bot-expression{width:50px;height:54px}.tr-bot-expression>.tr-lupi-portrait{width:50px;height:54px}.tr-bot-expression>.tr-lupi-portrait>span{width:50px;height:87px}}
+@media(prefers-reduced-motion:reduce){.tr-envido-live{animation:none}}
