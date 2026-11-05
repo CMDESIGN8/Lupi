@@ -49,20 +49,25 @@ export default function App() {
   const [hydrated, setHydrated] = useState(false);
   const [loadingPhase, setLoadingPhase] = useState<"intro" | "waiting" | "exiting" | "done">("intro");
   const [introComplete, setIntroComplete] = useState(false);
+  const [matchCheckError, setMatchCheckError] = useState(false);
+  const [matchCheckAttempt, setMatchCheckAttempt] = useState(0);
 
-  // La entrada se reproduce completa aunque la sesión responda inmediatamente.
+  // La intro se conserva en la primera visita y se acorta en las siguientes.
   useEffect(() => {
+    let alreadySeen = false;
+    try { alreadySeen = window.localStorage.getItem("lupi-intro-seen") === "true"; } catch { /* storage unavailable */ }
     const timer = window.setTimeout(() => {
+      try { window.localStorage.setItem("lupi-intro-seen", "true"); } catch { /* storage unavailable */ }
       setIntroComplete(true);
       setLoadingPhase((phase) => phase === "intro" ? "waiting" : phase);
-    }, 2600);
+    }, alreadySeen ? 350 : 1600);
     return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
     if (!hydrated || !introComplete) return;
     setLoadingPhase("exiting");
-    const timer = window.setTimeout(() => setLoadingPhase("done"), 1050);
+    const timer = window.setTimeout(() => setLoadingPhase("done"), 950);
     return () => window.clearTimeout(timer);
   }, [hydrated, introComplete]);
   const [hasPlayedMatch, setHasPlayedMatch] = useState<boolean | null>(null);
@@ -71,17 +76,18 @@ export default function App() {
   const [, setTourKey] = useState(0);
 
   useEffect(() => {
-    if (!user?.id) { setHasPlayedMatch(null); return; }
+    if (!user?.id) { setHasPlayedMatch(null); setMatchCheckError(false); return; }
     let active = true;
     setHasPlayedMatch(null);
+    setMatchCheckError(false);
     void supabase.from("matches").select("id", { count: "exact", head: true })
       .eq("user_id", user.id).then(({ count, error }) => {
         if (!active) return;
-        if (error) { console.error("No se pudo consultar el debut:", error); setHasPlayedMatch(true); }
+        if (error) { console.error("No se pudo consultar el debut:", error); setMatchCheckError(true); }
         else setHasPlayedMatch((count ?? 0) > 0);
       });
     return () => { active = false; };
-  }, [user?.id]);
+  }, [user?.id, matchCheckAttempt]);
 
   const navigation = useAppNavigation();
   const { appRoute, tab, gameTab, setGameTab, handleTabChange, handleNavigate, enterGame, goHome } = navigation;
@@ -254,6 +260,7 @@ export default function App() {
               <span className="lupi-loading-status">{loadingPhase === "exiting" ? "ENTRANDO A LA CANCHA" : "PREPARANDO LA CANCHA"}<span className="lupi-loading-dots" aria-hidden="true">...</span></span>
               <span className="lupi-loading-sr-only">{hydrated ? "Abriendo Lupi World" : "Cargando aplicación"}</span>
             </div>
+            {hydrated && <button type="button" className="lupi-loading-skip" onClick={() => setLoadingPhase("done")}>Entrar ahora</button>}
           </div>
         </div>
       </ToastProvider>
@@ -302,7 +309,7 @@ if (user && needsPlayerOnboarding(user)) {
             <OnboardingTour onComplete={handleTourComplete} />
           )}
 
-          {appRoute === "home" && <><header className="app-masthead"><BottomNav activeTab={tab} onTabChange={handleTabChange} onEnterGame={()=>enterGame("game")} pendingRewards={pendingRewards}/></header><div className="app-content-intro"><div className="masthead-top"><div className="masthead-identity"><AppHeader userId={user.id}/></div>{tab === "home" && <div className="masthead-greeting"><div><span>TU PUNTO DE PARTIDA</span><h1>Hola, {user.username} <em>✦</em></h1></div></div>}</div></div></>}
+          {appRoute === "home" && <><header className="app-masthead"><BottomNav activeTab={tab} onTabChange={handleTabChange} onEnterGame={()=>enterGame("game")} pendingRewards={pendingRewards}/></header><div className="app-content-intro"><div className="masthead-top"><div className="masthead-identity"><AppHeader userId={user.id}/></div></div></div></>}
 
           {appRoute === "home" ? (
             <>
@@ -311,6 +318,8 @@ if (user && needsPlayerOnboarding(user)) {
                   user={user}
                   onEnterGame={() => enterGame("game")}
                   hasPlayedMatch={hasPlayedMatch}
+                  matchCheckError={matchCheckError}
+                  onRetryMatchCheck={() => setMatchCheckAttempt((attempt) => attempt + 1)}
                   onNavigate={handleNavigate}
                   onRewardClaimed={refreshPendingRewards}
                 />

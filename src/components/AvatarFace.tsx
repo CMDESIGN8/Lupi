@@ -1,6 +1,7 @@
+import { AnimeBrows, AnimeNose, AnimeMouth } from './AnimeFeatures';
 import { AnimeEyes } from './AnimeEyes';
 import { memo, useEffect, useRef, useState, type CSSProperties } from 'react';
-import { DEFAULT_APPEARANCE, HAIR_COLORS, HAIRS, type AvatarAppearance } from '../lib/avatarAppearance';
+import { type AvatarMood, DEFAULT_EXPRESSIONS, resolveEyeStyle, DEFAULT_APPEARANCE, HAIR_COLORS, HAIRS, type AvatarAppearance } from '../lib/avatarAppearance';
 import { getHairFit, HAIR_FIT_EVENT, type HairFit } from './hairFit';
 import './AvatarFace.css';
 
@@ -51,7 +52,9 @@ function HairTexture({ hair, color }: { hair: string; color: string }) {
   return <div className="lw-face__hair"><canvas ref={canvasRef} className="lw-face__hair-canvas" aria-hidden="true" /></div>;
 }
 
-export const AvatarFace = memo(function AvatarFace({ appearance=DEFAULT_APPEARANCE, className='' }: { appearance?:AvatarAppearance; className?:string }) {
+export const AvatarFace = memo(function AvatarFace({ appearance=DEFAULT_APPEARANCE, className='', mood }: { appearance?:AvatarAppearance; className?:string; mood?:AvatarMood }) {
+  if (mood) appearance = { ...appearance, expression: appearance.expressionPresets?.[mood] ?? DEFAULT_EXPRESSIONS[mood] };
+  const eyes = resolveEyeStyle(appearance.eyes ?? "normal");
   const hair=HAIRS.includes(appearance.hair as typeof HAIRS[number])?appearance.hair:DEFAULT_APPEARANCE.hair;
   const color=HAIR_COLORS.includes(appearance.hairColor)?appearance.hairColor:DEFAULT_APPEARANCE.hairColor;
   const [fit,setFit]=useState<HairFit>(()=>getHairFit(hair));
@@ -69,11 +72,11 @@ export const AvatarFace = memo(function AvatarFace({ appearance=DEFAULT_APPEARAN
     '--hair-top':`${fit.y}%`,'--hair-x':`${fit.x}%`,
     '--hair-width':`${fit.width}%`,'--hair-height':`${fit.height}%`,
   } as CSSProperties;
-  return <div className={`lw-face lw-face--hair-${hair} lw-face--${appearance.face} lw-face--eyes-${appearance.eyes ?? "normal"} lw-face--brows-${appearance.brows ?? "natural"} lw-face--nose-${appearance.nose ?? "soft"} lw-face--mouth-${appearance.mouth ?? "normal"} lw-face--expression-${appearance.expression ?? "neutral"} ${className}`} style={style} aria-label="Rostro personalizado" role="img">
+  return <div className={`lw-face lw-face--hair-${hair} lw-face--${appearance.face} lw-face--eyes-${eyes} lw-face--brows-${appearance.brows ?? "natural"} lw-face--nose-${appearance.nose ?? "soft"} lw-face--mouth-${appearance.mouth ?? "normal"} lw-face--expression-${appearance.expression ?? "neutral"} ${className}`} style={style} aria-label="Rostro personalizado" role="img">
     <span className="lw-face__ear lw-face__ear--left"/><span className="lw-face__ear lw-face__ear--right"/>
     <HairTexture hair={hair} color={color}/>
-    <div className="lw-face__brows"><i/><i/></div>
-    <AnimeEyes shape={appearance.eyes ?? "normal"} color={appearance.eyeColor ?? DEFAULT_APPEARANCE.eyeColor} expression={appearance.expression ?? "neutral"}/><span className="lw-face__nose"/>
-    <div className={`lw-face__mouth lw-face__mouth--${appearance.expression}`}/>
+    <AnimeBrows shape={appearance.brows ?? "natural"} expression={appearance.expression}/>
+    <AnimeEyes shape={eyes} color={appearance.eyeColor ?? DEFAULT_APPEARANCE.eyeColor} expression={appearance.expression ?? "neutral"}/><AnimeNose shape={appearance.nose ?? "soft"}/>
+    <AnimeMouth shape={appearance.mouth ?? "normal"} expression={appearance.expression}/>
   </div>;
 });

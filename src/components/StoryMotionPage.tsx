@@ -24,7 +24,7 @@ function StoryTypeText({text,active,delay=0,complete=false,reduced=false}:{text:
  return <span className="story-type" data-typing={active&&visible<text.length?'true':undefined} aria-label={text}><span className="story-type__space" aria-hidden="true">{text}</span><span className="story-type__ink" aria-hidden="true">{text.slice(0,visible)}</span></span>;
 }
 function ArrivalFace({appearance}:{appearance:AvatarAppearance}){
- return <AvatarFace appearance={appearance} className="manga-arrival-face"/>;
+ return <AvatarFace mood="presentation" appearance={appearance} className="manga-arrival-face"/>;
 }
 export function StoryMotionReplay({userId,playerName,onDone}:{userId:string;playerName?:string;onDone:()=>void}){
  const [progress,setProgress]=useState<StoryProgress>({intro_step:0,status:'intro',choice:null,session_id:null,result:null,user_score:null,opponent_score:null});

@@ -1,3 +1,5 @@
+import './TrucoPvpDesktop.css';
+import './TrucoPortraits.css';
 import { useDuelReward } from "../hooks/useDuelReward";
 import { DuelRewardCard } from "./DuelRewardCard";
 import { SkillMatchReward } from "./SkillMatchReward";
@@ -77,7 +79,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
 
 
   return (
-    <section className={`rps-arena tr-arena ${finished ? "is-complete" : ""}`} data-outcome={finished ? outcome : undefined} aria-label="Truco PvP">
+    <section className={`rps-arena tr-arena tr-arena--pvp ${finished ? "is-complete" : ""}`} data-outcome={finished ? outcome : undefined} aria-label="Truco PvP">
       {finished && <DuelResultEffects key={challenge.id} outcome={outcome} />}
       <header className="rps-header">
         <button type="button" onClick={() => { void leave(); onExit(); }}>← CLUB</button>
@@ -94,7 +96,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
         <div className="tr-score-player">
           <div className="tr-score-main">
             <div className="tr-score-identity">
-              <div className="tr-avatar"><AvatarFace appearance={myAppearance} className="tr-pvp-face"/></div>
+              <div className="tr-avatar"><AvatarFace mood={finished ? (iWon ? "celebrate" : "presentation") : "focus"} appearance={myAppearance} className="tr-pvp-face"/></div>
               <strong className="tr-score-name">{myName}</strong>
             </div>
             <b>{myScore}</b>
@@ -105,7 +107,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
         <div className="tr-score-player">
           <div className="tr-score-main">
             <div className="tr-score-identity">
-              <div className="tr-avatar"><AvatarFace appearance={rivalAppearance} className="tr-pvp-face"/></div>
+              <div className="tr-avatar"><AvatarFace mood={finished ? (!iWon ? "celebrate" : "presentation") : "focus"} appearance={rivalAppearance} className="tr-pvp-face"/></div>
               <strong className="tr-score-name">{rivalName}</strong>
             </div>
             <b>{rivalScore}</b>
@@ -120,7 +122,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
             <div className="tr-played">{[0,1,2].map(i => (
               <TrucoTableSlot key={`${state.handNo}:${i}`} card={state.table[rivalSeat][i] ?? null} result={state.trickResults[i]} seat={rivalSeat} mySeat={mySeat} handNo={state.handNo} />
             ))}</div>
-            {bubble?.seat === rivalSeat && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><AvatarFace appearance={rivalAppearance} className="tr-speaking-face"/><span>{bubble.text}</span></div>}
+            {bubble?.seat === rivalSeat && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><span className="tr-shout-face"><AvatarFace mood="focus" appearance={rivalAppearance}/></span><span>{bubble.text}</span></div>}
           </div>
 
           <div className="tr-felt" role="status">
@@ -132,7 +134,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
             <div className="tr-played">{[0,1,2].map(i => (
               <TrucoTableSlot key={`${state.handNo}:${i}`} card={state.table[mySeat][i] ?? null} result={state.trickResults[i]} seat={mySeat} mySeat={mySeat} handNo={state.handNo} />
             ))}</div>
-            {bubble?.seat === mySeat && <div key={bubble.n} className="tr-bubble tr-bubble--me"><AvatarFace appearance={myAppearance} className="tr-speaking-face"/><span>{bubble.text}</span></div>}
+            {bubble?.seat === mySeat && <div key={bubble.n} className="tr-bubble tr-bubble--me"><span className="tr-shout-face"><AvatarFace mood="focus" appearance={myAppearance}/></span><span>{bubble.text}</span></div>}
           </div>
         </div>
       )}

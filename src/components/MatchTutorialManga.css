@@ -123,10 +123,8 @@
 }
 @media(prefers-reduced-motion:reduce){.mt-play-cinema *{animation:none!important}}
 
-/* Give the play the entire vignette; only one user avatar is visible. */
+/* The action remains inside the existing court. */
 .match-tutorial .mt-content{position:relative}
-.match-tutorial .mt-content--playing>.mt-integrated-panel{visibility:hidden}
-.match-tutorial .mt-content--playing>.mt-practice-court{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-height:none!important;min-height:0!important;margin:0!important;z-index:12;box-sizing:border-box}
 .mt-content--playing .mt-practice-court>small{z-index:15}
 .mt-content--playing .mt-court-caption{z-index:15}
 .mt-play-cinema__call,.mt-play-cinema__player,.mt-play-cinema__ball,.mt-play-cinema__rival,.mt-play-cinema__result{animation-duration:4.8s!important}
@@ -172,4 +170,41 @@
  .match-tutorial .mt-integrated-panel .mt-manga-speech:after{left:10px}
  .mt-anime-gloves{width:65px;height:54px}
  .mt-play-cinema__rival .mt-anime-gloves{width:100px;height:83px}
+}
+
+.mt-quintet-panel{display:contents}
+@media(min-width:901px){
+ .lp-story--playing .match-tutorial.mt-cinematic:has(.mt-quintet-panel){width:100%!important;max-width:none!important;height:calc(100dvh - 116px)!important;min-height:0!important;max-height:calc(100dvh - 116px)!important;padding:10px!important;display:flex!important;flex-direction:column!important;overflow:hidden}
+ .match-tutorial:has(.mt-quintet-panel)>.mt-dots{margin:5px 0 8px!important}
+ .lp-story--playing .match-tutorial:has(.mt-quintet-panel)>.mt-content{display:grid!important;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;grid-template-rows:minmax(0,1fr)!important;gap:16px!important;min-height:0!important;flex:1!important;align-items:stretch}
+ .match-tutorial:has(.mt-quintet-panel) .mt-integrated-panel{grid-column:1!important;grid-row:1!important;min-height:0!important;height:100%!important;margin:0!important}
+ .match-tutorial:has(.mt-quintet-panel) .mt-integrated-panel .mt-manga-lupi{height:calc(100% - 145px)!important;max-height:330px;bottom:40px!important;left:8%!important;width:84%!important}
+ .match-tutorial .mt-quintet-panel{position:relative;display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;min-height:0;grid-column:2;grid-row:1}
+ .match-tutorial:has(.mt-quintet-panel) .mt-lineup-subtitle{margin:0!important}
+ .match-tutorial:has(.mt-quintet-panel) .mt-lineup{width:100%!important;max-width:none!important;display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important;padding:8px 0!important;margin:0!important}
+ .match-tutorial:has(.mt-quintet-panel) .mt-lineup-slot,.match-tutorial:has(.mt-quintet-panel) .mt-lineup-slot:last-child:nth-child(odd){grid-column:auto!important;width:100%!important}
+ .match-tutorial:has(.mt-quintet-panel) .mt-card-button{width:100%!important;max-width:120px!important;margin:auto;aspect-ratio:.7!important}
+ .match-tutorial:has(.mt-quintet-panel) .mt-card-hint{font-size:7px;letter-spacing:0;padding:3px}
+ .match-tutorial:has(.mt-quintet-panel) .mt-dt{margin:0!important;padding:9px!important;gap:8px}
+ .match-tutorial:has(.mt-quintet-panel) .mt-dt p{font-size:11px!important;line-height:1.35!important;margin:0!important}
+ .match-tutorial:has(.mt-quintet-panel) .mt-team-button{margin:0!important;min-height:36px!important;padding:7px!important}
+ .match-tutorial:has(.mt-quintet-panel)>footer{position:relative!important;inset:auto!important;flex-shrink:0;width:54%;max-width:none!important;align-self:flex-end;margin:8px 0 0!important;display:flex!important}
+ .match-tutorial:has(.mt-quintet-panel)>footer button{min-height:38px!important;padding:8px 12px!important}
+ .mt-quintet-panel .mt-player-detail{position:absolute;inset:0;z-index:6;margin:0;padding:16px;background:#071a27;display:flex;flex-direction:column;justify-content:center}
+}
+
+/* In-place action: keep the briefing, court size and controls stable. */
+.match-tutorial .mt-practice-court .mt-play-cinema{background:transparent;inset:0;z-index:8}
+.match-tutorial .mt-play-cinema__player{left:3%;width:30%;height:88%}
+.match-tutorial .mt-play-cinema__call{top:20%;font-size:clamp(18px,2vw,28px)}
+.match-tutorial .mt-play-cinema__result,.match-tutorial .mt-play-cinema.is-resolved .mt-play-cinema__result{top:auto;bottom:24px;font-size:clamp(17px,1.8vw,26px);padding:8px}
+.match-tutorial .mt-play-cinema__ball{font-size:28px}
+.match-tutorial .mt-play-cinema__rival .mt-anime-gloves{width:76px;height:63px}
+.match-tutorial .mt-play-cinema__lines{opacity:.18}
+@media(max-width:900px){
+ .match-tutorial .mt-play-cinema__player{width:32%;height:85%;left:0}
+ .match-tutorial .mt-play-cinema__call{font-size:19px;top:24%}
+ .match-tutorial .mt-play-cinema__result,.match-tutorial .mt-play-cinema.is-resolved .mt-play-cinema__result{font-size:17px;bottom:20px;padding:6px}
+ .match-tutorial .mt-play-cinema__ball{font-size:24px}
+ .match-tutorial .mt-play-cinema__rival .mt-anime-gloves{width:58px;height:48px}
 }

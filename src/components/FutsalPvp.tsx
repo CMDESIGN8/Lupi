@@ -25,7 +25,7 @@ type Props = { challenge: Challenge; meId: string; deck: Deck; players?: LobbyPl
 export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], onExit, onFinished, onRematch }: Props) {
   const { state, receivedAt, error, busy, join, play, leave, reconnect } = useFutsalPvp(challenge);
   const [portraits] = useState(() => players.filter(p => p.userId === challenge.fromId || p.userId === challenge.toId));
-  const portrait = (id: string, name: string) => { const player = players.find(p => p.userId === id) ?? portraits.find(p => p.userId === id); return <span className="fp-avatar trivia-portrait" aria-hidden="true">{player?.appearance ? <AvatarFace appearance={player.appearance} className="lw-face--game" /> : <span>{name.slice(0,1).toUpperCase()}</span>}</span>; };
+  const portrait = (id: string, name: string) => { const player = players.find(p => p.userId === id) ?? portraits.find(p => p.userId === id); return <span className="fp-avatar trivia-portrait" aria-hidden="true">{player?.appearance ? <AvatarFace mood={state?.status === "finished" ? (state.winnerId === id ? "celebrate" : "presentation") : "focus"} appearance={player.appearance} className="lw-face--game" /> : <span>{name.slice(0,1).toUpperCase()}</span>}</span>; };
   const fullAvatar = (id:string,name:string) => <ArenaAvatar player={players.find(p=>p.userId===id) ?? portraits.find(p=>p.userId===id)} catalog={catalog} isMe={id===meId} name={name}/>;
   const [now, setNow] = useState(Date.now());
   const [confirmExit, setConfirmExit] = useState(false);

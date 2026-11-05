@@ -1,0 +1,270 @@
+/* Cinemática de jugada (estilo 16 bits). Overlay a pantalla completa vía portal:
+   no depende del layout del tutorial, así se ve igual en móvil y escritorio. */
+.pc{--pcw:min(calc(100vw - 20px),1040px,calc((100dvh - 215px)*16/9));--tone:#ffe45e;--hero-scale:1.65;
+  position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;box-sizing:border-box;
+  padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));
+  background:radial-gradient(ellipse at 50% 25%,#0d2f42,#02070d 75%);color:#f2fff9;font-family:Barlow,system-ui,sans-serif;
+  overscroll-behavior:contain;touch-action:manipulation;animation:pc-in .25s ease-out both}
+.pc *{box-sizing:border-box}
+.pc--gold{--tone:#ffe45e}.pc--mint{--tone:#7dffd6}
+.pc__frame{display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
+.pc__stage{container:pcs/size;position:relative;isolation:isolate;overflow:hidden;width:var(--pcw);aspect-ratio:16/9;cursor:pointer;
+  border:3px solid #eafff8;border-radius:4px;background:#04121d;box-shadow:0 0 0 3px #04121d,0 24px 70px #000d}
+.pc__side{width:var(--pcs,var(--pcw));display:flex;flex-direction:column;gap:12px}
+
+.pc__layer{position:absolute;inset:0;display:none}
+.pc[data-beat="0"] .pc__call{display:flex}
+.pc[data-beat="1"] .pc__close{display:block}
+.pc[data-beat="2"] .pc__play,.pc[data-beat="3"] .pc__play{display:block}
+.pc[data-beat="3"] .pc__result{display:flex}
+.pc__bg{position:absolute;inset:0;background:linear-gradient(180deg,#02101bd9,#04202d55 42%,#02101be6),url('../assets/challenge-futsal-anime.webp') center/cover}
+.pc__flash{position:absolute;inset:0;z-index:5;background:#fff;pointer-events:none;animation:pc-flash .4s ease-out both}
+.pc__bars:before,.pc__bars:after{content:"";position:absolute;left:0;right:0;height:7%;background:#020a12;z-index:6}
+.pc__bars:before{top:0}.pc__bars:after{bottom:0}
+.pc__scan{position:absolute;inset:0;z-index:7;pointer-events:none;background:repeating-linear-gradient(0deg,#0000 0 2px,#00000030 2px 3px)}
+
+/* Líneas de concentración manga */
+.pc__rays{position:absolute;inset:-35%;pointer-events:none;opacity:.5;animation:pc-rays .34s steps(2) infinite;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,#fff 0 1.5deg,transparent 1.5deg 7deg);
+  -webkit-mask:radial-gradient(circle at 50% 50%,transparent 22%,#000 62%);mask:radial-gradient(circle at 50% 50%,transparent 22%,#000 62%)}
+
+/* Plano 1: llamada */
+.pc__call{align-items:center;justify-content:center;background:radial-gradient(circle,#0f6a8a99,#02101bd0 72%);z-index:1}
+.pc__call strong{position:relative;z-index:1;max-width:92%;text-align:center;text-wrap:balance;transform:rotate(-4deg);
+  font:1000 italic clamp(34px,17cqmin,130px)/.92 'Barlow Condensed',Impact,sans-serif;letter-spacing:.01em;color:var(--tone);
+  text-shadow:.6cqmin .6cqmin 0 #04121d,-.5cqmin -.5cqmin 0 #04121d,.5cqmin -.5cqmin 0 #04121d,-.5cqmin .5cqmin 0 #04121d,0 0 4cqmin #ffc84099;
+  animation:pc-slam .45s cubic-bezier(.2,1.5,.3,1) both}
+
+/* Plano 2: primer plano (vos vs. rival, pantalla partida) */
+.pc__close{z-index:1;background:#02101b}
+.pc__half{position:absolute;inset:0;overflow:hidden}
+.pc__half--hero{clip-path:polygon(0 0,60% 0,44% 100%,0 100%);background:linear-gradient(120deg,#0e7a93,#0a2c4a)}
+.pc__half--foe{clip-path:polygon(60% 0,100% 0,100% 100%,44% 100%);background:linear-gradient(240deg,#8a3030,#2a0f1e)}
+.pc--shoot .pc__half--foe{background:linear-gradient(240deg,#b3730f,#3b2306)}
+.pc--pass .pc__half--foe{background:linear-gradient(240deg,#139a78,#0a3346)}
+.pc__slash{position:absolute;inset:0;background:#fff;clip-path:polygon(59.3% 0,60.7% 0,44.7% 100%,43.3% 100%);filter:drop-shadow(0 0 1.2cqmin #8ff);animation:pc-flash-line .5s both}
+.pc__hero{position:absolute;left:5%;top:7%;width:40%;height:92%;transform-origin:50% 0;transform:scale(var(--hero-scale));animation:pc-hero-in .55s cubic-bezier(.2,1,.3,1) both;filter:drop-shadow(0 .8cqmin 0 #04121d99)}
+.pc__hero .lp-owned-portrait{overflow:visible}
+.pc__foe{position:absolute;right:3%;top:9%;width:42%;height:86%;animation:pc-foe-in .55s .08s cubic-bezier(.2,1,.3,1) both;filter:drop-shadow(0 .8cqmin 0 #04121d99)}
+.pc__foe svg{display:block;width:100%;height:100%}
+.pc__tag{position:absolute;left:4%;bottom:11%;z-index:2;display:flex;flex-direction:column;gap:.4cqmin;max-width:44%;padding:1.2cqmin 2cqmin;background:#04121de6;border-left:.9cqmin solid #7dffd6;
+  font:1000 italic clamp(15px,4.4cqmin,38px)/1 'Barlow Condensed',Impact,sans-serif;color:#fff;animation:pc-tag-in .4s .25s both}
+.pc__tag b{font:900 normal clamp(9px,2cqmin,15px)/1 Barlow,system-ui,sans-serif;letter-spacing:.14em;color:#7dffd6}
+.pc__tag--foe{left:auto;right:4%;text-align:right;align-items:flex-end;border-left:0;border-right:.9cqmin solid #ff8d7d}
+.pc__tag--foe b{color:#ff8d7d}
+.pc--shoot .pc__tag--foe{border-right-color:#ffc94d}.pc--shoot .pc__tag--foe b{color:#ffc94d}
+.pc--pass .pc__tag--foe{border-right-color:#7dffd6}.pc--pass .pc__tag--foe b{color:#7dffd6}
+
+/* Plano 3: la jugada en cancha */
+.pc__play{z-index:1;overflow:hidden}
+.pc__play:before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#02101bc4 46%,#0f6577d4 46.4%,#082a3cf2)}
+.pc--defense .pc__play{transform:scaleX(-1)}
+.pc__world{position:absolute;inset:0;animation:pc-shake 2.6s both}
+.pc__goal{position:absolute;left:38%;top:13%;width:54%;height:36%;border:.9cqmin solid #e7fbff;border-bottom:0;border-radius:.6cqmin .6cqmin 0 0;
+  background:repeating-linear-gradient(90deg,#0000 0 3.1%,#d1f7ff33 3.1% 3.6%),repeating-linear-gradient(0deg,#0000 0 6.5%,#d1f7ff33 6.5% 7.2%),#031a2a80}
+.pc__fig{position:absolute;display:block;height:31cqmin;width:15.5cqmin;margin:-31cqmin 0 0 -7.75cqmin;transform-origin:50% 92%}
+.pc__keeper{left:65%;top:50%}
+.pc__mate{left:80%;top:82%}.pc__rival{left:24%;top:82%}
+.pc--shoot .pc__mate,.pc--shoot .pc__rival,.pc--pass .pc__rival{display:none}
+.pc__ball{position:absolute;left:22%;top:80%;width:7cqmin;height:7cqmin;margin:-3.5cqmin 0 0 -3.5cqmin;filter:drop-shadow(0 .6cqmin .4cqmin #0008)}
+.pc__ball--g1{opacity:.4;animation-delay:.06s!important}.pc__ball--g2{opacity:.2;animation-delay:.12s!important}
+.pc__burst{position:absolute;width:22cqmin;height:22cqmin;margin:-11cqmin 0 0 -11cqmin;opacity:0;background:#fff6a8;
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);filter:drop-shadow(0 0 2cqmin #ffd34d)}
+.pc__shield{position:absolute;left:52%;top:57%;width:15cqmin;height:24cqmin;margin:-12cqmin 0 0 -7.5cqmin;display:none;opacity:0;border-radius:50% 50% 38% 38%;
+  border:1.1cqmin solid #9ffcff;background:radial-gradient(circle,#9ffcff66,#4ff2);box-shadow:0 0 3cqmin #4ff,inset 0 0 3cqmin #4ff}
+.pc__swoosh{position:absolute;left:49%;top:80%;width:34cqmin;height:2.4cqmin;margin:-1.2cqmin 0 0 -17cqmin;display:none;opacity:0;transform:rotate(-6deg);background:linear-gradient(90deg,#fff0,#fff,#fff0)}
+
+/* — Remate — */
+.pc--shoot .pc__ball{animation:pc-ball-shoot 2.4s both}
+.pc--shoot .pc__keeper{animation:pc-keeper-shoot 2.4s both}
+.pc--shoot .pc__keeper .fig-arm{animation:pc-arm-up .5s .55s both}
+.pc--shoot .pc__keeper .fig-arm--r{--sd:-1}
+.pc--shoot .pc__burst{left:63%;top:34%;animation:pc-burst .5s 1.25s both}
+/* — Pase — */
+.pc--pass .pc__ball{animation:pc-ball-pass 2.4s both}
+.pc--pass .pc__keeper{animation:pc-keeper-wrong 2.4s both}
+.pc--pass .pc__mate{animation:pc-mate-receive 2.4s both}
+.pc--pass .pc__mate .fig-arm--l{transform-origin:25px 64px;animation:pc-arm-wave .5s .3s both}
+.pc--pass .pc__burst{left:79%;top:78%;width:13cqmin;height:13cqmin;margin:-6.5cqmin 0 0 -6.5cqmin;animation:pc-burst .5s 1.3s both}
+/* — Salir a marcar — */
+.pc--press .pc__ball{animation:pc-ball-press 2.4s both}
+.pc--press .pc__rival{animation:pc-rival-press 2.4s both}
+.pc--press .pc__mate{left:76%;animation:pc-mate-slide 2.4s both}
+.pc--press .pc__keeper{height:20cqmin;width:10cqmin;margin:-20cqmin 0 0 -5cqmin;left:80%;top:46%}
+.pc--press .pc__goal{opacity:.55}
+.pc--press .pc__swoosh{display:block;animation:pc-swoosh 2.4s both}
+.pc--press .pc__burst{left:50%;top:80%;animation:pc-burst .5s 1.05s both}
+/* — Cubrir el arco — */
+.pc--cover .pc__ball{animation:pc-ball-cover 2.4s both}
+.pc--cover .pc__rival{animation:pc-rival-kick 2.4s both}
+.pc--cover .pc__mate{left:50%;top:76%;animation:pc-mate-block 2.4s both}
+.pc--cover .pc__mate .fig-arm{animation:pc-arm-up .4s .7s both}
+.pc--cover .pc__mate .fig-arm--r{--sd:-1}
+.pc--cover .pc__shield{display:block;animation:pc-shield 2.4s both}
+.pc--cover .pc__burst{left:52%;top:54%;animation:pc-burst .5s .95s both}
+.pc .fig-arm{transform-box:view-box}
+.pc .fig-arm--l{transform-origin:25px 64px}.pc .fig-arm--r{transform-origin:75px 64px}
+
+/* Plano 4: resolución (se queda hasta "Continuar") */
+.pc__result{z-index:3;align-items:center;justify-content:center;background:radial-gradient(circle,#0000 15%,#000b 100%)}
+.pc__result i{position:absolute;left:-6%;right:-6%;top:35%;height:30%;transform:rotate(-2.5deg);border-block:.9cqmin solid var(--tone);
+  background:linear-gradient(90deg,#041a2a00,#041a2af5 10%,#041a2af5 90%,#041a2a00);animation:pc-band .3s both}
+.pc__result strong{position:relative;max-width:92%;text-align:center;text-wrap:balance;transform:rotate(-2.5deg);
+  font:1000 italic clamp(28px,11.5cqmin,100px)/1 'Barlow Condensed',Impact,sans-serif;color:var(--tone);
+  text-shadow:.5cqmin .5cqmin 0 #04121d,0 0 3.5cqmin #0008;animation:pc-slam .5s .05s cubic-bezier(.2,1.5,.3,1) both}
+
+/* Caja de diálogo + botones */
+.pc__dialog{position:relative;min-height:88px;padding:22px 18px 14px;border:3px solid #eafff8;border-radius:8px;
+  background:linear-gradient(180deg,#0f4560,#071e30);box-shadow:0 0 0 3px #04121d,inset 0 0 0 2px #1f7a92}
+.pc__name{position:absolute;top:-13px;left:14px;padding:5px 9px;border-radius:3px;background:#ffe45e;color:#04121d;font:900 11px/1 Barlow,system-ui,sans-serif;letter-spacing:.14em}
+.pc__text{margin:0;min-height:2.9em;font:700 clamp(15px,2.3vw,19px)/1.45 Barlow,system-ui,sans-serif;color:#f4fffb}
+.pc__cursor{display:inline-block;width:.55em;height:.9em;margin-left:3px;vertical-align:-.12em;background:#ffe45e;animation:pc-blink .8s steps(2) infinite}
+.pc__sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.pc__actions{display:flex;justify-content:flex-end}
+.pc__btn{min-height:52px;min-width:210px;padding:12px 24px;cursor:pointer;border:3px solid #04121d;border-radius:6px;box-shadow:3px 3px 0 #04121d;
+  background:linear-gradient(110deg,#fff1a0,#ffdb48);color:#092633;font:1000 italic 21px/1 'Barlow Condensed',Impact,sans-serif;letter-spacing:.05em;animation:pc-btn .9s ease-in-out infinite alternate}
+.pc__btn--ghost{min-width:150px;background:#0a2d3e;color:#cfeeee;border-color:#3fb6b6;box-shadow:none;font-size:17px;animation:none}
+.pc__btn:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.pc__btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #04121d}
+
+/* ===== Móvil / vertical: escenario 10:13 y diagonal horizontal ===== */
+@media (max-width:720px),(max-aspect-ratio:1/1){
+ .pc{--pcw:min(calc(100vw - 20px),560px,calc((100dvh - 250px)*10/13))}
+ .pc__stage{aspect-ratio:10/13}
+ .pc__half--hero{clip-path:polygon(0 0,100% 0,100% 57%,0 43%)}
+ .pc__half--foe{clip-path:polygon(0 43%,100% 57%,100% 100%,0 100%)}
+ .pc__slash{clip-path:polygon(0 42.2%,100% 56.2%,100% 57.8%,0 43.8%)}
+ .pc__hero{left:18%;top:6%;width:64%;height:50%}
+ .pc__foe{right:auto;left:22%;top:auto;bottom:6%;width:56%;height:44%}
+ .pc__tag{left:3%;top:9%;bottom:auto;max-width:52%}
+ .pc__tag--foe{left:auto;right:3%;top:auto;bottom:9%}
+ .pc__goal{left:20%;width:72%;top:14%;height:32%}
+ .pc__fig{height:27cqmin;width:13.5cqmin;margin:-27cqmin 0 0 -6.75cqmin}
+ .pc--press .pc__keeper{height:17cqmin;width:8.5cqmin;margin:-17cqmin 0 0 -4.25cqmin}
+ .pc__ball{width:9cqmin;height:9cqmin;margin:-4.5cqmin 0 0 -4.5cqmin}
+ .pc__dialog{min-height:92px;padding:20px 14px 12px}
+ .pc__actions{justify-content:stretch}.pc__btn{width:100%}
+}
+/* Celular en horizontal: escenario a la izquierda, diálogo a la derecha */
+@media (orientation:landscape) and (max-height:520px){
+ .pc{--pcw:min(64vw,calc((100dvh - 24px)*16/9));--pcs:min(calc(100vw - 64vw - 36px),360px)}
+ .pc__frame{flex-direction:row;align-items:center;justify-content:center}
+ .pc__dialog{min-height:0}.pc__text{min-height:0;font-size:14px}
+ .pc__btn{min-width:0;width:100%;min-height:46px}
+ .pc__actions{justify-content:stretch}
+}
+
+/* El salto o "reducir movimiento" deja la jugada directo en su estado final */
+.pc[data-skipped] .pc__play *,.pc[data-skipped] .pc__world{animation-duration:.001s!important;animation-delay:0s!important}
+@media (prefers-reduced-motion:reduce){.pc *,.pc{animation-duration:.001s!important;animation-delay:0s!important;animation-iteration-count:1!important}}
+
+@keyframes pc-in{from{opacity:0}to{opacity:1}}
+@keyframes pc-flash{0%{opacity:.95}100%{opacity:0}}
+@keyframes pc-flash-line{0%{opacity:0;transform:scaleY(.2)}100%{opacity:1;transform:none}}
+@keyframes pc-rays{0%{transform:rotate(0) scale(1)}100%{transform:rotate(2.5deg) scale(1.05)}}
+@keyframes pc-slam{0%{opacity:0;transform:scale(2.6) rotate(-10deg)}55%{opacity:1;transform:scale(.93) rotate(-3deg)}100%{opacity:1;transform:scale(1) rotate(-4deg)}}
+@keyframes pc-band{from{opacity:0;transform:rotate(-2.5deg) scaleY(.1)}to{opacity:1;transform:rotate(-2.5deg) scaleY(1)}}
+@keyframes pc-hero-in{from{opacity:0;transform:translateX(-24%) scale(calc(var(--hero-scale)*1.18))}to{opacity:1;transform:scale(var(--hero-scale))}}
+@keyframes pc-foe-in{from{opacity:0;transform:translateX(24%) scale(1.15)}to{opacity:1;transform:none}}
+@keyframes pc-tag-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pc-blink{50%{opacity:0}}
+@keyframes pc-btn{from{box-shadow:3px 3px 0 #04121d,0 0 0 #ffe45e00}to{box-shadow:3px 3px 0 #04121d,0 0 18px #ffe45eaa}}
+@keyframes pc-burst{0%{opacity:0;transform:scale(.2) rotate(0)}30%{opacity:1;transform:scale(1.15) rotate(12deg)}100%{opacity:0;transform:scale(1.5) rotate(24deg)}}
+@keyframes pc-shake{0%,48%,64%,100%{transform:none}52%{transform:translate(-1.2cqmin,.8cqmin)}56%{transform:translate(1.2cqmin,-.6cqmin)}60%{transform:translate(-.6cqmin,.4cqmin)}}
+@keyframes pc-arm-up{to{transform:rotate(calc(150deg*var(--sd,1)))}}
+@keyframes pc-arm-wave{0%{transform:none}100%{transform:rotate(155deg)}}
+/* remate */
+@keyframes pc-ball-shoot{0%{left:22%;top:80%;transform:scale(1) rotate(0)}14%{left:22%;top:80%;transform:scale(1.12) rotate(0);animation-timing-function:cubic-bezier(.5,0,.9,.5)}
+ 52%{left:63%;top:34%;transform:scale(.6) rotate(540deg)}58%{left:63%;top:34%;transform:scale(.6) rotate(540deg);animation-timing-function:cubic-bezier(.2,.7,.4,1)}100%{left:90%;top:64%;transform:scale(.85) rotate(960deg)}}
+@keyframes pc-keeper-shoot{0%,12%{transform:none}46%,100%{transform:translate(-9cqmin,-3cqmin) rotate(-34deg)}}
+/* pase */
+@keyframes pc-ball-pass{0%,14%{left:22%;top:80%;transform:rotate(0)}38%{left:50%;top:70%;transform:rotate(330deg)}58%,100%{left:79%;top:81%;transform:rotate(700deg)}}
+@keyframes pc-keeper-wrong{0%,16%{transform:none}50%,100%{transform:translate(-11cqmin,0) rotate(-22deg)}}
+@keyframes pc-mate-receive{0%{transform:translateX(9cqmin)}55%,100%{transform:none}}
+/* salir a marcar (coordenadas normales; la escena se espeja) */
+@keyframes pc-ball-press{0%{left:32%;top:82%}42%{left:52%;top:82%;transform:rotate(300deg)}46%{left:52%;top:82%}62%{left:63%;top:70%;transform:rotate(520deg)}100%{left:74%;top:84%;transform:rotate(760deg)}}
+@keyframes pc-rival-press{0%{transform:translateX(0)}42%{transform:translateX(18cqmin)}62%,100%{transform:translate(20cqmin,-1cqmin) rotate(34deg)}}
+@keyframes pc-mate-slide{0%,34%{transform:none}50%,100%{transform:translateX(-18cqmin) rotate(-72deg)}}
+@keyframes pc-swoosh{0%,38%{opacity:0}46%{opacity:.95}58%,100%{opacity:0}}
+/* cubrir */
+@keyframes pc-ball-cover{0%{left:30%;top:80%}16%{left:30%;top:80%;transform:scale(1.1);animation-timing-function:cubic-bezier(.5,0,.9,.5)}
+ 38%{left:50%;top:55%;transform:scale(.8) rotate(360deg)}42%{left:50%;top:55%;transform:scale(.8) rotate(360deg);animation-timing-function:cubic-bezier(.2,.7,.4,1)}100%{left:34%;top:84%;transform:scale(1) rotate(-120deg)}}
+@keyframes pc-rival-kick{0%,10%{transform:none}20%{transform:translateX(3cqmin) rotate(14deg)}40%,100%{transform:translateX(1cqmin) rotate(6deg)}}
+@keyframes pc-mate-block{0%,20%{transform:none}38%{transform:translateY(-4cqmin) scale(1.06)}60%,100%{transform:none}}
+@keyframes pc-shield{0%,30%{opacity:0;transform:scale(.4)}40%{opacity:1;transform:scale(1.1)}70%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.2)}}
+
+/* Embedded resolution: contained by the existing court, never a portal or modal. */
+.mt-practice-court>.pc{position:absolute;inset:0;z-index:8;padding:0;display:block;width:100%;height:100%;background:transparent;animation:none;--hero-scale:1.25;--pcw:100%;color:#f2fff9;overscroll-behavior:auto}
+.mt-practice-court .pc__frame{width:100%;height:100%;display:grid;grid-template-rows:minmax(0,1fr) auto;gap:0}
+.mt-practice-court .pc__stage{width:100%;height:100%;min-height:0;aspect-ratio:auto;border:0;border-radius:0;box-shadow:none;cursor:default;background:transparent}
+.mt-practice-court .pc__side{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;background:#031925ed;padding:7px}
+.mt-practice-court .pc__dialog{border:0;border-radius:0;box-shadow:none;background:none;padding:0;min-height:0}
+.mt-practice-court .pc__name{display:none}
+.match-tutorial .pc__dialog .pc__text{font-size:11px;line-height:1.3;min-height:2.6em;margin:0;color:#ecfff9}
+.mt-practice-court .pc__btn{min-height:40px!important;margin:0;padding:8px 10px!important;font-size:10px!important;white-space:normal}
+.mt-practice-court .pc__bg{background:linear-gradient(180deg,#02101b33,#04202d22)}
+.mt-practice-court .pc__play:before{display:none}
+.mt-practice-court .pc__world{animation:none}
+.mt-practice-court .pc__goal{display:none}
+.mt-practice-court .pc__flash,.mt-practice-court .pc__scan,.mt-practice-court .pc__bars{display:none}
+.mt-practice-court .pc__call strong{font-size:clamp(22px,14cqmin,70px)}
+.mt-practice-court .pc__result strong{font-size:clamp(19px,11cqmin,50px)}
+.mt-practice-court .pc__tag{font-size:clamp(8px,4cqmin,15px)}
+.mt-practice-court .pc__rays{animation:none;opacity:.2}
+.mt-practice-court .pc__result{pointer-events:none}
+@media(max-width:540px){.mt-practice-court .pc__side{padding:5px}.match-tutorial .pc__dialog .pc__text{font-size:10px}.mt-practice-court .pc__btn{min-height:40px!important;padding:6px!important;font-size:9px!important}}
+
+/* Use the same grounded anime goalkeeper in the action frame. */
+.mt-practice-court .pc__keeper.fig--keeper-art{left:67%;top:78%;height:40cqmin;width:26.7cqmin;margin:-40cqmin 0 0 -13.35cqmin}
+.mt-practice-court .pc--press .pc__keeper.fig--keeper-art{height:28cqmin;width:18.7cqmin;margin:-28cqmin 0 0 -9.35cqmin;left:80%;top:70%}
+.pc__foe>.fig--keeper-art{width:100%;height:100%}
+
+/* Keep the goal on the right; actors face each other on the same floor plane. */
+.mt-practice-court .pc--defense .pc__play{transform:none}
+.mt-practice-court .pc__mate.fig--anime,.mt-practice-court .pc__rival.fig--anime{height:49cqmin;width:43cqmin;margin:-49cqmin 0 0 -21.5cqmin;transform-origin:center bottom}
+.mt-practice-court .pc__rival{left:28%;top:87%}
+.mt-practice-court .pc__mate{left:53%;top:84%}
+.mt-practice-court .pc--pass .pc__mate{left:81%;top:87%}
+.mt-practice-court .pc--defense .pc__keeper.fig--keeper-art{left:67%;top:72%;height:34cqmin;width:22.7cqmin;margin:-34cqmin 0 0 -11.35cqmin;animation:none}
+.mt-practice-court .pc--shoot .pc__keeper{animation:pc-keeper-set 2.4s both}
+.pc--shoot[data-beat="2"] .pc__keeper>.fig__ready{animation:pc-ready-out 2.4s both}
+.pc--shoot[data-beat="2"] .pc__keeper>.fig__save{animation:pc-save-in 2.4s both}
+.pc--shoot[data-beat="3"]:not([data-skipped]) .pc__keeper>.fig__ready{opacity:0}
+.pc--shoot[data-beat="3"]:not([data-skipped]) .pc__keeper>.fig__save{opacity:1}
+.mt-practice-court .pc--pass .pc__keeper{animation:pc-keeper-set 2.4s both}
+.mt-practice-court .pc--press .pc__mate{left:53%;top:84%;animation:pc-defender-close 2.4s both}
+.mt-practice-court .pc--press .pc__rival{animation:pc-attacker-stop 2.4s both}
+.mt-practice-court .pc--cover .pc__mate{left:53%;top:84%;animation:pc-defender-block 2.4s both}
+.mt-practice-court .pc--cover .pc__rival{animation:pc-attacker-stop 2.4s both}
+.mt-practice-court .pc--cover .pc__shield{left:53%;top:70%}
+@keyframes pc-ready-out{0%,35%{opacity:1}43%,100%{opacity:0}}
+@keyframes pc-save-in{0%,35%{opacity:0;transform:translateX(5cqmin)}43%,100%{opacity:1;transform:none}}
+@keyframes pc-keeper-set{0%,25%{transform:none}50%,100%{transform:translateX(-3cqmin)}}
+@keyframes pc-defender-close{0%,25%{transform:none}55%,100%{transform:translateX(-8cqmin)}}
+@keyframes pc-defender-block{0%,25%{transform:none}45%{transform:translateX(-2cqmin) scale(1.03)}70%,100%{transform:translateX(-2cqmin)}}
+@keyframes pc-attacker-stop{0%{transform:none}35%{transform:translateX(3cqmin)}65%,100%{transform:translateX(2cqmin)}}
+@keyframes pc-ball-shoot{0%,14%{left:22%;top:84%;transform:scale(1)}48%{left:55%;top:77%;transform:scale(.8) rotate(360deg)}57%{left:55%;top:77%;transform:scale(.8) rotate(400deg)}100%{left:40%;top:91%;transform:scale(.9) rotate(650deg)}}
+@keyframes pc-ball-press{0%,12%{left:35%;top:87%}43%{left:48%;top:84%;transform:rotate(230deg)}65%,100%{left:43%;top:88%;transform:rotate(380deg)}}
+@keyframes pc-ball-cover{0%,14%{left:35%;top:86%}40%{left:53%;top:79%;transform:scale(.85) rotate(300deg)}65%,100%{left:40%;top:90%;transform:rotate(480deg)}}
+
+/* Press: rival passes, defender switches from ready stance to a real slide. */
+.pc--press[data-beat="2"] .pc__mate>.fig__ready{animation:pc-slide-ready 2.4s both}
+.pc--press[data-beat="2"] .pc__mate>.fig__slide{animation:pc-slide-pose 2.4s both}
+.pc--press[data-beat="3"]:not([data-skipped]) .pc__mate>.fig__ready{opacity:0}
+.pc--press[data-beat="3"]:not([data-skipped]) .pc__mate>.fig__slide{opacity:1}
+.mt-practice-court .pc--press .pc__mate{animation:pc-slide-intercept 2.4s both}
+@keyframes pc-slide-ready{0%,25%{opacity:1}34%,100%{opacity:0}}
+@keyframes pc-slide-pose{0%,25%{opacity:0;transform:translateX(3cqmin)}34%,100%{opacity:1;transform:none}}
+@keyframes pc-slide-intercept{0%,25%{transform:none}52%,100%{transform:translateX(-3cqmin)}}
+@keyframes pc-ball-press{0%,14%{left:35%;top:70%;transform:scale(.9)}43%{left:43%;top:84%;transform:rotate(260deg)}55%,100%{left:42%;top:87%;transform:rotate(350deg)}}
+@keyframes pc-ball-cover{0%,14%{left:35%;top:70%;transform:scale(.9)}40%{left:53%;top:79%;transform:scale(.85) rotate(300deg)}65%,100%{left:40%;top:90%;transform:rotate(480deg)}}
+
+/* Mobile versus panels show a real face portrait, with the user's saved appearance. */
+.pc__hero-body{position:absolute;inset:0}
+.pc__avatar-face{display:none}
+@media(max-width:720px),(max-aspect-ratio:1/1){
+ .mt-practice-court .pc__hero--portrait{left:0;top:2%;width:100%;height:47%;transform:none;animation:none;filter:drop-shadow(0 2px 4px #00152588)}
+ .pc__hero--portrait>.pc__hero-body{display:none}
+ .pc__hero--portrait>.pc__avatar-face{display:block;position:absolute;left:50%;top:0;width:40cqmin;height:40cqmin;transform:translateX(-50%)}
+ .pc__avatar-face>.lw-face{width:100%;height:100%}
+}

@@ -1,0 +1,139 @@
+/* Tutorial de partido · escena de práctica.
+   - Un solo avatar del jugador (en la cancha); el panel del DT queda solo con Lupi.
+   - Cancha con figuras vectoriales en vez de emojis.
+   - Móvil: cancha más grande, diálogo lado a lado, botón de avance siempre a mano.
+   Se importa al final para ordenar la cascada sobre MatchTutorial/Manga/StoryTutorialPolish. */
+
+/* ---------- Panel del entrenador: solo Lupi ---------- */
+.match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-lupi{left:24%!important;width:52%!important}
+@media(min-width:901px){
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-sfx{right:16px;bottom:70px;font-size:34px}
+}
+
+/* ---------- Cancha de práctica ---------- */
+.mt-practice-court{container:mtc/size}
+.mt-practice-court .mt-fig{position:absolute;display:block;pointer-events:none;height:36cqh;width:18cqh;margin:-36cqh 0 0 -9cqh;filter:drop-shadow(0 1.2cqh 0 #0006)}
+.mt-practice-court .mt-fig--keeper{left:65%;top:50%;animation:mt-idle 1.6s ease-in-out infinite alternate}
+.mt-practice-court .mt-fig--rival{left:72%;top:92%;height:52cqh;width:26cqh;margin:-52cqh 0 0 -13cqh}
+.mt-practice-court .mt-ball{position:absolute;width:9cqh;height:9cqh;margin:-4.5cqh 0 0 -4.5cqh;pointer-events:none;filter:drop-shadow(0 .8cqh .5cqh #0008)}
+.mt-practice-court .mt-ball--attack{left:36%;top:80%;animation:mt-ball-bob 1.1s ease-in-out infinite alternate}
+.mt-practice-court .mt-ball--defense{left:60%;top:90%;animation:mt-ball-bob 1.1s ease-in-out infinite alternate}
+.mt-practice-court>.mt-match-player{left:8%;bottom:6%;width:26%;height:84%}
+.mt-practice-court .mt-practice-goal{opacity:.9}
+@keyframes mt-idle{from{transform:translateY(0)}to{transform:translateY(-1.2cqh)}}
+@keyframes mt-ball-bob{from{transform:translateY(0)}to{transform:translateY(-1.5cqh)}}
+@media(prefers-reduced-motion:reduce){.mt-practice-court .mt-fig,.mt-practice-court .mt-ball{animation:none!important}}
+
+/* Botones de jugada: más grandes y con feedback al tocar */
+.mt-practice-choices button:not(:disabled):active{transform:scale(.98)}
+.mt-practice-choices button[aria-pressed=true]::after{content:"✓";float:right;margin-top:-30px;color:#ffe17c;font-weight:900}
+
+/* ---------- Móvil / tablet vertical ---------- */
+@media(max-width:900px){
+ /* Panel del DT: Lupi a la izquierda, globo a la derecha (se lee como un diálogo) */
+ .match-tutorial .mt-integrated-panel.mt-manga-scene{min-height:216px!important;--coach-speech-height:0px}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-lupi{left:1%!important;top:10px!important;bottom:42px!important;width:42%!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech{top:12px!important;left:42%!important;right:8px!important;padding:10px 12px!important;border-radius:16px 16px 16px 3px}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech:after{left:-9px!important;top:30px!important;bottom:auto!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech h1{font-size:26px!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech p{font-size:12px;line-height:1.35}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-sfx{display:none}
+ .match-tutorial .mt-dots{margin:10px 0 12px}
+ .match-tutorial .mt-integrated-panel .mt-panel-objective span{font-size:11px}
+
+ /* Cancha: grande y legible (antes ~135-175px) */
+ .lp-story--playing .match-tutorial:not(:has(.mt-lineup)) .mt-practice-court.mt-practice-court{flex:none!important;height:auto!important;aspect-ratio:16/10;min-height:0!important;max-height:40dvh!important;margin:0!important}
+ .mt-practice-court .mt-court-caption{font-size:10px}
+ .mt-practice-court>small{font-size:8px}
+
+ /* Jugadas: dos botones cómodos para el pulgar */
+ .lp-story--playing .match-tutorial .mt-practice-choices{gap:8px!important}
+ .lp-story--playing .match-tutorial .mt-practice-choices button{min-height:58px!important;padding:10px 12px!important}
+ .lp-story--playing .match-tutorial .mt-practice-choices strong{font-size:19px}
+ .lp-story--playing .match-tutorial .mt-practice-feedback{padding:8px 12px!important}
+ .lp-story--playing .match-tutorial .mt-practice-feedback p{font-size:12px!important}
+ /* Antes de elegir: una sola línea con la pista */
+ .lp-story--playing .match-tutorial .mt-practice-feedback.is-idle{min-height:0!important;padding:9px 12px!important}
+ .lp-story--playing .match-tutorial .mt-practice-feedback.is-idle strong{font-size:17px!important;margin-right:8px}
+ .lp-story--playing .match-tutorial .mt-practice-feedback.is-idle p{display:inline;margin:0!important}
+
+ /* El botón principal queda visible aunque la pantalla sea corta */
+ .lp-story--playing .match-tutorial.mt-cinematic{overflow:clip}
+ .lp-story--playing .match-tutorial>footer{position:sticky;bottom:0;z-index:6;margin-top:10px!important;padding:10px 0 max(2px,env(safe-area-inset-bottom))!important;background:linear-gradient(0deg,#07131f 68%,#07131f00)}
+}
+@media(max-width:380px){
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech h1{font-size:23px!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech p{font-size:11px}
+}
+
+/* Celulares de poca altura: las jugadas tienen que quedar a la vista sin scrollear */
+@media(max-width:900px) and (max-height:720px){
+ .match-tutorial .mt-integrated-panel.mt-manga-scene{min-height:172px!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-lupi{top:4px!important;bottom:38px!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech{top:8px!important;padding:8px 10px!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech h1{font-size:21px!important;margin:2px 0 3px!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech p{font-size:11px;line-height:1.3}
+ .match-tutorial .mt-integrated-panel .mt-panel-objective{padding:6px 10px!important}
+ .match-tutorial .mt-integrated-panel .mt-panel-objective span{font-size:10px;line-height:1.2}
+ .lp-story--playing .match-tutorial:not(:has(.mt-lineup)) .mt-practice-court.mt-practice-court{max-height:24dvh!important}
+ .lp-story--playing .match-tutorial .mt-practice-choices button{min-height:54px!important}
+ .lp-story--playing .match-tutorial>footer{padding-top:6px!important}
+ .lp-story--playing .match-tutorial>footer button{min-height:46px!important}
+}
+
+/* Preview actors disappear while their single cinematic counterparts perform. */
+.mt-practice-court.is-playing>.mt-fig,.mt-practice-court.is-playing>.mt-match-player,
+.mt-practice-court.is-playing>.mt-ball,.mt-practice-court.is-playing>.mt-practice-goal,
+.mt-practice-court.is-playing>.mt-court-caption,.mt-practice-court.is-playing>small{visibility:hidden}
+.mt-start-error{color:#ffd7c7!important;padding:8px 12px;background:#502328;border-radius:6px;font-size:12px!important;margin:6px 0!important}
+@media(min-width:901px){
+ .match-tutorial:has(.mt-quintet-panel) .mt-integrated-panel.mt-manga-scene .mt-manga-lupi{left:8%!important;width:84%!important}
+}
+@media(max-width:900px){
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-lupi{height:auto!important}
+ .lp-story--playing .match-tutorial:not(:has(.mt-lineup)) .mt-practice-court.mt-practice-court{height:clamp(200px,28dvh,260px)!important;aspect-ratio:auto;max-height:none!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene{min-height:225px!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-lupi{width:46%!important;left:-1%!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-speech h1{font-size:23px!important}
+}
+/* Keep controls reachable on short phones; allow natural scrolling rather than clipping. */
+@media(max-width:900px) and (max-height:720px){
+ .match-tutorial .mt-integrated-panel.mt-manga-scene{min-height:185px!important}
+ .lp-story--playing .match-tutorial:not(:has(.mt-lineup)) .mt-practice-court.mt-practice-court{height:185px!important;max-height:none!important}
+ .lp-story--playing .match-tutorial.mt-cinematic{overflow:visible}
+}
+
+/* Anchor the keeper's soles in front of the photographed/illustrated goal. */
+.mt-practice-court .mt-fig--keeper.fig--keeper-art{left:67%;top:66%;height:42cqh;width:28cqh;margin:-42cqh 0 0 -14cqh;animation:none;filter:drop-shadow(0 2px 2px #001a2944)}
+@media(max-width:900px){.mt-practice-court .mt-fig--keeper.fig--keeper-art{left:68%;top:66%}}
+/* Desktop reference: Lupi occupies most of the available character area. */
+@media(min-width:901px){
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-lupi{left:6%!important;width:88%!important;top:126px!important;bottom:46px!important;height:auto!important;max-height:none!important}
+ .match-tutorial .mt-integrated-panel.mt-manga-scene .mt-manga-lupi>i{height:100%;max-width:100%}
+}
+.mt-practice-court .mt-fig--rival.fig--anime{left:57%;top:84%;height:49cqh;width:44cqh;margin:-49cqh 0 0 -22cqh}
+
+/* Defense briefing only: a grounded face-off; cinematic actor rules stay unchanged. */
+.mt-practice-court:has(>.mt-fig--rival)>.mt-match-player{left:calc(34% - 12cqh);bottom:18%;width:24cqh;height:52cqh;transform:rotate(3deg);transform-origin:center bottom}
+.mt-practice-court:has(>.mt-fig--rival)>.mt-match-player .lp-owned-portrait{overflow:visible}
+.mt-practice-court:has(>.mt-fig--rival)>.mt-match-player .lp-owned-portrait__rig{bottom:0}
+.mt-practice-court:has(>.mt-fig--rival)>.mt-match-player:after{content:'';position:absolute;left:22%;right:22%;bottom:-1%;height:3%;background:#00172466;border-radius:50%;filter:blur(2px);z-index:-1}
+.mt-practice-court>.mt-fig--rival.fig--anime{left:62%;top:82%;height:52cqh;width:35cqh;margin:-52cqh 0 0 -17.5cqh;transform-origin:center bottom;animation:mt-defense-ready 3s ease-in-out infinite;filter:drop-shadow(0 2px 2px #00172455)}
+.mt-practice-court>.mt-ball--defense{left:57%;top:83.5%;width:8cqh;height:8cqh;margin:-4cqh 0 0 -4cqh;animation:none}
+@keyframes mt-defense-ready{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.012)}}
+@media(max-width:900px){
+ .mt-practice-court:has(>.mt-fig--rival)>.mt-match-player{left:calc(29% - 12cqh)}
+ .mt-practice-court>.mt-fig--rival.fig--anime{left:67%}
+ .mt-practice-court>.mt-ball--defense{left:60%}
+}
+@media(prefers-reduced-motion:reduce){.mt-practice-court>.mt-fig--rival.fig--anime{animation:none}}
+
+/* Fine scale correction based on the visible avatar rig, not its empty bounds. */
+.mt-practice-court:has(>.mt-fig--rival)>.mt-match-player{left:calc(39% - 15cqh);width:30cqh;height:64cqh;bottom:19%;transform:rotate(2deg);filter:drop-shadow(0 2px 2px #00192544)}
+.mt-practice-court>.mt-fig--rival.fig--anime{left:63%;top:81%;height:52cqh;width:35cqh;margin:-52cqh 0 0 -17.5cqh}
+.mt-practice-court>.mt-ball--defense{left:58%;top:83%;width:7cqh;height:7cqh;margin:-3.5cqh 0 0 -3.5cqh}
+@media(max-width:900px){
+ .mt-practice-court:has(>.mt-fig--rival)>.mt-match-player{left:calc(33% - 15cqh)}
+ .mt-practice-court>.mt-fig--rival.fig--anime{left:68%}
+ .mt-practice-court>.mt-ball--defense{left:61%;top:83%}
+}

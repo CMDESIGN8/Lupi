@@ -1,0 +1,36 @@
+.home-experience .home-welcome--manga{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(170px,.8fr) minmax(0,1.35fr);grid-template-rows:auto 1fr auto;gap:0 24px;overflow:hidden;padding:0 28px 22px;border:1px solid #63dacb80;border-top:3px solid #ffe47d;border-radius:20px 5px 20px 5px;background:linear-gradient(100deg,#032432a6,#031925ed 55%,#051522),url('../../assets/flores-locker-room-desktop.webp') center/cover;color:#effff8;box-shadow:inset 0 0 50px #00111e80,0 12px 28px #0003;animation:hw-arrive .5s ease-out both}
+.hw-intro{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px;gap:8px;z-index:2}
+.hw-intro>span{font:800 9px/1.4 Barlow,system-ui,sans-serif;letter-spacing:1.6px;color:#b3f8e8}
+.home-welcome--manga .hw-intro>button{display:grid;place-items:center;flex-shrink:0;width:32px;height:32px;padding:0;border:1px solid #79b5b866;background:#09232ba8;border-radius:8px;color:#c8ede6;font-size:24px;cursor:pointer}
+.hw-scene{position:relative;grid-column:1;grid-row:2/4;min-height:235px;display:flex;align-items:flex-end;justify-content:center}
+.hw-scene>.lupi-story-pose{position:relative;width:100%;height:260px;z-index:1;filter:drop-shadow(0 5px 15px #021424);animation:hw-breathe 4s ease-in-out infinite;transform-origin:50% 100%}
+.hw-scene>.lupi-story-pose>i{max-width:100%}
+.hw-speedlines{position:absolute;inset:-50px -60px 0;background:repeating-conic-gradient(from 15deg at 50% 70%,transparent 0deg 14deg,#8beede13 14.2deg 14.8deg,transparent 15deg 25deg);mask-image:radial-gradient(ellipse,#000,transparent 70%)}
+.hw-coach-label{position:absolute;bottom:0;left:0;right:0;text-align:center;background:#021724cc;border-top:1px solid #83d5cd44;z-index:2;padding:5px;font:800 8px Barlow,system-ui,sans-serif;letter-spacing:1px;color:#bcf7e8}
+.hw-sfx{position:absolute;left:-10px;bottom:40px;transform:rotate(-10deg);color:#ffe475;font:900 italic 21px 'Barlow Condensed',Impact,sans-serif;text-shadow:2px 3px #021422;z-index:2}
+.hw-story{grid-column:2;grid-row:2;align-self:center;position:relative;z-index:2;padding:10px 0}
+.hw-eyebrow{font:800 9px Barlow,system-ui,sans-serif;letter-spacing:1.5px;color:#73e8d9}
+.home-experience .home-welcome--manga h2{font:900 italic clamp(30px,4vw,48px)/1.02 'Barlow Condensed',Impact,sans-serif;letter-spacing:-.6px;margin:10px 0 12px;text-shadow:2px 3px #01101b}
+.home-welcome--manga h2 em{font-style:inherit;color:#ffe475}
+.home-experience .home-welcome--manga .hw-story>p{font-size:13px;line-height:1.5;margin:0 0 15px;max-width:360px;color:#d2e9e8}
+.hw-journey{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 7px}.hw-journey>span{display:flex;align-items:center;gap:5px;font-size:10px;color:#c2dedb}.hw-journey b{display:grid;place-items:center;width:21px;height:21px;border:1px solid #5ddbcc55;border-radius:5px;background:#0c3d4266;color:#ffe475;font-size:9px}
+.hw-actions{grid-column:2;grid-row:3;z-index:2;display:flex;flex-direction:column;align-items:stretch;gap:4px;padding-top:3px}
+.home-welcome--manga .hw-primary{display:flex;align-items:center;justify-content:center;gap:14px;min-height:44px;padding:11px 15px;border:1px solid #fff0a0;border-radius:9px;background:linear-gradient(110deg,#ffeb91,#ffda56);box-shadow:0 4px #8b672d;color:#05202b;font:900 12px Barlow,system-ui,sans-serif;letter-spacing:.6px;cursor:pointer}
+.home-welcome--manga .hw-primary>span{font-size:20px;line-height:1}
+.home-welcome--manga .hw-later{min-height:32px;border:0;background:transparent;color:#b2d2d0;font:600 11px Barlow,system-ui,sans-serif;cursor:pointer;padding:7px}
+.home-welcome--manga button:focus-visible{outline:3px solid #76fff0;outline-offset:3px}
+@media(hover:hover){.home-welcome--manga .hw-primary:hover{filter:brightness(1.08)}.home-welcome--manga .hw-later:hover{color:#fff}}
+@media(max-width:540px){
+ .home-experience .home-welcome--manga{grid-template-columns:minmax(90px,.75fr) minmax(0,1.25fr);gap:0 10px;padding:0 13px 13px;border-radius:16px 4px 16px 4px;background-position:35% center}
+ .hw-intro{padding:8px 0 3px}.hw-intro>span{font-size:7px;letter-spacing:.8px}.home-welcome--manga .hw-intro>button{width:28px;height:28px}
+ .hw-scene{grid-row:2;min-height:180px}.hw-scene>.lupi-story-pose{height:180px;width:100%}
+ .hw-coach-label{font-size:6px;padding:4px 1px;letter-spacing:.3px}.hw-sfx{font-size:16px;left:-5px;bottom:27px}
+ .hw-story{padding:10px 0 8px}.hw-eyebrow{font-size:7px;letter-spacing:.6px}
+ .home-experience .home-welcome--manga h2{font-size:28px;margin:8px 0;line-height:1.04}
+ .home-experience .home-welcome--manga .hw-story>p{font-size:11px;line-height:1.45;margin-bottom:10px}
+ .hw-journey{gap:5px;flex-direction:column}.hw-journey>span{font-size:9px}.hw-journey b{width:17px;height:17px;font-size:8px}
+ .hw-actions{grid-column:1/-1;grid-row:3;padding-top:12px}.home-welcome--manga .hw-primary{font-size:11px;min-height:44px}
+}
+@keyframes hw-arrive{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes hw-breathe{50%{transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.home-experience .home-welcome--manga,.hw-scene>.lupi-story-pose{animation:none}}

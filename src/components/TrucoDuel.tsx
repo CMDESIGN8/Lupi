@@ -1,3 +1,5 @@
+import { TrucoCard } from "./TrucoCard";
+export { TrucoCard } from "./TrucoCard";
 import { SkillMatchReward } from "./SkillMatchReward";
 import { useEffect, useRef, useState } from "react";
 import type { Challenge } from "../hooks/useLobbyChallenges";
@@ -6,12 +8,11 @@ import { duelFx } from "../lib/duelFx";
 import {DuelGameHeader} from './DuelGameHeader';
 import { useDuelReward } from '../hooks/useDuelReward';
 import { DuelRewardCard } from './DuelRewardCard';
-import {OwnedCardPortrait} from './OwnedCardPortrait';
 import lupiTrucoAvatar from '../assets/lupi-truco-avatar.png';
 import { ENVIDO_NAME, TARGET, TRUCO_NAME, movesFor, envidoPoints, type Card, type EnvidoCall } from "../utils/trucoEngine";
 import "./RockPaperScissors.css";
 import "./TrucoDuel.css";
-import {LupiTrucoPose} from "./LupiTrucoPose";
+import {LupiFace} from "./LupiFace";
 import {TrucoMatchResult} from "./TrucoMatchResult";
 import { AvatarFace } from "./AvatarFace";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
@@ -31,55 +32,6 @@ export function TrucoTableSlot({ card, result, seat, mySeat, handNo }: {
     {winner && <em className={`tr-badge tr-badge--${outcome === "win" ? "w" : "l"}`} aria-hidden="true">{outcome === "win" ? "✓" : "✕"}</em>}
     {resolved && result === "tie" && <em className="tr-badge tr-badge--t" aria-hidden="true">=</em>}
   </div>;
-}
-
-const SUIT: Record<Card["suit"], { icon: string; name: string }> = {
-  espada: { icon: "⚔️", name: "espada" }, basto: { icon: "🪵", name: "basto" },
-  oro: { icon: "🪙", name: "oro" }, copa: { icon: "🏆", name: "copa" },
-};
-
-const TRUCO_CARD_ART = import.meta.glob("../assets/truco-cards/cards/*.webp", {
-  eager: true,
-  import: "default",
-  query: "?url",
-}) as Record<string, string>;
-
-const TRUCO_PIP_LAYOUTS: Record<2 | 3 | 4 | 5 | 6 | 7, [number, number][]> = {
-  2: [[1, 2], [3, 2]],
-  3: [[1, 2], [2, 2], [3, 2]],
-  4: [[1, 1], [1, 3], [3, 1], [3, 3]],
-  5: [[1, 1], [1, 3], [2, 2], [3, 1], [3, 3]],
-  6: [[1, 1], [1, 3], [2, 1], [2, 3], [3, 1], [3, 3]],
-  7: [[1, 1], [1, 3], [2, 1], [2, 2], [2, 3], [3, 1], [3, 3]],
-};
-
-function TrucoPipIcon({ suit }: { suit: Card["suit"] }) {
-  if (suit === "espada") return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M24 3 35 29 28 27 28 43 20 43 20 27 13 29Z" fill="#eafaff" stroke="#5ca8c0" strokeWidth="2"/><path d="m24 8 4 19-4-2-4 2Z" fill="#54eaff"/><path d="M11 42Q24 35 37 42L32 49 27 46 27 56 32 60 16 60 21 56 21 46 16 49Z" fill="#f6c943" stroke="#905f17" strokeWidth="2"/><path d="M20 43h8v4h-8z" fill="#fff0a1"/></svg>;
-  if (suit === "basto") return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M22 61 23 15Q24 8 29 8L28 20Q34 13 42 15 40 23 29 27L28 38Q34 31 41 33 39 42 28 46L28 61Z" fill="#a96431" stroke="#57351e" strokeWidth="2.5" strokeLinejoin="round"/><path d="M10 26Q9 20 14 20L22 25 21 32 14 30 12 44Q10 48 7 44Z" fill="#c48647" stroke="#694323" strokeWidth="2"/><path d="M17 55h15v6H17z" fill="#e3bb4f" stroke="#80541b" strokeWidth="2"/><path d="M25 12 24 56" stroke="#edc267" strokeWidth="1.5" opacity=".8"/></svg>;
-  if (suit === "oro") return <svg viewBox="0 0 48 64" aria-hidden="true"><circle cx="24" cy="31" r="20" fill="#e2a327" stroke="#70420f" strokeWidth="3"/><circle cx="24" cy="31" r="15.5" fill="#ffd95d" stroke="#fff0a0" strokeWidth="2"/><circle cx="24" cy="31" r="9" fill="#cf841b" stroke="#9a5c13"/><path d="m24 23 2.3 5 5.5.7-4 3.8 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.8 5.5-.7Z" fill="#fff0a0"/><circle cx="24" cy="31" r="2" fill="#fff9d4"/></svg>;
-  return <svg viewBox="0 0 48 64" aria-hidden="true"><path d="M12 12Q8 10 7 15L9 21 17 29 19 42 13 51Q11 56 18 57H30Q37 56 35 51L29 42 31 29 39 21 41 15Q40 10 36 12L29 18H19Z" fill="#f2c74e" stroke="#8a5a16" strokeWidth="2.5" strokeLinejoin="round"/><path d="M17 23h14l-2 16H19Z" fill="#31c9d1" stroke="#167879" strokeWidth="2"/><path d="M20 57h8v4h-8z" fill="#e4b943" stroke="#80541c" strokeWidth="2"/><path d="M17 22 12 16m19 6 5-6" stroke="#fff0a1" strokeWidth="2" strokeLinecap="round"/><circle cx="24" cy="30" r="3" fill="#fff7cf"/></svg>;
-}
-
-function TrucoPipFace({ card }: { card: Card & { num: 2 | 3 | 4 | 5 | 6 | 7 } }) {
-  const marks = TRUCO_PIP_LAYOUTS[card.num];
-  return <span className={`tr-pip-face tr-pip-face--${card.suit}`} aria-hidden="true">
-    <span className="tr-pip-face__frame" />
-    <span className="tr-pip-face__corner tr-pip-face__corner--top"><b>{card.num}</b><TrucoPipIcon suit={card.suit}/></span>
-    <span className="tr-pip-face__marks">{marks.map(([row, column], i) => <span key={i} style={{ gridRow: row, gridColumn: column }}><TrucoPipIcon suit={card.suit}/></span>)}</span>
-    <span className="tr-pip-face__corner tr-pip-face__corner--bottom"><b>{card.num}</b><TrucoPipIcon suit={card.suit}/></span>
-  </span>;
-}
-
-export function TrucoCard({ card, back, onClick, disabled, played }: { card?: Card | null; back?: boolean; onClick?: () => void; disabled?: boolean; played?: boolean }) {
-  if (!card || back) return <span className={`tr-card tr-card--back${card === null ? " is-empty" : ""}`} aria-hidden="true" />;
-  const s = SUIT[card.suit];
-  const art = TRUCO_CARD_ART[`../assets/truco-cards/cards/${String(card.num).padStart(2, "0")}-${card.suit}.webp`];
-  const pipCard = card.num >= 2 && card.num <= 7;
-  const body = <>{pipCard ? <TrucoPipFace card={card as Card & { num: 2 | 3 | 4 | 5 | 6 | 7 }}/> : art && <img className="tr-card__art" src={art} alt="" draggable={false} />}<b>{card.num}</b><i aria-hidden="true">{s.icon}</i><small>{s.name}</small></>;
-  const label = `${card.num} de ${s.name}`;
-  return onClick
-    ? <button type="button" className={`tr-card tr-card--${card.suit}${art || pipCard ? " tr-card--illustrated" : ""}${pipCard ? " tr-card--pips" : ""}`} onClick={onClick} disabled={disabled} aria-label={`Jugar ${label}`}>{body}</button>
-    : <span className={`tr-card tr-card--${card.suit}${art || pipCard ? " tr-card--illustrated" : ""}${pipCard ? " tr-card--pips" : ""}${played ? " is-played" : ""}`} role="img" aria-label={label}>{body}</span>;
 }
 
 function TrucoGuide({ onClose }: { onClose: () => void }) {
@@ -211,14 +163,14 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
 
   const dots = (n: number) => Array.from({ length: TARGET }, (_, i) => <i key={i} className={i < n ? "on" : ""} />);
 
-  if (!ready) return <div className="tr-bot-connection tr-loading" role="status" aria-live="polite"><div className="tr-loading__duel" aria-label={`${myName} contra ${rivalName}`}><div className="tr-loading__fighter tr-loading__fighter--me"><span className="tr-loading__label">VOS</span><div className="tr-loading__portrait"><AvatarFace appearance={appearance}/></div><strong>{myName}</strong></div><b className="tr-loading__versus" aria-hidden="true">VS</b><div className="tr-loading__fighter tr-loading__fighter--rival"><span className="tr-loading__label">RIVAL</span><div className="tr-loading__portrait"><LupiTrucoPose pose={connectionError ? "shy" : "compete"}/></div><strong>{rivalName}</strong></div></div><div className="tr-loading__copy"><small>LUPITRUCO · LA MESA TE ESPERA</small><h2>{connectionError ? "Pausa en la previa" : "¡Se viene el duelo!"}</h2><p>{connectionError ? "No pudimos conectar con la mesa. Volvé a intentarlo." : "Lupi está preparando las cartas. Enseguida jugás."}</p>{!connectionError && <div className="tr-loading__signal" aria-label="Conectando"><i/><i/><i/><span>CONECTANDO CON LA MESA</span></div>}</div><div className="tr-loading__actions">{connectionError && <button type="button" onClick={reconnect}>REINTENTAR</button>}<button type="button" onClick={onExit}>VOLVER AL CLUB</button></div></div>;
+  if (!ready) return <div className="tr-bot-connection tr-loading" role="status" aria-live="polite"><div className="tr-loading__duel" aria-label={`${myName} contra ${rivalName}`}><div className="tr-loading__fighter tr-loading__fighter--me"><span className="tr-loading__label">VOS</span><div className="tr-loading__portrait"><AvatarFace mood={ready ? "focus" : "presentation"} appearance={appearance}/></div><strong>{myName}</strong></div><b className="tr-loading__versus" aria-hidden="true">VS</b><div className="tr-loading__fighter tr-loading__fighter--rival"><span className="tr-loading__label">RIVAL</span><div className="tr-loading__portrait"><LupiFace pose={connectionError ? "shy" : "compete"}/></div><strong>{rivalName}</strong></div></div><div className="tr-loading__copy"><small>LUPITRUCO · LA MESA TE ESPERA</small><h2>{connectionError ? "Pausa en la previa" : "¡Se viene el duelo!"}</h2><p>{connectionError ? "No pudimos conectar con la mesa. Volvé a intentarlo." : "Lupi está preparando las cartas. Enseguida jugás."}</p>{!connectionError && <div className="tr-loading__signal" aria-label="Conectando"><i/><i/><i/><span>CONECTANDO CON LA MESA</span></div>}</div><div className="tr-loading__actions">{connectionError && <button type="button" onClick={reconnect}>REINTENTAR</button>}<button type="button" onClick={onExit}>VOLVER AL CLUB</button></div></div>;
 
   return (
     <section className={`rps-arena tr-arena ${finished ? "is-complete" : ""}`} data-outcome={finished ? outcome : undefined} aria-label="Truco">
       {intro && <div className="tr-rivalry" role="dialog" aria-modal="true" aria-label="Previa del duelo de Truco">
         <div className="tr-rivalry__rays" aria-hidden="true"/>
-        <div className="tr-rivalry__closeups" aria-hidden="true"><div><AvatarFace appearance={appearance}/></div><div><LupiTrucoPose pose="compete"/></div></div>
-        <div className="tr-rivalry__duel"><div className="tr-rivalry__panel tr-rivalry__panel--me"><span>EL DESAFÍO ES TUYO</span><div className="tr-rivalry__body"><OwnedCardPortrait userId={meId} appearanceOverride={appearance}/></div><strong>{myName}</strong></div><div className="tr-rivalry__panel tr-rivalry__panel--rival"><span>LA MESA TIENE RIVAL</span><div className="tr-rivalry__body"><LupiTrucoPose pose="compete"/></div><strong>{rivalName}</strong></div></div>
+        <div className="tr-rivalry__closeups" aria-hidden="true"><div><AvatarFace mood={ready ? "focus" : "presentation"} appearance={appearance}/></div><div><LupiFace pose="compete"/></div></div>
+        <div className="tr-rivalry__duel"><div className="tr-rivalry__panel tr-rivalry__panel--me"><span>EL DESAFÍO ES TUYO</span><div className="tr-rivalry__body"><AvatarFace mood="presentation" appearance={appearance}/></div><strong>{myName}</strong></div><div className="tr-rivalry__panel tr-rivalry__panel--rival"><span>LA MESA TIENE RIVAL</span><div className="tr-rivalry__body"><LupiFace pose="compete"/></div><strong>{rivalName}</strong></div></div>
         <div className="tr-rivalry__impact"><b>VS</b><strong>¡QUE HABLEN LAS CARTAS!</strong></div>
         <button type="button" className="tr-rivalry__skip" onClick={()=>setIntro(false)}>SALTAR PREVIA →</button>
       </div>}
@@ -229,21 +181,21 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
       <div className="tr-table">
         {tableGlow > 0 && <span key={tableGlow} className="tr-table-glow" aria-hidden="true"/>}
       <div className="tr-score" aria-live="polite">
-        <div className="tr-score-player"><div className="tr-score-main"><div className="tr-score-identity"><div className="tr-avatar"><OwnedCardPortrait userId={meId}/></div><strong className="tr-score-name">{myName}</strong></div><b>{state.scores[0]}</b></div><span className="tr-dots">{dots(state.scores[0])}</span></div>
+        <div className="tr-score-player"><div className="tr-score-main"><div className="tr-score-identity"><div className="tr-avatar"><AvatarFace mood={handOver && state.handResult?.winner===0 ? "celebrate" : "focus"} appearance={appearance}/></div><strong className="tr-score-name">{myName}</strong></div><b>{state.scores[0]}</b></div><span className="tr-dots">{dots(state.scores[0])}</span></div>
         <div className="tr-target">A {TARGET}<small>MANO {state.handNo}</small></div>
-        <div className="tr-score-player"><div className="tr-score-main"><div className="tr-score-identity"><span className="tr-bot-expression"><LupiTrucoPose pose={rivalPose}/></span><strong className="tr-score-name">{rivalName}</strong></div><b>{state.scores[1]}</b></div><span className="tr-dots tr-dots--rival">{dots(state.scores[1])}</span></div>
+        <div className="tr-score-player"><div className="tr-score-main"><div className="tr-score-identity"><span className="tr-bot-expression"><LupiFace pose={rivalPose}/></span><strong className="tr-score-name">{rivalName}</strong></div><b>{state.scores[1]}</b></div><span className="tr-dots tr-dots--rival">{dots(state.scores[1])}</span></div>
       </div>
 
 
         <div className="tr-row tr-row--rival">
           <div className="tr-hand" role="group" aria-label="Cartas ocultas del rival">{state.hands[1].map((_, i) => <TrucoCard key={i} back />)}</div>
           <div className="tr-played">{[0, 1, 2].map((i) => <TrucoTableSlot key={`${state.handNo}:${i}`} card={state.table[1][i] ?? null} result={state.trickResults[i]} seat={1} mySeat={0} handNo={state.handNo} />)}</div>
-          {bubble?.seat === 1 && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><span className="tr-bubble__avatar tr-bubble__avatar--lupi"><LupiTrucoPose pose={rivalPose}/></span><span>{bubble.text}</span></div>}
+          {bubble?.seat === 1 && <div key={bubble.n} className="tr-bubble tr-bubble--rival"><span className="tr-shout-face"><LupiFace pose={rivalPose}/></span><span>{bubble.text}</span></div>}
         </div>
         <div className={`tr-felt tr-felt--${answering ? 'answer' : myTurn ? 'turn' : handOver ? 'result' : 'wait'}`} role="status"><div className="tr-director"><span className="tr-director__eyebrow">{answering ? '¡EL RIVAL SUBE LA APUESTA!' : handOver ? 'BAZA FINALIZADA' : myTurn ? 'VOS DECIDÍS LA JUGADA' : 'DUELO EN CURSO'}</span><img className="tr-director__lupi" src={lupiTrucoAvatar} alt=""/><span>{state.truco.level ? `${TRUCO_NAME[state.truco.level]} · vale ${state.truco.level + 1}` : "MANO · vale 1"}</span><h3>{status}</h3><p className="tr-director__instruction">{answering ? 'Elegí QUIERO para aceptar o NO QUIERO para rechazar en la botonera.' : myTurn ? 'Elegí una de tus cartas de abajo para jugarla. También podés cantar antes de tirar.' : handOver ? 'Revisá el resultado y continuá con la siguiente mano.' : waitingRival ? 'El rival está evaluando tu canto. Esperá su respuesta.' : 'Mirá la carta del rival y prepará tu próxima jugada.'}</p></div>{showEnvido && state.envidoResult && !finished && !handOver && <div className={`tr-envido-live tr-envido-live--${state.envidoResult.winner === 0 ? "me" : "rival"}`}><b>ENVIDO</b><strong>{state.envidoResult.winner === 0 ? `Gana ${myName}` : `Gana ${rivalName}`}</strong><span>{state.envidoResult.points[0]} vos · {state.envidoResult.points[1]} rival · +{state.envidoResult.stake}</span></div>}</div>
         <div className="tr-row tr-row--me">
           <div className="tr-played">{[0, 1, 2].map((i) => <TrucoTableSlot key={`${state.handNo}:${i}`} card={state.table[0][i] ?? null} result={state.trickResults[i]} seat={0} mySeat={0} handNo={state.handNo} />)}</div>
-          {bubble?.seat === 0 && <div key={bubble.n} className="tr-bubble tr-bubble--me"><AvatarFace appearance={appearance} className="tr-speaking-face"/><span>{bubble.text}</span></div>}
+          {bubble?.seat === 0 && <div key={bubble.n} className="tr-bubble tr-bubble--me"><span className="tr-shout-face"><AvatarFace mood="focus" appearance={appearance}/></span><span>{bubble.text}</span></div>}
         </div>
       </div>
 

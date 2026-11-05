@@ -1,0 +1,9 @@
+/* Classic eye and eyebrow alignment, scoped to the detailed model. */
+.lw-face.lw-face.lw-face>.lw-face__anime-eyes--detailed{top:42%;height:31%;left:9%;width:82%}
+.lw-face.lw-face.lw-face--eyes-normal>.af-brows,
+.lw-face.lw-face.lw-face--eyes-anime-classic>.af-brows{top:41%;height:8%}
+.lw-face.lw-face.lw-face--expression-surprised>.lw-face__anime-eyes--detailed{top:39%;height:37%}
+.lw-face.lw-face.lw-face--expression-surprised.lw-face--eyes-normal>.af-brows,
+.lw-face.lw-face.lw-face--expression-surprised.lw-face--eyes-anime-classic>.af-brows{top:36.5%}
+.lw-face.lw-face.lw-face--expression-worried>.lw-face__anime-eyes--detailed,
+.lw-face.lw-face.lw-face--expression-sad>.lw-face__anime-eyes--detailed{top:41%;height:34%}

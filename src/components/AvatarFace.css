@@ -172,3 +172,17 @@
 .lw-face.lw-face--eyes-large>.lw-face__anime-eyes,.lw-face.lw-face--eyes-soft>.lw-face__anime-eyes,.lw-face.lw-face--eyes-anime-gentle>.lw-face__anime-eyes{top:43%;height:34%}
 .lw-face.lw-face--eyes-relaxed>.lw-face__anime-eyes,.lw-face.lw-face--eyes-anime-calm>.lw-face__anime-eyes{top:46%;height:29%}
 .lw-face.lw-face--expression-surprised>.lw-face__anime-eyes{top:42%;height:35%}
+
+/* Soft skin volume follows the cheek instead of a diagonal polygon. */
+.lw-face.lw-face.lw-face{background:radial-gradient(ellipse at 87% 66%,#56312d24,transparent 57%),linear-gradient(110deg,#fff1d00b,transparent 50%),var(--lw-skin)}
+.lw-face.lw-face.lw-face::before{background:radial-gradient(ellipse at 50% 4%,#34212b20,transparent 43%),radial-gradient(ellipse at 24% 46%,#fff1d219,transparent 54%)}
+.lw-face.lw-face.lw-face--game::after{background:radial-gradient(ellipse at 90% 70%,#291b2312,transparent 60%)}
+.lw-face.lw-face.lw-face--eyes-sharp>.af-brows{top:48%;height:7%}
+.lw-face.lw-face.lw-face--eyes-sharp>.af-brows--surprised{top:37%}
+
+/* Align brows with each eye opening while keeping surprised brows raised. */
+.lw-face.lw-face.lw-face--eyes-almond>.af-brows{top:43.5%;height:7.5%}
+.lw-face.lw-face.lw-face--eyes-relaxed>.af-brows{top:44%;height:7.5%}
+.lw-face.lw-face.lw-face--eyes-large>.af-brows,
+.lw-face.lw-face.lw-face--eyes-bright>.af-brows{top:41%;height:8%}
+.lw-face.lw-face.lw-face>.af-brows--surprised{top:36.5%}

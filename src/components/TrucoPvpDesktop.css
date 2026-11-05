@@ -1,0 +1,28 @@
+/* PvP desktop: court on the left, hand and decisions on the right. */
+@media(min-width:901px){
+ .tr-arena--pvp.tr-arena.rps-arena{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(350px,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:12px;box-sizing:border-box;height:100dvh;min-height:0;padding:12px 20px;align-items:stretch}
+ .tr-arena--pvp.tr-arena>.rps-header{grid-column:1/-1;margin:0;min-height:40px}
+ .tr-arena--pvp.tr-arena>.tr-table{grid-area:2/1;position:relative;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:90px minmax(0,1fr) 64px minmax(0,1fr);min-height:0;max-height:none;height:auto;padding:12px 16px;gap:10px;overflow:hidden;margin:0;width:100%;box-sizing:border-box}
+ .tr-arena--pvp.tr-arena>.tr-table>.tr-score{grid-area:1/1;position:relative;inset:auto;display:grid;grid-template-columns:1fr 74px 1fr;flex-direction:row;align-items:center;justify-content:stretch;padding:6px 10px;height:auto;gap:8px;width:100%}
+ .tr-arena--pvp.tr-arena .tr-score .tr-score-player{display:flex;flex-direction:column;gap:0;min-width:0}
+ .tr-arena--pvp.tr-arena .tr-score .tr-score-main{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:12px;width:100%}
+ .tr-arena--pvp.tr-arena .tr-score .tr-target{border:0;border-inline:1px solid #7bd9c844;padding:5px;font-size:17px}
+ .tr-arena--pvp.tr-arena .tr-score .tr-score-name{max-width:130px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+ .tr-arena--pvp.tr-arena>.tr-table>.tr-row--rival{grid-area:2/1;position:relative;inset:auto;min-height:0;align-self:center;width:100%;margin:0}
+ .tr-arena--pvp.tr-arena>.tr-table>.tr-row--me{grid-area:4/1;position:relative;inset:auto;min-height:0;align-self:center;width:100%;margin:0}
+ .tr-arena--pvp.tr-arena>.tr-table>.tr-felt{grid-area:3/1;position:relative;inset:auto;min-height:0;padding:7px 12px;border-left:0;border-block:1px solid #80d3be44;background:#021e27b3;display:flex;flex-direction:column;justify-content:center;text-align:center;margin:0}
+ .tr-arena--pvp.tr-arena .tr-felt h3{font-size:clamp(17px,1.7vw,25px);line-height:1.1;margin:3px 0;overflow-wrap:anywhere}
+ .tr-arena--pvp.tr-arena .tr-table .tr-slot{width:clamp(70px,9vh,112px);height:clamp(95px,13vh,155px)}
+ .tr-arena--pvp.tr-arena>.tr-mine{grid-area:2/2;display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:22px;min-height:0;margin:0;padding:20px;box-sizing:border-box}
+ .tr-arena--pvp.tr-arena .tr-hand--mine{justify-content:center;gap:12px;min-height:0;margin:0}
+ .tr-arena--pvp.tr-arena .tr-hand--mine .tr-card{width:clamp(86px,8vw,140px);height:clamp(124px,20vh,202px);margin:0;flex:0 1 auto}
+ .tr-arena--pvp.tr-arena .tr-envido-hint{align-self:center;margin:0;font-size:14px}
+ .tr-arena--pvp.tr-arena .tr-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;min-height:0;width:100%;margin:0}
+ .tr-arena--pvp.tr-arena .tr-actions button{min-height:44px;flex:1 1 120px}
+ .tr-arena--pvp.tr-arena>.rps-rule{grid-column:1/-1;margin:0;text-align:center}
+ .tr-arena--pvp.tr-arena .tr-bubble{min-height:94px;padding:10px 18px 10px 100px!important;font-size:clamp(25px,3vw,42px)}
+ .tr-arena--pvp.tr-arena .tr-bubble>.tr-shout-face{left:15px;width:66px;height:76px}
+ .tr-arena--pvp.tr-arena .tr-bubble>.tr-shout-face>.lw-face{position:relative;inset:auto;width:44px!important;height:54px!important;transform:none;margin-top:12px}
+ .tr-arena--pvp.tr-arena>.tr-error,.tr-arena--pvp.tr-arena>.tr-waiting{grid-column:1/-1}
+}
+@media(min-width:901px) and (max-height:560px){.tr-arena--pvp.tr-arena.rps-arena{height:auto;min-height:100dvh;grid-template-rows:auto minmax(400px,1fr) auto}}

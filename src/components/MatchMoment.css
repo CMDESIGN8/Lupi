@@ -1,0 +1,93 @@
+/* Resolución de jugada dentro de la cancha. Escala con cqh/cqw (el contenedor es el overlay). */
+.mm{--t:1.6s;--tone:#ffe45e;position:absolute;inset:0;z-index:30;overflow:hidden;container:mm/size;cursor:pointer;border-radius:inherit;font-family:Barlow,system-ui,sans-serif;animation:mm-in .2s ease-out both}
+.mm *{box-sizing:border-box}
+.mm--gold{--tone:#ffe45e}.mm--sky{--tone:#9fdcff}.mm--mint{--tone:#7dffd6}.mm--red{--tone:#ff8d7d}
+.mm__scrim{position:absolute;inset:0;background:linear-gradient(180deg,#02101bdb,#04202dd0 58%,#02101bf2)}
+.mm__world{position:absolute;inset:0}
+.mm--defense .mm__world{transform:scaleX(-1)}
+.mm__ground{position:absolute;left:0;right:0;top:90%;bottom:0;background:linear-gradient(#1b7388,#082a3c);border-top:.5cqh solid #9fefff66}
+.mm__goal{position:absolute;left:85%;top:34%;width:24%;height:56%;border:.9cqh solid #e7fbff;border-right:0;border-radius:.6cqh 0 0 0;transform-origin:100% 50%;
+  background:repeating-linear-gradient(90deg,#0000 0 12%,#d1f7ff33 12% 15%),repeating-linear-gradient(0deg,#0000 0 10%,#d1f7ff33 10% 13%),#031a2a99}
+.mm__fig{position:absolute;margin:0;transform-origin:50% 100%}
+.mm__attacker{left:22%;top:90%;height:46cqh;width:40cqh;margin:-46cqh 0 0 -20cqh}
+.mm__mate{left:64%;top:90%;height:46cqh;width:40cqh;margin:-46cqh 0 0 -20cqh}
+.mm__keeper{left:89%;top:90%;height:44cqh;width:29.3cqh;margin:-44cqh 0 0 -14.65cqh}
+.mm__ball{position:absolute;left:31%;top:86%;width:9cqh;height:9cqh;margin:-4.5cqh 0 0 -4.5cqh;filter:drop-shadow(0 .6cqh .4cqh #0008)}
+.mm__ball--g1{opacity:.4;animation-delay:calc(var(--t)*.04)!important}.mm__ball--g2{opacity:.2;animation-delay:calc(var(--t)*.08)!important}
+.mm__burst{position:absolute;width:26cqh;height:26cqh;margin:-13cqh 0 0 -13cqh;opacity:0;background:#fff6a8;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);filter:drop-shadow(0 0 2cqh #ffd34d)}
+.mm__shield{position:absolute;left:53%;top:70%;width:18cqh;height:30cqh;margin:-15cqh 0 0 -9cqh;display:none;opacity:0;border-radius:50% 50% 38% 38%;border:1cqh solid #9ffcff;background:radial-gradient(circle,#9ffcff66,#4ff2);box-shadow:0 0 3cqh #4ff,inset 0 0 3cqh #4ff}
+
+/* GOL */
+.mm--goal .mm__ball,.mm--concede .mm__ball{animation:mm-ball-goal var(--t) both}
+.mm--goal .mm__keeper,.mm--concede .mm__keeper{animation:mm-keeper-wrong var(--t) both}
+.mm--goal .mm__goal,.mm--concede .mm__goal{animation:mm-net var(--t) both}
+.mm--goal .mm__burst,.mm--concede .mm__burst{left:92%;top:50%;animation:mm-burst calc(var(--t)*.3) calc(var(--t)*.5) both}
+/* ATAJADA */
+.mm--saved .mm__ball{animation:mm-ball-saved var(--t) both}
+.mm--saved .mm__keeper{animation:mm-keeper-save var(--t) both}
+.mm--saved .mm__burst{left:84%;top:62%;width:18cqh;height:18cqh;margin:-9cqh 0 0 -9cqh;animation:mm-burst calc(var(--t)*.3) calc(var(--t)*.5) both}
+/* AL LADO */
+.mm--miss .mm__ball{animation:mm-ball-miss var(--t) both}
+/* BUENA JUGADA (pase) */
+.mm--chance .mm__ball{animation:mm-ball-chance var(--t) both}
+.mm--chance .mm__mate{animation:mm-mate-receive var(--t) both}
+.mm--chance .mm__keeper{animation:mm-keeper-wrong var(--t) both}
+/* ATAJADA PROPIA / BLOQUEO */
+.mm--blocked .mm__ball{animation:mm-ball-blocked var(--t) both}
+.mm--blocked .mm__mate{animation:mm-mate-block var(--t) both}
+.mm--blocked .mm__shield{display:block;animation:mm-shield var(--t) both}
+.mm--blocked .mm__keeper{left:92%}
+.mm--blocked .mm__burst{left:55%;top:68%;animation:mm-burst calc(var(--t)*.3) calc(var(--t)*.42) both}
+/* RECUPERACIÓN */
+.mm--recovered .mm__attacker{left:36%;animation:mm-attacker-trip var(--t) both}
+.mm--recovered .mm__ball{left:47%;animation:mm-ball-recover var(--t) both}
+.mm--recovered .mm__mate{left:80%;animation:mm-slide var(--t) both}
+.mm--recovered .mm__mate>.fig__ready{animation:mm-slide-ready var(--t) both}
+.mm--recovered .mm__mate>.fig__slide{animation:mm-slide-pose var(--t) both}
+.mm--recovered .mm__burst{left:50%;top:78%;animation:mm-burst calc(var(--t)*.3) calc(var(--t)*.42) both}
+.mm--recovered .mm__goal{opacity:.5}
+/* salvadas del arquero (cambio de pose si el arte la tiene) */
+.mm--goal .mm__keeper>.fig__ready,.mm--concede .mm__keeper>.fig__ready,.mm--saved .mm__keeper>.fig__ready{animation:mm-ready-out var(--t) both}
+.mm--goal .mm__keeper>.fig__save,.mm--concede .mm__keeper>.fig__save,.mm--saved .mm__keeper>.fig__save{animation:mm-save-in var(--t) both}
+
+/* Resultado */
+.mm__rays{position:absolute;inset:-40%;display:none;pointer-events:none;opacity:.4;z-index:2;background:repeating-conic-gradient(from 0deg at 50% 50%,#fff 0 1.4deg,transparent 1.4deg 7deg);-webkit-mask:radial-gradient(circle,transparent 24%,#000 64%);mask:radial-gradient(circle,transparent 24%,#000 64%)}
+.mm[data-stage=result] .mm__rays{display:block;animation:mm-rays .34s steps(2) 4 both}
+.mm__result{position:absolute;inset:0;z-index:3;display:none;flex-direction:column;align-items:center;justify-content:center;gap:1.4cqh;padding:0 4%;text-align:center}
+.mm[data-stage=result] .mm__result{display:flex}
+.mm__result>i{position:absolute;left:-6%;right:-6%;top:30%;height:40%;transform:rotate(-2.5deg);border-block:1cqh solid var(--tone);background:linear-gradient(90deg,#041a2a00,#041a2af2 10%,#041a2af2 90%,#041a2a00);animation:mm-band .3s both}
+.mm__result>strong{position:relative;max-width:94%;text-wrap:balance;transform:rotate(-2.5deg);font:1000 italic clamp(22px,15cqh,66px)/1 'Barlow Condensed',Impact,sans-serif;color:var(--tone);text-shadow:.5cqh .5cqh 0 #04121d,0 0 3cqh #0008;animation:mm-slam .45s .05s cubic-bezier(.2,1.5,.3,1) both}
+.mm__result>small{position:relative;max-width:88%;font:700 clamp(10px,4.6cqh,15px)/1.3 Barlow,system-ui,sans-serif;color:#e8fbff;animation:mm-fade .4s .3s both}
+.mm__bars:before,.mm__bars:after{content:"";position:absolute;left:0;right:0;height:6%;background:#020a12;z-index:4}
+.mm__bars:before{top:0}.mm__bars:after{bottom:0}
+.mm__skipall{position:absolute;top:8%;right:2%;z-index:6;padding:5px 9px;border:1px solid #ffffff44;border-radius:8px;background:#041a2ab8;color:#cfeeee;font:800 9px/1 Barlow,system-ui,sans-serif;letter-spacing:.1em;cursor:pointer}
+.mm__sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.mm[data-skipped] .mm__world,.mm[data-skipped] .mm__world *{animation-duration:.001s!important;animation-delay:0s!important}
+@media(prefers-reduced-motion:reduce){.mm,.mm *{animation-duration:.001s!important;animation-delay:0s!important}}
+
+@keyframes mm-in{from{opacity:0}to{opacity:1}}
+@keyframes mm-rays{0%{transform:rotate(0) scale(1)}100%{transform:rotate(2.5deg) scale(1.05)}}
+@keyframes mm-band{from{opacity:0;transform:rotate(-2.5deg) scaleY(.1)}to{opacity:1;transform:rotate(-2.5deg) scaleY(1)}}
+@keyframes mm-slam{0%{opacity:0;transform:scale(2.4) rotate(-9deg)}55%{opacity:1;transform:scale(.94) rotate(-3deg)}100%{opacity:1;transform:scale(1) rotate(-2.5deg)}}
+@keyframes mm-fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes mm-burst{0%{opacity:0;transform:scale(.2) rotate(0)}35%{opacity:1;transform:scale(1.15) rotate(12deg)}100%{opacity:0;transform:scale(1.5) rotate(24deg)}}
+@keyframes mm-net{0%,48%{transform:none}56%{transform:scaleX(.9) skewY(2deg)}70%,100%{transform:none}}
+@keyframes mm-ready-out{0%,38%{opacity:1}46%,100%{opacity:0}}
+@keyframes mm-save-in{0%,38%{opacity:0}46%,100%{opacity:1}}
+@keyframes mm-ball-goal{0%,12%{left:31%;top:86%;transform:scale(1) rotate(0)}34%{left:62%;top:58%;transform:scale(.85) rotate(300deg)}52%{left:91%;top:46%;transform:scale(.65) rotate(560deg)}62%,100%{left:94%;top:56%;transform:scale(.6) rotate(620deg)}}
+@keyframes mm-keeper-wrong{0%,24%{transform:none}56%,100%{transform:translate(-6cqh,-2cqh) rotate(-8deg)}}
+@keyframes mm-ball-saved{0%,12%{left:31%;top:86%;transform:scale(1)}50%{left:84%;top:62%;transform:scale(.7) rotate(500deg)}58%{left:84%;top:62%;transform:scale(.7) rotate(520deg)}100%{left:62%;top:86%;transform:scale(.9) rotate(900deg)}}
+@keyframes mm-keeper-save{0%,30%{transform:none}52%,100%{transform:translateX(-5cqh)}}
+@keyframes mm-ball-miss{0%,12%{left:31%;top:86%;transform:scale(1)}52%{left:92%;top:16%;transform:scale(.6) rotate(500deg)}100%{left:116%;top:2%;transform:scale(.5) rotate(900deg)}}
+@keyframes mm-ball-chance{0%,14%{left:31%;top:86%;transform:rotate(0)}60%,100%{left:62%;top:86%;transform:rotate(640deg)}}
+@keyframes mm-mate-receive{0%{transform:translateX(10cqh)}60%,100%{transform:none}}
+@keyframes mm-ball-blocked{0%,12%{left:31%;top:86%;transform:scale(1)}40%{left:53%;top:68%;transform:scale(.85) rotate(300deg)}48%{left:53%;top:68%;transform:scale(.85) rotate(330deg)}100%{left:44%;top:88%;transform:scale(1) rotate(560deg)}}
+@keyframes mm-mate-block{0%,24%{transform:none}42%{transform:translateY(-4cqh) scale(1.04)}64%,100%{transform:none}}
+@keyframes mm-shield{0%,30%{opacity:0;transform:scale(.4)}42%{opacity:1;transform:scale(1.1)}74%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.2)}}
+@keyframes mm-attacker-trip{0%,36%{transform:none}52%,100%{transform:translateX(3cqh) rotate(20deg)}}
+@keyframes mm-ball-recover{0%,30%{left:47%;top:87%}50%{left:56%;top:70%;transform:rotate(260deg)}100%{left:66%;top:87%;transform:rotate(520deg)}}
+@keyframes mm-slide{0%,26%{transform:none}50%,100%{transform:translateX(-28cqh)}}
+@keyframes mm-slide-ready{0%,28%{opacity:1}36%,100%{opacity:0}}
+@keyframes mm-slide-pose{0%,28%{opacity:0}36%,100%{opacity:1}}
+@media(max-width:600px){.mm__skipall{font-size:8px;padding:4px 7px}}

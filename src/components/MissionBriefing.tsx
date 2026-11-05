@@ -3,15 +3,18 @@ import type { DailyMission } from "../types/campaignStory";
 import "./MissionBriefing.css";
 export function MissionBriefing({mission,onStart,onTeam,onClose}:{mission:DailyMission;onStart:()=>void;onTeam:()=>void;onClose:()=>void}) {
  const ref=useRef<HTMLDialogElement>(null);const title=useId();
+ const isDebut=/debut/i.test(mission.title);
  // Native close events can be queued by StrictMode effect cleanup.
  // Only explicit actions and Escape dismiss this controlled dialog.
  useEffect(()=>{const dialog=ref.current;if(!dialog)return;dialog.showModal();const previous=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{if(dialog.open)dialog.close();document.body.style.overflow=previous;};},[]);
- return <dialog ref={ref} className="mission-briefing" aria-labelledby={title} onCancel={(event)=>{event.preventDefault();onClose();}}>
+ return <dialog ref={ref} className={`mission-briefing${isDebut?' mission-briefing--debut':''}`} aria-labelledby={title} onCancel={(event)=>{event.preventDefault();onClose();}}>
    <div className="mb-cinema" aria-hidden="true"><i/><i/></div>
    <header><span><i/> MISIÓN DISPONIBLE</span><button type="button" onClick={onClose} aria-label="Cerrar previa de misión">×</button></header>
    <div className="mb-body">
-     <div className="mb-emblem" aria-hidden="true"><span>⚽</span><i/></div>
-     <span className="mb-eyebrow">LUPI WORLD · LA ARENA TE ESPERA</span>
+     <div className="mb-emblem" aria-hidden="true">
+       <div className="mb-arena-lines"/><span>⚽</span><strong>01</strong><i/>
+     </div>
+     <span className="mb-eyebrow">{isDebut?'LUPI WORLD · TU PRIMER PARTIDO':'LUPI WORLD · LA ARENA TE ESPERA'}</span>
      <h2 id={title}>{mission.title.replace(/^[^\p{L}\p{N}]+/u,'')}</h2>
      <p className="mb-goal">{mission.requirement===1?'Tu primer desafío empieza en la cancha.':`Tu desafío: completar ${mission.requirement} partidos.`}</p>
      <div className="mb-objective"><span aria-hidden="true">◎</span><div><strong>{mission.requirement===1?'Completá un partido':`Completá ${mission.requirement} partidos`}</strong><small>No necesitás ganar. Jugá hasta el final.</small></div></div>

@@ -1,0 +1,8 @@
+.tutorial-defender{position:absolute;inset:0;pointer-events:none;isolation:isolate;filter:drop-shadow(0 2px 2px #00182366)}
+.tutorial-defender>svg{position:absolute;left:50%;bottom:0;height:100%;width:auto;max-width:none;transform:translateX(-50%);overflow:visible}
+.tutorial-defender__face{position:absolute;left:50%;top:0;width:43%;height:29%;transform:translateX(-50%);z-index:1}
+.tutorial-defender__face>.lw-face{width:100%;height:100%}
+/* Same court scale as the anime rival; all pose geometry stays inside the actor. */
+.mt-practice-court:has(>.mt-fig--rival)>.mt-match-player:has(>.tutorial-defender){height:53cqh;width:35cqh;left:calc(39% - 17.5cqh);bottom:19%;transform:none}
+.mt-match-player:has(>.tutorial-defender)::after{display:none}
+@media(max-width:720px){.mt-practice-court:has(>.mt-fig--rival)>.mt-match-player:has(>.tutorial-defender){left:calc(33% - 17.5cqh)}}

@@ -1,0 +1,12 @@
+/* One illustrated goalkeeper shared by preview, close-up and save animation. */
+.fig--keeper-art{display:block;position:relative;isolation:isolate;pointer-events:none}
+.fig--keeper-art>img{display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center bottom;pointer-events:none;user-select:none}
+.fig--keeper-art:not(.fig--bust):after{content:'';position:absolute;left:16%;right:16%;bottom:0;height:4%;border-radius:50%;background:#00121d66;filter:blur(2px);z-index:-1}
+.fig--keeper-art.fig--bust{overflow:hidden;width:100%;height:100%}
+.fig--keeper-art.fig--bust>img{height:185%;width:100%;object-fit:cover;object-position:center top}
+.fig--anime{display:block;position:relative;isolation:isolate;pointer-events:none}
+.fig--anime>img{display:block;width:100%;height:100%;max-width:none;object-fit:contain;object-position:center bottom;user-select:none;pointer-events:none}
+.fig--anime.fig--bust{overflow:hidden;width:100%;height:100%}
+.fig--anime.fig--bust>img{height:185%;object-fit:cover;object-position:center top}
+.fig--anime>img.fig__save{position:absolute;left:-100%;bottom:0;width:240%;height:100%;opacity:0;object-fit:contain;object-position:center bottom}
+.fig--anime>img.fig__slide{position:absolute;left:-20%;bottom:0;width:150%;height:100%;object-fit:contain;object-position:center bottom;opacity:0}

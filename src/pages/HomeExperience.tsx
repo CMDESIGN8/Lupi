@@ -19,6 +19,8 @@ type Props = {
   onRewardClaimed?: () => void;
   onCardReceived?: () => void;
   hasPlayedMatch?: boolean | null;
+  matchCheckError?: boolean;
+  onRetryMatchCheck?: () => void;
 };
 
 export function HomeExperience({
@@ -28,6 +30,8 @@ export function HomeExperience({
   onRewardClaimed,
   onCardReceived,
   hasPlayedMatch = null,
+  matchCheckError = false,
+  onRetryMatchCheck,
 }: Props) {
   const { data: heroData, refetch } = useHeroDataCached(user.id);
   const { count: packCount } = usePacksCount(user.id);
@@ -101,7 +105,8 @@ export function HomeExperience({
 
 
         {showFirstHint && hasPlayedMatch === false && <section className="home-welcome"><span className="home-kicker">BIENVENIDO A LUPI</span><h2>Tu mundo empieza con vos.</h2><p>Jugá, conectá con tu club y construí tu personaje a tu ritmo.</p><button type="button" onClick={dismissFirstHint}>Entendido, vamos →</button></section>}
-        <HomeFutsal userId={user.id}/>
+        {matchCheckError && <section className="home-welcome home-welcome--check-error" role="status"><span className="home-kicker">NO SE PUDO VERIFICAR</span><h2>Tu progreso sigue a salvo.</h2><p>No pudimos comprobar si ya jugaste tu primer partido. Reintentá para actualizar tus objetivos.</p><button type="button" onClick={onRetryMatchCheck}>Reintentar</button></section>}
+        
         <div className="home-side-stack">
           <HomeMission userId={user.id} level={level} progress={progress} onNavigate={onNavigate} onClaimed={()=>{void refetch();onRewardClaimed?.();}}/>
           <section className="home-world"><div className="home-section-heading"></div><div className="home-destinations"><button type="button" onClick={enterGame}><span aria-hidden="true">🎮</span><strong>Entrar a Lupi World</strong><small>Jugá y encontrate con tu comunidad</small><b aria-hidden="true">↗</b></button><button type="button" onClick={()=>onNavigate("character")}><span aria-hidden="true">👕</span><strong>Mi personaje</strong><small>Avatar, equipo e inventario</small><b aria-hidden="true">↗</b></button></div></section>
@@ -109,7 +114,7 @@ export function HomeExperience({
         </div>
 
 
-
+<HomeFutsal userId={user.id}/>
 
       </div>
     </main>

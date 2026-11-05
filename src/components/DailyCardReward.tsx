@@ -220,7 +220,7 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
     const rarityColor = getRarityColor(obtainedCard.overall_rating);
     
     return (
-      <div className="card-obtained-overlay" onClick={closeCardModal}>
+      <div className="card-obtained-overlay" onClick={(event) => { event.stopPropagation(); closeCardModal(); }}>
         <div className="card-obtained-container" onClick={(e) => e.stopPropagation()}>
           <div className="card-obtained-glow" />
           
@@ -243,358 +243,360 @@ export function DailyCardReward({ userId, onCardReceived }: DailyCardRewardProps
   }
 
   return (
-    <div className="daily-card-reward">
+    <section className="daily-card-reward" aria-label="Recompensa diaria">
       <div className={`pack-wrapper ${isOpening ? 'opening' : ''}`}>
-        <div className={`pack ${!claimed && !isOpening ? 'available' : 'opened'} ${isOpening ? 'opening-animation' : ''}`}>
-          
-          <div className="pack-shine" />
-          <div className="pack-sparkles">
+        <div className={`pack ${!claimed && !isOpening ? 'available' : 'opened'} ${claimed && !isOpening ? 'completed' : ''} ${isOpening ? 'opening-animation' : ''}`}>
+          <div className="pack-ambient-glow" aria-hidden="true" />
+          <div className="pack-shine" aria-hidden="true" />
+          <div className="pack-sparkles" aria-hidden="true">
             {[...Array(12)].map((_, i) => (
-              <div key={i} className="sparkle" style={{ '--i': i } as React.CSSProperties} />
+              <span key={i} className="sparkle" style={{ '--i': i } as React.CSSProperties} />
             ))}
           </div>
-          
+
           <div className="pack-content">
             {!isOpening && !claimed && (
               <>
                 <span className="pack-eyebrow">LUPI WORLD · INVENTARIO</span>
-                <div className="pack-icon pack-sealed" aria-hidden="true"><span className="pack-sealed-mark">L<span>W</span></span><small>PLAYER CARD</small><i>✦</i></div>
+                <div className="pack-envelope-wrap" aria-hidden="true">
+                  <span className="pack-envelope-halo" />
+                  <img
+                    className="pack-envelope-art"
+                    src="/images/lupi-pack-envelope.png"
+                    alt=""
+                    draggable={false}
+                  />
+                </div>
                 <h3>Tu próxima carta</h3>
-                <p className="pack-description">
-                  Abrí el sobre y descubrí quién se suma a tu equipo.
-                </p>
-                <button 
-                  className="open-pack-btn"
-                  onClick={handleClaim}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className="btn-loading">⚡ ABRIENDO...</span>
-                  ) : (
-                    <span className="btn-text">ABRIR SOBRE →</span>
-                  )}
+                <p className="pack-description">Abrí el sobre y descubrí quién se suma a tu equipo.</p>
+                <button className="open-pack-btn" onClick={handleClaim} disabled={loading} type="button">
+                  {loading ? <span className="btn-loading">⚡ ABRIENDO...</span> : <span className="btn-text">ABRIR SOBRE →</span>}
                 </button>
               </>
             )}
-            
+
             {(isOpening || claimed) && !showCardModal && (
               <div className="opening-state">
-                {isOpening ? <div className="pack-opening-scene" role="status" aria-live="polite">
-                  <span className="pack-scene-kicker">LUPI WORLD · REVELACIÓN</span>
-                  <div className="pack-burst" aria-hidden="true">
-                    <div className="pack-rays" />
-                    <div className="pack-rip-top"><span>✦</span></div>
-                    <div className="pack-rip-body"><strong>LW</strong><small>PLAYER CARD</small></div>
-                    <div className="pack-emerging-card"><span>♛</span><strong>?</strong></div>
-                    {Array.from({length:18},(_,i)=><i key={i} className="pack-particle" style={{'--p':i} as React.CSSProperties}/>)}
+                {isOpening ? (
+                  <div className="pack-opening-scene" role="status" aria-live="polite">
+                    <span className="pack-scene-kicker">LUPI WORLD · REVELACIÓN</span>
+                    <div className="pack-burst" aria-hidden="true">
+                      <div className="pack-rays" />
+                      <div className="pack-rip-top"><span>✦</span></div>
+                      <div className="pack-rip-body"><strong>LW</strong><small>PLAYER CARD</small></div>
+                      <div className="pack-emerging-card"><span>♛</span><strong>?</strong></div>
+                      {Array.from({ length: 18 }, (_, i) => <i key={i} className="pack-particle" style={{ '--p': i } as React.CSSProperties} />)}
+                    </div>
+                    <h3>El próximo fichaje…</h3>
+                    <p className="pack-scene-copy">Abriendo tu sobre. Prepará tu quinteto.</p>
+                    <div className="pack-energy" aria-hidden="true"><span /></div>
                   </div>
-                  <h3>El próximo fichaje…</h3>
-                  <p className="pack-scene-copy">Abriendo tu sobre. Prepará tu quinteto.</p>
-                  <div className="pack-energy" aria-hidden="true"><span/></div>
-                </div> : <div className="pack-complete-scene" role="status">
-                  <span className="pack-scene-kicker">LUPI WORLD · INVENTARIO</span>
-                  <div className="pack-complete-cards" aria-hidden="true"><i/><i/><i><span>♛</span><b>✓</b></i></div>
-                  <h3>Fichaje completado</h3>
-                  <p className="pack-scene-copy">Tu carta ya forma parte de la colección.</p>
-                  <div className="pack-next-drop"><span>PRÓXIMO SOBRE</span><strong>{timeLeft || 'Calculando…'}</strong><small>Volvé para descubrir otro jugador.</small></div>
-                </div>}
-
+                ) : (
+                  <div className="pack-complete-scene" role="status">
+                    <span className="pack-scene-kicker">LUPI WORLD · INVENTARIO</span>
+                    <div className="pack-complete-cards" aria-hidden="true"><i /><i /><i><span>♛</span><b>✓</b></i></div>
+                    <h3>Fichaje completado</h3>
+                    <p className="pack-scene-copy">Tu carta ya forma parte de la colección.</p>
+                    <div className="pack-next-drop"><span>PRÓXIMO SOBRE</span><strong>{timeLeft || 'Calculando…'}</strong><small>Volvé para descubrir otro jugador.</small></div>
+                  </div>
+                )}
               </div>
             )}
           </div>
-
-          <div className="pack-ribbon ribbon-left" />
-          <div className="pack-ribbon ribbon-right" />
+          <div className="pack-ribbon ribbon-left" aria-hidden="true" />
+          <div className="pack-ribbon ribbon-right" aria-hidden="true" />
         </div>
       </div>
-      
       <style>{dailyStyles}</style>
-    </div>
+    </section>
   );
 }
 
 // Estilos del sobre
 const dailyStyles = `
-  .daily-card-reward {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-height: 400px;
-  }
+.daily-card-reward {
+  --lupi-gold: #f2d18a;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 610px;
+  padding: 36px 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 42%, rgba(34, 128, 170, .40), transparent 48%),
+    radial-gradient(ellipse at 12% 90%, rgba(21, 67, 100, .42), transparent 42%),
+    linear-gradient(145deg, #071725 0%, #102b3b 52%, #07131f 100%);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.daily-card-reward::before,
+.daily-card-reward::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+.daily-card-reward::before {
+  opacity: .5;
+  background:
+    radial-gradient(circle at 14% 19%, #81efff 0 1.5px, transparent 4px),
+    radial-gradient(circle at 87% 27%, #81efff 0 1.5px, transparent 4px),
+    radial-gradient(circle at 79% 78%, #81efff 0 1.5px, transparent 4px),
+    repeating-linear-gradient(118deg, transparent 0 52px, rgba(159, 222, 255, .035) 53px 54px);
+}
+.daily-card-reward::after {
+  background: linear-gradient(90deg, rgba(1, 8, 15, .26), transparent 22% 78%, rgba(1, 8, 15, .26));
+}
+.daily-card-reward .pack-wrapper {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 410px);
+  perspective: 1000px;
+}
+.daily-card-reward .pack {
+  box-sizing: border-box;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 570px;
+  overflow: hidden;
+  border: 1px solid rgba(127, 220, 245, .22);
+  border-radius: 28px;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(31, 112, 147, .29), transparent 58%),
+    linear-gradient(155deg, rgba(10, 31, 46, .96), rgba(4, 14, 24, .98));
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .48), 0 0 46px rgba(54, 191, 220, .09), inset 0 1px rgba(255,255,255,.06);
+  transition: transform .3s ease, box-shadow .3s ease;
+}
+.daily-card-reward .pack::before { content: none !important; }
+.daily-card-reward .pack::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, transparent, rgba(255,255,255,.035) 48%, transparent 72%);
+  pointer-events: none;
+}
+.daily-card-reward .pack-ambient-glow {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  width: min(76%, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(38, 209, 227, .20), rgba(30, 121, 167, .10) 38%, transparent 70%);
+  filter: blur(12px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.daily-card-reward .pack-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.10) 50%, transparent 65%);
+  animation: lupiPackShine 5s ease-in-out infinite;
+  pointer-events: none;
+}
+.daily-card-reward .pack-sparkles { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.daily-card-reward .sparkle {
+  position: absolute;
+  top: calc(10% + (var(--i) * 6.5%));
+  left: calc(8% + (var(--i) * 7%));
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #8cf0ff;
+  box-shadow: 0 0 10px 2px rgba(88, 222, 255, .65);
+  opacity: 0;
+  animation: lupiPackSparkle 2.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * .17s);
+}
+.daily-card-reward .pack-content {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 570px;
+  padding: 34px clamp(20px, 6vw, 34px) 30px;
+  text-align: center;
+}
+.daily-card-reward .pack-eyebrow,
+.daily-card-reward .pack-scene-kicker {
+  display: block;
+  margin: 0 0 8px;
+  color: #9bd8e5;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .21em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 10px rgba(0,0,0,.65);
+}
+.daily-card-reward .pack-envelope-wrap {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 272px;
+  margin: 0 0 4px;
+  perspective: 900px;
+}
+.daily-card-reward .pack-envelope-halo {
+  position: absolute;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(46, 210, 230, .22), rgba(39, 125, 182, .11) 42%, transparent 72%);
+  filter: blur(8px);
+  animation: lupiEnvelopeGlow 3.8s ease-in-out infinite;
+}
+.daily-card-reward .pack-envelope-art {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: 252px;
+  max-width: min(68%, 210px);
+  object-fit: contain;
+  filter: drop-shadow(0 18px 24px rgba(0,0,0,.48)) drop-shadow(0 0 18px rgba(49,216,234,.18));
+  transform-origin: 50% 65%;
+  animation: lupiEnvelopeFloat 3.8s ease-in-out infinite;
+  user-select: none;
+  pointer-events: none;
+}
+.daily-card-reward .pack-content h3 {
+  margin: 4px 0 10px;
+  color: #f7fbff;
+  font-size: clamp(24px, 6vw, 30px);
+  font-weight: 950;
+  letter-spacing: -.035em;
+  line-height: 1.08;
+  text-shadow: 0 3px 14px rgba(0,0,0,.65);
+}
+.daily-card-reward .pack-description,
+.daily-card-reward .pack-scene-copy {
+  max-width: 292px;
+  margin: 0 0 22px;
+  color: rgba(218, 237, 246, .82);
+  font-size: 13px;
+  line-height: 1.55;
+  text-shadow: 0 2px 8px rgba(0,0,0,.6);
+}
+.daily-card-reward .open-pack-btn {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 300px;
+  min-height: 50px;
+  border: 1px solid rgba(255, 238, 190, .62);
+  border-radius: 14px;
+  padding: 13px 20px;
+  background: linear-gradient(110deg, #ffe5a0, #e4b84f);
+  color: #102238;
+  font-size: 13px;
+  font-weight: 950;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(231, 185, 76, .23), inset 0 1px rgba(255,255,255,.42);
+  transition: transform .2s ease, filter .2s ease, box-shadow .2s ease;
+}
+.daily-card-reward .open-pack-btn:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.06); box-shadow: 0 12px 28px rgba(231,185,76,.34); }
+.daily-card-reward .open-pack-btn:active:not(:disabled) { transform: scale(.985); }
+.daily-card-reward .open-pack-btn:disabled { cursor: wait; opacity: .78; }
+.daily-card-reward .btn-loading { animation: lupiPackPulse 1s ease-in-out infinite; }
+.daily-card-reward .pack.available { cursor: pointer; }
+.daily-card-reward .pack.available:hover { transform: translateY(-3px); box-shadow: 0 34px 90px rgba(0,0,0,.52), 0 0 54px rgba(54,191,220,.14); }
+.daily-card-reward .pack.opening-animation { animation: none; opacity: 1; transform: none; }
+.daily-card-reward .pack.opening-animation .pack-opening-scene { animation: lupiRevealEnter .45s cubic-bezier(.16,1,.3,1) both; }
+.daily-card-reward .opening-state,
+.daily-card-reward .pack-opening-scene,
+.daily-card-reward .pack-complete-scene { width: 100%; text-align: center; }
+.daily-card-reward .pack-burst { position: relative; width: 180px; height: 200px; margin: 12px auto 20px; }
+.daily-card-reward .pack-rays { position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(rgba(255,222,121,.32) 0 7deg, transparent 7deg 18deg); animation: lupiPackSpin 12s linear infinite; mask-image: radial-gradient(circle, transparent 0 20%, #000 65%, transparent 72%); }
+.daily-card-reward .pack-rip-top,
+.daily-card-reward .pack-rip-body,
+.daily-card-reward .pack-emerging-card { position: absolute; top: 34px; left: 50%; display: grid; place-items: center; width: 88px; height: 118px; border: 1px solid rgba(255,222,121,.8); border-radius: 9px; background: linear-gradient(145deg,#164765,#071b2c); color: #eafaff; box-shadow: 0 0 26px rgba(89,218,255,.25); transform: translateX(-50%) rotate(-6deg); }
+.daily-card-reward .pack-rip-body strong { color: #48d9ee; font-size: 26px; }
+.daily-card-reward .pack-rip-body small { font-size: 7px; letter-spacing: 1px; }
+.daily-card-reward .pack-emerging-card { top: 8px; z-index: 2; width: 78px; height: 106px; color: #ffe08a; font-size: 30px; transform: translateX(-50%) rotate(7deg); animation: lupiCardRise 1.2s ease-in-out infinite alternate; }
+.daily-card-reward .pack-particle { position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; border-radius: 50%; background: #ffe28a; box-shadow: 0 0 10px #ffe28a; animation: lupiParticle 1.4s ease-out infinite; animation-delay: calc(var(--p) * .04s); }
+.daily-card-reward .pack-energy { width: min(80%,220px); height: 4px; margin: 20px auto 0; overflow: hidden; border-radius: 9px; background: rgba(255,255,255,.15); }
+.daily-card-reward .pack-energy span { display: block; width: 35%; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#40d9ff,#ffe28a); box-shadow: 0 0 14px #40d9ff; animation: lupiPackProgress 1.2s ease-in-out infinite alternate; }
+.daily-card-reward .pack-complete-cards { position: relative; width: 150px; height: 115px; margin: 12px auto 22px; }
+.daily-card-reward .pack-complete-cards i { position: absolute; top: 8px; left: 50%; width: 70px; height: 100px; border: 1px solid rgba(255,222,121,.75); border-radius: 8px; background: linear-gradient(145deg,#164765,#071b2c); transform: translateX(-50%) rotate(-12deg); }
+.daily-card-reward .pack-complete-cards i:nth-child(2) { transform: translateX(-50%) rotate(12deg); }
+.daily-card-reward .pack-complete-cards i:nth-child(3) { display: grid; place-items: center; color: #ffe28a; font-size: 28px; transform: translateX(-50%); }
+.daily-card-reward .pack-complete-cards b { position: absolute; right: -8px; bottom: -8px; display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: #38d69f; color: #05271c; font-size: 15px; }
+.daily-card-reward .pack-next-drop { display: grid; gap: 8px; width: min(100%,270px); margin: 12px auto 0; padding: 14px; border: 1px solid rgba(132,223,255,.2); border-radius: 14px; background: rgba(0,0,0,.3); }
+.daily-card-reward .pack-next-drop span { color: #aeeaff; font-size: 9px; font-weight: 800; letter-spacing: 2px; }
+.daily-card-reward .pack-next-drop strong { color: #70f0b2; font-family: monospace; font-size: 24px; }
+.daily-card-reward .pack-next-drop small { color: rgba(255,255,255,.72); font-size: 11px; }
+.daily-card-reward .pack.completed { min-height: 450px; }
+.daily-card-reward .pack.completed .pack-content {
+  min-height: 450px;
+  padding: 24px 26px;
+}
+.daily-card-reward .pack.completed .pack-scene-kicker { margin-bottom: 6px; }
+.daily-card-reward .pack.completed .pack-complete-cards {
+  width: 126px;
+  height: 88px;
+  margin: 2px auto 14px;
+}
+.daily-card-reward .pack.completed .pack-complete-cards i {
+  top: 4px;
+  left: 50%;
+  width: 58px;
+  height: 80px;
+}
+.daily-card-reward .pack.completed .pack-complete-cards i:nth-child(2) { transform: translateX(-50%) rotate(12deg); }
+.daily-card-reward .pack.completed .pack-complete-cards i:nth-child(3) { transform: translateX(-50%); }
+.daily-card-reward .pack.completed .pack-complete-cards span { font-size: 24px; }
+.daily-card-reward .pack.completed .pack-complete-cards b { width: 23px; height: 23px; right: -6px; bottom: -6px; }
+.daily-card-reward .pack.completed .pack-content h3 { margin-bottom: 8px; font-size: clamp(23px, 5.5vw, 27px); }
+.daily-card-reward .pack.completed .pack-scene-copy { margin-bottom: 14px; font-size: 12px; }
+.daily-card-reward .pack.completed .pack-next-drop { gap: 5px; margin-top: 6px; padding: 11px 14px; }
+.daily-card-reward .pack.completed .pack-next-drop strong { font-size: 22px; }
+.daily-card-reward .pack-ribbon { display: none; }
 
-  .pack-wrapper {
-    perspective: 1000px;
-  }
+@keyframes lupiPackShine { 0%,35% { transform: translateX(-120%); } 70%,100% { transform: translateX(120%); } }
+@keyframes lupiPackSparkle { 0%,100% { opacity: 0; transform: scale(.4); } 50% { opacity: .9; transform: scale(1.15); } }
+@keyframes lupiEnvelopeFloat { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-9px) rotate(2deg); } }
+@keyframes lupiEnvelopeGlow { 0%,100% { opacity: .68; transform: translateX(-50%) scale(.92); } 50% { opacity: 1; transform: translateX(-50%) scale(1.08); } }
+@keyframes lupiCardRise { to { margin-top: -12px; } }
+@keyframes lupiParticle { from { transform: rotate(calc(var(--p) * 20deg)) translateY(0) scale(1); opacity: 1; } to { transform: rotate(calc(var(--p) * 20deg)) translateY(-82px) scale(0); opacity: 0; } }
+@keyframes lupiPackProgress { to { transform: translateX(185%); } }
+@keyframes lupiPackSpin { to { transform: rotate(360deg); } }
+@keyframes lupiPackPulse { 50% { opacity: .55; } }
+@keyframes lupiRevealEnter { from { opacity: 0; transform: translateY(12px) scale(.96); filter: brightness(1.5); } to { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); } }
 
-  .pack {
-    width: 340px;
-    height: 420px;
-    border-radius: 20px;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid rgba(255, 215, 0, 0.6);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    background: linear-gradient(135deg, #1a1a2e 0%, #0a0a15 100%);
-  }
-
-  .pack.available {
-    cursor: pointer;
-    animation: floatPack 3s ease-in-out infinite;
-  }
-
-  .pack.available:hover {
-    transform: translateY(-10px) scale(1.02);
-    border-color: rgba(255, 215, 0, 0.9);
-    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 215, 0, 0.3);
-  }
-
-  .pack.opening-animation {
-    animation: packOpen 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  @keyframes packOpen {
-    0% { transform: rotate(0deg) scale(1); opacity: 1; }
-    50% { transform: rotate(5deg) scale(1.1); opacity: 0.8; }
-    100% { transform: rotate(10deg) scale(0.9); opacity: 0; }
-  }
-
-  @keyframes floatPack {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-  }
-
-  .pack::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 100, 0, 0.05));
-    z-index: 0;
-  }
-
-  .pack::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 0%, rgba(255, 215, 0, 0.05) 50%, transparent 100%);
-    pointer-events: none;
-  }
-
-  .pack-shine {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-    animation: packShine 3s infinite;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  @keyframes packShine {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(100%); }
-  }
-
-  .pack-sparkles {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  .sparkle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: radial-gradient(circle, #ffd700, transparent);
-    border-radius: 50%;
-    opacity: 0;
-    animation: sparkleFloat 2s infinite;
-    top: calc(20% + (var(--i) * 8%));
-    left: calc(10% + (var(--i) * 12%));
-    animation-delay: calc(var(--i) * 0.2s);
-  }
-
-  @keyframes sparkleFloat {
-    0%, 100% { opacity: 0; transform: scale(0); }
-    50% { opacity: 1; transform: scale(1.5); }
-  }
-
-  .pack-content {
-    position: relative;
-    z-index: 4;
-    padding: 40px 20px;
-    text-align: center;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .pack-icon {
-    font-size: 64px;
-    margin-bottom: 20px;
-    animation: bounceIcon 1s ease-in-out infinite;
-    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
-  }
-
-  @keyframes bounceIcon {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .pack-content h3 {
-    font-size: 28px;
-    letter-spacing: 3px;
-    margin-bottom: 15px;
-    background: linear-gradient(135deg, #ffd700, #ffaa00);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-weight: 900;
-  }
-
-  .pack-description {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 30px;
-    line-height: 1.6;
-  }
-
-  .open-pack-btn {
-    background: linear-gradient(135deg, #ffd700, #ff9800);
-    border: none;
-    border-radius: 50px;
-    padding: 14px 32px;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    color: #1a1a2e;
-    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .open-pack-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
-  }
-
-  .btn-loading {
-    animation: pulse 1s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-  }
-
-  .opening-state {
-    text-align: center;
-  }
-
-  .opening-loader {
-    position: relative;
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
-  }
-
-  .loader-ring {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 3px solid transparent;
-    border-top-color: #ffd700;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-
-  .loader-ring:nth-child(2) {
-    width: 70%;
-    height: 70%;
-    top: 15%;
-    left: 15%;
-    border-top-color: #ffaa00;
-    animation-duration: 0.8s;
-  }
-
-  .loader-ring:nth-child(3) {
-    width: 40%;
-    height: 40%;
-    top: 30%;
-    left: 30%;
-    border-top-color: #ff6600;
-    animation-duration: 0.6s;
-  }
-
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
-
-  .opening-text {
-    font-size: 18px;
-    font-weight: bold;
-    color: #ffd700;
-    letter-spacing: 2px;
-    animation: blink 1s infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-  }
-
-  .claimed-info {
-    text-align: center;
-    padding: 20px;
-  }
-
-  .claimed-info p {
-    font-size: 18px;
-    margin: 10px 0;
-    color: #ffd700;
-    font-weight: bold;
-  }
-
-  .proximo {
-    font-size: 12px;
-    letter-spacing: 3px;
-    background: rgba(0, 0, 0, 0.4);
-    padding: 6px 16px;
-    border-radius: 30px;
-    display: inline-block;
-    backdrop-filter: blur(4px);
-  }
-
-  .countdown {
-    font-size: 28px;
-    font-family: monospace;
-    color: #3dffa0;
-    text-shadow: 0 0 15px rgba(61, 255, 160, 0.5);
-  }
-
-  .pack-ribbon {
-    position: absolute;
-    width: 60px;
-    height: 30px;
-    background: linear-gradient(135deg, #ffd700, #ff9800);
-    top: 20px;
-    z-index: 5;
-  }
-
-  .ribbon-left {
-    left: -15px;
-    transform: rotate(-45deg);
-  }
-
-  .ribbon-right {
-    right: -15px;
-    transform: rotate(45deg);
-  }
+@media (max-width: 480px) {
+  .daily-card-reward { min-height: 560px; padding: 24px 12px; }
+  .daily-card-reward .pack { min-height: 540px; border-radius: 24px; }
+  .daily-card-reward .pack-content { min-height: 540px; padding: 28px 20px 24px; }
+  .daily-card-reward .pack-envelope-wrap { height: 246px; }
+  .daily-card-reward .pack-envelope-art { height: 224px; max-width: min(66%, 190px); }
+  .daily-card-reward .pack-description { margin-bottom: 18px; font-size: 12px; }
+}
+@media (max-width: 360px) {
+  .daily-card-reward { min-height: 520px; }
+  .daily-card-reward .pack, .daily-card-reward .pack-content { min-height: 500px; }
+  .daily-card-reward .pack-envelope-wrap { height: 218px; }
+  .daily-card-reward .pack-envelope-art { height: 202px; }
+  .daily-card-reward .pack-content h3 { font-size: 23px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .daily-card-reward *, .daily-card-reward *::before, .daily-card-reward *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+}
 `;
+
 const modalStyles = `
   .card-obtained-overlay {
     position: fixed;

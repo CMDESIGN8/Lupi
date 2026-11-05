@@ -1,3 +1,5 @@
+import { AvatarExpressionPresets } from './AvatarExpressionPresets';
+import './AvatarPolish.css';
 import flores8vaCamisetaPreview from "../assets/flores-8va-camiseta-preview.webp";
 import flores8vaShortPreview from "../assets/flores-8va-short-preview.webp";
 import { supabase } from "../lib/supabaseClient";
@@ -6,7 +8,7 @@ import { createPortal } from "react-dom";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import { useAuraInventory, type ItemRarity, type ItemSlot } from "../hooks/useAuraInventory";
-import { HAIRS, HAIR_COLORS, SKINS, EYES, EYE_COLORS, BROWS, NOSES, MOUTHS, type AvatarAppearance } from "../lib/avatarAppearance";
+import { HAIRS, HAIR_PALETTE, SKINS, EYES, EYE_COLORS, BROWS, NOSES, MOUTHS, type AvatarAppearance } from "../lib/avatarAppearance";
 import { AnimeEyes } from "./AnimeEyes";
 import { AvatarFace } from "./AvatarFace";
 import { CharacterStage } from "./CharacterStage";
@@ -321,15 +323,16 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
             </div>
 
             <h3 className="lw-id__label">COLOR DE CABELLO</h3>
-            <div className="lw-id__swatches">
-              {HAIR_COLORS.map((value) => (
+            <div className="lw-id__swatches lw-id__hair-palette" role="group" aria-label="Color de cabello">
+              {HAIR_PALETTE.map(({ color: value, name }) => (
                 <button
                   type="button"
                   key={value}
                   aria-pressed={draft.hairColor === value}
                   style={{ background: value }}
                   onClick={() => change("hairColor", value)}
-                  aria-label={`Color de cabello ${value}`}
+                  aria-label={`Cabello ${name}`}
+                  title={name}
                 />
               ))}
             </div>
@@ -348,7 +351,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
             </div>
 
             {([
-              ["eyes", "OJOS", EYES, { normal:"Normales",large:"Grandes",almond:"Almendrados",bright:"Brillantes",sharp:"Afilados",relaxed:"Relajados",soft:"Dulces","anime-classic":"Anime clásico","anime-competitive":"Anime rival","anime-gentle":"Anime dulce","anime-calm":"Anime sereno" }],
+              ["eyes", "OJOS", EYES, { normal:"Normales",large:"Grandes",almond:"Almendrados",bright:"Brillantes",sharp:"Afilados",relaxed:"Relajados" }],
               ["brows", "CEJAS", BROWS, { natural:"Naturales",straight:"Rectas",arched:"Arqueadas",bold:"Marcadas" }],
               ["nose", "NARIZ", NOSES, { soft:"Suave",small:"Pequeña",round:"Redonda",defined:"Definida" }],
               ["mouth", "BOCA", MOUTHS, { normal:"Normal",small:"Pequeña",wide:"Ancha",full:"Carnosa" }],
@@ -385,6 +388,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
                 />
               ))}
             </div>
+            <AvatarExpressionPresets appearance={draft} onChange={expressionPresets=>{setDraft(current=>({...current,expressionPresets}));setDone(false);}}/>
           </div>
         </aside>
 

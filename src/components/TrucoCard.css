@@ -1,0 +1,7 @@
+/* Original Library artwork: one exact crop per rank and suit, including the back. */
+.tr-card.tr-card--library{position:relative;overflow:hidden;padding:0!important;background:#fbefd3!important;border:1px solid #e9ca80!important;border-radius:9%;isolation:isolate}
+.tr-card--library .tr-edition-art{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}
+.tr-card--library .tr-edition-art>img{position:absolute;max-width:none!important;max-height:none!important;object-fit:fill;user-select:none;pointer-events:none}
+.tr-card.tr-card--back.tr-card--library:after{display:none!important;content:none!important}
+.tr-card.tr-card--library.is-empty{background:#062b37a6!important;border-color:#d9c36c55!important}
+.tr-edition-fallback{display:grid;place-items:center;height:100%;color:#082139;font-weight:900;font-size:12px}

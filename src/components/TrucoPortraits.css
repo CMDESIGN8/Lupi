@@ -1,0 +1,26 @@
+.tr-lupi-face{display:block;width:120px;height:125px;overflow:hidden;flex-shrink:0}
+/* Both scoreboard identities use a face frame with room above for hair and ears. */
+.tr-arena.tr-arena .tr-score .tr-avatar,.tr-arena.tr-arena .tr-score .tr-bot-expression{position:relative;display:flex;align-items:center;justify-content:center;width:48px;height:52px;overflow:visible;flex:0 0 48px}
+.tr-arena.tr-arena .tr-score .tr-avatar>.lw-face{position:relative;inset:auto;width:32px!important;height:40px!important;transform:none;margin-top:8px}
+.tr-arena.tr-arena .tr-score .tr-bot-expression>.tr-lupi-face{width:48px;height:50px}
+/* Shout artwork fits inside its band, including the avatar's hair. */
+.tr-arena.tr-arena .tr-bubble{box-sizing:border-box;min-height:100px;padding:12px 18px 12px 108px!important;overflow:hidden;display:flex;align-items:center}
+.tr-arena.tr-arena .tr-bubble>.tr-shout-face{position:absolute;left:18px;top:50%;transform:translateY(-50%);width:70px;height:78px;flex:none;display:flex;align-items:center;justify-content:center;font-size:inherit}
+.tr-arena.tr-arena .tr-bubble>.tr-shout-face>.lw-face{position:relative;inset:auto;transform:none;width:49px!important;height:60px!important;margin-top:12px}
+.tr-arena.tr-arena .tr-bubble>.tr-shout-face>.tr-lupi-face{width:70px;height:76px}
+.tr-arena.tr-arena .tr-bubble>span:last-child{position:relative;min-width:0;line-height:1.1;overflow-wrap:anywhere}
+.tr-loading__portrait>.tr-lupi-face{width:125px;height:135px}
+.tr-rivalry__closeups .tr-lupi-face{width:190px;height:195px}
+.tr-rivalry__body>.tr-lupi-face{width:clamp(100px,18vw,210px);height:clamp(115px,20vw,225px)}
+.tr-rivalry__body>.lw-face{position:relative;inset:auto;width:clamp(75px,13vw,145px)!important;height:clamp(95px,16vw,180px)!important;margin-top:30px;transform:none}
+.tr-result__players .tr-lupi-face{width:120px;height:125px}
+@media(max-width:900px){
+ .tr-arena.tr-arena .tr-bubble{min-height:88px;padding-left:88px!important}
+ .tr-arena.tr-arena .tr-bubble>.tr-shout-face{left:12px;width:60px;height:70px}
+ .tr-arena.tr-arena .tr-bubble>.tr-shout-face>.lw-face{width:42px!important;height:52px!important;margin-top:12px}
+ .tr-arena.tr-arena .tr-bubble>.tr-shout-face>.tr-lupi-face{width:60px;height:68px}
+ .tr-arena.tr-arena .tr-score .tr-avatar,.tr-arena.tr-arena .tr-score .tr-bot-expression{width:38px;height:44px;flex-basis:38px}
+ .tr-arena.tr-arena .tr-score .tr-avatar>.lw-face{width:27px!important;height:34px!important;margin-top:8px}
+ .tr-arena.tr-arena .tr-score .tr-bot-expression>.tr-lupi-face{width:38px;height:42px}
+ .tr-result__players .tr-lupi-face{width:105px;height:115px}
+}

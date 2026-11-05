@@ -1,0 +1,37 @@
+/* Vector features keep their line weight and silhouette from thumbnail to editor. */
+.lw-face>.af-brows{position:absolute;left:15%;top:38%;width:70%;height:10%;overflow:visible;z-index:3;pointer-events:none;fill:var(--lw-hair,#30242a);stroke:#241c2844;stroke-width:.6;stroke-linejoin:round}
+.af-brows__left,.af-brows__right{transform-box:view-box;transform-origin:22px 15px}
+.af-brows--focused .af-brows__left,.af-brows--focused .af-brows__right,.af-brows--determined .af-brows__left,.af-brows--determined .af-brows__right{transform:rotate(12deg)}
+.af-brows--angry .af-brows__left,.af-brows--angry .af-brows__right{transform:rotate(21deg)}
+.af-brows--sad .af-brows__left,.af-brows--sad .af-brows__right,.af-brows--worried .af-brows__left,.af-brows--worried .af-brows__right{transform:rotate(-16deg)}
+.lw-face>.af-brows--surprised{top:34%}
+.af-brows--wink .af-brows__right{transform:translateY(-3px) rotate(-8deg)}
+.lw-face>.af-nose{position:absolute;left:44%;top:63%;width:12%;height:13%;overflow:visible;z-index:5;pointer-events:none;fill:none;stroke:#59392dcc;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.af-nose .af-nose__shade{fill:#59332533;stroke:none}.af-nose .af-nose__light{stroke:#fff0d699;stroke-width:2.4}
+.lw-face>.af-mouth{position:absolute;left:32%;top:77%;width:36%;height:13%;overflow:visible;z-index:5;pointer-events:none;fill:none;stroke:#4e2835;stroke-width:1.9;stroke-linejoin:round;stroke-linecap:round}
+.af-mouth__inside{fill:#552637}.af-mouth__teeth{fill:#fff9e9;stroke:none}.af-mouth__tongue{fill:#df8997;stroke:none}
+.af-mouth__line{fill:none}.lw-face--mouth-full .af-mouth__line{fill:#a35d65;stroke-width:1.6}.af-mouth__lip{stroke:#e2a1a088;stroke-width:2}.af-mouth__shadow{stroke:#613c3738;stroke-width:1.6}
+.lw-face>.af-mouth--laugh{top:75%;height:17%}.lw-face>.af-mouth--surprised{left:37%;width:26%;top:77%;height:14%}
+
+/* Layered ink, pigment, soft volume and light; no fixed-pixel facial primitives. */
+.lw-face>.af-brows{left:16%;width:68%;top:38.5%;height:8%;stroke:#241d2b;stroke-width:.7}
+.af-brows .af-brows__grain{fill:none;stroke:#fff1dd;stroke-opacity:.23;stroke-width:.65;stroke-linecap:round}
+.af-brows .af-brows__edge{fill:none;stroke:var(--lw-hair);stroke-opacity:.13;stroke-width:1.2}
+.lw-face>.af-nose{left:43%;width:14%;top:62%;height:15%;stroke:#674035;stroke-width:1.55}
+.af-nose .af-nose__volume{stroke:none}
+.af-nose .af-nose__shade{fill:#78482d26}
+.af-nose .af-nose__light{stroke:#ffe6c7;stroke-opacity:.62;stroke-width:2.3}
+.lw-face>.af-mouth{left:33%;width:34%;top:76%;height:12%;stroke:#57303b;stroke-width:2.2}
+.af-mouth .af-mouth__volume{stroke:none}
+.af-mouth .af-mouth__line{stroke:#59323b;stroke-width:2.1}
+.af-mouth .af-mouth__shadow{stroke:#704735;stroke-opacity:.22;stroke-width:1.4}
+.lw-face--mouth-full .af-mouth__line{fill:#a56669;fill-opacity:.55}
+.lw-face>.af-mouth--laugh{top:75%;height:17%}
+.lw-face>.af-mouth--surprised{left:38%;width:24%;height:14%}
+/* Skin-integrated nose: feathered volume replaces the closed triangular contour. */
+.af-nose .af-nose__bridge{fill:none;stroke:#714833;stroke-opacity:.26;stroke-width:1.3}
+.af-nose .af-nose__tip{fill:none;stroke:#714833;stroke-opacity:.5;stroke-width:1.5}
+.af-nose .af-nose__nostril{fill:none;stroke:#57382c;stroke-opacity:.48;stroke-width:1.6}
+.af-mouth .af-mouth__line{stroke-width:1.65;stroke-opacity:.84}
+.af-mouth .af-mouth__shadow{stroke-opacity:.12}
+.lw-face--mouth-full .af-mouth__line{fill:#a56669;fill-opacity:.3;stroke-width:1.6}

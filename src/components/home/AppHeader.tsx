@@ -6,6 +6,8 @@ import { useClubRanking } from '../../hooks/useClubRanking';
 import { RARITY_CONFIG } from '../../utils/userProgression';
 import { Notifications } from '../Notifications';
 import { useHeroDataCached } from '../../hooks/useHeroData';
+import { useAvatarAppearance } from '../../hooks/useAvatarAppearance';
+import { AvatarFace } from '../AvatarFace';
 
 interface AppHeaderProps {
   userId: string;
@@ -28,6 +30,7 @@ const {
   loading: heroLoading,
   refetch: refetchHero,
 } = useHeroDataCached(userId);
+const { appearance, loading: appearanceLoading } = useAvatarAppearance(userId);
 
   useEffect(() => {
     loadUserProfile();
@@ -83,13 +86,15 @@ const {
   };
 }, [userId, refetchHero]);
 
-  if (heroLoading || !user || !heroData) {
+  if (heroLoading || appearanceLoading || !user || !heroData) {
     return (
       <header className="app-header">
-        <div className="header-inner">
-          <div className="header-skeleton">
-            <div className="skel-avatar" />
-            <div className="skel-info" />
+        <div className="user-panel-shell user-panel-shell--loading">
+          <div className="header-inner">
+            <div className="header-skeleton">
+              <div className="skel-avatar" />
+              <div className="skel-info" />
+            </div>
           </div>
         </div>
 
@@ -118,6 +123,7 @@ const rarity =
 
   return (
     <header className="app-header">
+      <div className="user-panel-shell">
       <div className="header-inner">
 
         {/* =====================================================
@@ -128,18 +134,10 @@ const rarity =
 
           <div
             className="avatar-wrap"
-            style={{
-              borderColor: rarity?.color || '#189df5',
-              boxShadow: rarity
-                ? `0 0 14px ${rarity.color}55`
-                : 'none',
-            }}
           >
-            <img
-              src="/images/avatar.png"
-              alt="avatar"
-              className="avatar-img"
-            />
+            <span className="avatar-face-frame">
+              <AvatarFace appearance={appearance} mood="presentation" className="avatar-face" />
+            </span>
 
             <span
               className="lvl-badge"
@@ -232,8 +230,7 @@ const rarity =
                   className="xp-fill"
                   style={{
                     width: `${xpPercentage}%`,
-                    background:
-                      rarity?.color || '#189df5',
+                    background: 'linear-gradient(90deg, #168bda, #22d7e8 58%, #7af3e1)',
                   }}
                 />
 
@@ -323,6 +320,7 @@ const rarity =
         </div>
 
       </div>
+      </div>
 
       <style>{headerStyles}</style>
     </header>
@@ -334,10 +332,56 @@ const headerStyles = `
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(10, 12, 22, 0.97);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    padding: calc(10px + var(--safe-top, 0px)) 16px 8px;
+    background: rgba(5, 13, 22, 0.78);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(89, 205, 220, .12);
+    padding: calc(12px + var(--safe-top, 0px)) 16px 12px;
+  }
+
+  .user-panel-shell {
+    position: relative;
+    isolation: isolate;
+    width: min(100%, 1100px);
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid rgba(64, 197, 231, .34);
+    border-radius: 18px;
+    background:
+      radial-gradient(ellipse at 8% 0%, rgba(17, 143, 205, .2), transparent 40%),
+      linear-gradient(112deg, rgba(7, 28, 49, .99), rgba(5, 17, 34, .99) 56%, rgba(7, 24, 43, .99));
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .28), 0 0 28px rgba(15, 156, 215, .08), inset 0 1px rgba(191, 240, 255, .09);
+  }
+
+  .user-panel-shell::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -90px;
+    left: 15%;
+    width: 38%;
+    height: 150px;
+    border-radius: 50%;
+    background: rgba(16, 178, 229, .14);
+    filter: blur(38px);
+    pointer-events: none;
+  }
+
+  .user-panel-shell::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -116px;
+    right: 7%;
+    width: 250px;
+    height: 250px;
+    border: 1px solid rgba(60, 206, 245, .17);
+    border-radius: 50%;
+    box-shadow: 0 0 0 19px rgba(60, 206, 245, .05), 0 0 0 42px rgba(60, 206, 245, .035);
+    pointer-events: none;
+  }
+
+  .user-panel-shell--loading {
+    min-height: 94px;
   }
 
   .header-inner {
@@ -345,8 +389,11 @@ const headerStyles = `
     justify-content: space-between;
     align-items: center;
     gap: 10px;
-    max-width: min(100%, 580px);
+    width: 100%;
+    max-width: none;
     margin: 0 auto;
+    padding: 14px 18px 8px;
+    position: relative;
   }
 
   /* ===============================
@@ -363,13 +410,30 @@ const headerStyles = `
 
   .avatar-wrap {
     position: relative;
-    width: 56px;
-    height: 56px;
+    isolation: isolate;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    border: 2.5px solid #189df5;
+    border: 2.5px solid #22c9ed;
     flex-shrink: 0;
     overflow: visible;
-    transition: all 0.3s ease;
+    box-shadow: 0 0 0 3px rgba(49, 198, 242, .2), 0 0 20px rgba(20, 160, 238, .28);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .avatar-wrap::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: -5px;
+    border-radius: 50%;
+    background: conic-gradient(from 35deg, #36eff4, #1689dc 30%, #72e8ff 52%, #1467bd 74%, #36eff4);
+    opacity: .94;
+  }
+
+  .avatar-wrap:hover {
+    transform: translateY(-2px) scale(1.035);
+    box-shadow: 0 0 0 4px rgba(49, 198, 242, .25), 0 0 28px rgba(20, 160, 238, .38);
   }
 
   .avatar-img {
@@ -378,6 +442,26 @@ const headerStyles = `
     border-radius: 50%;
     object-fit: cover;
     display: block;
+  }
+
+  .avatar-face-frame {
+    position: absolute;
+    inset: 3px;
+    display: block;
+    overflow: hidden;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 25%, #274c63, #07131f 75%);
+  }
+
+  .avatar-face-frame .avatar-face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    transform: scale(.92);
+    transform-origin: center 54%;
+    filter: saturate(1.12) contrast(1.04) drop-shadow(0 2px 4px rgba(0, 0, 0, .38));
   }
 
   .lvl-badge {
@@ -425,7 +509,8 @@ const headerStyles = `
     letter-spacing: 0.5px;
     padding: 2px 7px;
     border-radius: 20px;
-    color: #000;
+    color: #17120a;
+    box-shadow: inset 0 1px rgba(255,255,255,.35), 0 2px 8px rgba(0,0,0,.2);
   }
 
   /* ===============================
@@ -516,7 +601,7 @@ const headerStyles = `
   .xp-level-label {
     font-size: 10px;
     font-weight: 800;
-    color: #189df5;
+    color: #73dce9;
     letter-spacing: 1px;
   }
 
@@ -527,18 +612,21 @@ const headerStyles = `
   }
 
   .xp-track {
-    height: 5px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 4px;
+    height: 7px;
+    background: linear-gradient(90deg, rgba(255,255,255,.1), rgba(255,255,255,.045));
+    border: 1px solid rgba(190, 236, 240, .08);
+    border-radius: 8px;
     overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.35);
   }
 
   .xp-fill {
     height: 100%;
-    border-radius: 4px;
+    border-radius: 8px;
     transition: width 0.5s ease;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 0 10px rgba(40, 222, 217, .28);
   }
 
   .xp-fill::after {
@@ -586,6 +674,7 @@ const headerStyles = `
     gap: 5px;
     padding: 4px 8px 4px 7px;
     border-radius: 20px;
+    box-shadow: inset 0 1px rgba(255,255,255,.05), 0 3px 10px rgba(0,0,0,.12);
   }
 
   .gold-pill {
@@ -594,8 +683,8 @@ const headerStyles = `
   }
 
   .green-pill {
-    background: rgba(61,255,160,0.1);
-    border: 1px solid rgba(61,255,160,0.25);
+    background: rgba(28, 203, 232, .1);
+    border: 1px solid rgba(60, 214, 244, .3);
   }
 
   .gold-amount {
@@ -603,7 +692,7 @@ const headerStyles = `
   }
 
   .green-amount {
-    color: #3dffa0;
+    color: #61e8f1;
   }
 
   .currency-emoji {
@@ -622,21 +711,34 @@ const headerStyles = `
   =============================== */
 
   .header-stats {
-    max-width: min(100%, 580px);
-    margin: 8px auto 0;
+    position: relative;
+    max-width: none;
+    margin: 7px 18px 0;
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 4px;
+    gap: 6px;
     padding-top: 7px;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid rgba(148, 221, 231, .12);
   }
 
   .stat-mini {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1px;
-    padding: 3px 0;
+    padding: 5px 2px 4px;
+    border: 1px solid rgba(116, 196, 209, .12);
+    border-radius: 9px;
+    background: linear-gradient(145deg, rgba(18, 49, 62, .62), rgba(7, 20, 31, .68));
+    box-shadow: inset 0 1px rgba(255,255,255,.035);
+    transition: border-color .2s ease, transform .2s ease, background .2s ease;
+  }
+
+  .stat-mini:hover {
+    transform: translateY(-2px);
+    border-color: rgba(104, 226, 228, .4);
+    background: linear-gradient(145deg, rgba(22, 65, 78, .8), rgba(8, 25, 36, .82));
   }
 
   .stat-icon {
@@ -647,7 +749,7 @@ const headerStyles = `
   .stat-label {
     font-size: 7px;
     font-weight: 700;
-    color: rgba(255,255,255,0.45);
+    color: rgba(180, 221, 226, .62);
     letter-spacing: 0.5px;
   }
 
@@ -708,6 +810,28 @@ const headerStyles = `
 
   @media (max-width: 420px) {
 
+    .app-header {
+      padding: calc(8px + var(--safe-top, 0px)) 10px 9px;
+    }
+
+    .user-panel-shell {
+      border-radius: 15px;
+    }
+
+    .header-inner {
+      gap: 7px;
+      padding: 10px 10px 7px;
+    }
+
+    .header-stats {
+      margin: 6px 10px 0;
+      padding-top: 6px;
+    }
+
+    .header-right {
+      gap: 6px;
+    }
+
     .currencies {
       gap: 4px;
     }
@@ -745,7 +869,7 @@ const headerStyles = `
   @media (max-width: 380px) {
 
     .app-header {
-      padding: 8px 12px;
+      padding: calc(7px + var(--safe-top, 0px)) 8px 8px;
     }
 
     .username {
@@ -769,7 +893,7 @@ const headerStyles = `
 
   @media (max-width: 360px) {
     .app-header {
-      padding: 6px 8px;
+      padding: calc(6px + var(--safe-top, 0px)) 6px 7px;
     }
 
     .user-left {
@@ -777,8 +901,8 @@ const headerStyles = `
     }
 
     .avatar-wrap {
-      width: 42px;
-      height: 42px;
+      width: 46px;
+      height: 46px;
     }
 
     .lvl-badge {
