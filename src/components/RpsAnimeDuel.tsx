@@ -83,7 +83,7 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
   :outcome==='loss'?'sad':outcome==='draw'?'surprised':(p?.appearance?.expressionPresets?.focus??'determined');
  const appearance={...(p?.appearance??DEFAULT_APPEARANCE),expression};
  const mood=outcome==='win'?'celebrate':outcome==='focus'?'focus':undefined;
- if(matchOver&&p)return <span className={`rps-anime-player rps-result-avatar is-emotion-${outcome}`}><OwnedCardPortrait userId={id} appearanceOverride={appearance} mood={outcome==='win'?'celebrate':outcome==='loss'?'miss':undefined} scaleMultiplier={1.12}/></span>;
+ if(matchOver&&p)return <span className={`rps-anime-player rps-result-avatar is-emotion-${outcome}`}><ArenaAvatar player={{...p,appearance}} catalog={catalog} isMe={id===meId} name={name}/></span>;
  return <span className={`rps-anime-player rps-anime-player--face is-emotion-${outcome}`}><AvatarFace mood={mood} appearance={appearance}/></span>;
  };
  return <section className={`rps-arena rps-anime-duel ${shake?"duel-shake":""} ${chant?"is-chanting":""} ${reveal?"is-revealing":""} ${finished&&!chant?"is-complete":""}`} data-outcome={finished ? state.winnerId===meId?"win":state.winnerId===null?"draw":"loss" : undefined} aria-label="Piedra, papel o tijera">
