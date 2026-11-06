@@ -606,3 +606,13 @@
   .rps-arena.rps-anime-duel.is-complete .rps-result-stack .lp-reward-summary-info>strong{display:flex!important;align-items:baseline!important;gap:5px!important;flex-wrap:wrap!important;line-height:1!important}
   .rps-arena.rps-anime-duel.is-complete .rps-result-stack .lp-reward-summary-info>strong small{display:inline!important;margin:0!important;font-size:11px!important;font-weight:700!important;line-height:1.2!important}
 }
+
+/* Link each PvP outcome to the avatar's expression and visual reaction. */
+.rps-arena.rps-anime-duel .rps-anime-player.is-emotion-win{filter:drop-shadow(0 0 13px #ffe16b9c)}
+.rps-arena.rps-anime-duel .rps-anime-player.is-emotion-loss{filter:drop-shadow(0 0 9px #63c9e45c)}
+.rps-arena.rps-anime-duel .rps-anime-player.is-emotion-draw{filter:drop-shadow(0 0 10px #b8c8d65c)}
+.rps-arena.rps-anime-duel.is-complete .rps-result-avatar.is-emotion-win{animation:rps-final-cheer .48s cubic-bezier(.2,1.3,.35,1) both}
+.rps-arena.rps-anime-duel.is-complete .rps-result-avatar.is-emotion-loss{animation:rps-final-loss .4s ease-out both}
+@keyframes rps-final-cheer{0%{translate:0 8px;scale:.96}65%{translate:0 -6px;scale:1.04}100%{translate:0 0;scale:1}}
+@keyframes rps-final-loss{0%{translate:0 -4px}55%{translate:0 2px}100%{translate:0 0}}
+@media(prefers-reduced-motion:reduce){.rps-arena.rps-anime-duel.is-complete .rps-result-avatar{animation:none!important}}

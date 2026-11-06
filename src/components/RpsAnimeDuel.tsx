@@ -73,17 +73,18 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
  const roundOutcome=reveal?(mine===theirs?'draw':roundWin==='¡RONDA TUYA!'?'win':'loss'):null;
  if(isBot&&id===rivalId){
   const pose=matchOver?(userWon?'sad':draw?'surprised':'celebrate'):roundOutcome==='win'?'sad':roundOutcome==='loss'?'celebrate':roundOutcome==='draw'?'surprised':'determined';
-  if(matchOver)return <span className="rps-anime-player rps-result-avatar"><LupiStoryPose className="trivia-lupi-pose" pose={pose} label={`Lupi · ${name}`}/></span>;
-  return <span className="rps-anime-player rps-anime-player--face"><LupiStoryPose className="rps-score-lupi-face" pose={pose} label={`Lupi · ${name}`}/></span>;
+  const emotion=pose==='celebrate'?'win':pose==='sad'?'loss':pose==='surprised'?'draw':'focus';
+  if(matchOver)return <span className={`rps-anime-player rps-result-avatar is-emotion-${emotion}`}><LupiStoryPose className="trivia-lupi-pose" pose={pose} label={`Lupi · ${name}`}/></span>;
+  return <span className={`rps-anime-player rps-anime-player--face is-emotion-${emotion}`}><LupiStoryPose className="rps-score-lupi-face" pose={pose} label={`Lupi · ${name}`}/></span>;
  }
- const userLost=matchOver&&!userWon&&!draw&&id===meId;
- const userTied=matchOver&&draw&&id===meId;
- const roundLost=roundOutcome==='loss'&&id===meId;
- const roundTied=roundOutcome==='draw'&&id===meId;
- const appearance=userLost||userTied||roundLost||roundTied?{...(p?.appearance??DEFAULT_APPEARANCE),expression:userLost||roundLost?'sad':'surprised'}:p?.appearance;
- const mood=(matchOver&&userWon&&id===meId)||(roundOutcome==='win'&&id===meId)?'celebrate':userLost||userTied||roundLost||roundTied?undefined:'focus';
- if(matchOver&&p)return <span className="rps-anime-player rps-result-avatar"><ArenaAvatar player={p} catalog={catalog} isMe={id===meId} name={name}/></span>;
- return <span className="rps-anime-player rps-anime-player--face"><AvatarFace mood={mood} appearance={appearance}/></span>;
+ const outcome=matchOver?(draw?'draw':state?.winnerId===id?'win':'loss')
+  :roundOutcome?(roundOutcome==='draw'?'draw':(roundOutcome==='win')===(id===meId)?'win':'loss'):'focus';
+ const expression=outcome==='win'?(p?.appearance?.expressionPresets?.celebrate??'happy')
+  :outcome==='loss'?'sad':outcome==='draw'?'surprised':(p?.appearance?.expressionPresets?.focus??'determined');
+ const appearance={...(p?.appearance??DEFAULT_APPEARANCE),expression};
+ const mood=outcome==='win'?'celebrate':outcome==='focus'?'focus':undefined;
+ if(matchOver&&p)return <span className={`rps-anime-player rps-result-avatar is-emotion-${outcome}`}><ArenaAvatar player={{...p,appearance}} catalog={catalog} isMe={id===meId} name={name}/></span>;
+ return <span className={`rps-anime-player rps-anime-player--face is-emotion-${outcome}`}><AvatarFace mood={mood} appearance={appearance}/></span>;
  };
  return <section className={`rps-arena rps-anime-duel ${shake?"duel-shake":""} ${chant?"is-chanting":""} ${reveal?"is-revealing":""} ${finished&&!chant?"is-complete":""}`} data-outcome={finished ? state.winnerId===meId?"win":state.winnerId===null?"draw":"loss" : undefined} aria-label="Piedra, papel o tijera">
  {entrance&&state&&<DuelAnimeEntrance game="PIEDRA, PAPEL O TIJERA" leftName={myName} rightName={rivalName} leftAvatar={<OwnedCardPortrait userId={meId}/>} rightAvatar={isBot?<LupiStoryPose pose="determined" label="Profe Lupi"/>:<ArenaAvatar player={players.find(p=>p.userId===rivalId)??portraits.find(p=>p.userId===rivalId)} catalog={catalog} name={rivalName}/>} leftLine="¡Esta mano la juego con todo!" rightLine={isBot?"¡A ver si podés leer mi estrategia!":"¡No vas a anticipar mi jugada!"} onDone={()=>setEntrance(false)}/>}

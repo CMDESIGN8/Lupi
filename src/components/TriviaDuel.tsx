@@ -72,14 +72,14 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
   const verdict = connection.stopped ? "DUELO INTERRUMPIDO" : expired ? "DUELO VENCIDO" : state?.winnerId === meId ? "¡GANASTE!" : state?.winnerId === null ? "¡EMPATE!" : "ESTA VEZ NO FUE";
   const pending = state?.rematch?.status === "pending";
   const mine = state?.rematch?.requestedBy === meId;
-  const portrait = (id: string, name: string, mood: 'idle'|'win'|'miss' = 'idle') => {
+  const portrait = (id: string, name: string, mood: 'idle'|'win'|'miss'|'draw' = 'idle') => {
     const player = players.find(p => p.userId === id) ?? portraits.find(p => p.userId === id);
     const bot = challenge.vsBot && id !== meId;
     const appearance = player?.appearance ?? DEFAULT_APPEARANCE;
     const playerMood = mood === 'win' ? 'celebrate' : mood === 'idle' ? 'focus' : undefined;
-    const playerAppearance = mood === 'miss' ? { ...appearance, expression: 'sad' } : appearance;
-    const fullAvatarMood = mood === 'win' ? 'celebrate' : mood === 'miss' ? 'miss' : 'focus';
-    const lupiPose = mood === 'win' ? 'celebrate' : mood === 'miss' ? 'sad' : 'determined';
+    const playerAppearance = mood === 'miss' ? { ...appearance, expression: 'sad' } : mood === 'draw' ? { ...appearance, expression: 'surprised' } : appearance;
+    const fullAvatarMood = mood === 'win' ? 'celebrate' : mood === 'miss' ? 'miss' : mood === 'idle' ? 'focus' : undefined;
+    const lupiPose = mood === 'win' ? 'celebrate' : mood === 'miss' ? 'sad' : mood === 'draw' ? 'surprised' : 'determined';
     return <div className={`trivia-full-player trivia-reaction--${mood}${bot?' trivia-full-player--lupi':''}`}>
       {bot
         ? <LupiStoryPose className="trivia-lupi-coach trivia-lupi-pose" pose={lupiPose} label="Profe Lupi"/>
@@ -92,7 +92,7 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
   const resultBanner = state && <div className={`trivia-result-banner trivia-result-heading ${expired || connection.stopped ? "is-expired" : state.winnerId === meId ? "is-win" : ""}`} role="status"><span aria-hidden="true">{expired || connection.stopped ? "⌛" : state.winnerId === meId ? "🏆" : state.winnerId === null ? "🤝" : "👏"}</span><small>{connection.stopped?"ESPERA FINALIZADA":"RESULTADO FINAL"}</small><h3>{verdict}</h3><p>{connection.stopped ? "La espera terminó sin resolver el duelo." : expired ? "Faltó una respuesta. Sin ganador." : state.winnerId === null ? "Igualados hasta el final. ¿Desempatamos?" : `${state.winnerId === meId ? (host ? challenge.fromName : challenge.toName) : (host ? challenge.toName : challenge.fromName)} se lleva el duelo. ¿Sale otra?`}</p><div className="trivia-confetti" aria-hidden="true">{Array.from({length:12},(_,i)=><i key={i} style={{"--particle":i} as React.CSSProperties} />)}</div></div>;
   const scoreStrip = <div className="trivia-score lupi-duel-score">
     <div className={finished && state.winnerId===meId?'is-winner':''}>
-      {portrait(meId,host?challenge.fromName:challenge.toName,ended?(finished&&state.winnerId===meId?'win':finished&&state.winnerId!==null?'miss':'idle'):celebrating?(myHit?'win':'miss'):'idle')}
+      {portrait(meId,host?challenge.fromName:challenge.toName,ended?(!finished?'idle':state.winnerId===null?'draw':state.winnerId===meId?'win':'miss'):celebrating?(myHit?'win':'miss'):'idle')}
       {celebrating && myHit && <i key={`point-me-${result.round}`} className="trivia-flying-point" aria-hidden="true">+1</i>}
       <strong>{host?challenge.fromName:challenge.toName}</strong><small>VOS</small>
     </div>
@@ -102,7 +102,7 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
     </div>
     <div className={finished && state.winnerId===(host?challenge.toId:challenge.fromId)?'is-winner':''}>
       {celebrating && rivalHit && <i key={`point-rival-${result.round}`} className="trivia-flying-point" aria-hidden="true">+1</i>}
-      {portrait(host?challenge.toId:challenge.fromId,host?challenge.toName:challenge.fromName,ended?(finished&&state.winnerId===(host?challenge.toId:challenge.fromId)?'win':finished&&state.winnerId!==null?'miss':'idle'):celebrating?(rivalHit?'win':'miss'):'idle')}
+      {portrait(host?challenge.toId:challenge.fromId,host?challenge.toName:challenge.fromName,ended?(!finished?'idle':state.winnerId===null?'draw':state.winnerId===(host?challenge.toId:challenge.fromId)?'win':'miss'):celebrating?(rivalHit?'win':'miss'):'idle')}
       <strong>{host?challenge.toName:challenge.fromName}</strong><small>RIVAL</small>
     </div>
   </div>;

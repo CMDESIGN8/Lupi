@@ -80,3 +80,9 @@
  .lp-reward-cinema .lp-earned-skill b{font-size:17px}
  .lp-reward-cinema .lp-earned-skill>small{font-size:9px}
 }
+
+/* Keep the EXP total and its label together in narrow duel result screens. */
+@media(max-width:600px){
+ .lp-reward-summary-info>strong{white-space:nowrap;font-size:clamp(24px,7.4vw,30px)}
+ .lp-reward-summary-info>strong small{display:inline!important;margin:0 0 0 4px!important;font-size:10px!important;line-height:1.2!important;white-space:nowrap!important}
+}
