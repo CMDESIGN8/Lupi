@@ -562,3 +562,47 @@
   .rps-arena.rps-anime-duel.is-complete .rps-rule--detailed>strong{font-size:13px!important}
   .rps-arena.rps-anime-duel.is-complete .rps-rule--detailed>span{font-size:10px!important;line-height:1.3!important}
 }
+
+/* Mobile final card: show both complete fighters, with the score centered between them. */
+@media(max-width:600px){
+  .rps-arena.rps-anime-duel.is-complete .rps-score{
+    min-height:208px!important;height:auto!important;max-height:none!important;
+    padding:8px 9px!important;grid-template-columns:minmax(0,1fr) 48px minmax(0,1fr)!important;
+    grid-template-rows:minmax(168px,1fr)!important;align-items:stretch!important;gap:3px!important;
+    overflow:visible!important;clip-path:none!important
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-score>div:not(.rps-scoreboard){
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:minmax(140px,1fr) auto auto!important;align-items:end!important;
+    justify-items:center!important;gap:2px!important;min-width:0!important
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-score>div:last-child:not(.rps-scoreboard){transform:translateX(7px)!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{
+    grid-column:1!important;grid-row:1!important;display:flex!important;align-items:flex-end!important;
+    justify-content:center!important;width:min(100%,132px)!important;height:148px!important;
+    min-width:0!important;overflow:visible!important;align-self:end!important
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-result-avatar>.arena-avatar{
+    width:100%!important;height:100%!important;overflow:visible!important;
+    filter:drop-shadow(0 5px 8px #00101d99)!important
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-result-avatar .arena-avatar__rig{
+    top:auto!important;bottom:0!important;transform:translateX(-50%) scale(.285)!important;
+    transform-origin:center bottom!important
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-result-avatar .trivia-lupi-pose{
+    display:flex!important;width:100%!important;height:100%!important;align-items:flex-end!important;
+    justify-content:center!important;overflow:visible!important;filter:drop-shadow(0 5px 8px #00101d99)
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-result-avatar .trivia-lupi-pose>i{height:100%!important;transform:translateY(2px)!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score>div>strong{grid-column:1!important;grid-row:2!important;width:100%!important;font-size:13px!important;line-height:1.05!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score>div>small{grid-column:1!important;grid-row:3!important;font-size:7px!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score>.rps-scoreboard{grid-column:2!important;grid-row:1!important;align-self:center!important;justify-self:center!important;width:100%!important;min-width:0!important;padding:0!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score>.rps-scoreboard>b{font-size:clamp(23px,7vw,29px)!important;white-space:nowrap!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score>.rps-scoreboard>b>i{margin:0 1px!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score>.rps-scoreboard>span{font-size:7px!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score>div.is-winner:after{grid-column:1!important;grid-row:4!important;min-height:20px!important;padding:3px 7px!important;font-size:9px!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-result-stack .lp-skill-match-reward>summary:has(.lp-reward-summary-info):not(:has(.lp-reward-player)){grid-template-columns:minmax(0,1fr)!important;gap:6px!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-result-stack .lp-reward-summary-info>strong{display:flex!important;align-items:baseline!important;gap:5px!important;flex-wrap:wrap!important;line-height:1!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-result-stack .lp-reward-summary-info>strong small{display:inline!important;margin:0!important;font-size:11px!important;font-weight:700!important;line-height:1.2!important}
+}

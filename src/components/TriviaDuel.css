@@ -326,3 +326,9 @@
  .trivia-arena.trivia-arena--ended .trivia-final-duel>.trivia-score.lupi-duel-score>div>strong{font-size:14px}
  .trivia-arena.trivia-arena--ended .trivia-final-duel>.trivia-score.lupi-duel-score>.lupi-duel-scoreboard{padding-inline:0}
 }
+
+/* Ajuste final móvil: despeja la franja central para el marcador y el avatar rival. */
+@media(max-width:600px){
+ .trivia-arena.trivia-arena--ended .trivia-final-duel>.trivia-score.lupi-duel-score>.lupi-duel-scoreboard{transform:translateX(3px)!important}
+ .trivia-arena.trivia-arena--ended .trivia-final-duel>.trivia-score.lupi-duel-score>div:last-child:not(.lupi-duel-scoreboard){transform:translateX(8px)!important}
+}
