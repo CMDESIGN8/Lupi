@@ -157,6 +157,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
     finally {setShopBusy(false);} };
   const [draft, setDraft] = useState(appearance);
   const [done, setDone] = useState(false);
+  const savedCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [previewMode, setPreviewMode] = useState<"full" | "face">("full");
   const [mobileTab, setMobileTab] = useState<"character" | "wardrobe">(initialSlot?"wardrobe":"character");
   const [wardrobeTab, setWardrobeTab] = useState<WardrobeTab>("wardrobe");
@@ -175,7 +176,10 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
     if (equipFxTimer.current) clearTimeout(equipFxTimer.current);
     equipFxTimer.current = setTimeout(() => setEquipFx(0), 1650);
   };
-  useEffect(() => () => { if (equipFxTimer.current) clearTimeout(equipFxTimer.current); }, []);
+  useEffect(() => () => {
+    if (equipFxTimer.current) clearTimeout(equipFxTimer.current);
+    if (savedCloseTimer.current) clearTimeout(savedCloseTimer.current);
+  }, []);
 
   useEffect(() => setDraft(appearance), [appearance]);
 
@@ -192,8 +196,18 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
   }, [onClose]);
 
   const change = (key: keyof AvatarAppearance, value: string) => {
+    if (savedCloseTimer.current) clearTimeout(savedCloseTimer.current);
     setDraft((current) => ({ ...current, [key]: value }));
     setDone(false);
+  };
+
+  const saveChanges = async () => {
+    const saved = await save(draft);
+    setDone(saved);
+    if (!saved) return;
+    window.dispatchEvent(new CustomEvent("lupi:identity-saved", { detail: { userId } }));
+    if (savedCloseTimer.current) clearTimeout(savedCloseTimer.current);
+    savedCloseTimer.current = setTimeout(onClose, 1800);
   };
 
   const equipped = useMemo(() => items.filter((item) => item.equipped), [items]);
@@ -388,7 +402,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
                 />
               ))}
             </div>
-            <AvatarExpressionPresets appearance={draft} onChange={expressionPresets=>{setDraft(current=>({...current,expressionPresets}));setDone(false);}}/>
+            <AvatarExpressionPresets appearance={draft} onChange={expressionPresets=>{if(savedCloseTimer.current)clearTimeout(savedCloseTimer.current);setDraft(current=>({...current,expressionPresets}));setDone(false);}}/>
           </div>
         </aside>
 
@@ -701,7 +715,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
             type="button"
             className="lw-id__save"
             disabled={saving}
-            onClick={async () => setDone(await save(draft))}
+            onClick={() => void saveChanges()}
           >
             {saving ? (
               "GUARDANDO…"

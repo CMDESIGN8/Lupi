@@ -1071,7 +1071,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
         <>
         {storyOpen&&<FutsalStoryChapter key={user.id} story={story} userId={user.id} playerName={user.username} deck={activeDeck} cards={userCards} onClose={()=>setStoryOpen(false)} onTeam={()=>{setStoryOpen(false);setGameTab("deck");}} onBattleComplete={onBattleComplete} onMatchRecorded={()=>{recordLupiMatchCompleted();adventureComplete("first_match");void updateMissionProgress("play_match");onMatchRecorded?.();}}/>}
         {missionBriefing && <MissionBriefing mission={missionBriefing} onStart={()=>{setMissionBriefing(null);openMatch("quick");}} onTeam={()=>{setMissionBriefing(null);setGameTab("deck");}} onClose={()=>setMissionBriefing(null)}/>}
-        {showAvatarEditor && <AvatarEditor userId={user.id} onClose={() => setShowAvatarEditor(false)} />}
+        {showAvatarEditor && <AvatarEditor userId={user.id} level={level} xp={exp} xpNeeded={expNeeded} points={user.points ?? 0} coins={user.coins ?? 0} onClose={() => setShowAvatarEditor(false)} />}
         <div className={`main-content gh-root ${gameTab === "deck" ? "gh-root--team" : ""} ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""} ${gameTab === "deck" && view === "match" ? "gh-root--team-preview" : ""}`}>
           {showFirstWelcome && (
             <div className={`lupi-first-welcome lupi-anime-intro${welcomeExiting ? " is-exiting" : ""}`} role="presentation">
