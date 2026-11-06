@@ -1,4 +1,9 @@
 /* Lupi sports-anime duel: cyan challenger / gold rival, secret hands untouched. */
+.rps-arena .lupi-game-header{min-height:36px;gap:10px}
+.rps-arena .lupi-game-header>button{min-height:40px;padding:8px 12px;border-radius:6px 2px;font:900 11px/1 Barlow,system-ui,sans-serif}
+.rps-arena .lupi-game-title{margin:12px 0 9px;text-align:center}
+.rps-arena .lupi-game-title>small{display:block;font:800 8px/1.4 Barlow,system-ui,sans-serif;color:#83e8df;letter-spacing:1.2px}
+.rps-arena .lupi-game-title h2{margin:6px 0;font:1000 italic clamp(28px,4vw,42px)/1 'Barlow Condensed',Impact,sans-serif;color:#edfff8;letter-spacing:.3px;text-shadow:2px 3px #021520}
 .rps-arena .rps-score{position:relative;isolation:isolate;overflow:hidden;border-block:2px solid #64e7f2;clip-path:polygon(2% 0,100% 0,98% 100%,0 100%);padding:7px 15px;background:linear-gradient(112deg,#07536ce8 0 42%,#02111cf5 42% 58%,#7a601cce 58% 100%);box-shadow:inset 0 3px #b6f9ff22,inset 0 -3px #00131d99;max-width:760px}
 .rps-arena .rps-score:before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;background:repeating-linear-gradient(166deg,transparent 0 9px,#a7f2ff14 10px 11px,transparent 12px 23px),linear-gradient(112deg,transparent 41%,#bbf7ff70 41.5%,transparent 42.5% 57.5%,#ffe98c70 58%,transparent 59%);animation:rps-speed-enter .6s ease-out both}
 .rps-anime-player{position:relative;display:block;width:105px;height:116px;flex-shrink:0}
@@ -22,7 +27,11 @@
 @keyframes rps-rival-enter{from{opacity:0;translate:25px 0}to{opacity:1;translate:0 0}}
 @keyframes rps-impact-light{0%{box-shadow:inset 0 0 50px #67e9ff44}100%{box-shadow:inset 0 0 0 transparent}}
 @media(max-width:600px){
-.rps-arena .rps-title{margin:10px 0 8px}
+.rps-arena .lupi-game-header{width:calc(100% - 12px);margin-inline:6px;min-height:36px;font-size:8px;letter-spacing:.07em;gap:8px}
+.rps-arena .lupi-game-header>button{min-height:40px;padding:8px 12px;font-size:11px}
+.rps-arena .lupi-game-title{margin:10px 0 12px}
+.rps-arena .lupi-game-title>small{display:none}
+.rps-arena .lupi-game-title h2{font-size:30px;margin:4px 0}
 .rps-arena .rps-score{padding:5px 9px;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);gap:5px;margin:8px auto}
 .rps-anime-player,.rps-anime-player .arena-avatar{width:76px;height:88px}
 .rps-anime-player .arena-avatar__rig{transform:translateX(-50%) scale(.168)}
@@ -262,7 +271,8 @@
   }
   .rps-arena.rps-anime-duel .rps-header{grid-column:1/-1!important;grid-row:1!important}
   .rps-arena.rps-anime-duel .rps-title{grid-column:1/-1!important;grid-row:2!important;margin:2px 0!important}
-  .rps-arena.rps-anime-duel .rps-title h2{font-size:clamp(30px,3.1vw,40px)!important;margin:2px 0!important}
+  .rps-arena.rps-anime-duel .rps-title>small{display:none!important}
+  .rps-arena.rps-anime-duel .rps-title h2{font-size:30px!important;margin:4px 0!important}
   .rps-arena.rps-anime-duel .rps-score{grid-column:1!important;grid-row:3!important;width:100%!important;height:112px!important;min-height:112px!important;margin:0!important}
   .rps-arena.rps-anime-duel .rps-score .rps-anime-player--face{width:70px!important;height:70px!important}
   .rps-arena.rps-anime-duel .rps-score>div:not(.rps-scoreboard){grid-template-rows:72px auto auto!important}
@@ -579,15 +589,15 @@
   .rps-arena.rps-anime-duel.is-complete .rps-score>div:last-child:not(.rps-scoreboard){transform:translateX(7px)!important}
   .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{
     grid-column:1!important;grid-row:1!important;display:flex!important;align-items:flex-end!important;
-    justify-content:center!important;width:min(100%,132px)!important;height:148px!important;
+    justify-content:center!important;width:min(100%,132px)!important;height:180px!important;
     min-width:0!important;overflow:visible!important;align-self:end!important
   }
-  .rps-arena.rps-anime-duel.is-complete .rps-result-avatar>.arena-avatar{
-    width:100%!important;height:100%!important;overflow:visible!important;
+  .rps-arena.rps-anime-duel.is-complete .rps-result-avatar>.lp-owned-portrait{
+    inset:0 -8%!important;width:auto!important;height:100%!important;overflow:visible!important;
     filter:drop-shadow(0 5px 8px #00101d99)!important
   }
-  .rps-arena.rps-anime-duel.is-complete .rps-result-avatar .arena-avatar__rig{
-    top:auto!important;bottom:0!important;transform:translateX(-50%) scale(.285)!important;
+  .rps-arena.rps-anime-duel.is-complete .rps-result-avatar .lp-owned-portrait__rig{
+    top:auto!important;bottom:0!important;transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.25))!important;
     transform-origin:center bottom!important
   }
   .rps-arena.rps-anime-duel.is-complete .rps-result-avatar .trivia-lupi-pose{
@@ -616,3 +626,12 @@
 @keyframes rps-final-cheer{0%{translate:0 8px;scale:.96}65%{translate:0 -6px;scale:1.04}100%{translate:0 0;scale:1}}
 @keyframes rps-final-loss{0%{translate:0 -4px}55%{translate:0 2px}100%{translate:0 0}}
 @media(prefers-reduced-motion:reduce){.rps-arena.rps-anime-duel.is-complete .rps-result-avatar{animation:none!important}}
+
+/* Match the roomy full-body portrait treatment from the Preguntados finale on desktop too. */
+@media(min-width:900px) and (min-height:540px){
+ .rps-arena.rps-anime-duel.is-complete .rps-score{height:210px!important;min-height:210px!important;grid-row:3!important}
+ .rps-arena.rps-anime-duel.is-complete .rps-score>div:not(.rps-scoreboard){grid-template-rows:minmax(160px,1fr) auto auto!important}
+ .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{width:min(100%,180px)!important;height:190px!important}
+ .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar>.lp-owned-portrait{inset:0 -8%!important;overflow:visible!important}
+ .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .lp-owned-portrait__rig{bottom:0!important;transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.25))!important;transform-origin:center bottom!important}
+}
