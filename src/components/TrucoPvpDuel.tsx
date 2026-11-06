@@ -15,6 +15,9 @@ import { TrucoCard, TrucoTableSlot } from "./TrucoDuel";
 import "./RockPaperScissors.css";
 import "./TrucoDuel.css";
 import {TrucoMatchResult} from "./TrucoMatchResult";
+import { DuelAnimeEntrance } from "./DuelAnimeEntrance";
+import { OwnedCardPortrait } from "./OwnedCardPortrait";
+import { LupiStoryPose } from "./LupiStoryPose";
 
 type Props = { challenge: Challenge; meId: string; onExit: () => void; onFinished?: (f: boolean) => void };
 
@@ -32,6 +35,8 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
   const rivalSeat = mySeat === 0 ? 1 : 0;
 
   const state    = gameState;
+  const [entrance, setEntrance] = useState(false);
+  const entranceShownFor = useRef<string | null>(null);
   const finished = pvpState?.status === "finished" || pvpState?.status === "abandoned";
   const {reward, error: rewardError, retry: retryReward} = useDuelReward("truco", challenge.id, finished, {rivalId});
   const waiting  = pvpState?.status === "waiting";
@@ -44,6 +49,12 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
   const [bubble, setBubble] = useState<{ seat: 0 | 1; text: string; n: number } | null>(null);
 
   useEffect(() => { onFinished?.(finished); }, [finished, onFinished]);
+  useEffect(() => {
+    if (pvpState?.status === "playing" && state && entranceShownFor.current !== challenge.id) {
+      entranceShownFor.current = challenge.id;
+      setEntrance(true);
+    }
+  }, [challenge.id, pvpState?.status, !!state]);
   useEffect(() => {
     const sh = state?.lastShout;
     if (!sh || sh.n === lastShout.current) return;
@@ -81,6 +92,7 @@ export function TrucoPvpDuel({ challenge, meId, onExit, onFinished }: Props) {
   return (
     <section className={`rps-arena tr-arena tr-arena--pvp ${finished ? "is-complete" : ""}`} data-outcome={finished ? outcome : undefined} aria-label="Truco PvP">
       {finished && <DuelResultEffects key={challenge.id} outcome={outcome} />}
+      {entrance && state && <DuelAnimeEntrance game="TRUCO" leftName={myName} rightName={rivalName} leftAvatar={<OwnedCardPortrait userId={meId} appearanceOverride={myAppearance}/>} rightAvatar={<OwnedCardPortrait userId={rivalId} appearanceOverride={rivalAppearance}/>} leftLine="¡Ya tengo mis cartas! Vamos por la primera mano." rightLine="Prepará el mazo, este duelo recién empieza." onDone={() => setEntrance(false)} />}
       <header className="rps-header">
         <button type="button" onClick={() => { void leave(); onExit(); }}>← CLUB</button>
         <span>LUPI WORLD · TRUCO</span>

@@ -13,10 +13,10 @@ export function DuelAnimeEntrance({ game, leftName, rightName, leftAvatar, right
     <div className="duel-anime-entrance__kicker">LUPI WORLD · ARENA SOCIAL <span>{game}</span></div>
     <div className="duel-anime-entrance__stage">
       <article className="duel-anime-entrance__fighter duel-anime-entrance__fighter--left"><small>EL DESAFÍO ES TUYO</small><div className="duel-anime-entrance__body">{leftAvatar}</div><strong>{leftName}</strong><div className="duel-anime-entrance__speech"><b>⚡ {leftName}</b><span>{leftLine}</span></div></article>
-      <div className="duel-anime-entrance__vs"><b>VS</b><strong>¡QUE HABLEN LAS CARTAS!</strong></div>
-      <article className="duel-anime-entrance__fighter duel-anime-entrance__fighter--right"><small>EL RIVAL ENTRA A LA CANCHA</small><div className="duel-anime-entrance__body">{rightAvatar}</div><strong>{rightName}</strong><div className="duel-anime-entrance__speech"><b>✦ {rightName}</b><span>{rightLine}</span></div></article>
+      <div className="duel-anime-entrance__vs"><b>VS</b><strong>¡QUE EMPIECE EL DUELO!</strong></div>
+      <article className="duel-anime-entrance__fighter duel-anime-entrance__fighter--right"><small>EL RIVAL ENTRA A LA ARENA</small><div className="duel-anime-entrance__body">{rightAvatar}</div><strong>{rightName}</strong><div className="duel-anime-entrance__speech"><b>✦ {rightName}</b><span>{rightLine}</span></div></article>
     </div>
-    <div className="duel-anime-entrance__caption">SE DEFINE EN LA CANCHA · PREPARÁ TU JUGADA</div>
+    <div className="duel-anime-entrance__caption">UN DESAFÍO · UNA ARENA · ¡QUE GANE EL MEJOR!</div>
     <button type="button" onClick={onDone}>ENTRAR AL DUELO →</button>
   </div>, document.body);
 }
