@@ -21,17 +21,23 @@ import "./FutsalClub.css";
 import "./FutsalFinale.css";
 import "./FutsalFormation.css";
 import { PvpSimulatorCourt } from "./match/PvpSimulatorCourt";
+import { DuelGameHeader } from "./DuelGameHeader";
+import { DuelAnimeEntrance } from './DuelAnimeEntrance';
+import { OwnedCardPortrait } from './OwnedCardPortrait';
 type Props = { challenge: Challenge; meId: string; deck: Deck; players?: LobbyPlayer[]; catalog?: InventoryItem[]; onExit: () => void; onFinished?: (finished: boolean) => void; onRematch?: () => void };
 export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], onExit, onFinished, onRematch }: Props) {
   const { state, receivedAt, error, busy, join, play, leave, reconnect } = useFutsalPvp(challenge);
   const [portraits] = useState(() => players.filter(p => p.userId === challenge.fromId || p.userId === challenge.toId));
-  const portrait = (id: string, name: string) => { const player = players.find(p => p.userId === id) ?? portraits.find(p => p.userId === id); return <span className="fp-avatar trivia-portrait" aria-hidden="true">{player?.appearance ? <AvatarFace mood={state?.status === "finished" ? (state.winnerId === id ? "celebrate" : "presentation") : "focus"} appearance={player.appearance} className="lw-face--game" /> : <span>{name.slice(0,1).toUpperCase()}</span>}</span>; };
+  const portrait = (id: string, name: string) => { const player = players.find(p => p.userId === id) ?? portraits.find(p => p.userId === id); const last=state?.history[state.history.length-1]; const eventLive=!!last&&Date.parse(state.nextAt)>Date.parse(state.serverNow)+Math.max(0,Date.now()-receivedAt); const mood=state?.status === "finished" ? (state.winnerId === id ? "celebrate" : "presentation") : eventLive&&last?.goal ? (last.attackerId===id?"celebrate":"presentation") : eventLive&&last?.defended ? (last.attackerId===id?"presentation":"celebrate") : "focus"; return <span className={`fp-avatar trivia-portrait fp-avatar--${mood}`} aria-hidden="true">{player?.appearance ? <AvatarFace mood={mood} appearance={player.appearance} className="lw-face--game" /> : <span>{name.slice(0,1).toUpperCase()}</span>}</span>; };
   const fullAvatar = (id:string,name:string) => <ArenaAvatar player={players.find(p=>p.userId===id) ?? portraits.find(p=>p.userId===id)} catalog={catalog} isMe={id===meId} name={name}/>;
+  const entranceAvatar = (id:string,name:string) => id===meId ? <OwnedCardPortrait userId={meId}/> : fullAvatar(id,name);
   const [now, setNow] = useState(Date.now());
   const [confirmExit, setConfirmExit] = useState(false);
   const sendingChoice = useRef(false);
   const lastTouch = useRef(0);
   const [selected, setSelected] = useState<{ version: number; choice: FutsalChoice } | null>(null);
+  const [entrance,setEntrance]=useState(false);
+  useEffect(()=>{if(state?.status==='playing'&&!entrance){setEntrance(true);const timer=window.setTimeout(()=>setEntrance(false),3500);return()=>window.clearTimeout(timer);}},[state?.status,challenge.id]);
   useEffect(() => {
     setNow(Date.now());
     if(state && !['waiting','playing'].includes(state.status)){
@@ -94,9 +100,9 @@ export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], o
     </div></div><div className="fp-secret-note">◇ Sin elegir a tiempo: jugada automática.</div>
   </section></div> : undefined;
   return <section data-outcome={ended ? won ? "win" : state?.winnerId ? "loss" : "draw" : undefined} className={`trivia-arena fp-arena ${quick ? "fp-arena--quick" : ""} ${ended ? "trivia-arena--ended fp-arena--result" : state?.status === "playing" || state?.status === "finished" ? "fp-arena--live fp-arena--broadcast" : "fp-arena--waiting"}`} aria-label="Partido Futsal PvP">
+    {entrance&&state?.status==='playing'&&<DuelAnimeEntrance game="FUTSAL" leftName={mine} rightName={rival} leftAvatar={entranceAvatar(meId,mine)} rightAvatar={entranceAvatar(host?challenge.toId:challenge.fromId,rival)} leftLine="¡La cancha es nuestra, voy por ese gol!" rightLine="¡Leé mi jugada si podés!" onDone={()=>setEntrance(false)}/>}
     {state?.status === "finished" && <DuelResultEffects key={challenge.id} outcome={won?"win":state.winnerId?"loss":"draw"}/> }
-    <header className="trivia-header"><button type="button" onClick={() => ended || !state ? onExit() : setConfirmExit(true)}>← Lobby</button><span>LUPI WORLD · FUTSAL PvP</span><b className="trivia-brand-mark">⚽</b></header>
-    <div className="trivia-title"><small>LEÉ AL RIVAL · ELEGÍ TU JUGADA</small><h2>{quick ? "DUELO RELÁMPAGO" : "DUELO EN LA CANCHA"}</h2><p>{totalAttacks} ataques por jugador · {quick ? `Tres situaciones · ${decisionSeconds} segundos para decidir` : "Construcción y definición"}</p></div>
+    <DuelGameHeader game="futsal" onBack={() => ended || !state ? onExit() : setConfirmExit(true)} mode={challenge.vsBot ? "VS BOT" : "1 VS 1"} subtitle="FUTSAL · ARENA LUPI WORLD" title={quick ? "DUELO RELÁMPAGO" : "DUELO EN LA CANCHA"} description={`${totalAttacks} ataques por jugador · ${quick ? `Tres situaciones · ${decisionSeconds} segundos para decidir` : "Construcción y definición"}`}/>
     {!live && !ended && (<div className="trivia-score fp-score">{scoreSide(meId,mine,state ? host ? state.hostScore : state.guestScore : 0,true)}<span className="fp-score-mid"><small>AMISTOSO</small>VS<small>{totalAttacks} ATAQUES</small></span>{scoreSide(host?challenge.toId:challenge.fromId,rival,state ? host ? state.guestScore : state.hostScore : 0,false)}</div>)}
     {error && <div className="trivia-error" role="alert"><p>{error}</p><button type="button" disabled={busy} onClick={reconnect}>Reconectar</button></div>}
     {!state && <p role="status">Conectando con la cancha…</p>}

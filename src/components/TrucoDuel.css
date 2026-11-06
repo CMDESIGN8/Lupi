@@ -699,3 +699,5 @@
 @keyframes tr-rivalry-reveal{0%,88%{opacity:1}100%{opacity:0}}
 @media(min-width:901px){.tr-rivalry__duel{inset:6% 18% 18%}.tr-rivalry__closeups{inset:15% 10% 25%}}
 @media(prefers-reduced-motion:reduce){.tr-rivalry,.tr-rivalry *{animation:none!important}.tr-rivalry__closeups{display:none}.tr-rivalry__impact{opacity:1}.tr-rivalry__impact b{font-size:70px}}
+.tr-rivalry__body>.lp-owned-portrait{position:absolute;inset:0;width:100%;height:100%;--own-card-scale:.8}.tr-rivalry__body>.lp-owned-portrait .lp-owned-portrait__rig{bottom:0;transform:scale(1.35);transform-origin:center bottom}.tr-rivalry__body>.lupi-story-pose{width:min(100%,230px);height:100%;background:none;transform:scale(1.15);transform-origin:center bottom}.tr-rivalry__body>.lupi-story-pose>i{height:100%;background-size:300% 200%}
+@media(max-width:600px){.tr-rivalry__body>.lp-owned-portrait .lp-owned-portrait__rig{transform:scale(1.05)}.tr-rivalry__body>.lupi-story-pose{transform:scale(1.02)}}

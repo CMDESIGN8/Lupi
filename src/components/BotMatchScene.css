@@ -42,20 +42,43 @@
 @media(max-width:600px){.result-modal-overlay>.result-modal.bot-match-result{padding:12px 14px calc(12px + env(safe-area-inset-bottom))!important}.bot-match-result .rm-topline{font-size:8px}.result-modal-overlay>.bot-match-result .rm-trophy{font-size:26px;margin:5px 0 0}.result-modal-overlay>.bot-match-result .rm-title{font-size:40px;margin:2px 0 11px}.result-modal-overlay>.bot-match-result .rm-score{padding:10px;margin-bottom:8px}.result-modal-overlay>.bot-match-result .rm-score-num{font-size:57px}.bot-match-result .rm-score-label{font-size:10px}.result-modal-overlay>.bot-match-result .rm-reward-box{padding:8px;gap:9px}.bot-match-result .rm-reward-box .rm-reward-val{font-size:25px}.bot-match-result .rm-reward-box .rm-reward-icon{font-size:18px}}
 @media(prefers-reduced-motion:reduce){.result-modal-overlay>.bot-match-result .rm-title{transform:none}}
 
+/* Put the result headline and full-body fighters together in one match scene. */
+.bot-match-result>.rm-match-scene{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;gap:8px;width:100%;min-height:370px;box-sizing:border-box;padding:12px;overflow:hidden;border:1px solid #5ce5ec78;border-radius:8px;background:linear-gradient(180deg,#0218248c,#041723a8),url('../assets/challenge-futsal-anime.webp') 65% center/cover;box-shadow:inset 0 0 70px #00111dcc,0 0 22px #32d8e222}
+.bot-match-result>.rm-match-scene::before{content:"";position:absolute;inset:0;z-index:-1;background:repeating-linear-gradient(155deg,transparent 0 24px,#a8fbff0c 25px 26px,transparent 27px 46px),radial-gradient(ellipse at 50% 100%,#18c9da30,transparent 68%);pointer-events:none}
+.rm-scene-heading{display:flex;align-items:center;justify-content:center;gap:12px;min-height:62px;margin:0;padding:4px 6px 9px;border-bottom:1px solid #a2f5f333}
+.rm-scene-heading .rm-trophy{flex:none;margin:0;font-size:35px;line-height:1;animation:rmTrophy .65s cubic-bezier(.2,1.4,.4,1) both}
+.rm-scene-heading .rm-title{margin:0!important;font:1000 italic clamp(36px,5vw,57px)/.95 'Barlow Condensed',Impact,sans-serif!important;letter-spacing:.02em;text-align:center;text-shadow:3px 4px #00111d,0 0 24px #ffdc6260;transform:none!important}
+.bot-match-result>.rm-match-scene .rm-result-score{display:grid;grid-template-columns:minmax(0,1fr) 82px minmax(0,1fr);align-items:stretch;gap:5px;width:100%;max-width:none;min-height:270px;flex:1;margin:0;padding:8px 10px 10px;box-sizing:border-box;clip-path:none;border:0;border-bottom:2px solid #6de7ee;background:linear-gradient(105deg,#06415a99,#03111de8 48%,#62501d99);box-shadow:none}
+.rm-match-scene .rm-result-fighter{height:250px;align-self:stretch}
+.rm-match-scene .rm-result-avatar--user{width:min(100%,205px)!important;height:230px!important;filter:drop-shadow(0 0 20px #29e5e65c)}
+.rm-result-avatar--user>.lp-owned-portrait>.lp-owned-portrait__rig{bottom:0;transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.08));}
+.rm-match-scene .rm-result-fighter--rival .rm-result-avatar{width:min(100%,205px);height:230px}
+.rm-result-scoreline{position:relative;z-index:2;align-self:center;padding:0!important;font-size:clamp(38px,5vw,56px)}
+.rm-result-avatar--lupi-win{filter:drop-shadow(0 0 20px #ffe16b99)!important;background:radial-gradient(ellipse,#e7bd4760,transparent 72%)}
+.rm-result-avatar--lupi-loss{filter:drop-shadow(0 0 20px #62c7e899)!important;background:radial-gradient(ellipse,#62c7e84f,transparent 72%)}
+.rm-result-avatar--lupi-draw{filter:drop-shadow(0 0 20px #72e8ef99)!important;background:radial-gradient(ellipse,#72e8ef4f,transparent 72%)}
+.rm-result-avatar--lupi-win>.lupi-story-pose{animation:rm-lupi-win .6s cubic-bezier(.2,1.35,.4,1) both;filter:drop-shadow(0 0 12px #ffe16b99)}
+.rm-result-avatar--lupi-loss>.lupi-story-pose{animation:rm-lupi-loss .45s ease-out both;filter:drop-shadow(0 0 10px #73d9f288)}
+.rm-result-avatar--lupi-draw>.lupi-story-pose{animation:rm-lupi-draw .5s ease-out both}
+@keyframes rm-lupi-win{from{transform:translateY(18px) scale(.82)}to{transform:translateY(0) scale(1.06)}}
+@keyframes rm-lupi-loss{from{transform:translateY(0) scale(1.02)}to{transform:translateY(5px) scale(.96)}}
+@keyframes rm-lupi-draw{from{transform:scale(.88)}to{transform:scale(1)}}
+@media(min-width:901px){.bot-match-result>.rm-match-scene{grid-column:1;grid-row:2;min-height:370px}.bot-match-result>.rm-match-scene .rm-result-score{grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr)}.bot-match-result>.rm-rewards{grid-column:1;grid-row:3}.bot-match-result>.lp-reward-cinema,.bot-match-result>.lp-skill-reward-note,.bot-match-result>.rm-unconfirmed{grid-column:2;grid-row:2/4}}
+@media(max-width:900px){.bot-match-result>.rm-match-scene{min-height:320px}.rm-scene-heading{min-height:54px}.rm-scene-heading .rm-title{font-size:clamp(32px,9vw,45px)!important}.bot-match-result>.rm-match-scene .rm-result-score{min-height:225px;grid-template-columns:minmax(0,1fr) 68px minmax(0,1fr);padding:6px}.rm-match-scene .rm-result-fighter{height:205px}.rm-match-scene .rm-result-avatar--user{width:min(100%,138px)!important;height:184px!important}.rm-match-scene .rm-result-fighter--rival .rm-result-avatar{width:min(100%,138px);height:184px}.rm-result-scoreline{font-size:32px}.rm-result-scoreline small{font-size:6px}}
+@media(max-width:380px){.bot-match-result>.rm-match-scene{min-height:288px;padding:8px}.bot-match-result>.rm-match-scene .rm-result-score{grid-template-columns:minmax(0,1fr) 58px minmax(0,1fr);min-height:200px;padding:4px}.rm-match-scene .rm-result-avatar--user,.rm-match-scene .rm-result-fighter--rival .rm-result-avatar{height:162px!important}.rm-result-fighter{height:182px}.rm-result-scoreline{font-size:27px}}
+@media(prefers-reduced-motion:reduce){.rm-scene-heading .rm-trophy,.rm-result-avatar--lupi-win>.lupi-story-pose,.rm-result-avatar--lupi-loss>.lupi-story-pose,.rm-result-avatar--lupi-draw>.lupi-story-pose{animation:none}}
+
 /* Desktop finale uses the available width instead of stacking the entire scene. */
 @media(min-width:901px){
  .result-modal-overlay:has(>.bot-match-result){padding:20px;display:flex;align-items:flex-start;justify-content:center}
- .result-modal-overlay>.result-modal.bot-match-result{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);grid-template-rows:auto auto auto auto auto auto;column-gap:30px;row-gap:8px;align-items:center;width:min(1120px,100%)!important;max-width:1120px!important;padding:24px 28px!important;margin:auto;min-height:0!important}
+ .result-modal-overlay>.result-modal.bot-match-result{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(0,1.1fr);grid-template-rows:auto minmax(350px,1fr) auto auto;column-gap:30px;row-gap:8px;align-items:center;width:min(1120px,100%)!important;max-width:1120px!important;padding:24px 28px!important;margin:auto;min-height:0!important}
  .result-modal-overlay>.bot-match-result>.rm-topline{grid-column:1/-1;grid-row:1;margin:0 0 10px;text-align:center}
- .result-modal-overlay>.bot-match-result>.rm-trophy{grid-column:1;grid-row:2;margin:0;font-size:40px;align-self:end}
- .result-modal-overlay>.bot-match-result>.rm-title{grid-column:1;grid-row:3;margin:0 0 10px;font-size:clamp(42px,4.5vw,64px);align-self:start}
- .result-modal-overlay>.bot-match-result>.rm-score{grid-column:1;grid-row:4;width:100%;max-width:none;box-sizing:border-box;margin:0;padding:20px 12px}
- .result-modal-overlay>.bot-match-result .rm-score-num{font-size:84px}
- .result-modal-overlay>.bot-match-result>.rm-rewards{grid-column:1;grid-row:5;width:100%;margin:0;align-self:start}
- .result-modal-overlay>.bot-match-result>.lp-reward-cinema{grid-column:2;grid-row:2/6;width:100%;max-width:none;box-sizing:border-box;margin:0;padding:14px;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
- .result-modal-overlay>.bot-match-result>.lp-skill-reward-note,.result-modal-overlay>.bot-match-result>.rm-unconfirmed{grid-column:2;grid-row:2/6;margin:0;align-self:center}
- .result-modal-overlay>.bot-match-result>.rm-btn{grid-column:1;grid-row:6;width:100%;max-width:none;margin:12px 0 0;align-self:end}
- .result-modal-overlay>.bot-match-result>.lp-result-player-link{grid-column:2;grid-row:6;width:100%;max-width:none;margin:12px 0 0;min-height:44px;box-sizing:border-box;align-self:end}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene{grid-column:1;grid-row:2;align-self:stretch}
+ .result-modal-overlay>.bot-match-result>.rm-rewards{grid-column:1;grid-row:3;width:100%;margin:0;align-self:start}
+ .result-modal-overlay>.bot-match-result>.lp-reward-cinema{grid-column:2;grid-row:2/4;width:100%;max-width:none;box-sizing:border-box;margin:0;padding:14px;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+ .result-modal-overlay>.bot-match-result>.lp-skill-reward-note,.result-modal-overlay>.bot-match-result>.rm-unconfirmed{grid-column:2;grid-row:2/4;margin:0;align-self:center}
+ .result-modal-overlay>.bot-match-result>.rm-btn{grid-column:1;grid-row:4;width:100%;max-width:none;margin:12px 0 0;align-self:end}
+ .result-modal-overlay>.bot-match-result>.lp-result-player-link{grid-column:2;grid-row:4;width:100%;max-width:none;margin:12px 0 0;min-height:44px;box-sizing:border-box;align-self:end}
  .result-modal-overlay>.bot-match-result>.rm-streak-banner,.result-modal-overlay>.bot-match-result>.rm-skill-upgrade,.result-modal-overlay>.bot-match-result>.rm-cards-levelup{grid-column:1/-1;grid-row:auto;margin:5px 0}
  .bot-match-result .lp-reward-cinema .lp-earned-skills{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:10px}
  .bot-match-result .lp-reward-cinema .lp-earned-skill{padding:7px 8px}
@@ -207,3 +230,26 @@
 @keyframes lp-shot-stream{from{opacity:.55;transform:scaleX(.86)}to{opacity:.85;transform:scaleX(1.08)}}
 @media(min-width:901px){.lp-choice-preparation--anime .lp-technique-ball--drawn{font-size:86px}.lp-technique-face-strip{height:76px}.lp-technique-face-art{top:-70px;height:370px}}
 @media(prefers-reduced-motion:reduce){.lp-technique-ball--drawn .lp-shot-trails{animation:none}}
+
+/* Retratos de resultado en formato de juego: cuerpo completo, sin máscara circular. */
+.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-avatar{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-fighter{overflow:visible!important}
+.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-avatar--user{width:min(100%,158px)!important;height:212px!important}
+.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-avatar--user>.lp-owned-portrait{overflow:visible!important}
+.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-avatar--user>.lp-owned-portrait>.lp-owned-portrait__rig{bottom:0;transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.08))}
+.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-fighter--rival .rm-result-avatar{width:min(100%,158px)!important;height:212px!important}
+@media(max-width:600px){
+ .result-modal-overlay>.bot-match-result>.rm-match-scene{min-height:340px!important;padding:9px!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-scene-heading{min-height:48px!important;padding:2px 4px 7px!important;margin:0!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-scene-heading .rm-title{font-size:clamp(32px,9vw,42px)!important;margin:0!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-scene-heading .rm-trophy{font-size:28px!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-score{min-height:248px!important;grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr)!important;align-items:end!important;gap:2px!important;padding:4px 3px 8px!important;margin:0!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-fighter{height:220px!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-avatar--user,.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-fighter--rival .rm-result-avatar{width:min(100%,146px)!important;height:202px!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-scoreline{font-size:29px!important;padding:0 0 27px!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-scoreline i{font-size:17px!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-scoreline small{font-size:5px!important;letter-spacing:.04em!important}
+ .result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-fighter>span{font-size:7px!important}
+}
+@media(max-width:380px){.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-score{grid-template-columns:minmax(0,1fr) 54px minmax(0,1fr)!important}.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-avatar--user,.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-fighter--rival .rm-result-avatar{height:188px!important}.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-fighter{height:205px!important}}
+@media(prefers-reduced-motion:reduce){.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-avatar--user-celebrate,.result-modal-overlay>.bot-match-result>.rm-match-scene .rm-result-avatar--user-miss{animation:none!important}}

@@ -9,6 +9,11 @@ import { MatchCourt } from './match/MatchCourt';
 import { FORMATIONS, mirror, type Formation, type Pos } from './match/formations';
 import { MatchTutorial } from './MatchTutorial';
 import { createPortal } from 'react-dom';
+import { DuelAnimeEntrance } from './DuelAnimeEntrance';
+import { LupiStoryPose } from './LupiStoryPose';
+import { AvatarFace } from './AvatarFace';
+import { useAvatarAppearance } from '../hooks/useAvatarAppearance';
+import './FutsalBotScore.css';
 // src/components/CardBattle.tsx — v6 (con soporte para modo campaña)
 // Fix #1: arena-container width:10% removido
 // Fix #2: scoreboard top corregido en mobile
@@ -31,6 +36,8 @@ import {
 import { supabase } from '../lib/supabaseClient';
 import { verifiedMatchApi } from '../lib/verifiedMatchApi';
 import { AnimeEffects, AnimeEffectsHandle } from './AnimeEffects';
+import { MatchMoment, momentsEnabled, type MomentOutcome } from './MatchMoment';
+import { outcomeFromBotDecision } from './match/momentOutcomes';
 
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -44,6 +51,9 @@ interface CardBattleProps {
   onResultClosed?: () => void;
   onVerifiedMatchStarted?: (sessionId:string) => Promise<void>;
   onVerifiedMatchCompleted?: (sessionId:string) => Promise<void>;
+  /** Historia: retomar exactamente la sesión vinculada al capítulo. */
+  resumeSessionId?: string | null;
+  resumeRequired?: boolean;
   onNavigateToDeck?: () => void;
   forcedOpponent?: BotPlayer | null;
   isCampaignMode?: boolean;
@@ -78,10 +88,13 @@ interface UserStats {
 
 interface LogLine { id: number; text: string; type: 'neutral'|'good'|'bad'|'event'|'goal'; }
 
+type MatchPlayResult = 'user-goal'|'rival-goal'|'user-miss'|'rival-miss'|'neutral';
+
 interface MatchResult {
   winner: 'user' | 'draw' | 'rival';
   userScore: number;
   rivalScore: number;
+  lastPlay: MatchPlayResult;
   xpGained: number;
   serverVerified: boolean;
   rewardConfirmed: boolean;
@@ -136,6 +149,8 @@ export function CardBattle({
   onResultClosed,
   onVerifiedMatchStarted,
   onVerifiedMatchCompleted,
+  resumeSessionId = null,
+  resumeRequired = false,
   onNavigateToDeck,
   forcedOpponent = null,
   isCampaignMode = false,
@@ -145,6 +160,7 @@ export function CardBattle({
 }: CardBattleProps) {
 
   const {ask:askEquipment,dialog:equipmentDialog}=useEquipmentNotice();
+  const {appearance:playerAppearance}=useAvatarAppearance(userId);
   const [pausedMatch,setPausedMatch]=useState<string|null>(null);
   useEffect(()=>{if(!pausedMatch)return;const old=document.body.style.overflow;document.body.style.overflow='hidden';return()=>{document.body.style.overflow=old;};},[pausedMatch]);
   const [skillMatchId,setSkillMatchId] = useState<string|null>(null);
@@ -158,6 +174,7 @@ export function CardBattle({
   const [phase, setPhase] = useState<'select'|'battle'|'result'>(
   autoStart && isCampaignMode && forcedOpponent ? 'battle' : 'select'
 );
+  const [entryCinematic,setEntryCinematic]=useState<{resolve:()=>void}|null>(null);
   
   // En modo campaña, el bot se setea automáticamente al oponente forzado
   const [bot, setBot] = useState<BotPlayer>(
@@ -169,6 +186,8 @@ export function CardBattle({
 
   const [uGoals, setUGoals] = useState(0);
   const [rGoals, setRGoals] = useState(0);
+  const [scoreReaction, setScoreReaction] = useState<{ kind: 'neutral' | 'user-goal' | 'rival-goal' | 'user-miss' | 'rival-miss'; tick: number }>({ kind: 'neutral', tick: 0 });
+  const reactOnScore = (kind: typeof scoreReaction.kind) => setScoreReaction(current => ({ kind, tick: current.tick + 1 }));
   const [minute, setMinute] = useState(0);
 
   const [log, setLog] = useState<LogLine[]>([]);
@@ -187,6 +206,9 @@ export function CardBattle({
   const [activeTab, setActiveTab] = useState<'court' | 'tactics'>('court');
 
   const [flash, setFlash] = useState<{ text:string; type:'goal'|'miss'|'ok'|'bad'; x:number; y:number } | null>(null);
+  // Resolución cinematográfica de la jugada: la promesa se cumple cuando termina (o la persona la saltea).
+  const [cine, setCine] = useState<{ outcome: MomentOutcome; title?: string; caption?: string } | null>(null);
+  const cineResolve = useRef<(() => void) | null>(null);
 
   const [moment, setMoment]     = useState<MomentContext | null>(null);
   const [timerPct, setTimerPct] = useState(100);
@@ -268,6 +290,14 @@ export function CardBattle({
     setUPos({ ...FORMATIONS.base }); setRPos({ ...mirror(FORMATIONS.base) });
     setUHL(null); setRHL(null);
     setBallVis(false); setBall({ x:50, y:50 }); setBallTeam(null);
+  }
+
+  function playMoment(outcome: MomentOutcome, title?: string, caption?: string): Promise<void> {
+    if (!momentsEnabled()) return Promise.resolve();
+    return new Promise(resolve => { cineResolve.current = resolve; setCine({ outcome, title, caption }); });
+  }
+  function endMoment() {
+    const resolve = cineResolve.current; cineResolve.current = null; setCine(null); resolve?.();
   }
 
   function showFlash(text: string, type: 'goal'|'miss'|'ok'|'bad', x = 50, y = 38) {
@@ -397,9 +427,10 @@ export function CardBattle({
     const deckCards = (userDeck.cards ?? []) as UserCard[];
     if (deckCards.length < 5) { alert('Necesitás 5 cartas en el mazo'); return; }
     if (isRunning.current) return;
-    setPausedMatch(null);
-    // Prevent double-start while asynchronous equipment checks are running.
     isRunning.current = true;
+    await new Promise<void>(resolve=>setEntryCinematic({resolve}));
+    setPausedMatch(null);
+    // Keep subsequent clicks from starting a second copy of this match.
     // UX preflight only. The trusted match server must enforce this again.
     // Do not consume durability here: client-side matches are not verified.
     setNetworkStatus('Revisando tu equipamiento…');
@@ -462,6 +493,22 @@ export function CardBattle({
         setNetworkStatus('Conectando con el árbitro…');
         // Fast path: one start call; discovery is only needed to recover an existing game.
         let startError:unknown;
+        if (resumeRequired && !resumeSessionId)
+          throw new Error('La historia indica que hay un partido en curso, pero falta su identificador. Sincronizá el capítulo antes de iniciar otro partido.');
+        if (resumeSessionId) {
+          // Continuar una historia debe recuperar el session_id que la historia guardó.
+          // Crear primero una sesión nueva podía dejar el capítulo y el marcador desincronizados.
+          const session = await verifiedMatchApi.resume(resumeSessionId);
+          if (session.state !== 'started') throw new Error('Este partido ya terminó. Volvé a la historia para actualizar el resultado.');
+          if (session.opponent_key !== bot.name) throw new Error('El rival de la historia no coincide con el partido guardado.');
+          window.localStorage.setItem(recoveryKey, session.id);
+          resumedTurnIndex = session.turn_index;
+          resumedPending = session.pending_decision as MomentContext | null;
+          resumedScore = { user: session.user_score, rival: session.opponent_score };
+          if (resumedPending && !session.simulation_state?.last_turn)
+            throw new Error('No se pudo reconstruir la decisión pendiente.');
+          verifiedSession = { id: session.id, version: session.state_version };
+        } else {
         try {verifiedSession=await verifiedMatchApi.start(bot.name);window.localStorage.setItem(recoveryKey,verifiedSession.id);} catch(error){startError=error;}
         if(!verifiedSession){
         // Server discovery also works after clearing storage or switching devices.
@@ -487,6 +534,7 @@ export function CardBattle({
         }
         if (!verifiedSession) throw startError instanceof Error?startError:new Error('No se pudo iniciar el partido. Reintentá desde la previa.');
         }
+        }
         if (verifiedSession) await onVerifiedMatchStarted?.(verifiedSession.id);
       } catch (error) {
         setNetworkStatus('');
@@ -500,6 +548,7 @@ export function CardBattle({
     const adv = Math.max(-0.3, Math.min(0.3, (calcOvr(deckCards) - bot.overall_rating) / 100));
     const turnPacer = createVerifiedTurnPacer(Boolean(verifiedSession && resumedTurnIndex > 0));
     let ug = resumedScore?.user ?? 0, rg = resumedScore?.rival ?? 0;
+    let lastPlay: MatchPlayResult = 'neutral';
 
     setLog([]); setShowFullLog(false); setUGoals(ug); setRGoals(rg);
     setMinute(resumedTurnIndex * 5);
@@ -525,6 +574,8 @@ export function CardBattle({
       ug = decision.userScore;
       rg = decision.opponentScore;
       authoritativeScore = { user: ug, rival: rg };
+      lastPlay = decision.result.goalFor === 'user' ? 'user-goal' : decision.result.goalFor === 'rival' ? 'rival-goal' : 'user-miss';
+      reactOnScore(lastPlay);
       setUGoals(ug); setRGoals(rg);
       addLog(decision.result.narrative, decision.result.goalFor === 'user' ? 'goal' : 'event');
     } else if (verifiedSession && resumedTurnIndex > 0) {
@@ -573,6 +624,10 @@ export function CardBattle({
           }
           const res = serverDecision?.result ?? resolveDecision(chosen, ctx.mainCard, ctx.type, min);
           addLog(res.narrative, res.goalFor === 'user' ? 'goal' : res.success ? 'good' : 'neutral');
+          const momentScene = outcomeFromBotDecision(ctx, chosen, res);
+          lastPlay = res.goalFor === 'user' ? 'user-goal' : res.goalFor === 'rival' ? 'rival-goal' : (momentScene === 'miss' || momentScene === 'saved' || !res.success) ? 'user-miss' : 'neutral';
+          if (lastPlay !== 'neutral') reactOnScore(lastPlay);
+          if (momentScene) await playMoment(momentScene, momentScene === 'concede' ? `¡GOL DE ${bot.name.toUpperCase()}!` : undefined, res.narrative);
 
           if (res.goalFor === 'user') {
             await animateGoalUser();
@@ -614,9 +669,12 @@ export function CardBattle({
         }
 
         if (rp.autoGoal === 'rival') {
+          lastPlay = 'rival-goal';
+          reactOnScore('rival-goal');
           await animateRivalBuild();
           animeRef.current?.triggerDanger();
           await delay(300);
+          await playMoment('concede', `¡GOL DE ${bot.name.toUpperCase()}!`);
           await animateGoalRival();
           rg++; setRGoals(rg);
           addLog(`💔 ¡${bot.name} convierte! Qué golpe.`, 'bad');
@@ -624,8 +682,11 @@ export function CardBattle({
           showFlash(`⚽ GOL ${bot.name.toUpperCase()}`, 'bad', 50, 38);
           await delay(GOAL_MS);
         } else if (rp.narrative) {
+          lastPlay = 'rival-miss';
+          reactOnScore('rival-miss');
           addLog(rp.narrative, 'good');
           await animateRivalBuild();
+          await playMoment('blocked', '¡LA SACÓ TU ARQUERO!', rp.narrative);
           await animateSave();
         }
 
@@ -672,12 +733,13 @@ export function CardBattle({
         return;
       }
     }
-    await handleMatchEnd(ug, rg, deckCards, Boolean(verifiedSession), confirmedXp);
+    await handleMatchEnd(ug, rg, deckCards, Boolean(verifiedSession), confirmedXp, lastPlay);
     } catch (error) {
       setNetworkStatus('');
       console.error('Partido interrumpido:', error);
       setPendingChoice(null);
       setMoment(null);
+      cineResolve.current = null; setCine(null);
       clearTimer();
       setPausedMatch(error instanceof Error ? error.message : 'No se pudo completar el partido');
       setPhase('select');
@@ -692,7 +754,7 @@ export function CardBattle({
   // No llamar a update_daily_progress desde el cliente.
   // Los desafíos diarios competitivos quedan pendientes de un validador del servidor.
 
-  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[], verified = false, confirmedXp: number | null = null) {
+  async function handleMatchEnd(ug: number, rg: number, deckCards: UserCard[], verified = false, confirmedXp: number | null = null, lastPlay: MatchPlayResult = 'neutral') {
     const won   = ug > rg;
     const tied  = ug === rg;
 
@@ -783,6 +845,7 @@ export function CardBattle({
       winner:     won ? 'user' : (tied ? 'draw' : 'rival'),
       userScore:  ug,
       rivalScore: rg,
+      lastPlay,
       xpGained,
       serverVerified: verified,
       rewardConfirmed: !verified || confirmedXp !== null,
@@ -856,12 +919,19 @@ export function CardBattle({
     return handleStartBattle;
   };
 
+  const resultPlay = matchResult?.lastPlay ?? 'neutral';
+  const userWonLastPlay = resultPlay === 'user-goal' || resultPlay === 'rival-miss';
+  const userLostLastPlay = resultPlay === 'user-miss' || resultPlay === 'rival-goal';
+  const resultUserMood = userWonLastPlay ? 'celebrate' : userLostLastPlay ? 'miss' : matchResult?.winner === 'user' ? 'celebrate' : matchResult?.winner === 'rival' ? 'miss' : 'focus';
+  const resultLupiPose = userWonLastPlay ? 'sad' : userLostLastPlay ? 'celebrate' : matchResult?.winner === 'user' ? 'sad' : matchResult?.winner === 'rival' ? 'celebrate' : 'determined';
+
   if (phase === 'select' && !autoStart) {
-    return <>{pausedDialog}{equipmentEditor}{networkNotice}<MatchTutorial userId={userId} cards={deckCards} opponent={bot.name} onTeam={onNavigateToDeck} onStart={handleStartBattle} />{equipmentDialog}</>;
+    return <>{pausedDialog}{equipmentEditor}{networkNotice}{entryCinematic&&<DuelAnimeEntrance game="FUTSAL · PARTIDO" leftName="Tu equipo" rightName={bot.name} leftAvatar={<OwnedCardPortrait userId={userId} appearanceOverride={playerAppearance}/>} rightAvatar={<LupiStoryPose pose="determined" label={bot.name}/>} leftLine="¡El equipo está listo! Vamos por el partido." rightLine="La cancha va a decidir quién manda." onDone={()=>{const done=entryCinematic.resolve;setEntryCinematic(null);done();}}/>}<MatchTutorial userId={userId} cards={deckCards} opponent={bot.name} onTeam={onNavigateToDeck} onStart={handleStartBattle} />{equipmentDialog}</>;
   }
 
   return (
     <div className="arena-container">
+      {entryCinematic&&<DuelAnimeEntrance game="FUTSAL · PARTIDO" leftName="Tu equipo" rightName={bot.name} leftAvatar={<OwnedCardPortrait userId={userId} appearanceOverride={playerAppearance}/>} rightAvatar={<LupiStoryPose pose="determined" label={bot.name}/>} leftLine="¡El equipo está listo! Vamos por el partido." rightLine="La cancha va a decidir quién manda." onDone={()=>{const done=entryCinematic.resolve;setEntryCinematic(null);done();}}/>}
       {pausedDialog}
       {equipmentDialog}
       {equipmentEditor}
@@ -880,6 +950,7 @@ export function CardBattle({
           homePositions={uPos} awayPositions={rPos} homeHighlight={uHL} awayHighlight={rHL}
           ball={ballVisible ? ball : null} ballTeam={ballTeam}
         >
+          {cine && <MatchMoment key={`${cine.outcome}-${cine.title ?? ''}-${cine.caption ?? ''}`} outcome={cine.outcome} title={cine.title} caption={cine.caption} onDone={endMoment} />}
 
           {pendingChoice && phase === 'battle' && (
             <div className={`lp-choice-preparation lp-choice-preparation--anime lp-technique--${pendingChoice.effect}`} style={{'--technique-color':pendingChoice.color} as React.CSSProperties} role="status" aria-live="polite" aria-atomic="true">
@@ -1142,9 +1213,9 @@ export function CardBattle({
             </div>
 
             <div className="match-center-score">
-              <div className="match-center-team"><span>LOCAL</span><strong>{uGoals}</strong></div>
+              <div className={`match-center-team match-center-team--${scoreReaction.kind}`}><div className="match-center-avatar" key={`home-${scoreReaction.tick}`}><AvatarFace mood={scoreReaction.kind === 'user-goal' || scoreReaction.kind === 'rival-miss' ? 'celebrate' : scoreReaction.kind === 'neutral' ? 'focus' : undefined} appearance={scoreReaction.kind === 'user-miss' || scoreReaction.kind === 'rival-goal' ? {...playerAppearance, expression: 'sad'} : playerAppearance}/></div><span>LOCAL · VOS</span><strong>{uGoals}</strong></div>
               <div className="match-center-divider">VS</div>
-              <div className="match-center-team match-center-rival"><span>VISITANTE</span><strong>{rGoals}</strong></div>
+              <div className={`match-center-team match-center-rival match-center-team--${scoreReaction.kind}`}><div className="match-center-avatar" key={`rival-${scoreReaction.tick}`}><LupiStoryPose className="match-center-lupi-face" pose={scoreReaction.kind === 'user-goal' || scoreReaction.kind === 'rival-miss' ? 'sad' : scoreReaction.kind === 'rival-goal' || scoreReaction.kind === 'user-miss' ? 'celebrate' : 'determined'} label="Profe Lupi"/></div><span>RIVAL · {bot.name.replace(/^Bot\s+/i, '')}</span><strong>{rGoals}</strong></div>
             </div>
 
             <div className="match-center-possession">
@@ -1186,24 +1257,29 @@ export function CardBattle({
             >
               <DuelResultEffects outcome={matchResult.winner==='user'?'win':matchResult.winner==='draw'?'draw':'loss'}/>
               <div className="rm-topline"><span className="rm-live-dot" /> LUPI WORLD <span>·</span> MATCH COMPLETE</div>
-              <div className="rm-trophy" aria-hidden="true">{matchResult.winner === 'user' ? '🏆' : matchResult.winner === 'draw' ? '🤝' : '⚽'}</div>
-              <div className="rm-title">
-                {matchResult.winner === 'user'  && '¡VICTORIA!'}
-                {matchResult.winner === 'draw'  && '¡EMPATE!'}
-                {matchResult.winner === 'rival' && 'DERROTA'}
-              </div>
-
-              <div className="rm-score">
-                <div className="rm-score-side">
-                  <div className="rm-score-label">VOS</div>
-                  <div className="rm-score-num user-color">{matchResult.userScore}</div>
+              <section className="rm-match-scene" aria-label="Resultado del partido">
+                <div className="rm-scene-heading">
+                  <div className="rm-trophy" aria-hidden="true">{matchResult.winner === 'user' ? '🏆' : matchResult.winner === 'draw' ? '🤝' : '⚽'}</div>
+                  <div className="rm-title">
+                    {matchResult.winner === 'user'  && '¡VICTORIA!'}
+                    {matchResult.winner === 'draw'  && '¡EMPATE!'}
+                    {matchResult.winner === 'rival' && 'DERROTA'}
+                  </div>
                 </div>
-                <div className="rm-score-sep">–</div>
-                <div className="rm-score-side">
-                  <div className="rm-score-label">{bot.avatar} {bot.name.replace('Bot ','')}</div>
-                  <div className="rm-score-num rival-color">{matchResult.rivalScore}</div>
+                <div className="rm-score rm-result-score">
+                  <div className="rm-result-fighter rm-result-fighter--user">
+                    <div className={`rm-result-avatar rm-result-avatar--user rm-result-avatar--user-${resultUserMood}`}><OwnedCardPortrait userId={userId} appearanceOverride={playerAppearance} mood={resultUserMood} scaleMultiplier={1.22}/></div>
+                    <span>VOS · TU EQUIPO</span>
+                  </div>
+                  <div className="rm-result-scoreline"><b>{matchResult.userScore}</b><i>:</i><b>{matchResult.rivalScore}</b><small>MARCADOR FINAL</small></div>
+                  <div className="rm-result-fighter rm-result-fighter--rival">
+                    <div className={`rm-result-avatar rm-result-avatar--lupi-${resultLupiPose === 'celebrate' ? 'win' : resultLupiPose === 'sad' ? 'loss' : 'draw'}`}>
+                      <LupiStoryPose pose={resultLupiPose} label={bot.name}/>
+                    </div>
+                    <span>{bot.name.replace('Bot ','').toUpperCase()}</span>
+                  </div>
                 </div>
-              </div>
+              </section>
 
               {!matchResult.rewardConfirmed ? <div className="rm-unconfirmed" role="status"><strong>PARTIDO VALIDADO</strong><p>La XP de este partido no tiene acreditación confirmada. No está relacionada con los 6 premios diarios de PPT y Preguntados.</p></div> : <>
               <div className="rm-rewards-title"><span>RECOMPENSAS DEL PARTIDO</span></div>
@@ -1872,7 +1948,21 @@ export function CardBattle({
         .rm-skill-label{font-size:13px;}.rm-skill-desc{color:#9bbac4;font-size:12px;line-height:1.35;}
         .rm-btn{width:100%;min-height:51px;border-radius:13px!important;background:linear-gradient(105deg,#50f2e3,#1cc6e4)!important;color:#03222c!important;font-size:13px;font-weight:1000;letter-spacing:1.4px;box-shadow:0 8px 30px rgba(28,214,216,.23);transition:filter .2s,transform .2s;}
         .rm-btn:hover{filter:brightness(1.1);transform:translateY(-2px);}
+        .result-modal .rm-result-score{display:grid;grid-template-columns:minmax(0,1fr) 82px minmax(0,1fr);align-items:end;gap:5px;min-height:210px;padding:10px 12px 12px;margin:0 0 20px;overflow:hidden;background:linear-gradient(105deg,rgba(18,106,133,.33),rgba(4,20,34,.88) 48%,rgba(118,86,24,.3));border:1px solid rgba(85,226,226,.25);border-radius:16px;}
+        .rm-result-fighter{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0;height:190px;overflow:hidden;border-bottom:2px solid #55e8e5;background:linear-gradient(180deg,transparent,rgba(2,13,25,.45));}
+        .rm-result-fighter--rival{border-bottom-color:#ffda62;}
+        .rm-result-avatar{position:relative;width:148px;height:158px;flex:none;overflow:hidden;filter:drop-shadow(0 0 18px rgba(42,223,226,.3));}
+        .rm-result-fighter--rival .rm-result-avatar{filter:drop-shadow(0 0 14px rgba(255,210,84,.2));}
+        .rm-result-avatar>.lp-owned-portrait{position:absolute;inset:0;width:100%;height:100%;}
+        .rm-result-avatar>.lupi-story-pose{position:absolute;inset:0;width:100%;height:100%;}
+        .rm-result-avatar>.lupi-story-pose>i{height:100%;}
+        .rm-result-fighter>span{position:relative;z-index:2;display:block;max-width:100%;padding:4px 2px 2px;color:#d9faff;font-size:8px;line-height:1.15;font-weight:1000;letter-spacing:.08em;text-align:center;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}
+        .rm-result-fighter--rival>span{color:#ffe8a0;}
+        .rm-result-scoreline{display:grid;grid-template-columns:auto 14px auto;align-items:center;justify-content:center;column-gap:3px;padding-bottom:34px;font:1000 italic 42px/.9 'Barlow Condensed',Impact,sans-serif;color:#ffe16b;text-shadow:2px 3px #00111d;}
+        .rm-result-scoreline i{font-style:normal;color:#8daeb8;font-size:23px;text-align:center;}
+        .rm-result-scoreline small{grid-column:1/-1;margin-top:7px;color:#9bcbd2;font:900 7px/1 Barlow,system-ui,sans-serif;letter-spacing:.12em;text-align:center;text-shadow:none;white-space:nowrap;}
         @media(max-width:480px){.result-modal{padding:22px 17px 18px;max-width:390px;border-radius:20px;}.rm-topline{font-size:9px;letter-spacing:1.6px;}.rm-trophy{font-size:40px;}.rm-score{padding:12px 8px;margin-bottom:15px;}.rm-reward-box{padding:11px 6px;}.rm-reward-val{font-size:23px;}.rm-rewards{gap:7px;}.rm-title{margin-bottom:14px;}.rm-skill-upgrade{padding:11px 12px;}.rm-btn{min-height:48px;}}
+        @media(max-width:480px){.result-modal .rm-result-score{grid-template-columns:minmax(0,1fr) 68px minmax(0,1fr);min-height:162px;padding:6px 7px;margin-bottom:15px;gap:2px}.rm-result-fighter{height:148px}.rm-result-avatar{width:108px;height:122px;filter:drop-shadow(0 0 14px rgba(42,223,226,.28))}.rm-result-fighter>span{font-size:7px}.rm-result-scoreline{grid-template-columns:auto 10px auto;padding-bottom:27px;font-size:31px}.rm-result-scoreline i{font-size:18px}.rm-result-scoreline small{font-size:6px;letter-spacing:.08em}}
         @media(prefers-reduced-motion:reduce){.rm-trophy,.rm-reward-box,.result-modal{animation:none!important;}}
       `}</style>
     </div>

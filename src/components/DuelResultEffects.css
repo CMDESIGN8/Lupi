@@ -13,15 +13,15 @@
 .duel-result-fx--loss .duel-result-fx__particle{height:2px;width:3px;animation-name:result-embers;background:#d58c8a}
 .duel-result-fx--loss .duel-result-fx__ring--second,.duel-result-fx--loss .duel-result-fx__streaks{display:none}
 .duel-result-fx--loss .duel-result-fx__ring{animation-name:result-settle}
-.trivia-arena--ended[data-outcome=win]>.trivia-result-banner h3{color:#ffe379;animation:result-title-win .8s .12s cubic-bezier(.2,.8,.25,1.25) both;text-shadow:0 0 32px #ffd55465}
-.trivia-arena--ended[data-outcome=draw]>.trivia-result-banner h3{color:#7eeef4;animation:result-title-draw .9s .12s ease-out both;text-shadow:0 0 25px #41dfed50}
-.trivia-arena--ended[data-outcome=loss]>.trivia-result-banner h3{color:#e8c3bd;animation:result-title-loss .9s ease-out both;text-shadow:0 0 20px #b7696125}
-.trivia-arena--ended[data-outcome]>.trivia-score{animation:result-score-in .65s .18s ease-out both}
+.trivia-arena--ended[data-outcome=win] .trivia-final-duel>.trivia-result-banner h3{color:#ffe379;animation:result-title-win .8s .12s cubic-bezier(.2,.8,.25,1.25) both;text-shadow:0 0 32px #ffd55465}
+.trivia-arena--ended[data-outcome=draw] .trivia-final-duel>.trivia-result-banner h3{color:#7eeef4;animation:result-title-draw .9s .12s ease-out both;text-shadow:0 0 25px #41dfed50}
+.trivia-arena--ended[data-outcome=loss] .trivia-final-duel>.trivia-result-banner h3{color:#e8c3bd;animation:result-title-loss .9s ease-out both;text-shadow:0 0 20px #b7696125}
+.trivia-arena--ended[data-outcome] .trivia-final-duel>.trivia-score{animation:result-score-in .65s .18s ease-out both}
 .trivia-arena--ended[data-outcome]>.drc{animation:result-score-in .65s .36s ease-out both}
 .trivia-arena--ended[data-outcome]>.trivia-rematch{animation:result-score-in .5s .48s ease-out both}
-.trivia-arena--ended[data-outcome=win] .trivia-score .is-winner .trivia-portrait{border-color:#ffe379;box-shadow:0 0 26px #ffd55445}
-.trivia-arena--ended[data-outcome=draw]>.trivia-score{border-color:#50e4ed70;box-shadow:0 0 24px #50e4ed12}
-.trivia-arena--ended[data-outcome=loss]>.trivia-score{border-color:#d58c8a45}
+.trivia-arena--ended[data-outcome=win] .trivia-final-duel .trivia-score .is-winner .trivia-full-player{filter:drop-shadow(0 0 15px #ffd55488)}
+.trivia-arena--ended[data-outcome=draw] .trivia-final-duel>.trivia-score{border-color:#50e4ed70;box-shadow:0 0 24px #50e4ed12}
+.trivia-arena--ended[data-outcome=loss] .trivia-final-duel>.trivia-score{border-color:#d58c8a45}
 .trivia-arena--ended[data-outcome] .trivia-confetti{display:none}
 @keyframes result-aura{0%{opacity:0;transform:scale(.8)}35%{opacity:1}100%{opacity:.65;transform:scale(1)}}
 @keyframes result-ring{0%{opacity:.8;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(3)}}
@@ -35,7 +35,7 @@
 @keyframes result-title-draw{0%{opacity:0;letter-spacing:.15em;transform:translateY(8px)}100%{opacity:1;letter-spacing:normal;transform:none}}
 @keyframes result-title-loss{0%{opacity:0;transform:translateY(-10px)}100%{opacity:1;transform:none}}
 @keyframes result-score-in{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){.duel-result-fx__ring,.duel-result-fx__streaks,.duel-result-fx__particle{display:none}.duel-result-fx__aura,.trivia-arena--ended[data-outcome]>.trivia-result-banner h3,.trivia-arena--ended[data-outcome]>.trivia-score,.trivia-arena--ended[data-outcome]>.drc,.trivia-arena--ended[data-outcome]>.trivia-rematch{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.duel-result-fx__ring,.duel-result-fx__streaks,.duel-result-fx__particle{display:none}.duel-result-fx__aura,.trivia-arena--ended[data-outcome] .trivia-final-duel>.trivia-result-banner h3,.trivia-arena--ended[data-outcome] .trivia-final-duel>.trivia-score,.trivia-arena--ended[data-outcome]>.drc,.trivia-arena--ended[data-outcome]>.trivia-rematch{animation:none!important}}
 .rps-arena.is-complete[data-outcome=win] .rps-live h3{color:#ffe379;animation:result-title-win .8s ease-out both}
 .rps-arena.is-complete[data-outcome=draw] .rps-live h3{color:#7eeef4;animation:result-title-draw .9s ease-out both}
 .rps-arena.is-complete[data-outcome=loss] .rps-live h3{color:#e8c3bd;animation:result-title-loss .9s ease-out both}

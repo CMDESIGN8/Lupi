@@ -1,5 +1,5 @@
 import { AvatarFace } from "./AvatarFace";
-import type { AvatarAppearance } from "../lib/avatarAppearance";
+import type { AvatarAppearance, AvatarMood } from "../lib/avatarAppearance";
 import { useMemo } from "react";
 import { getItemVisual, type AvatarVisualSlot } from "../lib/avatarVisualRig";
 import type { InventoryItem } from "../hooks/useAuraInventory";
@@ -10,6 +10,7 @@ type Avatar2DProps = {
   level?: number;
   compact?: boolean;
   appearance?: AvatarAppearance;
+  mood?: AvatarMood | "miss";
 };
 
 type AvatarLayer = {
@@ -73,6 +74,7 @@ export function Avatar2D({
   level = 1,
   compact = false,
   appearance,
+  mood,
 }: Avatar2DProps) {
   const equippedItems = useMemo(
     () => items.filter((item) => item.equipped),
@@ -166,7 +168,7 @@ export function Avatar2D({
         />
 
         {appearance ? (
-          <div className="avatar2d__custom-head"><AvatarFace appearance={appearance} className="lw-face--game" /></div>
+          <div className="avatar2d__custom-head"><AvatarFace appearance={mood === "miss" ? { ...appearance, expression: "sad" } : appearance} mood={mood && mood !== "miss" ? mood : undefined} className="lw-face--game" /></div>
         ) : (
           <img src="/images/head.png" className="avatar2d__base-head" alt="Cabeza del personaje" draggable={false} />
         )}

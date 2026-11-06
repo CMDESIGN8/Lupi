@@ -137,3 +137,49 @@
  .mt-practice-court>.mt-fig--rival.fig--anime{left:68%}
  .mt-practice-court>.mt-ball--defense{left:61%;top:83%}
 }
+
+/* Desktop briefing: Lupi coaches beside a clear court-and-controls column. */
+@media(min-width:901px){
+ .gh-root--playing .gh-shell:has(.match-tutorial){width:100%!important;max-width:1320px!important;padding-inline:28px!important}
+ .gh-root--playing .gh-match:has(.match-tutorial){display:block!important;width:100%!important;max-width:none!important;overflow:visible!important}
+ .gh-root--playing .gh-match:has(.match-tutorial)>.gh-panel{width:100%!important;max-width:none!important;min-width:0!important;padding:0!important}
+ .gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial.mt-cinematic:not(:has(.mt-lineup)){
+  width:min(1180px,calc(100vw - 80px))!important;max-width:1180px!important;
+  height:min(660px,calc(100dvh - 126px))!important;max-height:calc(100dvh - 126px)!important;min-height:0!important;
+  margin:12px auto 18px!important;padding:20px 24px 18px!important;
+  display:flex!important;flex-direction:column!important;gap:0!important;overflow:hidden!important;
+ }
+ .gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial.mt-cinematic:not(:has(.mt-lineup))>.mt-dots{margin:10px 0 14px!important;flex:none}
+ .gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial.mt-cinematic:not(:has(.mt-lineup))>.mt-content{
+  display:grid!important;grid-template-columns:minmax(300px,.92fr) minmax(0,1.08fr)!important;
+  grid-template-rows:minmax(0,1fr) auto auto!important;align-items:stretch!important;gap:10px 16px!important;
+  flex:1 1 auto!important;min-height:0!important;height:auto!important;
+ }
+ .gh-root--playing .gh-match:has(.match-tutorial) .mt-content>.mt-integrated-panel{
+  grid-column:1!important;grid-row:1/4!important;align-self:stretch!important;
+  width:100%!important;height:100%!important;min-height:0!important;margin:0!important;
+ }
+ .gh-root--playing .gh-match:has(.match-tutorial) .mt-integrated-panel .mt-manga-lupi{
+  top:118px!important;bottom:44px!important;height:auto!important;max-height:calc(100% - 162px)!important;
+  left:7%!important;width:86%!important;
+ }
+ .gh-root--playing .gh-match:has(.match-tutorial) .mt-content>.mt-practice-court{
+  grid-column:2!important;grid-row:1!important;align-self:stretch!important;
+  width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+  aspect-ratio:auto!important;margin:0!important;border-radius:14px!important;
+ }
+ .gh-root--playing .gh-match:has(.match-tutorial) .mt-content>.mt-practice-choices{
+  grid-column:2!important;grid-row:2!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;margin:0!important;align-self:stretch!important;
+ }
+ .gh-root--playing .gh-match:has(.match-tutorial) .mt-practice-choices button{min-height:64px!important;padding:10px 13px!important}
+ .gh-root--playing .gh-match:has(.match-tutorial) .mt-practice-choices strong{font-size:20px}
+ .gh-root--playing .gh-match:has(.match-tutorial) .mt-content>.mt-practice-feedback{
+  grid-column:2!important;grid-row:3!important;align-self:stretch!important;min-height:60px!important;
+  margin:0!important;padding:10px 13px!important;display:flex;flex-direction:column;justify-content:center;
+ }
+ .gh-root--playing .gh-match:has(.match-tutorial) .mt-practice-feedback p{margin:4px 0 0!important;font-size:12px!important;line-height:1.4!important}
+ .gh-root--playing .gh-match:has(.match-tutorial) .match-tutorial.mt-cinematic:not(:has(.mt-lineup))>footer{
+  flex:none!important;margin:12px 0 0!important;padding:0!important;background:none!important;
+ }
+}

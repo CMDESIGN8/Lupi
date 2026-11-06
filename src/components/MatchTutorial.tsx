@@ -35,12 +35,12 @@ export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Prop
     setTransition('out');
     timer.current = setTimeout(() => { setStep(next); setPractice(null); setSelected(null); setStartError(null); setTransition('idle'); }, reducedMotion() ? 0 : 180);
   };
-  const start = () => {
+  const start = (skipTutorial = false) => {
     if (startLock.current || transition !== 'idle' || cards.length < 5) return;
     startLock.current = true;
     setStartError(null);
-    setTransition('kickoff');
-    timer.current = setTimeout(async()=>{try{await onStart();}catch{setStartError('No pudimos iniciar el partido. Probá de nuevo.');}finally{startLock.current=false;setTransition('idle');}}, reducedMotion() ? 0 : 850);
+    setTransition(skipTutorial ? 'idle' : 'kickoff');
+    timer.current = setTimeout(async()=>{try{await onStart();}catch{setStartError('No pudimos iniciar el partido. Probá de nuevo.');}finally{startLock.current=false;setTransition('idle');}}, skipTutorial || reducedMotion() ? 0 : 850);
   };
   const titles = ['¡Te queda una!', '¡Ahora defendé!', '¡Tu equipo está listo!'];
   const detail = selected === null || !cards[selected] ? null : getCardData(cards[selected]);
@@ -89,6 +89,6 @@ export function MatchTutorial({ userId, cards, opponent, onTeam, onStart }: Prop
       </div>}
     </div>
     {startError && <p role="alert" className="mt-start-error">{startError}</p>}
-    <footer>{step > 0 && <button type="button" className="mt-back" disabled={transition !== 'idle' || !!cinema} onClick={() => changeStep(step - 1)}>Atrás</button>}<button type="button" ref={nextButton} className="mt-next" disabled={transition !== 'idle' || !!cinema || (step === 2 && cards.length < 5) || (step < 2 && !practice)} onClick={() => { if (step < 2) changeStep(step + 1); else start(); }}>{step === 2 ? 'Jugar partido →' : practice ? (step===0?'Ahora defendé →':'Presentá tu equipo →') : 'Elegí una jugada arriba'}</button></footer>
+    <footer>{step > 0 && <button type="button" className="mt-back" disabled={transition !== 'idle' || !!cinema} onClick={() => changeStep(step - 1)}>Atrás</button>}{cards.length >= 5 && <button type="button" className="mt-skip" disabled={transition !== 'idle' || !!cinema} onClick={() => start(true)}>SALTAR TUTORIAL</button>}<button type="button" ref={nextButton} className="mt-next" disabled={transition !== 'idle' || !!cinema || (step === 2 && cards.length < 5) || (step < 2 && !practice)} onClick={() => { if (step < 2) changeStep(step + 1); else start(); }}>{step === 2 ? 'Jugar partido →' : practice ? (step===0?'Ahora defendé →':'Presentá tu equipo →') : 'Elegí una jugada arriba'}</button></footer>
   </section>;
 }

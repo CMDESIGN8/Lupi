@@ -23,6 +23,7 @@ import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
     import { useLobbyPresence, type LobbyLook, type LobbyPlayer } from "../hooks/useLobbyPresence";
     import { LobbyChat } from "../components/LobbyChat";
 import { ChallengeGameSelector } from "../components/ChallengeGameSelector";
+import { DuelGameHeader } from "../components/DuelGameHeader";
 import { FutsalPvp } from "../components/FutsalPvp";
 import { TriviaDuel } from "../components/TriviaDuel";
 import { RockPaperScissors } from "../components/RpsAnimeDuel";
@@ -408,7 +409,22 @@ import { useAchievements } from "../hooks/useAchievements";
       const story=useFutsalStory(user.id);
       const [storyOpen,setStoryOpen]=useState(false);
       const enterStory=()=>{if(story.busy||story.loading||quick.game||incoming||outgoing||activeTruco||activeRps||activeTrivia||activeFutsal||versusChallenge)return;void story.run('begin').then(()=>{setStoryOpen(true);setShowExploreWorld(false);setShowPlayersSheet(false);}).catch(()=>{});};
-      const [view, setView] = useState<"lobby" | "match">(()=>new URLSearchParams(window.location.search).get("start")==="match"?"match":"lobby");
+      const startMatchRoute = useRef(new URLSearchParams(window.location.search).get("start") === "match");
+      const [view, setView] = useState<"lobby" | "match">("lobby");
+      // A direct mission link used to bypass the story chapter and mount a fresh CardBattle.
+      // Resolve the saved story first so "Continuar partido" returns to its own session.
+      useEffect(() => {
+        if (!startMatchRoute.current || story.loading || story.busy || story.error) return;
+        startMatchRoute.current = false;
+        setGameTab("play");
+        if (story.progress?.status === "completed") {
+          setView("match");
+          return;
+        }
+        setView("lobby");
+        if (story.progress) setStoryOpen(true);
+        else enterStory();
+      }, [story.loading, story.busy, story.error, story.progress?.status]);
       const [showCommunities, setShowCommunities] = useState(false);
       const [lobbyCommunity, setLobbyCommunity] = useState<string | null>(null);
       const refreshLobbyCommunity = async () => {
@@ -1623,11 +1639,7 @@ onChallengeGame={(player, game) => {
               )}
               {!debutWaiting && gameTab === "play" && view === "match" && (
                 <section className="gh-match">
-                  <div className="gh-match__bar">
-                    <button className="gh-ghost" onClick={() => setView("lobby")}><span aria-hidden>‹</span> Volver al lobby</button>
-                    <span style={{fontSize:12,opacity:.8}}>⚽ Partido rápido · Tomá decisiones para ganar XP</span>
-
-                  </div>
+                  <div className="gh-match__bar"><DuelGameHeader compact game="futsal" onBack={() => setView("lobby")} mode="VS BOT" subtitle="LUPI WORLD · PARTIDO RÁPIDO" title="FUTSAL"/></div>
 
                   <div className="gh-panel">
                     {(

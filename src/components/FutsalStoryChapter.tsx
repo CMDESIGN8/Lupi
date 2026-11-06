@@ -36,7 +36,9 @@ export function FutsalStoryChapter({story,userId,playerName,deck,cards,onClose,o
   <div className="lp-story-heading"><small>LUPI WORLD · HISTORIA ORIGINAL</small><h1 id="lp-story-title">La primera oportunidad</h1><p>Leé la escena. Elegí la respuesta. Entrá a la cancha.</p></div>
   {story.error&&<div className="lp-story-error" role="alert"><strong>No pudimos sincronizar tu historia</strong><p>{story.error}</p><button type="button" disabled={story.busy} onClick={()=>act('get')}>Reintentar sincronización</button></div>}
   {replaying?<StoryMotionReplay userId={userId} playerName={playerName} onDone={()=>setReplaying(false)}/>:activeMatch?<div className="lp-story-match">
-    <CardBattle userCards={cards} userDeck={deck} userId={userId} isCampaignMode autoStart={false}
+    <CardBattle userCards={cards} userDeck={deck} userId={userId} isCampaignMode autoStart={story.progress?.status==='match'}
+      resumeSessionId={story.progress?.status==='match' ? story.progress.session_id : null}
+      resumeRequired={story.progress?.status==='match'}
       forcedOpponent={{name:'Bot Novato',overall_rating:55,category:'8va',level:1,avatar:'🥉',color:'#7a7a9a',xpBase:10,reqWins:0}}
       onBattleComplete={onBattleComplete} onMatchRecorded={onMatchRecorded}
       onVerifiedMatchStarted={async id=>{await story.run('bind',undefined,id);}}

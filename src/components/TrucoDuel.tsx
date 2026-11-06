@@ -16,6 +16,8 @@ import {LupiFace} from "./LupiFace";
 import {TrucoMatchResult} from "./TrucoMatchResult";
 import { AvatarFace } from "./AvatarFace";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
+import { OwnedCardPortrait } from './OwnedCardPortrait';
+import { LupiStoryPose } from './LupiStoryPose';
 
 type Props = { challenge: Challenge; meId: string; onExit: () => void; onFinished?: (finished: boolean) => void; onRematch?: () => void };
 
@@ -170,7 +172,7 @@ export function TrucoDuel({ challenge, meId, onExit, onFinished, onRematch }: Pr
       {intro && <div className="tr-rivalry" role="dialog" aria-modal="true" aria-label="Previa del duelo de Truco">
         <div className="tr-rivalry__rays" aria-hidden="true"/>
         <div className="tr-rivalry__closeups" aria-hidden="true"><div><AvatarFace mood={ready ? "focus" : "presentation"} appearance={appearance}/></div><div><LupiFace pose="compete"/></div></div>
-        <div className="tr-rivalry__duel"><div className="tr-rivalry__panel tr-rivalry__panel--me"><span>EL DESAFÍO ES TUYO</span><div className="tr-rivalry__body"><AvatarFace mood="presentation" appearance={appearance}/></div><strong>{myName}</strong></div><div className="tr-rivalry__panel tr-rivalry__panel--rival"><span>LA MESA TIENE RIVAL</span><div className="tr-rivalry__body"><LupiFace pose="compete"/></div><strong>{rivalName}</strong></div></div>
+        <div className="tr-rivalry__duel"><div className="tr-rivalry__panel tr-rivalry__panel--me"><span>EL DESAFÍO ES TUYO</span><div className="tr-rivalry__body"><OwnedCardPortrait userId={meId} appearanceOverride={appearance}/></div><strong>{myName}</strong></div><div className="tr-rivalry__panel tr-rivalry__panel--rival"><span>LA MESA TIENE RIVAL</span><div className="tr-rivalry__body"><LupiStoryPose pose="determined" label="Profe Lupi"/></div><strong>{rivalName}</strong></div></div>
         <div className="tr-rivalry__impact"><b>VS</b><strong>¡QUE HABLEN LAS CARTAS!</strong></div>
         <button type="button" className="tr-rivalry__skip" onClick={()=>setIntro(false)}>SALTAR PREVIA →</button>
       </div>}

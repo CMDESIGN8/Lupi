@@ -13,9 +13,27 @@
 @media(max-height:720px){.rps-title{margin:10px 0}.rps-clash{min-height:150px}.rps-clash__side>.rps-hand{width:108px}.rps-mystery{height:120px}.rps-score{margin:8px auto}.rps-choices .rps-hand{width:65px}.rps-rule{margin-top:10px}}
 @media(prefers-reduced-motion:reduce){.rps-arena *{animation:none!important;transition:none!important}}
 /* A short reveal beat runs only after the server has resolved both choices. */
-.rps-clash.is-chanting .rps-hand{animation:rps-hand-shake .32s ease-in-out 3}.rps-clash.is-chanting .rps-clash__center{position:relative;z-index:3}.rps-clash.is-chanting .rps-clash__center>b{font-size:clamp(24px,5vw,47px);white-space:nowrap;animation:rps-burst .25s both}.rps-clash.is-chanting .rps-clash__center>span{font-size:7px;margin-top:10px}.rps-arena.is-chanting .rps-scoreboard>b{visibility:hidden}.rps-arena.is-chanting .rps-clash__side>small{visibility:hidden}.rps-score>.is-winner .rps-player-face{border-color:#ffdd65;filter:drop-shadow(0 0 12px #ffdd6570)}.rps-score>.is-winner strong{color:#ffdf70}.rps-score>.is-winner:after{content:'✦ GANADOR';font-size:8px;letter-spacing:.13em;color:#ffdf70}.rps-winner-name{font:800 12px Barlow,system-ui;color:#b8e5ed}.rps-arena.is-complete[data-outcome=win] .rps-live h3{font-size:40px;text-shadow:0 0 35px #ffdd6544;animation:rps-burst .5s both}.rps-arena.is-complete .rps-finish .duel-rematch{min-height:52px;box-shadow:0 4px #89681d,0 0 25px #ffdb5122}
+.rps-clash.is-chanting .rps-hand{animation:rps-hand-shake .32s ease-in-out 3}.rps-clash.is-chanting .rps-clash__center{position:relative;z-index:3}.rps-clash.is-chanting .rps-clash__center>b{font-size:clamp(24px,5vw,47px);white-space:nowrap;animation:rps-burst .25s both}.rps-clash.is-chanting .rps-clash__center>span{font-size:7px;margin-top:10px}.rps-arena.is-chanting .rps-scoreboard>b{visibility:hidden}.rps-arena.is-chanting .rps-clash__side>small{visibility:hidden}.rps-score>.is-winner .rps-player-face{border-color:#ffdd65;filter:drop-shadow(0 0 12px #ffdd6570)}.rps-score>.is-winner strong{color:#ffdf70}
+
+
+.rps-score>.is-winner:after{content:'✦ GANADOR';font-size:8px;letter-spacing:.13em;color:#ffdf70}
+.rps-winner-name{font:800 12px Barlow,system-ui;color:#b8e5ed}
+.rps-arena.is-complete[data-outcome=win] 
+.rps-live h3{font-size:40px;text-shadow:0 0 35px #ffdd6544;animation:rps-burst .5s both}
+.rps-arena.is-complete 
+.rps-finish .duel-rematch{min-height:52px;box-shadow:0 4px #89681d,0 0 25px #ffdb5122}
+
+
 @keyframes rps-hand-shake{0%,100%{translate:0 0}50%{translate:0 -13px}}
 @media(prefers-reduced-motion:reduce){.rps-clash.is-chanting .rps-hand,.rps-clash.is-chanting .rps-clash__center>b{animation:none}}
+.rps-anime-dialogue{max-width:440px;text-align:center}
+.rps-arena.is-revealing .rps-score>div:first-child .rps-anime-player{animation:rps-reaction-own .56s cubic-bezier(.2,1.4,.3,1) both;filter:drop-shadow(0 0 13px #ffe16b77)}
+.rps-arena.is-revealing .rps-score>div:last-child .rps-anime-player{animation:rps-reaction-rival .5s ease both}
+.rps-arena.is-complete[data-outcome=win] .rps-score>div:first-child .rps-anime-player{filter:drop-shadow(0 0 16px #ffe16bcc)}
+.rps-arena.is-complete[data-outcome=loss] .rps-score>div:last-child .rps-anime-player{filter:drop-shadow(0 0 16px #ff6f6f99)}
+@keyframes rps-reaction-own{0%{transform:translateY(8px) scale(.9)}48%{transform:translateY(-8px) scale(1.14) rotate(-4deg)}75%{transform:translateY(2px) scale(.98) rotate(2deg)}100%{transform:none}}
+@keyframes rps-reaction-rival{0%,100%{transform:none}30%{transform:translateX(4px) rotate(4deg)}60%{transform:translateX(-3px) rotate(-2deg)}}
+@media(prefers-reduced-motion:reduce){.rps-arena.is-revealing .rps-anime-player{animation:none}}
 /* Desktop: a two-sided arena keeps the final score, prize and rematch in one view. */
 @media(min-width:900px) and (min-height:540px){
  .rps-cinema-screen>.rps-arena{height:100dvh;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,370px);grid-template-rows:36px 65px 90px minmax(110px,1fr) auto 24px;gap:5px 24px;padding:12px 28px;align-content:start}

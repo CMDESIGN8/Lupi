@@ -3,6 +3,8 @@ import { AnimeEffects, type AnimeEffectsHandle } from "../AnimeEffects";
 import { MatchCourt } from "./MatchCourt";
 import { eventChoiceLabel } from "./futsalTactics";
 import { pvpPresentation } from "./pvpPresentation";
+import { MatchMoment, momentsEnabled } from "../MatchMoment";
+import { outcomeFromPvpEvent } from "./momentOutcomes";
 import type { FutsalState } from "../../hooks/useFutsalPvp";
 import "./PvpSimulatorCourt.css";
 type Props={state:FutsalState;meId:string;mine:string;rival:string;now:number;receivedAt:number;isHost:boolean;overlay?:ReactNode};
@@ -18,6 +20,8 @@ export function PvpSimulatorCourt({state,meId,mine,rival,now,receivedAt,isHost,o
   const ended=!["waiting","playing"].includes(state.status) && revealAge===null;
   const a=isHost?state.hostTeam:state.guestTeam;
   const b=isHost?state.guestTeam:state.hostTeam;
+  const momentScene=event && revealAge!==null ? outcomeFromPvpEvent(event,event.attackerId===meId) : null;
+  const showMoment=!!momentScene && momentsEnabled();
   const presentation=pvpPresentation(attackingHome,event,event?.attackerId===meId,revealAge,Math.max(0,serverNow-next),state.support,state);
   useEffect(()=>{
     if(!event || seen.current===event.version) return;
@@ -39,7 +43,8 @@ export function PvpSimulatorCourt({state,meId,mine,rival,now,receivedAt,isHost,o
       homePositions={ended&&revealAge===null?undefined:presentation.home} awayPositions={ended&&revealAge===null?undefined:presentation.away}
       homeHighlight={ended?null:presentation.homeHighlight} awayHighlight={ended?null:presentation.awayHighlight}
       ball={ended&&revealAge===null?null:presentation.ball} ballTeam={presentation.ballTeam}>
-      {revealAge!==null && event && <div key={event.version} className={`pvp-sim-flash ${event.goal?"is-goal":""}`} role="status"><b>{event.goal?"¡GOL!":event.defended?event.stage==="build"?"¡RECUPERACIÓN!":"¡JUGADA FRENADA!":event.keepAttack?event.stage==="build"?"¡CAMINO AL ARCO!":"¡PASE COMPLETADO!":"SIN GOL"}</b><small>{eventChoiceLabel(event,true)} · {eventChoiceLabel(event,false)}</small></div>}
+      {revealAge!==null && event && !showMoment && <div key={event.version} className={`pvp-sim-flash ${event.goal?"is-goal":""}`} role="status"><b>{event.goal?"¡GOL!":event.defended?event.stage==="build"?"¡RECUPERACIÓN!":"¡JUGADA FRENADA!":event.keepAttack?event.stage==="build"?"¡CAMINO AL ARCO!":"¡PASE COMPLETADO!":"SIN GOL"}</b><small>{eventChoiceLabel(event,true)} · {eventChoiceLabel(event,false)}</small></div>}
+      {showMoment && event && momentScene && <MatchMoment key={event.version} outcome={momentScene} caption={event.narrative} autoClose={false} playMs={1400} resultOnly={(revealAge ?? 0)>1600}/>}
       <div className="pvp-court-atmosphere" aria-hidden="true"><i/><i/><i/><i/><i/><i/></div>
       {overlay}
       {!ended && <span className="pvp-sim-live"><i/> {revealAge!==null?"REPETICIÓN DE LA JUGADA":overlay?"MOMENTO CLAVE":"EN JUEGO"}</span>}

@@ -1,0 +1,92 @@
+.duel-anime-entrance{position:fixed;inset:0;z-index:2147483000;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:clamp(16px,4vw,48px);box-sizing:border-box;color:#eaffff;background:radial-gradient(ellipse at 50% 48%,#075269 0,#031b2b 55%,#020913 100%);animation:dae-in .35s ease-out both;font-family:Barlow,system-ui,sans-serif}
+.duel-anime-entrance:before{content:"";position:absolute;inset:0;z-index:-1;background:repeating-conic-gradient(from 0deg at 50% 48%,transparent 0 12deg,#5ce9ff10 12.4deg 12.8deg,transparent 13deg 24deg);animation:dae-rays 14s linear infinite}
+.duel-anime-entrance__rays{position:absolute;inset:0;background:radial-gradient(ellipse at 25% 50%,#06d9ff24,transparent 42%),radial-gradient(ellipse at 75% 50%,#ffd84c1c,transparent 42%);pointer-events:none}
+.duel-anime-entrance__kicker{position:relative;z-index:1;margin-bottom:clamp(18px,4vh,38px);font-size:11px;font-weight:900;letter-spacing:.2em;color:#8df6f0;text-align:center}.duel-anime-entrance__kicker span{display:block;margin-top:6px;color:#ffdc67;font-size:9px}
+.duel-anime-entrance__stage{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,.42fr) minmax(0,1fr);align-items:center;width:min(1120px,100%);min-height:min(62vh,610px);gap:clamp(8px,2vw,24px)}
+.duel-anime-entrance__fighter{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;padding:clamp(14px,3vw,30px) 12px 18px;box-sizing:border-box;border:1px solid #5fe9f277;border-top:3px solid #61eaf0;background:linear-gradient(160deg,#073a50d9,#061726c9 75%);clip-path:polygon(0 3%,100% 0,100% 97%,0 100%);animation:dae-left .65s cubic-bezier(.2,.8,.2,1) both;box-shadow:inset 0 0 50px #22cde918}
+.duel-anime-entrance__fighter--right{border-color:#ffe07888;border-top-color:#ffdc68;background:linear-gradient(205deg,#604519aa,#071a2ad9 75%);clip-path:polygon(0 0,100% 3%,100% 100%,0 97%);animation-name:dae-right}
+.duel-anime-entrance__fighter>small{position:absolute;top:14px;font-weight:900;font-size:clamp(8px,1vw,11px);letter-spacing:.14em;color:#9df9f1;text-align:center}.duel-anime-entrance__fighter--right>small{color:#ffe6a1}
+.duel-anime-entrance__body{position:relative;display:flex;align-items:flex-end;justify-content:center;width:100%;height:min(43vh,420px);min-height:190px;overflow:hidden;filter:drop-shadow(0 0 20px #35d9ef55)}
+.duel-anime-entrance__body .arena-avatar{width:min(100%,310px);height:100%;position:relative}.duel-anime-entrance__body .arena-avatar__rig{position:absolute;bottom:0;left:50%;transform:translateX(-50%) scale(.72);transform-origin:center bottom;width:390px;height:520px}.duel-anime-entrance__body .avatar2d__label{display:none}
+.duel-anime-entrance__body .lp-owned-portrait{position:absolute;inset:0;width:100%;height:100%;--own-card-scale:.84}.duel-anime-entrance__body .lp-owned-portrait__rig{bottom:0;transform:translateX(-50%) scale(var(--own-card-scale,.24));transform-origin:center bottom}
+.duel-anime-entrance__body .lupi-story-pose{width:min(100%,300px);height:100%;background-size:300% 200%;background-position:center;background-repeat:no-repeat;transform:scale(1.2);transform-origin:center bottom}
+.duel-anime-entrance__fighter>strong{position:relative;z-index:1;max-width:100%;margin-top:8px;font:900 italic clamp(20px,3vw,38px)/1.1 'Barlow Condensed',sans-serif;text-align:center;text-shadow:2px 3px #00101d;overflow-wrap:anywhere}
+.duel-anime-entrance__speech{position:absolute;top:10%;left:8%;z-index:4;display:flex;flex-direction:column;gap:5px;max-width:78%;padding:11px 14px;border:2px solid #dfffff;border-radius:15px 15px 15px 3px;background:#eafff2;color:#092431;box-shadow:0 8px 24px #0007;animation:dae-speech .35s .7s both}
+.duel-anime-entrance__fighter--right .duel-anime-entrance__speech{top:10%;left:auto;right:8%;border-color:#ffe58a;border-radius:15px 15px 3px 15px;background:#fff4cb;animation-delay:1.1s}
+.duel-anime-entrance__speech b{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#078ca0}.duel-anime-entrance__fighter--right .duel-anime-entrance__speech b{color:#a06e00}.duel-anime-entrance__speech span{font-weight:800;font-size:clamp(11px,1.3vw,16px);line-height:1.2}
+.duel-anime-entrance__vs{position:relative;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;pointer-events:none}.duel-anime-entrance__vs b{font:1000 italic clamp(64px,10vw,140px)/.8 'Barlow Condensed',sans-serif;color:#ffdf58;text-shadow:5px 7px #00101c,0 0 30px #ffe05088;animation:dae-impact .65s .55s both}.duel-anime-entrance__vs strong{position:absolute;top:calc(100% + clamp(16px,3vh,30px));width:max-content;max-width:40vw;color:#fff1b5;font:900 italic clamp(13px,2.3vw,27px)/1.1 'Barlow Condensed',sans-serif;text-shadow:2px 3px #00101c;animation:dae-impact .45s 1s both}
+.duel-anime-entrance__caption{position:relative;margin-top:clamp(10px,2vh,20px);color:#94cfd5;font-size:9px;letter-spacing:.18em;font-weight:900;text-align:center}.duel-anime-entrance>button{position:relative;margin-top:16px;min-height:46px;padding:0 25px;border:1px solid #ffdf6a;border-radius:7px;background:linear-gradient(110deg,#ffe780,#efc34f);color:#061927;font-weight:1000;letter-spacing:.06em;cursor:pointer;box-shadow:0 0 28px #ffd85545;animation:dae-button .4s 1.3s both}
+@keyframes dae-in{from{opacity:0}to{opacity:1}}@keyframes dae-rays{to{transform:rotate(360deg)}}@keyframes dae-left{from{opacity:0;transform:translateX(-90px) skewY(4deg)}to{opacity:1;transform:none}}@keyframes dae-right{from{opacity:0;transform:translateX(90px) skewY(-4deg)}to{opacity:1;transform:none}}@keyframes dae-impact{from{opacity:0;scale:.35;rotate:-12deg}to{opacity:1;scale:1;rotate:0}}@keyframes dae-speech{from{opacity:0;translate:0 16px;scale:.85}to{opacity:1;translate:0 0;scale:1}}@keyframes dae-button{from{opacity:0;translate:0 10px}to{opacity:1;translate:0 0}}
+@media(max-width:650px){.duel-anime-entrance{padding:20px 12px calc(18px + env(safe-area-inset-bottom))}.duel-anime-entrance__kicker{margin-bottom:10px}.duel-anime-entrance__stage{grid-template-columns:minmax(0,1fr) 46px minmax(0,1fr);gap:4px;min-height:58vh}.duel-anime-entrance__fighter{padding:12px 5px 14px}.duel-anime-entrance__fighter>small{top:9px;font-size:7px}.duel-anime-entrance__body{height:44vh;min-height:230px}.duel-anime-entrance__body .arena-avatar__rig{transform:translateX(-50%) scale(.56)}.duel-anime-entrance__body .lp-owned-portrait__rig{transform:translateX(-50%) scale(var(--own-card-scale,.24));transform-origin:center bottom}.duel-anime-entrance__body .lupi-story-pose{transform:scale(1.04)}.duel-anime-entrance__fighter>strong{font-size:19px}.duel-anime-entrance__speech{top:10%;left:4%;max-width:92%;padding:8px 9px}.duel-anime-entrance__fighter--right .duel-anime-entrance__speech{top:10%;left:auto;right:4%}.duel-anime-entrance__speech span{font-size:10px}.duel-anime-entrance__vs b{font-size:53px}.duel-anime-entrance__vs strong{top:calc(100% + 13px);max-width:40vw;font-size:11px}.duel-anime-entrance__caption{font-size:7px}.duel-anime-entrance>button{margin-top:10px}}
+@media(max-height:650px){.duel-anime-entrance__body{height:38vh;min-height:160px}.duel-anime-entrance__stage{min-height:52vh}}
+@media(prefers-reduced-motion:reduce){.duel-anime-entrance,.duel-anime-entrance *{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* Marcadores compactos durante el juego; los cuerpos completos quedan solo en la previa. */
+.rps-arena .rps-score{height:auto!important;max-height:none!important;min-height:76px!important;padding:6px 12px!important;grid-template-columns:minmax(0,1fr) 82px minmax(0,1fr)!important;gap:8px!important}
+.rps-anime-player--face{width:38px!important;height:38px!important;border:1px solid #60eaf0;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 50% 28%,#176276,#041725 75%);box-shadow:0 0 13px #38d7e855;flex:none}
+.rps-score>div:last-child .rps-anime-player--face{border-color:#ffdc68;box-shadow:0 0 13px #ffdc6844}
+.rps-anime-player--face .lw-face{width:100%;height:100%;transform:scale(1.05);transform-origin:center 35%}
+.rps-anime-player--face>img{object-fit:cover;object-position:50% 40%;transform:scale(1.3)}
+.rps-arena .rps-score>div{display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-rows:auto auto;align-items:center;justify-items:start;column-gap:8px;min-width:0}
+.rps-arena .rps-score>div .rps-anime-player{grid-row:1/3;grid-column:1}
+.rps-arena .rps-score>div>strong{grid-column:2;grid-row:1;max-width:100%;font:800 13px/1.05 Barlow,system-ui,sans-serif;letter-spacing:.02em;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.rps-arena .rps-score>div>small{grid-column:2;grid-row:2;font-size:8px;letter-spacing:.12em}
+.rps-arena .rps-score>div:last-child{justify-items:end;grid-template-columns:minmax(0,1fr) 40px}
+.rps-arena .rps-score>div:last-child .rps-anime-player{grid-column:2}
+.rps-arena .rps-score>div:last-child>strong,.rps-arena .rps-score>div:last-child>small{grid-column:1;text-align:right}
+.rps-arena .rps-score .rps-scoreboard>b{font-size:36px!important}
+.trivia-arena .trivia-score.lupi-duel-score{height:auto!important;max-height:none!important;min-height:76px;max-width:760px;padding:6px 12px;grid-template-columns:minmax(0,1fr) 82px minmax(0,1fr);gap:8px}
+.trivia-arena .trivia-score.lupi-duel-score>div{position:relative;display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-rows:auto auto;align-items:center;justify-items:start;gap:2px 8px;min-width:0}
+.trivia-arena .trivia-full-player{grid-row:1/3;grid-column:1;width:92px;height:98px;margin:0;padding:0;border:0;border-radius:0;overflow:visible;background:none;box-shadow:none}
+.trivia-arena .trivia-full-player>.lw-face{width:100%;height:100%}
+.trivia-arena .trivia-full-player>.trivia-lupi-coach{width:100%;height:100%;object-fit:contain;object-position:center;transform:none}
+.trivia-arena .trivia-player-base,.trivia-arena .trivia-bot-tag{display:none!important}
+.trivia-arena .trivia-score>div>strong{grid-column:2;grid-row:1;max-width:100%;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trivia-arena .trivia-score>div>small{grid-column:2;grid-row:2;font-size:8px;letter-spacing:.12em}
+.trivia-arena .trivia-score>.lupi-duel-scoreboard{display:flex;align-items:center;justify-content:center;grid-template:none;padding:0}
+.trivia-arena .trivia-score>.lupi-duel-scoreboard>b{font-size:36px}
+@media(max-width:600px){.rps-arena .rps-score{height:auto!important;min-height:62px!important;padding:4px 7px!important;grid-template-columns:minmax(0,1fr) 66px minmax(0,1fr)!important;gap:4px!important}.rps-anime-player--face,.trivia-arena .trivia-full-player{width:32px!important;height:32px!important}.rps-arena .rps-score>div{grid-template-columns:34px minmax(0,1fr);column-gap:5px}.rps-arena .rps-score>div:last-child{grid-template-columns:minmax(0,1fr) 34px}.rps-arena .rps-score>div>strong,.trivia-arena .trivia-score>div>strong{font-size:11px}.rps-arena .rps-score .rps-scoreboard>b,.trivia-arena .trivia-score>.lupi-duel-scoreboard>b{font-size:29px!important}.trivia-arena .trivia-score.lupi-duel-score{height:auto!important;min-height:62px;padding:4px 7px;grid-template-columns:minmax(0,1fr) 66px minmax(0,1fr);gap:4px}.trivia-arena .trivia-score.lupi-duel-score>div{grid-template-columns:34px minmax(0,1fr);gap:2px 5px}}
+.rps-arena .rps-score>.rps-scoreboard{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px!important;padding:0!important;min-height:0!important;text-align:center}
+.fp-arena .fp-score{max-width:760px;margin:8px auto 10px;padding:7px 14px;grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr);gap:10px;border-radius:12px;background:linear-gradient(100deg,#082c3acc,#061522ee 50%,#382d16aa);border:1px solid #4ddfe455;box-shadow:0 8px 24px #0005,inset 0 1px #d3ffff18}
+.fp-arena .fp-score>.fp-score-side{grid-template-columns:38px minmax(0,1fr) auto;gap:8px}.fp-arena .fp-score>.fp-score-side--rival{grid-template-columns:auto minmax(0,1fr) 38px}
+.fp-arena .fp-score .fp-avatar.trivia-portrait{width:36px;height:36px;padding:0;border-radius:50%;clip-path:none;border:1px solid #4eeaf0;background:#0a3746;box-shadow:0 0 12px #21d9e455}.fp-arena .fp-score-side--rival .fp-avatar{border-color:#ffdc68;box-shadow:0 0 12px #ffdc6844}
+.fp-arena .fp-score .fp-avatar>.lw-face{width:100%;height:100%;transform:scale(1.08);transform-origin:center 35%}.fp-arena .fp-score .fp-team-identity small{font-size:7px}.fp-arena .fp-score .fp-team-identity strong{margin:1px 0 3px;font-size:13px}.fp-arena .fp-score .fp-attempts i{width:9px;height:3px}.fp-arena .fp-score b{font-size:35px}
+.fp-arena .fp-score .fp-score-mid{font-size:15px}.fp-arena .fp-score .fp-score-mid small{font-size:6px}
+@media(max-width:600px){.fp-arena .fp-score{min-height:62px;margin:4px auto 6px;padding:4px 7px;grid-template-columns:minmax(0,1fr) 56px minmax(0,1fr);gap:4px}.fp-arena .fp-score>.fp-score-side{grid-template-columns:30px minmax(0,1fr) auto;gap:4px}.fp-arena .fp-score>.fp-score-side--rival{grid-template-columns:auto minmax(0,1fr) 30px}.fp-arena .fp-score .fp-avatar.trivia-portrait{width:29px;height:29px}.fp-arena .fp-score .fp-team-identity strong{font-size:10px}.fp-arena .fp-score .fp-team-identity small{font-size:6px}.fp-arena .fp-score .fp-attempts i{width:6px}.fp-arena .fp-score b{font-size:28px}.fp-arena .fp-score .fp-score-mid{font-size:12px}}
+
+/* Keep match HUDs at the same compact face-and-score scale as Truco. */
+.rps-arena.rps-anime-duel .rps-score{height:auto!important;max-height:none!important;min-height:74px!important;align-self:center!important}
+.trivia-arena .trivia-score.lupi-duel-score{height:auto!important;max-height:none!important;min-height:74px!important}
+.trivia-arena .trivia-score.lupi-duel-score>.trivia-full-player,
+.trivia-arena .trivia-score.lupi-duel-score>div>.trivia-full-player{width:92px!important;height:98px!important;min-height:0!important;max-height:98px!important;border:0!important;border-radius:0!important;overflow:visible!important;background:none!important;box-shadow:none!important}
+@media(max-width:600px){.rps-arena.rps-anime-duel .rps-score{min-height:62px!important}.trivia-arena .trivia-score.lupi-duel-score{min-height:62px!important}.trivia-arena .trivia-score.lupi-duel-score>div>.trivia-full-player{width:74px!important;height:82px!important;max-height:82px!important}}
+
+/* Equilibra el tamaño óptico del avatar del usuario con el personaje ilustrado. */
+@media(min-width:651px){.duel-anime-entrance__body .lp-owned-portrait__rig{transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.18))}}
+@media(max-width:650px){.duel-anime-entrance__body .lp-owned-portrait__rig{transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.3))}}
+
+/* Diálogos tipo viñeta: legibles, opacos y ubicados por encima de los personajes. */
+.duel-anime-entrance__speech{top:38px;left:8%;right:auto;z-index:6;max-width:82%;box-sizing:border-box;padding:8px 11px;background:radial-gradient(#183b4718 .7px,transparent .9px) 0 0/6px 6px,#effff8;border:2px solid #071522;border-radius:2px 10px 2px 2px;box-shadow:4px 4px 0 #20d9dc;color:#092431;transform:skewX(-1deg)}
+.duel-anime-entrance__fighter--right .duel-anime-entrance__speech{top:38px;left:auto;right:8%;border-radius:10px 2px 2px 2px;box-shadow:-4px 4px 0 #ffd65b}
+.duel-anime-entrance__speech::after{content:"";position:absolute;bottom:-12px;left:18px;width:17px;height:13px;background:#effff8;clip-path:polygon(0 0,100% 0,0 100%);filter:drop-shadow(2px 2px #071522)}
+.duel-anime-entrance__fighter--right .duel-anime-entrance__speech::after{left:auto;right:18px;transform:scaleX(-1)}
+.duel-anime-entrance__speech b{display:inline-flex;align-items:center;align-self:flex-start;padding:2px 5px;background:#072b3b;color:#9ffff3;font-size:8px;letter-spacing:.13em}
+.duel-anime-entrance__fighter--right .duel-anime-entrance__speech b{background:#47380e;color:#ffe486}
+.duel-anime-entrance__speech span{font-size:clamp(11px,1.2vw,15px);line-height:1.15}
+@media(max-width:650px){
+ .duel-anime-entrance__stage{grid-template-columns:minmax(0,1fr) 38px minmax(0,1fr);gap:3px;min-height:58vh}
+ .duel-anime-entrance__fighter{padding:12px 5px 14px}
+ .duel-anime-entrance__fighter>small{top:8px;font-size:6px;letter-spacing:.1em}
+ .duel-anime-entrance__body{height:35vh;min-height:230px}
+ .duel-anime-entrance__speech,.duel-anime-entrance__fighter--right .duel-anime-entrance__speech{top:34px;left:4%;right:auto;width:92%;max-width:none;gap:4px;padding:6px 7px;box-shadow:3px 3px 0 #20d9dc}
+ .duel-anime-entrance__fighter--right .duel-anime-entrance__speech{left:auto;right:4%;box-shadow:-3px 3px 0 #ffd65b}
+ .duel-anime-entrance__speech b{font-size:6px;padding:2px 4px}
+ .duel-anime-entrance__speech span{font-size:9px;line-height:1.12}
+ .duel-anime-entrance__speech::after{bottom:-9px;width:13px;height:10px}
+ .duel-anime-entrance__body .lupi-story-pose{transform:scale(.98)}
+ .duel-anime-entrance__vs b{font-size:43px}
+ .duel-anime-entrance__vs strong{max-width:44vw;font-size:9px}
+}
+@media(max-width:380px){.duel-anime-entrance__stage{grid-template-columns:minmax(0,1fr) 32px minmax(0,1fr)}.duel-anime-entrance__speech,.duel-anime-entrance__fighter--right .duel-anime-entrance__speech{padding:5px 6px}.duel-anime-entrance__speech span{font-size:8px}}
+
+@media(max-width:650px){.duel-anime-entrance__body .lp-owned-portrait__rig{transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.72))}}
