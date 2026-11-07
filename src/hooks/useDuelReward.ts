@@ -15,6 +15,8 @@ export function useDuelReward(game: DuelGame, matchId: string, finished: boolean
     if (claimed.current === matchId) return;
     if (opts.vsBot && !opts.botResult) return;
     claimed.current = matchId;
+    setReward(null);
+    setError(false);
     claimDuelReward(game, matchId, opts)
       .then(r => { if (mounted.current && activeMatch.current === matchId) setReward(r); })
       .catch(() => { if (mounted.current && activeMatch.current === matchId) setError(true); });
