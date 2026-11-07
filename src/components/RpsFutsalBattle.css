@@ -259,3 +259,36 @@
  .rps-futsal-battle[data-phase] *,.rps-futsal-battle[data-phase] *:before,.rps-futsal-battle[data-phase] *:after{animation:none!important;transition:none!important}
  .rps-point-flight{top:45%;transform:translateX(-50%);font-size:28px}
 }
+
+/* Mobile finale: reserve space for the actual rewards and return controls. */
+@media(max-width:899px){
+ .rps-cinema-screen>.rps-arena.rps-anime-duel.rps-futsal-battle.is-complete{gap:8px!important;padding-top:8px!important;padding-bottom:max(14px,env(safe-area-inset-bottom))!important}
+ .rps-arena.rps-futsal-battle.is-complete{--battle-portrait:clamp(82px,24vw,105px);--battle-hand:clamp(84px,25vw,112px)}
+ .rps-arena.rps-futsal-battle.is-complete>.rps-clash{height:278px!important;min-height:278px!important;max-height:278px!important;flex:none!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-battle-cast{inset:12px 0 auto!important;height:126px!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-battle-fighter>small{font-size:7px!important;padding:3px 7px!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-battle-name{font-size:12px!important;margin:4px 0 2px!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-clash__side{top:51%!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-clash__center{top:64%!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-clash__center>b{font-size:32px!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-battle-score>b{font-size:29px!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-clash__side>small{font-size:7px!important;margin-top:3px!important}
+ .rps-arena.rps-futsal-battle.is-complete>.rps-title{margin:2px 0 4px!important}
+ .rps-arena.rps-futsal-battle.is-complete>.rps-result-scene{display:flex!important;flex-direction:column!important;gap:8px!important;width:100%!important;min-width:0!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-live{margin:0!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-live h3{font-size:27px!important;margin:3px 0!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-battle-sound{margin-bottom:5px;padding:5px 10px}
+ .rps-arena.rps-futsal-battle.is-complete .rps-anime-dialogue{margin:5px auto!important;padding:7px 9px!important;box-sizing:border-box;width:100%}
+ .rps-arena.rps-futsal-battle.is-complete .rps-anime-dialogue p{font-size:10px!important;margin:3px 0!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-result-stack{display:flex!important;flex-direction:column!important;gap:8px!important;margin:0!important;overflow:visible!important;width:100%!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-result-stack>.lp-reward-cinema{margin:0!important;padding:9px!important}
+ .rps-arena.rps-futsal-battle.is-complete .lp-reward-summary-info>strong{font-size:24px!important}
+ .rps-arena.rps-futsal-battle.is-complete .lp-earned-skills{margin-top:7px!important;gap:5px!important}
+ .rps-arena.rps-futsal-battle.is-complete .lp-earned-skill{padding:7px!important}
+ .rps-arena.rps-futsal-battle.is-complete .lp-reward-coach{padding-top:6px!important;margin-top:6px!important}
+ .rps-arena.rps-futsal-battle.is-complete .lp-reward-coach p{font-size:10px!important;margin:4px 0!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-result-stack>.drc{margin:0!important;padding:9px!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-finish{margin:0!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-finish .duel-rematch{margin:5px auto!important;min-height:42px!important;min-width:0!important;width:100%!important}
+ .rps-arena.rps-futsal-battle.is-complete .rps-exit{margin:5px auto!important;min-height:38px!important;width:100%!important}
+}
