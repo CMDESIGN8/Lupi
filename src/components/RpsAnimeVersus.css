@@ -672,20 +672,62 @@
   .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{height:205px!important}
 }
 
-/* Bring full-body owned avatars up to the same visual weight as Preguntados. */
+/* The two result portraits share equal frames and are centered independently of their source art. */
+.rps-arena.rps-anime-duel.is-complete .rps-score>div:not(.rps-scoreboard){
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:minmax(190px,1fr) auto auto!important;
+  justify-items:center!important;align-items:end!important;text-align:center!important;
+}
+.rps-arena.rps-anime-duel.is-complete .rps-score>div:last-child:not(.rps-scoreboard){transform:none!important}
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{
+  position:relative!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;
+  justify-self:center!important;align-self:end!important;width:min(100%,148px)!important;height:205px!important;
+  min-width:0!important;margin:0 auto!important;overflow:visible!important;box-sizing:border-box!important;
+}
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar>.lp-owned-portrait{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:visible!important;
+  filter:drop-shadow(0 5px 8px #00101d99)!important;
+}
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .lp-owned-portrait__rig{
+  left:50%!important;top:auto!important;bottom:0!important;
+  transform:translateX(-50%) scale(var(--own-card-scale,.24))!important;transform-origin:center bottom!important;
+}
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .trivia-lupi-pose{
+  position:relative!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;
+  width:100%!important;height:100%!important;overflow:hidden!important;filter:drop-shadow(0 5px 8px #00101d99);
+}
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .trivia-lupi-pose>i{
+  position:relative!important;left:auto!important;top:auto!important;width:auto!important;height:100%!important;
+  max-width:100%!important;transform:none!important;transform-origin:center bottom!important;
+}
+@media(min-width:900px){
+  .rps-arena.rps-anime-duel.is-complete .rps-score>div:not(.rps-scoreboard){grid-template-rows:minmax(190px,1fr) auto auto!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{width:min(100%,180px)!important;height:205px!important}
+}
+
+/* Final visual calibration: identical portrait height, balanced custom avatar, centered rival. */
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .lp-owned-portrait__rig{
+  transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*.9))!important;
+}
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .trivia-lupi-pose>i{
+  height:90%!important;transform:translateX(-50px)!important;
+}
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .trivia-lupi-pose{overflow:visible!important}
 @media(max-width:600px){
-  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{
-    width:min(100%,148px)!important;height:220px!important;
-  }
-  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .lp-owned-portrait__rig{
-    transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.48))!important;
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .trivia-lupi-pose>i{
+    transform:translateX(-18px)!important;
   }
 }
-@media(min-width:601px){
-  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{
-    width:min(100%,200px)!important;height:220px!important;
-  }
-  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .lp-owned-portrait__rig{
-    transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.48))!important;
+
+/* Align Lupi inside the marked open area of the rival side on the final score panel. */
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar:has(.trivia-lupi-pose){
+  transform:translateX(-86px)!important;
+}
+.rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .trivia-lupi-pose>i{
+  transform:none!important;
+}
+@media(max-width:600px){
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar:has(.trivia-lupi-pose){
+    transform:translateX(-26px)!important;
   }
 }
