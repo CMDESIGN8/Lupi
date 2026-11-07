@@ -91,3 +91,43 @@
  .rps-arena.rps-futsal-battle .rps-clash__side>.rps-hand{width:76px!important}
  .rps-arena.rps-futsal-battle .rps-rule{position:static!important;margin:10px 0!important}
 }
+
+/* A single pair of faces and one scoreboard, all inside the court. */
+.rps-arena.rps-futsal-battle .rps-battle-cast,
+.rps-arena.rps-futsal-battle.is-complete .rps-battle-cast{
+ display:grid!important;grid-template-columns:minmax(0,1fr) 112px minmax(0,1fr);
+ grid-template-rows:1fr;align-items:center;inset:32px 0 auto;height:170px;padding:0 6%;gap:8px;z-index:2;
+}
+.rps-arena.rps-futsal-battle .rps-battle-fighter{width:100%;min-width:0;grid-row:1;justify-self:center}
+.rps-arena.rps-futsal-battle .rps-battle-fighter.is-own{grid-column:1}
+.rps-arena.rps-futsal-battle .rps-battle-fighter.is-rival{grid-column:3}
+.rps-arena.rps-futsal-battle .rps-battle-name{font:900 italic 15px/1.2 Barlow,system-ui;color:#edfff9;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:6px 0 3px;text-shadow:0 2px 4px #000}
+.rps-arena.rps-futsal-battle .rps-battle-score{grid-column:2;grid-row:1;display:flex;flex-direction:column;align-items:center;gap:7px;align-self:center;padding:12px 3px;border-block:1px solid #64e5ec88;background:linear-gradient(90deg,transparent,#021620e8 18% 82%,transparent)}
+.rps-arena.rps-futsal-battle .rps-battle-score>b{display:flex;align-items:center;justify-content:center;gap:10px;font:900 italic 40px/1 Barlow,Impact,system-ui;color:#ffdc68;text-shadow:2px 3px #00131d}
+.rps-arena.rps-futsal-battle .rps-battle-score i{font-size:22px;margin:0;font-style:normal;color:#98e5ed}
+.rps-arena.rps-futsal-battle .rps-battle-score>span{font:800 8px/1.4 system-ui;letter-spacing:.08em;color:#c9f6f8;text-align:center}
+.rps-arena.rps-futsal-battle.is-chanting .rps-battle-score>b{visibility:hidden}
+.rps-arena.rps-futsal-battle.is-complete>.rps-clash{display:block!important}
+.rps-arena.rps-futsal-battle .rps-battle-impact>b{margin-top:5px;font-size:23px}
+@media(min-width:900px){
+ .rps-cinema-screen>.rps-arena.rps-anime-duel.rps-futsal-battle,
+ .rps-cinema-screen>.rps-arena.rps-anime-duel.rps-futsal-battle.is-complete{grid-template-rows:32px 42px minmax(430px,1fr) 48px!important}
+ .rps-arena.rps-futsal-battle>.rps-clash,
+ .rps-arena.rps-futsal-battle.is-complete>.rps-clash{grid-row:3!important;min-height:430px!important}
+ .rps-arena.rps-futsal-battle>.rps-live-scene,
+ .rps-arena.rps-futsal-battle.is-complete>.rps-result-scene{grid-row:3/5!important}
+ .rps-arena.rps-futsal-battle>.rps-rule--detailed,
+ .rps-arena.rps-futsal-battle.is-complete>.rps-rule--detailed{grid-row:4!important}
+ .rps-arena.rps-futsal-battle>.rps-community-report{grid-row:5!important}
+}
+@media(max-width:899px){
+ .rps-arena.rps-futsal-battle>.rps-clash,
+ .rps-arena.rps-futsal-battle.is-complete>.rps-clash{display:block!important;min-height:380px!important;width:100%!important;flex:none!important}
+ .rps-arena.rps-futsal-battle .rps-battle-cast,
+ .rps-arena.rps-futsal-battle.is-complete .rps-battle-cast{grid-template-columns:minmax(0,1fr) 78px minmax(0,1fr);padding:0 4%;gap:4px;height:145px}
+ .rps-arena.rps-futsal-battle .rps-battle-score>b{font-size:30px;gap:6px}
+ .rps-arena.rps-futsal-battle .rps-battle-score>span{font-size:7px}
+ .rps-arena.rps-futsal-battle .rps-battle-name{font-size:12px}
+ .rps-arena.rps-futsal-battle .rps-battle-fighter .lw-face{width:85px!important;height:85px!important}
+ .rps-arena.rps-futsal-battle .rps-battle-emote{right:0;font-size:23px}
+}

@@ -92,18 +92,18 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
  {finished&&!chant&&<DuelResultEffects key={challenge.id} outcome={state.winnerId===meId?"win":state.winnerId===null?"draw":"loss"}/> }
   <DuelGameHeader game="rps" onBack={exit} mode={isBot?'VS BOT':'1 VS 1'} subtitle="FUTSAL BATTLE · LEÉ LA JUGADA" title={<>PIEDRA, PAPEL <em>O TIJERA</em></>}/>
 
-  <div className="rps-score lupi-duel-score"><div className={finished&&!chant&&state.winnerId===meId?"is-winner":""}>{face(meId,myName)}<strong>{myName}</strong><small>VOS</small></div><div className="rps-scoreboard"><b>{myWins}<i>:</i>{rivalWins}</b><span>{chant?"MANOS SELLADAS":finished?"FINAL":`RONDA ${state?.round??1} / 3`}</span></div><div className={finished&&!chant&&state.winnerId===rivalId?"is-winner":""}>{face(rivalId,rivalName)}<strong>{rivalName}</strong><small>RIVAL</small></div></div>
   <div data-round-outcome={reveal ? mine===theirs?"draw":roundWin==="¡RONDA TUYA!"?"win":"loss" : undefined} className={`rps-clash ${reveal?'is-revealed':''} ${finished?'is-final':''} ${chant?'is-chanting':''} ${selected&&!reveal&&!chant?"is-selected":""}`} key={reveal?revealKey:'secret'}>
    <div className="rps-battle-world" aria-hidden="true"><div className="rps-battle-lights"/><div className="rps-battle-court"><i/><i/></div><div className="rps-battle-goal"/><div className="rps-battle-speed"/></div>
    <div className="rps-battle-cast">
     {[{id:meId,name:myName,own:true},{id:rivalId,name:rivalName,own:false}].map(player=>{
-     const outcome=reveal?(mine===theirs?'draw':(roundWin==='¡RONDA TUYA!')===player.own?'win':'loss'):'focus';
+     const outcome=finished&&!chant?(state.winnerId===null?'draw':state.winnerId===player.id?'win':'loss'):reveal?(mine===theirs?'draw':(roundWin==='¡RONDA TUYA!')===player.own?'win':'loss'):'focus';
      return <div key={player.id} className={`rps-battle-fighter ${player.own?'is-own':'is-rival'} is-${outcome}`}>
       <div className="rps-battle-aura"/>{face(player.id,player.name,true)}
       <span key={`${revealKey}:${reveal}:${chant}`} className="rps-battle-emote" aria-hidden="true">{chant?'👀':outcome==='win'?'🤩':outcome==='loss'?'😵':outcome==='draw'?'😳':selected&&player.own?'🤫':'🔥'}</span>
-      <small>{reveal?(outcome==='win'?'¡TE LEÍ!':outcome==='loss'?'¡¿CÓMO?!':'¡IGUALES!'):player.own?'TU INSTINTO':'SU ESTRATEGIA'}</small>
+      <strong className="rps-battle-name">{player.name}</strong><small>{reveal?(outcome==='win'?'¡TE LEÍ!':outcome==='loss'?'¡¿CÓMO?!':'¡IGUALES!'):player.own?'VOS':'RIVAL'}</small>
      </div>;
     })}
+    <div className="rps-scoreboard rps-battle-score" aria-label={`Marcador: ${myName} ${myWins}, ${rivalName} ${rivalWins}`}><b><span>{myWins}</span><i>:</i><span>{rivalWins}</span></b><span>{chant?'MANOS SELLADAS':finished?'FINAL':`RONDA ${state?.round??1} / 3`}</span></div>
    </div>
    <div className="rps-battle-ball" aria-hidden="true">⚽</div>
    {reveal&&<div className="rps-battle-impact" aria-hidden="true"><b>{mine===theirs?'¡BLOQUEO!':roundWin==='¡RONDA TUYA!'?'¡GOLAZO!':'¡CONTRAATAQUE!'}</b>{Array.from({length:18},(_,i)=><i key={i} style={{'--angle':`${i*20}deg`,'--distance':`${65+(i%4)*25}px`,'--delay':`${(i%3)*35}ms`} as CSSProperties}/>)}</div>}
