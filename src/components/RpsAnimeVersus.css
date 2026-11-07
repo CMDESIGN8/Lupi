@@ -40,6 +40,7 @@
 .rps-arena .rps-score strong{font-size:15px}
 .rps-arena .rps-clash{min-height:160px}
 }
+
 @media(prefers-reduced-motion:reduce){.rps-arena .rps-score:before,.rps-score .rps-anime-player,.rps-arena .rps-clash.is-revealed{animation:none!important}}
 /* Desktop reserves the actual height of the full-body versus strip. */
 @media(min-width:900px) and (min-height:540px){
@@ -634,4 +635,57 @@
  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{width:min(100%,180px)!important;height:190px!important}
  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar>.lp-owned-portrait{inset:0 -8%!important;overflow:visible!important}
  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .lp-owned-portrait__rig{bottom:0!important;transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.25))!important;transform-origin:center bottom!important}
+}
+
+/* Finish layout follows the same title → full-width score scene hierarchy as Preguntados. */
+@media(min-width:900px){
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete{
+    grid-template-rows:34px 48px 230px minmax(120px,1fr) 0px 54px!important;
+    row-gap:5px!important;
+  }
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-header{grid-row:1!important}
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-title{grid-row:2!important;align-self:center!important;height:auto!important;margin:0!important}
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-score{grid-row:3!important;height:100%!important;min-height:0!important;margin:0!important}
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-result-scene>.rps-live{grid-row:3!important}
+}
+@media(max-width:600px){
+  .rps-screen-overlay.rps-cinema-screen{height:100dvh!important;max-height:100dvh!important;overflow-x:hidden!important;overflow-y:auto!important;padding:0!important}
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete{
+    display:flex!important;flex-direction:column!important;width:100%!important;height:auto!important;
+    min-height:100dvh!important;max-height:none!important;overflow:visible!important;
+    padding:calc(9px + env(safe-area-inset-top)) 12px calc(14px + env(safe-area-inset-bottom))!important;
+    gap:7px!important;box-sizing:border-box!important;
+  }
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-header,
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-title,
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-score{flex:none!important;width:100%!important;box-sizing:border-box!important}
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-title{margin:3px 0 7px!important;text-align:center!important}
+  .rps-cinema-screen>.rps-arena.rps-anime-duel.is-complete>.rps-title h2{font-size:clamp(22px,6vw,27px)!important;line-height:1!important}
+  .rps-arena.rps-anime-duel.is-complete .rps-score{
+    min-height:clamp(270px,34vh,310px)!important;
+    height:auto!important;max-height:none!important;width:100%!important;
+    grid-template-rows:minmax(210px,1fr)!important;
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-score>div:not(.rps-scoreboard){
+    grid-template-rows:minmax(190px,1fr) auto auto!important;
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{height:205px!important}
+}
+
+/* Bring full-body owned avatars up to the same visual weight as Preguntados. */
+@media(max-width:600px){
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{
+    width:min(100%,148px)!important;height:220px!important;
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .lp-owned-portrait__rig{
+    transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.48))!important;
+  }
+}
+@media(min-width:601px){
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar{
+    width:min(100%,200px)!important;height:220px!important;
+  }
+  .rps-arena.rps-anime-duel.is-complete .rps-score .rps-result-avatar .lp-owned-portrait__rig{
+    transform:translateX(-50%) scale(calc(var(--own-card-scale,.24)*1.48))!important;
+  }
 }
