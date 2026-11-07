@@ -99,13 +99,11 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
      const outcome=finished&&!chant?(state.winnerId===null?'draw':state.winnerId===player.id?'win':'loss'):reveal?(mine===theirs?'draw':(roundWin==='¡RONDA TUYA!')===player.own?'win':'loss'):'focus';
      return <div key={player.id} className={`rps-battle-fighter ${player.own?'is-own':'is-rival'} is-${outcome}`}>
       <div className="rps-battle-aura"/>{face(player.id,player.name,true)}
-      <span key={`${revealKey}:${reveal}:${chant}`} className="rps-battle-emote" aria-hidden="true">{chant?'👀':outcome==='win'?'🤩':outcome==='loss'?'😵':outcome==='draw'?'😳':selected&&player.own?'🤫':'🔥'}</span>
       <strong className="rps-battle-name">{player.name}</strong><small>{reveal?(outcome==='win'?'¡TE LEÍ!':outcome==='loss'?'¡¿CÓMO?!':'¡IGUALES!'):player.own?'VOS':'RIVAL'}</small>
      </div>;
     })}
     <div className="rps-scoreboard rps-battle-score" aria-label={`Marcador: ${myName} ${myWins}, ${rivalName} ${rivalWins}`}><b><span>{myWins}</span><i>:</i><span>{rivalWins}</span></b><span>{chant?'MANOS SELLADAS':finished?'FINAL':`RONDA ${state?.round??1} / 3`}</span></div>
    </div>
-   <div className="rps-battle-ball" aria-hidden="true">⚽</div>
    {reveal&&<div className="rps-battle-impact" aria-hidden="true"><b>{mine===theirs?'¡BLOQUEO!':roundWin==='¡RONDA TUYA!'?'¡GOLAZO!':'¡CONTRAATAQUE!'}</b>{Array.from({length:18},(_,i)=><i key={i} style={{'--angle':`${i*20}deg`,'--distance':`${65+(i%4)*25}px`,'--delay':`${(i%3)*35}ms`} as CSSProperties}/>)}</div>}
    <div className="rps-clash__side">{chant?<RpsHand move="rock"/>:reveal?<RpsHand move={mine as Move}/>:selected?<RpsHand move={selected}/>:<RpsHand move="rock"/>}<small>{reveal?label(mine!):selected?"TU MANO · SECRETA":"TU PRÓXIMA JUGADA"}</small></div>
    <div className="rps-clash__center"><b key={chant}>{chant|| (reveal?"⚡":"VS")}</b><span>{chant?"LAS DOS MANOS ESTÁN SELLADAS":reveal?roundWin:state?.opponentSubmitted?"RIVAL LISTO":"ELECCIÓN SECRETA"}</span></div>
@@ -116,10 +114,10 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
   {error&&<p role="alert" className="rps-error">{error} <button type="button" onClick={()=>void refresh()}>RECONECTAR</button></p>}
   <DuelConnectionNotice {...connection} onRetry={()=>void connection.ping()} onExit={exit}/>
   {!finished&&!connection.stopped&&<div className="rps-choices">{choices.map(c=><button key={c.id} type="button" aria-pressed={selected===c.id} disabled={!state||connection.networkError||busy||entrance||!!chant||revealing||state.mineSubmitted} onClick={()=>void choose(c.id)}><RpsHand move={c.id}/><strong>{c.label}</strong><em>{c.id==="rock"?"POTENCIA":c.id==="paper"?"CONTROL":"VELOCIDAD"}</em><small>{c.beats}</small></button>)}</div>}
+  {!finished&&<aside className="rps-battle-rules" aria-label="Reglas del duelo"><small>LEÉ AL RIVAL</small><h3>ASÍ SE GANA EL CHOQUE</h3><p>Elegí tu mano en secreto. Las dos jugadas se revelan juntas.</p><div className="rps-battle-rule-rows">{choices.map(c=><div key={c.id}><RpsHand move={c.id}/><strong>{c.label}</strong><span>{c.beats}</span></div>)}</div><p className="rps-battle-rule-tip"><strong>Mejor de 3</strong> · Si eligen lo mismo, la ronda empata. Cambiá el ritmo para sorprender al rival.</p></aside>}
   {finished&&!chant&&<div className="rps-result-stack">{reward&&<SkillMatchReward key={`${challenge.id}:${reward.duplicate}`} game="rps" matchId={challenge.id} userId={meId}/>}<DuelRewardCard reward={reward} error={rewardError} onRetry={retryReward} rivalName={rivalName} gameLabel="Piedra, papel o tijera"/><div className="rps-finish"><p className="rps-winner-name">{state.winnerId===null?"NADIE CEDE TERRENO":`${state.winnerId===meId?myName:rivalName} SE LLEVA EL DUELO`}</p>{onRematch&&<button className="duel-rematch" type="button" onClick={onRematch}>OTRA MANO · REVANCHA ↻</button>}<button className="rps-exit" type="button" onClick={exit}>VOLVER AL CLUB →</button></div></div>}
   </div>
   {state?.lastMoves&&!chant&&<p className="rps-last">ÚLTIMA RONDA · {label(mine!)} vs {label(theirs!)} · {roundWin}</p>}
   {communityReport&&<p className="rps-community-report" role="status">{communityReport}</p>}
-  <footer className="rps-rule rps-rule--detailed"><strong>REGLAS DEL DUELO</strong><span>Mejor de 3 · elección secreta</span><span>Piedra vence a tijera · papel vence a piedra · tijera vence a papel</span></footer>
  </section>;
 }
