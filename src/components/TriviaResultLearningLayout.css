@@ -1,0 +1,56 @@
+/* Results grow with their content; optional learning no longer shrinks the duel. */
+.rps-screen-overlay.trivia-screen-overlay:has(>.trivia-arena--ended){overflow-y:auto!important;overflow-x:hidden!important;align-items:start!important}
+.trivia-arena.trivia-arena--ended.trivia-result-scene{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;
+ width:100%!important;max-width:1120px!important;height:auto!important;min-height:calc(100dvh - 28px)!important;
+ max-height:none!important;overflow:visible!important;gap:12px!important;box-sizing:border-box;
+}
+.trivia-arena.trivia-arena--ended.trivia-result-scene>.trivia-header,
+.trivia-arena.trivia-arena--ended.trivia-result-scene>.trivia-title,
+.trivia-arena.trivia-arena--ended.trivia-result-scene>.trivia-result-layout,
+.trivia-arena.trivia-arena--ended.trivia-result-scene>.trivia-footnote,
+.trivia-arena.trivia-arena--ended.trivia-result-scene>.trivia-learning-section{flex:none!important;min-width:0!important}
+.trivia-arena.trivia-arena--ended.trivia-result-scene>.trivia-result-layout{
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-rows:auto!important;
+ width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;
+ align-items:start!important;margin:0!important;
+}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-layout>.trivia-result-left,
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-layout>.trivia-result-right{
+ display:flex!important;flex-direction:column!important;grid-row:1!important;min-width:0!important;min-height:0!important;
+ height:auto!important;max-height:none!important;overflow:visible!important;align-self:start!important;
+}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-layout>.trivia-result-left{grid-column:1!important}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-layout>.trivia-result-right{grid-column:2!important;gap:14px!important;padding:16px!important;box-sizing:border-box}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-left>.trivia-final-duel{
+ position:relative!important;display:flex!important;flex-direction:column!important;width:100%!important;
+ height:auto!important;min-height:0!important;max-height:none!important;overflow:hidden!important;padding:0!important;margin:0!important;
+}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-final-duel>.trivia-result-heading{
+ position:relative!important;inset:auto!important;width:auto!important;padding:16px 18px!important;margin:0!important;
+ flex:none!important;box-sizing:border-box;
+}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-final-duel>.trivia-score.lupi-duel-score{
+ position:relative!important;inset:auto!important;display:grid!important;flex:none!important;
+ width:100%!important;height:280px!important;min-height:280px!important;max-height:none!important;
+ grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr)!important;grid-template-rows:1fr!important;
+ padding:10px 8px!important;margin:0!important;box-sizing:border-box;
+}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-final-duel>.trivia-score.lupi-duel-score>div:not(.lupi-duel-scoreboard){grid-template-rows:minmax(180px,1fr) auto auto!important;min-height:0!important}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-final-duel>.trivia-score.lupi-duel-score>div>.trivia-full-player{width:min(100%,170px)!important;height:210px!important;max-height:210px!important;min-height:0!important}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-right>.trivia-reward-stack{flex:none!important;gap:12px!important;min-height:0!important;height:auto!important;max-height:none!important;overflow:visible!important}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-right>.trivia-reward-stack>*{flex:none!important}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-left>.trivia-summary{flex:none!important;position:relative!important;inset:auto!important;width:100%!important;height:auto!important;margin:0!important;box-sizing:border-box}
+.trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-right>.trivia-rematch{flex:none!important;margin:0!important}
+.trivia-learning-section{width:100%;min-width:0;box-sizing:border-box;border:1px solid #5ce5d84d;border-radius:12px 3px;background:#05212ce6;margin:0!important;text-align:left}
+.trivia-learning-section>summary{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:60px;padding:12px 16px;box-sizing:border-box;cursor:pointer;list-style:none;color:#c6fff0;font:900 14px Barlow,system-ui}
+.trivia-learning-section>summary::-webkit-details-marker{display:none}.trivia-learning-section>summary small{display:block;color:#9dc6cb;font:500 11px/1.4 system-ui;margin-top:5px}.trivia-learning-section>summary>b{color:#ffdf7a;font-size:22px}.trivia-learning-section[open]>summary>b{rotate:180deg}.trivia-learning-section>.tl-hub{width:100%;max-width:none;margin:0;border:0;border-top:1px solid #5ce5d82b;border-radius:0;background:none}.trivia-learning-section>summary:focus-visible{outline:3px solid #ffdf76;outline-offset:-4px}
+@media(max-width:899px){
+ .trivia-arena.trivia-arena--ended.trivia-result-scene>.trivia-result-layout{grid-template-columns:minmax(0,1fr)!important;gap:0!important}
+ .trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-layout>.trivia-result-left{grid-column:1!important;grid-row:1!important}
+ .trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-result-layout>.trivia-result-right{grid-column:1!important;grid-row:2!important;border-left:0!important;border-top:1px solid #69eaf646!important;padding:12px!important}
+ .trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-final-duel>.trivia-score.lupi-duel-score{height:230px!important;min-height:230px!important;grid-template-columns:minmax(0,1fr) 60px minmax(0,1fr)!important}
+ .trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-final-duel>.trivia-score.lupi-duel-score>div:not(.lupi-duel-scoreboard){grid-template-rows:minmax(140px,1fr) auto auto!important}
+ .trivia-arena.trivia-arena--ended.trivia-result-scene .trivia-final-duel>.trivia-score.lupi-duel-score>div>.trivia-full-player{width:min(100%,126px)!important;height:165px!important;max-height:165px!important}
+ .trivia-learning-section>summary{padding:12px;font-size:12px}
+}

@@ -10,6 +10,8 @@ import "./TriviaDuel.css";
 import "./DuelResolution.css";
 import "./TriviaAsyncDuel.css";
 
+import "./TriviaResultLearningLayout.css";
+
 type Props = {
   matchId: string; meId: string; meName: string; rivalName: string; rivalId?: string;
   onExit: () => void; onRematch: (rival: { userId: string; username: string }) => void; onChanged?: () => void; onLearningOpenChange?: (open:boolean)=>void;
@@ -178,7 +180,7 @@ export function TriviaAsyncDuel({ matchId, meId, meName, rivalName, rivalId, onE
               <td aria-label={(host ? round.guestOk : round.hostOk) ? "Rival acertó" : "Rival no acertó"}>{(host ? round.guestOk : round.hostOk) ? "✅" : "✕"}</td></tr>)}</tbody></table></div>
         </details>}
       </>}
-      {ended&&<TriviaLearningHub compact onOpenChange={onLearningOpenChange}/>}
+      {ended&&<details className="trivia-learning-section"><summary><span>TU PROGRESO Y DESAFÍOS<small>Ver temas, desafío diario y revancha de aprendizaje</small></span><b aria-hidden="true">⌄</b></summary><TriviaLearningHub compact onOpenChange={onLearningOpenChange}/></details>}
       <p className="trivia-footnote">Duelo por turnos · Premios y rachas de Lupi · Sin puntos para el ranking comunitario.</p>
     </section>
   );

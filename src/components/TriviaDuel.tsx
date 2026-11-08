@@ -22,6 +22,8 @@ import { LupiStoryPose } from './LupiStoryPose';
 import { AvatarFace } from './AvatarFace';
 import { OwnedCardPortrait } from './OwnedCardPortrait';
 
+import "./TriviaResultLearningLayout.css";
+
 type Props = { challenge: Challenge; meId: string; players?: LobbyPlayer[]; catalog?: InventoryItem[]; onExit: () => void; onRematch: (challenge: Challenge) => void; onLearningOpenChange?: (open:boolean)=>void };
 export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit, onRematch, onLearningOpenChange }: Props) {
   const { state, error, busy, answer, rematch, reconnect } = useTriviaMatch(challenge);
@@ -161,7 +163,7 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
       </div>}
       <p className="trivia-footnote">Duelo global · Premios y rachas de Lupi · Sin puntos para el ranking comunitario.</p>
       {confirmExit && <div className="trivia-confirm"><div role="dialog" aria-modal="true" aria-labelledby="trivia-exit-title"><h3 id="trivia-exit-title">¿Salir del duelo?</h3><p>El rival quedará esperando. Si falta una respuesta, la partida vencerá sin ganador al terminar el tiempo.</p><button autoFocus type="button" onClick={() => setConfirmExit(false)}>SEGUIR JUGANDO</button><button type="button" onClick={exit}>SALIR AL LOBBY</button></div></div>}
-    {ended&&<TriviaLearningHub compact onOpenChange={onLearningOpenChange}/>}
+    {ended&&<details className="trivia-learning-section"><summary><span>TU PROGRESO Y DESAFÍOS<small>Ver temas, desafío diario y revancha de aprendizaje</small></span><b aria-hidden="true">⌄</b></summary><TriviaLearningHub compact onOpenChange={onLearningOpenChange}/></details>}
     </section>
   );
 }
