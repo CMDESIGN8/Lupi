@@ -196,3 +196,24 @@
 .gh-root.gh-root--cinematic .gh-world{background-size:cover!important;background-position:center 55%!important;background-repeat:no-repeat!important}
 @media(min-width:1000px){.gh-root.gh-root--cinematic .gh-world{background-size:100% auto!important;background-position:center 52%!important}}
 @media(max-width:700px){.gh-root.gh-root--cinematic .gh-avatar-actionbar>button{font-size:12px!important}}
+/* Final mobile framing: safe home control, coach feet and browser bottom inset. */
+.gh-root.gh-root--cinematic .gh-back--home{left:10px!important;top:50%!important;transform:translateY(-50%)!important;width:28px!important;height:36px!important;min-height:36px!important;z-index:2!important}
+.gh-root.gh-root--cinematic .gh-brand{margin-left:30px!important}
+@media(max-width:700px){
+ .gh-root.gh-root--cinematic .gh-shell>.gh-hud{padding-left:10px!important}
+ .gh-root.gh-root--cinematic .gh-brand{margin-left:32px!important}
+ .gh-root.gh-root--cinematic .gh-brand strong{font-size:clamp(17px,5vw,20px)!important;white-space:nowrap!important}
+ .gh-root.gh-root--cinematic .gh-back--home{left:8px!important;width:26px!important}
+ .gh-root.gh-root--cinematic .gh-world{padding-bottom:env(safe-area-inset-bottom,0px)!important;height:max(778px,calc(100dvh - 74px))!important;min-height:778px!important}
+ .gh-root.gh-root--cinematic .gh-lobby-coach{bottom:calc(290px + env(safe-area-inset-bottom,0px))!important;height:154px!important;width:110px!important}
+ .gh-root.gh-root--cinematic .gh-lobby-coach>p{top:-52px!important}
+ .gh-root.gh-root--cinematic .gh-world__dock{height:calc(76px + env(safe-area-inset-bottom,0px))!important;padding-bottom:env(safe-area-inset-bottom,0px)!important}
+ .gh-root.gh-root--cinematic .gh-world__dock button{padding-bottom:8px!important}
+ .gh-root.gh-root--cinematic .gh-world__players-toggle,.gh-root.gh-root--cinematic .lc--mobile-closed>.lc-mobile-chat-trigger{bottom:calc(88px + env(safe-area-inset-bottom,0px))!important}
+ .gh-root.gh-root--cinematic .gh-world__discover{bottom:calc(139px + env(safe-area-inset-bottom,0px))!important}
+ .gh-root.gh-root--cinematic .gh-world__play{bottom:calc(196px + env(safe-area-inset-bottom,0px))!important}
+}
+@media(max-width:700px){
+ .gh-root.gh-root--cinematic{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;overflow-y:visible!important}
+ .gh-root.gh-root--cinematic .gh-world__dock{overflow:visible!important}
+}
