@@ -1,0 +1,27 @@
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, expect, it, vi } from 'vitest';
+const h = vi.hoisted(() => ({ rpc: vi.fn() }));
+vi.mock('../src/lib/supabaseClient', () => ({ supabase: { rpc: h.rpc, from: vi.fn() } }));
+vi.mock('../src/lib/duelFx', () => ({ duelFx: { isMuted: () => false, setMuted() {}, tap() {}, reveal() {}, result() {}, chest() {}, answer() {}, shout() {} } }));
+vi.mock('../src/components/AvatarFace', async () => { const R = await import('react'); return { AvatarFace: () => R.createElement('span') }; });
+vi.mock('../src/components/OwnedCardPortrait', () => ({ OwnedCardPortrait: () => null }));
+vi.mock('../src/components/match/ArenaAvatar', () => ({ ArenaAvatar: () => null }));
+vi.mock('../src/components/LupiStoryPose', () => ({ LupiStoryPose: () => null }));
+vi.mock('../src/components/SkillMatchReward', () => ({ SkillMatchReward: () => null }));
+vi.mock('../src/components/DuelAnimeEntrance', () => ({ DuelAnimeEntrance: () => null }));
+vi.mock('../src/components/DuelConnectionNotice', () => ({ DuelConnectionNotice: () => null }));
+import { RockPaperScissors } from '../src/components/RpsAnimeDuel';
+afterEach(() => { cleanup(); vi.useRealTimers(); });
+it('con un duelFx viejo (sin whistle/beat/kick/crowd) no se rompe la pantalla', async () => {
+  vi.useFakeTimers();
+  const base = { id: 'm', round: 1, hostWins: 0, guestWins: 0, status: 'playing', winnerId: null, mineSubmitted: false, opponentSubmitted: false, lastMoves: null };
+  h.rpc.mockImplementation(async (n: string) => n === 'duel_bot_open' ? { data: base, error: null } : n === 'duel_bot_play' ? { data: { ...base, round: 2, hostWins: 1, lastMoves: { host: 'rock', guest: 'scissors' } }, error: null } : { data: null, error: null });
+  const ch: any = { id: 'm', gameType: 'rps', fromId: 'me', toId: 'bot', fromName: 'Yo', toName: 'Lupi', vsBot: true, botIndex: 0 };
+  const { container } = render(<RockPaperScissors challenge={ch} meId="me" onExit={() => {}} />);
+  const tick = (ms: number) => act(async () => { await vi.advanceTimersByTimeAsync(ms); });
+  await tick(0); await tick(3600);
+  fireEvent.click(screen.getByRole('button', { name: /PIEDRA/ })); await tick(0);
+  await tick(1500);
+  expect(container.querySelector('.rps-arena')).not.toBeNull();
+  expect(container.querySelector('.rpsf-bang b')?.textContent).toBe('¡PIEDRA GANA!');
+});

@@ -1,0 +1,65 @@
+import {act,cleanup,fireEvent,render,screen} from '@testing-library/react';
+import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest';
+const h=vi.hoisted(()=>({next:{} as any,play:vi.fn(),fx:vi.fn()}));
+vi.mock('../src/lib/supabaseClient',()=>({supabase:{rpc:vi.fn(async()=>({data:null,error:null}))}}));
+vi.mock('../src/hooks/useRpsMatch',async()=>{const R=await import('react');return {useRpsMatch:()=>{const[state,set]=R.useState({id:'test',round:1,status:'playing',hostWins:0,guestWins:0,winnerId:null,lastMoves:null,mineSubmitted:false,opponentSubmitted:false});return{state,error:'',busy:false,refresh:vi.fn(),play:async(move:string)=>{h.play(move);set(h.next);return true}}}}});
+vi.mock('../src/hooks/useRpsBotMatch',async()=>{const m=await import('../src/hooks/useRpsMatch');return {useRpsBotMatch:m.useRpsMatch}});
+vi.mock('../src/hooks/useDuelConnection',()=>({useDuelConnection:()=>({leave:vi.fn(),ping:vi.fn(),stopped:false,networkError:false})}));
+vi.mock('../src/hooks/useDuelReward',()=>({useDuelReward:()=>({reward:null,error:false,retry:vi.fn()})}));
+vi.mock('../src/lib/duelFx',()=>({duelFx:{isMuted:()=>true,setMuted:vi.fn(),tap:vi.fn(),beat:vi.fn(),reveal:h.fx,kick:vi.fn(),crowd:vi.fn()}}));
+vi.mock('../src/components/AvatarFace',()=>({AvatarFace:({appearance}:any)=><span data-testid="face" data-expression={appearance.expression}/>}));
+vi.mock('../src/components/LupiStoryPose',()=>({LupiStoryPose:({pose}:any)=><span data-testid="lupi" data-pose={pose}/>}));
+vi.mock('../src/components/OwnedCardPortrait',()=>({OwnedCardPortrait:()=>null}));
+vi.mock('../src/components/match/ArenaAvatar',()=>({ArenaAvatar:()=>null}));
+vi.mock('../src/components/DuelAnimeEntrance',()=>({DuelAnimeEntrance:()=>null}));
+vi.mock('../src/components/DuelConnectionNotice',()=>({DuelConnectionNotice:()=>null}));
+vi.mock('../src/components/DuelResultEffects',()=>({DuelResultEffects:()=>null}));
+vi.mock('../src/components/SkillMatchReward',()=>({SkillMatchReward:()=>null}));
+vi.mock('../src/components/DuelRewardCard',()=>({DuelRewardCard:()=>null}));
+import {RockPaperScissors} from '../src/components/RpsAnimeDuel';
+import {bangFor,faceExpression,MOVE_ORDER,roundResult} from '../src/lib/rpsFutsal';
+const challenge:any={id:'test',fromId:'me',toId:'bot',fromName:'Christian',toName:'Lupi',vsBot:true};
+const tick=async(ms:number)=>{await act(async()=>{await vi.advanceTimersByTimeAsync(ms)})};
+const phase=(c:HTMLElement)=>c.querySelector('section')?.getAttribute('data-phase');
+const button=(text:string)=>screen.getByRole('button',{name:new RegExp(`^${text}`)});
+beforeEach(()=>{vi.useFakeTimers();h.play.mockClear();h.fx.mockClear();h.next={id:'test',round:2,status:'playing',hostWins:1,guestWins:0,winnerId:null,lastMoves:{host:'rock',guest:'scissors'},mineSubmitted:false,opponentSubmitted:false}});
+afterEach(()=>{cleanup();vi.useRealTimers()});
+describe('PPT original con efectos adaptados',()=>{
+ it('conserva nombres, orientación y solo un par de caras con marcador integrado',async()=>{
+  const{container:c}=render(<RockPaperScissors challenge={challenge} meId="me" onExit={()=>{}}/>);await tick(3500);
+  for(const name of ['PIEDRA','PAPEL','TIJERA'])expect(button(name)).toBeTruthy();
+  expect(c.querySelectorAll('.rps-battle-fighter')).toHaveLength(2);
+  expect(c.querySelectorAll('.rps-duel-scene')).toHaveLength(1);expect(c.querySelector('.rps-duel-scene>.rps-clash')).not.toBeNull();expect(c.querySelector('.rps-duel-scene>.rps-live')).not.toBeNull();
+  expect(c.querySelectorAll('.rps-battle-cast .rps-scoreboard')).toHaveLength(1);
+  expect(c.querySelector('.rps-score')).toBeNull();expect(c.querySelector('.rps-battle-ball,.rpsf-ball,.rpsf-emote')).toBeNull();
+  expect(c.textContent).not.toMatch(/CAÑONAZO|ATAJADÓN|GAMBETA/);
+ });
+ it('cuenta → sorpresa → reacción → punto → próxima jugada, sin doble envío',async()=>{
+  const{container:c}=render(<RockPaperScissors challenge={challenge} meId="me" onExit={()=>{}}/>);await tick(3500);
+  fireEvent.click(button('PIEDRA'));await tick(0);expect(phase(c)).toBe('charge');
+  expect(screen.getByTestId('face').getAttribute('data-expression')).toBe('focused');
+  expect((button('PAPEL') as HTMLButtonElement).disabled).toBe(true);fireEvent.click(button('PAPEL'));expect(h.play).toHaveBeenCalledTimes(1);
+  await tick(680);expect(phase(c)).toBe('slow');expect(screen.getByTestId('face').getAttribute('data-expression')).toBe('angry');
+  await tick(500);expect(phase(c)).toBe('impact');expect(screen.getByTestId('face').getAttribute('data-expression')).toBe('surprised');expect(h.fx).toHaveBeenCalledWith('win');
+  expect(c.querySelector('.rpsf-fx--win')).not.toBeNull();expect(c.querySelector('.rpsf-bang b')?.textContent).toBe('¡PIEDRA!');
+  expect(c.querySelectorAll('.rpsf-spark')).toHaveLength(14);expect(c.querySelectorAll('.rpsf-confetti')).toHaveLength(16);
+  await tick(350);expect(screen.getByTestId('face').getAttribute('data-expression')).toBe('happy');
+  await tick(430);expect(c.querySelector('.rps-point-flight.is-own')).not.toBeNull();
+  await tick(540);expect(phase(c)).toBe('next');expect(c.querySelector('.rps-battle-score b')?.textContent).toBe('1:0');
+  await tick(450);expect((button('PAPEL') as HTMLButtonElement).disabled).toBe(false);
+ });
+ it.each([['rock','paper','lose','loss'],['rock','rock','tie','draw']] as const)('representa %s vs %s sin inventar puntos',async(mine,theirs,result,outcome)=>{
+  h.next={...h.next,hostWins:0,guestWins:result==='lose'?1:0,lastMoves:{host:mine,guest:theirs}};
+  const{container:c}=render(<RockPaperScissors challenge={challenge} meId="me" onExit={()=>{}}/>);await tick(3500);fireEvent.click(button('PIEDRA'));await tick(1180);
+  expect(h.fx).toHaveBeenCalledWith(result);expect(c.querySelector(`.rpsf-fx--${result}`)).not.toBeNull();
+  await tick(780);expect(!!c.querySelector('.rps-point-flight.is-rival')).toBe(result==='lose');
+  expect(c.querySelector('.rps-battle-fighter.is-own')?.className).toContain(`is-${outcome}`);
+ });
+ it('espera al punto para mostrar el resultado final',async()=>{h.next={...h.next,status:'finished',hostWins:2,winnerId:'me'};const{container:c}=render(<RockPaperScissors challenge={challenge} meId="me" onExit={()=>{}}/>);await tick(3500);fireEvent.click(button('PIEDRA'));await tick(2500);expect(c.querySelector('.rps-result-stack')).toBeNull();await tick(450);expect(c.querySelector('.rps-result-stack')).not.toBeNull()});
+ it('mantiene al usuario a la izquierda aunque sea visitante',async()=>{h.next={...h.next,hostWins:0,guestWins:1,lastMoves:{host:'rock',guest:'paper'}};const{container:c}=render(<RockPaperScissors challenge={{...challenge,fromId:'rival',toId:'me',fromName:'Rival',toName:'Christian'}} meId="me" onExit={()=>{}}/>);await tick(3500);fireEvent.click(button('PAPEL'));await tick(2500);expect(c.querySelector('.rps-battle-score b')?.textContent).toBe('1:0');expect(c.querySelector('.rps-battle-fighter.is-own .rps-battle-name')?.textContent).toBe('Christian')});
+ it('cancela la secuencia al desmontar',async()=>{const{unmount}=render(<RockPaperScissors challenge={challenge} meId="me" onExit={()=>{}}/>);await tick(3500);fireEvent.click(button('PIEDRA'));await tick(0);unmount();await tick(4000);expect(h.fx).not.toHaveBeenCalled()});
+});
+describe('reglas y expresiones',()=>{
+ it('mantiene las nueve combinaciones originales',()=>{const rows=[['tie','lose','win'],['win','tie','lose'],['lose','win','tie']];MOVE_ORDER.forEach((a,i)=>MOVE_ORDER.forEach((b,j)=>expect(roundResult(a,b)).toBe(rows[i][j])))});
+ it('usa PPT en los gritos y respeta el preset de festejo',()=>{expect(bangFor('scissors','paper').text).toBe('¡TIJERA!');expect(bangFor('paper','paper').text).toBe('¡MISMA MANO!');expect(faceExpression({stage:'result',side:'me',result:'win',presets:{celebrate:'wink'}})).toBe('wink')});
+});

@@ -1,7 +1,7 @@
 import {DuelGameHeader} from './DuelGameHeader';
 import { SkillMatchReward } from './SkillMatchReward';
 import { DuelResultEffects } from './DuelResultEffects';
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import type { Challenge } from "../hooks/useLobbyChallenges";
 import type { LobbyPlayer } from "../hooks/useLobbyPresence";
@@ -23,6 +23,9 @@ import "./RockPaperScissors.css";
 import "./DuelResolution.css";
 import "./RpsAnimeVersus.css";
 import "./RpsFutsalBattle.css";
+import "./RpsAnimeEffects.css";
+import { RpsPitch, RpsClashFx, RpsImpactFrame } from './RpsFutsalFx';
+import { bangFor, faceExpression, roundResult, type FaceStage } from '../lib/rpsFutsal';
 type Props = { challenge: Challenge; meId: string; players?: LobbyPlayer[]; catalog?: InventoryItem[]; onExit: () => void; onFinished?: (finished: boolean) => void; onRematch?: () => void };
 const choices = [{id:"rock",label:"PIEDRA",beats:"Vence a tijera"},{id:"paper",label:"PAPEL",beats:"Vence a piedra"},{id:"scissors",label:"TIJERA",beats:"Vence a papel"}] as const;
 type Move=typeof choices[number]['id'];
@@ -57,12 +60,12 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
  const revealKey=state?.lastMoves?`${challenge.id}:${state.round}:${state.status}`:"";
  useLayoutEffect(()=>{
   if(!revealKey){setPhase("ready");setRevealing(false);setChant("");setScoreSettled(true);return;}
-  setRevealing(false);setScoreSettled(false);setPhase("charge");setChant("¡PIEDRA!");
+  setRevealing(false);setScoreSettled(false);setPhase("charge");setChant("¡PIEDRA!");duelFx.beat(0);
   const timers=[
-   window.setTimeout(()=>setChant("¡PAPEL!"),340),
-   window.setTimeout(()=>{setChant("¡TIJERA!");setPhase("slow");},680),
+   window.setTimeout(()=>{setChant("¡PAPEL!");duelFx.beat(1);},340),
+   window.setTimeout(()=>{setChant("¡TIJERA!");setPhase("slow");duelFx.beat(2);},680),
    window.setTimeout(()=>{setChant("");setRevealing(true);setPhase("impact");
-    if(valid(mine)&&valid(theirs)){const tie=mine===theirs;const win=(mine==="rock"&&theirs==="scissors")||(mine==="paper"&&theirs==="rock")||(mine==="scissors"&&theirs==="paper");duelFx.reveal(tie?"tie":win?"win":"lose");}
+    if(valid(mine)&&valid(theirs)){const tie=mine===theirs;const win=(mine==="rock"&&theirs==="scissors")||(mine==="paper"&&theirs==="rock")||(mine==="scissors"&&theirs==="paper");duelFx.reveal(tie?"tie":win?"win":"lose");duelFx.kick(tie?.5:.75);duelFx.crowd(tie?"tie":win?"win":"lose");}
    },1180),
    window.setTimeout(()=>setPhase("reaction"),1530),
    window.setTimeout(()=>setPhase("point"),1960),
@@ -85,6 +88,8 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
  const matchPresented=!!finished&&phase==='ready'&&!chant;
  const verdict=state?.winnerId===null?"¡EMPATE!":state?.winnerId===meId?"¡GANASTE!":"ESTA VEZ NO FUE";
  const choose=async(move:Move)=>{if(!state||finished||connection.stopped||connection.networkError||busy||entrance||chant||revealing||state.mineSubmitted||sending.current)return;sending.current=true;duelFx.tap();const round=state.round;setRevealing(false);setSelection({round,move});try{if(!await play(move))setSelection(value=>value?.round===round?null:value);}finally{sending.current=false;}};
+ const faceStage:FaceStage=chant?'chant':phase==='impact'?'impact':matchPresented?'final':reveal?'result':'idle';
+ const chantBeat=chant==='¡TIJERA!'?2:chant==='¡PAPEL!'?1:0;
  const face=(id:string,name:string, battle=false)=>{
  const p=players.find(p=>p.userId===id)??portraits.find(p=>p.userId===id);
  const matchOver=matchPresented;
@@ -92,27 +97,26 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
  const draw=state?.winnerId===null;
  const roundOutcome=reveal?(mine===theirs?'draw':roundWin==='¡RONDA TUYA!'?'win':'loss'):null;
  if(isBot&&id===rivalId){
-  const pose=matchOver?(userWon?'sad':draw?'surprised':'celebrate'):roundOutcome==='win'?'sad':roundOutcome==='loss'?'celebrate':roundOutcome==='draw'?'surprised':'determined';
+  const pose=phase==='impact'?'surprised':matchOver?(userWon?'sad':draw?'surprised':'celebrate'):roundOutcome==='win'?'sad':roundOutcome==='loss'?'celebrate':roundOutcome==='draw'?'surprised':'determined';
   const emotion=pose==='celebrate'?'win':pose==='sad'?'loss':pose==='surprised'?'draw':'focus';
   if(matchOver&&!battle)return <span className={`rps-anime-player rps-result-avatar is-emotion-${emotion}`}><LupiStoryPose className="trivia-lupi-pose" pose={pose} label={`Lupi · ${name}`}/></span>;
   return <span className={`rps-anime-player rps-anime-player--face is-emotion-${emotion}`}><LupiStoryPose className="rps-score-lupi-face" pose={pose} label={`Lupi · ${name}`}/></span>;
  }
  const outcome=matchOver?(draw?'draw':state?.winnerId===id?'win':'loss')
   :roundOutcome?(roundOutcome==='draw'?'draw':(roundOutcome==='win')===(id===meId)?'win':'loss'):'focus';
- const expression=outcome==='win'?(p?.appearance?.expressionPresets?.celebrate??'happy')
-  :outcome==='loss'?'sad':outcome==='draw'?'surprised':(p?.appearance?.expressionPresets?.focus??'determined');
+ const expression=faceExpression({stage:faceStage,side:id===meId?'me':'rival',beat:chantBeat,result:outcome==='focus'?null:outcome,presets:p?.appearance?.expressionPresets,ready:id===meId?!!state?.mineSubmitted:!!state?.opponentSubmitted});
  const appearance={...(p?.appearance??DEFAULT_APPEARANCE),expression};
- const mood=outcome==='win'?'celebrate':outcome==='focus'?'focus':undefined;
  if(matchOver&&p&&!battle)return <span className={`rps-anime-player rps-result-avatar is-emotion-${outcome}`}><OwnedCardPortrait userId={id} appearanceOverride={appearance} mood={outcome==='win'?'celebrate':outcome==='loss'?'miss':undefined}/></span>;
- return <span className={`rps-anime-player rps-anime-player--face is-emotion-${outcome}`}><AvatarFace mood={mood} appearance={appearance}/></span>;
+ return <span className={`rps-anime-player rps-anime-player--face is-emotion-${outcome}`}><AvatarFace appearance={appearance}/></span>;
  };
  return <section className={`rps-arena rps-anime-duel rps-futsal-battle ${chant?"is-chanting":""} ${reveal?"is-revealing":""} ${matchPresented?"is-complete":""}`} data-phase={phase} data-outcome={matchPresented ? state.winnerId===meId?"win":state.winnerId===null?"draw":"loss" : undefined} aria-label="Piedra, papel o tijera">
- {entrance&&state&&<DuelAnimeEntrance game="FUTSAL BATTLE" leftName={myName} rightName={rivalName} leftAvatar={<OwnedCardPortrait userId={meId}/>} rightAvatar={isBot?<LupiStoryPose pose="determined" label="Profe Lupi"/>:<ArenaAvatar player={players.find(p=>p.userId===rivalId)??portraits.find(p=>p.userId===rivalId)} catalog={catalog} name={rivalName}/>} leftLine="¡Esta mano la juego con todo!" rightLine={isBot?"¡A ver si podés leer mi estrategia!":"¡No vas a anticipar mi jugada!"} onDone={()=>setEntrance(false)}/>}
+ {entrance&&state&&<DuelAnimeEntrance game="PIEDRA, PAPEL O TIJERA" leftName={myName} rightName={rivalName} leftAvatar={<OwnedCardPortrait userId={meId}/>} rightAvatar={isBot?<LupiStoryPose pose="determined" label="Profe Lupi"/>:<ArenaAvatar player={players.find(p=>p.userId===rivalId)??portraits.find(p=>p.userId===rivalId)} catalog={catalog} name={rivalName}/>} leftLine="¡Esta mano la juego con todo!" rightLine={isBot?"¡A ver si podés leer mi estrategia!":"¡No vas a anticipar mi jugada!"} onDone={()=>setEntrance(false)}/>}
  {matchPresented&&<DuelResultEffects key={challenge.id} outcome={state.winnerId===meId?"win":state.winnerId===null?"draw":"loss"}/> }
   <DuelGameHeader game="rps" onBack={exit} mode={isBot?'VS BOT':'1 VS 1'} subtitle="FUTSAL BATTLE · LEÉ LA JUGADA" title={<>PIEDRA, PAPEL <em>O TIJERA</em></>}/>
 
+  <div className="rps-duel-scene">
   <div data-round-outcome={reveal ? mine===theirs?"draw":roundWin==="¡RONDA TUYA!"?"win":"loss" : undefined} className={`rps-clash ${reveal?'is-revealed':''} ${finished?'is-final':''} ${chant?'is-chanting':''} ${selected&&!reveal&&!chant?"is-selected":""}`} key={reveal?revealKey:'secret'}>
-   <div className="rps-battle-world" aria-hidden="true"><div className="rps-battle-lights"/><div className="rps-battle-court"><i/><i/></div><div className="rps-battle-goal"/><div className="rps-battle-speed"/></div>
+   <div className="rps-battle-world" aria-hidden="true"><div className="rps-battle-lights"/><RpsPitch/><div className="rps-battle-court"><i/><i/></div><div className="rps-battle-goal"/><div className="rps-battle-speed"/></div>
    <div className="rps-battle-cast">
     {[{id:meId,name:myName,own:true},{id:rivalId,name:rivalName,own:false}].map(player=>{
      const outcome=matchPresented?(state.winnerId===null?'draw':state.winnerId===player.id?'win':'loss'):reveal?(mine===theirs?'draw':(roundWin==='¡RONDA TUYA!')===player.own?'win':'loss'):'focus';
@@ -123,15 +127,19 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
     })}
     <div className="rps-scoreboard rps-battle-score" aria-label={`Marcador: ${myName} ${shownMyWins}, ${rivalName} ${shownRivalWins}`}><b className={phase==='next'&&(roundMineWon||roundRivalWon)?'rps-score-arrived':undefined}><span>{shownMyWins}</span><i>:</i><span>{shownRivalWins}</span></b><span>{chant?'MANOS SELLADAS':matchPresented?'FINAL':phase==='next'?'PRÓXIMA JUGADA':`RONDA ${state?.round??1} / 3`}</span></div>
    </div>
-   {reveal&&phase!=="next"&&phase!=="ready"&&<div className="rps-battle-impact" aria-hidden="true"><b>{mine===theirs?'¡BLOQUEO!':roundWin==='¡RONDA TUYA!'?'¡GOLAZO!':'¡CONTRAATAQUE!'}</b>{Array.from({length:18},(_,i)=><i key={i} style={{'--angle':`${i*20}deg`,'--distance':`${65+(i%4)*25}px`,'--delay':`${(i%3)*35}ms`} as CSSProperties}/>)}</div>}
+   {chant&&<RpsClashFx phase="chant"/>}
+   {reveal&&phase!=="next"&&phase!=="ready"&&valid(mine)&&valid(theirs)&&<RpsClashFx phase="reveal" result={roundResult(mine,theirs)} bang={bangFor(mine,theirs)}/>}
+   {phase==='impact'&&valid(mine)&&valid(theirs)&&<RpsImpactFrame result={roundResult(mine,theirs)}/>}
+
    {phase==='point'&&(roundMineWon||roundRivalWon)&&<span className={`rps-point-flight ${roundMineWon?'is-own':'is-rival'}`} aria-hidden="true">+1</span>}
    {phase==='next'&&!finished&&<span className="rps-next-play" role="status">¡PRÓXIMA JUGADA!</span>}
    <div className="rps-clash__side">{chant?<RpsHand move="rock"/>:reveal?<RpsHand move={mine as Move}/>:selected?<RpsHand move={selected}/>:<RpsHand move="rock"/>}<small>{reveal?label(mine!):selected?"TU MANO · SECRETA":"TU PRÓXIMA JUGADA"}</small></div>
    <div className="rps-clash__center"><b key={chant}>{chant|| (reveal?"⚡":"VS")}</b><span>{chant?"LAS DOS MANOS ESTÁN SELLADAS":reveal?roundWin:state?.opponentSubmitted?"RIVAL LISTO":"ELECCIÓN SECRETA"}</span></div>
    <div className="rps-clash__side rps-clash__side--rival">{chant?<RpsHand move="rock"/>:reveal?<RpsHand move={theirs as Move}/>:<span className="rps-mystery" aria-label="Mano rival oculta">?</span>}<small>{reveal?label(theirs!):"NO MUESTRES TU JUEGO"}</small></div>
   </div>
-  <div className={matchPresented?"rps-result-scene":"rps-live-scene"}>
   <div className="rps-live" role="status"><button className="rps-battle-sound" type="button" aria-pressed={!muted} onClick={()=>{const next=!muted;duelFx.setMuted(next);setMuted(next);}}>{muted?"♪ ACTIVAR SONIDO":"♪ SONIDO ACTIVADO"}</button>{connection.stopped?<h3>DUELO INTERRUMPIDO</h3>:chant?<h3>¡A LA CUENTA DE TRES!</h3>:matchPresented?<h3>{verdict}</h3>:phase==='next'?<><h3>{finished?"¡DUELO DEFINIDO!":"¡PRÓXIMA JUGADA!"}</h3><p>{finished?"Preparando el resultado…":"Volvé a leer al rival. Ya casi…"}</p></>:revealing?<><h3>{roundWin}</h3><p>Preparando el próximo choque…</p></>:<><h3>{busy?"SELLANDO TU MANO…":state?.mineSubmitted?"MANO ENVIADA ✓":"ELEGÍ TU JUGADA"}</h3><p>{!state?"Entrando a la arena…":state.mineSubmitted?"Tu elección está oculta. Esperando al rival…":"Leé su gesto, elegí tu mano y ganá el choque."}</p></>}{reveal&&<aside className={`rps-anime-dialogue ${mine===theirs?'is-tie':roundWin==='¡RONDA TUYA!'?'is-positive':'is-focus'}`}><small>{isBot?'PROFE LUPI':mine===theirs?'DUELO PAREJO':roundWin==='¡RONDA TUYA!'?'VOS':'RIVAL'}</small><p>{mine===theirs?'¡Misma lectura! Esta mano se define en la próxima.':roundWin==='¡RONDA TUYA!'?(isBot?'¡Muy bien leída! Esa jugada fue toda tuya.':'¡Leíste el movimiento y te quedaste con la ronda!'):(isBot?'¡Te anticipé esta vez! Ajustá la estrategia y vamos otra.':'El rival leyó tu jugada. Cambiá el ritmo en la próxima.')}</p></aside>}</div>
+  </div>
+  <div className={matchPresented?"rps-result-scene":"rps-live-scene"}>
   {error&&<p role="alert" className="rps-error">{error} <button type="button" onClick={()=>void refresh()}>RECONECTAR</button></p>}
   <DuelConnectionNotice {...connection} onRetry={()=>void connection.ping()} onExit={exit}/>
   {!finished&&!connection.stopped&&<div className="rps-choices">{choices.map(c=><button key={c.id} type="button" aria-pressed={selected===c.id} disabled={!state||connection.networkError||busy||entrance||!!chant||revealing||state.mineSubmitted} onClick={()=>void choose(c.id)}><RpsHand move={c.id}/><strong>{c.label}</strong><em>{c.id==="rock"?"POTENCIA":c.id==="paper"?"CONTROL":"VELOCIDAD"}</em><small>{c.beats}</small></button>)}</div>}

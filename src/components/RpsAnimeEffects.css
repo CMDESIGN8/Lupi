@@ -1,0 +1,70 @@
+.rpsf-pitch{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.rpsf-pitch__floor{position:absolute;left:-14%;right:-14%;bottom:-4%;height:46%;transform:perspective(520px) rotateX(64deg);transform-origin:50% 100%;
+  -webkit-mask-image:linear-gradient(to top,#000 35%,transparent);mask-image:linear-gradient(to top,#000 35%,transparent);animation:rpsf-line-pulse 3.4s ease-in-out infinite}
+.rpsf-pitch__floor svg{display:block;width:100%;height:100%;fill:none;stroke:#5ff0ff;stroke-width:2;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 6px #25d8ff99)}
+.rpsf-pitch__floor svg *{vector-effect:non-scaling-stroke}
+.rpsf-pitch__floor .rpsf-dot{fill:#5ff0ff;stroke:none}
+.rpsf-pitch__beam{position:absolute;top:-12%;width:36%;height:84%;background:linear-gradient(180deg,#c6f7ff3a,transparent 82%);clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);transform-origin:50% 0;mix-blend-mode:screen;animation:rpsf-sway 7s ease-in-out infinite alternate}
+.rpsf-pitch__beam--a{left:2%}
+.rpsf-pitch__beam--b{left:32%;animation-delay:-2.4s;animation-duration:9s}
+.rpsf-pitch__beam--c{right:2%;background:linear-gradient(180deg,#ffe9923a,transparent 82%);animation-delay:-4.1s}
+.rpsf-pitch__crowd{position:absolute;inset:0 0 52% 0}
+.rpsf-pitch__crowd i{position:absolute;left:var(--x);top:var(--y);width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 7px 2px #ffffffb0;opacity:0;animation:rpsf-twinkle var(--t) var(--d) ease-in-out infinite}
+@keyframes rpsf-sway{from{rotate:-9deg}to{rotate:9deg}}
+@keyframes rpsf-twinkle{0%,82%,100%{opacity:0;scale:.5}88%{opacity:1;scale:1.5}94%{opacity:.2}}
+@keyframes rpsf-line-pulse{0%,100%{opacity:.4}50%{opacity:.7}}
+
+
+.rpsf-fx{--ln:#ffffff40;position:absolute;inset:0;z-index:4;pointer-events:none}
+.rpsf-fx--win{--ln:#ffe58a}.rpsf-fx--lose{--ln:#ff7b7b}.rpsf-fx--tie{--ln:#7df0ff}
+.rpsf-speed{position:absolute;inset:0;overflow:hidden;opacity:.6;-webkit-mask-image:radial-gradient(ellipse at center,transparent 14%,#000 55%,transparent 80%);mask-image:radial-gradient(ellipse at center,transparent 14%,#000 55%,transparent 80%)}
+.rpsf-speed:before{content:'';position:absolute;left:50%;top:50%;width:230%;aspect-ratio:1;translate:-50% -50%;background:repeating-conic-gradient(from 0deg,transparent 0 5deg,var(--ln) 5.3deg 5.8deg,transparent 6.2deg 12deg);animation:rpsf-spin .6s linear infinite}
+.rpsf-fx--chant .rpsf-speed{--ln:#bff6ff4a}
+.rpsf-speed--b{opacity:.35}.rpsf-speed--b:before{animation-duration:1.1s;animation-direction:reverse}
+.rpsf-fx--reveal .rpsf-speed{animation:rpsf-speed-out 1.6s ease-out both}
+@keyframes rpsf-spin{to{rotate:360deg}}
+@keyframes rpsf-speed-out{0%{opacity:.9}100%{opacity:0}}
+.rpsf-shock{position:absolute;left:50%;top:50%;width:60px;height:60px;border:3px solid var(--ln);border-radius:50%;translate:-50% -50%;animation:rpsf-shock .7s ease-out both}
+.rpsf-shock--2{animation-delay:.12s;border-width:2px}
+@keyframes rpsf-shock{from{scale:.2;opacity:.95}to{scale:5.5;opacity:0}}
+
+
+/* Chispas y confeti */
+.rpsf-spark{position:absolute;left:50%;top:50%;width:var(--w);height:14px;margin:-7px 0 0 -2px;border-radius:2px;background:linear-gradient(#fff,var(--ln));opacity:0;animation:rpsf-spark .62s .02s ease-out both}
+@keyframes rpsf-spark{0%{opacity:1;transform:rotate(var(--a)) translateY(0)}100%{opacity:0;transform:rotate(var(--a)) translateY(calc(var(--d) * -1))}}
+.rpsf-confetti{position:absolute;top:-6px;left:var(--x);width:6px;height:11px;background:var(--c);opacity:0;animation:rpsf-confetti 1.7s var(--delay) ease-in both}
+@keyframes rpsf-confetti{0%{opacity:1;transform:translateY(-8px) rotate(0)}100%{opacity:0;transform:translateY(250px) rotate(var(--spin))}}
+
+/* Onomatopeya de manga */
+.rpsf-bang{--bg:#ffd84d;--tx:#1a1200;--glow:#ffb300aa;position:absolute;left:50%;top:-6%;translate:-50% 0;isolation:isolate;display:grid;place-items:center;gap:2px;padding:10px 26px 12px;text-align:center;white-space:nowrap;animation:rpsf-bang 1.9s cubic-bezier(.2,1.5,.35,1) both}
+.rpsf-bang:before{content:'';position:absolute;inset:-18% -14%;z-index:-1;background:var(--bg);clip-path:polygon(50% 0,58% 14%,74% 4%,76% 22%,96% 20%,86% 38%,100% 50%,86% 62%,96% 80%,76% 78%,74% 96%,58% 86%,50% 100%,42% 86%,26% 96%,24% 78%,4% 80%,14% 62%,0 50%,14% 38%,4% 20%,24% 22%,26% 4%,42% 14%)}
+.rpsf-bang b{font:italic 900 clamp(26px,7vw,50px)/1 'Barlow Condensed',Impact,sans-serif;letter-spacing:.02em;color:var(--tx);filter:drop-shadow(0 0 10px var(--glow))}
+.rpsf-bang small{font:900 clamp(8px,2vw,11px)/1 Barlow,system-ui,sans-serif;letter-spacing:.16em;color:var(--tx);opacity:.85}
+.rpsf-bang--lose{--bg:#ff5360;--tx:#fff;--glow:#ff2d3acc}
+.rpsf-bang--tie{--bg:#5ff0ff;--tx:#02202b;--glow:#25d8ffaa}
+.rpsf-bang.is-final{animation-duration:2.8s}
+.rpsf-bang.is-final b{font-size:clamp(30px,8.4vw,62px)}
+@keyframes rpsf-bang{0%{opacity:0;scale:.15;rotate:-16deg}16%{opacity:1;scale:1.28;rotate:-5deg}30%{scale:1;rotate:-6deg}84%{opacity:1;scale:1;rotate:-6deg}100%{opacity:0;scale:.92;rotate:-6deg;translate:-50% -12px}}
+
+
+/* ---------- Impact frame de pantalla completa (un solo destello suave) ---------- */
+.rpsf-impact{--ic:#fff6c8;position:absolute;inset:0;z-index:30;pointer-events:none;background:radial-gradient(circle at 50% 46%,#fff 0,var(--ic) 32%,transparent 74%);animation:rpsf-impact .46s ease-out both}
+.rpsf-impact--lose{--ic:#ff9aa0}.rpsf-impact--tie{--ic:#9ff4ff}
+@keyframes rpsf-impact{0%{opacity:0}7%{opacity:.8}22%{opacity:.1}36%{opacity:.3}100%{opacity:0}}
+
+
+/* These layers follow the existing court, faces and central scoreboard. */
+.rps-futsal-battle .rpsf-pitch{z-index:0}
+.rps-futsal-battle .rpsf-pitch__floor{display:none}
+.rps-futsal-battle .rpsf-pitch__beam{opacity:.35}
+.rps-futsal-battle .rpsf-pitch__crowd i{opacity:.25}
+.rps-futsal-battle .rpsf-fx{inset:38% 0 0;z-index:3;overflow:visible}
+.rps-futsal-battle .rpsf-speed:before{animation-iteration-count:2}
+.rps-futsal-battle .rpsf-bang{top:0;max-width:82%;padding:7px 16px 9px}
+.rps-futsal-battle .rpsf-bang b,.rps-futsal-battle .rpsf-bang.is-final b{font-size:clamp(22px,3vw,32px)}
+.rps-futsal-battle .rpsf-bang small{font-size:8px}
+.rps-futsal-battle .rpsf-impact{z-index:5;animation-name:rpsf-impact-soft}
+.rps-futsal-battle .rps-battle-speed{display:none}
+@keyframes rpsf-impact-soft{0%{opacity:0}15%{opacity:.23}100%{opacity:0}}
+@media(max-width:600px){.rps-futsal-battle .rpsf-pitch__crowd i:nth-child(odd){display:none}.rps-futsal-battle .rpsf-bang b,.rps-futsal-battle .rpsf-bang.is-final b{font-size:22px}.rps-futsal-battle .rpsf-bang{padding:5px 10px 7px}}
+@media(prefers-reduced-motion:reduce){.rps-futsal-battle .rpsf-pitch,.rps-futsal-battle .rpsf-speed,.rps-futsal-battle .rpsf-shock,.rps-futsal-battle .rpsf-spark,.rps-futsal-battle .rpsf-confetti,.rps-futsal-battle .rpsf-impact{display:none!important}.rps-futsal-battle .rpsf-bang{animation:none!important;opacity:1}}
