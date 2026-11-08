@@ -2,7 +2,7 @@ import {useFutsalStory} from '../hooks/useFutsalStory';
 import {FutsalStoryChapter} from '../components/FutsalStoryChapter';
 import { LobbyActionIcon } from "../components/LobbyActionIcon";
 import { LobbyAvatarStage } from "../components/LobbyAvatarStage";
-import { LupiStoryPose } from "../components/LupiStoryPose";
+import lobbyLupiSeated from "../assets/lobby-lupi-seated.webp";
 import { MissionBriefing } from "../components/MissionBriefing";
 import type { DailyMission } from "../types/campaignStory";
 import { supabase } from "../lib/supabaseClient";
@@ -56,6 +56,7 @@ import { DuelVersus } from "../components/DuelVersus";
 import "./LupiRewardAnime.css";
     import "./LupiWorld_Theme.css";
 import "./LobbyCinematic.css";
+import "./LobbyReference.css";
     import {
       useLobbyChallenges,
       type Challenge,
@@ -1344,7 +1345,7 @@ onChallengeGame={(player, game) => {
       onClick={() => setShowPlayersSheet(true)}
       aria-label="Ver jugadores en línea"
     >
-      <span aria-hidden>👥</span>
+      <span aria-hidden><LobbyActionIcon kind="people"/></span>
       <em>{lobbyPlayers.filter(p => p.userId !== user.id).length}</em>
     </button>
 
@@ -1393,7 +1394,7 @@ onChallengeGame={(player, game) => {
                       return sent;
                     }}
                   />}
-                  <div className="gh-lobby-coach"><LupiStoryPose pose="welcome" label="Lupi te acompaña en el vestuario"/><p>¿Listo para salir<br/>a la cancha?</p></div>
+                  <div className="gh-lobby-coach"><img className="gh-lobby-lupi-seated" src={lobbyLupiSeated} alt="Lupi sentado, listo para acompañarte" draggable={false}/><p>¿Listo para salir<br/>a la cancha?</p></div>
                   <LobbyAvatarStage>
         <div className="gh-avatar-customize-trigger gh-avatar-actionbar" role="group" aria-label="Mi personaje"><button type="button" onClick={()=>setShowAvatarEditor(true)}><LobbyActionIcon kind="shirt"/><span>PERSONALIZAR</span></button><button type="button" onClick={()=>setGameTab("deck")}><LobbyActionIcon kind="card"/><span>MI CARTA</span></button></div>
         <LockerPreview
@@ -1476,7 +1477,7 @@ onChallengeGame={(player, game) => {
                       <>
                         <span className="gh-world__next-kicker">LUPI TE ACOMPAÑA · {lupiRecommendation.reason}</span>
                         {lupiRecommendation.action === "pack" && <span className="gh-lobby-pack-art" aria-hidden="true">LUPI<small>PACK</small></span>}
-                        <strong>{lupiRecommendation.title}</strong>
+                        <strong>{lupiRecommendation.action === "pack" ? "Tenés un pack para abrir" : lupiRecommendation.title}</strong>
                         <p>{lupiRecommendation.description}</p>
                         <button type="button" onClick={() => runLupiRecommendation(lupiRecommendation.action)}>
                           ⚡ {lupiRecommendation.button} →
@@ -1544,6 +1545,7 @@ onChallengeGame={(player, game) => {
                       <strong>{story.loading ? 'CARGANDO…' : story.progress?.status === 'match' ? 'CONTINUAR PARTIDO' : story.progress?.status === 'completed' ? 'JUGAR PARTIDO' : story.progress ? 'CONTINUAR HISTORIA' : 'EMPEZAR HISTORIA'}</strong>
                     </span>
                     <span className="gh-world__play-arrow" aria-hidden>→</span>
+                    <em className="gh-lobby-play-tagline">Tu próxima jugada empieza acá</em>
                   </button>
 
                   {lobbyCommunity && <button type="button" className="gh-lobby-community" onClick={() => setShowCommunities(true)} title="Abrir mis comunidades" style={{display:"block",margin:"6px auto",padding:"7px 14px",border:"1px solid #2bd7ff",borderRadius:9,background:"#072635",color:"#d7f8ff",fontWeight:800,cursor:"pointer",maxWidth:"min(90vw,320px)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>🏟️ {lobbyCommunity} · Mi comunidad →</button>}
@@ -1596,42 +1598,13 @@ onChallengeGame={(player, game) => {
                   </div>
                   {showExploreWorld && <ExploreWorld deck={activeDeck} unlocked={unlockedAchievements.length} onClose={()=>setShowExploreWorld(false)} onMatch={()=>handleGameNavigate("battle")} onDeck={()=>handleGameNavigate("deck")} onAlbum={()=>handleGameNavigate("album")} onAchievements={()=>setShowAchievements(true)}/>}
 
-                  <div className="gh-world__dock">
-                    <button type="button" onClick={() => setShowCommunities(true)}><span>♧</span><strong>CLUBES</strong></button>
-                    <button className="is-active" type="button" onClick={() => setView("lobby")}>
-                      <span>⚽</span><strong>LOBBY</strong>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowAchievements(true)}
-                    >
-                      <span>🏆</span>
-                      <strong>LOGROS</strong>
-                      {unlockedAchievements.length > 0 && (
-                        <em>{unlockedAchievements.length}</em>
-                      )}
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                          setShowPackModal(true);
-                          updateMissionProgress("open_pack");
-                        }}
-                      >
-                        <span>🎁</span>
-                        <strong>PACK</strong>
-
-                        {packCount > 0 && (
-                          <em>{packCount}</em>
-                        )}
-                      </button>
-                    <button type="button" onClick={() => handleGameNavigate("deck")}>
-                      <span>👕</span><strong>EQUIPO</strong>
-                    </button>
-                    <button type="button" onClick={() => handleGameNavigate("album")}>
-                      <span>▦</span><strong>ÁLBUM</strong>
-                    </button>
-                  </div>
+                  <nav className="gh-world__dock" aria-label="Navegación del lobby">
+                    <button type="button" onClick={() => setShowCommunities(true)}><LobbyActionIcon kind="club"/><strong>CLUB</strong></button>
+                    <button className="is-active" type="button" onClick={() => setView("lobby")} aria-current="page"><LobbyActionIcon kind="ball"/><strong>LOBBY</strong></button>
+                    <button type="button" onClick={() => {setShowPackModal(true);updateMissionProgress("open_pack");}}><LobbyActionIcon kind="pack"/><strong>PACK</strong>{packCount > 0 && <em>{packCount}</em>}</button>
+                    <button type="button" onClick={() => handleGameNavigate("deck")}><LobbyActionIcon kind="shirt"/><strong>EQUIPO</strong></button>
+                    <button type="button" onClick={() => setShowAchievements(true)}><LobbyActionIcon kind="trophy"/><strong>LOGROS</strong>{unlockedAchievements.length > 0 && <em>{unlockedAchievements.length}</em>}</button>
+                  </nav>
                 </div>
               )}
 

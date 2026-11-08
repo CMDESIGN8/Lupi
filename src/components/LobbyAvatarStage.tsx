@@ -7,7 +7,10 @@ export function LobbyAvatarStage({ children }: { children: ReactNode }) {
   useLayoutEffect(() => {
     const element = ref.current;
     if (!element) return;
-    const measure = () => setScale(Math.max(.3, Math.min(1.2, (element.clientHeight - 36) / 420)));
+    const measure = () => {
+      const rigUnit = Number.parseFloat(getComputedStyle(element).getPropertyValue("--lobby-rig-unit")) || 420;
+      setScale(Math.max(.3, Math.min(1.2, (element.clientHeight - 36) / rigUnit)));
+    };
     measure();
     if (typeof ResizeObserver !== 'undefined') {
       const observer = new ResizeObserver(measure);
