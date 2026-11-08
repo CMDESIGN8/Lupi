@@ -31,7 +31,7 @@ export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], o
   const [portraits] = useState(() => players.filter(p => p.userId === challenge.fromId || p.userId === challenge.toId));
   const portrait = (id: string, name: string) => { const player = players.find(p => p.userId === id) ?? portraits.find(p => p.userId === id); const last=state?.history[state.history.length-1]; const eventLive=!!last&&Date.parse(state.nextAt)>Date.parse(state.serverNow)+Math.max(0,Date.now()-receivedAt); const mood=state?.status === "finished" ? (state.winnerId === id ? "celebrate" : "presentation") : eventLive&&last?.goal ? (last.attackerId===id?"celebrate":"presentation") : eventLive&&last?.defended ? (last.attackerId===id?"presentation":"celebrate") : "focus"; return <span className={`fp-avatar trivia-portrait fp-avatar--${mood}`} aria-hidden="true">{player?.appearance ? <AvatarFace mood={mood} appearance={player.appearance} className="lw-face--game" /> : <span>{name.slice(0,1).toUpperCase()}</span>}</span>; };
   const fullAvatar = (id:string,name:string) => <ArenaAvatar player={players.find(p=>p.userId===id) ?? portraits.find(p=>p.userId===id)} catalog={catalog} isMe={id===meId} name={name}/>;
-  const entranceAvatar = (id:string,name:string) => id===meId ? <OwnedCardPortrait userId={meId}/> : fullAvatar(id,name);
+  const entranceAvatar = (id:string,name:string) => { const player=players.find(p=>p.userId===id) ?? portraits.find(p=>p.userId===id); return player?.appearance ? fullAvatar(id,name) : <OwnedCardPortrait userId={id}/>; };
   const [now, setNow] = useState(Date.now());
   const [confirmExit, setConfirmExit] = useState(false);
   const sendingChoice = useRef(false);

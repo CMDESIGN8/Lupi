@@ -26,3 +26,11 @@ npx vitest run --config tests/futsal-desktop.config.ts
 ## Resultado: dos columnas
 
 Ver la cancha y Relato del partido se agrupan en una misma grilla de dos columnas desde 900 px, con ancho parejo y sin superposición. En móvil quedan en una columna. Cada panel puede abrirse de forma independiente. Se conserva el contenido del partido y la lógica de recompensas. Compilación del componente y CSS correcta.
+
+## Encuadre de avatares en la entrada
+
+La entrada compartida calcula una sola escala por espacio disponible y la aplica tanto a ArenaAvatar como a OwnedCardPortrait. Se eliminan los zooms acumulados y se fija el origen del rig para evitar recortes. Los diálogos tienen una fila propia, separada del cuerpo. En Futsal se usa el personaje ya disponible del lobby; si falta, se consulta el personaje de ese usuario. La carga pendiente se indica en pantalla.
+
+Compilación correcta y 4 pruebas de escala compartida, cambio de tamaño a móvil, duración de entrada y limpieza del observador/temporizador. El encuadre visual final requiere revisión en el navegador del usuario.
+
+Pruebas: npx vitest run --config tests/duel-avatar.config.ts
