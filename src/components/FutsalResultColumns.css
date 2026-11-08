@@ -1,0 +1,26 @@
+/* Both post-match disclosures share one grid, below the final scene. */
+.fp-arena.fp-arena--result>.fp-result-layout{
+ display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:12px;
+ grid-column:1/-1!important;width:100%!important;max-width:none!important;min-width:0;
+ box-sizing:border-box;margin:0!important;position:relative;isolation:isolate;
+}
+.fp-arena.fp-arena--result>.fp-result-layout>.fp-match-extra{
+ position:relative!important;inset:auto!important;float:none!important;grid-column:auto!important;grid-row:auto!important;
+ width:100%!important;max-width:none!important;min-width:0!important;height:auto!important;align-self:start;
+ box-sizing:border-box;margin:0!important;padding:0!important;transform:none!important;
+}
+.fp-arena.fp-arena--result .fp-result-layout>.fp-match-extra>summary{
+ position:relative;display:flex;align-items:center;gap:12px;min-height:74px;width:100%;box-sizing:border-box;padding:12px 14px;
+}
+.fp-arena.fp-arena--result .fp-result-layout>.fp-match-extra>summary>span{min-width:0;overflow-wrap:anywhere;font-size:19px;line-height:1.2}
+.fp-arena.fp-arena--result .fp-result-layout>.fp-match-extra>summary small{font-size:10px;line-height:1.4}
+.fp-arena.fp-arena--result .fp-result-layout>.fp-match-extra>summary>b{flex-shrink:0}
+.fp-arena.fp-arena--result .fp-result-layout .fp-history{max-height:380px;overflow-y:auto;overscroll-behavior:contain;margin:0;padding:0 14px 12px;box-sizing:border-box}
+.fp-arena.fp-arena--result .fp-result-layout .pvp-simulator-stage{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+@media(min-width:900px){
+ .fp-arena.fp-arena--result>.fp-result-layout{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+ .fp-arena.fp-arena--result>.fp-result-layout>.fp-match-extra:only-child{grid-column:1/-1!important}
+}
+@media(max-width:899px){
+ .fp-arena.fp-arena--result .fp-result-layout>.fp-match-extra>summary{min-height:65px;padding:11px 12px}
+}

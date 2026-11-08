@@ -20,6 +20,7 @@ import "./FutsalResultCinema.css";
 import "./FutsalClub.css";
 import "./FutsalFinale.css";
 import "./FutsalFormation.css";
+import "./FutsalResultColumns.css";
 import { PvpSimulatorCourt } from "./match/PvpSimulatorCourt";
 import { DuelGameHeader } from "./DuelGameHeader";
 import { DuelAnimeEntrance } from './DuelAnimeEntrance';
@@ -134,8 +135,9 @@ export function FutsalPvp({ challenge, meId, deck, players = [], catalog = [], o
       <div className="fp-finale__bottom"><span>{state.winnerId===null?"Un duelo a la altura del club.":won?"Esta cancha ya conoce tu nombre.":"La revancha empieza en el próximo partido."}</span><button type="button" className="fp-primary" onClick={onExit}>VOLVER AL CLUB <span aria-hidden="true"> →</span></button></div>
       <details className="fp-finale__stats"><summary>RESUMEN DEL DUELO</summary><div><span><b>{ownScore}</b>GOLES TUYOS</span><span><b>{attackResults(meId).length}/{totalAttacks}</b>ATAQUES JUGADOS</span><span><b>{state.history.filter(e=>e.attackerId!==meId&&e.defended).length}</b>CIERRES ACERTADOS</span></div></details>
       </div>
-      <div className="fp-result-layout"><details className="trivia-summary fp-final-court fp-match-extra"><summary><i className="fp-match-extra__icon"><ArenaSymbol kind="setpiece"/></i><span>VER LA CANCHA<small>Equipos que disputaron el partido</small></span><b>⌄</b></summary><PvpSimulatorCourt state={state} meId={meId} mine={mine} rival={rival} now={now} receivedAt={receivedAt} isHost={host}/></details></div>
+      <div className="fp-result-layout"><details className="trivia-summary fp-final-court fp-match-extra"><summary><i className="fp-match-extra__icon"><ArenaSymbol kind="setpiece"/></i><span>VER LA CANCHA<small>Equipos que disputaron el partido</small></span><b>⌄</b></summary><PvpSimulatorCourt state={state} meId={meId} mine={mine} rival={rival} now={now} receivedAt={receivedAt} isHost={host}/></details>
       {state.history.length > 0 && <details className="trivia-summary fp-match-extra fp-match-extra--replay"><summary><i className="fp-match-extra__icon"><ArenaSymbol kind="elaborated"/></i><span>RELATO DEL PARTIDO<small>{state.history.length} decisiones resueltas · Ver jugadas</small></span><b>⌄</b></summary><ol className="fp-history">{state.history.map(event=><li key={event.version}><b>{Math.ceil(event.turn/2)}. {event.attackerId===meId?"Tu ataque":"Ataque rival"}{(event.rulesVersion??1)>=2 ? ` · ${event.stage==="build" ? "Construcción" : "Definición"}` : ""}</b><p>{event.narrative}</p><small>{eventChoiceLabel(event,true)} / {eventChoiceLabel(event,false)}{event.hostAuto || event.guestAuto ? " · Elección automática" : ""}</small></li>)}</ol></details>}
+      </div>
     </>}
     <p className="trivia-footnote">Amistoso · Entrena habilidades · Sin XP de cuenta, monedas ni puntos de ranking{!ended && <> · {decisionSeconds}s por elección · Jugada automática al vencer el tiempo</>}</p>
     {confirmExit && <div className="trivia-confirm"><div role="dialog" aria-modal="true" aria-labelledby="fp-exit"><h3 id="fp-exit">¿Salir del partido?</h3><p>{state?.status === "playing" ? "Salir cuenta como abandono y el rival gana el duelo amistoso." : "Se cancelará la preparación de ambos equipos."}</p><button type="button" autoFocus onClick={() => setConfirmExit(false)}>SEGUIR JUGANDO</button><button type="button" disabled={busy} onClick={() => void finishExit()}>SALIR DEL PARTIDO</button></div></div>}
