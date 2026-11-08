@@ -1,4 +1,3 @@
-import {TriviaLearningHub} from "../components/TriviaLearningHub";
 import {useFutsalStory} from '../hooks/useFutsalStory';
 import {FutsalStoryChapter} from '../components/FutsalStoryChapter';
 import { MissionBriefing } from "../components/MissionBriefing";
@@ -1156,7 +1155,6 @@ const handleLobbyMissionClaim = async (missionId: string) => {
             {gameTab === "deck" && view === "match" && <button type="button" className="gh-return-preview" onClick={() => setGameTab("play")}>← Volver a la previa del partido</button>}
             <div className="gh-scene" key={sceneKey}>
               {view === "lobby" && gameTab === "play" && !showPlayersSheet && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={learningPracticeOpen||!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>}
-              {view === "lobby" && gameTab === "play" && !showPlayersSheet && !storyOpen && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && !asyncMatch && !incoming && !outgoing && !quick.game && <TriviaLearningHub onOpenChange={setLearningPracticeOpen}/>}
               {view === "lobby" && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && (
                 <QuickDuelPanel variant="pill" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
                   onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
