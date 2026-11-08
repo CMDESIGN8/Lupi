@@ -1,0 +1,198 @@
+/* Live lobby scene. Scoped to the lobby, never to team, battle or duel screens. */
+.gh-level-label{display:none}
+.gh-root.gh-root--cinematic{--lobby-gold:#ffdf55;--lobby-cyan:#42e4ef;background:#02131d!important;padding:0!important;min-height:100dvh!important;height:auto!important;overflow:visible!important}
+.gh-root.gh-root--cinematic .gh-shell{box-sizing:border-box!important;width:100%!important;max-width:1600px!important;margin:auto!important;padding:0!important;gap:0!important;min-height:100dvh!important}
+.gh-root.gh-root--cinematic .gh-shell>.gh-hud{position:relative!important;inset:auto!important;display:grid!important;grid-template-columns:1fr auto!important;align-items:center!important;gap:2px 16px!important;box-sizing:border-box!important;height:82px!important;min-height:82px!important;padding:12px 28px!important;background:linear-gradient(105deg,#052837,#03141e)!important;border:0!important;border-bottom:1px solid #42e4ef66!important;clip-path:none!important;border-radius:0!important;z-index:20!important;transform:none!important}
+.gh-root.gh-root--cinematic .gh-back--home{position:absolute!important;left:12px!important;top:9px!important;width:24px!important;padding:0!important;min-height:32px!important;font-size:0!important;background:transparent!important;border:0!important;color:#9cf9f3!important}
+.gh-root.gh-root--cinematic .gh-back--home>span{font-size:22px}
+.gh-root.gh-root--cinematic .gh-brand{position:static!important;transform:none!important;display:flex!important;align-items:flex-start!important;text-align:left!important;margin:0 0 0 20px!important;padding:0!important;min-width:0!important}
+.gh-root.gh-root--cinematic .gh-brand strong{font:900 italic clamp(23px,3.4vw,36px)/1 'Barlow Condensed',Impact,sans-serif!important;letter-spacing:.035em!important;color:#fff!important}
+.gh-root.gh-root--cinematic .gh-brand__player{font-size:11px!important;letter-spacing:.2em!important;color:#69e7f5!important;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gh-root.gh-root--cinematic .gh-hud__right{display:flex!important;position:static!important;transform:none!important;align-items:center!important;gap:10px!important;margin:0!important;min-width:0!important}
+.gh-root.gh-root--cinematic .gh-wallet{padding:8px 12px!important;border:1px solid #ffe06566!important;border-radius:30px!important;background:#091f27b0!important;font-size:20px!important;color:#ffdd52!important;gap:7px!important}
+.gh-root.gh-root--cinematic .gh-wallet__icon{font-size:18px!important}
+.gh-root.gh-root--cinematic .gh-level{width:48px!important;height:48px!important;min-width:48px!important}
+.gh-root.gh-root--cinematic .gh-level__core{display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:22px!important}.gh-root--cinematic .gh-level-label{display:block;font-size:6px;letter-spacing:.08em}
+.gh-root.gh-root--cinematic .gh-scene{position:relative!important;min-height:0!important;animation:none!important}
+.gh-root.gh-root--cinematic .gh-world{position:relative!important;inset:auto!important;box-sizing:border-box!important;height:max(640px,calc(100dvh - 82px))!important;min-height:640px!important;width:100%!important;overflow:hidden!important;isolation:isolate;background:linear-gradient(0deg,#02101fea,transparent 40%,#02101f38),url('../assets/lobby-locker-cinematic.webp') center 55%/cover no-repeat!important}
+.gh-root.gh-root--cinematic .gh-world:before{background:radial-gradient(ellipse at 50% 58%,transparent 20%,#00132033 85%)!important;z-index:-1!important}.gh-root.gh-root--cinematic .gh-world:after{background:linear-gradient(0deg,#02131dd9,transparent 32%)!important;z-index:-1!important}
+.gh-root.gh-root--cinematic>.gh-light,.gh-root.gh-root--cinematic .gh-world__lights,.gh-root.gh-root--cinematic .gh-world__grain{display:none!important}
+.gh-root.gh-root--cinematic .gh-world__left-rail{position:absolute!important;top:16px!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important;width:min(720px,calc(100% - 48px))!important;max-height:none!important;z-index:15!important;display:block!important;pointer-events:none!important}
+.gh-root.gh-root--cinematic .gh-world__left-rail>.gh-online,.gh-root.gh-root--cinematic .gh-world__left-rail>.gh-world__async{display:none!important}
+.gh-root.gh-root--cinematic .gh-world__next{position:relative!important;inset:auto!important;transform:none!important;translate:none!important;width:100%!important;max-width:none!important;height:auto!important;max-height:170px!important;min-height:66px!important;overflow:auto!important;box-sizing:border-box!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:4px 16px!important;padding:12px 18px!important;border:1px solid #49e3ed99!important;border-radius:14px 4px!important;background:linear-gradient(110deg,#073342ed,#031b27ef)!important;box-shadow:0 8px 25px #00131b77,0 0 20px #24dfee18!important;pointer-events:auto!important;clip-path:none!important}
+.gh-root.gh-root--cinematic .gh-world__next-kicker{grid-column:1!important;font-size:8px!important;letter-spacing:.09em!important;color:#7debe8!important}
+.gh-root.gh-root--cinematic .gh-world__next>strong{grid-column:1!important;font:800 italic 21px/1.1 'Barlow Condensed',system-ui,sans-serif!important;color:#fff!important}
+.gh-root.gh-root--cinematic .gh-world__next>p{grid-column:1!important;display:block!important;font-size:11px!important;line-height:1.3!important;margin:0!important;color:#bdd9e1!important}
+.gh-root.gh-root--cinematic .gh-world__next>button:not(.gh-world__next-secondary){grid-column:2!important;grid-row:1/4!important;align-self:center!important;min-height:42px!important;width:auto!important;max-width:210px!important;white-space:normal!important;padding:10px 16px!important;margin:0!important;font-size:12px!important;background:linear-gradient(110deg,#ffed93,#ffce31)!important;color:#08222f!important;border:0!important;border-radius:8px 3px!important}
+.gh-root.gh-root--cinematic .gh-world__next>.gh-world__next-secondary{font-size:9px!important;min-height:24px!important;padding:3px 6px!important;margin:0!important;grid-column:auto!important}
+.gh-root.gh-root--cinematic .gh-world__next--compact>p,.gh-root.gh-root--cinematic .gh-world__next--compact>.gh-world__next-secondary{display:none!important}
+.gh-root.gh-root--cinematic .gh-world__next--compact:has(.gh-lobby-pack-art){padding-left:84px!important}.gh-lobby-pack-art{position:absolute;left:18px;top:9px;width:45px;height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-12deg);border:2px solid #89f9ef;border-bottom-color:#ffdb52;background:linear-gradient(135deg,#10667b,#031d2a 45%,#075065);color:#fff;font:900 italic 13px/1.2 Impact,system-ui;box-shadow:0 0 14px #ffe26888}.gh-lobby-pack-art small{font-size:9px;color:#ffe264}
+.gh-root.gh-root--cinematic .gh-locker-zone{container-type:size;position:absolute!important;top:105px!important;bottom:190px!important;left:50%!important;right:auto!important;width:min(650px,90%)!important;height:auto!important;max-width:none!important;transform:translateX(-50%)!important;translate:none!important;z-index:5!important;pointer-events:none!important;display:block!important}
+.gh-root.gh-root--cinematic .gh-locker-zone>.gh-avatar-actionbar{position:absolute!important;inset:0 0 auto!important;width:100%!important;height:38px!important;max-width:none!important;margin:0!important;translate:none!important;transform:none!important;display:flex!important;justify-content:space-between!important;gap:10px!important;overflow:visible!important;border:0!important;background:none!important;box-shadow:none!important;pointer-events:none!important}
+.gh-root.gh-root--cinematic .gh-avatar-actionbar>button{pointer-events:auto!important;width:auto;min-height:36px!important;padding:8px 13px!important;color:#b9fffa!important;background:#052d3ddd!important;border:1px solid #4be8ed!important;border-radius:9px 3px!important;box-shadow:0 0 18px #2fe6e922;font-size:11px!important}
+.gh-root.gh-root--cinematic .locker-preview{position:absolute!important;inset:0!important;min-height:0!important;height:100%!important;width:100%!important;padding:0!important;background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;overflow:visible!important;pointer-events:none!important}
+.gh-root.gh-root--cinematic .locker-header,.gh-root.gh-root--cinematic .locker-footer,.gh-root.gh-root--cinematic .locker-rarity,.gh-root.gh-root--cinematic .locker-character-grid,.gh-root.gh-root--cinematic .locker-preview:before,.gh-root.gh-root--cinematic .locker-preview:after{display:none!important}
+.gh-root.gh-root--cinematic .locker-character{position:absolute!important;inset:42px 0 0!important;width:100%!important;height:auto!important;margin:0!important;overflow:visible!important;background:none!important}
+.gh-root.gh-root--cinematic .locker-avatar{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;transform:none!important;overflow:visible!important}
+.gh-root.gh-root--cinematic .locker-avatar .avatar2d{position:absolute!important;left:50%!important;right:auto!important;top:auto!important;bottom:0!important;width:390px!important;height:520px!important;margin:0!important;transform:translateX(-50%) scale(var(--lobby-avatar-scale,.7))!important;transform-origin:center bottom!important;filter:drop-shadow(0 9px 12px #0007)!important}
+.gh-root.gh-root--cinematic .locker-platform{position:absolute!important;left:50%!important;bottom:-2px!important;top:auto!important;width:65%!important;height:16px!important;transform:translateX(-50%)!important;border:1px solid #3ce5ef!important;border-radius:50%!important;box-shadow:0 0 17px #36ebf766!important;background:#2cefff0b!important}
+.gh-root.gh-root--cinematic .locker-equipment{position:absolute!important;inset:52px 0 auto auto!important;width:58px!important;height:auto!important;display:flex!important;flex-direction:column!important;gap:9px!important;transform:none!important;z-index:20!important;pointer-events:auto!important}
+.gh-root.gh-root--cinematic .gh-locker-zone .locker-equipment .locker-slot{position:relative!important;inset:auto!important;transform:none!important;translate:none!important;width:58px!important;height:58px!important;min-width:58px!important;min-height:58px!important;max-width:58px!important;max-height:58px!important;aspect-ratio:1!important;margin:0!important;padding:7px!important;background:#022734dd!important;border:1px solid #46dfdfaa!important;border-radius:12px!important;box-shadow:0 0 10px #35dcdd22!important}
+.gh-root.gh-root--cinematic .locker-slot-info,.gh-root.gh-root--cinematic .locker-slot-arrow{display:none!important}
+.gh-root.gh-root--cinematic .gh-lobby-coach{position:absolute;bottom:192px;left:max(20px,calc(50% - 420px));width:170px;height:220px;z-index:7;pointer-events:none}
+.gh-lobby-coach>.lupi-story-pose{height:100%;filter:drop-shadow(0 5px 9px #00131b99)}.gh-lobby-coach>p{position:absolute;top:-45px;left:20px;margin:0;padding:12px 14px;background:#ecfff4;color:#062335;border:2px solid #32dbe4;border-radius:15px 15px 15px 2px;box-shadow:3px 4px #031d2e;font:800 italic 15px/1.15 system-ui;transform:rotate(-3deg)}
+.gh-root.gh-root--cinematic .gh-world__play{position:absolute!important;left:50%!important;top:auto!important;bottom:115px!important;transform:translateX(-50%)!important;translate:none!important;width:min(540px,calc(100% - 112px))!important;height:66px!important;min-height:66px!important;max-height:none!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:14px!important;padding:10px 20px!important;background:linear-gradient(115deg,#fff0a0,#ffdc46 70%,#ffbf21)!important;color:#041e2b!important;border:1px solid #fff3b8!important;border-radius:13px 4px!important;box-shadow:0 4px #b28d31,0 0 25px #ffdd4938!important;clip-path:none!important;z-index:25!important}
+.gh-root.gh-root--cinematic .gh-world__play strong{font:900 italic 27px/1 'Barlow Condensed',Impact,sans-serif!important;color:#05202c!important}.gh-root.gh-root--cinematic .gh-world__play small{color:#604f22!important;font-size:8px!important;letter-spacing:.13em!important}.gh-root--cinematic .gh-world__play-icon{font-size:29px!important}
+.gh-root.gh-root--cinematic .gh-world__discover{position:absolute!important;left:50%!important;top:auto!important;right:auto!important;bottom:60px!important;transform:translateX(-50%)!important;display:flex!important;gap:10px!important;align-items:stretch!important;width:min(480px,calc(100% - 112px))!important;z-index:25!important}
+.gh-root.gh-root--cinematic .gh-world__discover>.qd-launcher{order:-1;flex:1;position:static!important;inset:auto!important;transform:none!important;display:block!important}.gh-root--cinematic .gh-world__discover>.gh-explore-trigger{flex:1}
+.gh-root.gh-root--cinematic .gh-world__discover button{width:100%!important;box-sizing:border-box!important;min-height:40px!important;height:auto!important;padding:8px 10px!important;border:1px solid #46e3ed!important;background:#062b3bdc!important;border-radius:10px 3px!important;color:#bafaff!important;font:800 italic 14px/1 'Barlow Condensed',system-ui!important;box-shadow:none!important}
+.gh-root.gh-root--cinematic .gh-world__actions,.gh-root.gh-root--cinematic .gh-lobby-community{display:none!important}
+.gh-root.gh-root--cinematic .gh-world__dock{position:absolute!important;inset:auto 0 0!important;transform:none!important;display:flex!important;width:100%!important;height:52px!important;padding:0 max(12px,calc((100% - 760px)/2))!important;box-sizing:border-box!important;justify-content:space-around!important;gap:0!important;border:0!important;border-top:1px solid #56cfd844!important;background:#02151deb!important;backdrop-filter:blur(8px)!important;border-radius:0!important;z-index:30!important}
+.gh-root.gh-root--cinematic .gh-world__dock button{position:relative;flex:1;min-width:0!important;max-width:110px!important;height:100%!important;margin:0!important;padding:5px 2px!important;border:0!important;border-radius:4px!important;color:#8caeb5!important;background:none!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:3px!important}.gh-root--cinematic .gh-world__dock button>span{font-size:18px!important;line-height:1}.gh-root--cinematic .gh-world__dock button>strong{font-size:8px!important;letter-spacing:.06em!important}.gh-root--cinematic .gh-world__dock .is-active{color:#6cfff0!important;background:linear-gradient(0deg,#22d9eb22,transparent)!important;border-top:2px solid #4ff6ee!important}
+.gh-root.gh-root--cinematic .gh-world__players-toggle{position:absolute!important;inset:auto auto 66px 14px!important;width:38px!important;height:38px!important;min-height:38px!important;border:1px solid #40ddeb!important;border-radius:12px!important;transform:none!important;background:#052935de!important;z-index:25!important}.gh-root--cinematic .gh-world__players-toggle>span{font-size:19px!important}.gh-root--cinematic .gh-world__players-toggle>em{font-size:8px!important;min-width:14px!important;padding:2px!important}
+.gh-root.gh-root--cinematic .lc--mobile-closed>.lc-mobile-chat-trigger{position:absolute!important;inset:auto 14px 66px auto!important;width:38px!important;height:38px!important;min-height:38px!important;border:1px solid #40ddeb!important;border-radius:12px!important;transform:none!important;background:#052935de!important;z-index:25!important;display:flex!important;align-items:center!important;justify-content:center!important}.gh-root--cinematic .lc-mobile-chat-icon{font-size:21px!important}.gh-root--cinematic .lc-mobile-chat-label{display:none!important}
+.gh-root.gh-root--cinematic button:focus-visible{outline:2px solid #fff1a4!important;outline-offset:3px!important}
+@media(min-width:1000px){.gh-root.gh-root--cinematic .gh-world{background-size:100% auto!important;background-position:center 52%!important}.gh-root.gh-root--cinematic .gh-world__chat:not(.gh-world__chat--tutorial-open){right:24px!important;bottom:200px!important;width:260px!important;max-height:250px!important}.gh-root.gh-root--cinematic .gh-world__players-toggle{left:28px!important}.gh-root.gh-root--cinematic .gh-lobby-coach{left:calc(50% - 380px)}}
+@media(max-width:700px){
+ .gh-root.gh-root--cinematic .gh-shell>.gh-hud{height:74px!important;min-height:74px!important;padding:8px 12px!important;gap:3px 6px!important}.gh-root.gh-root--cinematic .gh-brand{margin-left:16px!important}.gh-root.gh-root--cinematic .gh-brand strong{font-size:22px!important}.gh-root.gh-root--cinematic .gh-brand__player{font-size:9px!important;letter-spacing:.1em!important}.gh-root.gh-root--cinematic .gh-hud__right{gap:5px!important}.gh-root.gh-root--cinematic .gh-wallet{font-size:12px!important;padding:6px 7px!important;gap:3px!important}.gh-root.gh-root--cinematic .gh-wallet__icon{font-size:11px!important}.gh-root.gh-root--cinematic .gh-level{width:35px!important;height:35px!important;min-width:35px!important}.gh-root.gh-root--cinematic .gh-level__core{width:27px!important;height:27px!important;font-size:17px!important}.gh-root.gh-root--cinematic .gh-level-label{font-size:5px}
+ .gh-root.gh-root--cinematic .gh-world{height:max(566px,calc(100dvh - 74px))!important;min-height:566px!important;background-position:center center!important}
+ .gh-root.gh-root--cinematic .gh-world__left-rail{top:10px!important;width:calc(100% - 24px)!important}.gh-root.gh-root--cinematic .gh-world__next{gap:3px 6px!important;padding:10px 12px!important;max-height:155px!important}.gh-root.gh-root--cinematic .gh-world__next>strong{font-size:16px!important}.gh-root.gh-root--cinematic .gh-world__next-kicker{font-size:6px!important;letter-spacing:.04em!important}.gh-root.gh-root--cinematic .gh-world__next>p{font-size:9px!important}.gh-root.gh-root--cinematic .gh-world__next>button:not(.gh-world__next-secondary){max-width:122px!important;padding:8px!important;font-size:9px!important;min-height:36px!important}.gh-root.gh-root--cinematic .gh-world__next--compact:has(.gh-lobby-pack-art){padding-left:60px!important}.gh-lobby-pack-art{width:32px;height:44px;left:12px;font-size:10px}
+ .gh-root.gh-root--cinematic .gh-locker-zone{top:94px!important;bottom:186px!important;width:calc(100% - 32px)!important}.gh-root.gh-root--cinematic .gh-world:has(.gh-world__next:not(.gh-world__next--compact)) .gh-locker-zone{top:162px!important}
+ .gh-root.gh-root--cinematic .gh-avatar-actionbar>button{font-size:9px!important;padding:6px 9px!important;min-height:32px!important}
+ .gh-root.gh-root--cinematic .locker-equipment{width:44px!important;top:44px!important;gap:6px!important}.gh-root.gh-root--cinematic .gh-locker-zone .locker-equipment .locker-slot{width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;max-width:44px!important;max-height:44px!important;padding:5px!important;border-radius:10px!important}.gh-root.gh-root--cinematic .locker-extra-label{font-size:6px!important}
+ .gh-root.gh-root--cinematic .gh-lobby-coach{left:0;bottom:185px;width:90px;height:135px}.gh-lobby-coach>p{font-size:9px;top:-28px;left:4px;padding:7px 8px;border-width:1px}
+ .gh-root.gh-root--cinematic .gh-world__play{height:60px!important;min-height:60px!important;bottom:113px!important;width:calc(100% - 42px)!important;gap:9px!important;padding:9px 15px!important}.gh-root.gh-root--cinematic .gh-world__play strong{font-size:25px!important}.gh-root.gh-root--cinematic .gh-world__play small{font-size:7px!important}
+ .gh-root.gh-root--cinematic .gh-world__discover{width:calc(100% - 112px)!important;gap:7px!important;bottom:62px!important}.gh-root.gh-root--cinematic .gh-world__discover button{font-size:11px!important;padding:8px 4px!important}
+ .gh-root.gh-root--cinematic .gh-world__dock{height:54px!important;padding-bottom:env(safe-area-inset-bottom,0px)!important}.gh-root.gh-root--cinematic .gh-world__dock button>strong{font-size:7px!important}
+}
+@media(prefers-reduced-motion:reduce){.gh-root--cinematic .gh-world__atmosphere *,.gh-root--cinematic .locker-platform,.gh-root--cinematic .locker-character-glow{animation:none!important}}
+
+@media(max-width:700px){.gh-root.gh-root--cinematic .gh-world__chat:not(.gh-world__chat--tutorial-open),.gh-root.gh-root--cinematic .lc--mobile-closed{display:contents!important;position:static!important;transform:none!important}}
+@media(min-width:701px){.gh-root.gh-root--cinematic .lc-mobile-chat-trigger{display:none!important}}
+
+/* Searching remains cancellable and asynchronous invitations retain their inbox. */
+.gh-root.gh-root--cinematic .gh-world__next--searching{max-height:230px!important}
+.gh-root.gh-root--cinematic .gh-world__next>.qd-search-status{grid-column:1/-1!important;min-width:0!important}
+.gh-root.gh-root--cinematic .gh-world__discover>.gh-explore-trigger:nth-of-type(2){position:absolute!important;bottom:46px!important;right:0!important;width:auto!important;min-height:25px!important;font-size:9px!important}
+.gh-root.gh-root--cinematic .gh-world__play:active{transform:translateX(-50%) scale(.98)!important}
+@media(max-width:700px){.gh-root.gh-root--cinematic .gh-world__next--searching{max-height:220px!important}.gh-root.gh-root--cinematic .gh-world:has(.gh-world__next--searching) .gh-locker-zone{top:230px!important}}
+.gh-root.gh-root--cinematic .gh-locker-zone{overflow-x:clip!important;overflow-y:visible!important}
+.gh-root.gh-root--cinematic .gh-world__next:not(.gh-world__next--compact)>.gh-world__next-secondary{display:block!important}
+@media(max-width:380px){.gh-root.gh-root--cinematic .gh-brand strong{font-size:18px!important;white-space:nowrap!important}.gh-root.gh-root--cinematic .gh-hud__right{gap:4px!important}.gh-root.gh-root--cinematic .gh-wallet{padding:6px!important;font-size:11px!important}}
+/* Desktop: three lanes keep the mission out of the character controls. */
+@media(min-width:1100px){
+ .gh-root.gh-root--cinematic .gh-world__left-rail{top:28px!important;left:24px!important;right:auto!important;transform:none!important;width:270px!important}
+ .gh-root.gh-root--cinematic .gh-world__next{grid-template-columns:1fr!important;max-height:260px!important;padding:15px!important;gap:8px!important}
+ .gh-root.gh-root--cinematic .gh-world__next>button:not(.gh-world__next-secondary){grid-column:1!important;grid-row:auto!important;width:100%!important;max-width:none!important}
+ .gh-root.gh-root--cinematic .gh-world__next--compact:has(.gh-lobby-pack-art){padding-left:76px!important}
+ .gh-root.gh-root--cinematic .gh-world__next--compact>button:not(.gh-world__next-secondary){grid-column:1!important}
+ .gh-root.gh-root--cinematic .gh-locker-zone{top:30px!important;width:min(650px,calc(100% - 640px))!important}
+ .gh-root.gh-root--cinematic .gh-world__chat:not(.gh-world__chat--tutorial-open){top:28px!important;bottom:auto!important;right:24px!important;left:auto!important;width:270px!important;height:320px!important;max-height:320px!important;transform:none!important;overflow:hidden!important;border:1px solid #42dce970!important;border-radius:12px 3px!important;background:#042230e8!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc{width:100%!important;max-width:none!important;height:100%!important;max-height:none!important;min-height:0!important;display:flex!important;flex-direction:column!important;box-sizing:border-box!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc>.lc-head{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important;padding:12px!important;flex-shrink:0!important;min-height:0!important;height:auto!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc-title{white-space:nowrap!important;margin:0!important;font-size:18px!important;line-height:1.1!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc-head-right{display:flex!important;gap:6px!important;flex-wrap:wrap!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc>.lc-body{flex:1!important;min-height:0!important;overflow:hidden!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc-mobile-chat-trigger{display:none!important}
+ .gh-root.gh-root--cinematic .gh-lobby-coach{left:max(34px,calc(50% - 450px));bottom:190px;width:185px;height:240px}
+}
+@media(min-width:701px) and (max-width:1099px){
+ .gh-root.gh-root--cinematic .gh-world:has(.gh-world__next:not(.gh-world__next--compact)) .gh-locker-zone{top:180px!important}
+}
+/* Readable secondary copy, with a separate mobile social row. */
+.gh-root.gh-root--cinematic .gh-world__next-kicker{font-size:10px!important;line-height:1.35!important}
+.gh-root.gh-root--cinematic .gh-world__next>p{font-size:12px!important;line-height:1.45!important}
+.gh-root.gh-root--cinematic .gh-world__next>.gh-world__next-secondary{font-size:11px!important;line-height:1.3!important;min-height:30px!important}
+.gh-root.gh-root--cinematic .gh-world__play small{font-size:10px!important;line-height:1.3!important}
+.gh-root.gh-root--cinematic .gh-world__dock button>strong{font-size:10px!important;letter-spacing:.04em!important}
+@media(max-width:700px){
+ .gh-root.gh-root--cinematic .gh-world__next-kicker{font-size:8px!important}
+ .gh-root.gh-root--cinematic .gh-world__next>strong{font-size:18px!important}
+ .gh-root.gh-root--cinematic .gh-world__next>p{font-size:11px!important;line-height:1.35!important}
+ .gh-root.gh-root--cinematic .gh-world__next>.gh-world__next-secondary{font-size:10px!important;min-height:28px!important}
+ .gh-root.gh-root--cinematic .gh-world__next{max-height:180px!important}
+ .gh-root.gh-root--cinematic .gh-world:has(.gh-world__next:not(.gh-world__next--compact)) .gh-locker-zone{top:190px!important}
+ .gh-root.gh-root--cinematic .gh-locker-zone{bottom:236px!important}
+ .gh-root.gh-root--cinematic .gh-lobby-coach{bottom:235px!important}
+ .gh-root.gh-root--cinematic .gh-world__play{bottom:162px!important}
+ .gh-root.gh-root--cinematic .gh-world__play small{font-size:9px!important;letter-spacing:.06em!important}
+ .gh-root.gh-root--cinematic .gh-world__discover{bottom:110px!important;width:calc(100% - 42px)!important;gap:10px!important}
+ .gh-root.gh-root--cinematic .gh-world__discover button{font-size:14px!important;min-height:40px!important}
+ .gh-root.gh-root--cinematic .gh-world__players-toggle,.gh-root.gh-root--cinematic .lc--mobile-closed>.lc-mobile-chat-trigger{display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;width:100px!important;height:40px!important;min-height:40px!important;top:auto!important;bottom:62px!important;border-radius:9px!important;box-shadow:none!important;padding:6px 10px!important;box-sizing:border-box!important}
+ .gh-root.gh-root--cinematic .gh-world__players-toggle{left:calc(50% - 106px)!important;right:auto!important}
+ .gh-root.gh-root--cinematic .lc--mobile-closed>.lc-mobile-chat-trigger{left:calc(50% + 6px)!important;right:auto!important}
+ .gh-root.gh-root--cinematic .gh-world__players-toggle:after{content:'ONLINE';font:800 10px/1 system-ui;letter-spacing:.04em;color:#aff7ed}
+ .gh-root.gh-root--cinematic .gh-world__players-toggle>span{font-size:17px!important}
+ .gh-root.gh-root--cinematic .lc--mobile-closed .lc-mobile-chat-label{display:block!important;font:800 10px/1 system-ui!important;letter-spacing:.04em!important;color:#aff7ed!important}
+ .gh-root.gh-root--cinematic .lc--mobile-closed .lc-mobile-chat-icon{display:flex!important;align-items:center!important;width:20px!important;height:20px!important;font-size:18px!important}
+ .gh-root.gh-root--cinematic .lc--mobile-closed .lc-mobile-chat-icon svg{width:20px!important;height:20px!important}
+ .gh-root.gh-root--cinematic .gh-world__players-toggle>em,.gh-root.gh-root--cinematic .lc--mobile-closed .lc-mobile-chat-count{position:absolute!important;top:-5px!important;right:3px!important;left:auto!important;bottom:auto!important;min-width:16px!important;width:auto!important;height:16px!important;padding:1px 4px!important;font-size:9px!important;line-height:14px!important;box-sizing:border-box!important}
+ .gh-root.gh-root--cinematic .gh-world__dock button>strong{font-size:9px!important}
+ .gh-root.gh-root--cinematic .gh-lobby-coach>p{font-size:11px!important;top:-38px!important}
+}
+@media(max-width:700px){
+ .gh-root.gh-root--cinematic .gh-world{height:max(720px,calc(100dvh - 74px))!important;min-height:720px!important}
+ .gh-root.gh-root--cinematic .gh-locker-zone{top:112px!important}
+ .gh-root.gh-root--cinematic .gh-world:has(.gh-world__next:not(.gh-world__next--compact)) .gh-locker-zone{top:200px!important}
+ .gh-root.gh-root--cinematic .gh-world:has(.gh-world__next--searching) .gh-locker-zone{top:240px!important}
+}
+@media(max-width:700px){
+ .gh-root.gh-root--cinematic .gh-world__players-toggle:after,.gh-root.gh-root--cinematic .lc--mobile-closed .lc-mobile-chat-label{position:static!important;inset:auto!important;transform:none!important;translate:none!important;display:block!important;visibility:visible!important;opacity:1!important;width:auto!important;max-width:none!important;height:auto!important;overflow:visible!important;clip-path:none!important;font:800 10px/1 system-ui!important;letter-spacing:.04em!important;color:#aff7ed!important;margin:0!important}
+ .gh-root.gh-root--cinematic .gh-world__players-toggle:after{content:'ONLINE'!important}
+}
+/* Desktop chat uses the full free side lane above the lobby navigation. */
+@media(min-width:1100px){
+ .gh-root.gh-root--cinematic .gh-world__chat:not(.gh-world__chat--tutorial-open){top:28px!important;bottom:112px!important;height:auto!important;max-height:none!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc>.lc-body{display:flex!important;flex-direction:column!important;flex:1 1 auto!important;min-height:0!important;height:auto!important;max-height:none!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc-log-wrap{flex:1 1 auto!important;min-height:0!important;height:100%!important;max-height:none!important;overflow-y:auto!important}
+ .gh-root.gh-root--cinematic .gh-world__chat .lc-composer,.gh-root.gh-root--cinematic .gh-world__chat .lc-foot{flex-shrink:0!important}
+}
+/* Sports-game polish: legible actions and a strong character silhouette. */
+.gh-root.gh-root--cinematic .gh-world{background-image:linear-gradient(0deg,#02101ff0,transparent 40%,#02101f44),radial-gradient(ellipse at 50% 50%,transparent 15%,#01172777 85%),url('../assets/lobby-locker-cinematic.webp')!important}
+.gh-lobby-action-icon{display:block;width:24px;height:24px;flex-shrink:0}
+.gh-root.gh-root--cinematic .gh-avatar-actionbar>button{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;font:900 italic 17px/1.1 'Barlow Condensed',system-ui!important;padding:10px 15px!important;min-height:46px!important;background:linear-gradient(120deg,#0b4054e8,#032534ed)!important;box-shadow:0 0 18px #36e9f52b,inset 0 1px #b8fff344!important;border-radius:13px 4px!important}
+.gh-root.gh-root--cinematic .gh-locker-zone>.gh-avatar-actionbar{height:46px!important}
+.gh-root.gh-root--cinematic .gh-world__play{height:76px!important;min-height:76px!important;border:2px solid #fff3a2!important;box-shadow:0 4px #ad852c,0 0 28px #ffdf594d,inset 0 1px 8px #fff7b988!important}
+.gh-root.gh-root--cinematic .gh-world__play strong{font-size:34px!important;letter-spacing:.015em!important}
+.gh-root.gh-root--cinematic .gh-world__play small{font-size:11px!important}
+.gh-root.gh-root--cinematic .gh-world__play-icon .gh-lobby-action-icon{width:38px;height:44px;fill:#ffdb31;stroke:#715200;stroke-width:1.2}
+.gh-root.gh-root--cinematic .gh-world__discover button{font-size:18px!important;min-height:46px!important;box-shadow:0 0 16px #32d7e51a!important}
+.gh-root.gh-root--cinematic .gh-locker-zone .locker-equipment .locker-slot{border:1px solid #4ce8e0!important;background:linear-gradient(135deg,#0a3b47e8,#021923e8)!important;box-shadow:inset 0 0 12px #40f0e218,0 0 12px #33dbed1a!important}
+.gh-root.gh-root--cinematic .locker-slot-img{object-fit:contain!important;max-width:100%!important;max-height:100%!important}
+.gh-root.gh-root--cinematic .gh-world__dock button>span{font-size:23px!important}
+.gh-root.gh-root--cinematic .gh-world__dock button>strong{font-size:12px!important;line-height:1.15!important}
+.gh-root.gh-root--cinematic .gh-world__dock .is-active{box-shadow:inset 0 -2px #4affdf,0 0 20px #2ce4ef22!important}
+@media(min-width:1100px){
+ .gh-root.gh-root--cinematic .gh-lobby-coach{left:calc(50% - 400px);width:210px;height:270px;bottom:205px}
+ .gh-root.gh-root--cinematic .gh-lobby-coach>p{font-size:17px;top:-48px;left:20px;max-width:175px;padding:13px 16px}
+ .gh-root.gh-root--cinematic .gh-world__play{bottom:125px!important}
+ .gh-root.gh-root--cinematic .gh-world__discover{bottom:67px!important}
+ .gh-root.gh-root--cinematic .gh-locker-zone{bottom:210px!important}
+ .gh-root.gh-root--cinematic .gh-world__dock{height:58px!important}
+}
+@media(max-width:700px){
+ .gh-root.gh-root--cinematic .gh-world{height:max(778px,calc(100dvh - 74px))!important;min-height:778px!important}
+ .gh-root.gh-root--cinematic .gh-locker-zone{top:105px!important;bottom:280px!important}
+ .gh-root.gh-root--cinematic .gh-world:has(.gh-world__next:not(.gh-world__next--compact)) .gh-locker-zone{top:168px!important}
+ .gh-root.gh-root--cinematic .gh-world:has(.gh-world__next--searching) .gh-locker-zone{top:245px!important}
+ .gh-root.gh-root--cinematic .gh-world__next{gap:4px 8px!important;padding:10px 12px!important;max-height:148px!important}
+ .gh-root.gh-root--cinematic .gh-world__next>.gh-world__next-secondary{min-height:25px!important;padding:3px 5px!important}
+ .gh-root.gh-root--cinematic .gh-avatar-actionbar>button{font-size:13px!important;min-height:42px!important;gap:6px!important;padding:8px 9px!important}
+ .gh-root--cinematic .gh-avatar-actionbar .gh-lobby-action-icon{width:20px;height:20px}
+ .gh-root.gh-root--cinematic .gh-lobby-coach{left:0;bottom:277px;width:116px;height:172px}
+ .gh-root.gh-root--cinematic .gh-lobby-coach>p{left:5px;top:-50px!important;width:106px;max-width:106px;font-size:12px!important;line-height:1.2;padding:9px!important;box-sizing:border-box}
+ .gh-root.gh-root--cinematic .locker-equipment{top:56px!important;gap:8px!important;width:48px!important}
+ .gh-root.gh-root--cinematic .gh-locker-zone .locker-equipment .locker-slot{width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;max-width:48px!important;max-height:48px!important;border-radius:12px!important;padding:6px!important}
+ .gh-root.gh-root--cinematic .gh-world__play{bottom:196px!important;height:72px!important;min-height:72px!important;width:calc(100% - 30px)!important;padding:10px 12px!important}
+ .gh-root.gh-root--cinematic .gh-world__play strong{font-size:29px!important}
+ .gh-root.gh-root--cinematic .gh-world__play small{font-size:10px!important;letter-spacing:.035em!important}
+ .gh-root.gh-root--cinematic .gh-world__discover{bottom:139px!important;width:calc(100% - 30px)!important}
+ .gh-root.gh-root--cinematic .gh-world__discover button{font-size:17px!important;min-height:46px!important}
+ .gh-root.gh-root--cinematic .gh-world__players-toggle,.gh-root.gh-root--cinematic .lc--mobile-closed>.lc-mobile-chat-trigger{bottom:88px!important}
+ .gh-root.gh-root--cinematic .gh-world__dock{height:76px!important}
+ .gh-root.gh-root--cinematic .gh-world__dock button>strong{font-size:10px!important}
+ .gh-root.gh-root--cinematic .gh-world__dock button>span{font-size:23px!important}
+}
+.gh-root.gh-root--cinematic .gh-world{background-size:cover!important;background-position:center 55%!important;background-repeat:no-repeat!important}
+@media(min-width:1000px){.gh-root.gh-root--cinematic .gh-world{background-size:100% auto!important;background-position:center 52%!important}}
+@media(max-width:700px){.gh-root.gh-root--cinematic .gh-avatar-actionbar>button{font-size:12px!important}}

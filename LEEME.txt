@@ -1,1 +1,33 @@
-V4.4: Instalar los dos archivos de src/components y la máscara PNG en public/images. Conservá tu avatar-base.png original. Tinte limitado a manos y piernas visibles de la imagen original. Los brazos cubiertos por mangas NO se tiñen. Los pantalones y botines equipados siguen encima. No se modificó Supabase ni LockerPreview. Probar npm run build y revisar las distintas prendas.
+LUPIAPP · LOBBY VESTUARIO CINEMÁTICO
+
+INSTALACIÓN
+1. Hacer copia de src/pages/GameHub.tsx.
+2. Copiar la carpeta src del ZIP sobre el proyecto, reemplazando los archivos correspondientes. Conservar el resto del proyecto y public/images (avatar, cabellos y prendas).
+3. Ejecutar el build habitual del proyecto y desplegar con tu flujo habitual.
+No requiere SQL ni dependencias nuevas.
+
+CAMBIOS
+- Fondo de vestuario original, sin controles ni personajes incrustados: el avatar sigue siendo el avatar real del usuario.
+- Lupi integrado a la escena; equipamiento alineado; avatar escalado según el espacio disponible sin modificar el rig ni las coordenadas de prendas.
+- HUD compacto, recomendación más breve, una entrada principal al partido y una sola entrada a Duelo rápido.
+- Misiones, recompensas, pack, carta, chat, clubes, álbum y selector de equipamiento conservan sus handlers existentes. No modifica recompensas, saldos o datos.
+- Adaptación móvil/escritorio; las pantallas muy bajas pueden desplazarse para conservar controles accesibles.
+
+VALIDACIÓN
+Compilación del grafo de GameHub con esbuild en formato ESM, dependencias npm externas. Prueba de presentación aislada en navegador a 393x760, 360x640 y 1366x768: sin desbordes horizontales; comprobados accesos principales, selector real de modalidades y selector real de prendas. Datos de inventario simulados para esta prueba. No se probó una sesión autenticada ni acreditaciones en Supabase. El proyecto recibido contiene src, sin package.json, por lo que no se ejecutó el build completo de Vite.
+
+ALCANCE
+Es implementación de la dirección visual del boceto. Se mantiene tu sistema actual de avatar y sus prendas; no se sustituye por el personaje dibujado en la imagen conceptual. GameHub.tsx parte de la versión acumulada de este intercambio.
+
+AJUSTE V2
+Escritorio desde 1100px: tres zonas independientes para misión, personaje y chat. Controles del avatar despejados y avatar mayor al liberar la zona superior. Chat con cabecera adaptable y sin botón flotante duplicado. Verificación adicional a 1700x760 y medición sin superposición entre misión y controles. Pruebas de presentación con datos simulados; no se accedió a una sesión autenticada.
+
+AJUSTE V3
+Online y Chat tienen una fila propia en movil, debajo de Duelo rápido y Explorar. Textos secundarios ampliados en mision, botones y navegacion. Pantallas bajas permiten scroll para conservar legibilidad y separacion de controles. Verificado en presentacion aislada a 393x852, 360x640, 1366x768 y 1700x760. Selectores de duelo y prendas funcionales en la prueba. Sin cambios de logica ni SQL.
+
+AJUSTE V4
+Chat de escritorio extendido verticalmente por la columna lateral, desde 28px debajo de la cabecera hasta 112px sobre el borde inferior. Lista de mensajes con scroll y compositor visible. Sin cambios en movil.
+
+AJUSTE V5 · DIRECCION VISUAL DEL BOCETO
+Botones principales mas grandes, iconos SVG propios en Personalizar/Mi carta/Jugar, contraste del fondo reforzado, Lupi y burbuja ampliados, marcos de equipo uniformes y navegacion inferior mas legible. Encuadre movil con menos espacio superior y escalado proporcional del avatar. Se conserva chat ampliado y fila social independiente.
+Validacion: grafo GameHub compilado con esbuild; interfaz aislada a 393x852, 360x640, 1366x768 y 1700x760. Sin desbordes horizontales ni superposicion mision/botonera. Selectores de duelo y prendas comprobados con inventario simulado. No se probo una sesion autenticada.

@@ -1,5 +1,8 @@
 import {useFutsalStory} from '../hooks/useFutsalStory';
 import {FutsalStoryChapter} from '../components/FutsalStoryChapter';
+import { LobbyActionIcon } from "../components/LobbyActionIcon";
+import { LobbyAvatarStage } from "../components/LobbyAvatarStage";
+import { LupiStoryPose } from "../components/LupiStoryPose";
 import { MissionBriefing } from "../components/MissionBriefing";
 import type { DailyMission } from "../types/campaignStory";
 import { supabase } from "../lib/supabaseClient";
@@ -52,6 +55,7 @@ import { DuelVersus } from "../components/DuelVersus";
      import "./LupiFirstWelcomeAnime.css";
 import "./LupiRewardAnime.css";
     import "./LupiWorld_Theme.css";
+import "./LobbyCinematic.css";
     import {
       useLobbyChallenges,
       type Challenge,
@@ -1073,7 +1077,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
         {storyOpen&&<FutsalStoryChapter key={user.id} story={story} userId={user.id} playerName={user.username} deck={activeDeck} cards={userCards} onClose={()=>setStoryOpen(false)} onTeam={()=>{setStoryOpen(false);setGameTab("deck");}} onBattleComplete={onBattleComplete} onMatchRecorded={()=>{recordLupiMatchCompleted();adventureComplete("first_match");void updateMissionProgress("play_match");onMatchRecorded?.();}}/>}
         {missionBriefing && <MissionBriefing mission={missionBriefing} onStart={()=>{setMissionBriefing(null);openMatch("quick");}} onTeam={()=>{setMissionBriefing(null);setGameTab("deck");}} onClose={()=>setMissionBriefing(null)}/>}
         {showAvatarEditor && <AvatarEditor userId={user.id} level={level} xp={exp} xpNeeded={expNeeded} points={user.points ?? 0} coins={user.coins ?? 0} onClose={() => setShowAvatarEditor(false)} />}
-        <div className={`main-content gh-root ${gameTab === "deck" ? "gh-root--team" : ""} ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""} ${gameTab === "deck" && view === "match" ? "gh-root--team-preview" : ""}`}>
+        <div className={`main-content gh-root ${gameTab === "play" && view === "lobby" ? "gh-root--cinematic" : ""} ${gameTab === "deck" ? "gh-root--team" : ""} ${gameTab === "play" && view === "match" ? "gh-root--playing" : ""} ${gameTab === "deck" && view === "match" ? "gh-root--team-preview" : ""}`}>
           {showFirstWelcome && (
             <div className={`lupi-first-welcome lupi-anime-intro${welcomeExiting ? " is-exiting" : ""}`} role="presentation">
               <section className="lupi-anime-intro__scene" role="dialog" aria-modal="true" aria-labelledby="lupi-anime-title">
@@ -1120,7 +1124,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
   </button>
 
   <div className="gh-brand">
-    <strong>LOBBY PRINCIPAL</strong>
+    <strong>{gameTab === "play" && view === "lobby" ? "LUPI WORLD" : "LOBBY PRINCIPAL"}</strong>
     <span className="gh-brand__player">
       {user.username || "Jugador"}
     </span>
@@ -1145,7 +1149,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
       style={{ ["--xp" as string]: xpPct }}
       title={`Nivel ${level} · ${exp}/${expNeeded} XP`}
     >
-      <div className="gh-level__core">{level}</div>
+      <div className="gh-level__core"><small className="gh-level-label">NIVEL</small>{level}</div>
     </div>
   </div>
 </header>
@@ -1154,7 +1158,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
             {gameTab === "deck" && view === "match" && <button type="button" className="gh-return-preview" onClick={() => setGameTab("play")}>← Volver a la previa del partido</button>}
             <div className="gh-scene" key={sceneKey}>
-              {view === "lobby" && gameTab === "play" && !showPlayersSheet && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={learningPracticeOpen||!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>}
+
               {view === "lobby" && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && (
                 <QuickDuelPanel variant="pill" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
                   onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
@@ -1389,8 +1393,9 @@ onChallengeGame={(player, game) => {
                       return sent;
                     }}
                   />}
-                  <div className="gh-locker-zone">
-        <div className="gh-avatar-customize-trigger gh-avatar-actionbar" role="group" aria-label="Mi personaje"><button type="button" onClick={()=>setShowAvatarEditor(true)}>✦ PERSONALIZAR</button><button type="button" onClick={()=>setGameTab("deck")}>MI CARTA Y SKILLS →</button></div>
+                  <div className="gh-lobby-coach"><LupiStoryPose pose="welcome" label="Lupi te acompaña en el vestuario"/><p>¿Listo para salir<br/>a la cancha?</p></div>
+                  <LobbyAvatarStage>
+        <div className="gh-avatar-customize-trigger gh-avatar-actionbar" role="group" aria-label="Mi personaje"><button type="button" onClick={()=>setShowAvatarEditor(true)}><LobbyActionIcon kind="shirt"/><span>PERSONALIZAR</span></button><button type="button" onClick={()=>setGameTab("deck")}><LobbyActionIcon kind="card"/><span>MI CARTA</span></button></div>
         <LockerPreview
           userId={user.id}
           level={level}
@@ -1400,7 +1405,7 @@ onChallengeGame={(player, game) => {
             setGameTab("deck");
           }}
         />
-      </div>
+      </LobbyAvatarStage>
 
                   {levelUp && (
                     <div className="gh-world__levelup-overlay" role="presentation">
@@ -1437,7 +1442,7 @@ onChallengeGame={(player, game) => {
                     </div>
                   )}
                   <aside className="gh-world__left-rail" aria-label="Lupi y comunidad">
-                  <section ref={rewardCardRef} className={`gh-world__next ${quick.game?"gh-world__next--searching":""} ${highlightNext ? "gh-world__next--highlight" : ""}`} aria-label="Recomendación personalizada de Lupi">
+                  <section ref={rewardCardRef} className={`gh-world__next ${quick.game?"gh-world__next--searching":""} ${highlightNext ? "gh-world__next--highlight" : ""} ${!pendingFirstReward && !(lobbyMission?.isCompleted && !lobbyMission?.isClaimed) && (!adventure.ready || adventure.finished) ? "gh-world__next--compact" : ""}`} aria-label="Recomendación personalizada de Lupi">
                     <QuickDuelPanel variant="status" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>
                     {pendingFirstReward ? (
                       <>
@@ -1469,7 +1474,8 @@ onChallengeGame={(player, game) => {
                       </>
                     ) : (
                       <>
-                        <span className="gh-world__next-kicker">✦ LUPI TE ACOMPAÑA · {lupiRecommendation.reason}</span>
+                        <span className="gh-world__next-kicker">LUPI TE ACOMPAÑA · {lupiRecommendation.reason}</span>
+                        {lupiRecommendation.action === "pack" && <span className="gh-lobby-pack-art" aria-hidden="true">LUPI<small>PACK</small></span>}
                         <strong>{lupiRecommendation.title}</strong>
                         <p>{lupiRecommendation.description}</p>
                         <button type="button" onClick={() => runLupiRecommendation(lupiRecommendation.action)}>
@@ -1532,7 +1538,7 @@ onChallengeGame={(player, game) => {
 
                   </aside>
                   <button className={`gh-world__play ${story.progress?.status !== 'completed' ? 'gh-world__play--story' : ''}`} type="button" disabled={story.loading || story.busy} onClick={() => handleGameNavigate("battle")}>
-                    <span className="gh-world__play-icon" aria-hidden>⚡</span>
+                    <span className="gh-world__play-icon" aria-hidden><LobbyActionIcon kind="bolt"/></span>
                     <span>
                       <small>{story.loading ? 'PREPARANDO TU DEBUT' : story.progress?.status !== 'completed' ? 'MODO HISTORIA · CAPÍTULO 01' : 'LISTO PARA JUGAR'}</small>
                       <strong>{story.loading ? 'CARGANDO…' : story.progress?.status === 'match' ? 'CONTINUAR PARTIDO' : story.progress?.status === 'completed' ? 'JUGAR PARTIDO' : story.progress ? 'CONTINUAR HISTORIA' : 'EMPEZAR HISTORIA'}</strong>
@@ -1540,7 +1546,7 @@ onChallengeGame={(player, game) => {
                     <span className="gh-world__play-arrow" aria-hidden>→</span>
                   </button>
 
-                  {lobbyCommunity && <button type="button" onClick={() => setShowCommunities(true)} title="Abrir mis comunidades" style={{display:"block",margin:"6px auto",padding:"7px 14px",border:"1px solid #2bd7ff",borderRadius:9,background:"#072635",color:"#d7f8ff",fontWeight:800,cursor:"pointer",maxWidth:"min(90vw,320px)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>🏟️ {lobbyCommunity} · Mi comunidad →</button>}
+                  {lobbyCommunity && <button type="button" className="gh-lobby-community" onClick={() => setShowCommunities(true)} title="Abrir mis comunidades" style={{display:"block",margin:"6px auto",padding:"7px 14px",border:"1px solid #2bd7ff",borderRadius:9,background:"#072635",color:"#d7f8ff",fontWeight:800,cursor:"pointer",maxWidth:"min(90vw,320px)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>🏟️ {lobbyCommunity} · Mi comunidad →</button>}
                   <div className="gh-world__actions" aria-label="Acciones rápidas">
                     <button type="button" onClick={() => setShowCommunities(true)} aria-label="Abrir clubes y comunidades"><span>♧</span><strong>CLUBES</strong></button>
 
