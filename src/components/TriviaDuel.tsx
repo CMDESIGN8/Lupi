@@ -1,3 +1,4 @@
+import {TriviaLearningHub} from "./TriviaLearningHub";
 import {DuelGameHeader} from './DuelGameHeader';
 import { SkillMatchReward } from './SkillMatchReward';
 import { ArenaAvatar } from './match/ArenaAvatar';
@@ -21,8 +22,8 @@ import { LupiStoryPose } from './LupiStoryPose';
 import { AvatarFace } from './AvatarFace';
 import { OwnedCardPortrait } from './OwnedCardPortrait';
 
-type Props = { challenge: Challenge; meId: string; players?: LobbyPlayer[]; catalog?: InventoryItem[]; onExit: () => void; onRematch: (challenge: Challenge) => void };
-export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit, onRematch }: Props) {
+type Props = { challenge: Challenge; meId: string; players?: LobbyPlayer[]; catalog?: InventoryItem[]; onExit: () => void; onRematch: (challenge: Challenge) => void; onLearningOpenChange?: (open:boolean)=>void };
+export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit, onRematch, onLearningOpenChange }: Props) {
   const { state, error, busy, answer, rematch, reconnect } = useTriviaMatch(challenge);
   const [remaining, setRemaining] = useState(60);
   const [selectedAnswer, setSelectedAnswer] = useState<{ round: number; index: number } | null>(null);
@@ -113,7 +114,7 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
       <DuelGameHeader game="trivia" onBack={()=>ended?exit():setConfirmExit(true)} mode={challenge.vsBot?'VS BOT':'1 VS 1'} subtitle="FÚTBOL · 5 PREGUNTAS · 1 PUNTO POR ACIERTO" title={<>PREGUN<em>TADOS</em></>}/>
 
       {!ended && scoreStrip}
-      {!ended && celebrating && <aside key={`dialogue-${result.round}`} className={`trivia-anime-dialogue ${myHit?'is-positive':'is-focus'}`} role="status"><small>{myHit?(challenge.vsBot?'PROFE LUPI':'TU EQUIPO'):challenge.vsBot?'PROFE LUPI':'BANCO RIVAL'}</small><p>{myHit?(challenge.vsBot?'¡Esa lectura fue perfecta! Sumamos y seguimos con todo.':'¡La clavaste! Un punto más para el equipo.'):(challenge.vsBot?'¡Uhh, por poco! Respirá, todavía queda partido.':'¡Uhh, por poco! Mantené el foco, queda duelo.')}</p><strong className="trivia-dialogue-answer">✓ {result.correct}</strong></aside>}
+      {!ended && celebrating && <aside key={`dialogue-${result.round}`} className={`trivia-anime-dialogue ${myHit?'is-positive':'is-focus'}`} role="status"><small>{myHit?(challenge.vsBot?'PROFE LUPI':'TU EQUIPO'):challenge.vsBot?'PROFE LUPI':'BANCO RIVAL'}</small><p>{myHit?(challenge.vsBot?'¡Esa lectura fue perfecta! Sumamos y seguimos con todo.':'¡La clavaste! Un punto más para el equipo.'):(challenge.vsBot?'¡Uhh, por poco! Respirá, todavía queda partido.':'¡Uhh, por poco! Mantené el foco, queda duelo.')}</p><strong className="trivia-dialogue-answer">✓ {result.correct}</strong>{result.explanation&&<p className="trivia-learning-explanation">{result.explanation}</p>}</aside>}
       {!ended && <DuelConnectionNotice {...connection} onRetry={()=>{void connection.ping();reconnect();}} onExit={exit}/>}
       {!ended && !state && !error && <p role="status">Preparando las mismas preguntas para ambos…</p>}
       {error && <div className="trivia-error" role="alert"><p>{error}</p><button type="button" onClick={reconnect}>Reconectar</button></div>}
@@ -126,7 +127,7 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
       </div>}
       {!ended && result && <details key={result.round} className="trivia-reveal">
         <summary><span className={(host ? result.hostCorrect : result.guestCorrect) ? "trivia-round-hit" : "trivia-round-miss"}>{(host ? result.hostCorrect : result.guestCorrect) ? "✓" : "✕"}</span><span>RONDA {result.round} · {(host ? result.hostCorrect : result.guestCorrect) ? "ACERTASTE" : "NO ACERTASTE"}<small>Ver respuesta anterior</small></span><b aria-hidden="true">⌄</b></summary>
-        <div className="trivia-reveal-body"><p>{result.prompt}</p><strong>✓ {result.correct}</strong><p>{(host ? result.guestCorrect : result.hostCorrect) ? "Tu rival acertó." : "Tu rival no acertó."}</p></div>
+        <div className="trivia-reveal-body"><p>{result.prompt}</p><strong>✓ {result.correct}</strong>{result.explanation&&<p className="trivia-learning-explanation">Lupi: {result.explanation}</p>}<p>{(host ? result.guestCorrect : result.hostCorrect) ? "Tu rival acertó." : "Tu rival no acertó."}</p></div>
       </details>}
       {ended && <div className="trivia-result-layout">
         <div className="trivia-result-left">
@@ -135,7 +136,7 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
             {scoreStrip}
           </div>
           {state && <details className="trivia-summary"><summary><span>ASÍ FUE EL DUELO<small>{summary.length} de {state.total} preguntas · Ver respuestas</small></span><b aria-hidden="true">⌄</b></summary>
-            <div className="trivia-summary-scroll"><table><thead><tr><th scope="col">Pregunta y respuesta correcta</th><th scope="col">Vos</th><th scope="col">Rival</th></tr></thead><tbody>{summary.map(round => <tr key={round.round}><td><small>PREGUNTA {round.round}</small><strong>{round.prompt}</strong><span>✓ {round.correct}</span></td><td aria-label={(host ? round.hostCorrect : round.guestCorrect) ? "Acertaste" : "No acertaste"}>{(host ? round.hostCorrect : round.guestCorrect) ? "✅" : "✕"}</td><td aria-label={(host ? round.guestCorrect : round.hostCorrect) ? "Rival acertó" : "Rival no acertó"}>{(host ? round.guestCorrect : round.hostCorrect) ? "✅" : "✕"}</td></tr>)}</tbody></table></div>
+            <div className="trivia-summary-scroll"><table><thead><tr><th scope="col">Pregunta y respuesta correcta</th><th scope="col">Vos</th><th scope="col">Rival</th></tr></thead><tbody>{summary.map(round => <tr key={round.round}><td><small>PREGUNTA {round.round}</small><strong>{round.prompt}</strong><span>✓ {round.correct}</span>{round.explanation&&<p className="trivia-learning-explanation">{round.explanation}</p>}</td><td aria-label={(host ? round.hostCorrect : round.guestCorrect) ? "Acertaste" : "No acertaste"}>{(host ? round.hostCorrect : round.guestCorrect) ? "✅" : "✕"}</td><td aria-label={(host ? round.guestCorrect : round.hostCorrect) ? "Rival acertó" : "Rival no acertó"}>{(host ? round.guestCorrect : round.hostCorrect) ? "✅" : "✕"}</td></tr>)}</tbody></table></div>
             {summary.length === 0 && <p>No llegaron a completar ninguna pregunta.</p>}
           </details>}
         </div>
@@ -160,6 +161,7 @@ export function TriviaDuel({ challenge, meId, players = [], catalog = [], onExit
       </div>}
       <p className="trivia-footnote">Duelo global · Premios y rachas de Lupi · Sin puntos para el ranking comunitario.</p>
       {confirmExit && <div className="trivia-confirm"><div role="dialog" aria-modal="true" aria-labelledby="trivia-exit-title"><h3 id="trivia-exit-title">¿Salir del duelo?</h3><p>El rival quedará esperando. Si falta una respuesta, la partida vencerá sin ganador al terminar el tiempo.</p><button autoFocus type="button" onClick={() => setConfirmExit(false)}>SEGUIR JUGANDO</button><button type="button" onClick={exit}>SALIR AL LOBBY</button></div></div>}
+    {ended&&<TriviaLearningHub compact onOpenChange={onLearningOpenChange}/>}
     </section>
   );
 }

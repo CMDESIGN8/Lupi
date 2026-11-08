@@ -1,8 +1,8 @@
 import { supabase } from "./supabaseClient";
 
 export type AsyncTriviaQuestion = { index: number; prompt: string; options: string[] };
-export type AsyncTriviaLast = { index: number; prompt: string; options: string[]; correctIndex: number; mine: number; ok: boolean; timeout: boolean; ms: number };
-export type AsyncTriviaHistory = { prompt: string; correct: string; hostOk: boolean; guestOk: boolean };
+export type AsyncTriviaLast = { index: number; prompt: string; explanation?: string; topic?: string; options: string[]; correctIndex: number; mine: number; ok: boolean; timeout: boolean; ms: number };
+export type AsyncTriviaHistory = { prompt: string; correct: string; explanation?: string; hostOk: boolean; guestOk: boolean };
 
 export type AsyncTriviaState = {
   id: string; mode: "async"; status: "open" | "finished" | "expired" | "declined"; role: "host" | "guest";

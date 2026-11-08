@@ -1,3 +1,4 @@
+import {TriviaLearningHub} from "./TriviaLearningHub";
 import { SkillMatchReward } from './SkillMatchReward';
 import { DuelResultEffects } from './DuelResultEffects';
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -11,13 +12,13 @@ import "./TriviaAsyncDuel.css";
 
 type Props = {
   matchId: string; meId: string; meName: string; rivalName: string; rivalId?: string;
-  onExit: () => void; onRematch: (rival: { userId: string; username: string }) => void; onChanged?: () => void;
+  onExit: () => void; onRematch: (rival: { userId: string; username: string }) => void; onChanged?: () => void; onLearningOpenChange?: (open:boolean)=>void;
 };
 
 const FEEDBACK_MS = 1500;
 const fmtDeadline = (iso: string) => new Date(iso).toLocaleString("es-AR", { weekday: "long", hour: "2-digit", minute: "2-digit" });
 
-export function TriviaAsyncDuel({ matchId, meId, meName, rivalName, rivalId, onExit, onRematch, onChanged }: Props) {
+export function TriviaAsyncDuel({ matchId, meId, meName, rivalName, rivalId, onExit, onRematch, onChanged, onLearningOpenChange }: Props) {
   const [state, setState] = useState<AsyncTriviaState | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -65,7 +66,7 @@ export function TriviaAsyncDuel({ matchId, meId, meName, rivalName, rivalId, onE
       stateRef.current = next; setState(next); onChanged?.();
       window.clearTimeout(feedbackTimer.current);
       // La próxima pregunta se pide recién acá: su reloj no corre durante el feedback.
-      feedbackTimer.current = window.setTimeout(() => {
+      if(!last?.explanation) feedbackTimer.current = window.setTimeout(() => {
         if (!mounted.current) return;
         setFeedback(null);
         if (next.status === "open" && !next.mineDone) void load();
@@ -112,11 +113,12 @@ export function TriviaAsyncDuel({ matchId, meId, meName, rivalName, rivalId, onE
     <section className={`trivia-arena${ended ? " trivia-arena--ended" : " trivia-arena--playing"}`} data-outcome={finished && !state?.forfeit ? win?"win":state?.winnerId===null?"draw":"loss" : undefined} aria-label="Preguntados por turnos">
       {finished && !state?.forfeit && <DuelResultEffects key={matchId} outcome={win?"win":state?.winnerId===null?"draw":"loss"}/> }
       <header className="trivia-header"><button type="button" onClick={leave}>← Lobby</button><span>LUPI WORLD · POR TURNOS</span><b className="trivia-brand-mark" aria-hidden="true">✦</b></header>
-      <div className="trivia-title"><small>ARENA DE CONOCIMIENTO</small><h2>PREGUNTADOS</h2><p>Por turnos · 5 preguntas · 20 s cada una · tu rival responde en 24 h</p></div>
+      <div className="trivia-title"><small>ARENA DE CONOCIMIENTO</small><h2>PREGUNTADOS</h2><p>Por turnos · 5 preguntas · 25 s cada una · tu rival responde en 24 h</p></div>
 
       {!state && !error && <p role="status">Preparando tus preguntas…</p>}
       {error && <div className="trivia-error" role="alert"><p>{error}</p><button type="button" onClick={() => { setError(""); void load(); }}>Reintentar</button></div>}
 
+      {feedback?.explanation&&<aside className="trivia-learning-explanation" role="status"><small>LUPI · APRENDÉ LA JUGADA</small><p>{feedback.explanation}</p><button type="button" disabled={busy} onClick={()=>{window.clearTimeout(feedbackTimer.current);setFeedback(null);if(state?.status==='open'&&!state.mineDone)void load();}}>Continuar →</button></aside>}
       {state && !ended && <div className="tad-progress-row" aria-label="Avance del duelo">
         <span>VOS · {state.myScore} acierto{state.myScore === 1 ? "" : "s"}</span>
         <span>{rivalName.toUpperCase()} · {state.opponentDone ? "ya jugó ✓" : `${state.opponentAnswered}/${state.total} respondidas`}</span>
@@ -171,11 +173,12 @@ export function TriviaAsyncDuel({ matchId, meId, meName, rivalName, rivalId, onE
         </div>
         {finished && state.history && <details className="trivia-summary"><summary><span>ASÍ FUE EL DUELO<small>{state.history.length} preguntas · Ver respuestas</small></span><b aria-hidden="true">⌄</b></summary>
           <div className="trivia-summary-scroll"><table><thead><tr><th scope="col">Pregunta y respuesta correcta</th><th scope="col">Vos</th><th scope="col">Rival</th></tr></thead>
-            <tbody>{state.history.map((round, i) => <tr key={i}><td><small>PREGUNTA {i + 1}</small><strong>{round.prompt}</strong><span>✓ {round.correct}</span></td>
+            <tbody>{state.history.map((round, i) => <tr key={i}><td><small>PREGUNTA {i + 1}</small><strong>{round.prompt}</strong><span>✓ {round.correct}</span>{round.explanation&&<p className="trivia-learning-explanation">{round.explanation}</p>}</td>
               <td aria-label={(host ? round.hostOk : round.guestOk) ? "Acertaste" : "No acertaste"}>{(host ? round.hostOk : round.guestOk) ? "✅" : "✕"}</td>
               <td aria-label={(host ? round.guestOk : round.hostOk) ? "Rival acertó" : "Rival no acertó"}>{(host ? round.guestOk : round.hostOk) ? "✅" : "✕"}</td></tr>)}</tbody></table></div>
         </details>}
       </>}
+      {ended&&<TriviaLearningHub compact onOpenChange={onLearningOpenChange}/>}
       <p className="trivia-footnote">Duelo por turnos · Premios y rachas de Lupi · Sin puntos para el ranking comunitario.</p>
     </section>
   );

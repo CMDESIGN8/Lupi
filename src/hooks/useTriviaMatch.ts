@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import type { Challenge } from "./useLobbyChallenges";
-export type TriviaRoundResult = { round: number; prompt: string; correct: string; hostCorrect: boolean; guestCorrect: boolean };
+export type TriviaRoundResult = { round: number; prompt: string; correct: string; explanation?: string; topic?: string; hostCorrect: boolean; guestCorrect: boolean };
 export type TriviaState = {
   id: string; round: number; total: number; hostScore: number; guestScore: number;
   status: "playing" | "finished" | "expired"; winnerId: string | null;

@@ -1,3 +1,4 @@
+import {TriviaLearningHub} from "../components/TriviaLearningHub";
 import {useFutsalStory} from '../hooks/useFutsalStory';
 import {FutsalStoryChapter} from '../components/FutsalStoryChapter';
 import { MissionBriefing } from "../components/MissionBriefing";
@@ -453,6 +454,7 @@ import { useAchievements } from "../hooks/useAchievements";
       }, [dailyChallengeToasts]);
   const [challengeTarget, setChallengeTarget] = useState<LobbyPlayer | null>(null);
   const [activeFutsal, setActiveFutsal] = useState<Challenge | null>(null);
+  const [learningPracticeOpen,setLearningPracticeOpen]=useState(false);
   const [activeTrivia, setActiveTrivia] = useState<Challenge | null>(null);
   const [asyncMatch, setAsyncMatch] = useState<{ id: string; rivalName: string; rivalId?: string } | null>(null);
   const [asyncNotice, setAsyncNotice] = useState("");
@@ -690,7 +692,7 @@ const {
       const duelStreak = useDuelStreak(user.id);
       const { players: lobbyPlayers, status: lobbyStatus } = useLobbyPresence({
       room: "global",
-      activity: view === "match" || asyncMatch || activeTruco || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
+      activity: learningPracticeOpen || view === "match" || asyncMatch || activeTruco || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
       me: {
         userId: user.id,
         username: user.username,
@@ -724,7 +726,7 @@ const {
       room: "global",
       meId: user.id,
       meName: user.username || "Jugador",
-      available: view === "lobby" && !storyOpen && !activeTrucoPvp && !activeTruco && !asyncMatch && !versusChallenge && (duelFinished || (!activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal)),
+      available: !learningPracticeOpen && view === "lobby" && !storyOpen && !activeTrucoPvp && !activeTruco && !asyncMatch && !versusChallenge && (duelFinished || (!activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal)),
       isMuted,
       quickGameRef,
       onAccepted: (challengeData) => {
@@ -746,7 +748,7 @@ const {
 
     const quick = useQuickDuel({
       room: "global", meId: user.id, meName: user.username || "Jugador",
-      available: view === "lobby" && !storyOpen && !activeTrucoPvp && !activeTruco && !incoming && (!outgoing || !!outgoing.quick) && !versusChallenge && !asyncMatch && (duelFinished || (!activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal)),
+      available: !learningPracticeOpen && view === "lobby" && !storyOpen && !activeTrucoPvp && !activeTruco && !incoming && (!outgoing || !!outgoing.quick) && !versusChallenge && !asyncMatch && (duelFinished || (!activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal)),
       quickGameRef,
       send: (target, game) => challenge(target, 1, game, undefined, true),
       cancelOutgoing: cancel,
@@ -766,7 +768,7 @@ const {
     });
 
     const startBotTruco=(botIndex=1)=>{
-      if(quick.game||incoming||outgoing||storyOpen||activeRps||activeTrivia||activeFutsal||versusChallenge||asyncMatch)return;
+      if(learningPracticeOpen||quick.game||incoming||outgoing||storyOpen||activeRps||activeTrivia||activeFutsal||versusChallenge||asyncMatch)return;
       const i=Number.isFinite(botIndex)?Math.min(2,Math.max(0,Math.trunc(botIndex))):1;
       setActiveTruco({id:`truco-bot-${crypto.randomUUID()}`,gameType:'truco',fromId:user.id,fromName:user.username||'Jugador',toId:`bot-${i}`,toName:BOT_NAMES[i],botIndex:i,vsBot:true,at:Date.now()});
       setDuelFinished(false);setRematchTarget(null);setChallengeTarget(null);setShowExploreWorld(false);setShowPlayersSheet(false);setGameTab('play');setView('lobby');
@@ -1153,7 +1155,8 @@ const handleLobbyMissionClaim = async (missionId: string) => {
 
             {gameTab === "deck" && view === "match" && <button type="button" className="gh-return-preview" onClick={() => setGameTab("play")}>← Volver a la previa del partido</button>}
             <div className="gh-scene" key={sceneKey}>
-              {view === "lobby" && gameTab === "play" && !showPlayersSheet && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>}
+              {view === "lobby" && gameTab === "play" && !showPlayersSheet && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={learningPracticeOpen||!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>}
+              {view === "lobby" && gameTab === "play" && !showPlayersSheet && !storyOpen && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && !asyncMatch && !incoming && !outgoing && !quick.game && <TriviaLearningHub onOpenChange={setLearningPracticeOpen}/>}
               {view === "lobby" && !activeTrucoPvp && !activeTruco && !activeRps && !activeTrivia && !activeFutsal && !versusChallenge && (
                 <QuickDuelPanel variant="pill" game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice}
                   onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} />
@@ -1584,7 +1587,7 @@ onChallengeGame={(player, game) => {
 
                   <div className="gh-world__discover" aria-label="Exploración y comunidad">
                     <button type="button" className="gh-explore-trigger" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
-                    <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>
+                    <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={learningPracticeOpen||!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>
                     {asyncInbox.badge > 0 && <button type="button" className="gh-explore-trigger" onClick={() => setShowPlayersSheet(true)}>🧠 {asyncInbox.badge} POR JUGAR</button>}
                   </div>
                   {showExploreWorld && <ExploreWorld deck={activeDeck} unlocked={unlockedAchievements.length} onClose={()=>setShowExploreWorld(false)} onMatch={()=>handleGameNavigate("battle")} onDeck={()=>handleGameNavigate("deck")} onAlbum={()=>handleGameNavigate("album")} onAchievements={()=>setShowAchievements(true)}/>}
@@ -1700,10 +1703,10 @@ onChallengeGame={(player, game) => {
           />
           {activeFutsal && <div className="rps-screen-overlay trivia-screen-overlay"><FutsalPvp key={activeFutsal.id} challenge={activeFutsal} meId={user.id} deck={activeDeck} players={lobbyPlayers} catalog={auraItems} onFinished={setDuelFinished} onRematch={() => requestSocialRematch(activeFutsal)} onExit={() => { setActiveFutsal(null); setDuelFinished(false); }} /></div>}
           <AsyncToast message={asyncNotice} onDone={() => setAsyncNotice("")} />
-          {asyncMatch && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaAsyncDuel key={asyncMatch.id} matchId={asyncMatch.id} meId={user.id} meName={user.username || "Vos"} rivalName={asyncMatch.rivalName} rivalId={asyncMatch.rivalId}
+          {asyncMatch && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaAsyncDuel onLearningOpenChange={setLearningPracticeOpen} key={asyncMatch.id} matchId={asyncMatch.id} meId={user.id} meName={user.username || "Vos"} rivalName={asyncMatch.rivalName} rivalId={asyncMatch.rivalId}
             onChanged={() => void asyncInbox.refresh()} onExit={() => { setAsyncMatch(null); void asyncInbox.refresh(); }}
             onRematch={(rival) => { setAsyncMatch(null); void startAsyncTrivia(rival); }} /></div>}
-          {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} catalog={auraItems} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
+          {activeTrivia && <div className="rps-screen-overlay trivia-screen-overlay"><TriviaDuel onLearningOpenChange={setLearningPracticeOpen} key={activeTrivia.id} challenge={activeTrivia} meId={user.id} players={lobbyPlayers} catalog={auraItems} onRematch={setActiveTrivia} onExit={() => setActiveTrivia(null)} /></div>}
           {activeTrucoPvp && <div className="rps-screen-overlay tr-screen"><TrucoPvpDuel key={activeTrucoPvp.id} challenge={activeTrucoPvp} meId={user.id} onFinished={setDuelFinished} onExit={()=>{setActiveTrucoPvp(null);setDuelFinished(false);}}/></div>}
           {activeTruco&&<div className="rps-screen-overlay tr-screen"><TrucoDuel key={activeTruco.id} challenge={activeTruco} meId={user.id} onRematch={()=>startBotTruco(activeTruco.botIndex)} onExit={()=>{setActiveTruco(null);setDuelFinished(false);}}/></div>}
           {activeRps && (
