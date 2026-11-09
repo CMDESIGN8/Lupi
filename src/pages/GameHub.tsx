@@ -203,10 +203,20 @@ import { useAchievements } from "../hooks/useAchievements";
     }: {
       event: WorldEvent;
     }) {
+      const [visible, setVisible] = useState(() => Date.now() - event.createdAt < 5000);
+      useEffect(() => {
+        const remaining = 5000 - (Date.now() - event.createdAt);
+        setVisible(remaining > 0);
+        if (remaining <= 0) return;
+        const timer = window.setTimeout(() => setVisible(false), remaining);
+        return () => window.clearTimeout(timer);
+      }, [event.id, event.createdAt]);
+      if (!visible) return null;
       return (
         <div
       key={event.id}
       className={`gh-world-event gh-world-event--${event.type}`}
+      role="status"
       style={
         event.auraColor
           ? ({
@@ -1480,7 +1490,7 @@ onChallengeGame={(player, game) => {
                         <strong>{lupiRecommendation.action === "pack" ? "Tenés un pack para abrir" : lupiRecommendation.title}</strong>
                         <p>{lupiRecommendation.description}</p>
                         <button type="button" onClick={() => runLupiRecommendation(lupiRecommendation.action)}>
-                          ⚡ {lupiRecommendation.button} →
+                          {lupiRecommendation.action === "pack" ? "ABRIR PACK →" : `⚡ ${lupiRecommendation.button} →`}
                         </button>
                       </>
                     )}
