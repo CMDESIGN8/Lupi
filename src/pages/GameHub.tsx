@@ -1131,7 +1131,7 @@ const handleLobbyMissionClaim = async (missionId: string) => {
           <div className={`gh-shell ${(gameTab === "play" && view === "lobby") || gameTab === "deck" ? "gh-shell--wide" : ""} ${gameTab === "deck" || view === "match" ? "gh-shell--compact-hud" : ""}`}>
             <header className="gh-hud">
   <button type="button" className="gh-back gh-back--home" onClick={onBackHome} aria-label="Volver a la página de inicio">
-    <span aria-hidden>⌂</span> Volver al inicio
+    <span aria-hidden>⌂</span><span className="gh-home-label">Inicio</span>
   </button>
 
   <div className="gh-brand">
