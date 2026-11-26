@@ -22,6 +22,7 @@ import { LeaderboardTab } from "./pages/LeaderboardTab";
 import { ProfileTab } from "./pages/ProfileTab";
 import { GameHub } from "./pages/GameHub";
 import { MarketplaceTab } from "./pages/MarketplaceTab";
+import { TrainingTab } from "./pages/TrainingTab";
 
 import { UserCardProfile } from "./components/UserCardProfile";
 import { AppHeader } from "./components/home/AppHeader";
@@ -324,7 +325,7 @@ if (user && needsPlayerOnboarding(user)) {
                   onRewardClaimed={refreshPendingRewards}
                 />
               )}
-              {["benefits", "ticket", "ranking"].includes(tab) && <div className="profile-dashboard-links"><button type="button" onClick={()=>handleNavigate("profile")}>← Volver al perfil</button></div>}
+              {["benefits", "ticket", "ranking", "training"].includes(tab) && <div className="profile-dashboard-links"><button type="button" onClick={()=>handleNavigate("profile")}>← Volver al perfil</button></div>}
               {tab === "ticket" && (
                 <TicketTab user={user} onPointsUpdate={handlePointsUpdate} />
               )}
@@ -340,6 +341,7 @@ if (user && needsPlayerOnboarding(user)) {
               {tab === "benefits" && (
                 <BenefitsTab user={user} onPointsUpdate={handlePointsUpdate} />
               )}
+              {tab === "training" && <TrainingTab user={user} />}
               {tab === "shop" && (
                 <MarketplaceTab
                   user={user}

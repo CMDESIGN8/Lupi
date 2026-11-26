@@ -220,3 +220,6 @@
 .hm-track{height:5px;background:#21343d;border-radius:5px;overflow:hidden;margin:7px 0 12px}.hm-track>span{display:block;height:100%;background:linear-gradient(90deg,#04bde1,#a6f74a)}
 .hm-rewards{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}.hm-rewards>span{font-size:11px;color:#f0d588;background:#e8ce6a0c;border:1px solid #b7a66f33;border-radius:7px;padding:5px 8px}
 .hm-mission>button{width:100%;min-height:44px;padding:11px 15px;background:#1bbfd3;border:1px solid #56d1d8;border-radius:9px;font:inherit;font-size:13px;font-weight:800;color:#041f29;cursor:pointer}.hm-mission>button:disabled{opacity:.6;cursor:wait}
+
+/* Training Hub shortcut */
+.home-training-entry{position:relative;border:1px solid rgba(9,188,235,.42)!important;background:linear-gradient(135deg,rgba(0,132,175,.22),rgba(10,4,32,.78))!important;box-shadow:inset 0 0 24px rgba(9,188,235,.07)}.home-training-entry>span{color:#70eaff}.home-training-entry strong{color:#eafaff}

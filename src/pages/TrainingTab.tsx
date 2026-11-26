@@ -28,6 +28,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
   const [savingDay, setSavingDay] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [earnedXp, setEarnedXp] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -63,8 +64,12 @@ export function TrainingTab({ user }: { user: AppUser }) {
     } else {
       const result = Array.isArray(data) ? data[0] : data;
       if (result?.success) {
-        setSessions((current) => [...current, { program_id: selected, day_number: day, completed_at: new Date().toISOString() }]);
-        setNotice("¡Desafío completado! Sumaste 50 XP a tu jugador.");
+        const rewarded = result.rewarded !== false && Number(result.xp_reward ?? 50) > 0;
+        setSessions((current) => current.some((item) => item.program_id === selected && item.day_number === day)
+          ? current
+          : [...current, { program_id: selected, day_number: day, completed_at: new Date().toISOString() }]);
+        if (rewarded) setEarnedXp((current) => current + Number(result.xp_reward ?? 50));
+        setNotice(rewarded ? `¡Desafío completado! Sumaste ${Number(result.xp_reward ?? 50)} XP a tu jugador.` : "Desafío completado. La recompensa ya había sido acreditada.");
         window.dispatchEvent(new Event("lupi:progression-updated"));
       } else {
         await load();
@@ -83,7 +88,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
           <p>Entrená, completá desafíos y llevá tu evolución a la cancha.</p>
           <div className="training-player-stats">
             <div><strong>{user.level ?? 1}</strong><small>NIVEL</small></div>
-            <div><strong>{(user.exp ?? 0).toLocaleString("es-AR")}</strong><small>XP TOTAL</small></div>
+            <div><strong>{((user.exp ?? 0) + earnedXp).toLocaleString("es-AR")}</strong><small>XP TOTAL</small></div>
             <div><strong>{sessions.length}</strong><small>DESAFÍOS</small></div>
           </div>
         </header>
