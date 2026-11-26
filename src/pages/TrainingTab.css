@@ -373,3 +373,30 @@
 @keyframes playerStatNumber{0%{transform:scale(1.35)}65%{transform:scale(.94)}100%{transform:scale(1)}}
 @media(max-width:420px){.training-cycle-evolution{padding:10px}.training-cycle-evolution-foot{font-size:7px;letter-spacing:.035em}}
 @media(prefers-reduced-motion:reduce){.training-cycle-evolution-track i,.training-card-evolution .training-stat.is-upgraded strong{animation:none!important;transition:none!important}}
+
+
+/* AURA PLAYER RANK · OVR-BASED COMPETITIVE TIERS */
+.training-player-rank{position:relative;overflow:hidden;margin:0;padding:14px 17px;border:1px solid rgba(9,188,235,.25);border-top:0;background:linear-gradient(110deg,rgba(4,18,32,.96),rgba(7,14,26,.94));}
+.training-player-rank:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 10% 50%,var(--rank-glow),transparent 48%);opacity:.8}
+.training-player-rank-main{position:relative;display:flex;align-items:center;gap:12px;min-width:0}
+.training-player-rank-emblem{display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;border:1px solid var(--rank-color);border-radius:13px;background:var(--rank-bg);color:var(--rank-color);font-size:20px;font-weight:1000;text-shadow:0 0 14px var(--rank-glow);box-shadow:inset 0 0 18px var(--rank-glow),0 0 18px var(--rank-glow)}
+.training-player-rank-copy,.training-player-rank-next{display:flex;min-width:0;flex-direction:column;gap:3px}
+.training-player-rank-copy{flex:1}
+.training-player-rank-copy small,.training-player-rank-next small{color:#829bad;font-size:8px;font-weight:950;letter-spacing:.13em}
+.training-player-rank-copy strong{color:var(--rank-color);font-family:var(--font-display);font-size:clamp(18px,3vw,23px);line-height:1;text-shadow:0 0 16px var(--rank-glow)}
+.training-player-rank-copy span,.training-player-rank-next span{color:#8da5b5;font-size:8px;font-weight:850;letter-spacing:.06em}
+.training-player-rank-next{text-align:right}
+.training-player-rank-next strong{color:#eaf7ff;font-size:11px;letter-spacing:.08em}
+.training-player-rank-track{position:relative;height:6px;margin-top:12px;overflow:hidden;border-radius:8px;background:rgba(100,126,143,.23)}
+.training-player-rank-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--rank-color),#09bceb);box-shadow:0 0 12px var(--rank-glow);transition:width .5s ease}
+.training-player-rank-foot{display:flex;justify-content:space-between;gap:10px;margin-top:5px;color:#70899b;font-size:7px;font-weight:950;letter-spacing:.12em}
+.training-player-rank-foot strong{color:var(--rank-color)}
+.training-player-rank.is-rookie{--rank-color:#8fa8b8;--rank-bg:rgba(143,168,184,.09);--rank-glow:rgba(143,168,184,.16)}
+.training-player-rank.is-amateur{--rank-color:#64c9e8;--rank-bg:rgba(100,201,232,.09);--rank-glow:rgba(100,201,232,.17)}
+.training-player-rank.is-semi-pro{--rank-color:#90ff46;--rank-bg:rgba(144,255,70,.08);--rank-glow:rgba(144,255,70,.17)}
+.training-player-rank.is-pro{--rank-color:#b18cff;--rank-bg:rgba(177,140,255,.1);--rank-glow:rgba(177,140,255,.2)}
+.training-player-rank.is-elite{--rank-color:#ffc66e;--rank-bg:rgba(255,198,110,.1);--rank-glow:rgba(255,198,110,.2)}
+.training-player-rank.is-legend{--rank-color:#fff0a6;--rank-bg:rgba(255,226,130,.12);--rank-glow:rgba(255,226,130,.24)}
+.training-character-hud .training-player-rank{margin:0;border-right:0;border-left:0}
+@media(max-width:420px){.training-player-rank{padding:12px}.training-player-rank-emblem{flex-basis:42px;width:42px;height:42px}.training-player-rank-next small{font-size:7px}.training-player-rank-next span{font-size:7px;max-width:112px}}
+@media(prefers-reduced-motion:reduce){.training-player-rank-track i{transition:none}}
