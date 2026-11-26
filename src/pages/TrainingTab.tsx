@@ -22,6 +22,16 @@ const STAT_LABELS: Record<TrainingStat, string> = {
   defending: "Defensa", finishing: "Remate", physical: "Físico",
 };
 
+type BadgeKey = "coordination" | "speed" | "agility" | "technique";
+type TrainingBadge = { badge_key: BadgeKey; progress: number; unlocked_at: string | null };
+const BADGE_CONFIG: Record<BadgeKey, { title: string; skill: string; image: string; description: string }> = {
+  coordination: { title: "CONTROL CORE", skill: "Coordinación", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/coordinacion.png", description: "Dominá tu cuerpo, tus apoyos y el control de pelota." },
+  speed: { title: "FIRST STRIKE", skill: "Velocidad", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/velocidad.png", description: "Reaccioná antes y ganá ventaja en los primeros metros." },
+  agility: { title: "BREAKPOINT", skill: "Agilidad", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/agilidad.png", description: "Frená, girá y cambiá de dirección con control." },
+  technique: { title: "TOUCH MASTER", skill: "Técnica", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/tecnica.png", description: "Controlá, pasá y resolvé con más recursos." },
+};
+const EMPTY_BADGES: TrainingBadge[] = (Object.keys(BADGE_CONFIG) as BadgeKey[]).map(badge_key => ({ badge_key, progress: 0, unlocked_at: null }));
+
 const todayArgentina = () => new Intl.DateTimeFormat("en-CA", {
   timeZone: "America/Argentina/Buenos_Aires",
   year: "numeric", month: "2-digit", day: "2-digit",
@@ -32,6 +42,9 @@ export function TrainingTab({ user }: { user: AppUser }) {
     pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10,
   });
   const [cardLevel, setCardLevel] = useState(1);
+  const [trainingXp, setTrainingXp] = useState(0);
+  const [badges, setBadges] = useState<TrainingBadge[]>(EMPTY_BADGES);
+  const [unlockedBadge, setUnlockedBadge] = useState<BadgeKey | null>(null);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameId | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,11 +57,12 @@ export function TrainingTab({ user }: { user: AppUser }) {
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
-    const [profileResult, attemptsResult] = await Promise.all([
-      supabase.from("profiles").select("user_card_level,user_card_pace,user_card_dribbling,user_card_passing,user_card_defending,user_card_finishing,user_card_physical")
+    const [profileResult, attemptsResult, badgesResult] = await Promise.all([
+      supabase.from("profiles").select("user_card_level,user_card_exp,user_card_pace,user_card_dribbling,user_card_passing,user_card_defending,user_card_finishing,user_card_physical")
         .eq("id", user.id).single(),
       supabase.from("personal_training_attempts").select("game_id,stat,grade,delta,created_at")
         .eq("user_id", user.id).eq("training_date", todayArgentina()).order("created_at", { ascending: false }),
+      supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id),
     ]);
     if (profileResult.error) {
       setError("No pudimos cargar tu carta personal. Revisá los permisos de profiles.");
@@ -60,11 +74,18 @@ export function TrainingTab({ user }: { user: AppUser }) {
         finishing: p.user_card_finishing ?? 10, physical: p.user_card_physical ?? 10,
       });
       setCardLevel(p.user_card_level ?? 1);
+      setTrainingXp(p.user_card_exp ?? 0);
     }
     if (attemptsResult.error) {
       setError("Falta aplicar la migración personal_card_training en Supabase para habilitar los minijuegos y guardar mejoras.");
     } else {
       setAttempts((attemptsResult.data ?? []) as Attempt[]);
+    }
+    if (badgesResult.error) {
+      setError("Falta aplicar la migración 20261126_aura_training_badges.sql en Supabase para habilitar los badges AURA.");
+    } else {
+      const savedBadges = (badgesResult.data ?? []) as TrainingBadge[];
+      setBadges(EMPTY_BADGES.map(base => savedBadges.find(item => item.badge_key === base.badge_key) ?? base));
     }
     setLoading(false);
   }, [user.id]);
@@ -100,7 +121,16 @@ export function TrainingTab({ user }: { user: AppUser }) {
         const after = Number(row.stat_value ?? before);
         setStats(current => ({ ...current, [result.stat]: after }));
         setCardLevel(Number(row.card_level ?? cardLevel));
+        setTrainingXp(current => current + Number(row.xp_awarded ?? result.xpBonus));
         setLastUpgrade({ stat: result.stat, before, after, ovr: Number(row.overall_rating ?? overall) });
+        const { data: badgeRows, error: badgeError } = await supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id);
+        if (!badgeError) {
+          const savedBadges = (badgeRows ?? []) as TrainingBadge[];
+          const nextBadges = EMPTY_BADGES.map(base => savedBadges.find(item => item.badge_key === base.badge_key) ?? base);
+          const justUnlocked = nextBadges.find(item => item.unlocked_at && !badges.find(old => old.badge_key === item.badge_key)?.unlocked_at);
+          setBadges(nextBadges);
+          if (justUnlocked) setUnlockedBadge(justUnlocked.badge_key);
+        }
         setAttempts(current => [{
           game_id: selectedGame, stat: result.stat, grade: result.grade, delta: Number(row.xp_awarded ?? result.xpBonus), created_at: new Date().toISOString(),
         }, ...current]);
@@ -113,7 +143,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
       setSelectedGame(null);
     }
     setSaving(false);
-  }, [selectedGame, saving, stats, cardLevel, overall, user.id, load]);
+  }, [selectedGame, saving, stats, cardLevel, overall, user.id, load, badges]);
 
   const startGame = (gameId: string) => {
     if (!canTrain) return;
@@ -153,8 +183,31 @@ export function TrainingTab({ user }: { user: AppUser }) {
           </div>}
         </section>
 
+
+        <section className="training-badges">
+          <div className="training-section-title"><span>02 / AURA SKILL BADGES</span><small>3 ENTRENAMIENTOS PARA DESBLOQUEAR</small></div>
+          <div className="training-badge-grid">
+            {badges.map(badge => {
+              const config = BADGE_CONFIG[badge.badge_key];
+              const unlocked = Boolean(badge.unlocked_at);
+              return <article className={`training-badge ${unlocked ? "is-unlocked" : ""}`} key={badge.badge_key}>
+                <div className="training-badge-art"><img src={config.image} alt={config.title} loading="lazy" /></div>
+                <div className="training-badge-copy"><small>{config.skill.toUpperCase()}</small><strong>{config.title}</strong><p>{config.description}</p>
+                  <div className="training-badge-progress"><i style={{ width: `${Math.min(3, badge.progress) / 3 * 100}%` }} /></div>
+                  <span>{unlocked ? "BADGE DESBLOQUEADA ✓" : `${Math.min(3, badge.progress)} / 3 ENTRENAMIENTOS`}</span>
+                </div>
+              </article>;
+            })}
+          </div>
+          <div className="training-xp-evolution">
+            <div><small>AURA PLAYER EVOLUTION</small><strong>{trainingXp.toLocaleString("es-AR")} XP</strong></div>
+            <div className="training-xp-track"><i style={{ width: `${Math.min(100, trainingXp / 1000 * 100)}%` }} /></div>
+            <div className="training-xp-milestones"><span className={trainingXp >= 500 ? "is-earned" : ""}>{trainingXp >= 500 ? "✓ " : ""}500 XP · GAME CHANGER</span><span className={trainingXp >= 1000 ? "is-earned" : ""}>{trainingXp >= 1000 ? "✓ " : ""}1.000 XP · LEGEND STATUS</span></div>
+          </div>
+        </section>
+
         <section className="training-arena">
-          <div className="training-section-title"><span>02 / ELEGÍ TU DESAFÍO</span><small>MEJORÁ UNA HABILIDAD</small></div>
+          <div className="training-section-title"><span>03 / ELEGÍ TU DESAFÍO</span><small>MEJORÁ UNA HABILIDAD</small></div>
           {loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? (
             <div className="training-game-stage">
               <div className="training-game-top">
@@ -180,7 +233,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
         </section>
 
         {attempts.length > 0 && <section className="training-history">
-          <div className="training-section-title"><span>03 / RESULTADOS DE HOY</span><small>PROGRESO GUARDADO</small></div>
+          <div className="training-section-title"><span>04 / RESULTADOS DE HOY</span><small>PROGRESO GUARDADO</small></div>
           <div className="training-history-list">{attempts.map((attempt, index) => (
             <article key={`${attempt.game_id}-${index}`}>
               <span>{STAT_LABELS[attempt.stat]}</span><strong>CALIFICACIÓN {attempt.grade}</strong><b>+{attempt.delta}</b>
@@ -190,6 +243,19 @@ export function TrainingTab({ user }: { user: AppUser }) {
 
         {error && <p className="training-feedback is-error" role="alert">{error}</p>}
         {notice && <p className="training-feedback" role="status">{notice}</p>}
+
+        {unlockedBadge && <div className="training-badge-modal" role="dialog" aria-modal="true" aria-labelledby="training-badge-modal-title">
+          <div className="training-badge-modal-card">
+            <button type="button" className="training-badge-modal-close" aria-label="Cerrar" onClick={() => setUnlockedBadge(null)}>×</button>
+            <small>✦ AURA SKILL BADGE DESBLOQUEADA ✦</small>
+            <img src={BADGE_CONFIG[unlockedBadge].image} alt={BADGE_CONFIG[unlockedBadge].title} />
+            <span>{BADGE_CONFIG[unlockedBadge].skill.toUpperCase()}</span>
+            <h2 id="training-badge-modal-title">{BADGE_CONFIG[unlockedBadge].title}</h2>
+            <p>{BADGE_CONFIG[unlockedBadge].description}</p>
+            <button type="button" onClick={() => setUnlockedBadge(null)}>RECLAMAR BADGE</button>
+          </div>
+        </div>}
+
         <p className="training-disclaimer">Hasta 5 minijuegos por día. Cada resultado mejora solamente tu carta personal; los atributos no superan 99. Adaptá la intensidad y priorizá la técnica.</p>
       </div>
     </main>
