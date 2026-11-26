@@ -1578,7 +1578,7 @@ onChallengeGame={(player, game) => {
                   </section>
 
                   </aside>
-                  <button className={`gh-world__play ${story.progress?.status !== 'completed' ? 'gh-world__play--story' : ''}`} type="button" disabled={story.loading || story.busy} onClick={() => handleGameNavigate("battle")}>
+                  <button className="gh-world__play gh-world__play--story" type="button" disabled={story.loading || story.busy} onClick={() => handleGameNavigate("battle")}>
                     <span className="gh-world__play-icon" aria-hidden>
   <img src={ballUcl} alt="Balón" />
 </span>
