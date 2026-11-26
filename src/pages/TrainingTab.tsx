@@ -334,15 +334,16 @@ export function TrainingTab({ user }: { user: AppUser }) {
     setResettingTraining(false);
   }, [resettingTraining, drillSaving]);
 
-  const handleGameResult = useCallback(async (result: TrainingResult) => {
-    if (!selectedGame || resultSubmitted.current || saving) return;
+  const handleGameResult = useCallback(async (result: TrainingResult, gameIdOverride?: GameId) => {
+    const gameId = gameIdOverride ?? selectedGame;
+    if (!gameId || resultSubmitted.current || saving) return;
     resultSubmitted.current = true;
     setSaving(true);
     setError("");
     setNotice("");
     const before = stats[result.stat];
     const { data, error: rpcError } = await supabase.rpc("complete_personal_training", {
-      p_game_id: selectedGame,
+      p_game_id: gameId,
       p_stat: result.stat,
       p_grade: result.grade,
       p_delta: result.delta,
@@ -368,7 +369,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
           if (justUnlocked) setUnlockedBadge(justUnlocked.badge_key);
         }
         setAttempts(current => [{
-          game_id: selectedGame, stat: result.stat, grade: result.grade, delta: Number(row.xp_awarded ?? result.xpBonus), created_at: new Date().toISOString(),
+          game_id: gameId, stat: result.stat, grade: result.grade, delta: Number(row.xp_awarded ?? result.xpBonus), created_at: new Date().toISOString(),
         }, ...current]);
         setNotice(`¡${result.grade}! Tu carta mejoró ${STAT_LABELS[result.stat]}: ${before} → ${after}.`);
         window.dispatchEvent(new CustomEvent("lupi:progression-updated", { detail: { userId: user.id } }));
@@ -523,9 +524,34 @@ export function TrainingTab({ user }: { user: AppUser }) {
           </div>
         </section>
 
+                <section className="training-challenge-arena">
+          <div className="training-section-title"><span>04 / CHALLENGE ARENA</span><small>CAMPAÑA DE DESARROLLO</small></div>
+          <div className="training-arena-map">
+            <div className="training-arena-map-head"><span>PLAYER CAMPAIGN</span><strong>{overall} OVR</strong></div>
+            <div className="training-arena-stage-grid">
+              <button type="button" className="training-arena-stage is-open" onClick={() => setReactionChallenge(true)} disabled={!canTrain}>
+                <span className="training-arena-stage-number">01</span><span className="training-arena-stage-icon">⚡</span><strong>REACTION</strong><small>REFLEJOS · FÍSICO</small><b>INICIAR NIVEL ↗</b>
+              </button>
+              <button type="button" className="training-arena-stage" onClick={() => startGame("dribbling")} disabled={!canTrain}>
+                <span className="training-arena-stage-number">02</span><span className="training-arena-stage-icon">◈</span><strong>CONTROL</strong><small>DOMINIO · GAMBETA</small><b>INICIAR NIVEL ↗</b>
+              </button>
+              <button type="button" className="training-arena-stage" onClick={() => startGame("pace")} disabled={!canTrain}>
+                <span className="training-arena-stage-number">03</span><span className="training-arena-stage-icon">➤</span><strong>SPEED</strong><small>EXPLOSIVIDAD · VELOCIDAD</small><b>INICIAR NIVEL ↗</b>
+              </button>
+              <button type="button" className="training-arena-stage" onClick={() => startGame("physical")} disabled={!canTrain}>
+                <span className="training-arena-stage-number">04</span><span className="training-arena-stage-icon">⌁</span><strong>AGILITY</strong><small>GIROS · FÍSICO</small><b>INICIAR NIVEL ↗</b>
+              </button>
+              <div className="training-arena-stage is-boss-locked" aria-disabled="true">
+                <span className="training-arena-stage-number">05</span><span className="training-arena-stage-icon">✦</span><strong>BOSS CHALLENGE</strong><small>PRUEBA COMBINADA</small><b>PRÓXIMAMENTE</b>
+              </div>
+            </div>
+            <div className="training-arena-map-foot"><span>ENERGÍA DIARIA DISPONIBLE</span><strong>{Math.max(0,5-gamesPlayed)} / 5</strong><i><b style={{width:`${Math.max(0,5-gamesPlayed)/5*100}%`}}/></i><small>Los resultados de cada nivel impactan en tu carta.</small></div>
+          </div>
+        </section>
+
         <section className="training-arena">
           <div className="training-section-title"><span>04 / ELEGÍ TU DESAFÍO</span><small>MEJORÁ UNA HABILIDAD</small></div>
-          {reactionChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>REACTION MODE</h2></div><button type="button" onClick={() => setReactionChallenge(false)} disabled={saving}>SALIR</button></div><AuraReactionChallenge onComplete={result => { setReactionChallenge(false); void handleGameResult(result); }} /></div> : loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? (
+          {reactionChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>REACTION MODE</h2></div><button type="button" onClick={() => setReactionChallenge(false)} disabled={saving}>SALIR</button></div><AuraReactionChallenge onComplete={result => { setReactionChallenge(false); void handleGameResult(result, "physical"); }} /></div> : loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? (
             <div className="training-game-stage">
               <div className="training-game-top">
                 <div><span>MINIJUEGO ACTIVO</span><h2>{GAME_CONFIG[selectedGame].label}</h2></div>
