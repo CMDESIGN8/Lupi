@@ -307,3 +307,8 @@
 .training-character-hud .training-hud-badge-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .training-character-hud .training-hud-xp{margin-top:14px}
 @media(max-width:620px){.training-character-hud{padding:7px;border-radius:16px;gap:0}.training-character-hud .training-hud-hero{padding:15px 12px}.training-character-hud .training-card-evolution,.training-character-hud .training-hud-badges{padding:14px 11px}.training-character-hud .training-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.training-character-hud .training-hud-badge-grid{grid-template-columns:1fr}}
+
+.training-hud-actions{display:flex;align-items:center;gap:14px}
+.training-back-profile{border:1px solid rgba(9,188,235,.35);background:rgba(9,188,235,.08);color:#9cecff;border-radius:999px;padding:7px 12px;font:700 10px/1 inherit;letter-spacing:.08em;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
+.training-back-profile:hover{background:rgba(9,188,235,.16);border-color:rgba(9,188,235,.7)}
+@media(max-width:600px){.training-hud-actions{gap:8px}.training-back-profile{font-size:9px;padding:7px 9px}}
