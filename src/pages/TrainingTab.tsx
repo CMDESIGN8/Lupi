@@ -71,6 +71,8 @@ export function TrainingTab({ user }: { user: AppUser }) {
   const [drills, setDrills] = useState<DrillRecord[]>([]);
   const [drillSaving, setDrillSaving] = useState<string | null>(null);
   const [unlockedBadge, setUnlockedBadge] = useState<BadgeKey | null>(null);
+  const [drillFeedback, setDrillFeedback] = useState<{ skillKey: SkillKey; exerciseIndex: number; progress: number; xpAwarded: number; statLabel: string; statGain: number } | null>(null);
+  const [levelUpReward, setLevelUpReward] = useState<{ previous: number; current: number; skillKey: SkillKey; statLabel: string; statGain: number } | null>(null);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [selectedGame, setSelectedGame] = useState<GameId | null>(null);
   const [loading, setLoading] = useState(true);
@@ -155,6 +157,11 @@ export function TrainingTab({ user }: { user: AppUser }) {
             ovr: Number(row.overall_rating ?? overall),
           });
         }
+        const xpAwarded = Number(row.xp_awarded ?? 0);
+        const nextLevel = Number(row.user_card_level ?? cardLevel);
+        const statLabel = statKey ? STAT_LABELS[statKey] : "ATRIBUTO";
+        const statGain = Math.max(0, statAfter - statBefore);
+        let badgeJustUnlocked = false;
         const { data: badgeRows } = await supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id);
         if (badgeRows) {
           const savedBadges = badgeRows as TrainingBadge[];
@@ -162,15 +169,21 @@ export function TrainingTab({ user }: { user: AppUser }) {
           const previous = badges.find(item => item.badge_key === skillKey);
           const next = nextBadges.find(item => item.badge_key === skillKey);
           setBadges(nextBadges);
-          if (next?.unlocked_at && !previous?.unlocked_at) setUnlockedBadge(skillKey);
+          badgeJustUnlocked = Boolean(next?.unlocked_at && !previous?.unlocked_at);
         }
-        if (Number(row.xp_awarded) > 0) {
-          const statLabel = statKey ? STAT_LABELS[statKey] : "ATRIBUTO";
-          const statGain = statAfter - statBefore;
+        const nextProgress = Number(row.progress ?? Math.min(3, drills.filter(item => item.skill_key === skillKey).length + 1));
+        setDrillFeedback({ skillKey, exerciseIndex, progress: nextProgress, xpAwarded, statLabel, statGain });
+        if (xpAwarded > 0) {
           setNotice(`¡${AURA_SKILLS[skillKey].title} COMPLETADA! ${statLabel} +${statGain} · +50 XP · BADGE DESBLOQUEADA.`);
+          if (nextLevel > cardLevel) {
+            setUnlockedBadge(null);
+            setLevelUpReward({ previous: cardLevel, current: nextLevel, skillKey, statLabel, statGain });
+          } else if (badgeJustUnlocked) {
+            setUnlockedBadge(skillKey);
+          }
           window.dispatchEvent(new CustomEvent("lupi:progression-updated", { detail: { userId: user.id } }));
         } else {
-          setNotice(`Ejercicio guardado: ${AURA_SKILLS[skillKey].drills[exerciseIndex].title}.`);
+          setNotice(`¡EJERCICIO REGISTRADO! ${AURA_SKILLS[skillKey].drills[exerciseIndex].title} · ${nextProgress}/3 en ${AURA_SKILLS[skillKey].title}.`);
         }
       }
     }
@@ -250,7 +263,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
           <div className="training-section-title"><span>01 / TU CARTA EVOLUCIONA</span><small>ATRIBUTOS PERSONALES · MÁX. 99</small></div>
           <div className="training-stat-grid">
             {(Object.keys(STAT_LABELS) as TrainingStat[]).map(stat => (
-              <div className="training-stat" key={stat}>
+              <div className={`training-stat ${lastUpgrade?.stat === stat ? "is-upgraded" : ""}`} key={stat}>
                 <div><span>{STAT_LABELS[stat]}</span><strong>{stats[stat]}</strong></div>
                 <div className="training-stat-track"><i style={{ width: `${Math.min(99, stats[stat]) / 99 * 100}%` }} /></div>
               </div>
@@ -263,6 +276,16 @@ export function TrainingTab({ user }: { user: AppUser }) {
         </section>
 
 
+
+        {drillFeedback && <section className={`training-drill-feedback ${drillFeedback.xpAwarded > 0 ? "is-reward" : ""}`} role="status">
+          <div className="training-drill-feedback-icon">{drillFeedback.xpAwarded > 0 ? "✦" : "✓"}</div>
+          <div className="training-drill-feedback-copy">
+            <small>{drillFeedback.xpAwarded > 0 ? "DISCIPLINA COMPLETADA" : "PROGRESO GUARDADO"}</small>
+            <strong>{AURA_SKILLS[drillFeedback.skillKey].drills[drillFeedback.exerciseIndex].title}</strong>
+            <span>{AURA_SKILLS[drillFeedback.skillKey].title} · {drillFeedback.progress}/3 ejercicios</span>
+          </div>
+          {drillFeedback.xpAwarded > 0 ? <div className="training-drill-feedback-reward"><b>+50 XP</b><span>{drillFeedback.statLabel} +{drillFeedback.statGain}</span></div> : <div className="training-drill-feedback-progress">{drillFeedback.progress}/3</div>}
+        </section>}
 
         <section className="training-aura-program">
           <div className="training-section-title"><span>02 / AURA TRAINING SYSTEM</span><small>4 DISCIPLINAS · 12 EJERCICIOS</small></div>
@@ -311,9 +334,12 @@ export function TrainingTab({ user }: { user: AppUser }) {
             })}
           </div>
           <div className="training-xp-evolution">
-            <div><small>AURA PLAYER EVOLUTION</small><strong>{trainingXp.toLocaleString("es-AR")} XP</strong></div>
-            <div className="training-xp-track"><i style={{ width: `${Math.min(100, trainingXp / 1000 * 100)}%` }} /></div>
-            <div className="training-xp-milestones"><span className={trainingXp >= 500 ? "is-earned" : ""}>{trainingXp >= 500 ? "✓ " : ""}500 XP · GAME CHANGER</span><span className={trainingXp >= 1000 ? "is-earned" : ""}>{trainingXp >= 1000 ? "✓ " : ""}1.000 XP · LEGEND STATUS</span></div>
+            <div className="training-xp-level-head">
+              <div><small>AURA PLAYER EVOLUTION</small><strong>LVL {cardLevel}</strong></div>
+              <b>{trainingXp.toLocaleString("es-AR")} XP</b>
+            </div>
+            <div className="training-xp-track"><i style={{ width: `${trainingXp % 100}%` }} /></div>
+            <div className="training-xp-level-foot"><span>{trainingXp % 100} / 100 XP</span><strong>{100 - (trainingXp % 100)} XP PARA LVL {cardLevel + 1}</strong></div>
           </div>
         </section>
 
@@ -354,6 +380,22 @@ export function TrainingTab({ user }: { user: AppUser }) {
 
         {error && <p className="training-feedback is-error" role="alert">{error}</p>}
         {notice && <p className="training-feedback" role="status">{notice}</p>}
+
+        {levelUpReward && <div className="training-levelup-overlay" role="dialog" aria-modal="true" aria-labelledby="training-levelup-title">
+          <div className="training-levelup-card">
+            <div className="training-levelup-orbit" aria-hidden="true">✦</div>
+            <small>AURA PLAYER EVOLUTION</small>
+            <h2 id="training-levelup-title">LEVEL UP</h2>
+            <div className="training-levelup-level">LVL {levelUpReward.current}</div>
+            <p>Tu carta acaba de evolucionar.</p>
+            <div className="training-levelup-reward">
+              <span>+50 XP</span>
+              <strong>{levelUpReward.statLabel} +{levelUpReward.statGain}</strong>
+            </div>
+            <div className="training-levelup-from">NIVEL {levelUpReward.previous} <span>→</span> NIVEL {levelUpReward.current}</div>
+            <button type="button" onClick={() => setLevelUpReward(null)}>SEGUIR EVOLUCIONANDO</button>
+          </div>
+        </div>}
 
         {unlockedBadge && <div className="training-badge-modal" role="dialog" aria-modal="true" aria-labelledby="training-badge-modal-title">
           <div className="training-badge-modal-card">
