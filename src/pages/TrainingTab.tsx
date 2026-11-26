@@ -380,23 +380,42 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
               <div><small>AURA RANK REWARDS</small><h2>DESBLOQUEÁ TU ESTATUS</h2></div>
               <span>{Math.max(0, (highestUnlockedRank ?? currentRankIndex) + 1)}/6 RANGOS</span>
             </div>
-            <div className="training-rank-rewards-grid">
-              {playerRanks.map((rank, index) => {
-                const unlocked = highestUnlockedRank !== null && index <= highestUnlockedRank;
-                const rewardNames = ["INSIGNIA ROOKIE", "MARCO AZUL", "INSIGNIA SEMI PRO", "MARCO PRO", "EFECTO ELITE", "MARCO LEGENDARIO"];
-                const rewardDetails = ["Tu primer paso en el club.", "Identidad visual AMATEUR para tu carta.", "Insignia exclusiva de progreso.", "Marco premium para tu carta.", "Efecto especial de rango ELITE.", "Apariencia legendaria y celebración exclusiva."];
-                const rewardIcons = ["◆", "⬡", "✦", "✧", "♛", "★"];
-                return <article key={rank.name} className={`training-rank-reward is-${rank.color} ${unlocked ? "is-unlocked" : "is-locked"}`}>
-                  <div className="training-rank-reward-icon" aria-hidden="true">{unlocked ? rewardIcons[index] : "🔒"}</div>
+            {(() => {
+              const rewardNames = ["INSIGNIA ROOKIE", "MARCO AZUL", "INSIGNIA SEMI PRO", "MARCO PRO", "EFECTO ELITE", "MARCO LEGENDARIO"];
+              const rewardDetails = ["Tu primer paso en el club.", "Identidad visual AMATEUR para tu carta.", "Insignia exclusiva de progreso.", "Marco premium para tu carta.", "Efecto especial de rango ELITE.", "Apariencia legendaria y celebración exclusiva."];
+              const rewardIcons = ["◆", "⬡", "✦", "✧", "♛", "★"];
+              const upcomingIndex = Math.min(currentRankIndex + 1, playerRanks.length - 1);
+              const upcoming = playerRanks[upcomingIndex];
+              const allUnlocked = currentRankIndex === playerRanks.length - 1;
+              return <>
+                <article className={`training-rank-reward training-rank-reward-featured is-${upcoming.color}`}>
+                  <div className="training-rank-reward-icon" aria-hidden="true">{allUnlocked ? "★" : "🔒"}</div>
                   <div className="training-rank-reward-copy">
-                    <small>{rank.name}</small>
-                    <strong>{rewardNames[index]}</strong>
-                    <span>{unlocked ? (rankRewardHistory[index] ? `DESBLOQUEADO · ${new Date(rankRewardHistory[index]).toLocaleDateString("es-AR")}` : "RANGO ALCANZADO") : rewardDetails[index]}</span>
+                    <small>{allUnlocked ? "RANGO MÁXIMO ALCANZADO" : "PRÓXIMO DESBLOQUEO · " + upcoming.name}</small>
+                    <strong>{allUnlocked ? "TODAS LAS RECOMPENSAS CONSEGUIDAS" : rewardNames[upcomingIndex]}</strong>
+                    <span>{allUnlocked ? "Llegaste a LEGEND. ¡Tu camino continúa en 99 OVR!" : rewardDetails[upcomingIndex]}</span>
                   </div>
-                  <b>{unlocked ? "✓" : "OVR " + rank.min}</b>
-                </article>;
-              })}
-            </div>
+                  <b>{allUnlocked ? "✓" : "OVR " + upcoming.min}</b>
+                </article>
+                <details className="training-rank-rewards-details">
+                  <summary><span>VER TODAS LAS RECOMPENSAS</span><span className="training-rank-rewards-chevron" aria-hidden="true">⌄</span></summary>
+                  <div className="training-rank-rewards-grid">
+                    {playerRanks.map((rank, index) => {
+                      const unlocked = highestUnlockedRank !== null && index <= highestUnlockedRank;
+                      return <article key={rank.name} className={`training-rank-reward is-${rank.color} ${unlocked ? "is-unlocked" : "is-locked"}`}>
+                        <div className="training-rank-reward-icon" aria-hidden="true">{unlocked ? rewardIcons[index] : "🔒"}</div>
+                        <div className="training-rank-reward-copy">
+                          <small>{rank.name}</small>
+                          <strong>{rewardNames[index]}</strong>
+                          <span>{unlocked ? (rankRewardHistory[index] ? `DESBLOQUEADO · ${new Date(rankRewardHistory[index]).toLocaleDateString("es-AR")}` : "RANGO ALCANZADO") : rewardDetails[index]}</span>
+                        </div>
+                        <b>{unlocked ? "✓" : "OVR " + rank.min}</b>
+                      </article>;
+                    })}
+                  </div>
+                </details>
+              </>;
+            })()}
           </section>
 
           <div className="training-xp-evolution training-hud-xp">
