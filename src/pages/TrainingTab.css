@@ -63,3 +63,56 @@
 .training-aura-drill.is-done button{border-color:rgba(55,225,180,.35);background:rgba(20,145,105,.15);color:#76edc0}
 .training-aura-skill-reward{margin-top:11px;padding:10px;border-radius:8px;background:rgba(21,120,83,.17);color:#8dff68;text-align:center;font-size:9px;font-weight:1000;letter-spacing:.12em}
 @media(max-width:560px){.training-aura-program{padding:13px}.training-aura-skill{padding:10px}.training-aura-skill-head{grid-template-columns:58px minmax(0,1fr) auto;gap:8px}.training-aura-skill-head img{width:58px;height:58px}.training-aura-skill-head h3{font-size:16px}.training-aura-drill{grid-template-columns:1fr;gap:8px}.training-aura-drill button{width:100%;min-height:36px}}
+
+
+/* GAME FEEL: instant feedback, attribute evolution and player level-up */
+.training-stat{transition:border-color .25s,background .25s,transform .25s}
+.training-stat.is-upgraded{border-color:rgba(75,245,190,.72);background:linear-gradient(110deg,rgba(26,130,100,.22),rgba(3,12,24,.55));animation:trainingStatUpgrade .75s ease-out}
+.training-stat.is-upgraded strong{color:#8dffcf;text-shadow:0 0 16px rgba(80,255,190,.5)}
+.training-stat.is-upgraded .training-stat-track i{background:linear-gradient(90deg,#19c99a,#b0ff76);box-shadow:0 0 14px rgba(100,255,190,.5)}
+@keyframes trainingStatUpgrade{0%{transform:scale(1)}35%{transform:scale(1.025)}100%{transform:scale(1)}}
+.training-drill-feedback{display:flex;align-items:center;gap:12px;padding:13px 15px;border:1px solid rgba(47,210,245,.28);border-radius:15px;background:linear-gradient(110deg,rgba(8,54,75,.8),rgba(8,17,30,.94));box-shadow:0 10px 28px rgba(0,0,0,.18);animation:trainingFeedbackIn .35s ease-out}
+.training-drill-feedback.is-reward{border-color:rgba(106,255,185,.5);background:radial-gradient(ellipse at 95% 50%,rgba(67,255,168,.13),transparent 45%),linear-gradient(110deg,rgba(13,73,61,.82),rgba(8,17,30,.96))}
+.training-drill-feedback-icon{width:35px;height:35px;flex:0 0 35px;display:grid;place-items:center;border-radius:11px;background:rgba(45,213,245,.12);color:#57e8ff;font-size:20px;font-weight:900}
+.training-drill-feedback.is-reward .training-drill-feedback-icon{background:rgba(94,255,176,.13);color:#8dffbd;box-shadow:0 0 20px rgba(94,255,176,.16)}
+.training-drill-feedback-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:3px}
+.training-drill-feedback-copy small{font-size:8px;font-weight:950;letter-spacing:.14em;color:#53e3fa}
+.training-drill-feedback.is-reward .training-drill-feedback-copy small{color:#8dffbd}
+.training-drill-feedback-copy strong{overflow:hidden;color:#f3fbff;font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+.training-drill-feedback-copy span{color:#91aebe;font-size:9px}
+.training-drill-feedback-reward{display:flex;flex-direction:column;align-items:flex-end;gap:3px;white-space:nowrap}
+.training-drill-feedback-reward b{color:#9dffbe;font-family:var(--font-display);font-size:20px}
+.training-drill-feedback-reward span{color:#a9d9c2;font-size:9px;font-weight:900}
+.training-drill-feedback-progress{padding:7px 9px;border-radius:9px;background:rgba(54,218,245,.1);color:#5de5f8;font-size:12px;font-weight:950}
+@keyframes trainingFeedbackIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.training-xp-evolution{border-color:rgba(54,218,245,.3);background:radial-gradient(ellipse at 95% 0,rgba(0,188,235,.12),transparent 48%),rgba(0,8,18,.58)}
+.training-xp-level-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.training-xp-level-head>div{display:flex;flex-direction:column;gap:3px}
+.training-xp-level-head>div strong{font-family:var(--font-display);font-size:25px;color:#f5fcff}
+.training-xp-level-head>b{color:#6deafa;font-family:var(--font-display);font-size:19px}
+.training-xp-level-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.training-xp-level-foot span{font-size:9px;color:#90aaba;font-weight:800}
+.training-xp-level-foot strong{font-size:9px;color:#6ce8f7;letter-spacing:.06em}
+.training-xp-track{height:9px}
+.training-xp-track i{background:linear-gradient(90deg,#078bc7,#39e5f4,#b3ff83);box-shadow:0 0 12px rgba(43,221,240,.3);transition:width .65s cubic-bezier(.22,1,.36,1)}
+.training-levelup-overlay{position:fixed;inset:0;z-index:4000;display:grid;place-items:center;padding:18px;background:rgba(1,5,12,.91);backdrop-filter:blur(13px);animation:trainingLevelBackdrop .25s ease-out}
+.training-levelup-card{position:relative;isolation:isolate;overflow:hidden;width:min(100%,410px);padding:31px 25px 24px;text-align:center;border:1px solid rgba(112,255,190,.65);border-radius:24px;background:radial-gradient(ellipse at 50% 0,rgba(38,225,158,.23),transparent 54%),linear-gradient(145deg,#122b31,#080e18 72%);box-shadow:0 0 0 1px rgba(69,255,190,.08),0 25px 90px rgba(0,0,0,.65),0 0 55px rgba(55,235,170,.12);animation:trainingLevelCardIn .45s cubic-bezier(.16,1,.3,1)}
+.training-levelup-card:before,.training-levelup-card:after{position:absolute;z-index:-1;content:"";width:230px;height:230px;border:1px solid rgba(112,255,190,.14);border-radius:50%;left:50%;top:42%;transform:translate(-50%,-50%);box-shadow:0 0 0 18px rgba(112,255,190,.025),0 0 0 38px rgba(112,255,190,.018)}
+.training-levelup-card:after{width:310px;height:310px;border-color:rgba(112,255,190,.08)}
+.training-levelup-orbit{position:absolute;top:20px;right:25px;color:#a2ffc8;font-size:24px;text-shadow:0 0 20px #56f0a8;animation:trainingStarTurn 5s linear infinite}
+.training-levelup-card>small{color:#9dffca;font-size:9px;font-weight:950;letter-spacing:.2em}
+.training-levelup-card h2{margin:13px 0 0;color:#fff;font-family:var(--font-display);font-size:clamp(38px,11vw,54px);line-height:1;text-shadow:0 0 26px rgba(104,255,184,.28)}
+.training-levelup-level{margin:10px 0 7px;color:#9dffbf;font-family:var(--font-display);font-size:clamp(58px,16vw,78px);line-height:1;text-shadow:0 0 28px rgba(103,255,180,.5)}
+.training-levelup-card>p{margin:0;color:#a9c6bd;font-size:12px}
+.training-levelup-reward{display:flex;justify-content:center;align-items:center;gap:14px;margin:23px 0 15px;padding:13px;border:1px solid rgba(111,255,190,.23);border-radius:13px;background:rgba(55,220,150,.08)}
+.training-levelup-reward span{color:#9dffbf;font-family:var(--font-display);font-size:22px;font-weight:950}
+.training-levelup-reward strong{color:#e6fff0;font-size:11px}
+.training-levelup-from{color:#8ba99b;font-size:9px;font-weight:900;letter-spacing:.13em}
+.training-levelup-from span{padding:0 8px;color:#9dffbf}
+.training-levelup-card>button{width:100%;margin-top:23px;padding:14px 12px;border:0;border-radius:11px;background:linear-gradient(90deg,#19c98f,#a3ff78);color:#06170f;font-size:10px;font-weight:1000;letter-spacing:.13em;cursor:pointer;box-shadow:0 8px 28px rgba(75,255,165,.18);transition:transform .2s,filter .2s}
+.training-levelup-card>button:hover{transform:translateY(-2px);filter:brightness(1.08)}
+@keyframes trainingLevelBackdrop{from{opacity:0}to{opacity:1}}
+@keyframes trainingLevelCardIn{from{opacity:0;transform:translateY(18px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes trainingStarTurn{to{transform:rotate(360deg)}}
+@media(max-width:560px){.training-drill-feedback{gap:9px;padding:11px}.training-drill-feedback-icon{width:31px;height:31px;flex-basis:31px}.training-drill-feedback-copy strong{font-size:10px}.training-drill-feedback-reward b{font-size:17px}.training-drill-feedback-reward span{font-size:8px}.training-levelup-card{padding:28px 18px 20px}.training-levelup-reward{gap:9px;flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.training-stat.is-upgraded,.training-drill-feedback,.training-levelup-overlay,.training-levelup-card,.training-levelup-orbit{animation:none}.training-xp-track i,.training-levelup-card>button{transition:none}}
