@@ -116,6 +116,8 @@ function AuraReactionChallenge({ onComplete }: { onComplete: (result: TrainingRe
   const [falseStarts, setFalseStarts] = useState(0);
   const startedAt = useRef(0);
   const finished = useRef(false);
+  const completionRef = useRef(onComplete);
+  useEffect(() => { completionRef.current = onComplete; }, [onComplete]);
   const rounds = 5;
   useEffect(() => {
     if (finished.current || reaction !== null || round >= rounds) return;
@@ -134,11 +136,11 @@ function AuraReactionChallenge({ onComplete }: { onComplete: (result: TrainingRe
         const grade: TrainingResult["grade"] = avg < 250 && falseStarts === 0 ? "S" : avg < 350 ? "A" : avg < 500 ? "B" : "C";
         const delta = grade === "S" ? 8 : grade === "A" ? 5 : grade === "B" ? 3 : 1;
         const xpBonus = grade === "S" ? 200 : grade === "A" ? 120 : grade === "B" ? 70 : 40;
-        onComplete({ stat: "physical", grade, delta, xpBonus, message: `Media ${Math.round(avg)} ms · ${falseStarts} salida(s) anticipada(s)` });
+        completionRef.current({ stat: "physical", grade, delta, xpBonus, message: `Media ${Math.round(avg)} ms · ${falseStarts} salida(s) anticipada(s)` });
       } else { setRound(updated.length); setReaction(null); }
     }, 800);
     return () => window.clearTimeout(timer);
-  }, [reaction, times, falseStarts, onComplete]);
+  }, [reaction, times, falseStarts]);
   const tap = () => {
     if (finished.current) return;
     if (!signal) { setFalseStarts(n => n + 1); setSignal(true); setWaiting(false); startedAt.current = performance.now(); return; }
