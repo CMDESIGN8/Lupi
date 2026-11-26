@@ -416,7 +416,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
         </header>
 
         <section className="training-card-evolution">
-          <div className="training-section-title"><span>01 / TU CARTA EVOLUCIONA</span><small>ATRIBUTOS PERSONALES · MÁX. 99</small></div>
+          <div className="training-section-title"><span>00 / TU PLAYER CARD</span><small>ATRIBUTOS PERSONALES · MÁX. 99</small></div>
           <div className="training-stat-grid">
             {(Object.keys(STAT_LABELS) as TrainingStat[]).map(stat => (
               <div className={`training-stat ${lastUpgrade?.stat === stat ? "is-upgraded" : ""}`} key={stat}>
@@ -434,7 +434,8 @@ export function TrainingTab({ user }: { user: AppUser }) {
 
 
         <section className="training-aura-program">
-          <div className="training-section-title"><span>02 / AURA TRAINING SYSTEM</span><small>4 DISCIPLINAS · 12 EJERCICIOS</small></div>
+          <div className="training-section-title"><span>01 / TRAINING LAB</span><small>ENTRENÁ · DESARROLLÁ SKILLS · DESBLOQUEÁ BADGES</small></div>
+          <p className="training-unified-intro">Elegí una disciplina, completá sus 3 ejercicios progresivos y desbloqueá su insignia. Cada ejercicio suma progreso a tu jugador.</p>
           <div className="training-aura-toolbar"><p className="training-arena-intro">Completá los tres ejercicios de cada disciplina para desbloquear su badge y ganar 50 XP en tu carta.</p><button type="button" className="training-reset-button" onClick={() => void resetAuraTraining()} disabled={resettingTraining || drillSaving !== null || drills.length === 0}>{resettingTraining ? "REINICIANDO…" : "↻ REINICIAR ENTRENAMIENTO"}</button></div>
         {drillFeedback && <section className={`training-drill-feedback ${drillFeedback.xpAwarded > 0 ? "is-reward" : ""}`} role="status">
           <div className="training-drill-feedback-icon">{drillFeedback.xpAwarded > 0 ? "✦" : "✓"}</div>
@@ -457,6 +458,11 @@ export function TrainingTab({ user }: { user: AppUser }) {
                   <strong>{Math.round(done / 3 * 100)}%</strong>
                 </div>
                 <div className="training-aura-skill-track"><i style={{width:`${done/3*100}%`}} /></div>
+                <div className={`training-inline-badge ${unlocked ? "is-unlocked" : ""}`}>
+                  <img src={BADGE_CONFIG[skillKey].image} alt="" />
+                  <div><small>BADGE DE DISCIPLINA</small><strong>{BADGE_CONFIG[skillKey].title}</strong><span>{unlocked ? "DESBLOQUEADA ✓" : `${done}/3 ejercicios · ${3-done} para desbloquear`}</span></div>
+                  <b>{unlocked ? "✦" : "🔒"}</b>
+                </div>
                 <div className="training-aura-drills">
                   {skill.drills.map((drill,index) => {
                     const completed = drills.some(item => item.skill_key === skillKey && item.exercise_index === index);
@@ -510,84 +516,27 @@ export function TrainingTab({ user }: { user: AppUser }) {
           </div>;
         })()}
 
-        <section className="training-badges">
-          <div className="training-section-title"><span>03 / AURA SKILL BADGES</span><small>3 EJERCICIOS POR DISCIPLINA</small></div>
-          <div className="training-badge-grid">
-            {badges.map(badge => {
-              const config = BADGE_CONFIG[badge.badge_key];
-              const unlocked = Boolean(badge.unlocked_at);
-              return <article className={`training-badge ${unlocked ? "is-unlocked" : ""}`} key={badge.badge_key}>
-                <div className="training-badge-art"><img src={config.image} alt={config.title} loading="lazy" /></div>
-                <div className="training-badge-copy"><small>{config.skill.toUpperCase()}</small><strong>{config.title}</strong><p>{config.description}</p>
-                  <div className="training-badge-progress"><i style={{ width: `${Math.min(3, badge.progress) / 3 * 100}%` }} /></div>
-                  <span>{unlocked ? "BADGE DESBLOQUEADA ✓" : `${Math.min(3, badge.progress)} / 3 ENTRENAMIENTOS`}</span>
-                </div>
-              </article>;
-            })}
-          </div>
-          <div className="training-xp-evolution">
-            <div className="training-xp-level-head">
-              <div><small>AURA PLAYER EVOLUTION</small><strong>LVL {cardLevel}</strong></div>
-              <b>{trainingXp.toLocaleString("es-AR")} XP</b>
-            </div>
-            <div className="training-xp-track"><i style={{ width: `${trainingXp % 100}%` }} /></div>
-            <div className="training-xp-level-foot"><span>{trainingXp % 100} / 100 XP</span><strong>{100 - (trainingXp % 100)} XP PARA LVL {cardLevel + 1}</strong></div>
-          </div>
-        </section>
-
-                <section className="training-challenge-arena">
-          <div className="training-section-title"><span>04 / CHALLENGE ARENA</span><small>CAMPAÑA DE DESARROLLO</small></div>
+        <section className="training-challenge-arena training-unified-arena">
+          <div className="training-section-title"><span>02 / CHALLENGE ARENA</span><small>COMPETÍ · SUMÁ XP · MEJORÁ TU CARTA</small></div>
+          <p className="training-unified-intro">Los ejercicios desarrollan tus fundamentos. En la Arena los ponés a prueba con minijuegos y desafíos de rendimiento.</p>
           <div className="training-arena-map">
-            <div className="training-arena-map-head"><span>PLAYER CAMPAIGN</span><strong>{overall} OVR</strong></div>
-            <div className="training-arena-stage-grid">
-              <button type="button" className="training-arena-stage is-open" onClick={() => setReactionChallenge(true)} disabled={!canTrain}>
-                <span className="training-arena-stage-number">01</span><span className="training-arena-stage-icon">⚡</span><strong>REACTION</strong><small>REFLEJOS · FÍSICO</small><b>INICIAR NIVEL ↗</b>
-              </button>
-              <button type="button" className="training-arena-stage" onClick={() => startGame("dribbling")} disabled={!canTrain}>
-                <span className="training-arena-stage-number">02</span><span className="training-arena-stage-icon">◈</span><strong>CONTROL</strong><small>DOMINIO · GAMBETA</small><b>INICIAR NIVEL ↗</b>
-              </button>
-              <button type="button" className="training-arena-stage" onClick={() => startGame("pace")} disabled={!canTrain}>
-                <span className="training-arena-stage-number">03</span><span className="training-arena-stage-icon">➤</span><strong>SPEED</strong><small>EXPLOSIVIDAD · VELOCIDAD</small><b>INICIAR NIVEL ↗</b>
-              </button>
-              <button type="button" className="training-arena-stage" onClick={() => startGame("physical")} disabled={!canTrain}>
-                <span className="training-arena-stage-number">04</span><span className="training-arena-stage-icon">⌁</span><strong>AGILITY</strong><small>GIROS · FÍSICO</small><b>INICIAR NIVEL ↗</b>
-              </button>
-              <button type="button" className="training-arena-stage is-boss-open" onClick={() => setBossChallenge(true)} disabled={!canTrain}>
-                <span className="training-arena-stage-number">05</span><span className="training-arena-stage-icon">✦</span><strong>BOSS CHALLENGE</strong><small>3 FASES · SCORE · COMBO</small><b>INICIAR BOSS ↗</b>
-              </button>
-            </div>
-            <div className="training-arena-map-foot"><span>ENERGÍA DIARIA DISPONIBLE</span><strong>{Math.max(0,5-gamesPlayed)} / 5</strong><i><b style={{width:`${Math.max(0,5-gamesPlayed)/5*100}%`}}/></i><small>Los resultados de cada nivel impactan en tu carta.</small></div>
-          </div>
-        </section>
-
-        <section className="training-arena">
-          <div className="training-section-title"><span>05 / ELEGÍ TU DESAFÍO</span><small>MEJORÁ UNA HABILIDAD</small></div>
-          {bossChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>BOSS ACTIVO</span><h2>CHALLENGE ARENA</h2></div><button type="button" onClick={() => setBossChallenge(false)} disabled={saving}>SALIR</button></div><AuraBossChallenge onExit={() => setBossChallenge(false)} onComplete={result => { setBossChallenge(false); void handleGameResult(result, "physical"); }} /></div> : reactionChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>REACTION MODE</h2></div><button type="button" onClick={() => setReactionChallenge(false)} disabled={saving}>SALIR</button></div><AuraReactionChallenge onComplete={result => { setReactionChallenge(false); void handleGameResult(result, "physical"); }} /></div> : loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? (
-            <div className="training-game-stage">
-              <div className="training-game-top">
-                <div><span>MINIJUEGO ACTIVO</span><h2>{GAME_CONFIG[selectedGame].label}</h2></div>
-                <button type="button" onClick={() => { setSelectedGame(null); resultSubmitted.current = false; }} disabled={saving}>SALIR</button>
+            <div className="training-arena-map-head"><span>MODOS DE JUEGO</span><strong>{Math.max(0,5-gamesPlayed)} / 5 ENERGÍA</strong></div>
+            {bossChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>BOSS ACTIVO</span><h2>CHALLENGE ARENA</h2></div><button type="button" onClick={() => setBossChallenge(false)} disabled={saving}>SALIR</button></div><AuraBossChallenge onExit={() => setBossChallenge(false)} onComplete={result => { setBossChallenge(false); void handleGameResult(result, "physical"); }} /></div> : reactionChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>REACTION MODE</h2></div><button type="button" onClick={() => setReactionChallenge(false)} disabled={saving}>SALIR</button></div><AuraReactionChallenge onComplete={result => { setReactionChallenge(false); void handleGameResult(result, "physical"); }} /></div> : loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>{GAME_CONFIG[selectedGame].label}</h2></div><button type="button" onClick={() => { setSelectedGame(null); resultSubmitted.current = false; }} disabled={saving}>SALIR</button></div><TrainingGame key={selectedGame} gameId={selectedGame} stat={GAME_CONFIG[selectedGame].stat} onComplete={handleGameResult} difficulty="normal" />{saving && <p className="training-feedback">Guardando la evolución de tu carta...</p>}</div> : <>
+              <div className="training-arena-stage-grid">
+                <button type="button" className="training-arena-stage is-open" onClick={() => setReactionChallenge(true)} disabled={!canTrain}><span className="training-arena-stage-number">01</span><span className="training-arena-stage-icon">⚡</span><strong>REACTION</strong><small>REFLEJOS · FÍSICO</small><b>JUGAR ↗</b></button>
+                <button type="button" className="training-arena-stage" onClick={() => startGame("dribbling")} disabled={!canTrain}><span className="training-arena-stage-number">02</span><span className="training-arena-stage-icon">◈</span><strong>CONTROL</strong><small>DOMINIO · GAMBETA</small><b>JUGAR ↗</b></button>
+                <button type="button" className="training-arena-stage" onClick={() => startGame("pace")} disabled={!canTrain}><span className="training-arena-stage-number">03</span><span className="training-arena-stage-icon">➤</span><strong>SPEED</strong><small>EXPLOSIVIDAD · VELOCIDAD</small><b>JUGAR ↗</b></button>
+                <button type="button" className="training-arena-stage" onClick={() => startGame("physical")} disabled={!canTrain}><span className="training-arena-stage-number">04</span><span className="training-arena-stage-icon">⌁</span><strong>AGILITY</strong><small>GIROS · FÍSICO</small><b>JUGAR ↗</b></button>
+                <button type="button" className="training-arena-stage is-boss-open" onClick={() => setBossChallenge(true)} disabled={!canTrain}><span className="training-arena-stage-number">05</span><span className="training-arena-stage-icon">✦</span><strong>BOSS CHALLENGE</strong><small>3 FASES · SCORE · COMBO</small><b>ENFRENTAR ↗</b></button>
               </div>
-              <TrainingGame
-                key={selectedGame}
-                gameId={selectedGame}
-                stat={GAME_CONFIG[selectedGame].stat}
-                onComplete={handleGameResult}
-                difficulty="normal"
-              />
-              {saving && <p className="training-feedback">Guardando la evolución de tu carta...</p>}
-            </div>
-          ) : (
-            <>
-              <p className="training-arena-intro">{canTrain ? "Elegí una disciplina. Tu resultado define cuánto mejora el atributo correspondiente." : "Completaste tus 5 desafíos de hoy. Volvé mañana para seguir evolucionando."}</p>
-              <div className="training-remaining"><span>ENERGÍA DE ENTRENAMIENTO</span><strong>{Math.max(0, 5 - gamesPlayed)} / 5</strong></div>
-              <button type="button" className="aura-reaction-launch" onClick={() => setReactionChallenge(true)}><span>⚡</span><strong>REACTION MODE</strong><small>5 rondas · reflejos · mejorá tu FÍSICO</small></button><TrainingGameSelector onSelectGame={startGame} />
-            </>
-          )}
+              <div className="training-arena-map-foot"><span>ENERGÍA DIARIA DISPONIBLE</span><strong>{Math.max(0,5-gamesPlayed)} / 5</strong><i><b style={{width:`${Math.max(0,5-gamesPlayed)/5*100}%`}}/></i><small>{canTrain ? "Cada desafío mejora un atributo de tu carta." : "Completaste tus 5 desafíos de hoy. Volvé mañana."}</small></div>
+              <div className="training-unified-selector"><strong>OTROS MINIJUEGOS</strong><p>Elegí una habilidad específica para practicar.</p><TrainingGameSelector onSelectGame={startGame} /></div>
+            </>}
+          </div>
         </section>
 
         {attempts.length > 0 && <section className="training-history">
-          <div className="training-section-title"><span>05 / RESULTADOS DE HOY</span><small>PROGRESO GUARDADO</small></div>
+          <div className="training-section-title"><span>03 / TU RENDIMIENTO</span><small>PROGRESO GUARDADO</small></div>
           <div className="training-history-list">{attempts.map((attempt, index) => (
             <article key={`${attempt.game_id}-${index}`}>
               <span>{STAT_LABELS[attempt.stat]}</span><strong>CALIFICACIÓN {attempt.grade}</strong><b>+{attempt.delta}</b>
