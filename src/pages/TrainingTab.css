@@ -249,3 +249,46 @@
 .training-card-evolution{border-color:rgba(9,188,235,.27)}
 .training-badges{display:none}
 @media(max-width:560px){.training-aura-skill-head{grid-template-columns:52px minmax(0,1fr) auto;gap:8px}.training-aura-skill-head img{width:52px;height:52px}.training-inline-badge{margin-bottom:10px}.training-unified-arena{margin:14px 0}.training-unified-arena .training-arena-stage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* LUPI WORLD · TRAINING ARENA HUD */
+.training-hud-hero{isolation:isolate;border-color:rgba(9,188,235,.48);background:radial-gradient(ellipse at 88% 4%,rgba(9,188,235,.28),transparent 43%),radial-gradient(ellipse at 0 100%,rgba(144,255,70,.09),transparent 42%),linear-gradient(135deg,#08182a 0%,#0b1222 56%,#070d18 100%);box-shadow:inset 0 1px rgba(255,255,255,.06),0 18px 50px rgba(0,0,0,.32)}
+.training-hud-hero:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.18;background-image:linear-gradient(rgba(105,190,220,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(105,190,220,.13) 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(110deg,#000,transparent 75%)}
+.training-hud-topline{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.training-hud-live{display:flex;align-items:center;gap:6px;color:#a2ff71;font-size:8px;font-weight:950;letter-spacing:.13em;white-space:nowrap}
+.training-hud-live i{width:6px;height:6px;border-radius:50%;background:#90ff46;box-shadow:0 0 10px #90ff46}
+.training-hud-hero h1{letter-spacing:.015em;text-shadow:0 5px 25px rgba(0,0,0,.35)}
+.training-hud-metrics{gap:8px}
+.training-hud-metrics>div{position:relative;overflow:hidden;border-color:rgba(65,203,235,.23);background:linear-gradient(145deg,rgba(5,22,38,.88),rgba(2,10,21,.8));box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.training-hud-metrics>div:first-child{border-color:rgba(144,255,70,.35)}
+.training-hud-metrics strong{font-size:clamp(27px,5vw,34px);line-height:1;color:#f5fcff}
+.training-hud-metrics>div:first-child strong{color:#a4ff72;text-shadow:0 0 18px rgba(144,255,70,.2)}
+.training-card-evolution,.training-aura-program,.training-unified-arena,.training-hud-badges{position:relative;overflow:hidden;border-radius:17px;border-color:rgba(9,188,235,.25);background:linear-gradient(145deg,rgba(10,28,46,.97),rgba(5,12,24,.99));box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 30px rgba(0,0,0,.17)}
+.training-card-evolution:before,.training-hud-badges:before{content:"";position:absolute;top:0;left:18px;right:18px;height:1px;background:linear-gradient(90deg,transparent,rgba(69,225,246,.7),transparent)}
+.training-card-evolution .training-section-title>span,.training-hud-badges .training-section-title>span{color:#54e3f5}
+.training-stat-grid{gap:10px}
+.training-stat{border-color:rgba(77,174,206,.16);background:linear-gradient(115deg,rgba(3,18,32,.82),rgba(3,10,21,.68))}
+.training-stat-track{background:rgba(66,94,115,.34)}
+.training-hud-badges{display:block;padding:clamp(14px,3vw,20px)}
+.training-hud-badge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.training-hud-badge{position:relative;display:flex;align-items:center;gap:11px;min-width:0;min-height:142px;padding:12px;border:1px solid rgba(77,174,206,.2);border-radius:13px;background:linear-gradient(145deg,rgba(3,17,31,.92),rgba(5,11,22,.88));}
+.training-hud-badge.is-unlocked{border-color:rgba(144,255,70,.45);background:radial-gradient(ellipse at 20% 50%,rgba(144,255,70,.1),transparent 65%),linear-gradient(145deg,rgba(12,34,34,.9),rgba(5,11,22,.9))}
+.training-hud-badge-art{display:grid;place-items:center;flex:0 0 82px;width:82px;height:82px}
+.training-hud-badge-art img{display:block;width:100%;height:100%;object-fit:contain;opacity:.65;filter:grayscale(.45) drop-shadow(0 0 8px rgba(9,188,235,.18))}
+.training-hud-badge.is-unlocked .training-hud-badge-art img{opacity:1;filter:drop-shadow(0 0 12px rgba(144,255,70,.25))}
+.training-hud-badge-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.training-hud-badge-copy>small{color:#55dff0;font-size:8px;font-weight:950;letter-spacing:.13em}
+.training-hud-badge-copy h3{margin:0;color:#f2fbff;font-family:var(--font-display);font-size:clamp(13px,2vw,16px);line-height:1.1}
+.training-hud-badge-copy p{margin:1px 0 3px;color:#8fa9ba;font-size:9px;line-height:1.4}
+.training-hud-badge-progress{height:5px;overflow:hidden;border-radius:8px;background:#26394a}
+.training-hud-badge-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#078bc7,#37e1ef);transition:width .35s}
+.training-hud-badge.is-unlocked .training-hud-badge-progress i{background:linear-gradient(90deg,#55cf5e,#a4ff70)}
+.training-hud-badge-copy>strong{color:#92aabb;font-size:8px;letter-spacing:.07em}
+.training-hud-badge.is-unlocked .training-hud-badge-copy>strong,.training-hud-badge.is-unlocked .training-hud-badge-state{color:#a4ff72}
+.training-hud-badge-state{align-self:flex-start;color:#6f8798;font-size:8px;font-weight:950;letter-spacing:.06em}
+.training-hud-xp{margin-top:12px;border-color:rgba(9,188,235,.28)}
+.training-hud-xp .training-xp-level-head>div strong{font-size:clamp(23px,4vw,29px)}
+.training-hud-xp .training-xp-level-head>b{color:#a3ff71;font-size:clamp(18px,3vw,23px);text-shadow:0 0 14px rgba(144,255,70,.16)}
+@media(max-width:620px){.training-hud-badge-grid{grid-template-columns:1fr}.training-hud-badge{min-height:120px}.training-hud-badge-art{flex-basis:72px;width:72px;height:72px}}
+@media(max-width:390px){.training-hud-topline{align-items:flex-start;flex-direction:column;gap:7px}.training-hud-live{align-self:flex-end;margin-top:-20px}.training-player-stats{gap:6px}.training-player-stats>div{padding:9px 7px}.training-player-stats small{font-size:7px;letter-spacing:.07em}.training-hud-badge{gap:8px;padding:9px}.training-hud-badge-art{flex-basis:62px;width:62px;height:62px}}
+@media(prefers-reduced-motion:reduce){.training-hud-badge-progress i{transition:none}}
