@@ -143,6 +143,18 @@ export function TrainingTab({ user }: { user: AppUser }) {
         setDrills(current => [...current, { skill_key: skillKey, exercise_index: exerciseIndex, completed_at: new Date().toISOString() }]);
         setTrainingXp(Number(row.user_card_exp ?? trainingXp));
         setCardLevel(Number(row.user_card_level ?? cardLevel));
+        const statKey = row.stat_key as TrainingStat | undefined;
+        const statBefore = statKey ? stats[statKey] : 0;
+        const statAfter = Number(row.stat_value ?? statBefore);
+        if (statKey && statAfter > statBefore) {
+          setStats(current => ({ ...current, [statKey]: statAfter }));
+          setLastUpgrade({
+            stat: statKey,
+            before: statBefore,
+            after: statAfter,
+            ovr: Number(row.overall_rating ?? overall),
+          });
+        }
         const { data: badgeRows } = await supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id);
         if (badgeRows) {
           const savedBadges = badgeRows as TrainingBadge[];
@@ -153,7 +165,9 @@ export function TrainingTab({ user }: { user: AppUser }) {
           if (next?.unlocked_at && !previous?.unlocked_at) setUnlockedBadge(skillKey);
         }
         if (Number(row.xp_awarded) > 0) {
-          setNotice(`¡${AURA_SKILLS[skillKey].title} COMPLETADA! +50 XP · ${AURA_SKILLS[skillKey].title} BADGE DESBLOQUEADA.`);
+          const statLabel = statKey ? STAT_LABELS[statKey] : "ATRIBUTO";
+          const statGain = statAfter - statBefore;
+          setNotice(`¡${AURA_SKILLS[skillKey].title} COMPLETADA! ${statLabel} +${statGain} · +50 XP · BADGE DESBLOQUEADA.`);
           window.dispatchEvent(new CustomEvent("lupi:progression-updated", { detail: { userId: user.id } }));
         } else {
           setNotice(`Ejercicio guardado: ${AURA_SKILLS[skillKey].drills[exerciseIndex].title}.`);
@@ -161,7 +175,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
       }
     }
     setDrillSaving(null);
-  }, [drillSaving, drills, trainingXp, cardLevel, badges, user.id]);
+  }, [drillSaving, drills, trainingXp, cardLevel, badges, user.id, stats, overall]);
 
   const handleGameResult = useCallback(async (result: TrainingResult) => {
     if (!selectedGame || resultSubmitted.current || saving) return;
