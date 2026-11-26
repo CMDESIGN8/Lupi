@@ -182,6 +182,23 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     (stats.pace + stats.dribbling + stats.passing + stats.defending + stats.finishing + stats.physical + stats.aerobic + stats.strength) / 8
   ), [stats]);
 
+  const rankValue = Math.max(10, Math.min(99, overall));
+  const playerRanks = [
+    { name: "ROOKIE", min: 10, max: 29, color: "rookie" },
+    { name: "AMATEUR", min: 30, max: 44, color: "amateur" },
+    { name: "SEMI PRO", min: 45, max: 59, color: "semi-pro" },
+    { name: "PRO", min: 60, max: 74, color: "pro" },
+    { name: "ELITE", min: 75, max: 89, color: "elite" },
+    { name: "LEGEND", min: 90, max: 99, color: "legend" },
+  ];
+  const currentRankIndex = playerRanks.findIndex(rank => rankValue >= rank.min && rankValue <= rank.max);
+  const currentRank = playerRanks[Math.max(0, currentRankIndex)];
+  const nextRank = playerRanks[currentRankIndex + 1];
+  const rankProgress = nextRank
+    ? Math.round(((rankValue - currentRank.min) / (currentRank.max - currentRank.min + 1)) * 100)
+    : 100;
+  const pointsToNextRank = nextRank ? nextRank.min - rankValue : 0;
+
   const completedDrills = drills.length;
   const trainingProgress = Math.round((completedDrills / 18) * 100);
   const nextDiscipline = (Object.keys(AURA_SKILLS) as SkillKey[])
@@ -295,6 +312,24 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
             <div><strong>06</strong><small>DISCIPLINAS</small></div>
           </div>
         </header>
+
+          <section className={`training-player-rank is-${currentRank.color}`} aria-label={`Rango actual ${currentRank.name}, OVR ${rankValue}`}>
+            <div className="training-player-rank-main">
+              <div className="training-player-rank-emblem" aria-hidden="true">{currentRankIndex + 1 < 6 ? String(currentRankIndex + 1).padStart(2, "0") : "★"}</div>
+              <div className="training-player-rank-copy">
+                <small>RANGO DEL JUGADOR</small>
+                <strong>{currentRank.name}</strong>
+                <span>OVR {rankValue} · {currentRank.min}–{currentRank.max}</span>
+              </div>
+              <div className="training-player-rank-next">
+                <small>{nextRank ? "SIGUIENTE RANGO" : "RANGO MÁXIMO"}</small>
+                <strong>{nextRank ? nextRank.name : "LEGEND"}</strong>
+                <span>{nextRank ? `FALTAN ${pointsToNextRank} PUNTOS OVR` : "99 OVR ALCANZADO"}</span>
+              </div>
+            </div>
+            <div className="training-player-rank-track"><i style={{ width: `${rankProgress}%` }} /></div>
+            <div className="training-player-rank-foot"><span>PROGRESO DE RANGO</span><strong>{rankProgress}%</strong></div>
+          </section>
 
           <div className="training-xp-evolution training-hud-xp">
             <div className="training-xp-level-head">
