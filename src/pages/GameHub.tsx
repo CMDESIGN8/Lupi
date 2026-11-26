@@ -12,6 +12,8 @@ import { AvatarEditor } from "../components/AvatarEditor";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
 import iconTeam from '../assets/team.png';
 import ballUcl from '../assets/ball.png'; // Ajusta el nombre real
+import iconRanking from "../assets/icon_ranking.png";
+import iconEscudoBoton from "../assets/icon_escudo_boton.png";
 
 
     // src/pages/GameHub.tsx
@@ -1578,11 +1580,7 @@ onChallengeGame={(player, game) => {
                   </aside>
                   <button className={`gh-world__play ${story.progress?.status !== 'completed' ? 'gh-world__play--story' : ''}`} type="button" disabled={story.loading || story.busy} onClick={() => handleGameNavigate("battle")}>
                     <span className="gh-world__play-icon" aria-hidden>
-  <img 
-    src="/src/assets/ball.png" 
-    alt="Balón" 
-    className="gh-ball-img" 
-  />
+  <img src={ballUcl} alt="Balón" />
 </span>
                     <span>
                       <small>{story.loading ? 'PREPARANDO TU DEBUT' : story.progress?.status !== 'completed' ? 'MODO HISTORIA · CAPÍTULO 01' : 'LISTO PARA JUGAR'}</small>
@@ -1662,11 +1660,7 @@ onChallengeGame={(player, game) => {
 
                   <nav className="gh-world__dock" aria-label="Navegación del lobby">
                     <button type="button" onClick={() => setShowCommunities(true)} className="gh-btn-club">
-  <img 
-    src="/src/assets/icon_escudo_boton.png" 
-    alt="Club" 
-    className="gh-icon-club" 
-  />
+  <img src={iconEscudoBoton} alt="Club" />
   <strong>CLUB</strong>
 </button>
                     <button 
@@ -1701,11 +1695,7 @@ onChallengeGame={(player, game) => {
   <strong>EQUIPO</strong>
 </button>
                     <button type="button" onClick={() => setShowAchievements(true)} className="gh-btn-achievements">
-  <img 
-    src="/src/assets/icon_ranking.png" 
-    alt="Logros" 
-    className="gh-icon-ranking" 
-  />
+  <img src={iconRanking} alt="Logros" />
   <strong>LOGROS</strong>
   {unlockedAchievements.length > 0 && <em className="gh-badge-count">{unlockedAchievements.length}</em>}
 </button>
