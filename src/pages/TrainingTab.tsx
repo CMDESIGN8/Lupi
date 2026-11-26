@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import type { AppUser } from "../lib/api";
-import { TrainingGame, TrainingGameSelector, type TrainingResult, type TrainingStat } from "../components/campaign/TrainingGames";
+import type { TrainingStat } from "../components/campaign/TrainingGames";
 import "./TrainingTab.css";
 
 type GameId = "shooting" | "dribbling" | "defending" | "passing" | "physical" | "pace";
@@ -22,7 +22,7 @@ const STAT_LABELS: Record<TrainingStat, string> = {
   defending: "Defensa", finishing: "Remate", physical: "Físico",
 };
 
-type SkillKey = "coordination" | "speed" | "agility" | "technique";
+type SkillKey = "coordination" | "speed" | "agility" | "technique" | "aerobic" | "strength";
 type DrillRecord = { skill_key: SkillKey; exercise_index: number; completed_at: string };
 const AURA_SKILLS: Record<SkillKey, { title: string; description: string; image: string; drills: { title: string; reps: string; description: string; benefit: string }[] }> = {
   coordination: { title: "COORDINACIÓN", description: "Dominá tu cuerpo y cada apoyo.", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/coordinacion.png", drills: [
@@ -44,6 +44,16 @@ const AURA_SKILLS: Record<SkillKey, { title: string; description: string; image:
     { title: "CONTROL ORIENTADO", reps: "10 por perfil", description: "Recibí y llevá el primer toque hacia el espacio libre.", benefit: "Salir de la presión con el primer toque." },
     { title: "PASE CONTRA PARED", reps: "20 pases", description: "Alterná pie derecho e izquierdo. Prepará el cuerpo antes de recibir.", benefit: "Dar pases más precisos con ambos perfiles." },
     { title: "CONDUCCIÓN + CAMBIO", reps: "5 recorridos", description: "Conducí, cambiá de dirección y salí con un toque más largo.", benefit: "Cambiar el ritmo para dejar atrás al rival." }
+  ] },
+  aerobic: { title: "AERÓBICO", description: "Construí resistencia para sostener la intensidad durante todo el partido.", image: "", drills: [
+    { title: "CARRERA CONTINUA", reps: "8 minutos", description: "Trotá a ritmo cómodo y constante. Mantené una respiración controlada.", benefit: "Sostener el ritmo durante todo el encuentro." },
+    { title: "INTERVALOS DE RESISTENCIA", reps: "6 ciclos · 30s/30s", description: "Alterná 30 segundos de trote activo con 30 segundos suaves.", benefit: "Recuperarte mejor entre esfuerzos intensos." },
+    { title: "SHUTTLE RUN", reps: "6 pasadas de 20 m", description: "Corré entre dos marcas separadas por 10 metros, girando con control.", benefit: "Repetir piques y recuperarte más rápido." }
+  ] },
+  strength: { title: "FUERZA", description: "Desarrollá fuerza funcional para proteger la pelota, saltar y disputar cada duelo.", image: "", drills: [
+    { title: "SENTADILLA", reps: "3 series · 10 repeticiones", description: "Bajá con control, espalda neutra y rodillas alineadas con los pies. Usá solo tu peso corporal.", benefit: "Fortalecer piernas para acelerar y proteger la pelota." },
+    { title: "FLEXIONES", reps: "3 series · 8 repeticiones", description: "Mantené el cuerpo alineado y bajá hasta donde puedas conservar una técnica correcta. Adaptá apoyando rodillas.", benefit: "Mejorar fuerza del tren superior y estabilidad." },
+    { title: "PUENTE DE GLÚTEOS + PLANCHA", reps: "3 series · 12 + 20s", description: "Combiná 12 puentes de glúteos con 20 segundos de plancha, descansando entre series.", benefit: "Fortalecer core y cadena posterior." }
   ] }
 };
 
@@ -76,6 +86,16 @@ const AURA_VISUALS: Record<SkillKey, AuraVisualScene[]> = {
     { route: "M22 52 L150 52", points: [[22,52],[150,52]], ball: [22,52], caption: "PASE Y DEVOLUCIÓN" },
     { route: "M20 70 L66 25 L112 70 L158 25", points: [[66,25],[112,70],[158,25]], ball: [20,70], caption: "CONDUCCIÓN + CAMBIO" },
   ],
+  aerobic: [
+    { route: "M20 52 L160 52", points: [[20,52],[55,52],[90,52],[125,52],[160,52]], ball: [20,52], caption: "CARRERA CONTINUA" },
+    { route: "M20 70 L55 25 L90 70 L125 25 L160 70", points: [[55,25],[90,70],[125,25],[160,70]], ball: [20,70], caption: "INTERVALOS DE RESISTENCIA" },
+    { route: "M25 25 L155 25 L155 75 L25 75 Z", points: [[25,25],[155,25],[155,75],[25,75]], ball: [25,25], caption: "SHUTTLE RUN" },
+  ],
+  strength: [
+    { route: "M30 25 L150 25 M45 25 L45 75 M135 25 L135 75", points: [[45,25],[135,25]], ball: [90,52], caption: "SENTADILLA · FUERZA DE PIERNAS" },
+    { route: "M30 52 L150 52", points: [[30,52],[150,52]], ball: [90,52], caption: "FLEXIONES · TREN SUPERIOR" },
+    { route: "M30 70 L150 70", points: [[30,70],[150,70]], ball: [90,70], caption: "CORE · ESTABILIDAD" },
+  ],
 };
 
 function AuraDrillVisual({ skillKey, exerciseIndex, compact = false }: { skillKey: SkillKey; exerciseIndex: number; compact?: boolean }) {
@@ -99,6 +119,8 @@ const BADGE_CONFIG: Record<BadgeKey, { title: string; skill: string; image: stri
   speed: { title: "FIRST STRIKE", skill: "Velocidad", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/velocidad.png", description: "Reaccioná antes y ganá ventaja en los primeros metros." },
   agility: { title: "BREAKPOINT", skill: "Agilidad", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/agilidad.png", description: "Frená, girá y cambiá de dirección con control." },
   technique: { title: "TOUCH MASTER", skill: "Técnica", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/tecnica.png", description: "Controlá, pasá y resolvé con más recursos." },
+  aerobic: { title: "ENDURANCE ENGINE", skill: "Aeróbico", image: "", description: "Construí resistencia para sostener la intensidad hasta el último minuto." },
+  strength: { title: "POWER BUILDER", skill: "Fuerza", image: "", description: "Desarrollá fuerza funcional para cada duelo y movimiento en cancha." },
 };
 const EMPTY_BADGES: TrainingBadge[] = (Object.keys(BADGE_CONFIG) as BadgeKey[]).map(badge_key => ({ badge_key, progress: 0, unlocked_at: null }));
 
