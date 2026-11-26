@@ -56,9 +56,10 @@ begin
     return;
   end if;
 
+  -- Training rewards are XP only; they do not affect LupiPoints,
+  -- ticket balances, coins, or the competitive leaderboard.
   update public.profiles
-  set exp = coalesce(exp, 0) + 50,
-      points = coalesce(points, 0) + 50
+  set exp = coalesce(exp, 0) + 50
   where id = v_user_id
   returning exp into v_total_xp;
 
