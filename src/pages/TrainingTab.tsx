@@ -416,6 +416,15 @@ export function TrainingTab({ user }: { user: AppUser }) {
           </div>
         </header>
 
+          <div className="training-xp-evolution training-hud-xp">
+            <div className="training-xp-level-head">
+              <div><small>AURA PLAYER EVOLUTION</small><strong>LVL {cardLevel}</strong></div>
+              <b>{trainingXp.toLocaleString("es-AR")} XP</b>
+            </div>
+            <div className="training-xp-track"><i style={{ width: `${trainingXp % 100}%` }} /></div>
+            <div className="training-xp-level-foot"><span>{trainingXp % 100} / 100 XP</span><strong>{100 - (trainingXp % 100)} XP PARA LVL {cardLevel + 1}</strong></div>
+          </div>
+
         <section className="training-card-evolution">
           <div className="training-section-title"><span>01 / TU CARTA EVOLUCIONA</span><small>ATRIBUTOS PERSONALES · MÁX. 99</small></div>
           <div className="training-stat-grid">
@@ -454,14 +463,6 @@ export function TrainingTab({ user }: { user: AppUser }) {
                 <span className="training-hud-badge-state">{unlocked ? "✦" : "LOCKED"}</span>
               </article>;
             })}
-          </div>
-          <div className="training-xp-evolution training-hud-xp">
-            <div className="training-xp-level-head">
-              <div><small>AURA PLAYER EVOLUTION</small><strong>LVL {cardLevel}</strong></div>
-              <b>{trainingXp.toLocaleString("es-AR")} XP</b>
-            </div>
-            <div className="training-xp-track"><i style={{ width: `${trainingXp % 100}%` }} /></div>
-            <div className="training-xp-level-foot"><span>{trainingXp % 100} / 100 XP</span><strong>{100 - (trainingXp % 100)} XP PARA LVL {cardLevel + 1}</strong></div>
           </div>
         </section>
 
