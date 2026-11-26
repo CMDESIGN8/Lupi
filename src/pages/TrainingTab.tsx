@@ -394,7 +394,8 @@ export function TrainingTab({ user }: { user: AppUser }) {
                 <div className="training-aura-drills">
                   {skill.drills.map((drill,index) => {
                     const completed = drills.some(item => item.skill_key === skillKey && item.exercise_index === index);
-                    const available = index === done;
+                    const nextExercise = skill.drills.findIndex((_, drillIndex) => !drills.some(item => item.skill_key === skillKey && item.exercise_index === drillIndex));
+                    const available = index === nextExercise;
                     const level = DRILL_LEVELS[index];
                     const token = `${skillKey}-${index}`;
                     return <div className={`training-aura-drill ${completed ? "is-done" : ""} ${!completed && !available ? "is-locked" : ""}`} key={token}>
