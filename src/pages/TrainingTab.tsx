@@ -196,8 +196,8 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
   const nextRank = playerRanks[currentRankIndex + 1];
   const rankProgress = nextRank
     ? Math.round(((rankValue - currentRank.min) / (currentRank.max - currentRank.min + 1)) * 100)
-    : 100;
-  const pointsToNextRank = nextRank ? nextRank.min - rankValue : 0;
+    : Math.round(((rankValue - currentRank.min) / (currentRank.max - currentRank.min)) * 100);
+  const pointsToNextRank = nextRank ? nextRank.min - rankValue : 99 - rankValue;
 
   const completedDrills = drills.length;
   const trainingProgress = Math.round((completedDrills / 18) * 100);
@@ -322,9 +322,9 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
                 <span>OVR {rankValue} · {currentRank.min}–{currentRank.max}</span>
               </div>
               <div className="training-player-rank-next">
-                <small>{nextRank ? "SIGUIENTE RANGO" : "RANGO MÁXIMO"}</small>
-                <strong>{nextRank ? nextRank.name : "LEGEND"}</strong>
-                <span>{nextRank ? `FALTAN ${pointsToNextRank} PUNTOS OVR` : "99 OVR ALCANZADO"}</span>
+                <small>{nextRank ? "SIGUIENTE RANGO" : "META FINAL"}</small>
+                <strong>{nextRank ? nextRank.name : "99 OVR"}</strong>
+                <span>{pointsToNextRank > 0 ? `FALTAN ${pointsToNextRank} PUNTOS OVR` : "OVR MÁXIMO ALCANZADO"}</span>
               </div>
             </div>
             <div className="training-player-rank-track"><i style={{ width: `${rankProgress}%` }} /></div>
