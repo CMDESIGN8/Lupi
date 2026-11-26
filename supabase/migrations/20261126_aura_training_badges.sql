@@ -51,7 +51,7 @@ begin
       or (v_badge_key = 'technique' and a.stat in ('passing','finishing'))
     );
 
-  insert into public.personal_training_badges(user_id, badge_key, progress, unlocked_at, updated_at)
+  insert into public.personal_training_badges as current_badge(user_id, badge_key, progress, unlocked_at, updated_at)
   values (
     new.user_id,
     v_badge_key,
@@ -60,8 +60,8 @@ begin
     now()
   )
   on conflict (user_id, badge_key) do update
-  set progress = greatest(public.personal_training_badges.progress, excluded.progress),
-      unlocked_at = coalesce(public.personal_training_badges.unlocked_at, excluded.unlocked_at),
+  set progress = greatest(current_badge.progress, excluded.progress),
+      unlocked_at = coalesce(current_badge.unlocked_at, excluded.unlocked_at),
       updated_at = now();
 
   return new;
