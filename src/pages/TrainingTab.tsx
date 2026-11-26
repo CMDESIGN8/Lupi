@@ -123,11 +123,6 @@ const BADGE_CONFIG: Record<BadgeKey, { title: string; skill: string; image: stri
 };
 const EMPTY_BADGES: TrainingBadge[] = (Object.keys(BADGE_CONFIG) as BadgeKey[]).map(badge_key => ({ badge_key, progress: 0, unlocked_at: null }));
 
-const todayArgentina = () => new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/Argentina/Buenos_Aires",
-  year: "numeric", month: "2-digit", day: "2-digit",
-}).format(new Date());
-
 export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackToProfile: () => void }) {
   const [stats, setStats] = useState<PlayerStats>({
     pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10,
@@ -294,7 +289,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
       <div className="training-shell">
         <section className="training-character-hud" aria-label="Lupi World player development">
         <header className="training-hero training-hud-hero">
-          <div className="training-hud-topline"><span className="training-kicker">LUPI WORLD / PLAYER DEVELOPMENT</span><div className="training-hud-actions"><button type="button" className="training-back-profile" onClick={onBackToProfile}>← VOLVER AL PERFIL</button><span className="training-hud-live"><i /> PLAYER ONLINE</span></div></div>
+          <div className="training-hud-topline"><span className="training-kicker">LUPI WORLD / CLUB PERFORMANCE</span><div className="training-hud-actions"><button type="button" className="training-back-profile" onClick={onBackToProfile}>← VOLVER AL PERFIL</button><span className="training-hud-live"><i /> PLAYER ONLINE</span></div></div>
           <h1>CLUB<span> TRAINING CENTER</span></h1>
           <p>Preparación física de futsal. Entrená con método, progresá y llevá tu evolución a la cancha.</p>
           <div className="training-player-stats training-hud-metrics">
@@ -457,7 +452,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
           <div className="training-badge-modal-card">
             <button type="button" className="training-badge-modal-close" aria-label="Cerrar" onClick={() => setUnlockedBadge(null)}>×</button>
             <small>✦ AURA SKILL BADGE DESBLOQUEADA ✦</small>
-            <img src={BADGE_CONFIG[unlockedBadge].image} alt={BADGE_CONFIG[unlockedBadge].title} />
+            {BADGE_CONFIG[unlockedBadge].image ? <img src={BADGE_CONFIG[unlockedBadge].image} alt={BADGE_CONFIG[unlockedBadge].title} /> : <div className="training-badge-modal-gym-icon" aria-hidden="true">{unlockedBadge === "aerobic" ? "♥" : "✚"}</div>}
             <span>{BADGE_CONFIG[unlockedBadge].skill.toUpperCase()}</span>
             <h2 id="training-badge-modal-title">{BADGE_CONFIG[unlockedBadge].title}</h2>
             <p>{BADGE_CONFIG[unlockedBadge].description}</p>
