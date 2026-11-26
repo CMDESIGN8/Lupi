@@ -337,3 +337,21 @@
 .training-gym-skill-icon{display:grid;place-items:center;width:64px;height:64px;flex:0 0 64px;border:1px solid rgba(144,255,70,.25);border-radius:14px;background:linear-gradient(145deg,rgba(144,255,70,.13),rgba(9,188,235,.08));color:#a5f77a;font-size:32px;font-weight:900;text-shadow:0 0 14px rgba(144,255,70,.28)}
 .training-badge-modal-gym-icon{display:grid;place-items:center;width:118px;height:118px;margin:12px auto;border:1px solid rgba(144,255,70,.35);border-radius:50%;background:radial-gradient(circle,rgba(144,255,70,.18),rgba(9,188,235,.08));color:#a5f77a;font-size:56px;font-weight:900}
 @media(max-width:560px){.training-gym-skill-icon{width:52px;height:52px;flex-basis:52px;font-size:26px}}
+
+
+/* Badge unlock celebration restored */
+.training-badge-modal{animation:trainingBadgeBackdropIn .28s ease-out both}
+.training-badge-modal-card{isolation:isolate;overflow:hidden;animation:trainingBadgeCardIn .58s cubic-bezier(.16,1,.3,1) both;box-shadow:0 24px 80px rgba(0,0,0,.55),0 0 42px rgba(9,188,235,.18)}
+.training-badge-modal-card:before,.training-badge-modal-card:after{content:"";position:absolute;z-index:-1;left:50%;top:39%;width:210px;height:210px;border:1px solid rgba(72,225,245,.3);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 18px rgba(9,188,235,.045),0 0 0 38px rgba(9,188,235,.025);animation:trainingBadgeOrbit 9s linear infinite}
+.training-badge-modal-card:after{width:270px;height:270px;border-color:rgba(144,255,70,.18);box-shadow:0 0 0 22px rgba(144,255,70,.025);animation-direction:reverse;animation-duration:13s}
+.training-badge-modal-card img,.training-badge-modal-card .training-badge-modal-gym-icon{position:relative;animation:trainingBadgePop .7s cubic-bezier(.16,1,.3,1) both;filter:drop-shadow(0 0 12px rgba(0,195,240,.48)) drop-shadow(0 0 28px rgba(144,255,70,.2))}
+.training-badge-modal-card>small{position:relative;animation:trainingBadgeTextIn .45s .12s both}
+.training-badge-modal-card h2{position:relative;text-shadow:0 0 18px rgba(9,188,235,.22)}
+.training-badge-modal-card>button:last-child{position:relative;box-shadow:0 0 22px rgba(9,188,235,.2);transition:transform .2s,filter .2s}
+.training-badge-modal-card>button:last-child:hover{transform:translateY(-2px);filter:brightness(1.12)}
+@keyframes trainingBadgeBackdropIn{from{opacity:0}to{opacity:1}}
+@keyframes trainingBadgeCardIn{from{opacity:0;transform:translateY(22px) scale(.88)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes trainingBadgePop{0%{opacity:0;transform:scale(.42) rotate(-12deg);filter:brightness(2) drop-shadow(0 0 35px rgba(72,225,245,.8))}65%{opacity:1;transform:scale(1.09) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes trainingBadgeOrbit{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes trainingBadgeTextIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.training-badge-modal,.training-badge-modal-card,.training-badge-modal-card:before,.training-badge-modal-card:after,.training-badge-modal-card img,.training-badge-modal-card .training-badge-modal-gym-icon{animation:none!important}}
