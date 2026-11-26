@@ -35,3 +35,31 @@
 .training-badge-modal-card p{margin:0 auto 18px;max-width:280px;color:#a5bac8;font-size:12px;line-height:1.5}
 .training-badge-modal-card>button:last-child{width:100%;padding:13px;border:0;border-radius:10px;background:linear-gradient(90deg,#08bceB,#48e5f2);color:#03111b;font-size:11px;font-weight:1000;letter-spacing:.12em}
 @media(max-width:560px){.training-badges{padding:14px}.training-badge-grid{grid-template-columns:1fr}.training-badge-art{width:68px;height:68px;flex-basis:68px}.training-badge-copy p{font-size:9px}}
+
+/* AURA physical training paths */
+.training-aura-program{padding:18px;border:1px solid rgba(42,210,245,.2);border-radius:18px;background:linear-gradient(145deg,rgba(14,35,52,.94),rgba(10,16,27,.98))}
+.training-aura-skills{display:flex;flex-direction:column;gap:13px}
+.training-aura-skill{padding:14px;border:1px solid rgba(125,165,190,.18);border-radius:14px;background:rgba(3,12,24,.56)}
+.training-aura-skill.is-complete{border-color:rgba(55,225,180,.45);background:linear-gradient(110deg,rgba(20,100,85,.15),rgba(3,12,24,.7))}
+.training-aura-skill-head{display:grid;grid-template-columns:74px minmax(0,1fr) auto;align-items:center;gap:12px}
+.training-aura-skill-head img{width:74px;height:74px;object-fit:contain;filter:drop-shadow(0 0 9px rgba(32,190,235,.2))}
+.training-aura-skill-head>div{min-width:0}
+.training-aura-skill-head small{font-size:8px;letter-spacing:.13em;color:#49dff4;font-weight:900}
+.training-aura-skill-head h3{margin:3px 0;font-family:var(--font-display);font-size:19px;color:#f4fbff}
+.training-aura-skill-head p{margin:0;color:#8fa9ba;font-size:10px;line-height:1.4}
+.training-aura-skill-head>strong{font-family:var(--font-display);font-size:19px;color:#43dff4}
+.training-aura-skill-track{height:6px;margin:12px 0;background:#26394a;border-radius:8px;overflow:hidden}
+.training-aura-skill-track i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#078bc7,#37e1ef);transition:width .35s}
+.training-aura-skill.is-complete .training-aura-skill-track i{background:linear-gradient(90deg,#18bb91,#8dff68)}
+.training-aura-drills{display:flex;flex-direction:column;gap:8px}
+.training-aura-drill{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;padding:11px;border:1px solid rgba(150,205,225,.1);border-radius:10px;background:rgba(2,9,18,.48)}
+.training-aura-drill.is-done{border-color:rgba(55,225,180,.3);background:rgba(15,83,67,.14)}
+.training-aura-drill-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
+.training-aura-drill-copy small{font-size:8px;color:#43dff4;font-weight:900;letter-spacing:.1em}
+.training-aura-drill-copy strong{font-size:12px;color:#f1faff}
+.training-aura-drill-copy p{margin:0;color:#8fa9ba;font-size:10px;line-height:1.4}
+.training-aura-drill-copy em{font-style:normal;font-size:9px;color:#7ca4b9}
+.training-aura-drill button{min-width:112px;padding:9px 10px;border:1px solid rgba(48,210,240,.35);border-radius:8px;background:rgba(0,165,210,.12);color:#5de4f4;font-size:8px;font-weight:900;letter-spacing:.06em}
+.training-aura-drill.is-done button{border-color:rgba(55,225,180,.35);background:rgba(20,145,105,.15);color:#76edc0}
+.training-aura-skill-reward{margin-top:11px;padding:10px;border-radius:8px;background:rgba(21,120,83,.17);color:#8dff68;text-align:center;font-size:9px;font-weight:1000;letter-spacing:.12em}
+@media(max-width:560px){.training-aura-program{padding:13px}.training-aura-skill{padding:10px}.training-aura-skill-head{grid-template-columns:58px minmax(0,1fr) auto;gap:8px}.training-aura-skill-head img{width:58px;height:58px}.training-aura-skill-head h3{font-size:16px}.training-aura-drill{grid-template-columns:1fr;gap:8px}.training-aura-drill button{width:100%;min-height:36px}}
