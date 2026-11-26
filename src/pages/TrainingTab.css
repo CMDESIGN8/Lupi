@@ -62,4 +62,8 @@
 .training-aura-drill button{min-width:112px;padding:9px 10px;border:1px solid rgba(48,210,240,.35);border-radius:8px;background:rgba(0,165,210,.12);color:#5de4f4;font-size:8px;font-weight:900;letter-spacing:.06em}
 .training-aura-drill.is-done button{border-color:rgba(55,225,180,.35);background:rgba(20,145,105,.15);color:#76edc0}
 .training-aura-skill-reward{margin-top:11px;padding:10px;border-radius:8px;background:rgba(21,120,83,.17);color:#8dff68;text-align:center;font-size:9px;font-weight:1000;letter-spacing:.12em}
+<<<<<<< HEAD
 @media(max-width:560px){.training-aura-program{padding:13px}.training-aura-skill{padding:10px}.training-aura-skill-head{grid-template-columns:58px minmax(0,1fr) auto;gap:8px}.training-aura-skill-head img{width:58px;height:58px}.training-aura-skill-head h3{font-size:16px}.training-aura-drill{grid-template-columns:1fr;gap:8px}.training-aura-drill button{width:100%;min-height:36px}}
+=======
+@media(max-width:560px){.training-aura-program{padding:13px}.training-aura-skill{padding:10px}.training-aura-skill-head{grid-template-columns:58px minmax(0,1fr) auto;gap:8px}.training-aura-skill-head img{width:58px;height:58px}.training-aura-skill-head h3{font-size:16px}.training-aura-drill{grid-template-columns:1fr;gap:8px}.training-aura-drill button{width:100%;min-height:36px}}
+>>>>>>> d3b576c74ea82bbeb00190b7d002c52bb7c3a1e6
