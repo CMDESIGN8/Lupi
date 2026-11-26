@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import type { AppUser } from "../lib/api";
 import type { TrainingStat } from "../components/campaign/TrainingGames";
@@ -130,14 +130,11 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
   const [unlockedBadge, setUnlockedBadge] = useState<BadgeKey | null>(null);
   const [drillFeedback, setDrillFeedback] = useState<{ skillKey: SkillKey; exerciseIndex: number; progress: number; xpAwarded: number; statLabel: string; statGain: number } | null>(null);
   const [levelUpReward, setLevelUpReward] = useState<{ previous: number; current: number; skillKey: SkillKey; statLabel: string; statGain: number } | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [lastUpgrade, setLastUpgrade] = useState<{ stat: PlayerStat; before: number; after: number; ovr: number } | null>(null);
-  const resultSubmitted = useRef(false);
 
   const load = useCallback(async () => {
-    setLoading(true);
     setError("");
     const [profileResult, badgesResult, drillsResult] = await Promise.all([
       supabase.from("profiles").select("user_card_level,user_card_exp,user_card_pace,user_card_dribbling,user_card_passing,user_card_defending,user_card_finishing,user_card_physical,user_card_aerobic,user_card_strength")
@@ -165,7 +162,6 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
       setBadges(EMPTY_BADGES.map(base => savedBadges.find(item => item.badge_key === base.badge_key) ?? base));
       setDrills((drillsResult.data ?? []) as DrillRecord[]);
     }
-    setLoading(false);
   }, [user.id]);
 
   useEffect(() => { void load(); }, [load]);
