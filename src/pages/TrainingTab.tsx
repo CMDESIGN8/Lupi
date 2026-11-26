@@ -170,7 +170,7 @@ function AuraBossChallenge({ onComplete, onExit }: { onComplete: (result: Traini
  return <div className="aura-boss-game"><div className="aura-boss-top"><small>BOSS CHALLENGE · FASE {stage+1}/3</small><strong>{seconds}s</strong></div><div className="aura-boss-stage"><span>FASE {stage+1}</span><h3>{names[stage]}</h3><p>¡Mantené el ritmo y encadená acciones para subir el combo!</p></div><button className="aura-boss-tap" type="button" disabled={finished||seconds<=0} onClick={tap}><span>⚡</span><strong>TOCÁ PARA ATACAR</strong><small>+ PUNTOS · + COMBO</small></button><div className="aura-boss-stats"><div><small>SCORE</small><strong>{score}</strong></div><div><small>COMBO</small><strong>×{combo}</strong></div><div><small>MEJOR COMBO</small><strong>×{bestCombo}</strong></div><div><small>ACCIONES</small><strong>{hits}</strong></div></div><div className="aura-boss-stage-progress">{names.map((n,i)=><i key={n} className={i<stage?"is-done":i===stage?"is-current":""}/>)}</div>{finished?<div className="aura-boss-finish"><small>ARENA COMPLETADA</small><strong>{score} PUNTOS</strong><p>Combo máximo ×{bestCombo} · {hits} acciones</p><button type="button" onClick={claim}>RECLAMAR RECOMPENSA</button></div>:<button type="button" className="aura-boss-exit" onClick={onExit}>ABANDONAR DESAFÍO</button>}</div>;
 }
 
-export function TrainingTab({ user }: { user: AppUser }) {
+export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackToProfile: () => void }) {
   const [stats, setStats] = useState<PlayerStats>({
     pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10,
   });
@@ -406,7 +406,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
       <div className="training-shell">
         <section className="training-character-hud" aria-label="Lupi World player development">
         <header className="training-hero training-hud-hero">
-          <div className="training-hud-topline"><span className="training-kicker">LUPI WORLD / PLAYER DEVELOPMENT</span><span className="training-hud-live"><i /> PLAYER ONLINE</span></div>
+          <div className="training-hud-topline"><span className="training-kicker">LUPI WORLD / PLAYER DEVELOPMENT</span><div className="training-hud-actions"><button type="button" className="training-back-profile" onClick={onBackToProfile}>← VOLVER AL PERFIL</button><span className="training-hud-live"><i /> PLAYER ONLINE</span></div></div>
           <h1>TRAINING<span> ARENA</span></h1>
           <p>No completás tareas: jugás minijuegos y mejorás tu propia carta.</p>
           <div className="training-player-stats training-hud-metrics">
