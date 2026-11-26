@@ -155,4 +155,8 @@
 .training-guided-complete:disabled{opacity:.4;cursor:not-allowed}
 .training-guided-note{margin:12px 0 0;color:#718a9b;font-size:9px;line-height:1.45;text-align:center}
 @media(max-width:560px){.training-guided-overlay{padding:8px;align-items:end}.training-guided-card{max-height:94dvh;padding:20px 16px;border-radius:18px}.training-guided-dose{align-items:flex-start;flex-direction:column;gap:5px}.training-guided-dose strong{text-align:left}.training-guided-actions{grid-template-columns:1fr}.training-guided-actions button{min-height:44px}}
+<<<<<<< HEAD
 @media(prefers-reduced-motion:reduce){.training-guided-overlay{backdrop-filter:none}}
+=======
+@media(prefers-reduced-motion:reduce){.training-guided-overlay{backdrop-filter:none}}
+>>>>>>> 43d788f60110f7a3b06071f57eed2fd775a3bbce
