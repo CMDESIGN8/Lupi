@@ -182,6 +182,13 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     (stats.pace + stats.dribbling + stats.passing + stats.defending + stats.finishing + stats.physical + stats.aerobic + stats.strength) / 8
   ), [stats]);
 
+  const completedDrills = drills.length;
+  const trainingProgress = Math.round((completedDrills / 18) * 100);
+  const nextDiscipline = (Object.keys(AURA_SKILLS) as SkillKey[])
+    .map(key => ({ key, done: drills.filter(item => item.skill_key === key).length }))
+    .filter(item => item.done < 3)
+    .sort((a, b) => b.done - a.done)[0];
+
   const completeDrill = useCallback(async (skillKey: SkillKey, exerciseIndex: number) => {
     const token = `${skillKey}-${exerciseIndex}`;
     if (drillSaving || drills.some(item => item.skill_key === skillKey && item.exercise_index === exerciseIndex)) return;
@@ -296,6 +303,14 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
             </div>
             <div className="training-xp-track"><i style={{ width: `${trainingXp % 100}%` }} /></div>
             <div className="training-xp-level-foot"><span>{trainingXp % 100} / 100 XP</span><strong>{100 - (trainingXp % 100)} XP PARA LVL {cardLevel + 1}</strong></div>
+            <div className="training-cycle-evolution" aria-label={`Progreso general: ${completedDrills} de 18 ejercicios completados`}>
+              <div className="training-cycle-evolution-head"><span>PROGRESO DEL ENTRENAMIENTO</span><strong>{completedDrills}/18 · {trainingProgress}%</strong></div>
+              <div className="training-cycle-evolution-track"><i style={{ width: `${trainingProgress}%` }} /></div>
+              <div className="training-cycle-evolution-foot">
+                <span>{completedDrills === 18 ? "CICLO COMPLETADO · EXCELENTE TRABAJO" : nextDiscipline ? `SIGUIENTE OBJETIVO · ${AURA_SKILLS[nextDiscipline.key].title} (${nextDiscipline.done}/3)` : "TODAS LAS DISCIPLINAS COMPLETADAS"}</span>
+                <span>{18 - completedDrills} RESTANTES</span>
+              </div>
+            </div>
           </div>
 
         <section className="training-card-evolution">
