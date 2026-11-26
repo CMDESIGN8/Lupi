@@ -355,3 +355,21 @@
 @keyframes trainingBadgeOrbit{to{transform:translate(-50%,-50%) rotate(360deg)}}
 @keyframes trainingBadgeTextIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.training-badge-modal,.training-badge-modal-card,.training-badge-modal-card:before,.training-badge-modal-card:after,.training-badge-modal-card img,.training-badge-modal-card .training-badge-modal-gym-icon{animation:none!important}}
+
+
+/* PLAYER EVOLUTION 2.0 · GLOBAL TRAINING CYCLE */
+.training-cycle-evolution{display:flex;flex-direction:column;gap:7px;margin-top:15px;padding:12px 13px;border:1px solid rgba(144,255,70,.18);border-radius:11px;background:linear-gradient(100deg,rgba(144,255,70,.055),rgba(9,188,235,.045))}
+.training-cycle-evolution-head,.training-cycle-evolution-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.training-cycle-evolution-head span{color:#8da9b9;font-size:8px;font-weight:950;letter-spacing:.13em}
+.training-cycle-evolution-head strong{color:#a5ff78;font-size:11px;font-weight:950;white-space:nowrap}
+.training-cycle-evolution-track{height:7px;overflow:hidden;border-radius:8px;background:rgba(90,116,130,.28);box-shadow:inset 0 1px 3px rgba(0,0,0,.35)}
+.training-cycle-evolution-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#09bceb,#90ff46);box-shadow:0 0 12px rgba(144,255,70,.25);transition:width .55s cubic-bezier(.2,.8,.2,1)}
+.training-cycle-evolution-foot{color:#7793a5;font-size:8px;font-weight:850;letter-spacing:.07em}
+.training-cycle-evolution-foot span:first-child{min-width:0}
+.training-cycle-evolution-foot span:last-child{flex:0 0 auto;color:#a7bdc9}
+.training-card-evolution .training-stat.is-upgraded .training-stat-track i{animation:playerStatUpgrade .9s ease-out}
+.training-card-evolution .training-stat.is-upgraded strong{color:#a5ff78;text-shadow:0 0 14px rgba(144,255,70,.38);animation:playerStatNumber .65s ease-out}
+@keyframes playerStatUpgrade{0%{filter:brightness(2.4);box-shadow:0 0 18px rgba(144,255,70,.8)}100%{filter:brightness(1);box-shadow:none}}
+@keyframes playerStatNumber{0%{transform:scale(1.35)}65%{transform:scale(.94)}100%{transform:scale(1)}}
+@media(max-width:420px){.training-cycle-evolution{padding:10px}.training-cycle-evolution-foot{font-size:7px;letter-spacing:.035em}}
+@media(prefers-reduced-motion:reduce){.training-cycle-evolution-track i,.training-card-evolution .training-stat.is-upgraded strong{animation:none!important;transition:none!important}}
