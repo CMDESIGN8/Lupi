@@ -472,3 +472,16 @@
 @keyframes rankUnlockFade{from{opacity:0}to{opacity:1}}@keyframes rankUnlockCard{from{opacity:0;transform:translateY(24px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes rankUnlockSpin{to{transform:rotate(360deg)}}@keyframes rankUnlockEmblem{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-5px) scale(1.045)}}
 @media(max-width:520px){.training-rank-rewards{padding:13px 11px}.training-rank-rewards-grid{grid-template-columns:1fr}.training-rank-reward{padding:8px}.training-rank-unlock-card{padding:26px 18px 20px}}
 @media(prefers-reduced-motion:reduce){.training-rank-unlock-overlay,.training-rank-unlock-card,.training-rank-unlock-card:before,.training-rank-unlock-emblem,.training-rank-unlock-rays{animation:none!important}}
+
+
+/* Compact rank rewards: highlight only the next unlock, expand the full collection on demand */
+.training-rank-reward-featured{margin:0 0 9px;padding:11px 12px;border-color:color-mix(in srgb,var(--reward-color) 48%,transparent);background:linear-gradient(105deg,color-mix(in srgb,var(--reward-color) 13%,transparent),rgba(4,12,21,.94));box-shadow:inset 0 0 24px color-mix(in srgb,var(--reward-color) 7%,transparent),0 0 18px color-mix(in srgb,var(--reward-color) 5%,transparent)}
+.training-rank-reward-featured .training-rank-reward-icon{width:40px;height:40px;flex-basis:40px;font-size:18px}
+.training-rank-rewards-details{border-top:1px solid rgba(137,178,202,.13)}
+.training-rank-rewards-details summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 2px 2px;color:#91a9b8;font-size:8px;font-weight:950;letter-spacing:.12em;cursor:pointer;list-style:none;user-select:none}
+.training-rank-rewards-details summary::-webkit-details-marker{display:none}
+.training-rank-rewards-details summary:after{content:"";position:absolute}
+.training-rank-rewards-chevron{color:#90ff46;font-size:17px;line-height:1;transition:transform .2s}
+.training-rank-rewards-details[open] .training-rank-rewards-chevron{transform:rotate(180deg)}
+.training-rank-rewards-details .training-rank-rewards-grid{padding-top:10px;animation:rankRewardsReveal .22s ease-out both}
+@keyframes rankRewardsReveal{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
