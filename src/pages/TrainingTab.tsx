@@ -4,21 +4,12 @@ import type { AppUser } from "../lib/api";
 import type { TrainingStat } from "../components/campaign/TrainingGames";
 import "./TrainingTab.css";
 
-type PlayerStats = Record<TrainingStat, number>;
-type Attempt = { game_id: GameId; stat: TrainingStat; grade: string; delta: number; created_at: string };
+type PlayerStat = TrainingStat | "aerobic" | "strength";
+type PlayerStats = Record<PlayerStat, number>;
 
-const GAME_CONFIG: Record<GameId, { stat: TrainingStat; label: string }> = {
-  shooting: { stat: "finishing", label: "Remate" },
-  dribbling: { stat: "dribbling", label: "Gambeta" },
-  defending: { stat: "defending", label: "Defensa" },
-  passing: { stat: "passing", label: "Pase" },
-  physical: { stat: "physical", label: "Físico" },
-  pace: { stat: "pace", label: "Velocidad" },
-};
-
-const STAT_LABELS: Record<TrainingStat, string> = {
+const STAT_LABELS: Record<PlayerStat, string> = {
   pace: "Velocidad", dribbling: "Gambeta", passing: "Pase",
-  defending: "Defensa", finishing: "Remate", physical: "Físico",
+  defending: "Defensa", finishing: "Remate", physical: "Físico", aerobic: "Aeróbico", strength: "Fuerza",
 };
 
 type SkillKey = "coordination" | "speed" | "agility" | "technique" | "aerobic" | "strength";
@@ -125,7 +116,7 @@ const EMPTY_BADGES: TrainingBadge[] = (Object.keys(BADGE_CONFIG) as BadgeKey[]).
 
 export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackToProfile: () => void }) {
   const [stats, setStats] = useState<PlayerStats>({
-    pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10,
+    pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10, aerobic: 10, strength: 10,
   });
   const [cardLevel, setCardLevel] = useState(1);
   const [trainingXp, setTrainingXp] = useState(0);
@@ -149,7 +140,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     setLoading(true);
     setError("");
     const [profileResult, badgesResult, drillsResult] = await Promise.all([
-      supabase.from("profiles").select("user_card_level,user_card_exp,user_card_pace,user_card_dribbling,user_card_passing,user_card_defending,user_card_finishing,user_card_physical")
+      supabase.from("profiles").select("user_card_level,user_card_exp,user_card_pace,user_card_dribbling,user_card_passing,user_card_defending,user_card_finishing,user_card_physical,user_card_aerobic,user_card_strength")
         .eq("id", user.id).single(),
       supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id),
       supabase.from("personal_training_cycle_drills").select("skill_key,exercise_index,completed_at").eq("user_id", user.id),
@@ -162,6 +153,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
         pace: p.user_card_pace ?? 10, dribbling: p.user_card_dribbling ?? 10,
         passing: p.user_card_passing ?? 10, defending: p.user_card_defending ?? 10,
         finishing: p.user_card_finishing ?? 10, physical: p.user_card_physical ?? 10,
+        aerobic: p.user_card_aerobic ?? 10, strength: p.user_card_strength ?? 10,
       });
       setCardLevel(p.user_card_level ?? 1);
       setTrainingXp(p.user_card_exp ?? 0);
@@ -191,7 +183,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
   }, [resting, restSeconds]);
 
   const overall = useMemo(() => Math.floor(
-    (stats.pace + stats.dribbling + stats.passing + stats.defending + stats.finishing + stats.physical) / 6
+    (stats.pace + stats.dribbling + stats.passing + stats.defending + stats.finishing + stats.physical + stats.aerobic + stats.strength) / 8
   ), [stats]);
 
   const completeDrill = useCallback(async (skillKey: SkillKey, exerciseIndex: number) => {
@@ -269,7 +261,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
 
   const resetAuraTraining = useCallback(async () => {
     if (resettingTraining || drillSaving) return;
-    const confirmed = window.confirm("¿Reiniciar AURA Training? Los 12 ejercicios volverán a estar pendientes. Tu carta, XP, atributos y badges ganadas se conservan. Las recompensas de carta no se entregan nuevamente.");
+    const confirmed = window.confirm("¿Reiniciar AURA Training? Los 18 ejercicios volverán a estar pendientes. Tu carta, XP, atributos y badges ganadas se conservan. Las recompensas de carta no se entregan nuevamente.");
     if (!confirmed) return;
     setResettingTraining(true);
     setError("");
