@@ -245,8 +245,10 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
       setNotice(xpAwarded > 0
         ? `¡${AURA_SKILLS[skillKey].title} COMPLETADA! ${statLabel} +${statGain} · +50 XP · BADGE DESBLOQUEADA.`
         : `¡${AURA_SKILLS[skillKey].title} COMPLETADA! Tu recompensa de carta ya había sido obtenida en un ciclo anterior.`);
+      // Celebrate the badge only on its first successful unlock.
+      // A level-up is shown first; the badge modal remains underneath it.
+      if (xpAwarded > 0) setUnlockedBadge(skillKey);
       if (xpAwarded > 0 && Number(row.user_card_level ?? cardLevel) > cardLevel) {
-        setUnlockedBadge(null);
         setLevelUpReward({ previous: cardLevel, current: Number(row.user_card_level), skillKey, statLabel, statGain });
       }
     } else {
