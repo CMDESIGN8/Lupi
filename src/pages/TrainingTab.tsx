@@ -160,6 +160,16 @@ function AuraReactionChallenge({ onComplete }: { onComplete: (result: TrainingRe
   </div>;
 }
 
+function AuraBossChallenge({ onComplete, onExit }: { onComplete: (result: TrainingResult) => void; onExit: () => void }) {
+ const [stage,setStage]=useState(0),[seconds,setSeconds]=useState(12),[combo,setCombo]=useState(0),[bestCombo,setBestCombo]=useState(0),[score,setScore]=useState(0),[hits,setHits]=useState(0),[finished,setFinished]=useState(false);
+ const names=["REACTION BURST","CONTROL RUSH","FINAL OVERDRIVE"];
+ useEffect(()=>{if(finished)return;const timer=window.setInterval(()=>setSeconds(s=>s>0?s-1:0),1000);return()=>window.clearInterval(timer)},[finished,stage]);
+ useEffect(()=>{if(seconds!==0||finished)return;if(stage<2){setStage(s=>s+1);setSeconds(12);setCombo(0)}else setFinished(true)},[seconds,stage,finished]);
+ const tap=()=>{if(finished||seconds<=0)return;const n=combo+1;setCombo(n);setBestCombo(b=>Math.max(b,n));setHits(h=>h+1);setScore(s=>s+10+Math.min(20,Math.floor(n/5)*5))};
+ const claim=()=>{const grade:TrainingResult["grade"]=score>=900?"S":score>=650?"A":score>=400?"B":"C";const delta=grade==="S"?10:grade==="A"?7:grade==="B"?4:2;const xpBonus=grade==="S"?250:grade==="A"?180:grade==="B"?120:60;onComplete({stat:"physical",grade,delta,xpBonus,message:`Boss Score ${score} · ${hits} acciones · combo ${bestCombo}`})};
+ return <div className="aura-boss-game"><div className="aura-boss-top"><small>BOSS CHALLENGE · FASE {stage+1}/3</small><strong>{seconds}s</strong></div><div className="aura-boss-stage"><span>FASE {stage+1}</span><h3>{names[stage]}</h3><p>¡Mantené el ritmo y encadená acciones para subir el combo!</p></div><button className="aura-boss-tap" type="button" disabled={finished||seconds<=0} onClick={tap}><span>⚡</span><strong>TOCÁ PARA ATACAR</strong><small>+ PUNTOS · + COMBO</small></button><div className="aura-boss-stats"><div><small>SCORE</small><strong>{score}</strong></div><div><small>COMBO</small><strong>×{combo}</strong></div><div><small>MEJOR COMBO</small><strong>×{bestCombo}</strong></div><div><small>ACCIONES</small><strong>{hits}</strong></div></div><div className="aura-boss-stage-progress">{names.map((n,i)=><i key={n} className={i<stage?"is-done":i===stage?"is-current":""}/>)}</div>{finished?<div className="aura-boss-finish"><small>ARENA COMPLETADA</small><strong>{score} PUNTOS</strong><p>Combo máximo ×{bestCombo} · {hits} acciones</p><button type="button" onClick={claim}>RECLAMAR RECOMPENSA</button></div>:<button type="button" className="aura-boss-exit" onClick={onExit}>ABANDONAR DESAFÍO</button>}</div>;
+}
+
 export function TrainingTab({ user }: { user: AppUser }) {
   const [stats, setStats] = useState<PlayerStats>({
     pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10,
@@ -178,6 +188,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
   const [levelUpReward, setLevelUpReward] = useState<{ previous: number; current: number; skillKey: SkillKey; statLabel: string; statGain: number } | null>(null);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [reactionChallenge, setReactionChallenge] = useState(false);
+  const [bossChallenge, setBossChallenge] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameId | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -541,17 +552,17 @@ export function TrainingTab({ user }: { user: AppUser }) {
               <button type="button" className="training-arena-stage" onClick={() => startGame("physical")} disabled={!canTrain}>
                 <span className="training-arena-stage-number">04</span><span className="training-arena-stage-icon">⌁</span><strong>AGILITY</strong><small>GIROS · FÍSICO</small><b>INICIAR NIVEL ↗</b>
               </button>
-              <div className="training-arena-stage is-boss-locked" aria-disabled="true">
-                <span className="training-arena-stage-number">05</span><span className="training-arena-stage-icon">✦</span><strong>BOSS CHALLENGE</strong><small>PRUEBA COMBINADA</small><b>PRÓXIMAMENTE</b>
-              </div>
+              <button type="button" className="training-arena-stage is-boss-open" onClick={() => setBossChallenge(true)} disabled={!canTrain}>
+                <span className="training-arena-stage-number">05</span><span className="training-arena-stage-icon">✦</span><strong>BOSS CHALLENGE</strong><small>3 FASES · SCORE · COMBO</small><b>INICIAR BOSS ↗</b>
+              </button>
             </div>
             <div className="training-arena-map-foot"><span>ENERGÍA DIARIA DISPONIBLE</span><strong>{Math.max(0,5-gamesPlayed)} / 5</strong><i><b style={{width:`${Math.max(0,5-gamesPlayed)/5*100}%`}}/></i><small>Los resultados de cada nivel impactan en tu carta.</small></div>
           </div>
         </section>
 
         <section className="training-arena">
-          <div className="training-section-title"><span>04 / ELEGÍ TU DESAFÍO</span><small>MEJORÁ UNA HABILIDAD</small></div>
-          {reactionChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>REACTION MODE</h2></div><button type="button" onClick={() => setReactionChallenge(false)} disabled={saving}>SALIR</button></div><AuraReactionChallenge onComplete={result => { setReactionChallenge(false); void handleGameResult(result, "physical"); }} /></div> : loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? (
+          <div className="training-section-title"><span>05 / ELEGÍ TU DESAFÍO</span><small>MEJORÁ UNA HABILIDAD</small></div>
+          {bossChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>BOSS ACTIVO</span><h2>CHALLENGE ARENA</h2></div><button type="button" onClick={() => setBossChallenge(false)} disabled={saving}>SALIR</button></div><AuraBossChallenge onExit={() => setBossChallenge(false)} onComplete={result => { setBossChallenge(false); void handleGameResult(result, "physical"); }} /></div> : reactionChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>REACTION MODE</h2></div><button type="button" onClick={() => setReactionChallenge(false)} disabled={saving}>SALIR</button></div><AuraReactionChallenge onComplete={result => { setReactionChallenge(false); void handleGameResult(result, "physical"); }} /></div> : loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? (
             <div className="training-game-stage">
               <div className="training-game-top">
                 <div><span>MINIJUEGO ACTIVO</span><h2>{GAME_CONFIG[selectedGame].label}</h2></div>
