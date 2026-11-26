@@ -292,3 +292,18 @@
 @media(max-width:620px){.training-hud-badge-grid{grid-template-columns:1fr}.training-hud-badge{min-height:120px}.training-hud-badge-art{flex-basis:72px;width:72px;height:72px}}
 @media(max-width:390px){.training-hud-topline{align-items:flex-start;flex-direction:column;gap:7px}.training-hud-live{align-self:flex-end;margin-top:-20px}.training-player-stats{gap:6px}.training-player-stats>div{padding:9px 7px}.training-player-stats small{font-size:7px;letter-spacing:.07em}.training-hud-badge{gap:8px;padding:9px}.training-hud-badge-art{flex-basis:62px;width:62px;height:62px}}
 @media(prefers-reduced-motion:reduce){.training-hud-badge-progress i{transition:none}}
+
+
+/* CHARACTER HUD: one integrated player identity panel */
+.training-character-hud{position:relative;display:flex;flex-direction:column;gap:0;margin:0 0 20px;padding:clamp(10px,2vw,16px);overflow:hidden;border:1px solid rgba(9,188,235,.38);border-radius:22px;background:radial-gradient(ellipse at 80% 0,rgba(9,188,235,.12),transparent 45%),linear-gradient(145deg,#081729 0%,#070d19 70%);box-shadow:0 20px 48px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.045)}
+.training-character-hud:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.13;background-image:linear-gradient(rgba(77,198,226,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(77,198,226,.14) 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(130deg,#000,transparent 75%)}
+.training-character-hud>*{position:relative}
+.training-character-hud .training-hud-hero{margin:0;padding:clamp(14px,2.5vw,24px);border:0;border-radius:14px 14px 0 0;box-shadow:none}
+.training-character-hud .training-card-evolution{margin:0;padding:clamp(14px,2.5vw,22px);border-width:1px 0 0;border-radius:0;background:rgba(2,11,22,.48);box-shadow:none}
+.training-character-hud .training-hud-badges{margin:0;padding:clamp(14px,2.5vw,22px);border-width:1px 0 0;border-radius:0 0 14px 14px;background:rgba(2,11,22,.48);box-shadow:none}
+.training-character-hud .training-hud-badges:before,.training-character-hud .training-card-evolution:before{display:none}
+.training-character-hud .training-section-title{margin-bottom:14px}
+.training-character-hud .training-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.training-character-hud .training-hud-badge-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.training-character-hud .training-hud-xp{margin-top:14px}
+@media(max-width:620px){.training-character-hud{padding:7px;border-radius:16px;gap:0}.training-character-hud .training-hud-hero{padding:15px 12px}.training-character-hud .training-card-evolution,.training-character-hud .training-hud-badges{padding:14px 11px}.training-character-hud .training-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.training-character-hud .training-hud-badge-grid{grid-template-columns:1fr}}
