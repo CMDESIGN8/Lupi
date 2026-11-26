@@ -359,7 +359,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
               const unlocked = done === 3;
               return <article className={`training-aura-skill ${unlocked ? "is-complete" : ""}`} key={skillKey}>
                 <div className="training-aura-skill-head">
-                  <img src={skill.image} alt="" loading="lazy" />
+                  {skill.image ? <img src={skill.image} alt="" loading="lazy" /> : <span className="training-gym-skill-icon" aria-hidden="true">{skillKey === "aerobic" ? "♥" : "✚"}</span>}
                   <div><small>{String(done).padStart(2,"0")} / 03 EJERCICIOS</small><h3>{skill.title}</h3><p>{skill.description}</p></div>
                   <strong>{Math.round(done / 3 * 100)}%</strong>
                 </div>
