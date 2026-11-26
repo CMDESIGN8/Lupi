@@ -133,6 +133,9 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [lastUpgrade, setLastUpgrade] = useState<{ stat: PlayerStat; before: number; after: number; ovr: number } | null>(null);
+  const [highestUnlockedRank, setHighestUnlockedRank] = useState<number | null>(null);
+  const [rankRewardHistory, setRankRewardHistory] = useState<Record<number, string>>({});
+  const [rankReward, setRankReward] = useState<{ name: string; color: string; index: number } | null>(null);
 
   const load = useCallback(async () => {
     setError("");
@@ -198,6 +201,47 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     ? Math.round(((rankValue - currentRank.min) / (currentRank.max - currentRank.min + 1)) * 100)
     : Math.round(((rankValue - currentRank.min) / (currentRank.max - currentRank.min)) * 100);
   const pointsToNextRank = nextRank ? nextRank.min - rankValue : 99 - rankValue;
+
+  useEffect(() => {
+    const storageKey = `lupi:aura-rank-rewards:${user.id}`;
+    try {
+      const saved = window.localStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved) as { highest?: number; history?: Record<number, string> };
+        setHighestUnlockedRank(Number.isInteger(parsed.highest) ? Number(parsed.highest) : -1);
+        setRankRewardHistory(parsed.history ?? {});
+      } else {
+        setHighestUnlockedRank(-1);
+        setRankRewardHistory({});
+      }
+    } catch {
+      setHighestUnlockedRank(-1);
+      setRankRewardHistory({});
+    }
+  }, [user.id]);
+
+  useEffect(() => {
+    if (highestUnlockedRank === null) return;
+    const storageKey = `lupi:aura-rank-rewards:${user.id}`;
+    if (highestUnlockedRank < 0) {
+      const baselineHistory: Record<number, string> = {};
+      for (let index = 0; index <= currentRankIndex; index += 1) baselineHistory[index] = "";
+      setHighestUnlockedRank(currentRankIndex);
+      setRankRewardHistory(baselineHistory);
+      window.localStorage.setItem(storageKey, JSON.stringify({ highest: currentRankIndex, history: baselineHistory }));
+      return;
+    }
+    if (currentRankIndex > highestUnlockedRank) {
+      const nextHistory = { ...rankRewardHistory };
+      const unlockedAt = new Date().toISOString();
+      for (let index = highestUnlockedRank + 1; index <= currentRankIndex; index += 1) nextHistory[index] = unlockedAt;
+      setRankRewardHistory(nextHistory);
+      setHighestUnlockedRank(currentRankIndex);
+      setRankReward({ ...playerRanks[currentRankIndex], index: currentRankIndex });
+      window.localStorage.setItem(storageKey, JSON.stringify({ highest: currentRankIndex, history: nextHistory }));
+    }
+  }, [currentRankIndex, highestUnlockedRank, rankRewardHistory, user.id]);
+
 
   const completedDrills = drills.length;
   const trainingProgress = Math.round((completedDrills / 18) * 100);
@@ -329,6 +373,30 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
             </div>
             <div className="training-player-rank-track"><i style={{ width: `${rankProgress}%` }} /></div>
             <div className="training-player-rank-foot"><span>PROGRESO DE RANGO</span><strong>{rankProgress}%</strong></div>
+          </section>
+
+          <section className="training-rank-rewards" aria-label="Recompensas por rango">
+            <div className="training-rank-rewards-heading">
+              <div><small>AURA RANK REWARDS</small><h2>DESBLOQUEÁ TU ESTATUS</h2></div>
+              <span>{Math.max(0, (highestUnlockedRank ?? currentRankIndex) + 1)}/6 RANGOS</span>
+            </div>
+            <div className="training-rank-rewards-grid">
+              {playerRanks.map((rank, index) => {
+                const unlocked = highestUnlockedRank !== null && index <= highestUnlockedRank;
+                const rewardNames = ["INSIGNIA ROOKIE", "MARCO AZUL", "INSIGNIA SEMI PRO", "MARCO PRO", "EFECTO ELITE", "MARCO LEGENDARIO"];
+                const rewardDetails = ["Tu primer paso en el club.", "Identidad visual AMATEUR para tu carta.", "Insignia exclusiva de progreso.", "Marco premium para tu carta.", "Efecto especial de rango ELITE.", "Apariencia legendaria y celebración exclusiva."];
+                const rewardIcons = ["◆", "⬡", "✦", "✧", "♛", "★"];
+                return <article key={rank.name} className={`training-rank-reward is-${rank.color} ${unlocked ? "is-unlocked" : "is-locked"}`}>
+                  <div className="training-rank-reward-icon" aria-hidden="true">{unlocked ? rewardIcons[index] : "🔒"}</div>
+                  <div className="training-rank-reward-copy">
+                    <small>{rank.name}</small>
+                    <strong>{rewardNames[index]}</strong>
+                    <span>{unlocked ? (rankRewardHistory[index] ? `DESBLOQUEADO · ${new Date(rankRewardHistory[index]).toLocaleDateString("es-AR")}` : "RANGO ALCANZADO") : rewardDetails[index]}</span>
+                  </div>
+                  <b>{unlocked ? "✓" : "OVR " + rank.min}</b>
+                </article>;
+              })}
+            </div>
           </section>
 
           <div className="training-xp-evolution training-hud-xp">
@@ -485,6 +553,19 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
             </div>
             <div className="training-levelup-from">NIVEL {levelUpReward.previous} <span>→</span> NIVEL {levelUpReward.current}</div>
             <button type="button" onClick={() => setLevelUpReward(null)}>SEGUIR EVOLUCIONANDO</button>
+          </div>
+        </div>}
+
+        {rankReward && <div className={`training-rank-unlock-overlay is-${rankReward.color}`} role="dialog" aria-modal="true" aria-labelledby="training-rank-unlock-title">
+          <div className="training-rank-unlock-card">
+            <div className="training-rank-unlock-rays" aria-hidden="true">✦</div>
+            <small>AURA RANK REWARDS · NUEVO RANGO</small>
+            <div className="training-rank-unlock-emblem">{rankReward.index === 5 ? "★" : String(rankReward.index + 1).padStart(2, "0")}</div>
+            <h2 id="training-rank-unlock-title">{rankReward.name}</h2>
+            <p>Tu esfuerzo te llevó a un nuevo nivel. Recompensa desbloqueada:</p>
+            <strong>{["INSIGNIA ROOKIE", "MARCO AZUL", "INSIGNIA SEMI PRO", "MARCO PRO", "EFECTO ELITE", "MARCO LEGENDARIO"][rankReward.index]}</strong>
+            <span>{["Tu camino en AURA Training comienza.", "Tu carta gana una identidad azul.", "Una insignia para reconocer tu progreso.", "Un marco premium para tu evolución.", "Un efecto visual reservado para ELITE.", "El máximo reconocimiento del club."][rankReward.index]}</span>
+            <button type="button" onClick={() => setRankReward(null)}>RECLAMAR RECOMPENSA</button>
           </div>
         </div>}
 
