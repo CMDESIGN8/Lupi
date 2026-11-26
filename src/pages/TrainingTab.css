@@ -485,3 +485,19 @@
 .training-rank-rewards-details[open] .training-rank-rewards-chevron{transform:rotate(180deg)}
 .training-rank-rewards-details .training-rank-rewards-grid{padding-top:10px;animation:rankRewardsReveal .22s ease-out both}
 @keyframes rankRewardsReveal{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+
+
+/* AURA SESSION MODE · CLEAR PREP / EXECUTION / RECOVERY FLOW */
+.training-guided-progress{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:17px 0 4px}
+.training-guided-progress i{height:4px;border-radius:8px;background:rgba(125,157,177,.2);transition:background .25s,box-shadow .25s}
+.training-guided-progress i.is-done{background:linear-gradient(90deg,#09bceb,#90ff46);box-shadow:0 0 10px rgba(9,188,235,.3)}
+.training-guided-gym-icon{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(78,222,242,.35);border-radius:10px;background:rgba(0,160,205,.12);color:#8dff68;font-size:20px}
+.training-guided-start{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:48px;margin-top:18px;padding:12px 16px;border:0;border-radius:10px;background:linear-gradient(100deg,#08bceb,#90ff46);color:#03131c;font-size:10px;font-weight:1000;letter-spacing:.1em;cursor:pointer;box-shadow:0 8px 24px rgba(9,188,235,.17);transition:transform .2s,filter .2s}
+.training-guided-start span{font-size:17px;transition:transform .2s}
+.training-guided-start:hover{transform:translateY(-2px);filter:brightness(1.08)}
+.training-guided-start:hover span{transform:translateX(4px)}
+.training-guided-rest-ready.is-ready{border-color:rgba(144,255,70,.32);background:rgba(100,210,90,.08)}
+.training-guided-rest-ready.is-ready>strong{color:#a8ff78}
+.training-guided-rest-ready.is-ready p{color:#b9d2bb}
+@media(hover:none){.training-guided-start:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){.training-guided-progress i,.training-guided-start,.training-guided-start span{transition:none}}
