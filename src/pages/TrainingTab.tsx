@@ -282,7 +282,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
         </section>
 
         <section className="training-badges">
-          <div className="training-section-title"><span>03 / AURA SKILL BADGES</span><small>3 ENTRENAMIENTOS PARA DESBLOQUEAR</small></div>
+          <div className="training-section-title"><span>03 / AURA SKILL BADGES</span><small>3 EJERCICIOS POR DISCIPLINA</small></div>
           <div className="training-badge-grid">
             {badges.map(badge => {
               const config = BADGE_CONFIG[badge.badge_key];
