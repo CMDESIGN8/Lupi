@@ -404,6 +404,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
   return (
     <main className="main-content training-hub">
       <div className="training-shell">
+        <section className="training-character-hud" aria-label="Lupi World player development">
         <header className="training-hero training-hud-hero">
           <div className="training-hud-topline"><span className="training-kicker">LUPI WORLD / PLAYER DEVELOPMENT</span><span className="training-hud-live"><i /> PLAYER ONLINE</span></div>
           <h1>TRAINING<span> ARENA</span></h1>
@@ -432,6 +433,39 @@ export function TrainingTab({ user }: { user: AppUser }) {
         </section>
 
 
+
+        <section className="training-badges training-hud-badges">
+          <div className="training-section-title"><span>03 / AURA SKILL BADGES</span><small>3 EJERCICIOS POR DISCIPLINA</small></div>
+          <div className="training-hud-badge-grid">
+            {(Object.keys(BADGE_CONFIG) as BadgeKey[]).map(key => {
+              const config = BADGE_CONFIG[key];
+              const badge = badges.find(item => item.badge_key === key) ?? EMPTY_BADGES.find(item => item.badge_key === key)!;
+              const progress = Math.min(3, badge.progress);
+              const unlocked = Boolean(badge.unlocked_at);
+              return <article className={`training-hud-badge ${unlocked ? "is-unlocked" : ""}`} key={key}>
+                <div className="training-hud-badge-art"><img src={config.image} alt={config.title} loading="lazy" /></div>
+                <div className="training-hud-badge-copy">
+                  <small>{config.skill.toUpperCase()}</small>
+                  <h3>{config.title}</h3>
+                  <p>{config.description}</p>
+                  <div className="training-hud-badge-progress"><i style={{ width: `${progress / 3 * 100}%` }} /></div>
+                  <strong>{unlocked ? "BADGE DESBLOQUEADA ✓" : `${progress} / 3 ENTRENAMIENTOS`}</strong>
+                </div>
+                <span className="training-hud-badge-state">{unlocked ? "✦" : "LOCKED"}</span>
+              </article>;
+            })}
+          </div>
+          <div className="training-xp-evolution training-hud-xp">
+            <div className="training-xp-level-head">
+              <div><small>AURA PLAYER EVOLUTION</small><strong>LVL {cardLevel}</strong></div>
+              <b>{trainingXp.toLocaleString("es-AR")} XP</b>
+            </div>
+            <div className="training-xp-track"><i style={{ width: `${trainingXp % 100}%` }} /></div>
+            <div className="training-xp-level-foot"><span>{trainingXp % 100} / 100 XP</span><strong>{100 - (trainingXp % 100)} XP PARA LVL {cardLevel + 1}</strong></div>
+          </div>
+        </section>
+
+        </section>
 
         <section className="training-aura-program">
           <div className="training-section-title"><span>02 / TRAINING LAB</span><small>ENTRENÁ · DESARROLLÁ SKILLS · DESBLOQUEÁ BADGES</small></div>
@@ -475,37 +509,6 @@ export function TrainingTab({ user }: { user: AppUser }) {
                 {unlocked && <div className="training-aura-skill-reward">✦ DISCIPLINA COMPLETADA · {badges.find(item => item.badge_key === skillKey)?.unlocked_at ? "BADGE CONSERVADA" : "BADGE DESBLOQUEADA"}</div>}
               </article>;
             })}
-          </div>
-        </section>
-
-        <section className="training-badges training-hud-badges">
-          <div className="training-section-title"><span>03 / AURA SKILL BADGES</span><small>3 EJERCICIOS POR DISCIPLINA</small></div>
-          <div className="training-hud-badge-grid">
-            {(Object.keys(BADGE_CONFIG) as BadgeKey[]).map(key => {
-              const config = BADGE_CONFIG[key];
-              const badge = badges.find(item => item.badge_key === key) ?? EMPTY_BADGES.find(item => item.badge_key === key)!;
-              const progress = Math.min(3, badge.progress);
-              const unlocked = Boolean(badge.unlocked_at);
-              return <article className={`training-hud-badge ${unlocked ? "is-unlocked" : ""}`} key={key}>
-                <div className="training-hud-badge-art"><img src={config.image} alt={config.title} loading="lazy" /></div>
-                <div className="training-hud-badge-copy">
-                  <small>{config.skill.toUpperCase()}</small>
-                  <h3>{config.title}</h3>
-                  <p>{config.description}</p>
-                  <div className="training-hud-badge-progress"><i style={{ width: `${progress / 3 * 100}%` }} /></div>
-                  <strong>{unlocked ? "BADGE DESBLOQUEADA ✓" : `${progress} / 3 ENTRENAMIENTOS`}</strong>
-                </div>
-                <span className="training-hud-badge-state">{unlocked ? "✦" : "LOCKED"}</span>
-              </article>;
-            })}
-          </div>
-          <div className="training-xp-evolution training-hud-xp">
-            <div className="training-xp-level-head">
-              <div><small>AURA PLAYER EVOLUTION</small><strong>LVL {cardLevel}</strong></div>
-              <b>{trainingXp.toLocaleString("es-AR")} XP</b>
-            </div>
-            <div className="training-xp-track"><i style={{ width: `${trainingXp % 100}%` }} /></div>
-            <div className="training-xp-level-foot"><span>{trainingXp % 100} / 100 XP</span><strong>{100 - (trainingXp % 100)} XP PARA LVL {cardLevel + 1}</strong></div>
           </div>
         </section>
 
