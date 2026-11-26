@@ -400,3 +400,40 @@
 .training-character-hud .training-player-rank{margin:0;border-right:0;border-left:0}
 @media(max-width:420px){.training-player-rank{padding:12px}.training-player-rank-emblem{flex-basis:42px;width:42px;height:42px}.training-player-rank-next small{font-size:7px}.training-player-rank-next span{font-size:7px;max-width:112px}}
 @media(prefers-reduced-motion:reduce){.training-player-rank-track i{transition:none}}
+
+
+/* AAA RANK PRESENTATION · CINEMATIC TIER IDENTITIES */
+.training-player-rank{isolation:isolate;border:1px solid color-mix(in srgb,var(--rank-color) 48%,transparent);border-top:0;background:radial-gradient(ellipse at 7% 50%,var(--rank-glow),transparent 42%),linear-gradient(112deg,var(--rank-panel-a),var(--rank-panel-b) 58%,rgba(4,10,20,.98));box-shadow:inset 0 1px rgba(255,255,255,.07),inset 0 -1px rgba(255,255,255,.025),0 12px 28px rgba(0,0,0,.2),0 0 24px var(--rank-glow);transition:border-color .35s,box-shadow .35s,background .35s;animation:rankArrival .75s cubic-bezier(.16,1,.3,1) both}
+.training-player-rank:before{z-index:-1;opacity:.95;background:linear-gradient(112deg,transparent 0%,rgba(255,255,255,.025) 38%,rgba(255,255,255,.13) 49%,rgba(255,255,255,.025) 58%,transparent 75%),radial-gradient(ellipse at 12% 50%,var(--rank-glow),transparent 52%);background-size:220% 100%,100% 100%;animation:rankShine 7s ease-in-out infinite}
+.training-player-rank:after{content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;opacity:.55;background-image:radial-gradient(circle at 83% 20%,var(--rank-color) 0 1px,transparent 2px),radial-gradient(circle at 91% 72%,var(--rank-color) 0 1px,transparent 2px),radial-gradient(circle at 68% 82%,var(--rank-color) 0 1px,transparent 2px);background-size:100% 100%;animation:rankParticles 5s ease-in-out infinite alternate}
+.training-player-rank-emblem{position:relative;overflow:hidden;border:1px solid color-mix(in srgb,var(--rank-color) 85%,white);background:linear-gradient(145deg,var(--rank-emblem-a),var(--rank-emblem-b));box-shadow:inset 0 1px rgba(255,255,255,.22),inset 0 0 22px var(--rank-glow),0 0 22px var(--rank-glow);animation:rankEmblemFloat 4s ease-in-out infinite}
+.training-player-rank-emblem:after{content:"";position:absolute;inset:-60% -30%;pointer-events:none;background:linear-gradient(105deg,transparent 42%,rgba(255,255,255,.55) 50%,transparent 58%);transform:translateX(-80%) rotate(15deg);animation:rankEmblemShine 4.8s ease-in-out infinite}
+.training-player-rank-copy strong{letter-spacing:.075em;text-shadow:0 0 10px var(--rank-glow),0 0 25px var(--rank-glow);animation:rankTitleGlow 3s ease-in-out infinite alternate}
+.training-player-rank-next strong{color:var(--rank-color);text-shadow:0 0 12px var(--rank-glow)}
+.training-player-rank-track{height:8px;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+.training-player-rank-track i{position:relative;overflow:hidden;background:linear-gradient(90deg,var(--rank-bar-a),var(--rank-color),var(--rank-bar-b));background-size:200% 100%;box-shadow:0 0 9px var(--rank-glow),0 0 20px var(--rank-glow);animation:rankBarEnergy 4s linear infinite}
+.training-player-rank-track i:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);transform:translateX(-100%);animation:rankBarShine 3.2s ease-in-out infinite}
+.training-player-rank-foot strong{font-size:9px;text-shadow:0 0 10px var(--rank-glow)}
+.training-player-rank.is-rookie{--rank-color:#b6c5d1;--rank-bg:rgba(143,168,184,.12);--rank-glow:rgba(143,168,184,.18);--rank-panel-a:#182632;--rank-panel-b:#0a1420;--rank-emblem-a:#526574;--rank-emblem-b:#1b2b38;--rank-bar-a:#667d8e;--rank-bar-b:#e0e9ef}
+.training-player-rank.is-amateur{--rank-color:#72dcff;--rank-bg:rgba(100,201,232,.12);--rank-glow:rgba(50,180,255,.22);--rank-panel-a:#102b43;--rank-panel-b:#091725;--rank-emblem-a:#1479a5;--rank-emblem-b:#12304b;--rank-bar-a:#0878bd;--rank-bar-b:#b1f1ff}
+.training-player-rank.is-semi-pro{--rank-color:#a8ff68;--rank-bg:rgba(144,255,70,.11);--rank-glow:rgba(144,255,70,.2);--rank-panel-a:#183626;--rank-panel-b:#0a1b1b;--rank-emblem-a:#4e9b37;--rank-emblem-b:#183b2a;--rank-bar-a:#55b93d;--rank-bar-b:#e0ff9d}
+.training-player-rank.is-pro{--rank-color:#c5a0ff;--rank-bg:rgba(177,140,255,.12);--rank-glow:rgba(151,102,255,.24);--rank-panel-a:#2a1d48;--rank-panel-b:#110f25;--rank-emblem-a:#7751bd;--rank-emblem-b:#2d2053;--rank-bar-a:#8054db;--rank-bar-b:#e1caff}
+.training-player-rank.is-elite{--rank-color:#ffd18a;--rank-bg:rgba(255,198,110,.13);--rank-glow:rgba(255,164,65,.26);--rank-panel-a:#49301a;--rank-panel-b:#1c1420;--rank-emblem-a:#b7792c;--rank-emblem-b:#50301c;--rank-bar-a:#d28a32;--rank-bar-b:#fff0b8}
+.training-player-rank.is-legend{--rank-color:#fff2ad;--rank-bg:rgba(255,226,130,.15);--rank-glow:rgba(255,214,105,.32);--rank-panel-a:#51401a;--rank-panel-b:#211827;--rank-emblem-a:#e5bd59;--rank-emblem-b:#795021;--rank-bar-a:#e1a936;--rank-bar-b:#fffbd4}
+.training-player-rank.is-legend{border-color:rgba(255,230,145,.75);box-shadow:inset 0 1px rgba(255,255,255,.2),0 0 22px rgba(255,214,105,.22),0 0 52px rgba(255,185,65,.13);animation:rankArrival .75s cubic-bezier(.16,1,.3,1) both,legendAura 3.5s ease-in-out infinite}
+.training-player-rank.is-legend .training-player-rank-emblem{border-radius:50%;animation:legendCrown 5s ease-in-out infinite}
+.training-player-rank.is-legend .training-player-rank-copy strong{font-size:clamp(20px,3.4vw,26px)}
+.training-character-hud .training-player-rank{border-bottom-color:color-mix(in srgb,var(--rank-color) 45%,transparent)}
+@keyframes rankArrival{from{opacity:0;transform:translateY(10px) scale(.985);filter:brightness(1.7)}to{opacity:1;transform:translateY(0) scale(1);filter:brightness(1)}}
+@keyframes rankShine{0%,65%,100%{background-position:160% 0,0 0}82%{background-position:-80% 0,0 0}}
+@keyframes rankParticles{from{opacity:.22;transform:translateY(2px)}to{opacity:.72;transform:translateY(-2px)}}
+@keyframes rankEmblemFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes rankEmblemShine{0%,58%,100%{transform:translateX(-80%) rotate(15deg)}78%{transform:translateX(80%) rotate(15deg)}}
+@keyframes rankTitleGlow{from{filter:brightness(.96)}to{filter:brightness(1.2)}}
+@keyframes rankBarEnergy{to{background-position:200% 0}}
+@keyframes rankBarShine{0%,45%,100%{transform:translateX(-100%)}75%{transform:translateX(100%)}}
+@keyframes legendAura{0%,100%{box-shadow:inset 0 1px rgba(255,255,255,.2),0 0 18px rgba(255,214,105,.18),0 0 38px rgba(255,185,65,.09)}50%{box-shadow:inset 0 1px rgba(255,255,255,.25),0 0 30px rgba(255,214,105,.32),0 0 65px rgba(255,185,65,.18)}}
+@keyframes legendCrown{0%,100%{transform:rotate(-2deg) scale(1)}50%{transform:rotate(2deg) scale(1.06)}}
+@media(hover:hover){.training-player-rank:hover{transform:translateY(-2px);filter:brightness(1.08)}}
+@media(max-width:420px){.training-player-rank-main{gap:9px}.training-player-rank-copy strong{font-size:18px}.training-player-rank-next strong{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.training-player-rank,.training-player-rank:before,.training-player-rank:after,.training-player-rank-emblem,.training-player-rank-emblem:after,.training-player-rank-copy strong,.training-player-rank-track i,.training-player-rank-track i:after{animation:none!important;transition:none!important}}
