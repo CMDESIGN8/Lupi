@@ -217,3 +217,606 @@
  .gh-root.gh-root--cinematic{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;overflow-y:visible!important}
  .gh-root.gh-root--cinematic .gh-world__dock{overflow:visible!important}
 }
+<<<<<<< HEAD
+=======
+
+
+/* LUPI WORLD - PRIMARY PLAY BUTTON */
+
+.gh-lobby-action-icon--bolt {
+  color: #ffbd16;
+  stroke-width: 2.8;
+  filter: drop-shadow(0 0 5px rgba(255, 190, 20, .7));
+  transition: transform .25s ease, filter .25s ease;
+}
+
+.gh-lobby-action:hover .gh-lobby-action-icon--bolt {
+  transform: scale(1.16) rotate(-8deg);
+  filter: drop-shadow(0 0 10px #ffbd16);
+}
+
+/* Animación de energía */
+.gh-lobby-action:hover {
+  filter: brightness(1.08);
+}
+
+/* Flecha */
+.gh-world__play-icon {
+  transition: transform .25s ease;
+}
+
+.gh-lobby-action:hover .gh-world__play-icon {
+  transform: translateX(5px);
+}
+
+/* DEBUG — VISIBILIDAD JUGADORES ONLINE EN DESKTOP */
+@media (min-width: 701px) {
+  .gh-root.gh-root--cinematic .gh-world__left-rail {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 100 !important;
+  }
+
+  .gh-root.gh-root--cinematic .gh-world__players.gh-online {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 101 !important;
+    width: 100% !important;
+    min-height: 100px !important;
+    background: rgba(0, 32, 46, 0.897) !important;
+    border: 2px solid #00d9ff !important;
+  }
+
+  .gh-root.gh-root--cinematic .gh-online__list {
+    display: flex !important;
+    flex-direction: column !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}
+
+
+/* =========================================================
+   LUPI WORLD — STORY BUTTON / MANGA IMPACT (V2 MEJORADA)
+   Identidad: Anime Futsal / Cyan / Dark Navy / Gold
+   ========================================================= */
+
+.gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story {
+  --lupi-cyan: #09bceb;
+  --lupi-blue: #0084af;
+  --lupi-gold: #ffffffa8;
+  --lupi-ball: #ff0000;
+
+  position: absolute !important;
+  left: 50% !important;
+  bottom: calc(120px + env(safe-area-inset-bottom, 0px)) !important;
+  transform: translateX(-50%) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+
+  width: calc(100% - 30px) !important;
+  max-width: 540px !important;
+  height: 68px !important;
+  min-height: 68px !important;
+  padding: 8px 16px !important;
+
+  border: 2px solid var(--lupi-cyan) !important;
+  border-radius: 0 !important;
+
+  clip-path: polygon(
+    17px 0,
+    100% 0,
+    100% calc(100% - 17px),
+    calc(100% - 17px) 100%,
+    0 100%,
+    0 17px
+  ) !important;
+
+  /* MEJORA 1: Reflejo de cristal sutil en la parte superior */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 30%),
+    radial-gradient(ellipse at 8% 50%, rgba(9,188,235,.30), transparent 35%),
+    linear-gradient(110deg, #03111d 0%, #07364b 48%, #031622 100%) !important;
+
+  /* MEJORA 2: Animación de pulso para el neón (respira) */
+  box-shadow:
+    0 0 12px rgba(9,188,235,.45),
+    0 0 28px rgba(0,132,175,.25),
+    4px 4px 0 #000,
+    inset 0 0 18px rgba(9,188,235,.12) !important;
+  animation: lupi-neon-pulse 3s infinite alternate !important;
+
+  overflow: hidden !important;
+  z-index: 25 !important;
+  transition:
+    transform .22s ease,
+    box-shadow .22s ease,
+    border-color .22s ease !important;
+}
+
+/* KEYFRAMES DEL PULSO NEÓN */
+@keyframes lupi-neon-pulse {
+  0% {
+    box-shadow: 0 0 12px rgba(9,188,235,.45), 0 0 28px rgba(0,132,175,.25), 4px 4px 0 #000, inset 0 0 18px rgba(9,188,235,.12);
+  }
+  100% {
+    box-shadow: 0 0 22px rgba(9,188,235,.7), 0 0 45px rgba(0,132,175,.4), 4px 4px 0 #000, inset 0 0 25px rgba(9,188,235,.25);
+  }
+}
+
+/* VELOCIDAD MANGA */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    rgba(9,188,235,.05) 35%,
+    rgba(255,255,255,.22) 48%,
+    rgba(9,188,235,.12) 55%,
+    transparent 72%
+  ) !important;
+
+  transform: translateX(-120%) skewX(-22deg) !important;
+  animation: lupi-manga-speed 3.5s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+/* TRAMAS DIAGONALES MANGA */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 27% !important;
+  height: 100% !important;
+
+  background: repeating-linear-gradient(
+    125deg,
+    transparent 0 10px,
+    rgba(9,188,235,.10) 11px 13px,
+    transparent 14px 21px
+  ) !important;
+
+  opacity: .8 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+@keyframes lupi-manga-speed {
+  0%, 65% {
+    transform: translateX(-120%) skewX(-22deg);
+  }
+  100% {
+    transform: translateX(160%) skewX(-22deg);
+  }
+}
+
+/* BALÓN */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story .gh-world__play-icon {
+  position: relative !important;
+  z-index: 3 !important;
+  color: var(--lupi-gold) !important;
+  
+
+  /* MEJORA 3: El balón flota */
+  animation: lupi-ball-float 2.5s ease-in-out infinite !important;
+  flex-shrink: 0 !important;
+}
+
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story .gh-world__play-icon svg {
+  width: 30px !important;
+  height: 30px !important;
+  fill: var(--lupi-gold) !important;
+  stroke: #0e0d0d !important;
+  stroke-width: 1.5 !important;
+}
+
+@keyframes lupi-ball-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.05);
+  }
+}
+
+/* TEXTO */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story > span:nth-child(2) {
+  position: relative !important;
+  z-index: 3 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: flex-start !important;
+  flex: 1 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* CAPÍTULO */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story small {
+  color: var(--lupi-cyan) !important;
+  -webkit-text-fill-color: var(--lupi-cyan) !important;
+  font-family: 'Barlow', sans-serif !important;
+  font-size: 8px !important;
+  font-weight: 900 !important;
+  letter-spacing: .16em !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 0 8px rgba(9,188,235,.7) !important;
+  line-height: 1.2 !important;
+  margin-bottom: 3px !important;
+}
+
+/* TÍTULO */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story strong {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+  font-family: 'Barlow Condensed', Impact, sans-serif !important;
+  font-size: 27px !important;
+  font-style: italic !important;
+  font-weight: 1000 !important;
+  letter-spacing: .025em !important;
+  text-transform: uppercase !important;
+  line-height: 1 !important;
+
+  text-shadow:
+    2px 2px 0 #00101a,
+    3px 3px 0 #0084af,
+    0 0 12px rgba(255,255,255,.25) !important;
+
+  white-space: nowrap !important;
+}
+
+/* FLECHA */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story .gh-world__play-arrow {
+  position: relative !important;
+  z-index: 3 !important;
+  color: var(--lupi-cyan) !important;
+  font-size: 23px !important;
+  filter: drop-shadow(0 0 7px var(--lupi-cyan)) !important;
+  transition: transform .2s ease !important;
+}
+
+/* HOVER */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story:hover {
+  transform: translateX(-50%) translateY(-3px) !important;
+  border-color: #fff !important;
+  animation: none !important; /* Detiene el pulso al hacer hover para que el efecto sea más limpio */
+
+  box-shadow:
+    0 0 16px rgba(9,188,235,.8),
+    0 0 38px rgba(9,188,235,.4),
+    5px 5px 0 #000,
+    inset 0 0 24px rgba(9,188,235,.22) !important;
+}
+
+/* MEJORA 4: El balón gira al hacer hover */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story:hover .gh-world__play-icon {
+  animation: spinBall 0.8s linear infinite !important;
+}
+
+@keyframes spinBall {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story:hover
+.gh-world__play-arrow {
+  transform: translateX(6px) !important;
+  filter: drop-shadow(0 0 12px var(--lupi-cyan)) !important; /* Brillo extra en la flecha */
+}
+
+/* PRESIONADO */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story:active {
+  transform: translateX(-50%) translateY(1px) !important;
+}
+
+/* ACCESIBILIDAD */
+@media (prefers-reduced-motion: reduce) {
+  .gh-root.gh-root--cinematic
+  .gh-world__play.gh-world__play--story::before,
+  .gh-root.gh-root--cinematic
+  .gh-world__play.gh-world__play--story .gh-world__play-icon,
+  .gh-root.gh-root--cinematic
+  .gh-world__play.gh-world__play--story {
+    animation: none !important;
+  }
+}
+
+/* MOBILE */
+@media (max-width: 700px) {
+  .gh-root.gh-root--cinematic
+  .gh-world__play.gh-world__play--story {
+    width: calc(100% - 30px) !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    padding: 6px 12px !important;
+    bottom: calc(155px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 50 !important;
+  }
+
+  .gh-root.gh-root--cinematic
+  .gh-world__play.gh-world__play--story strong {
+    font-size: clamp(20px, 5.5vw, 25px) !important;
+  }
+}
+/* =========================================================
+   AJUSTE DE TAMAÑO PARA LA PELOTA UCL
+   ========================================================= */
+
+/* 1. Ajustamos el contenedor del icono */
+.gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story .gh-world__play-icon {
+  width: 38px !important;  /* Un poco más ancho para dar espacio */
+  height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  z-index: 3 !important;
+}
+
+/* 2. Ajustamos la imagen de la pelota */
+.gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story .gh-world__play-icon img {
+  width: 160% !important; /* Escalamos la imagen para que la pelota llene el espacio */
+  height: 160% !important;
+  max-width: none !important; /* Evita que se limite al tamaño del contenedor */
+  max-height: none !important;
+  object-fit: contain !important;
+  
+  /* Mantenemos los efectos de brillo (neón) alrededor de la pelota */
+  filter: 
+    drop-shadow(0 0 6px #ffc83d) 
+    drop-shadow(0 0 12px rgba(9,188,235,.8)) !important;
+    
+  /* Animación de flotación */
+  animation: lupi-ball-float 2.5s ease-in-out infinite !important;
+  
+  background: transparent !important;
+  border: none !important;
+}
+
+/* 3. Efecto Hover: que gire y brille más */
+.gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story:hover .gh-world__play-icon img {
+  animation: spinBall 0.8s linear infinite !important;
+  filter: 
+    drop-shadow(0 0 10px #ffc83d) 
+    drop-shadow(0 0 20px rgba(9,188,235,1)) !important;
+}
+/* =========================================================
+   AJUSTE FINAL: POSICIÓN Y AIRE PARA LA PELOTA
+   ========================================================= */
+
+.gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story .gh-world__play-icon {
+  /* Aseguramos que el contenedor tenga un poco de margen a la izquierda */
+  margin-left: 10px !important;
+  margin-right: 8px !important; /* Separación extra con el texto */
+  
+  /* Lo alineamos perfectamente al centro vertical */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* =========================================================
+   INTEGRACIÓN FORZADA: PELOTA UCL ESTILO CYBERPUNK
+   ========================================================= */
+
+.gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story .gh-world__play-icon {
+  width: 36px !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  z-index: 3 !important;
+  margin-left: 6px !important;
+  margin-right: 12px !important;
+  
+  /* Un pequeño fondo circular oscuro para que la pelota resalte */
+  background: radial-gradient(circle, rgba(9,188,235,0.2) 0%, transparent 70%) !important;
+  border-radius: 50% !important;
+}
+
+.gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story .gh-world__play-icon img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  
+  /* Magia: Filtros para integrar la pelota al estilo neón */
+  filter: 
+    grayscale(100%) /* La vuelve blanco y negro */
+    brightness(1.2) /* La aclara */
+    sepia(100%) /* Le da un tinte base */
+    hue-rotate(160deg) /* La tiñe de cyan */
+    saturate(300%) /* Intensifica el color */
+    drop-shadow(0 0 4px #09bceb) 
+    drop-shadow(0 0 10px #ffc83d) !important;
+    
+  animation: lupi-ball-float 2.5s ease-in-out infinite !important;
+}
+
+/* Al hacer hover, la pelota recupera su color original (o se vuelve dorada) */
+.gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story:hover .gh-world__play-icon img {
+  filter: 
+    grayscale(0%) 
+    brightness(1) 
+    drop-shadow(0 0 8px #09bceb) 
+    drop-shadow(0 0 20px #ffc83d) !important;
+  animation: spinBall 0.8s linear infinite !important;
+}
+
+/* =========================================================
+   MEJORA: BOTONES SECUNDARIOS (DUELO RÁPIDO / EXPLORAR)
+   ========================================================= */
+
+/* Contenedor de los botones */
+.gh-root.gh-root--cinematic .gh-world__discover button {
+  /* 1. Forma angular */
+  clip-path: polygon(
+    12px 0, 
+    100% 0, 
+    100% calc(100% - 12px), 
+    calc(100% - 12px) 100%, 
+    0 100%, 
+    0 12px
+  ) !important;
+  border-radius: 0 !important;
+
+  /* 2. Fondo con degradado y brillo interior */
+  background: linear-gradient(
+    180deg, 
+    rgba(9, 188, 235, 0.15) 0%, 
+    rgba(3, 17, 29, 0.9) 100%
+  ) !important;
+  
+  /* 3. Borde cyan definido */
+  border: 1px solid rgba(9, 188, 235, 0.6) !important;
+  
+  /* 4. Sombra interior para profundidad */
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 4px 10px rgba(0, 0, 0, 0.5) !important;
+
+  /* 5. Layout */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 10px 16px !important;
+  font-family: 'Barlow Condensed', sans-serif !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  font-style: italic !important;
+  color: #fff !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Iconos dentro de los botones (Rayo y Diamante) */
+.gh-root.gh-root--cinematic .gh-world__discover button svg,
+.gh-root.gh-root--cinematic .gh-world__discover button i {
+  filter: drop-shadow(0 0 5px currentColor) !important;
+  font-size: 1.2em !important;
+}
+
+/* Hover: Elevación y brillo */
+.gh-root.gh-root--cinematic .gh-world__discover button:hover {
+  transform: translateY(-2px) !important;
+  border-color: #09bceb !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 15px rgba(9, 188, 235, 0.4),
+    0 6px 15px rgba(0, 0, 0, 0.6) !important;
+  background: linear-gradient(
+    180deg, 
+    rgba(9, 188, 235, 0.25) 0%, 
+    rgba(3, 17, 29, 0.95) 100%
+  ) !important;
+}
+
+/* Ajuste específico para el icono del rayo (Duelo Rápido) */
+.gh-root.gh-root--cinematic .gh-world__discover .qd-launcher button svg {
+  color: #ffc83d !important; /* Dorado */
+}
+
+/* Ajuste específico para el icono del diamante (Explorar) */
+.gh-root.gh-root--cinematic .gh-world__discover .gh-explore-trigger svg {
+  color: #09bceb !important; /* Cyan */
+}
+/* =========================================================
+   ESTILO DEL NUEVO ICONO DE EXPLORAR (BRÚJULA)
+   ========================================================= */
+
+.gh-root.gh-root--cinematic .gh-world__discover .gh-explore-trigger {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important; /* Espacio entre icono y texto */
+}
+
+.gh-root.gh-root--cinematic .gh-world__discover .gh-explore-trigger .gh-icon-explore {
+  width: 24px !important;
+  height: 24px !important;
+  color: #09bceb !important; /* Cyan neón */
+  filter: drop-shadow(0 0 5px #09bceb) !important;
+  transition: transform 0.3s ease !important;
+}
+
+/* Al hacer hover en el botón, la brújula gira un poco */
+.gh-root.gh-root--cinematic .gh-world__discover .gh-explore-trigger:hover .gh-icon-explore {
+  transform: rotate(45deg) !important;
+}
+
+/* =========================================================
+   AJUSTE FINAL: ICONOS BRILLANTES EN BOTONES SECUNDARIOS
+   ========================================================= */
+
+/* 1. El rayo de Duelo Rápido (Dorado brillante) */
+.gh-root.gh-root--cinematic .gh-world__discover .qd-launcher__trigger .gh-icon-bolt {
+  color: #ffc83d !important; 
+  fill: #ffc83d !important; 
+  filter: drop-shadow(0 0 8px #ffc83d) drop-shadow(0 0 15px rgba(255, 200, 61, 0.5)) !important;
+  width: 22px !important;
+  height: 22px !important;
+  margin-right: 2px !important;
+}
+
+/* 2. La brújula de Explorar (Cyan brillante) */
+.gh-root.gh-root--cinematic .gh-world__discover .gh-explore-trigger .gh-icon-explore {
+  color: #09bceb !important; 
+  stroke: #09bceb !important;
+  filter: drop-shadow(0 0 8px #09bceb) drop-shadow(0 0 15px rgba(9, 188, 235, 0.5)) !important;
+  width: 22px !important;
+  height: 22px !important;
+  margin-right: 2px !important;
+}
+
+/* 3. Asegurar que el texto tenga el mismo tamaño en ambos */
+.gh-root.gh-root--cinematic .gh-world__discover .qd-launcher__trigger,
+.gh-root.gh-root--cinematic .gh-world__discover .gh-explore-trigger {
+  font-size: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+
+/* 4. En móvil, reducimos un poco para que no se desborde */
+@media (max-width: 700px) {
+  .gh-root.gh-root--cinematic .gh-world__discover .qd-launcher__trigger,
+  .gh-root.gh-root--cinematic .gh-world__discover .gh-explore-trigger {
+    font-size: 18px !important;
+    gap: 4px !important;
+  }
+  .gh-root.gh-root--cinematic .gh-world__discover .qd-launcher__trigger .gh-icon-bolt,
+  .gh-root.gh-root--cinematic .gh-world__discover .gh-explore-trigger .gh-icon-explore {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+>>>>>>> 5a26a2f4 (version final 1)

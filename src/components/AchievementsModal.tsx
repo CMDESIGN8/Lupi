@@ -11,43 +11,56 @@ type AchievementsModalProps = {
   onClose: () => void;
 };
 
+
 const getRarity = (achievement: Achievement) => {
   const value = achievement.requirement_value ?? 0;
   const type = achievement.requirement_type;
 
-  // Logros máximos / legendarios
   if (
     achievement.id === "rank_1" ||
-    achievement.id === "jackpot" ||
+    achievement.id === "jackpot"
+  ) {
+    return {
+      label: "LEGENDARIO",
+      color: "#ffc83d",
+      glow: "rgba(255,200,61,0.65)",
+      bg: "rgba(255,200,61,0.10)",
+      shape: "shield",
+    };
+  }
+
+  if (
     achievement.id === "streak_10" ||
     achievement.id === "points_500"
   ) {
     return {
       label: "ÉPICO",
-      color: "#f5c518",
-      glow: "rgba(245,197,24,0.55)",
-      bg: "rgba(245,197,24,0.08)",
+      color: "#a78bfa",
+      glow: "rgba(167,139,250,0.5)",
+      bg: "rgba(167,139,250,0.10)",
+      shape: "hexagon",
     };
   }
 
-  // Logros intermedios
   if (value >= 3 || type === "rank") {
     return {
       label: "RARO",
-      color: "#189df5",
-      glow: "rgba(24,157,245,0.45)",
-      bg: "rgba(24,157,245,0.08)",
+      color: "#09bceb",
+      glow: "rgba(9,188,235,0.5)",
+      bg: "rgba(9,188,235,0.10)",
+      shape: "hexagon",
     };
   }
 
-  // Iniciales
   return {
     label: "COMÚN",
-    color: "#8888aa",
-    glow: "rgba(136,136,170,0.35)",
-    bg: "rgba(136,136,170,0.08)",
+    color: "#9aabbf",
+    glow: "rgba(154,171,191,0.3)",
+    bg: "rgba(154,171,191,0.08)",
+    shape: "circle",
   };
 };
+
 
 export function AchievementsModal({
   unlocked,
@@ -55,269 +68,305 @@ export function AchievementsModal({
   getProgress,
   onClose,
 }: AchievementsModalProps) {
-  const unlockedIds = new Set(
-    unlocked.map((item) => item.achievement_id)
-  );
+  const unlockedIds = new Set(unlocked.map((item) => item.achievement_id));
 
-  const unlockedCount = allAchievements.filter((achievement) =>
-    unlockedIds.has(achievement.id)
-  ).length;
-
+  const unlockedCount = allAchievements.filter((a) => unlockedIds.has(a.id)).length;
   const totalCount = allAchievements.length;
+  const overallProgress = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
 
-  const overallProgress =
-    totalCount > 0
-      ? Math.round((unlockedCount / totalCount) * 100)
-      : 0;
+  // Encontrar el logro más cercano a completarse (el "MVP")
+  const nextAchievement = allAchievements
+    .filter((a) => !unlockedIds.has(a.id))
+    .map((a) => {
+      const target = Math.max(0, a.requirement_value ?? 0);
+const raw = getProgress(a.requirement_type, target);
+const progress = Math.max(0, Math.min(raw, target));
+      const percentage = a.requirement_value > 0 ? (progress / a.requirement_value) * 100 : 0;
+      return { achievement: a, progress, percentage };
+    })
+    .sort((a, b) => b.percentage - a.percentage)[0];
+
+  const nextRarity = nextAchievement ? getRarity(nextAchievement.achievement) : null;
+
+  // Ordenar: desbloqueados primero, luego por porcentaje de progreso
+  const sortedAchievements = [...allAchievements].sort((a, b) => {
+    const aUnlocked = unlockedIds.has(a.id);
+    const bUnlocked = unlockedIds.has(b.id);
+    
+    if (aUnlocked && !bUnlocked) return -1;
+    if (!aUnlocked && bUnlocked) return 1;
+    
+    if (!aUnlocked && !bUnlocked) {
+      const aProg = a.requirement_value > 0
+  ? getProgress(a.requirement_type, a.requirement_value) / a.requirement_value
+  : 0;
+
+const bProg = b.requirement_value > 0
+  ? getProgress(b.requirement_type, b.requirement_value) / b.requirement_value
+  : 0;
+
+return bProg - aProg;
+    }
+    
+    return 0;
+  });
 
   return (
-    <div
-      className="achievements-modal-overlay"
-      onClick={onClose}
-    >
-      <div
-        className="achievements-modal"
-        onClick={(event) => event.stopPropagation()}
-      >
-        {/* HEADER */}
-        <div className="achievements-modal-header">
-          <div>
-            <div className="achievements-modal-kicker">
-              LUPI WORLD
+    <div className="achievements-modal-overlay" onClick={onClose}>
+      <div className="achievements-modal" onClick={(e) => e.stopPropagation()}>
+        
+        {/* FONDO DE PARTÍCULAS */}
+        <div className="achievements-particles" aria-hidden />
+
+        {/* CONTENIDO CON SCROLL */}
+        <div className="achievements-modal-content">
+          
+          {/* HEADER */}
+          <div className="achievements-modal-header">
+            <div>
+              <div className="achievements-modal-kicker">LUPI WORLD</div>
+              <h2>🏆 SALA DE TROFEOS</h2>
+              <p>Completá desafíos y construí tu legado.</p>
             </div>
-
-            <h2>🏆 LOGROS</h2>
-
-            <p>
-              Completá desafíos y construí tu legado.
-            </p>
+            <button className="achievements-modal-close" onClick={onClose} aria-label="Cerrar">
+              ✕
+            </button>
           </div>
 
+      
+{/* =====================================================
+    ACHIEVEMENTS HUD — PROGRESO + PRÓXIMO DESAFÍO
+   ===================================================== */}
+
+<div className="achievements-overview">
+
+  {/* PANEL 1 — PROGRESO TOTAL */}
+  <section className="achievement-total-panel">
+
+    <div className="achievement-panel-heading">
+      <span className="achievement-panel-kicker">
+        <span className="achievement-live-dot" />
+        TU EVOLUCIÓN
+      </span>
+      <span className="achievement-panel-symbol">01 / WORLD</span>
+    </div>
+
+    <div className="achievement-total-content">
+
+      {/* ANILLO CIRCULAR REAL */}
+      <div className="achievement-progress-ring">
+        <svg viewBox="0 0 100 100" aria-label={`Progreso total ${overallProgress}%`}>
+          <circle
+            className="achievement-ring-track"
+            cx="50"
+            cy="50"
+            r="42"
+            fill="none"
+            strokeWidth="7"
+          />
+          <circle
+            className="achievement-ring-value"
+            cx="50"
+            cy="50"
+            r="42"
+            fill="none"
+            strokeWidth="7"
+            strokeLinecap="round"
+            strokeDasharray={263.89}
+            strokeDashoffset={263.89 * (1 - overallProgress / 100)}
+          />
+        </svg>
+
+        <div className="achievement-ring-center">
+          <strong>{overallProgress}<small>%</small></strong>
+          <span>COMPLETADO</span>
+        </div>
+      </div>
+
+      {/* ESTADÍSTICAS */}
+      <div className="achievement-total-info">
+        <span className="achievement-total-label">LOGROS DESBLOQUEADOS</span>
+
+        <div className="achievement-total-count">
+          <strong>{unlockedCount}</strong>
+          <span>/ {totalCount}</span>
+        </div>
+
+        <div className="achievement-total-bar">
+          <div style={{ width: `${overallProgress}%` }} />
+        </div>
+
+        <div className="achievement-total-foot">
+          <span>LEGADO LUPI</span>
+          <strong>{Math.max(0, totalCount - unlockedCount)} RESTANTES</strong>
+        </div>
+      </div>
+
+    </div>
+
+    <div className="achievement-total-bottom">
+      <span>⚡ CADA DESAFÍO CUENTA</span>
+      <span>PROGRESO DE CARRERA</span>
+    </div>
+
+  </section>
+
+
+  {/* PANEL 2 — PRÓXIMO LOGRO */}
+  {nextAchievement && nextRarity && (
+    <section
+      className="achievement-next-panel"
+      style={{
+        "--rarity-color": nextRarity.color,
+        "--rarity-glow": nextRarity.glow,
+        "--rarity-bg": nextRarity.bg,
+      } as React.CSSProperties}
+    >
+
+      <div className="achievement-panel-heading">
+        <span className="achievement-panel-kicker">
+          <span className="achievement-live-dot achievement-live-dot--gold" />
+          PRÓXIMO DESAFÍO
+        </span>
+
+        <span className="achievement-next-rarity">
+          {nextRarity.label}
+        </span>
+      </div>
+
+      <div className="achievement-next-content">
+
+        {/* MEDALLA */}
+        <div className="achievement-next-medal">
+          <div className="achievement-next-medal-glow" />
+          <div className="achievement-next-medal-inner">
+            <span>{nextAchievement.achievement.icon || "🏆"}</span>
+          </div>
+          <div className="achievement-next-medal-star">✦</div>
+        </div>
+
+        {/* INFORMACIÓN */}
+        <div className="achievement-next-info">
+          <h3>{nextAchievement.achievement.name}</h3>
+          <p>{nextAchievement.achievement.description}</p>
+
+          <div className="achievement-next-progress">
+            <div className="achievement-next-progress-top">
+              <span>PROGRESO DEL DESAFÍO</span>
+              <strong>{Math.round(nextAchievement.percentage)}%</strong>
+            </div>
+
+            <div className="achievement-next-bar">
+              <div
+                style={{
+                  width: `${nextAchievement.percentage}%`,
+                }}
+              />
+            </div>
+
+            <span className="achievement-next-counter">
+              {nextAchievement.progress} / {nextAchievement.achievement.requirement_value}
+            </span>
+          </div>
+        </div>
+
+        {/* RECOMPENSA */}
+        <div className="achievement-next-reward">
+          <span className="achievement-reward-label">RECOMPENSA</span>
+          <strong>+{nextAchievement.achievement.points_reward}</strong>
+          <span className="achievement-reward-unit">PTS</span>
+
           <button
-            type="button"
-            className="achievements-modal-close"
+            className="achievement-next-button"
             onClick={onClose}
-            aria-label="Cerrar logros"
           >
-            ✕
+            IR A POR ÉL <span>↗</span>
           </button>
         </div>
 
-        {/* PROGRESO GENERAL */}
-        <div className="achievements-progress-card">
-          <div className="achievements-progress-top">
-            <div>
-              <span className="achievements-progress-label">
-                PROGRESO
-              </span>
+      </div>
 
-              <strong>
-                {unlockedCount}
-                <span> / {totalCount}</span>
-              </strong>
-            </div>
+      <div className="achievement-next-bottom">
+        <span>✦ UN NUEVO HITO TE ESPERA</span>
+        <span>DESBLOQUEÁ TU POTENCIAL</span>
+      </div>
 
-            <div className="achievements-progress-percent">
-              {overallProgress}%
-            </div>
-          </div>
+    </section>
+  )}
 
-          <div className="achievements-progress-bar">
-            <div
-              className="achievements-progress-fill"
-              style={{
-                width: `${overallProgress}%`,
-              }}
-            />
-          </div>
-        </div>
+</div>
 
-        {/* LISTA */}
-        <div className="achievements-modal-body">
-          {allAchievements.map((achievement) => {
-            const isUnlocked = unlockedIds.has(achievement.id);
 
-            const unlockedData = unlocked.find(
-              (item) => item.achievement_id === achievement.id
-            );
-
-            const rarity = getRarity(achievement);
-
-            // ==========================================
-            // PROGRESO DEL LOGRO
-            // ==========================================
-
-            const rawProgress = getProgress(
-              achievement.requirement_type,
-              achievement.requirement_value
-            );
-
-            const achievementProgress = Math.max(
-              0,
-              Math.min(
-                rawProgress,
-                achievement.requirement_value
-              )
-            );
-
-            const achievementPercentage =
-              achievement.requirement_value > 0
-                ? Math.min(
-                    100,
-                    Math.round(
-                      (achievementProgress /
-                        achievement.requirement_value) *
-                        100
-                    )
-                  )
+          {/* GRILLA DE TROFEOS */}
+          <div className="trophy-grid">
+                        {sortedAchievements.map((achievement) => {
+              const isUnlocked = unlockedIds.has(achievement.id);
+              const unlockedData = unlocked.find((item) => item.achievement_id === achievement.id);
+              const rarity = getRarity(achievement);
+              const rawProgress = getProgress(achievement.requirement_type, achievement.requirement_value);
+              const achievementProgress = Math.max(0, Math.min(rawProgress, achievement.requirement_value));
+              const achievementPercentage = achievement.requirement_value > 0
+                ? Math.min(100, Math.round((achievementProgress / achievement.requirement_value) * 100))
                 : 0;
 
-            return (
-              <div
-                key={achievement.id}
-                className={`achievement-card ${
-                  isUnlocked
-                    ? "achievement-card--unlocked"
-                    : "achievement-card--locked"
-                }`}
-                style={
-                  isUnlocked
-                    ? {
-                        borderColor: `${rarity.color}55`,
-                        boxShadow: `0 0 24px ${rarity.glow}`,
-                      }
-                    : undefined
-                }
-              >
-                {/* ICONO */}
+              return (
                 <div
-                  className="achievement-card-icon"
-                  style={
-                    isUnlocked
-                      ? {
-                          background: rarity.bg,
-                          borderColor: `${rarity.color}55`,
-                          boxShadow: `0 0 18px ${rarity.glow}`,
-                        }
-                      : undefined
-                  }
+                  key={achievement.id}
+                  className={`trophy-item trophy-item--${rarity.shape} ${isUnlocked ? "is-unlocked" : "is-locked"}`}
+                  style={{
+                    "--rarity-color": rarity.color,
+                    "--rarity-glow": rarity.glow,
+                    "--rarity-bg": rarity.bg,
+                  } as React.CSSProperties}
                 >
-                  {isUnlocked ? (
-                    achievement.icon
-                  ) : (
-                    <span className="achievement-lock">
-                      🔒
-                    </span>
-                  )}
-                </div>
+                  {/* Medalla con progreso circular */}
+                  <div 
+                    className="trophy-medal"
+                    style={{
+                      background: `conic-gradient(${rarity.color} ${achievementPercentage}%, rgba(255,255,255,0.1) 0)`
+                    }}
+                  >
+                    <div className="trophy-medal-inner">
+                      <span className="trophy-icon">
+                        {isUnlocked ? achievement.icon : "🔒"}
+                      </span>
+                    </div>
+                  </div>
 
-                {/* INFO */}
-                <div className="achievement-card-info">
-                  <div className="achievement-card-title-row">
-                    <h3
-                      style={
-                        isUnlocked
-                          ? {
-                              color: rarity.color,
-                            }
-                          : undefined
-                      }
-                    >
-                      {achievement.name}
-                    </h3>
+                  {/* Nombre y rareza */}
+                  <h3 className="trophy-name">{achievement.name}</h3>
+                  <span className="trophy-rarity" style={{ color: rarity.color }}>
+                    {rarity.label}
+                  </span>
 
+                  {/* Recompensa */}
+                  <span className="trophy-reward">+{achievement.points_reward} PTS</span>
+
+                  {/* TOOLTIP AL HACER HOVER */}
+                  <div className="trophy-tooltip">
+                    <strong>{achievement.name}</strong>
+                    <p>{achievement.description}</p>
+                    {!isUnlocked && (
+                      <span className="trophy-tooltip-progress">
+                        Progreso: {achievementProgress} / {achievement.requirement_value}
+                      </span>
+                    )}
                     {isUnlocked && (
-                      <span className="achievement-check">
-                        ✓
+                      <span className="trophy-tooltip-completed">
+                        ¡Desbloqueado el {new Date(unlockedData?.unlocked_at || "").toLocaleDateString("es-AR")}!
                       </span>
                     )}
                   </div>
-
-                  <p>{achievement.description}</p>
-
-                  {/* ======================================
-                      PROGRESO INDIVIDUAL
-                  ====================================== */}
-
-                  <div className="achievement-progress">
-                    <div className="achievement-progress-header">
-                      <span>
-                        {isUnlocked
-                          ? "COMPLETADO"
-                          : "PROGRESO"}
-                      </span>
-
-                      <strong>
-                        {achievementProgress} /{" "}
-                        {achievement.requirement_value}
-                      </strong>
-                    </div>
-
-                    <div className="achievement-progress-bar">
-                      <div
-                        className="achievement-progress-fill"
-                        style={{
-                          width: `${achievementPercentage}%`,
-                          background: isUnlocked
-                            ? `linear-gradient(90deg, ${rarity.color}, ${rarity.color})`
-                            : undefined,
-                          boxShadow: isUnlocked
-                            ? `0 0 10px ${rarity.glow}`
-                            : undefined,
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* ESTADO */}
-                  {isUnlocked && unlockedData ? (
-                    <span className="achievement-date">
-                      Desbloqueado el{" "}
-                      {new Date(
-                        unlockedData.unlocked_at
-                      ).toLocaleDateString("es-AR")}
-                    </span>
-                  ) : (
-                    <span className="achievement-locked-text">
-                      🔒 Todavía no desbloqueado
-                    </span>
-                  )}
                 </div>
-
-                {/* RECOMPENSA / RAREZA */}
-                <div className="achievement-card-right">
-                  <div
-                    className="achievement-rarity"
-                    style={{
-                      color: rarity.color,
-                      borderColor: `${rarity.color}44`,
-                      background: rarity.bg,
-                    }}
-                  >
-                    {rarity.label}
-                  </div>
-
-                  <div className="achievement-reward">
-                    +{achievement.points_reward} pts
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* FOOTER */}
         <div className="achievements-modal-footer">
-          <span>
-            🏆 Cada logro forma parte de tu progreso.
-          </span>
-
-          <button
-            type="button"
-            onClick={onClose}
-          >
-            VOLVER
-          </button>
+          <span>🏆 Cada logro forma parte de tu progreso.</span>
+          <button onClick={onClose}>VOLVER</button>
         </div>
       </div>
     </div>

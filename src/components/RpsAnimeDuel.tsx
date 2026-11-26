@@ -11,6 +11,11 @@ import { useDuelConnection } from "../hooks/useDuelConnection";
 import { DuelConnectionNotice } from "./DuelConnectionNotice";
 import { useRpsMatch } from "../hooks/useRpsMatch";
 import { useRpsBotMatch } from "../hooks/useRpsBotMatch";
+<<<<<<< HEAD
+=======
+import { useRematchHotkey } from '../hooks/useRematchHotkey';
+import { CommunityStandingLine } from './CommunityStandingLine';
+>>>>>>> 5a26a2f4 (version final 1)
 import { useDuelReward } from "../hooks/useDuelReward";
 import { DuelRewardCard } from "./DuelRewardCard";
 import { duelFx } from "../lib/duelFx";
@@ -86,6 +91,10 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
  const shownMyWins=Math.max(0,myWins-(!scoreSettled&&roundMineWon?1:0));
  const shownRivalWins=Math.max(0,rivalWins-(!scoreSettled&&roundRivalWon?1:0));
  const matchPresented=!!finished&&phase==='ready'&&!chant;
+<<<<<<< HEAD
+=======
+ useRematchHotkey(matchPresented&&!!onRematch,onRematch);
+>>>>>>> 5a26a2f4 (version final 1)
  const verdict=state?.winnerId===null?"¡EMPATE!":state?.winnerId===meId?"¡GANASTE!":"ESTA VEZ NO FUE";
  const choose=async(move:Move)=>{if(!state||finished||connection.stopped||connection.networkError||busy||entrance||chant||revealing||state.mineSubmitted||sending.current)return;sending.current=true;duelFx.tap();const round=state.round;setRevealing(false);setSelection({round,move});try{if(!await play(move))setSelection(value=>value?.round===round?null:value);}finally{sending.current=false;}};
  const faceStage:FaceStage=chant?'chant':phase==='impact'?'impact':matchPresented?'final':reveal?'result':'idle';
@@ -148,5 +157,9 @@ export function RockPaperScissors({challenge,meId,players=[],catalog=[],onExit,o
   </div>
   {state?.lastMoves&&!chant&&<p className="rps-last">ÚLTIMA RONDA · {label(mine!)} vs {label(theirs!)} · {roundWin}</p>}
   {communityReport&&<p className="rps-community-report" role="status">{communityReport}</p>}
+<<<<<<< HEAD
+=======
+  <CommunityStandingLine communityId={challenge.communityId} userId={meId} refreshKey={communityReport}/>
+>>>>>>> 5a26a2f4 (version final 1)
  </section>;
 }

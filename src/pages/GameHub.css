@@ -2026,6 +2026,7 @@
 .gh-currency--coins strong {
   color: #24e987;
 }
+<<<<<<< HEAD
 /* =========================================================
    LUPI WORLD — ACHIEVEMENTS MODAL
    ========================================================= */
@@ -2098,10 +2099,223 @@
   letter-spacing: 2px;
 
   color: #28d9ff;
+=======
+
+
+
+/* ============================================================
+   LUPI WORLD — LEGENDARY ACHIEVEMENTS
+   CINEMATIC TROPHY ROOM / AAA ANIME FUTSAL
+   Palette: Cyan #09BCEB / Navy #0A0420 / Gold #FFC83D
+   ============================================================ */
+
+.achievements-modal-overlay {
+  --lupi-cyan: #09bceb;
+  --lupi-blue: #0084af;
+  --lupi-gold: #ffc83d;
+  --lupi-navy: #0a0420;
+  --lupi-deep: #020712;
+
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(0,132,175,.13), transparent 65%),
+    rgba(1, 4, 13, .94);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: lupi-trophy-overlay .4s ease both;
+}
+
+@keyframes lupi-trophy-overlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* =========================
+   MAIN MODAL
+   ========================= */
+
+.achievements-modal {
+  width: min(1280px, 100%);
+  max-height: min(94vh, 1000px);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 22px;
+
+  background:
+    radial-gradient(ellipse at 50% -10%, rgba(9,188,235,.19), transparent 55%),
+    radial-gradient(ellipse at 100% 100%, rgba(0,132,175,.10), transparent 45%),
+    linear-gradient(145deg, #0b1028 0%, #050b19 48%, #020611 100%);
+
+  border: 1px solid rgba(9,188,235,.55);
+
+  box-shadow:
+    0 0 0 1px rgba(9,188,235,.12),
+    0 30px 100px rgba(0,0,0,.9),
+    0 0 65px rgba(9,188,235,.17),
+    inset 0 1px 0 rgba(255,255,255,.12);
+
+  animation: lupi-trophy-enter .65s cubic-bezier(.16,1,.3,1) both;
+}
+
+@keyframes lupi-trophy-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(45px) scale(.94);
+    filter: brightness(1.8);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.005);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* Cinematic frame */
+
+.achievements-modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 0 35%, rgba(9,188,235,.035) 50%, transparent 65%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 4px,
+      rgba(255,255,255,.012) 5px
+    );
+}
+
+.achievements-modal::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--lupi-cyan),
+    white,
+    var(--lupi-gold),
+    transparent
+  );
+  box-shadow: 0 0 20px rgba(9,188,235,.8);
+}
+
+/* =========================
+   PARTICLES / ENERGY
+   ========================= */
+
+.achievements-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.achievements-particles::before,
+.achievements-particles::after {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  background-image:
+    radial-gradient(circle, rgba(9,188,235,.8) 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,200,61,.7) 1px, transparent 2px),
+    radial-gradient(circle, rgba(255,255,255,.7) .8px, transparent 1.5px);
+  background-size: 130px 150px, 190px 180px, 95px 110px;
+  background-position: 0 0, 60px 40px, 20px 80px;
+  opacity: .35;
+  animation: lupi-trophy-particles 32s linear infinite;
+}
+
+.achievements-particles::after {
+  transform: rotate(20deg);
+  opacity: .2;
+  animation-duration: 45s;
+  animation-direction: reverse;
+}
+
+@keyframes lupi-trophy-particles {
+  from { transform: translate3d(0,0,0); }
+  to { transform: translate3d(70px,-180px,0); }
+}
+
+/* =========================
+   CONTENT / SCROLL
+   ========================= */
+
+.achievements-modal-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 32px 24px;
+  position: relative;
+  z-index: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(9,188,235,.5) transparent;
+}
+
+.achievements-modal-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.achievements-modal-content::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--lupi-cyan), var(--lupi-blue));
+  border-radius: 10px;
+}
+
+/* =========================
+   HEADER — MANGA IMPACT
+   ========================= */
+
+.achievements-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  margin: 0 -32px;
+  padding: 30px 32px 23px;
+  border-bottom: 1px solid rgba(9,188,235,.2);
+
+  background:
+    linear-gradient(90deg, rgba(9,188,235,.10), transparent 65%),
+    linear-gradient(180deg, rgba(9,188,235,.08), transparent);
+}
+
+.achievements-modal-kicker {
+  margin-bottom: 7px;
+  color: var(--lupi-cyan);
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px rgba(9,188,235,.8);
+>>>>>>> 5a26a2f4 (version final 1)
 }
 
 .achievements-modal-header h2 {
   margin: 0;
+<<<<<<< HEAD
 
   font-size: 30px;
   font-weight: 900;
@@ -2168,18 +2382,111 @@
 
   border: 1px solid
     rgba(40, 217, 255, 0.12);
+=======
+  color: #fff;
+  font-size: clamp(27px, 4vw, 43px);
+  font-weight: 1000;
+  font-style: italic;
+  letter-spacing: -1.5px;
+  line-height: .95;
+  text-transform: uppercase;
+
+  text-shadow:
+    2px 2px 0 rgba(0,132,175,.65),
+    -1px -1px 0 rgba(255,255,255,.15),
+    0 0 30px rgba(9,188,235,.3);
+}
+
+.achievements-modal-header p {
+  margin: 10px 0 0;
+  color: rgba(220,240,255,.68);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+
+.achievements-modal-close {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lupi-cyan);
+  background: rgba(9,188,235,.07);
+  border: 1px solid rgba(9,188,235,.4);
+  border-radius: 10px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: .3s ease;
+}
+
+.achievements-modal-close:hover {
+  color: #fff;
+  background: rgba(9,188,235,.25);
+  border-color: var(--lupi-cyan);
+  box-shadow: 0 0 25px rgba(9,188,235,.5);
+  transform: rotate(90deg) scale(1.08);
+}
+
+/* =========================
+   GLOBAL PROGRESS
+   ========================= */
+
+.achievements-progress-card {
+  position: relative;
+  margin: 22px 0 18px;
+  padding: 20px 24px;
+  overflow: hidden;
+  border: 1px solid rgba(9,188,235,.35);
+  border-radius: 14px;
+
+  background:
+    linear-gradient(110deg, rgba(9,188,235,.13), rgba(0,132,175,.04) 55%, rgba(255,200,61,.06)),
+    #071222;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.25),
+    inset 0 1px 0 rgba(255,255,255,.07);
+}
+
+.achievements-progress-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.13), transparent);
+  transform: skewX(-20deg);
+  animation: lupi-progress-shine 5s ease-in-out infinite;
+}
+
+@keyframes lupi-progress-shine {
+  0%, 65% { left: -100%; }
+  100% { left: 160%; }
+>>>>>>> 5a26a2f4 (version final 1)
 }
 
 .achievements-progress-top {
   display: flex;
+<<<<<<< HEAD
   align-items: center;
   justify-content: space-between;
 
   margin-bottom: 11px;
+=======
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+>>>>>>> 5a26a2f4 (version final 1)
 }
 
 .achievements-progress-label {
   display: block;
+<<<<<<< HEAD
 
   margin-bottom: 3px;
 
@@ -2220,10 +2527,51 @@
   border-radius: 99px;
 
   background: rgba(255, 255, 255, 0.08);
+=======
+  margin-bottom: 5px;
+  color: rgba(220,240,255,.55);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.achievements-progress-top strong {
+  color: white;
+  font-size: 28px;
+  font-weight: 1000;
+  font-style: italic;
+  text-shadow: 0 0 15px rgba(9,188,235,.5);
+}
+
+.achievements-progress-top strong span {
+  color: rgba(255,255,255,.45);
+  font-size: 14px;
+  font-style: normal;
+}
+
+.achievements-progress-percent {
+  color: var(--lupi-cyan);
+  font-size: 27px;
+  font-weight: 1000;
+  font-style: italic;
+  text-shadow: 0 0 20px rgba(9,188,235,.75);
+}
+
+.achievements-progress-bar {
+  height: 11px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,.6);
+>>>>>>> 5a26a2f4 (version final 1)
 }
 
 .achievements-progress-fill {
   height: 100%;
+<<<<<<< HEAD
 
   border-radius: inherit;
 
@@ -2517,6 +2865,683 @@
 
   .achievements-modal-footer {
     padding: 12px 18px;
+=======
+  position: relative;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #006caa, #09bceb 60%, #ffc83d);
+  box-shadow: 0 0 18px rgba(9,188,235,.7);
+  transition: width .8s cubic-bezier(.16,1,.3,1);
+}
+
+.achievements-progress-fill::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, white, transparent);
+  opacity: .65;
+  animation: lupi-energy-flow 2s linear infinite;
+}
+
+@keyframes lupi-energy-flow {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(200%); }
+}
+
+/* =========================
+   FEATURED ACHIEVEMENT
+   ========================= */
+
+.achievement-featured {
+  --featured-glow: var(--rarity-glow, rgba(255,200,61,.35));
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  isolation: isolate;
+  margin: 20px 0;
+  padding: 23px;
+  overflow: hidden;
+
+  border: 1px solid var(--rarity-color, #ffc83d);
+  border-radius: 17px;
+
+  background:
+    radial-gradient(ellipse at 0% 50%, rgba(255,200,61,.13), transparent 65%),
+    radial-gradient(ellipse at 100% 0%, rgba(9,188,235,.14), transparent 55%),
+    linear-gradient(135deg, #111a2c, #070d1b 65%, #080c18);
+
+  box-shadow:
+    0 0 35px var(--featured-glow),
+    inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.achievement-featured::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.08) 50%, transparent 65%);
+  transform: translateX(-100%);
+  animation: lupi-featured-shine 6s ease-in-out infinite;
+}
+
+@keyframes lupi-featured-shine {
+  0%, 70% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.achievement-featured-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 11px;
+  color: #16100a;
+  background: linear-gradient(110deg, #ffc83d, #fff0a6);
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 1000;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  box-shadow: 0 0 18px rgba(255,200,61,.3);
+}
+
+.achievement-featured-main {
+  display: flex;
+  align-items: center;
+  gap: 19px;
+  flex-wrap: wrap;
+}
+
+.achievement-featured-icon {
+  width: 76px;
+  height: 76px;
+  flex: 0 0 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  color: white;
+  background: linear-gradient(145deg, rgba(255,200,61,.23), rgba(9,188,235,.12));
+  border: 1px solid rgba(255,200,61,.55);
+  box-shadow: 0 0 28px rgba(255,200,61,.2), inset 0 0 20px rgba(255,255,255,.06);
+  font-size: 36px;
+}
+
+.achievement-featured-info {
+  flex: 1;
+  min-width: 160px;
+}
+
+.achievement-featured-info h3 {
+  margin: 0 0 7px;
+  color: white;
+  font-size: 24px;
+  font-weight: 1000;
+  font-style: italic;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(255,200,61,.25);
+}
+
+.achievement-featured-info p {
+  margin: 0;
+  color: rgba(225,240,255,.65);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.achievement-featured-reward {
+  margin-left: auto;
+  color: var(--lupi-gold);
+  font-size: 20px;
+  font-weight: 1000;
+  font-style: italic;
+  text-shadow: 0 0 15px rgba(255,200,61,.55);
+}
+
+.achievement-featured-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.achievement-featured-bar {
+  flex: 1;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255,255,255,.1);
+}
+
+.achievement-featured-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--lupi-blue), var(--lupi-cyan), var(--lupi-gold));
+  box-shadow: 0 0 15px rgba(9,188,235,.55);
+}
+
+.achievement-featured-progress strong {
+  color: white;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.achievement-featured-action {
+  padding: 13px 18px;
+  color: #03111b;
+  background: linear-gradient(100deg, #09bceb, #70e7ff);
+  border: 0;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 1000;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: .25s ease;
+}
+
+.achievement-featured-action:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(9,188,235,.4);
+  filter: brightness(1.12);
+}
+
+.achievement-featured-arrow {
+  color: var(--lupi-cyan);
+  transition: transform .25s ease;
+}
+
+.achievement-featured-action:hover .achievement-featured-arrow {
+  transform: translateX(5px);
+}
+
+/* =========================
+   TROPHY GRID
+   ========================= */
+
+.trophy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  padding: 22px 0 28px;
+}
+
+@media (max-width: 1050px) {
+  .trophy-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .trophy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+}
+
+/* =========================
+   TROPHY ITEM
+   ========================= */
+
+.trophy-item {
+  --rarity-color: #09bceb;
+  --rarity-glow: rgba(9,188,235,.25);
+
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  padding: 19px 12px 17px;
+  overflow: hidden;
+
+  text-align: center;
+  border: 1px solid rgba(9,188,235,.12);
+  border-radius: 14px;
+
+  background:
+    linear-gradient(150deg, rgba(9,188,235,.065), transparent 65%),
+    rgba(5,13,28,.75);
+
+  transition:
+    transform .35s cubic-bezier(.16,1,.3,1),
+    border-color .3s,
+    box-shadow .3s,
+    background .3s;
+}
+
+.trophy-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 60%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rarity-color), transparent);
+  opacity: .5;
+}
+
+.trophy-item:hover {
+  transform: translateY(-7px) scale(1.025);
+  border-color: rgba(9,188,235,.55);
+  background:
+    linear-gradient(145deg, rgba(9,188,235,.14), rgba(255,255,255,.02)),
+    #081629;
+  box-shadow: 0 12px 35px rgba(0,0,0,.45), 0 0 25px rgba(9,188,235,.13);
+}
+
+/* =========================
+   MEDALS — 3D EFFECT
+   ========================= */
+
+.trophy-medal {
+  width: clamp(86px, 9vw, 116px);
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 5px;
+  border-radius: 50%;
+
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    var(--rarity-color) 18%,
+    rgba(255,255,255,.85) 25%,
+    var(--rarity-color) 36%,
+    transparent 55%,
+    var(--rarity-color) 80%,
+    transparent 100%
+  );
+
+  box-shadow:
+    0 0 18px var(--rarity-glow),
+    0 0 40px rgba(9,188,235,.08),
+    inset 0 0 10px rgba(255,255,255,.1);
+
+  transition: transform .4s cubic-bezier(.16,1,.3,1);
+}
+
+.trophy-medal::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.trophy-item:hover .trophy-medal {
+  transform: rotate(8deg) scale(1.08);
+}
+
+.trophy-medal-inner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 50%;
+
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,.14), transparent 35%),
+    linear-gradient(145deg, #14253b, #050b19 75%);
+
+  border: 2px solid rgba(255,255,255,.14);
+  box-shadow:
+    inset 0 3px 10px rgba(255,255,255,.08),
+    inset 0 -8px 14px rgba(0,0,0,.65);
+}
+
+.trophy-item.is-unlocked .trophy-medal-inner {
+  border-color: var(--rarity-color);
+}
+
+.trophy-item.is-unlocked .trophy-medal {
+  animation: lupi-medal-pulse 3.5s ease-in-out infinite;
+}
+
+@keyframes lupi-medal-pulse {
+  0%, 100% {
+    box-shadow: 0 0 16px var(--rarity-glow);
+  }
+  50% {
+    box-shadow: 0 0 32px var(--rarity-glow), 0 0 48px var(--rarity-glow);
+  }
+}
+
+.trophy-icon {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(31px, 3vw, 43px);
+  line-height: 1;
+  filter: drop-shadow(0 4px 7px rgba(0,0,0,.65));
+  transition: transform .3s ease;
+}
+
+.trophy-item:hover .trophy-icon {
+  transform: scale(1.12);
+}
+
+.trophy-item.is-locked .trophy-medal {
+  background: conic-gradient(
+    #1c2b40,
+    #526177,
+    #101b2c,
+    #28374c,
+    #1c2b40
+  );
+  box-shadow: 0 0 12px rgba(100,130,160,.1);
+}
+
+.trophy-item.is-locked .trophy-medal-inner {
+  border-color: rgba(150,180,210,.15);
+  background: linear-gradient(145deg, #182336, #080d18);
+}
+
+.trophy-item.is-locked .trophy-icon {
+  filter: grayscale(1) brightness(.55) opacity(.65);
+}
+
+/* =========================
+   TROPHY NAME / RARITY
+   ========================= */
+
+.trophy-name {
+  margin: 3px 0 0;
+  color: #f5faff;
+  font-size: 13px;
+  font-weight: 1000;
+  font-style: italic;
+  letter-spacing: .25px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  text-shadow: 0 2px 5px rgba(0,0,0,.8);
+}
+
+.trophy-rarity {
+  color: var(--rarity-color);
+  font-size: 9px;
+  font-weight: 1000;
+  font-style: italic;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-shadow: 0 0 12px currentColor;
+}
+
+/* =========================
+   INDIVIDUAL PROGRESS
+   ========================= */
+
+.trophy-progress {
+  width: 100%;
+  max-width: 135px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+}
+
+.trophy-progress-bar {
+  width: 100%;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255,255,255,.09);
+}
+
+.trophy-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #007cae, #09bceb, #ffc83d);
+  box-shadow: 0 0 10px rgba(9,188,235,.5);
+  transition: width .8s cubic-bezier(.16,1,.3,1);
+}
+
+.trophy-progress-text {
+  color: rgba(220,240,255,.55);
+  font-size: 10px;
+  font-weight: 800;
+  font-style: italic;
+}
+
+/* =========================
+   REWARD
+   ========================= */
+
+.trophy-reward {
+  margin-top: 3px;
+  color: var(--lupi-gold, #ffc83d);
+  font-size: 12px;
+  font-weight: 1000;
+  font-style: italic;
+  text-shadow: 0 0 12px rgba(255,200,61,.4);
+}
+
+/* =========================
+   FOOTER
+   ========================= */
+
+.achievements-modal-footer {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 16px 32px;
+
+  background: rgba(1,5,14,.85);
+  border-top: 1px solid rgba(9,188,235,.22);
+
+  color: rgba(210,235,255,.48);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.achievements-modal-footer button {
+  padding: 12px 25px;
+  color: var(--lupi-cyan, #09bceb);
+  background: linear-gradient(110deg, rgba(9,188,235,.13), rgba(0,132,175,.06));
+  border: 1px solid rgba(9,188,235,.55);
+  border-radius: 7px;
+
+  font-size: 11px;
+  font-weight: 1000;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-style: italic;
+  cursor: pointer;
+
+  transition: .25s ease;
+}
+
+.achievements-modal-footer button:hover {
+  color: #02101b;
+  background: linear-gradient(100deg, #09bceb, #73e8ff);
+  border-color: white;
+  box-shadow: 0 0 28px rgba(9,188,235,.45);
+  transform: translateY(-2px);
+}
+
+/* =========================
+   RARITY PRESETS
+   Optional: use on trophy-item
+   ========================= */
+
+.trophy-item.rarity-common {
+  --rarity-color: #9aabbf;
+  --rarity-glow: rgba(154,171,191,.2);
+}
+
+.trophy-item.rarity-rare {
+  --rarity-color: #09bceb;
+  --rarity-glow: rgba(9,188,235,.35);
+}
+
+.trophy-item.rarity-epic {
+  --rarity-color: #a78bfa;
+  --rarity-glow: rgba(167,139,250,.35);
+}
+
+.trophy-item.rarity-legendary {
+  --rarity-color: #ffc83d;
+  --rarity-glow: rgba(255,200,61,.45);
+}
+
+/* =========================
+   RESPONSIVE — TABLET
+   ========================= */
+
+@media (max-width: 900px) {
+  .achievements-modal-content {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .achievements-modal-header {
+    margin-left: -22px;
+    margin-right: -22px;
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .trophy-grid {
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 13px;
+  }
+}
+
+/* =========================
+   RESPONSIVE — MOBILE
+   ========================= */
+
+@media (max-width: 600px) {
+  .achievements-modal-overlay {
+    padding: 7px;
+    align-items: center;
+  }
+
+  .achievements-modal {
+    width: 100%;
+    max-height: 96dvh;
+    border-radius: 16px;
+  }
+
+  .achievements-modal-content {
+    padding: 0 13px 16px;
+  }
+
+  .achievements-modal-header {
+    margin: 0 -13px;
+    padding: 19px 14px 16px;
+    align-items: center;
+  }
+
+  .achievements-modal-header h2 {
+    font-size: clamp(24px, 7vw, 32px);
+    letter-spacing: -1px;
+  }
+
+  .achievements-modal-kicker {
+    font-size: 8px;
+    letter-spacing: 2.5px;
+  }
+
+  .achievements-modal-header p {
+    font-size: 10px;
+  }
+
+  .achievements-modal-close {
+    width: 36px;
+    height: 36px;
+  }
+
+  .achievements-progress-card {
+    margin: 14px 0;
+    padding: 15px;
+  }
+
+  .achievements-progress-top strong {
+    font-size: 23px;
+  }
+
+  .achievements-progress-percent {
+    font-size: 22px;
+  }
+
+  .achievement-featured {
+    margin: 14px 0;
+    padding: 15px;
+    gap: 13px;
+  }
+
+  .achievement-featured-icon {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+    font-size: 25px;
+  }
+
+  .achievement-featured-info h3 {
+    font-size: 17px;
+  }
+
+  .achievement-featured-info p {
+    font-size: 11px;
+  }
+
+  .achievement-featured-reward {
+    margin-left: 0;
+    font-size: 16px;
+  }
+
+  .trophy-grid {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 10px;
+    padding: 13px 0 20px;
+  }
+
+  .trophy-item {
+    padding: 15px 8px;
+    gap: 8px;
+    border-radius: 11px;
+  }
+
+  .trophy-medal {
+    width: 82px;
+  }
+
+  .trophy-icon {
+    font-size: 30px;
+  }
+
+  .trophy-name {
+    font-size: 11px;
+  }
+
+  .trophy-rarity {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .trophy-progress {
+    max-width: 110px;
+  }
+
+  .trophy-reward {
+    font-size: 10px;
+  }
+
+  .achievements-modal-footer {
+    padding: 12px 14px;
+>>>>>>> 5a26a2f4 (version final 1)
   }
 
   .achievements-modal-footer span {
@@ -2525,6 +3550,7 @@
 
   .achievements-modal-footer button {
     width: 100%;
+<<<<<<< HEAD
   }
 }
 .achievement-card-right {
@@ -2550,10 +3576,494 @@
   }
 
   .achievement-reward {
+=======
+    padding: 12px;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+   ========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .achievements-modal-overlay,
+  .achievements-modal,
+  .achievements-particles::before,
+  .achievements-particles::after,
+  .achievements-progress-card::before,
+  .achievements-progress-fill::after,
+  .achievement-featured::before,
+  .trophy-item.is-unlocked .trophy-medal {
+    animation: none !important;
+  }
+
+  .trophy-item,
+  .trophy-medal,
+  .trophy-icon {
+    transition: none !important;
+  }
+}
+
+
+/* =========================================================
+   LUPI WORLD — FIX MEDALLAS + TOOLTIP DE LOGROS
+   Pegar al FINAL del stylesheet
+   ========================================================= */
+
+/* 1. UNIFICAR TODAS LAS MEDALLAS: CÍRCULOS */
+.trophy-item,
+.trophy-item--shield,
+.trophy-item--hexagon,
+.trophy-item--circle {
+  clip-path: none !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+}
+
+.trophy-medal {
+  clip-path: none !important;
+  border-radius: 50% !important;
+  position: relative;
+  border: 2px solid var(--rarity-color, #09bceb) !important;
+  box-shadow:
+    0 0 0 3px rgba(9, 188, 235, 0.08),
+    0 0 16px var(--rarity-glow, rgba(9, 188, 235, 0.3)),
+    inset 0 0 12px rgba(255,255,255,0.08);
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease;
+}
+
+.trophy-medal-inner {
+  clip-path: none !important;
+  border-radius: 50% !important;
+}
+
+.trophy-item:hover .trophy-medal {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 0 4px rgba(9, 188, 235, 0.12),
+    0 0 25px var(--rarity-glow, rgba(9, 188, 235, 0.45));
+}
+
+/* 2. TARJETAS: SIN RECORTAR EL TOOLTIP */
+.trophy-item {
+  position: relative !important;
+  overflow: visible !important;
+  isolation: auto !important;
+}
+
+.trophy-item:hover,
+.trophy-item:focus-within {
+  z-index: 100 !important;
+}
+
+/* 3. TOOLTIP: VISIBLE AL PASAR EL MOUSE */
+.trophy-tooltip {
+  display: block !important;
+  position: absolute !important;
+
+  left: 50% !important;
+  bottom: calc(100% + 12px) !important;
+  top: auto !important;
+
+  width: 230px;
+  max-width: min(230px, 80vw);
+
+  padding: 14px 16px !important;
+
+  background: linear-gradient(
+    145deg,
+    #10263b 0%,
+    #061321 100%
+  ) !important;
+
+  border: 1px solid rgba(9, 188, 235, 0.65) !important;
+  border-radius: 12px !important;
+
+  color: #eaf8ff !important;
+  text-align: left !important;
+  white-space: normal !important;
+
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.65),
+    0 0 18px rgba(9,188,235,.18);
+
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+
+  transform: translate(-50%, 8px) !important;
+  transition:
+    opacity .2s ease,
+    visibility .2s ease,
+    transform .2s ease !important;
+
+  z-index: 9999 !important;
+}
+
+/* Mostrar tooltip */
+.trophy-item:hover .trophy-tooltip,
+.trophy-item:focus-within .trophy-tooltip {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translate(-50%, 0) !important;
+}
+
+/* 4. TEXTO DEL TOOLTIP */
+.trophy-tooltip * {
+  color: inherit;
+}
+
+.trophy-tooltip strong,
+.trophy-tooltip b {
+  color: #42dfff !important;
+}
+
+.trophy-tooltip p {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 5px 0;
+}
+
+/* 5. EVITAR TOOLTIP CORTADO POR LA GRILLA */
+.trophy-grid {
+  overflow: visible !important;
+}
+
+.achievements-modal-content {
+  overflow-x: visible;
+}
+
+/* 6. MÓVIL: NO MOSTRAR TOOLTIP DE HOVER */
+@media (hover: none) {
+  .trophy-tooltip {
+    display: none !important;
+  }
+}
+
+
+/* =========================================================
+   LUPI WORLD — DESKTOP FIT
+   Primera fila de logros visible sin scroll inicial
+   ========================================================= */
+
+@media (min-width: 901px) {
+
+  /* Modal más alto y mejor aprovechado */
+  .achievements-modal {
+    max-height: 96vh;
+    height: min(900px, 96vh);
+  }
+
+  /* Menos espacio vertical desperdiciado */
+  .achievements-modal-content {
+    padding: 0 28px 12px;
+  }
+
+  /* Header compacto */
+  .achievements-modal-header {
+    padding: 17px 28px 14px;
+  }
+
+  .achievements-modal-kicker {
+    margin-bottom: 4px;
+    font-size: 9px;
+    letter-spacing: 3px;
+  }
+
+  .achievements-modal-header h2 {
+    font-size: 34px;
+  }
+
+  .achievements-modal-header p {
+    margin-top: 6px;
+    font-size: 11px;
+  }
+
+  .achievements-modal-close {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Progreso general más bajo */
+  .achievements-progress-card {
+    margin: 12px 0;
+    padding: 12px 19px;
+  }
+
+  .achievements-progress-top {
+    margin-bottom: 8px;
+  }
+
+  .achievements-progress-top strong {
+    font-size: 23px;
+  }
+
+  .achievements-progress-percent {
+    font-size: 22px;
+  }
+
+  .achievements-progress-bar {
+    height: 8px;
+  }
+
+  /* Logro destacado más compacto */
+  .achievement-featured {
+    margin: 12px 0;
+    padding: 15px 19px;
+    gap: 10px;
+  }
+
+  .achievement-featured-badge {
+    padding: 4px 9px;
+    font-size: 8px;
+  }
+
+  .achievement-featured-main {
+    gap: 14px;
+  }
+
+  .achievement-featured-icon {
+    width: 58px;
+    height: 58px;
+    flex-basis: 58px;
+    font-size: 29px;
+  }
+
+  .achievement-featured-info h3 {
+    margin-bottom: 4px;
+    font-size: 19px;
+  }
+
+  .achievement-featured-info p {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .achievement-featured-reward {
+    font-size: 17px;
+  }
+
+  .achievement-featured-action {
+    padding: 9px 14px;
+    font-size: 10px;
+  }
+
+  .achievement-featured-progress {
+    gap: 9px;
+  }
+
+  /* Primera fila de trofeos más compacta */
+  .trophy-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    padding: 12px 0 20px;
+  }
+
+  .trophy-item {
+    padding: 11px 9px 10px;
+    gap: 6px;
+  }
+
+  .trophy-medal {
+    width: 76px;
+  }
+
+  .trophy-icon {
+    font-size: 32px;
+  }
+
+  .trophy-name {
+    font-size: 11px;
+    line-height: 1.2;
+  }
+
+  .trophy-rarity {
+    font-size: 8px;
+  }
+
+  .trophy-progress {
+    max-width: 115px;
+    gap: 4px;
+  }
+
+  .trophy-progress-text {
+    font-size: 9px;
+  }
+
+  .trophy-reward {
+    font-size: 10px;
+  }
+
+  /* Footer más fino */
+  .achievements-modal-footer {
+    padding: 10px 25px;
+  }
+}
+
+/* Escritorios de poca altura: compactar un poco más */
+@media (min-width: 901px) and (max-height: 800px) {
+
+  .achievements-modal {
+    height: 97vh;
+    max-height: 97vh;
+  }
+
+  .achievements-modal-header {
+    padding-top: 12px;
+    padding-bottom: 10px;
+  }
+
+  .achievements-modal-header h2 {
+    font-size: 29px;
+  }
+
+  .achievements-progress-card {
+    margin: 8px 0;
+    padding: 9px 16px;
+  }
+
+  .achievement-featured {
+    margin: 8px 0;
+    padding: 11px 15px;
+    gap: 7px;
+  }
+
+  .achievement-featured-icon {
+    width: 49px;
+    height: 49px;
+    flex-basis: 49px;
+    font-size: 25px;
+  }
+
+  .trophy-grid {
+    padding-top: 8px;
+    gap: 9px;
+  }
+
+  .trophy-item {
+    padding: 8px;
+  }
+
+  .trophy-medal {
+    width: 64px;
+  }
+
+  .trophy-icon {
+    font-size: 28px;
+  }
+
+  .achievements-modal-footer {
+    padding: 8px 20px;
+  }
+}
+
+
+/* =========================================================
+   LUPI WORLD — ACHIEVEMENTS OVERVIEW
+   PROGRESO TOTAL + PRÓXIMO LOGRO EN UN SOLO COMPONENTE
+   ========================================================= */
+
+@media (min-width: 701px) {
+
+  .achievements-overview {
+    display: grid;
+    grid-template-columns: minmax(220px, .75fr) minmax(0, 1.5fr);
+    align-items: stretch;
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  /* PROGRESO TOTAL — PANEL IZQUIERDO */
+  .achievements-overview .achievements-progress-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    margin: 0;
+    padding: 17px 19px;
+    border-radius: 14px;
+  }
+
+  .achievements-overview .achievements-progress-top {
+    margin-bottom: 12px;
+  }
+
+  .achievements-overview .achievements-progress-top strong {
+    font-size: 25px;
+  }
+
+  .achievements-overview .achievements-progress-percent {
+    font-size: 25px;
+  }
+
+  /* PRÓXIMO LOGRO — PANEL DERECHO */
+  .achievements-overview .achievement-featured {
+    min-width: 0;
+    margin: 0;
+    padding: 15px 19px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto 1fr;
+    align-items: center;
+    gap: 9px 15px;
+    border-radius: 14px;
+  }
+
+  .achievements-overview .achievement-featured-badge {
+    grid-column: 1 / -1;
+    margin: 0;
+    justify-self: start;
+  }
+
+  .achievements-overview .achievement-featured-main {
+    min-width: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .achievements-overview .achievement-featured-icon {
+    width: 53px;
+    height: 53px;
+    flex: 0 0 53px;
+    font-size: 27px;
+  }
+
+  .achievements-overview .achievement-featured-info {
+    min-width: 0;
+  }
+
+  .achievements-overview .achievement-featured-info h3 {
+    font-size: 17px;
+    margin-bottom: 4px;
+  }
+
+  .achievements-overview .achievement-featured-info p {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .achievements-overview .achievement-featured-reward {
+    font-size: 15px;
+    margin-left: 0;
+    white-space: nowrap;
+  }
+
+  .achievements-overview .achievement-featured-progress {
+    grid-column: 1 / -1;
+    gap: 10px;
+  }
+
+  .achievements-overview .achievement-featured-action {
+    padding: 9px 13px;
+>>>>>>> 5a26a2f4 (version final 1)
     font-size: 10px;
   }
 }
 
+<<<<<<< HEAD
 
 .achievement-progress {
   margin-top: 12px;
@@ -2623,6 +4133,674 @@
   color: #77778f;
   font-size: 10px;
 }
+=======
+/* PANTALLAS MÁS ESTRECHAS */
+@media (min-width: 701px) and (max-width: 950px) {
+  .achievements-overview {
+    grid-template-columns: minmax(180px, .65fr) minmax(0, 1.35fr);
+    gap: 9px;
+  }
+
+  .achievements-overview .achievement-featured {
+    padding: 12px;
+  }
+
+  .achievements-overview .achievement-featured-icon {
+    width: 43px;
+    height: 43px;
+    flex-basis: 43px;
+  }
+
+  .achievements-overview .achievement-featured-info h3 {
+    font-size: 14px;
+  }
+}
+
+/* MÓVIL: DOS BLOQUES APILADOS */
+@media (max-width: 700px) {
+  .achievements-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .achievements-overview .achievements-progress-card,
+  .achievements-overview .achievement-featured {
+    margin: 0;
+  }
+}
+
+
+/* =========================================================
+   LUPI WORLD — ACHIEVEMENT HUD V2
+   CYAN ENERGY / GOLD LEGENDARY / ANIME FUTSAL
+   ========================================================= */
+
+.achievements-overview {
+  display: grid;
+  grid-template-columns: minmax(260px, .82fr) minmax(0, 1.5fr);
+  gap: 14px;
+  align-items: stretch;
+  margin: 14px 0 18px;
+}
+
+/* ELEMENTOS COMPARTIDOS */
+
+.achievement-total-panel,
+.achievement-next-panel {
+  min-width: 0;
+  min-height: 205px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.achievement-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.achievement-panel-kicker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #eafaff;
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: 2px;
+}
+
+.achievement-panel-symbol {
+  color: rgba(92,213,255,.55);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.achievement-live-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #09bceb;
+  box-shadow: 0 0 10px #09bceb;
+  animation: achievement-dot-pulse 2s infinite;
+}
+
+.achievement-live-dot--gold {
+  background: #ffc83d;
+  box-shadow: 0 0 10px #ffc83d;
+}
+
+@keyframes achievement-dot-pulse {
+  50% { opacity: .4; transform: scale(.75); }
+}
+
+/* =========================================================
+   PANEL 1 — TOTAL PROGRESS
+   ========================================================= */
+
+.achievement-total-panel {
+  padding: 17px 19px 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  background:
+    radial-gradient(circle at 15% 60%, rgba(9,188,235,.2), transparent 50%),
+    radial-gradient(circle at 100% 0%, rgba(0,132,175,.18), transparent 55%),
+    linear-gradient(145deg, #0c2940, #061323 72%, #030b17);
+
+  border: 1px solid rgba(9,188,235,.55);
+
+  box-shadow:
+    0 0 24px rgba(9,188,235,.13),
+    inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.achievement-total-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .4;
+  background:
+    linear-gradient(125deg, transparent 35%, rgba(9,188,235,.09), transparent 65%),
+    repeating-linear-gradient(
+      135deg,
+      transparent 0 20px,
+      rgba(9,188,235,.035) 21px,
+      transparent 22px 42px
+    );
+}
+
+.achievement-total-panel::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: -90px;
+  bottom: -120px;
+  z-index: -1;
+  border-radius: 50%;
+  background: #09bceb;
+  opacity: .16;
+  filter: blur(35px);
+}
+
+.achievement-total-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex: 1;
+  padding: 12px 0;
+}
+
+/* ANILLO */
+
+.achievement-progress-ring {
+  width: 112px;
+  height: 112px;
+  flex: 0 0 112px;
+  position: relative;
+  filter: drop-shadow(0 0 12px rgba(9,188,235,.22));
+}
+
+.achievement-progress-ring svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.achievement-ring-track {
+  stroke: rgba(255,255,255,.10);
+}
+
+.achievement-ring-value {
+  stroke: #09bceb;
+  stroke-dasharray: 263.89;
+  transition: stroke-dashoffset 1.2s cubic-bezier(.16,1,.3,1);
+  filter: drop-shadow(0 0 5px rgba(9,188,235,.85));
+}
+
+.achievement-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.achievement-ring-center strong {
+  color: #fff;
+  font-size: 29px;
+  font-weight: 1000;
+  font-style: italic;
+  line-height: 1;
+  text-shadow: 0 0 18px rgba(9,188,235,.65);
+}
+
+.achievement-ring-center strong small {
+  color: #65dfff;
+  font-size: 13px;
+}
+
+.achievement-ring-center span {
+  margin-top: 5px;
+  color: #70dfff;
+  font-size: 7px;
+  font-weight: 1000;
+  letter-spacing: 1px;
+}
+
+/* DATOS */
+
+.achievement-total-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.achievement-total-label {
+  display: block;
+  color: rgba(204,234,255,.62);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  line-height: 1.4;
+}
+
+.achievement-total-count {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin: 5px 0 10px;
+}
+
+.achievement-total-count strong {
+  color: white;
+  font-size: 34px;
+  font-weight: 1000;
+  font-style: italic;
+  line-height: 1;
+}
+
+.achievement-total-count span {
+  color: #7fa5bd;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.achievement-total-bar {
+  width: 100%;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(9,188,235,.2);
+}
+
+.achievement-total-bar > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0074ad, #09bceb, #b7f5ff);
+  box-shadow: 0 0 12px rgba(9,188,235,.7);
+  transition: width 1s ease;
+}
+
+.achievement-total-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.achievement-total-foot span {
+  color: #09bceb;
+  font-size: 8px;
+  font-weight: 1000;
+  letter-spacing: .7px;
+}
+
+.achievement-total-foot strong {
+  color: rgba(222,241,255,.65);
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.achievement-total-bottom,
+.achievement-next-bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(9,188,235,.2);
+  color: rgba(166,220,245,.48);
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+/* =========================================================
+   PANEL 2 — NEXT ACHIEVEMENT
+   ========================================================= */
+
+.achievement-next-panel {
+  padding: 17px 19px 12px;
+
+  background:
+    radial-gradient(ellipse at 10% 65%, rgba(255,200,61,.16), transparent 52%),
+    radial-gradient(ellipse at 100% 0%, rgba(9,188,235,.13), transparent 55%),
+    linear-gradient(130deg, #282019, #111829 55%, #080e1b);
+
+  border: 1px solid rgba(255,200,61,.55);
+
+  box-shadow:
+    0 0 24px rgba(255,200,61,.10),
+    inset 0 1px 0 rgba(255,255,255,.12);
+}
+
+.achievement-next-panel::before {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -35%;
+  width: 35%;
+  height: 300%;
+  z-index: -1;
+  pointer-events: none;
+  transform: rotate(25deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,225,150,.13),
+    transparent
+  );
+  animation: achievement-next-shine 7s ease-in-out infinite;
+}
+
+@keyframes achievement-next-shine {
+  0%, 65% { left: -35%; }
+  100% { left: 140%; }
+}
+
+.achievement-next-rarity {
+  color: var(--rarity-color, #ffc83d);
+  font-size: 9px;
+  font-weight: 1000;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 12px var(--rarity-glow);
+}
+
+.achievement-next-content {
+  min-height: 135px;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 0;
+}
+
+/* MEDALLA PROTAGONISTA */
+
+.achievement-next-medal {
+  width: 72px;
+  height: 72px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.achievement-next-medal-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--rarity-color, #ffc83d);
+  opacity: .22;
+  filter: blur(17px);
+  animation: achievement-medal-glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes achievement-medal-glow {
+  from { transform: scale(.75); opacity: .13; }
+  to { transform: scale(1.2); opacity: .32; }
+}
+
+.achievement-next-medal-inner {
+  width: 65px;
+  height: 65px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255,255,255,.24), transparent 42%),
+    linear-gradient(145deg, #49391f, #141c2c);
+
+  border: 2px solid var(--rarity-color, #ffc83d);
+
+  box-shadow:
+    0 0 0 4px rgba(255,200,61,.07),
+    0 0 23px var(--rarity-glow),
+    inset 0 0 16px rgba(255,255,255,.1);
+}
+
+.achievement-next-medal-inner span {
+  font-size: 34px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,.6));
+}
+
+.achievement-next-medal-star {
+  position: absolute;
+  top: -3px;
+  right: -4px;
+  color: #fff0a6;
+  font-size: 20px;
+  text-shadow: 0 0 12px #ffc83d;
+  animation: achievement-star 3s ease-in-out infinite;
+}
+
+@keyframes achievement-star {
+  50% { transform: rotate(25deg) scale(1.25); }
+}
+
+/* INFO + PROGRESO */
+
+.achievement-next-info {
+  min-width: 0;
+}
+
+.achievement-next-info h3 {
+  margin: 0 0 5px;
+  color: #fff3d2;
+  font-size: 18px;
+  font-weight: 1000;
+  font-style: italic;
+  line-height: 1.15;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(255,200,61,.22);
+}
+
+.achievement-next-info p {
+  margin: 0 0 11px;
+  color: rgba(232,239,250,.7);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.achievement-next-progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+}
+
+.achievement-next-progress-top span {
+  color: rgba(255,224,164,.65);
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.achievement-next-progress-top strong {
+  color: #ffdf82;
+  font-size: 11px;
+  font-weight: 1000;
+}
+
+.achievement-next-bar {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(255,200,61,.2);
+}
+
+.achievement-next-bar > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #a36c16, #ffc83d, #fff0a6);
+  box-shadow: 0 0 12px rgba(255,200,61,.65);
+  transition: width 1s ease;
+}
+
+.achievement-next-counter {
+  display: block;
+  margin-top: 4px;
+  color: rgba(255,255,255,.48);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+/* RECOMPENSA */
+
+.achievement-next-reward {
+  min-width: 83px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-left: 13px;
+  border-left: 1px solid rgba(255,200,61,.2);
+}
+
+.achievement-reward-label {
+  color: rgba(255,222,151,.65);
+  font-size: 7px;
+  font-weight: 1000;
+  letter-spacing: 1px;
+}
+
+.achievement-next-reward > strong {
+  margin-top: 3px;
+  color: #ffdf82;
+  font-size: 28px;
+  font-weight: 1000;
+  font-style: italic;
+  line-height: 1;
+  text-shadow: 0 0 17px rgba(255,200,61,.55);
+}
+
+.achievement-reward-unit {
+  color: #ffc83d;
+  font-size: 9px;
+  font-weight: 1000;
+  letter-spacing: 2px;
+}
+
+.achievement-next-button {
+  margin-top: 9px;
+  padding: 8px 10px;
+  white-space: nowrap;
+  color: #211500;
+  background: linear-gradient(110deg, #ffc83d, #fff0a6);
+  border: 0;
+  border-radius: 5px;
+  font-size: 8px;
+  font-weight: 1000;
+  letter-spacing: .7px;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(255,200,61,.2);
+  transition: transform .2s, box-shadow .2s;
+}
+
+.achievement-next-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(255,200,61,.5);
+}
+
+.achievement-next-button span {
+  margin-left: 4px;
+}
+
+/* =========================================================
+   TABLET + MOBILE
+   ========================================================= */
+
+@media (max-width: 950px) {
+  .achievements-overview {
+    grid-template-columns: minmax(220px, .8fr) minmax(0, 1.3fr);
+    gap: 10px;
+  }
+
+  .achievement-next-content {
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .achievement-next-medal {
+    width: 58px;
+    height: 58px;
+  }
+
+  .achievement-next-medal-inner {
+    width: 53px;
+    height: 53px;
+  }
+
+  .achievement-next-medal-inner span {
+    font-size: 27px;
+  }
+
+  .achievement-next-reward {
+    grid-column: 2;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 7px;
+    padding: 8px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgba(255,200,61,.2);
+  }
+
+  .achievement-next-reward > strong {
+    font-size: 18px;
+    margin: 0;
+  }
+
+  .achievement-next-button {
+    margin: 0 0 0 auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .achievements-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+
+  .achievement-total-panel,
+  .achievement-next-panel {
+    min-height: 190px;
+  }
+
+  .achievement-total-content {
+    justify-content: flex-start;
+    gap: 20px;
+  }
+
+  .achievement-next-content {
+    grid-template-columns: 65px minmax(0, 1fr);
+  }
+
+  .achievement-next-reward {
+    grid-column: 1 / -1;
+  }
+
+  .achievement-total-bottom,
+  .achievement-next-bottom {
+    font-size: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-live-dot,
+  .achievement-next-panel::before,
+  .achievement-next-medal-glow,
+  .achievement-next-medal-star {
+    animation: none !important;
+  }
+}
+
+
+
+
+>>>>>>> 5a26a2f4 (version final 1)
 /* LUPI WORLD — parche HUD mobile. Agregar al FINAL de GameHub.css */
 @media (max-width: 700px) {
   .gh-root:has(.gh-world) {
@@ -2968,3 +5146,562 @@
   }
 }
 
+<<<<<<< HEAD
+=======
+/* =========================================================
+   REDISEÑO DEFINITIVO: BOTÓN DE HISTORIA / JUGAR
+   Anula estilos heredados y se integra con el HUD oscuro
+   ========================================================= */
+
+/* Selector con alta especificidad y !important para pisar cualquier otro estilo */
+.gh-root .gh-world .gh-world__play,
+.gh-root .gh-world__play {
+  /* 1. Forma: Esquinas cortadas como el resto de paneles */
+  clip-path: polygon(
+    16px 0, 
+    100% 0, 
+    100% calc(100% - 16px), 
+    calc(100% - 16px) 100%, 
+    0 100%, 
+    0 16px
+  ) !important;
+  border-radius: 0 !important;
+  
+  /* 2. Fondo: Vidrio oscuro, idéntico a los paneles laterales */
+  background: linear-gradient(
+    180deg,
+    rgba(14, 52, 43, 0.85) 0%,
+    rgba(8, 30, 25, 0.95) 100%
+  ) !important;
+  
+  /* 3. Borde y luces: Sutil acento dorado para indicar acción principal */
+  border: 1px solid rgba(255, 200, 61, 0.4) !important; 
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 8px 24px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(255, 200, 61, 0.15) !important; 
+
+  /* 4. Layout interno */
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 16px !important;
+  padding: 12px 28px !important;
+  width: 100% !important;
+  max-width: 520px !important;
+  margin: 0 auto !important;
+  
+  /* 5. Interacción */
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+}
+
+/* Efecto de destello al pasar el mouse */
+.gh-root .gh-world__play::before {
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important; left: -100% !important;
+  width: 100% !important; height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent) !important;
+  transition: left 0.6s ease !important;
+  z-index: 1 !important;
+  display: block !important;
+}
+
+.gh-root .gh-world__play:hover {
+  transform: translateY(-2px) scale(1.01) !important;
+  border-color: rgba(255, 200, 61, 0.8) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 12px 32px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(255, 200, 61, 0.3) !important;
+}
+
+.gh-root .gh-world__play:hover::before {
+  left: 100% !important;
+}
+
+.gh-root .gh-world__play:active {
+  transform: translateY(1px) scale(0.99) !important;
+}
+
+/* --- ESTILOS INTERNOS DEL BOTÓN --- */
+
+/* El icono (balón) */
+.gh-root .gh-world__play-icon {
+  font-size: 1.8rem !important;
+  color: #ffc83d !important;
+  filter: drop-shadow(0 0 8px rgba(255, 200, 61, 0.5)) !important;
+  display: flex !important;
+  align-items: center !important;
+  z-index: 2 !important;
+}
+
+/* Contenedor de textos */
+.gh-root .gh-world__play > span:nth-child(2) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+  z-index: 2 !important;
+}
+
+/* Texto superior (MODO HISTORIA...) */
+.gh-root .gh-world__play small {
+  font-family: "Barlow", sans-serif !important;
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  margin-bottom: 2px !important;
+}
+
+/* Texto principal (EMPEZAR HISTORIA) */
+.gh-root .gh-world__play strong {
+  font-family: "Barlow Condensed", sans-serif !important;
+  font-size: 1.8rem !important;
+  font-weight: 900 !important;
+  font-style: italic !important;
+  letter-spacing: 0.02em !important;
+  text-transform: uppercase !important;
+  color: #ffffff !important;
+  line-height: 0.9 !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* La flecha a la derecha */
+.gh-root .gh-world__play-arrow {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #ffc83d !important;
+  margin-left: auto !important;
+  z-index: 2 !important;
+  transition: transform 0.2s ease !important;
+}
+
+.gh-root .gh-world__play:hover .gh-world__play-arrow {
+  transform: translateX(4px) !important;
+}
+
+/* =========================================================
+   MENÚ INFERIOR UNIFICADO: BRILLO CYAN PARA TODOS LOS ICONOS
+   ========================================================= */
+
+.gh-root.gh-root--cinematic .gh-world__dock button img {
+  width: 40px !important;
+  height: 40px !important;
+  object-fit: contain !important;
+  transform: scale(1.5) !important;
+  margin-top: 6px !important;
+  margin-bottom: 0px !important;
+  
+  /* BRILLO CYAN ÚNICO */
+  filter: 
+    drop-shadow(0 0 6px rgba(9, 188, 235, 0.8)) 
+    drop-shadow(0 0 12px rgba(9, 188, 235, 0.5)) !important;
+    
+  transition: transform 0.2s ease, filter 0.2s ease !important;
+}
+
+.gh-root.gh-root--cinematic .gh-world__dock button:hover img {
+  transform: scale(1.7) translateY(-2px) !important;
+  filter: 
+    drop-shadow(0 0 10px rgba(9, 188, 235, 1)) 
+    drop-shadow(0 0 20px rgba(9, 188, 235, 0.7)) !important;
+}
+
+.gh-root.gh-root--cinematic .gh-world__dock button.is-active img {
+  filter: 
+    drop-shadow(0 0 12px rgba(9, 188, 235, 1)) 
+    drop-shadow(0 0 24px rgba(9, 188, 235, 0.8)) !important;
+}
+
+.gh-root.gh-root--cinematic .gh-world__dock button {
+  padding-top: 8px !important;
+  gap: 2px !important;
+}
+
+/* =========================================================
+   BADGE DE LOGROS (Dorado para resaltar)
+   ========================================================= */
+
+.gh-root.gh-root--cinematic .gh-world__dock button.gh-btn-achievements {
+  position: relative !important;
+}
+
+.gh-root.gh-root--cinematic .gh-world__dock button.gh-btn-achievements em.gh-badge-count {
+  position: absolute !important;
+  top: 2px !important; 
+  right: 20% !important;
+  
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  padding: 0 4px !important;
+  
+  background: #ffc83d !important;
+  color: #02131d !important;
+  
+  border: 2px solid #02131d !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 10px rgba(255, 200, 61, 0.8) !important;
+  
+  font-family: 'Barlow', sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+  z-index: 10 !important;
+  
+  animation: badge-pulse 2s infinite !important;
+}
+
+@keyframes badge-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 700px) {
+  .gh-root.gh-root--cinematic .gh-world__dock button.gh-btn-achievements em.gh-badge-count {
+    top: 0px !important;
+    right: 15% !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    font-size: 10px !important;
+  }
+}
+
+/* =========================================================
+   MEJORA: BRILLO PULSANTE EN EL AVATAR (SIN MOVIMIENTO)
+   ========================================================= */
+
+/* Solo animamos el brillo, sin tocar el transform */
+.gh-root.gh-root--cinematic .locker-avatar .avatar2d {
+  animation: avatar-glow 4s ease-in-out infinite !important;
+}
+
+@keyframes avatar-glow {
+  0%, 100% {
+    filter: 
+      drop-shadow(0 9px 12px rgba(0, 0, 0, 0.45)) 
+      drop-shadow(0 0 10px rgba(9, 188, 235, 0.1));
+  }
+  50% {
+    filter: 
+      drop-shadow(0 9px 12px rgba(0, 0, 0, 0.45)) 
+      drop-shadow(0 0 25px rgba(9, 188, 235, 0.5));
+  }
+}
+@keyframes avatar-sway-safe {
+  0%, 100% { translate: 0 0; }
+  25% { translate: -2px -2px; }
+  75% { translate: 2px -2px; }
+}
+
+.gh-root.gh-root--cinematic .locker-avatar .avatar2d {
+  animation: 
+    avatar-glow 4s ease-in-out infinite,
+    avatar-sway-safe 8s ease-in-out infinite !important;
+}
+/* =========================================================
+   MEJORA: EFECTO DE PRESIÓN 3D EN EL BOTÓN DE HISTORIA
+   ========================================================= */
+
+/* 1. Estado :active (cuando se presiona el botón) */
+.gh-root .gh-world__play:active {
+  transform: translateY(3px) scale(0.98) !important;
+  transition: transform 0.08s ease, box-shadow 0.1s ease !important;
+  
+  /* El borde y el brillo se intensifican */
+  border-color: #ffffff !important;
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.3),
+    0 0 30px rgba(9, 188, 235, 0.8),
+    0 0 60px rgba(9, 188, 235, 0.4),
+    0 2px 10px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 2. Flash de energía al presionar */
+.gh-root .gh-world__play:active::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(9, 188, 235, 0.4) 30%,
+    transparent 70%
+  ) !important;
+  animation: button-flash 0.3s ease-out !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+}
+
+@keyframes button-flash {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+/* 3. El icono del balón también reacciona (se achica un poco) */
+.gh-root .gh-world__play:active .gh-world__play-icon {
+  transform: scale(0.9) !important;
+  transition: transform 0.08s ease !important;
+}
+
+/* 4. La flecha se mueve un poco hacia la derecha */
+.gh-root .gh-world__play:active .gh-world__play-arrow {
+  transform: translateX(8px) !important;
+  transition: transform 0.08s ease !important;
+}@media (prefers-reduced-motion: reduce) {
+  .gh-root .gh-world__play:active::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}
+/* =========================================================
+   MEJORA: PARTÍCULAS FLOTANTES EN EL AMBIENTE
+   ========================================================= */
+
+/* Contenedor de las partículas */
+.gh-root.gh-root--cinematic .gh-world__atmosphere::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+  
+  /* Múltiples capas de partículas con diferentes tamaños y posiciones */
+  background-image: 
+    /* Capa 1: partículas grandes y brillantes (más cercanas) */
+    radial-gradient(circle at 20% 80%, rgba(9, 188, 235, 0.8) 1.5px, transparent 2px),
+    radial-gradient(circle at 80% 20%, rgba(255, 200, 61, 0.7) 1.5px, transparent 2px),
+    radial-gradient(circle at 50% 50%, rgba(9, 188, 235, 0.6) 1px, transparent 1.5px),
+    radial-gradient(circle at 90% 70%, rgba(255, 200, 61, 0.5) 1px, transparent 1.5px),
+    radial-gradient(circle at 10% 30%, rgba(9, 188, 235, 0.7) 1.2px, transparent 1.8px),
+    
+    /* Capa 2: partículas medianas */
+    radial-gradient(circle at 30% 60%, rgba(255, 255, 255, 0.4) 0.8px, transparent 1.2px),
+    radial-gradient(circle at 70% 40%, rgba(9, 188, 235, 0.5) 0.8px, transparent 1.2px),
+    radial-gradient(circle at 40% 90%, rgba(255, 200, 61, 0.4) 0.8px, transparent 1.2px),
+    radial-gradient(circle at 60% 10%, rgba(255, 255, 255, 0.3) 0.8px, transparent 1.2px),
+    
+    /* Capa 3: partículas pequeñas (más lejanas) */
+    radial-gradient(circle at 15% 45%, rgba(9, 188, 235, 0.3) 0.5px, transparent 0.8px),
+    radial-gradient(circle at 85% 55%, rgba(255, 200, 61, 0.3) 0.5px, transparent 0.8px),
+    radial-gradient(circle at 45% 25%, rgba(255, 255, 255, 0.2) 0.5px, transparent 0.8px),
+    radial-gradient(circle at 55% 75%, rgba(9, 188, 235, 0.25) 0.5px, transparent 0.8px);
+  
+  background-size: 100% 100%;
+  animation: particles-float 20s linear infinite !important;
+  opacity: 0.8;
+  mix-blend-mode: screen;
+}
+
+/* Animación de flotación (suben lentamente) */
+@keyframes particles-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-30px) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-60px) scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+/* Segunda capa de partículas (más lentas, diferentes posiciones) */
+.gh-root.gh-root--cinematic .gh-world__atmosphere::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  
+  background-image: 
+    radial-gradient(circle at 5% 15%, rgba(9, 188, 235, 0.4) 1px, transparent 1.5px),
+    radial-gradient(circle at 95% 85%, rgba(255, 200, 61, 0.4) 1px, transparent 1.5px),
+    radial-gradient(circle at 35% 70%, rgba(255, 255, 255, 0.3) 0.7px, transparent 1px),
+    radial-gradient(circle at 65% 30%, rgba(9, 188, 235, 0.3) 0.7px, transparent 1px),
+    radial-gradient(circle at 25% 50%, rgba(255, 200, 61, 0.25) 0.6px, transparent 0.9px),
+    radial-gradient(circle at 75% 60%, rgba(255, 255, 255, 0.2) 0.6px, transparent 0.9px);
+  
+  background-size: 100% 100%;
+  animation: particles-float-slow 30s linear infinite !important;
+  opacity: 0.6;
+  mix-blend-mode: screen;
+}
+
+@keyframes particles-float-slow {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+  100% {
+    transform: translateY(-40px) translateX(0);
+  }
+}
+
+/* Respetar prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .gh-root.gh-root--cinematic .gh-world__atmosphere::after,
+  .gh-root.gh-root--cinematic .gh-world__atmosphere::before {
+    animation: none !important;
+    opacity: 0.3;
+  }
+}
+
+/* =========================================================
+   MEJORA: HUD SUPERIOR CON EFECTO DE CRISTAL LÍQUIDO
+   ========================================================= */
+
+/* 1. Contenedor de monedas (puntos y coins) */
+.gh-root.gh-root--cinematic .gh-wallet,
+.gh-root.gh-root--cinematic .gh-currency {
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+}
+
+/* 2. Reflejo de cristal que cruza las monedas */
+.gh-root.gh-root--cinematic .gh-wallet::before,
+.gh-root.gh-root--cinematic .gh-currency::before {
+  content: "" !important;
+  position: absolute !important;
+  top: -50% !important;
+  left: -100% !important;
+  width: 200% !important;
+  height: 200% !important;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    transparent 70%
+  ) !important;
+  transform: rotate(25deg) !important;
+  animation: crystal-shine 6s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+/* Animación del reflejo (cruza cada 6 segundos) */
+@keyframes crystal-shine {
+  0%, 60% {
+    left: -100%;
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    left: 200%;
+    opacity: 0;
+  }
+}
+
+/* 3. Pulso sutil en las monedas */
+.gh-root.gh-root--cinematic .gh-wallet,
+.gh-root.gh-root--cinematic .gh-currency {
+  animation: currency-pulse 3s ease-in-out infinite !important;
+}
+
+@keyframes currency-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 6px 20px rgba(255, 200, 61, 0.08);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 8px 25px rgba(255, 200, 61, 0.15);
+  }
+}
+
+/* 4. Reflejo de cristal en el nivel */
+.gh-root.gh-root--cinematic .gh-level::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  border-radius: 50% !important;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.1) 100%
+  ) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+/* 5. Pulso sutil en el nivel */
+.gh-root.gh-root--cinematic .gh-level {
+  animation: level-pulse 4s ease-in-out infinite !important;
+}
+
+@keyframes level-pulse {
+  0%, 100% {
+    box-shadow: 
+      inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 0 20px rgba(255, 200, 61, 0.25);
+  }
+  50% {
+    box-shadow: 
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 0 30px rgba(255, 200, 61, 0.4);
+  }
+}
+
+/* 6. Hover: el cristal brilla más intensamente */
+.gh-root.gh-root--cinematic .gh-wallet:hover,
+.gh-root.gh-root--cinematic .gh-currency:hover {
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    0 10px 30px rgba(255, 200, 61, 0.25) !important;
+}
+
+.gh-root.gh-root--cinematic .gh-level:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 0 40px rgba(255, 200, 61, 0.5) !important;
+}
+
+/* 7. Respetar prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .gh-root.gh-root--cinematic .gh-wallet::before,
+  .gh-root.gh-root--cinematic .gh-currency::before,
+  .gh-root.gh-root--cinematic .gh-wallet,
+  .gh-root.gh-root--cinematic .gh-currency,
+  .gh-root.gh-root--cinematic .gh-level {
+    animation: none !important;
+  }
+}
+>>>>>>> 5a26a2f4 (version final 1)

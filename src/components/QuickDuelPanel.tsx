@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { QuickGame } from "../hooks/useQuickDuel";
 import { duelFx } from "../lib/duelFx";
+<<<<<<< HEAD
+=======
+import { PlayStreakLine } from "./PlayStreakLine";
+>>>>>>> 5a26a2f4 (version final 1)
 import "./QuickDuelPanel.css";
 
 type Props = {
@@ -28,7 +32,25 @@ export function QuickDuelPanel({ variant, streak = 0, game, seconds, others, not
   if(variant==='status')return game?<section className="qd-search-status" aria-label="Búsqueda de duelo en curso"><div className="qd-search-status__head"><span className="qd-search-status__radar" aria-hidden="true"/><div><strong role="status">BUSCANDO RIVAL…</strong><small>{NAME[game]}</small></div><b role="timer" aria-live="off">{seconds}s</b></div><div className="qd-search-status__signal" aria-hidden="true"><i/></div><p>{(seconds<8?'Si no aparece un rival, empezás una práctica con bot.':'Seguimos esperando la confirmación. Si no llega, abrimos una práctica.')}</p><button type="button" aria-label="Cancelar búsqueda" onClick={onCancel}>CANCELAR</button></section>:null;
   if(variant==='launcher')return <div className={`qd-launcher${game?' is-searching':''}`}>
 
+<<<<<<< HEAD
 <button ref={trigger} type="button" className="qd-launcher__trigger" aria-expanded={open} disabled={disabled||!!game} onClick={()=>setOpen(true)}><span aria-hidden="true">⚡</span><strong>{game?`BUSCANDO · ${seconds}s`:'DUELO RÁPIDO'}</strong></button>{open&&createPortal(<div className="qd-chooser-backdrop" onClick={()=>setOpen(false)}><div ref={dialog} className="qd-chooser" role="dialog" aria-modal="true" aria-label="Elegí tu duelo rápido" onClick={e=>e.stopPropagation()}><button className="qd-chooser__close" type="button" aria-label="Cerrar modalidades" onClick={()=>setOpen(false)}>×</button><small>ARENA GLOBAL · LUPI WORLD{streak>0?` · RACHA ${streak}`:""}</small><h2>ELEGÍ TU DUELO</h2><p>Un toque. Buscamos rival por vos.</p><button type="button" className="qd-mode qd-mode--futsal" onClick={()=>{setOpen(false);onStart('futsal');}}><strong>FUTSAL →</strong><small>Rival global · Si no aparece, partido contra bot</small></button><button type="button" className="qd-mode qd-mode--rps" onClick={()=>{setOpen(false);onStart('rps');}}><strong>PIEDRA, PAPEL O TIJERA →</strong><small>3 rondas · Si no hay rival, práctica con bot</small></button><button type="button" className="qd-mode qd-mode--trivia" onClick={()=>{setOpen(false);onStart('trivia');}}><strong>PREGUNTADOS →</strong><small>5 preguntas · Si no hay rival, práctica con bot</small></button>{onTrucoBot&&<button type="button" className="qd-mode qd-mode--truco" onClick={()=>{setOpen(false);onStart("truco");}}><strong>🃏 TRUCO →</strong><small>Rival global · 7 segundos y, si no hay rival, bot</small></button>}<button type="button" className="qd-card__fx" onClick={()=>{duelFx.setMuted(fxOn);setFxOn(!fxOn);}}>{fxOn?'🔊 Sonido y vibración: SÍ':'🔇 Sonido y vibración: NO'}</button></div></div>,document.body)}</div>;
+=======
+<button ref={trigger} type="button" className="qd-launcher__trigger" aria-expanded={open} disabled={disabled||!!game} onClick={()=>setOpen(true)}>
+  <svg 
+    className="gh-icon-bolt"
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2.5" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    {/* Icono de Rayo */}
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+  <strong>{game?`BUSCANDO · ${seconds}s`:'DUELO RÁPIDO'}</strong>
+</button>{open&&createPortal(<div className="qd-chooser-backdrop" onClick={()=>setOpen(false)}><div ref={dialog} className="qd-chooser" role="dialog" aria-modal="true" aria-label="Elegí tu duelo rápido" onClick={e=>e.stopPropagation()}><button className="qd-chooser__close" type="button" aria-label="Cerrar modalidades" onClick={()=>setOpen(false)}>×</button><small>ARENA GLOBAL · LUPI WORLD{streak>0?` · RACHA ${streak}`:""}</small><h2>ELEGÍ TU DUELO</h2><p>Un toque. Buscamos rival por vos.</p><PlayStreakLine variant="nudge"/><button type="button" className="qd-mode qd-mode--futsal" onClick={()=>{setOpen(false);onStart('futsal');}}><strong>FUTSAL →</strong><small>Rival global · Si no aparece, partido contra bot</small></button><button type="button" className="qd-mode qd-mode--rps" onClick={()=>{setOpen(false);onStart('rps');}}><strong>PIEDRA, PAPEL O TIJERA →</strong><small>3 rondas · Si no hay rival, práctica con bot</small></button><button type="button" className="qd-mode qd-mode--trivia" onClick={()=>{setOpen(false);onStart('trivia');}}><strong>PREGUNTADOS →</strong><small>5 preguntas · Si no hay rival, práctica con bot</small></button>{onTrucoBot&&<button type="button" className="qd-mode qd-mode--truco" onClick={()=>{setOpen(false);onStart("truco");}}><strong>🃏 TRUCO →</strong><small>Rival global · 7 segundos y, si no hay rival, bot</small></button>}<button type="button" className="qd-card__fx" onClick={()=>{duelFx.setMuted(fxOn);setFxOn(!fxOn);}}>{fxOn?'🔊 Sonido y vibración: SÍ':'🔇 Sonido y vibración: NO'}</button></div></div>,document.body)}</div>;
+>>>>>>> 5a26a2f4 (version final 1)
   if (variant === "pill") {
     if (game) return null; // The active search stays beside its lobby action.
     if (notice) {

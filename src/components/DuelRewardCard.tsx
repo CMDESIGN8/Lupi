@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import type { DuelRewardResult } from "../lib/duelRewards";
 import { duelFx } from "../lib/duelFx";
+<<<<<<< HEAD
+=======
+import { PlayStreakLine } from "./PlayStreakLine";
+>>>>>>> 5a26a2f4 (version final 1)
 import "./DuelRewardCard.css";
 
 const CHEST: Record<string, string> = { comun: "COFRE COMÚN", raro: "COFRE RARO", epico: "COFRE ÉPICO" };
@@ -43,8 +47,14 @@ export function DuelRewardCard({ reward, error, rivalName, gameLabel, onRetry }:
       <small>{reward.vsBot ? "ENTRENAMIENTO" : "BOTÍN DEL DUELO"}</small>
       <div className="drc__row">
         <b className="drc__pill">+{reward.xp ?? 0} XP</b>
+<<<<<<< HEAD
         <b className="drc__pill drc__pill--coin">+{reward.coins ?? 0} 🪙</b>
       </div>
+=======
+        <b className="drc__pill drc__pill--coin">+{reward.coins ?? 0} 💰</b>
+      </div>
+      <PlayStreakLine variant="reward" />
+>>>>>>> 5a26a2f4 (version final 1)
       {reward.firstWin && <p className="drc__tag">⭐ PRIMERA VICTORIA DEL DÍA</p>}
       {!reward.vsBot && win && (reward.streak ?? 0) >= 2 && <p className="drc__tag">🔥 RACHA x{reward.streak}{reward.streak === reward.bestStreak ? " · ¡TU RÉCORD!" : ""}</p>}
       {reward.chest && <p className="drc__chest">🎁 {CHEST[reward.chest]} · monedas extra</p>}

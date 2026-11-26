@@ -1357,3 +1357,31 @@ button.lc-avatar {
     max-height: min(280px, 48dvh) !important;
   }
 }
+<<<<<<< HEAD
+=======
+
+/* =========================================================
+   CURSOR PARPADEANTE PARA EFECTO MÁQUINA DE ESCRIBIR
+   ========================================================= */
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  background: currentColor;
+  vertical-align: text-bottom;
+  animation: typewriter-blink 0.8s step-end infinite;
+}
+
+@keyframes typewriter-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Si querés que el cursor sea cyan (color del HUD) en lugar del color del texto */
+.lc-bubble .typewriter-cursor {
+  background: #28d9ff;
+  box-shadow: 0 0 6px #28d9ff;
+}
+>>>>>>> 5a26a2f4 (version final 1)

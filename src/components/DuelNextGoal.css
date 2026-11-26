@@ -1,0 +1,11 @@
+.dng{display:grid;gap:6px;margin:10px 0 0;text-align:center}
+.dng__stamps{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 8px;margin:0;font:800 .74rem/1.2 Barlow,system-ui,sans-serif;letter-spacing:.06em;color:#bfe9f0}
+.dng__dots{display:inline-flex;gap:4px}
+.dng__dots i{width:10px;height:10px;border-radius:50%;border:2px solid #4fe1eb88}
+.dng__dots i.is-on{background:#ffd23f;border-color:#ffd23f;box-shadow:0 0 6px #ffd23f99}
+.dng__stamps small{flex-basis:100%;font-weight:600;letter-spacing:.02em;color:#e9f7fa}
+.dng__record{margin:0;padding:6px 10px;border-left:3px solid #ff9a3d;background:#ffffff0d;font:600 .78rem/1.3 Barlow,system-ui,sans-serif;color:#ffe3b8;text-align:left}
+.dng__record--rebuild{border-left-color:#4fe1eb;color:#c9f3f7}
+.dng__record--chest{border-left-color:#ffd23f;color:#ffe9a6}
+/* "Una más" siempre a mano: en pantallas chicas las acciones quedan fijas abajo del resultado */
+.rps-result-stack .rps-finish{position:sticky;bottom:0;z-index:3;padding-top:8px;background:linear-gradient(0deg,#031420 72%,transparent)}

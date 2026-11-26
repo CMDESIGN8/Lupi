@@ -1367,3 +1367,87 @@
 .locker-selector-overlay .locker-guide-step>span{font-size:10px;letter-spacing:1.3px;color:#7ee3db;font-weight:800}
 .locker-selector-overlay .locker-guide-step>strong{font-size:22px;line-height:1.25}
 .locker-selector-overlay .locker-guide-step>p{font-size:13px;line-height:1.6;margin:0;color:#bdd7db}
+<<<<<<< HEAD
+=======
+
+
+/* =========================================================
+   MEJORA 1: ARO DE ENERGÍA PULSANTE (CORREGIDO)
+   ========================================================= */
+
+/* La plataforma original ya tiene un transform complejo (perspective + rotateX).
+   Para no romperlo, animamos solo el box-shadow y el border-color. */
+.gh-root.gh-root--cinematic .locker-platform {
+  animation: platform-pulse 3s ease-in-out infinite !important;
+}
+
+@keyframes platform-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(54, 235, 247, 0.3), 
+      inset 0 0 12px rgba(54, 235, 247, 0.1);
+    border-color: rgba(60, 229, 239, 0.4);
+  }
+  50% {
+    box-shadow: 
+      0 0 40px rgba(54, 235, 247, 0.9), 
+      0 0 80px rgba(9, 188, 235, 0.5),
+      inset 0 0 25px rgba(54, 235, 247, 0.6);
+    border-color: rgba(60, 229, 239, 1);
+  }
+}
+
+/* =========================================================
+   MEJORA 2: BRILLO RESPIRANTE EN EL AVATAR (CORREGIDO)
+   ========================================================= */
+
+/* El avatar ya tiene un drop-shadow base. Lo animamos suavemente. */
+.gh-root.gh-root--cinematic .locker-avatar .avatar2d {
+  animation: avatar-glow 4s ease-in-out infinite !important;
+}
+
+@keyframes avatar-glow {
+  0%, 100% {
+    filter: 
+      drop-shadow(0 9px 12px rgba(0, 0, 0, 0.45)) 
+      drop-shadow(0 0 10px rgba(9, 188, 235, 0.1));
+  }
+  50% {
+    filter: 
+      drop-shadow(0 9px 12px rgba(0, 0, 0, 0.45)) 
+      drop-shadow(0 0 25px rgba(9, 188, 235, 0.5));
+  }
+}
+
+/* =========================================================
+   MEJORA 3: DESTELLO PERIÓDICO EN EL BOTÓN DE HISTORIA
+   ========================================================= */
+
+/* Hacemos que el destello cruce el botón cada 8 segundos, 
+   en lugar de estar constantemente animado. */
+.gh-root.gh-root--cinematic
+.gh-world__play.gh-world__play--story::before {
+  animation: lupi-manga-speed 8s ease-in-out infinite !important;
+}
+
+@keyframes lupi-manga-speed {
+  0%, 75% {
+    transform: translateX(-120%) skewX(-22deg); /* Quieto la mayor parte del tiempo */
+  }
+  95%, 100% {
+    transform: translateX(160%) skewX(-22deg); /* Cruza rápido al final */
+  }
+}
+
+/* =========================================================
+   ACCESIBILIDAD: Respetar prefers-reduced-motion
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  .gh-root.gh-root--cinematic .locker-platform,
+  .gh-root.gh-root--cinematic .locker-avatar .avatar2d,
+  .gh-root.gh-root--cinematic .gh-world__play.gh-world__play--story::before {
+    animation: none !important;
+  }
+}
+
+>>>>>>> 5a26a2f4 (version final 1)

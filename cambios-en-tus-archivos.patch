@@ -1,0 +1,85 @@
+--- src/components/DuelRewardCard.tsx
++++ src/components/DuelRewardCard.tsx
+@@ -48,7 +48,7 @@
+         <b className="drc__pill">+{reward.xp ?? 0} XP</b>
+         <b className="drc__pill drc__pill--coin">+{reward.coins ?? 0} 🪙</b>
+       </div>
+-      <PlayStreakLine variant="reward" />
++      <PlayStreakLine variant="reward" server={reward.activityStreak != null ? { days: reward.activityStreak, changed: !!reward.activityStreakChanged, best: reward.activityBest ?? undefined } : null} />
+       <DuelNextGoal reward={reward} />
+       {reward.firstWin && <p className="drc__tag">⭐ PRIMERA VICTORIA DEL DÍA</p>}
+       {!reward.vsBot && win && (reward.streak ?? 0) >= 2 && <p className="drc__tag">🔥 RACHA x{reward.streak}{reward.streak === reward.bestStreak ? " · ¡TU RÉCORD!" : ""}</p>}
+--- src/lib/duelRewards.ts
++++ src/lib/duelRewards.ts
+@@ -7,6 +7,7 @@
+   dailyLimit?: number; dailyPlayed?: number; firstWin?: boolean; capped?: boolean; hardCapped?: boolean; rivalCapped?: boolean; vsBot?: boolean;
+   h2h?: { wins: number; losses: number; draws: number } | null;
+   streak?: number; bestStreak?: number; wins?: number; losses?: number; draws?: number;
++  activityStreak?: number | null; activityBest?: number | null; activityStreakChanged?: boolean; // racha real (migración B1)
+   chestDry?: number; chestPityAfter?: number; chestPity?: boolean; // cofre garantizado (migración 01)
+ };
+ export type ClaimOptions = { vsBot?: boolean; botResult?: "win" | "loss" | "draw"; rivalId?: string };
+--- src/hooks/useStreak.ts
++++ src/hooks/useStreak.ts
+@@ -6,14 +6,16 @@
+   return useMemo(() => {
+     const streak = user?.streak ?? 0;
+     const bestStreak = user?.best_streak ?? 0;
+-    const activeToday = isStreakActive(user?.last_ticket_date);
++    // El servidor mueve la racha con cualquier actividad y guarda last_activity_date; last_ticket_date queda como respaldo.
++    const lastDate = [user?.last_activity_date, user?.last_ticket_date].filter((d): d is string => !!d).sort().pop() ?? null;
++    const activeToday = isStreakActive(lastDate);
+ 
+     return {
+       current: streak,
+       best: Math.max(bestStreak, streak),
+       activeToday,
+-      atRisk: isStreakAtRisk(streak, user?.last_ticket_date),
+-      lastActivity: user?.last_ticket_date ?? null,
++      atRisk: isStreakAtRisk(streak, lastDate),
++      lastActivity: lastDate,
+     };
+-  }, [user?.streak, user?.best_streak, user?.last_ticket_date]);
++  }, [user?.streak, user?.best_streak, user?.last_ticket_date, user?.last_activity_date]);
+ }
+--- src/lib/api.ts
++++ src/lib/api.ts
+@@ -26,6 +26,7 @@
+   exp: number;                    // ⚡ NUEVO
+   streak: number;
+   last_ticket_date: string | null;
++  last_activity_date?: string | null; // la que actualiza el servidor con cualquier actividad (process_user_action / duelos)
+   best_streak: number;
+   referral_code: string;
+   referral_count: number;
+--- src/lib/streak.ts
++++ src/lib/streak.ts
+@@ -2,6 +2,9 @@
+ 
+ export function dateKey(value: Date | string | null | undefined): string | null {
+   if (!value) return null;
++  // Las columnas `date` del servidor llegan como "YYYY-MM-DD": ya son un día calendario. Parsearlas con new Date() las toma como
++  // medianoche UTC y en Argentina (UTC-3) caen en el día ANTERIOR, por eso la racha figuraba siempre "en riesgo".
++  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+   const date = value instanceof Date ? value : new Date(value);
+   if (Number.isNaN(date.getTime())) return null;
+ 
+--- src/pages/GameHub.tsx
++++ src/pages/GameHub.tsx
+@@ -36,7 +36,7 @@
+ import { TrucoPvpDuel } from "../components/TrucoPvpDuel";
+ import { useQuickDuel } from "../hooks/useQuickDuel";
+ import { useDuelStreak } from "../hooks/useDuelStreak";
+-import { confirmedDuel, startPlayStreakTracking } from "../lib/playStreak";
++import { applyServerStreak, confirmedDuel, startPlayStreakTracking } from "../lib/playStreak";
+ import { BOT_NAMES } from "../hooks/useRpsBotMatch";
+ import { TriviaAsyncDuel } from "../components/TriviaAsyncDuel";
+ import { TriviaAsyncInbox, AsyncToast } from "../components/TriviaAsyncInbox";
+@@ -707,6 +707,7 @@
+       const duelStreak = useDuelStreak(user.id);
+       // Racha de juego (1 duelo por día) + misión de desafío: ambas se alimentan solo de premios confirmados por el servidor.
+       useEffect(() => startPlayStreakTracking(user.id), [user.id]);
++      useEffect(() => { applyServerStreak({ count: user.streak ?? 0, best: user.best_streak ?? 0, lastDay: user.last_activity_date ?? null }); }, [user.id, user.streak, user.best_streak, user.last_activity_date]);
+       useEffect(() => {
+         const onDuel = (e: Event) => {
+           const d = confirmedDuel((e as CustomEvent).detail);

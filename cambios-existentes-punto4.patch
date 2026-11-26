@@ -1,0 +1,10 @@
+--- src/lib/duelRewards.ts
++++ src/lib/duelRewards.ts
+@@ -7,6 +7,7 @@
+   dailyLimit?: number; dailyPlayed?: number; firstWin?: boolean; capped?: boolean; hardCapped?: boolean; rivalCapped?: boolean; vsBot?: boolean;
+   h2h?: { wins: number; losses: number; draws: number } | null;
+   streak?: number; bestStreak?: number; wins?: number; losses?: number; draws?: number;
++  chestDry?: number; chestPityAfter?: number; chestPity?: boolean; // cofre garantizado (migración 01)
+ };
+ export type ClaimOptions = { vsBot?: boolean; botResult?: "win" | "loss" | "draw"; rivalId?: string };
+ 

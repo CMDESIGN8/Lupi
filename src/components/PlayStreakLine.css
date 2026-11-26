@@ -1,0 +1,11 @@
+.psl{margin:8px 0 0;font:800 .8rem/1.3 Barlow,system-ui,sans-serif;letter-spacing:.04em;color:#ffd23f}
+.psl--reward{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px 8px}
+.psl--reward b{letter-spacing:.06em}
+.psl--reward small{flex-basis:100%;font-weight:600;color:#bfe9f0;letter-spacing:.02em}
+.psl--reward em{padding:1px 7px;border-radius:3px;background:#ffd23f;color:#1a1200;font-style:normal;font-size:.68rem;letter-spacing:.1em}
+.psl--reward.is-new{animation:psl-pop .6s cubic-bezier(.2,1.5,.35,1) both}
+.psl--nudge{margin:10px 0 0;padding:8px 10px;border-left:3px solid #ffd23f55;background:#ffffff0d;color:#e9f7fa;font-weight:600;letter-spacing:0}
+.psl--nudge.is-risk{border-left-color:#ff9a3d;color:#ffe3b8}
+.psl--nudge.is-safe{border-left-color:#4fe1eb;color:#c9f3f7}
+@keyframes psl-pop{0%{opacity:0;transform:scale(.7)}60%{transform:scale(1.08)}100%{opacity:1;transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.psl--reward.is-new{animation:none}}
