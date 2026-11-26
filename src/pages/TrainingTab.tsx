@@ -1,28 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import type { AppUser } from "../lib/api";
-import { TrainingGame, TrainingGameSelector, type TrainingResult, type TrainingStat } from "../components/campaign/TrainingGames";
+import type { TrainingStat } from "../components/campaign/TrainingGames";
 import "./TrainingTab.css";
 
-type GameId = "shooting" | "dribbling" | "defending" | "passing" | "physical" | "pace";
-type PlayerStats = Record<TrainingStat, number>;
-type Attempt = { game_id: GameId; stat: TrainingStat; grade: string; delta: number; created_at: string };
+type PlayerStat = TrainingStat | "aerobic" | "strength";
+type PlayerStats = Record<PlayerStat, number>;
 
-const GAME_CONFIG: Record<GameId, { stat: TrainingStat; label: string }> = {
-  shooting: { stat: "finishing", label: "Remate" },
-  dribbling: { stat: "dribbling", label: "Gambeta" },
-  defending: { stat: "defending", label: "Defensa" },
-  passing: { stat: "passing", label: "Pase" },
-  physical: { stat: "physical", label: "Físico" },
-  pace: { stat: "pace", label: "Velocidad" },
-};
-
-const STAT_LABELS: Record<TrainingStat, string> = {
+const STAT_LABELS: Record<PlayerStat, string> = {
   pace: "Velocidad", dribbling: "Gambeta", passing: "Pase",
-  defending: "Defensa", finishing: "Remate", physical: "Físico",
+  defending: "Defensa", finishing: "Remate", physical: "Físico", aerobic: "Aeróbico", strength: "Fuerza",
 };
 
-type SkillKey = "coordination" | "speed" | "agility" | "technique";
+type SkillKey = "coordination" | "speed" | "agility" | "technique" | "aerobic" | "strength";
 type DrillRecord = { skill_key: SkillKey; exercise_index: number; completed_at: string };
 const AURA_SKILLS: Record<SkillKey, { title: string; description: string; image: string; drills: { title: string; reps: string; description: string; benefit: string }[] }> = {
   coordination: { title: "COORDINACIÓN", description: "Dominá tu cuerpo y cada apoyo.", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/coordinacion.png", drills: [
@@ -44,6 +34,16 @@ const AURA_SKILLS: Record<SkillKey, { title: string; description: string; image:
     { title: "CONTROL ORIENTADO", reps: "10 por perfil", description: "Recibí y llevá el primer toque hacia el espacio libre.", benefit: "Salir de la presión con el primer toque." },
     { title: "PASE CONTRA PARED", reps: "20 pases", description: "Alterná pie derecho e izquierdo. Prepará el cuerpo antes de recibir.", benefit: "Dar pases más precisos con ambos perfiles." },
     { title: "CONDUCCIÓN + CAMBIO", reps: "5 recorridos", description: "Conducí, cambiá de dirección y salí con un toque más largo.", benefit: "Cambiar el ritmo para dejar atrás al rival." }
+  ] },
+  aerobic: { title: "AERÓBICO", description: "Construí resistencia para sostener la intensidad durante todo el partido.", image: "", drills: [
+    { title: "CARRERA CONTINUA", reps: "8 minutos", description: "Trotá a ritmo cómodo y constante. Mantené una respiración controlada.", benefit: "Sostener el ritmo durante todo el encuentro." },
+    { title: "INTERVALOS DE RESISTENCIA", reps: "6 ciclos · 30s/30s", description: "Alterná 30 segundos de trote activo con 30 segundos suaves.", benefit: "Recuperarte mejor entre esfuerzos intensos." },
+    { title: "SHUTTLE RUN", reps: "6 pasadas de 20 m", description: "Corré entre dos marcas separadas por 10 metros, girando con control.", benefit: "Repetir piques y recuperarte más rápido." }
+  ] },
+  strength: { title: "FUERZA", description: "Desarrollá fuerza funcional para proteger la pelota, saltar y disputar cada duelo.", image: "", drills: [
+    { title: "SENTADILLA", reps: "3 series · 10 repeticiones", description: "Bajá con control, espalda neutra y rodillas alineadas con los pies. Usá solo tu peso corporal.", benefit: "Fortalecer piernas para acelerar y proteger la pelota." },
+    { title: "FLEXIONES", reps: "3 series · 8 repeticiones", description: "Mantené el cuerpo alineado y bajá hasta donde puedas conservar una técnica correcta. Adaptá apoyando rodillas.", benefit: "Mejorar fuerza del tren superior y estabilidad." },
+    { title: "PUENTE DE GLÚTEOS + PLANCHA", reps: "3 series · 12 + 20s", description: "Combiná 12 puentes de glúteos con 20 segundos de plancha, descansando entre series.", benefit: "Fortalecer core y cadena posterior." }
   ] }
 };
 
@@ -76,6 +76,16 @@ const AURA_VISUALS: Record<SkillKey, AuraVisualScene[]> = {
     { route: "M22 52 L150 52", points: [[22,52],[150,52]], ball: [22,52], caption: "PASE Y DEVOLUCIÓN" },
     { route: "M20 70 L66 25 L112 70 L158 25", points: [[66,25],[112,70],[158,25]], ball: [20,70], caption: "CONDUCCIÓN + CAMBIO" },
   ],
+  aerobic: [
+    { route: "M20 52 L160 52", points: [[20,52],[55,52],[90,52],[125,52],[160,52]], ball: [20,52], caption: "CARRERA CONTINUA" },
+    { route: "M20 70 L55 25 L90 70 L125 25 L160 70", points: [[55,25],[90,70],[125,25],[160,70]], ball: [20,70], caption: "INTERVALOS DE RESISTENCIA" },
+    { route: "M25 25 L155 25 L155 75 L25 75 Z", points: [[25,25],[155,25],[155,75],[25,75]], ball: [25,25], caption: "SHUTTLE RUN" },
+  ],
+  strength: [
+    { route: "M30 25 L150 25 M45 25 L45 75 M135 25 L135 75", points: [[45,25],[135,25]], ball: [90,52], caption: "SENTADILLA · FUERZA DE PIERNAS" },
+    { route: "M30 52 L150 52", points: [[30,52],[150,52]], ball: [90,52], caption: "FLEXIONES · TREN SUPERIOR" },
+    { route: "M30 70 L150 70", points: [[30,70],[150,70]], ball: [90,70], caption: "CORE · ESTABILIDAD" },
+  ],
 };
 
 function AuraDrillVisual({ skillKey, exerciseIndex, compact = false }: { skillKey: SkillKey; exerciseIndex: number; compact?: boolean }) {
@@ -99,80 +109,14 @@ const BADGE_CONFIG: Record<BadgeKey, { title: string; skill: string; image: stri
   speed: { title: "FIRST STRIKE", skill: "Velocidad", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/velocidad.png", description: "Reaccioná antes y ganá ventaja en los primeros metros." },
   agility: { title: "BREAKPOINT", skill: "Agilidad", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/agilidad.png", description: "Frená, girá y cambiá de dirección con control." },
   technique: { title: "TOUCH MASTER", skill: "Técnica", image: "https://raw.githubusercontent.com/CMDESIGN8/AURAXPARG/main/assets/tecnica.png", description: "Controlá, pasá y resolvé con más recursos." },
+  aerobic: { title: "ENDURANCE ENGINE", skill: "Aeróbico", image: "", description: "Construí resistencia para sostener la intensidad hasta el último minuto." },
+  strength: { title: "POWER BUILDER", skill: "Fuerza", image: "", description: "Desarrollá fuerza funcional para cada duelo y movimiento en cancha." },
 };
 const EMPTY_BADGES: TrainingBadge[] = (Object.keys(BADGE_CONFIG) as BadgeKey[]).map(badge_key => ({ badge_key, progress: 0, unlocked_at: null }));
 
-const todayArgentina = () => new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/Argentina/Buenos_Aires",
-  year: "numeric", month: "2-digit", day: "2-digit",
-}).format(new Date());
-
-function AuraReactionChallenge({ onComplete }: { onComplete: (result: TrainingResult) => void }) {
-  const [round, setRound] = useState(0);
-  const [signal, setSignal] = useState(false);
-  const [waiting, setWaiting] = useState(true);
-  const [reaction, setReaction] = useState<number | null>(null);
-  const [times, setTimes] = useState<number[]>([]);
-  const [falseStarts, setFalseStarts] = useState(0);
-  const startedAt = useRef(0);
-  const finished = useRef(false);
-  const completionRef = useRef(onComplete);
-  useEffect(() => { completionRef.current = onComplete; }, [onComplete]);
-  const rounds = 5;
-  useEffect(() => {
-    if (finished.current || reaction !== null || round >= rounds) return;
-    setWaiting(true); setSignal(false);
-    const timer = window.setTimeout(() => { startedAt.current = performance.now(); setSignal(true); setWaiting(false); }, 1000 + Math.random() * 1800);
-    return () => window.clearTimeout(timer);
-  }, [round, reaction]);
-  useEffect(() => {
-    if (reaction === null || finished.current) return;
-    const timer = window.setTimeout(() => {
-      const updated = [...times, reaction];
-      setTimes(updated);
-      if (updated.length >= rounds) {
-        finished.current = true;
-        const avg = updated.reduce((sum, ms) => sum + ms, 0) / updated.length;
-        const grade: TrainingResult["grade"] = avg < 250 && falseStarts === 0 ? "S" : avg < 350 ? "A" : avg < 500 ? "B" : "C";
-        const delta = grade === "S" ? 8 : grade === "A" ? 5 : grade === "B" ? 3 : 1;
-        const xpBonus = grade === "S" ? 200 : grade === "A" ? 120 : grade === "B" ? 70 : 40;
-        completionRef.current({ stat: "physical", grade, delta, xpBonus, message: `Media ${Math.round(avg)} ms · ${falseStarts} salida(s) anticipada(s)` });
-      } else { setRound(updated.length); setReaction(null); }
-    }, 800);
-    return () => window.clearTimeout(timer);
-  }, [reaction, times, falseStarts]);
-  const tap = () => {
-    if (finished.current) return;
-    if (!signal) { setFalseStarts(n => n + 1); setSignal(true); setWaiting(false); startedAt.current = performance.now(); return; }
-    setSignal(false); setReaction(Math.round(performance.now() - startedAt.current));
-  };
-  const avg = times.length ? Math.round(times.reduce((s, ms) => s + ms, 0) / times.length) : 0;
-  return <div className="aura-reaction-game">
-    <div className="aura-reaction-head"><small>REACTION MODE · RONDA {Math.min(round + 1, rounds)} / {rounds}</small><strong>{avg ? avg + " ms" : "PREPARATE"}</strong></div>
-    <div className="aura-reaction-progress">{Array.from({length: rounds}, (_,i)=><i key={i} className={i < times.length ? "is-done" : i === round ? "is-current" : ""}/>)}</div>
-    <button type="button" onClick={tap} className={`aura-reaction-pad ${signal ? "is-signal" : waiting ? "is-waiting" : "is-result"}`}>
-      <span>{signal ? "⚡" : waiting ? "◉" : reaction !== null ? "✓" : "●"}</span>
-      <strong>{signal ? "¡AHORA!" : waiting ? "ESPERÁ LA SEÑAL" : reaction !== null ? reaction + " MS" : "PREPARADO"}</strong>
-      <small>{signal ? "TOCÁ YA" : waiting ? "No anticipes" : reaction !== null ? "Siguiente ronda…" : "Esperá el cambio"}</small>
-    </button>
-    <div className="aura-reaction-stats"><span>RONDAS <b>{times.length}/{rounds}</b></span><span>FALSAS SALIDAS <b>{falseStarts}</b></span></div>
-    <p className="aura-reaction-note">Respondé apenas aparezca la señal. Las salidas anticipadas se registran.</p>
-  </div>;
-}
-
-function AuraBossChallenge({ onComplete, onExit }: { onComplete: (result: TrainingResult) => void; onExit: () => void }) {
- const [stage,setStage]=useState(0),[seconds,setSeconds]=useState(12),[combo,setCombo]=useState(0),[bestCombo,setBestCombo]=useState(0),[score,setScore]=useState(0),[hits,setHits]=useState(0),[finished,setFinished]=useState(false);
- const names=["REACTION BURST","CONTROL RUSH","FINAL OVERDRIVE"];
- useEffect(()=>{if(finished)return;const timer=window.setInterval(()=>setSeconds(s=>s>0?s-1:0),1000);return()=>window.clearInterval(timer)},[finished,stage]);
- useEffect(()=>{if(seconds!==0||finished)return;if(stage<2){setStage(s=>s+1);setSeconds(12);setCombo(0)}else setFinished(true)},[seconds,stage,finished]);
- const tap=()=>{if(finished||seconds<=0)return;const n=combo+1;setCombo(n);setBestCombo(b=>Math.max(b,n));setHits(h=>h+1);setScore(s=>s+10+Math.min(20,Math.floor(n/5)*5))};
- const claim=()=>{const grade:TrainingResult["grade"]=score>=900?"S":score>=650?"A":score>=400?"B":"C";const delta=grade==="S"?10:grade==="A"?7:grade==="B"?4:2;const xpBonus=grade==="S"?250:grade==="A"?180:grade==="B"?120:60;onComplete({stat:"physical",grade,delta,xpBonus,message:`Boss Score ${score} · ${hits} acciones · combo ${bestCombo}`})};
- return <div className="aura-boss-game"><div className="aura-boss-top"><small>BOSS CHALLENGE · FASE {stage+1}/3</small><strong>{seconds}s</strong></div><div className="aura-boss-stage"><span>FASE {stage+1}</span><h3>{names[stage]}</h3><p>¡Mantené el ritmo y encadená acciones para subir el combo!</p></div><button className="aura-boss-tap" type="button" disabled={finished||seconds<=0} onClick={tap}><span>⚡</span><strong>TOCÁ PARA ATACAR</strong><small>+ PUNTOS · + COMBO</small></button><div className="aura-boss-stats"><div><small>SCORE</small><strong>{score}</strong></div><div><small>COMBO</small><strong>×{combo}</strong></div><div><small>MEJOR COMBO</small><strong>×{bestCombo}</strong></div><div><small>ACCIONES</small><strong>{hits}</strong></div></div><div className="aura-boss-stage-progress">{names.map((n,i)=><i key={n} className={i<stage?"is-done":i===stage?"is-current":""}/>)}</div>{finished?<div className="aura-boss-finish"><small>ARENA COMPLETADA</small><strong>{score} PUNTOS</strong><p>Combo máximo ×{bestCombo} · {hits} acciones</p><button type="button" onClick={claim}>RECLAMAR RECOMPENSA</button></div>:<button type="button" className="aura-boss-exit" onClick={onExit}>ABANDONAR DESAFÍO</button>}</div>;
-}
-
 export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackToProfile: () => void }) {
   const [stats, setStats] = useState<PlayerStats>({
-    pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10,
+    pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10, aerobic: 10, strength: 10,
   });
   const [cardLevel, setCardLevel] = useState(1);
   const [trainingXp, setTrainingXp] = useState(0);
@@ -186,25 +130,15 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
   const [unlockedBadge, setUnlockedBadge] = useState<BadgeKey | null>(null);
   const [drillFeedback, setDrillFeedback] = useState<{ skillKey: SkillKey; exerciseIndex: number; progress: number; xpAwarded: number; statLabel: string; statGain: number } | null>(null);
   const [levelUpReward, setLevelUpReward] = useState<{ previous: number; current: number; skillKey: SkillKey; statLabel: string; statGain: number } | null>(null);
-  const [attempts, setAttempts] = useState<Attempt[]>([]);
-  const [reactionChallenge, setReactionChallenge] = useState(false);
-  const [bossChallenge, setBossChallenge] = useState(false);
-  const [selectedGame, setSelectedGame] = useState<GameId | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [lastUpgrade, setLastUpgrade] = useState<{ stat: TrainingStat; before: number; after: number; ovr: number } | null>(null);
-  const resultSubmitted = useRef(false);
+  const [lastUpgrade, setLastUpgrade] = useState<{ stat: PlayerStat; before: number; after: number; ovr: number } | null>(null);
 
   const load = useCallback(async () => {
-    setLoading(true);
     setError("");
-    const [profileResult, attemptsResult, badgesResult, drillsResult] = await Promise.all([
-      supabase.from("profiles").select("user_card_level,user_card_exp,user_card_pace,user_card_dribbling,user_card_passing,user_card_defending,user_card_finishing,user_card_physical")
+    const [profileResult, badgesResult, drillsResult] = await Promise.all([
+      supabase.from("profiles").select("user_card_level,user_card_exp,user_card_pace,user_card_dribbling,user_card_passing,user_card_defending,user_card_finishing,user_card_physical,user_card_aerobic,user_card_strength")
         .eq("id", user.id).single(),
-      supabase.from("personal_training_attempts").select("game_id,stat,grade,delta,created_at")
-        .eq("user_id", user.id).eq("training_date", todayArgentina()).order("created_at", { ascending: false }),
       supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id),
       supabase.from("personal_training_cycle_drills").select("skill_key,exercise_index,completed_at").eq("user_id", user.id),
     ]);
@@ -216,23 +150,18 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
         pace: p.user_card_pace ?? 10, dribbling: p.user_card_dribbling ?? 10,
         passing: p.user_card_passing ?? 10, defending: p.user_card_defending ?? 10,
         finishing: p.user_card_finishing ?? 10, physical: p.user_card_physical ?? 10,
+        aerobic: p.user_card_aerobic ?? 10, strength: p.user_card_strength ?? 10,
       });
       setCardLevel(p.user_card_level ?? 1);
       setTrainingXp(p.user_card_exp ?? 0);
     }
-    if (attemptsResult.error) {
-      setError("Falta aplicar la migración personal_card_training en Supabase para habilitar los minijuegos y guardar mejoras.");
-    } else {
-      setAttempts((attemptsResult.data ?? []) as Attempt[]);
-    }
     if (badgesResult.error || drillsResult.error) {
-      setError("Falta aplicar la migración 20261126_aura_training_reset.sql en Supabase para habilitar los desafíos AURA.");
+      setError("Falta aplicar las migraciones de AURA Training en Supabase para cargar las disciplinas y sus badges.");
     } else {
       const savedBadges = (badgesResult.data ?? []) as TrainingBadge[];
       setBadges(EMPTY_BADGES.map(base => savedBadges.find(item => item.badge_key === base.badge_key) ?? base));
       setDrills((drillsResult.data ?? []) as DrillRecord[]);
     }
-    setLoading(false);
   }, [user.id]);
 
   useEffect(() => { void load(); }, [load]);
@@ -250,10 +179,8 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
   }, [resting, restSeconds]);
 
   const overall = useMemo(() => Math.floor(
-    (stats.pace + stats.dribbling + stats.passing + stats.defending + stats.finishing + stats.physical) / 6
+    (stats.pace + stats.dribbling + stats.passing + stats.defending + stats.finishing + stats.physical + stats.aerobic + stats.strength) / 8
   ), [stats]);
-  const gamesPlayed = attempts.length;
-  const canTrain = gamesPlayed < 5;
 
   const completeDrill = useCallback(async (skillKey: SkillKey, exerciseIndex: number) => {
     const token = `${skillKey}-${exerciseIndex}`;
@@ -286,7 +213,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     setDrills(current => [...current, { skill_key: skillKey, exercise_index: exerciseIndex, completed_at: new Date().toISOString() }]);
 
     const xpAwarded = row?.success ? Number(row.xp_awarded ?? 0) : 0;
-    let statKey: TrainingStat | undefined;
+    let statKey: PlayerStat | undefined;
     let statBefore = 0;
     let statAfter = 0;
     let statLabel = "ATRIBUTO";
@@ -295,7 +222,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     if (row?.success) {
       setTrainingXp(Number(row.user_card_exp ?? trainingXp));
       setCardLevel(Number(row.user_card_level ?? cardLevel));
-      statKey = row.stat_key as TrainingStat | undefined;
+      statKey = row.stat_key as PlayerStat | undefined;
       statBefore = statKey ? stats[statKey] : 0;
       statAfter = Number(row.stat_value ?? statBefore);
       if (statKey && statAfter > statBefore) {
@@ -330,7 +257,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
 
   const resetAuraTraining = useCallback(async () => {
     if (resettingTraining || drillSaving) return;
-    const confirmed = window.confirm("¿Reiniciar AURA Training? Los 12 ejercicios volverán a estar pendientes. Tu carta, XP, atributos y badges ganadas se conservan. Las recompensas de carta no se entregan nuevamente.");
+    const confirmed = window.confirm("¿Reiniciar AURA Training? Los 18 ejercicios volverán a estar pendientes. Tu carta, XP, atributos y badges ganadas se conservan. Las recompensas de carta no se entregan nuevamente.");
     if (!confirmed) return;
     setResettingTraining(true);
     setError("");
@@ -345,74 +272,18 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     setResettingTraining(false);
   }, [resettingTraining, drillSaving]);
 
-  const handleGameResult = useCallback(async (result: TrainingResult, gameIdOverride?: GameId) => {
-    const gameId = gameIdOverride ?? selectedGame;
-    if (!gameId || resultSubmitted.current || saving) return;
-    resultSubmitted.current = true;
-    setSaving(true);
-    setError("");
-    setNotice("");
-    const before = stats[result.stat];
-    const { data, error: rpcError } = await supabase.rpc("complete_personal_training", {
-      p_game_id: gameId,
-      p_stat: result.stat,
-      p_grade: result.grade,
-      p_delta: result.delta,
-      p_xp_bonus: result.xpBonus,
-    });
-    if (rpcError) {
-      setError("No se pudo guardar la mejora. Aplicá la migración 20261126_personal_card_training.sql en Supabase y esperá unos segundos a que se actualice el esquema.");
-      resultSubmitted.current = false;
-    } else {
-      const row = Array.isArray(data) ? data[0] : data;
-      if (row?.success) {
-        const after = Number(row.stat_value ?? before);
-        setStats(current => ({ ...current, [result.stat]: after }));
-        setCardLevel(Number(row.card_level ?? cardLevel));
-        setTrainingXp(current => current + Number(row.xp_awarded ?? result.xpBonus));
-        setLastUpgrade({ stat: result.stat, before, after, ovr: Number(row.overall_rating ?? overall) });
-        const { data: badgeRows, error: badgeError } = await supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id);
-        if (!badgeError) {
-          const savedBadges = (badgeRows ?? []) as TrainingBadge[];
-          const nextBadges = EMPTY_BADGES.map(base => savedBadges.find(item => item.badge_key === base.badge_key) ?? base);
-          const justUnlocked = nextBadges.find(item => item.unlocked_at && !badges.find(old => old.badge_key === item.badge_key)?.unlocked_at);
-          setBadges(nextBadges);
-          if (justUnlocked) setUnlockedBadge(justUnlocked.badge_key);
-        }
-        setAttempts(current => [{
-          game_id: gameId, stat: result.stat, grade: result.grade, delta: Number(row.xp_awarded ?? result.xpBonus), created_at: new Date().toISOString(),
-        }, ...current]);
-        setNotice(`¡${result.grade}! Tu carta mejoró ${STAT_LABELS[result.stat]}: ${before} → ${after}.`);
-        window.dispatchEvent(new CustomEvent("lupi:progression-updated", { detail: { userId: user.id } }));
-      } else {
-        await load();
-        setNotice("Ya entrenaste este minijuego hoy o alcanzaste el límite diario de 5 desafíos.");
-      }
-      setSelectedGame(null);
-    }
-    setSaving(false);
-  }, [selectedGame, saving, stats, cardLevel, overall, user.id, load, badges]);
-
-  const startGame = (gameId: string) => {
-    if (!canTrain) return;
-    resultSubmitted.current = false;
-    setNotice("");
-    setLastUpgrade(null);
-    setSelectedGame(gameId as GameId);
-  };
-
   return (
     <main className="main-content training-hub">
       <div className="training-shell">
         <section className="training-character-hud" aria-label="Lupi World player development">
         <header className="training-hero training-hud-hero">
-          <div className="training-hud-topline"><span className="training-kicker">LUPI WORLD / PLAYER DEVELOPMENT</span><div className="training-hud-actions"><button type="button" className="training-back-profile" onClick={onBackToProfile}>← VOLVER AL PERFIL</button><span className="training-hud-live"><i /> PLAYER ONLINE</span></div></div>
-          <h1>TRAINING<span> ARENA</span></h1>
-          <p>No completás tareas: jugás minijuegos y mejorás tu propia carta.</p>
+          <div className="training-hud-topline"><span className="training-kicker">LUPI WORLD / CLUB PERFORMANCE</span><div className="training-hud-actions"><button type="button" className="training-back-profile" onClick={onBackToProfile}>← VOLVER AL PERFIL</button><span className="training-hud-live"><i /> PLAYER ONLINE</span></div></div>
+          <h1>CLUB<span> TRAINING CENTER</span></h1>
+          <p>Preparación física de futsal. Entrená con método, progresá y llevá tu evolución a la cancha.</p>
           <div className="training-player-stats training-hud-metrics">
             <div><strong>{overall}</strong><small>OVR DE TU CARTA</small></div>
             <div><strong>{cardLevel}</strong><small>NIVEL DE CARTA</small></div>
-            <div><strong>{gamesPlayed}/5</strong><small>DESAFÍOS HOY</small></div>
+            <div><strong>06</strong><small>DISCIPLINAS</small></div>
           </div>
         </header>
 
@@ -452,7 +323,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
               const progress = Math.min(3, badge.progress);
               const unlocked = Boolean(badge.unlocked_at);
               return <article className={`training-hud-badge ${unlocked ? "is-unlocked" : ""}`} key={key}>
-                <div className="training-hud-badge-art"><img src={config.image} alt={config.title} loading="lazy" /></div>
+                <div className={`training-hud-badge-art ${config.image ? "" : "is-gym-icon"}`}>{config.image ? <img src={config.image} alt={config.title} loading="lazy" /> : <span aria-hidden="true">{key === "aerobic" ? "♥" : "✚"}</span>}</div>
                 <div className="training-hud-badge-copy">
                   <small>{config.skill.toUpperCase()}</small>
                   <h3>{config.title}</h3>
@@ -468,9 +339,9 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
 
         </section>
 
-        <section className="training-aura-program">
-          <div className="training-section-title"><span>02 / TRAINING LAB</span><small>ENTRENÁ · DESARROLLÁ SKILLS · DESBLOQUEÁ BADGES</small></div>
-          <p className="training-unified-intro">Elegí una disciplina, completá sus 3 ejercicios progresivos y desbloqueá su insignia. Cada ejercicio suma progreso a tu jugador.</p>
+        <section className="training-aura-program training-club-gym">
+          <div className="training-section-title"><span>02 / CLUB TRAINING FLOOR</span><small>PREPARACIÓN FÍSICA · FUTSAL PERFORMANCE</small></div>
+          <p className="training-unified-intro">Seis estaciones de preparación física del club. Completá los tres niveles de cada disciplina para desbloquear su badge y fortalecer tu perfil.</p>
           <div className="training-aura-toolbar"><p className="training-arena-intro">Completá los tres ejercicios de cada disciplina para desbloquear su badge y ganar 50 XP en tu carta.</p><button type="button" className="training-reset-button" onClick={() => void resetAuraTraining()} disabled={resettingTraining || drillSaving !== null || drills.length === 0}>{resettingTraining ? "REINICIANDO…" : "↻ REINICIAR ENTRENAMIENTO"}</button></div>
         {drillFeedback && <section className={`training-drill-feedback ${drillFeedback.xpAwarded > 0 ? "is-reward" : ""}`} role="status">
           <div className="training-drill-feedback-icon">{drillFeedback.xpAwarded > 0 ? "✦" : "✓"}</div>
@@ -488,7 +359,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
               const unlocked = done === 3;
               return <article className={`training-aura-skill ${unlocked ? "is-complete" : ""}`} key={skillKey}>
                 <div className="training-aura-skill-head">
-                  <img src={skill.image} alt="" loading="lazy" />
+                  {skill.image ? <img src={skill.image} alt="" loading="lazy" /> : <span className="training-gym-skill-icon" aria-hidden="true">{skillKey === "aerobic" ? "♥" : "✚"}</span>}
                   <div><small>{String(done).padStart(2,"0")} / 03 EJERCICIOS</small><h3>{skill.title}</h3><p>{skill.description}</p></div>
                   <strong>{Math.round(done / 3 * 100)}%</strong>
                 </div>
@@ -546,34 +417,6 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
           </div>;
         })()}
 
-        <section className="training-challenge-arena training-unified-arena">
-          <div className="training-section-title"><span>04 / CHALLENGE ARENA</span><small>COMPETÍ · SUMÁ XP · MEJORÁ TU CARTA</small></div>
-          <p className="training-unified-intro">Los ejercicios desarrollan tus fundamentos. En la Arena los ponés a prueba con minijuegos y desafíos de rendimiento.</p>
-          <div className="training-arena-map">
-            <div className="training-arena-map-head"><span>MODOS DE JUEGO</span><strong>{Math.max(0,5-gamesPlayed)} / 5 ENERGÍA</strong></div>
-            {bossChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>BOSS ACTIVO</span><h2>CHALLENGE ARENA</h2></div><button type="button" onClick={() => setBossChallenge(false)} disabled={saving}>SALIR</button></div><AuraBossChallenge onExit={() => setBossChallenge(false)} onComplete={result => { setBossChallenge(false); void handleGameResult(result, "physical"); }} /></div> : reactionChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>REACTION MODE</h2></div><button type="button" onClick={() => setReactionChallenge(false)} disabled={saving}>SALIR</button></div><AuraReactionChallenge onComplete={result => { setReactionChallenge(false); void handleGameResult(result, "physical"); }} /></div> : loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>{GAME_CONFIG[selectedGame].label}</h2></div><button type="button" onClick={() => { setSelectedGame(null); resultSubmitted.current = false; }} disabled={saving}>SALIR</button></div><TrainingGame key={selectedGame} gameId={selectedGame} stat={GAME_CONFIG[selectedGame].stat} onComplete={handleGameResult} difficulty="normal" />{saving && <p className="training-feedback">Guardando la evolución de tu carta...</p>}</div> : <>
-              <div className="training-arena-stage-grid">
-                <button type="button" className="training-arena-stage is-open" onClick={() => setReactionChallenge(true)} disabled={!canTrain}><span className="training-arena-stage-number">01</span><span className="training-arena-stage-icon">⚡</span><strong>REACTION</strong><small>REFLEJOS · FÍSICO</small><b>JUGAR ↗</b></button>
-                <button type="button" className="training-arena-stage" onClick={() => startGame("dribbling")} disabled={!canTrain}><span className="training-arena-stage-number">02</span><span className="training-arena-stage-icon">◈</span><strong>CONTROL</strong><small>DOMINIO · GAMBETA</small><b>JUGAR ↗</b></button>
-                <button type="button" className="training-arena-stage" onClick={() => startGame("pace")} disabled={!canTrain}><span className="training-arena-stage-number">03</span><span className="training-arena-stage-icon">➤</span><strong>SPEED</strong><small>EXPLOSIVIDAD · VELOCIDAD</small><b>JUGAR ↗</b></button>
-                <button type="button" className="training-arena-stage" onClick={() => startGame("physical")} disabled={!canTrain}><span className="training-arena-stage-number">04</span><span className="training-arena-stage-icon">⌁</span><strong>AGILITY</strong><small>GIROS · FÍSICO</small><b>JUGAR ↗</b></button>
-                <button type="button" className="training-arena-stage is-boss-open" onClick={() => setBossChallenge(true)} disabled={!canTrain}><span className="training-arena-stage-number">05</span><span className="training-arena-stage-icon">✦</span><strong>BOSS CHALLENGE</strong><small>3 FASES · SCORE · COMBO</small><b>ENFRENTAR ↗</b></button>
-              </div>
-              <div className="training-arena-map-foot"><span>ENERGÍA DIARIA DISPONIBLE</span><strong>{Math.max(0,5-gamesPlayed)} / 5</strong><i><b style={{width:`${Math.max(0,5-gamesPlayed)/5*100}%`}}/></i><small>{canTrain ? "Cada desafío mejora un atributo de tu carta." : "Completaste tus 5 desafíos de hoy. Volvé mañana."}</small></div>
-              <div className="training-unified-selector"><strong>OTROS MINIJUEGOS</strong><p>Elegí una habilidad específica para practicar.</p><TrainingGameSelector onSelectGame={startGame} /></div>
-            </>}
-          </div>
-        </section>
-
-        {attempts.length > 0 && <section className="training-history">
-          <div className="training-section-title"><span>05 / TU RENDIMIENTO</span><small>PROGRESO GUARDADO</small></div>
-          <div className="training-history-list">{attempts.map((attempt, index) => (
-            <article key={`${attempt.game_id}-${index}`}>
-              <span>{STAT_LABELS[attempt.stat]}</span><strong>CALIFICACIÓN {attempt.grade}</strong><b>+{attempt.delta}</b>
-            </article>
-          ))}</div>
-        </section>}
-
         {error && <p className="training-feedback is-error" role="alert">{error}</p>}
         {notice && <p className="training-feedback" role="status">{notice}</p>}
 
@@ -597,7 +440,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
           <div className="training-badge-modal-card">
             <button type="button" className="training-badge-modal-close" aria-label="Cerrar" onClick={() => setUnlockedBadge(null)}>×</button>
             <small>✦ AURA SKILL BADGE DESBLOQUEADA ✦</small>
-            <img src={BADGE_CONFIG[unlockedBadge].image} alt={BADGE_CONFIG[unlockedBadge].title} />
+            {BADGE_CONFIG[unlockedBadge].image ? <img src={BADGE_CONFIG[unlockedBadge].image} alt={BADGE_CONFIG[unlockedBadge].title} /> : <div className="training-badge-modal-gym-icon" aria-hidden="true">{unlockedBadge === "aerobic" ? "♥" : "✚"}</div>}
             <span>{BADGE_CONFIG[unlockedBadge].skill.toUpperCase()}</span>
             <h2 id="training-badge-modal-title">{BADGE_CONFIG[unlockedBadge].title}</h2>
             <p>{BADGE_CONFIG[unlockedBadge].description}</p>
@@ -605,7 +448,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
           </div>
         </div>}
 
-        <p className="training-disclaimer">Hasta 5 minijuegos por día. Cada resultado mejora solamente tu carta personal; los atributos no superan 99. Adaptá la intensidad y priorizá la técnica.</p>
+        <p className="training-disclaimer">Entrená con una carga adecuada a tu edad y condición. Priorizá la técnica, descansá entre series y detenete ante cualquier dolor. Los ejercicios de fuerza se realizan con peso corporal y supervisión adulta cuando corresponda.</p>
       </div>
     </main>
   );
