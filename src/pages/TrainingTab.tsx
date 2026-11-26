@@ -69,6 +69,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
   const [trainingXp, setTrainingXp] = useState(0);
   const [badges, setBadges] = useState<TrainingBadge[]>(EMPTY_BADGES);
   const [drills, setDrills] = useState<DrillRecord[]>([]);
+  const [resettingTraining, setResettingTraining] = useState(false);
   const [drillSaving, setDrillSaving] = useState<string | null>(null);
   const [unlockedBadge, setUnlockedBadge] = useState<BadgeKey | null>(null);
   const [drillFeedback, setDrillFeedback] = useState<{ skillKey: SkillKey; exerciseIndex: number; progress: number; xpAwarded: number; statLabel: string; statGain: number } | null>(null);
@@ -91,7 +92,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
       supabase.from("personal_training_attempts").select("game_id,stat,grade,delta,created_at")
         .eq("user_id", user.id).eq("training_date", todayArgentina()).order("created_at", { ascending: false }),
       supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id),
-      supabase.from("personal_training_drills").select("skill_key,exercise_index,completed_at").eq("user_id", user.id),
+      supabase.from("personal_training_cycle_drills").select("skill_key,exercise_index,completed_at").eq("user_id", user.id),
     ]);
     if (profileResult.error) {
       setError("No pudimos cargar tu carta personal. Revisá los permisos de profiles.");
@@ -111,7 +112,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
       setAttempts((attemptsResult.data ?? []) as Attempt[]);
     }
     if (badgesResult.error || drillsResult.error) {
-      setError("Falta aplicar la migración 20261126_aura_training_badges.sql en Supabase para habilitar los desafíos AURA y sus badges.");
+      setError("Falta aplicar la migración 20261126_aura_training_reset.sql en Supabase para habilitar los desafíos AURA.");
     } else {
       const savedBadges = (badgesResult.data ?? []) as TrainingBadge[];
       setBadges(EMPTY_BADGES.map(base => savedBadges.find(item => item.badge_key === base.badge_key) ?? base));
@@ -138,57 +139,85 @@ export function TrainingTab({ user }: { user: AppUser }) {
       p_exercise_index: exerciseIndex,
     });
     if (rpcError) {
-      setError("No se pudo guardar el ejercicio. Aplicá la migración 20261126_aura_training_badges.sql en Supabase.");
-    } else {
-      const row = Array.isArray(data) ? data[0] : data;
-      if (row?.success) {
-        setDrills(current => [...current, { skill_key: skillKey, exercise_index: exerciseIndex, completed_at: new Date().toISOString() }]);
-        setTrainingXp(Number(row.user_card_exp ?? trainingXp));
-        setCardLevel(Number(row.user_card_level ?? cardLevel));
-        const statKey = row.stat_key as TrainingStat | undefined;
-        const statBefore = statKey ? stats[statKey] : 0;
-        const statAfter = Number(row.stat_value ?? statBefore);
-        if (statKey && statAfter > statBefore) {
-          setStats(current => ({ ...current, [statKey]: statAfter }));
-          setLastUpgrade({
-            stat: statKey,
-            before: statBefore,
-            after: statAfter,
-            ovr: Number(row.overall_rating ?? overall),
-          });
-        }
-        const xpAwarded = Number(row.xp_awarded ?? 0);
-        const nextLevel = Number(row.user_card_level ?? cardLevel);
-        const statLabel = statKey ? STAT_LABELS[statKey] : "ATRIBUTO";
-        const statGain = Math.max(0, statAfter - statBefore);
-        let badgeJustUnlocked = false;
-        const { data: badgeRows } = await supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id);
-        if (badgeRows) {
-          const savedBadges = badgeRows as TrainingBadge[];
-          const nextBadges = EMPTY_BADGES.map(base => savedBadges.find(item => item.badge_key === base.badge_key) ?? base);
-          const previous = badges.find(item => item.badge_key === skillKey);
-          const next = nextBadges.find(item => item.badge_key === skillKey);
-          setBadges(nextBadges);
-          badgeJustUnlocked = Boolean(next?.unlocked_at && !previous?.unlocked_at);
-        }
-        const nextProgress = Number(row.progress ?? Math.min(3, drills.filter(item => item.skill_key === skillKey).length + 1));
-        setDrillFeedback({ skillKey, exerciseIndex, progress: nextProgress, xpAwarded, statLabel, statGain });
-        if (xpAwarded > 0) {
-          setNotice(`¡${AURA_SKILLS[skillKey].title} COMPLETADA! ${statLabel} +${statGain} · +50 XP · BADGE DESBLOQUEADA.`);
-          if (nextLevel > cardLevel) {
-            setUnlockedBadge(null);
-            setLevelUpReward({ previous: cardLevel, current: nextLevel, skillKey, statLabel, statGain });
-          } else if (badgeJustUnlocked) {
-            setUnlockedBadge(skillKey);
-          }
-          window.dispatchEvent(new CustomEvent("lupi:progression-updated", { detail: { userId: user.id } }));
-        } else {
-          setNotice(`¡EJERCICIO REGISTRADO! ${AURA_SKILLS[skillKey].drills[exerciseIndex].title} · ${nextProgress}/3 en ${AURA_SKILLS[skillKey].title}.`);
-        }
+      setError("No se pudo guardar el ejercicio. Revisá las funciones de entrenamiento en Supabase.");
+      setDrillSaving(null);
+      return;
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    const { data: cycleData, error: cycleError } = await supabase.rpc("record_personal_training_cycle_drill", {
+      p_skill_key: skillKey,
+      p_exercise_index: exerciseIndex,
+    });
+    if (cycleError) {
+      setError("El ejercicio se guardó, pero no pudimos actualizar el progreso del ciclo. Volvé a cargar la sección.");
+      setDrillSaving(null);
+      return;
+    }
+
+    const cycleRow = Array.isArray(cycleData) ? cycleData[0] : cycleData;
+    const nextProgress = Number(cycleRow?.progress ?? drills.filter(item => item.skill_key === skillKey).length + 1);
+    setDrills(current => [...current, { skill_key: skillKey, exercise_index: exerciseIndex, completed_at: new Date().toISOString() }]);
+
+    const xpAwarded = row?.success ? Number(row.xp_awarded ?? 0) : 0;
+    let statKey: TrainingStat | undefined;
+    let statBefore = 0;
+    let statAfter = 0;
+    let statLabel = "ATRIBUTO";
+    let statGain = 0;
+
+    if (row?.success) {
+      setTrainingXp(Number(row.user_card_exp ?? trainingXp));
+      setCardLevel(Number(row.user_card_level ?? cardLevel));
+      statKey = row.stat_key as TrainingStat | undefined;
+      statBefore = statKey ? stats[statKey] : 0;
+      statAfter = Number(row.stat_value ?? statBefore);
+      if (statKey && statAfter > statBefore) {
+        setStats(current => ({ ...current, [statKey!]: statAfter }));
+        setLastUpgrade({ stat: statKey, before: statBefore, after: statAfter, ovr: Number(row.overall_rating ?? overall) });
       }
+      statLabel = statKey ? STAT_LABELS[statKey] : "ATRIBUTO";
+      statGain = Math.max(0, statAfter - statBefore);
+      window.dispatchEvent(new CustomEvent("lupi:progression-updated", { detail: { userId: user.id } }));
+    }
+
+    const { data: badgeRows } = await supabase.from("personal_training_badges").select("badge_key,progress,unlocked_at").eq("user_id", user.id);
+    if (badgeRows) {
+      const savedBadges = badgeRows as TrainingBadge[];
+      setBadges(EMPTY_BADGES.map(base => savedBadges.find(item => item.badge_key === base.badge_key) ?? base));
+    }
+
+    setDrillFeedback({ skillKey, exerciseIndex, progress: nextProgress, xpAwarded, statLabel, statGain });
+    if (nextProgress === 3) {
+      setNotice(xpAwarded > 0
+        ? `¡${AURA_SKILLS[skillKey].title} COMPLETADA! ${statLabel} +${statGain} · +50 XP · BADGE DESBLOQUEADA.`
+        : `¡${AURA_SKILLS[skillKey].title} COMPLETADA! Tu recompensa de carta ya había sido obtenida en un ciclo anterior.`);
+      if (xpAwarded > 0 && Number(row.user_card_level ?? cardLevel) > cardLevel) {
+        setUnlockedBadge(null);
+        setLevelUpReward({ previous: cardLevel, current: Number(row.user_card_level), skillKey, statLabel, statGain });
+      }
+    } else {
+      setNotice(`¡EJERCICIO REGISTRADO! ${AURA_SKILLS[skillKey].drills[exerciseIndex].title} · ${nextProgress}/3 en ${AURA_SKILLS[skillKey].title}.`);
     }
     setDrillSaving(null);
-  }, [drillSaving, drills, trainingXp, cardLevel, badges, user.id, stats, overall]);
+  }, [drillSaving, drills, trainingXp, cardLevel, user.id, stats, overall]);
+
+  const resetAuraTraining = useCallback(async () => {
+    if (resettingTraining || drillSaving) return;
+    const confirmed = window.confirm("¿Reiniciar AURA Training? Los 12 ejercicios volverán a estar pendientes. Tu carta, XP, atributos y badges ganadas se conservan. Las recompensas de carta no se entregan nuevamente.");
+    if (!confirmed) return;
+    setResettingTraining(true);
+    setError("");
+    const { error: resetError } = await supabase.rpc("reset_personal_training_cycle");
+    if (resetError) {
+      setError("No se pudo reiniciar el entrenamiento. Revisá la migración de reinicio en Supabase.");
+    } else {
+      setDrills([]);
+      setDrillFeedback(null);
+      setNotice("AURA TRAINING REINICIADO. Tu evolución como jugador permanece intacta.");
+    }
+    setResettingTraining(false);
+  }, [resettingTraining, drillSaving]);
 
   const handleGameResult = useCallback(async (result: TrainingResult) => {
     if (!selectedGame || resultSubmitted.current || saving) return;
@@ -279,7 +308,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
 
         <section className="training-aura-program">
           <div className="training-section-title"><span>02 / AURA TRAINING SYSTEM</span><small>4 DISCIPLINAS · 12 EJERCICIOS</small></div>
-          <p className="training-arena-intro">Completá los tres ejercicios de cada disciplina para desbloquear su badge y ganar 50 XP en tu carta.</p>
+          <div className="training-aura-toolbar"><p className="training-arena-intro">Completá los tres ejercicios de cada disciplina para desbloquear su badge y ganar 50 XP en tu carta.</p><button type="button" className="training-reset-button" onClick={() => void resetAuraTraining()} disabled={resettingTraining || drillSaving !== null || drills.length === 0}>{resettingTraining ? "REINICIANDO…" : "↻ REINICIAR ENTRENAMIENTO"}</button></div>
         {drillFeedback && <section className={`training-drill-feedback ${drillFeedback.xpAwarded > 0 ? "is-reward" : ""}`} role="status">
           <div className="training-drill-feedback-icon">{drillFeedback.xpAwarded > 0 ? "✦" : "✓"}</div>
           <div className="training-drill-feedback-copy">
@@ -311,7 +340,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
                     </div>;
                   })}
                 </div>
-                {unlocked && <div className="training-aura-skill-reward">✦ BADGE DESBLOQUEADA · +50 XP</div>}
+                {unlocked && <div className="training-aura-skill-reward">✦ DISCIPLINA COMPLETADA · {badges.find(item => item.badge_key === skillKey)?.unlocked_at ? "BADGE CONSERVADA" : "BADGE DESBLOQUEADA"}</div>}
               </article>;
             })}
           </div>
