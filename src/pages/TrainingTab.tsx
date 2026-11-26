@@ -46,6 +46,52 @@ const AURA_SKILLS: Record<SkillKey, { title: string; description: string; image:
     { title: "CONDUCCIÓN + CAMBIO", reps: "5 recorridos", description: "Conducí, cambiá de dirección y salí con un toque más largo.", benefit: "Cambiar el ritmo para dejar atrás al rival." }
   ] }
 };
+
+type DrillLevel = { name: string; tag: string; guidance: string };
+const DRILL_LEVELS: DrillLevel[] = [
+  { name: "INICIACIÓN", tag: "NIVEL 01", guidance: "Priorizá el control y la técnica. Encontrá un ritmo cómodo." },
+  { name: "INTERMEDIO", tag: "NIVEL 02", guidance: "Sumá precisión y continuidad. Evitá perder la calidad del movimiento." },
+  { name: "AVANZADO", tag: "NIVEL 03", guidance: "Buscá fluidez y velocidad sin sacrificar el control." },
+];
+
+type AuraVisualScene = { route: string; points: [number, number][]; ball: [number, number]; caption: string };
+const AURA_VISUALS: Record<SkillKey, AuraVisualScene[]> = {
+  coordination: [
+    { route: "M22 52 L48 52 L74 52 L100 52 L126 52 L152 52", points: [[22,52],[48,52],[74,52],[100,52],[126,52],[152,52]], ball: [48,52], caption: "APOYOS ALTERNADOS" },
+    { route: "M20 70 L48 24 L76 70 L104 24 L132 70 L160 24", points: [[48,24],[76,70],[104,24],[132,70]], ball: [20,70], caption: "ZIGZAG CON PELOTA" },
+    { route: "M24 70 L74 70 L74 28 L144 28", points: [[24,70],[74,70],[74,28],[144,28]], ball: [24,70], caption: "CONTROL Y ACELERACIÓN" },
+  ],
+  speed: [
+    { route: "M20 52 L158 52", points: [[20,52],[158,52]], ball: [20,52], caption: "ACELERACIÓN EN 5 METROS" },
+    { route: "M24 68 L80 26 L148 68", points: [[24,68],[80,26],[148,68]], ball: [24,68], caption: "REACCIÓN A LA SEÑAL" },
+    { route: "M20 52 L112 52 L148 52", points: [[20,52],[112,52],[148,52]], ball: [20,52], caption: "SPRINT + FRENO CONTROLADO" },
+  ],
+  agility: [
+    { route: "M20 68 L48 26 L76 68 L104 26 L132 68 L160 26", points: [[48,26],[76,68],[104,26],[132,68]], ball: [20,68], caption: "CAMBIO DE DIRECCIÓN" },
+    { route: "M24 52 L76 52 L76 22 L140 22", points: [[24,52],[76,52],[76,22],[140,22]], ball: [24,52], caption: "FRENÁ, GIRÁ Y SALÍ" },
+    { route: "M38 25 L138 25 L138 75 L38 75 Z", points: [[38,25],[138,25],[138,75],[38,75]], ball: [38,25], caption: "RECORRIDO EN CUADRADO" },
+  ],
+  technique: [
+    { route: "M24 52 L82 52 L142 25", points: [[24,52],[82,52],[142,25]], ball: [24,52], caption: "PRIMER TOQUE ORIENTADO" },
+    { route: "M22 52 L150 52", points: [[22,52],[150,52]], ball: [22,52], caption: "PASE Y DEVOLUCIÓN" },
+    { route: "M20 70 L66 25 L112 70 L158 25", points: [[66,25],[112,70],[158,25]], ball: [20,70], caption: "CONDUCCIÓN + CAMBIO" },
+  ],
+};
+
+function AuraDrillVisual({ skillKey, exerciseIndex, compact = false }: { skillKey: SkillKey; exerciseIndex: number; compact?: boolean }) {
+  const scene = AURA_VISUALS[skillKey][exerciseIndex];
+  return <div className={`aura-drill-visual ${compact ? "is-compact" : ""}`} role="img" aria-label={scene.caption}>
+    <svg viewBox="0 0 180 100" aria-hidden="true">
+      <defs><marker id={`aura-arrow-${skillKey}-${exerciseIndex}`} markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" /></marker></defs>
+      <rect x="5" y="5" width="170" height="90" rx="9" className="aura-visual-field" />
+      <path d={scene.route} className="aura-visual-route" markerEnd={`url(#aura-arrow-${skillKey}-${exerciseIndex})`} />
+      {scene.points.map(([x,y],i) => <circle key={i} cx={x} cy={y} r="4.5" className="aura-visual-cone" />)}
+      <circle cx={scene.ball[0]} cy={scene.ball[1]} r="7" className="aura-visual-ball" />
+      <path d={`M${scene.ball[0]-3} ${scene.ball[1]} l3 -3 3 3 -3 3z`} className="aura-visual-ball-mark" />
+    </svg>
+    <span>{scene.caption}</span>
+  </div>;
+}
 type BadgeKey = SkillKey;
 type TrainingBadge = { badge_key: BadgeKey; progress: number; unlocked_at: string | null };
 const BADGE_CONFIG: Record<BadgeKey, { title: string; skill: string; image: string; description: string }> = {
@@ -348,10 +394,14 @@ export function TrainingTab({ user }: { user: AppUser }) {
                 <div className="training-aura-drills">
                   {skill.drills.map((drill,index) => {
                     const completed = drills.some(item => item.skill_key === skillKey && item.exercise_index === index);
+                    const nextExercise = skill.drills.findIndex((_, drillIndex) => !drills.some(item => item.skill_key === skillKey && item.exercise_index === drillIndex));
+                    const available = index === nextExercise;
+                    const level = DRILL_LEVELS[index];
                     const token = `${skillKey}-${index}`;
-                    return <div className={`training-aura-drill ${completed ? "is-done" : ""}`} key={token}>
-                      <div className="training-aura-drill-copy"><small>{drill.reps}</small><strong>{drill.title}</strong><p>{drill.description}</p><em>EN CANCHA · {drill.benefit}</em></div>
-                      <button type="button" disabled={completed || drillSaving !== null} onClick={() => { setActiveDrill({ skillKey, exerciseIndex: index }); setResting(false); setRestSeconds(30); }}>{completed ? "COMPLETADO ✓" : "INICIAR ENTRENAMIENTO"}</button>
+                    return <div className={`training-aura-drill ${completed ? "is-done" : ""} ${!completed && !available ? "is-locked" : ""}`} key={token}>
+                      <AuraDrillVisual skillKey={skillKey} exerciseIndex={index} compact />
+                      <div className="training-aura-drill-copy"><small>{level.tag} · {drill.reps}</small><strong>{drill.title}</strong><p>{drill.description}</p><em>{completed ? "EJERCICIO REGISTRADO" : level.name + " · " + level.guidance}</em></div>
+                      <button type="button" disabled={completed || !available || drillSaving !== null} onClick={() => { setActiveDrill({ skillKey, exerciseIndex: index }); setResting(false); setRestSeconds(30); }}>{completed ? "COMPLETADO ✓" : available ? "INICIAR ENTRENAMIENTO" : "BLOQUEADO"}</button>
                     </div>;
                   })}
                 </div>
@@ -369,8 +419,10 @@ export function TrainingTab({ user }: { user: AppUser }) {
             <section className="training-guided-card">
               <button type="button" className="training-guided-close" aria-label="Cerrar sesión" onClick={() => { setActiveDrill(null); setResting(false); }}>×</button>
               <div className="training-guided-kicker">AURA TRAINING / SESIÓN GUIADA</div>
-              <div className="training-guided-discipline"><img src={skill.image} alt="" /><span>{skill.title}</span></div>
+              <div className="training-guided-discipline"><img src={skill.image} alt="" /><span>{skill.title}</span><b>{DRILL_LEVELS[activeDrill.exerciseIndex].tag}</b></div>
               <h2 id="training-guided-title">{drill.title}</h2>
+              <AuraDrillVisual skillKey={activeDrill.skillKey} exerciseIndex={activeDrill.exerciseIndex} />
+              <div className="training-guided-level"><small>DIFICULTAD PROGRESIVA</small><strong>{DRILL_LEVELS[activeDrill.exerciseIndex].name}</strong><p>{DRILL_LEVELS[activeDrill.exerciseIndex].guidance}</p></div>
               <div className="training-guided-dose"><small>OBJETIVO DE ESTA SESIÓN</small><strong>{drill.reps}</strong></div>
               <div className="training-guided-step"><span>01</span><div><strong>PREPARÁ EL ESPACIO</strong><p>Buscá un lugar despejado, prepará los elementos que necesites y empezá a un ritmo que puedas controlar.</p></div></div>
               <div className="training-guided-step"><span>02</span><div><strong>EJECUTÁ EL EJERCICIO</strong><p>{drill.description}</p></div></div>
