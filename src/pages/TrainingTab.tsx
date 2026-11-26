@@ -107,6 +107,59 @@ const todayArgentina = () => new Intl.DateTimeFormat("en-CA", {
   year: "numeric", month: "2-digit", day: "2-digit",
 }).format(new Date());
 
+function AuraReactionChallenge({ onComplete }: { onComplete: (result: TrainingResult) => void }) {
+  const [round, setRound] = useState(0);
+  const [signal, setSignal] = useState(false);
+  const [waiting, setWaiting] = useState(true);
+  const [reaction, setReaction] = useState<number | null>(null);
+  const [times, setTimes] = useState<number[]>([]);
+  const [falseStarts, setFalseStarts] = useState(0);
+  const startedAt = useRef(0);
+  const finished = useRef(false);
+  const completionRef = useRef(onComplete);
+  useEffect(() => { completionRef.current = onComplete; }, [onComplete]);
+  const rounds = 5;
+  useEffect(() => {
+    if (finished.current || reaction !== null || round >= rounds) return;
+    setWaiting(true); setSignal(false);
+    const timer = window.setTimeout(() => { startedAt.current = performance.now(); setSignal(true); setWaiting(false); }, 1000 + Math.random() * 1800);
+    return () => window.clearTimeout(timer);
+  }, [round, reaction]);
+  useEffect(() => {
+    if (reaction === null || finished.current) return;
+    const timer = window.setTimeout(() => {
+      const updated = [...times, reaction];
+      setTimes(updated);
+      if (updated.length >= rounds) {
+        finished.current = true;
+        const avg = updated.reduce((sum, ms) => sum + ms, 0) / updated.length;
+        const grade: TrainingResult["grade"] = avg < 250 && falseStarts === 0 ? "S" : avg < 350 ? "A" : avg < 500 ? "B" : "C";
+        const delta = grade === "S" ? 8 : grade === "A" ? 5 : grade === "B" ? 3 : 1;
+        const xpBonus = grade === "S" ? 200 : grade === "A" ? 120 : grade === "B" ? 70 : 40;
+        completionRef.current({ stat: "physical", grade, delta, xpBonus, message: `Media ${Math.round(avg)} ms · ${falseStarts} salida(s) anticipada(s)` });
+      } else { setRound(updated.length); setReaction(null); }
+    }, 800);
+    return () => window.clearTimeout(timer);
+  }, [reaction, times, falseStarts]);
+  const tap = () => {
+    if (finished.current) return;
+    if (!signal) { setFalseStarts(n => n + 1); setSignal(true); setWaiting(false); startedAt.current = performance.now(); return; }
+    setSignal(false); setReaction(Math.round(performance.now() - startedAt.current));
+  };
+  const avg = times.length ? Math.round(times.reduce((s, ms) => s + ms, 0) / times.length) : 0;
+  return <div className="aura-reaction-game">
+    <div className="aura-reaction-head"><small>REACTION MODE · RONDA {Math.min(round + 1, rounds)} / {rounds}</small><strong>{avg ? avg + " ms" : "PREPARATE"}</strong></div>
+    <div className="aura-reaction-progress">{Array.from({length: rounds}, (_,i)=><i key={i} className={i < times.length ? "is-done" : i === round ? "is-current" : ""}/>)}</div>
+    <button type="button" onClick={tap} className={`aura-reaction-pad ${signal ? "is-signal" : waiting ? "is-waiting" : "is-result"}`}>
+      <span>{signal ? "⚡" : waiting ? "◉" : reaction !== null ? "✓" : "●"}</span>
+      <strong>{signal ? "¡AHORA!" : waiting ? "ESPERÁ LA SEÑAL" : reaction !== null ? reaction + " MS" : "PREPARADO"}</strong>
+      <small>{signal ? "TOCÁ YA" : waiting ? "No anticipes" : reaction !== null ? "Siguiente ronda…" : "Esperá el cambio"}</small>
+    </button>
+    <div className="aura-reaction-stats"><span>RONDAS <b>{times.length}/{rounds}</b></span><span>FALSAS SALIDAS <b>{falseStarts}</b></span></div>
+    <p className="aura-reaction-note">Respondé apenas aparezca la señal. Las salidas anticipadas se registran.</p>
+  </div>;
+}
+
 export function TrainingTab({ user }: { user: AppUser }) {
   const [stats, setStats] = useState<PlayerStats>({
     pace: 10, dribbling: 10, passing: 10, defending: 10, finishing: 10, physical: 10,
@@ -124,6 +177,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
   const [drillFeedback, setDrillFeedback] = useState<{ skillKey: SkillKey; exerciseIndex: number; progress: number; xpAwarded: number; statLabel: string; statGain: number } | null>(null);
   const [levelUpReward, setLevelUpReward] = useState<{ previous: number; current: number; skillKey: SkillKey; statLabel: string; statGain: number } | null>(null);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [reactionChallenge, setReactionChallenge] = useState(false);
   const [selectedGame, setSelectedGame] = useState<GameId | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -471,7 +525,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
 
         <section className="training-arena">
           <div className="training-section-title"><span>04 / ELEGÍ TU DESAFÍO</span><small>MEJORÁ UNA HABILIDAD</small></div>
-          {loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? (
+          {reactionChallenge ? <div className="training-game-stage"><div className="training-game-top"><div><span>MINIJUEGO ACTIVO</span><h2>REACTION MODE</h2></div><button type="button" onClick={() => setReactionChallenge(false)} disabled={saving}>SALIR</button></div><AuraReactionChallenge onComplete={result => { setReactionChallenge(false); void handleGameResult(result); }} /></div> : loading ? <div className="training-empty">Cargando tu carta...</div> : selectedGame ? (
             <div className="training-game-stage">
               <div className="training-game-top">
                 <div><span>MINIJUEGO ACTIVO</span><h2>{GAME_CONFIG[selectedGame].label}</h2></div>
@@ -490,7 +544,7 @@ export function TrainingTab({ user }: { user: AppUser }) {
             <>
               <p className="training-arena-intro">{canTrain ? "Elegí una disciplina. Tu resultado define cuánto mejora el atributo correspondiente." : "Completaste tus 5 desafíos de hoy. Volvé mañana para seguir evolucionando."}</p>
               <div className="training-remaining"><span>ENERGÍA DE ENTRENAMIENTO</span><strong>{Math.max(0, 5 - gamesPlayed)} / 5</strong></div>
-              <TrainingGameSelector onSelectGame={startGame} />
+              <button type="button" className="aura-reaction-launch" onClick={() => setReactionChallenge(true)}><span>⚡</span><strong>REACTION MODE</strong><small>5 rondas · reflejos · mejorá tu FÍSICO</small></button><TrainingGameSelector onSelectGame={startGame} />
             </>
           )}
         </section>
