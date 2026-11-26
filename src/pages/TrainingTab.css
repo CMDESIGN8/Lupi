@@ -312,3 +312,23 @@
 .training-back-profile{border:1px solid rgba(9,188,235,.35);background:rgba(9,188,235,.08);color:#9cecff;border-radius:999px;padding:7px 12px;font:700 10px/1 inherit;letter-spacing:.08em;cursor:pointer;white-space:nowrap;transition:background .2s,border-color .2s}
 .training-back-profile:hover{background:rgba(9,188,235,.16);border-color:rgba(9,188,235,.7)}
 @media(max-width:600px){.training-hud-actions{gap:8px}.training-back-profile{font-size:9px;padding:7px 9px}}
+
+
+/* AURA CLUB GYM · FUTSAL PERFORMANCE CENTER */
+.training-club-gym{position:relative;overflow:hidden;border-color:rgba(144,255,70,.24);background:radial-gradient(ellipse at 90% 0,rgba(144,255,70,.09),transparent 38%),linear-gradient(145deg,rgba(14,28,38,.98),rgba(5,12,20,.99))}
+.training-club-gym:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.2;background:repeating-linear-gradient(90deg,transparent 0 58px,rgba(180,210,220,.08) 59px 60px),linear-gradient(180deg,transparent 0 78%,rgba(9,188,235,.07) 78.2%,transparent 78.5%)}
+.training-club-gym>*{position:relative}
+.training-club-gym .training-section-title>span{color:#a5f77a}
+.training-club-gym .training-unified-intro{max-width:760px}
+.training-club-gym .training-aura-toolbar{padding:12px;border:1px solid rgba(144,255,70,.14);border-radius:12px;background:rgba(0,0,0,.2)}
+.training-club-gym .training-aura-skill{background:linear-gradient(145deg,rgba(22,39,47,.92),rgba(5,15,23,.96));border-color:rgba(144,255,70,.16);box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.training-club-gym .training-aura-skill-head{border-bottom-color:rgba(144,255,70,.13)}
+.training-club-gym .training-aura-skill-head small{color:#a5f77a}
+.training-hud-badge-art.is-gym-icon{border:1px solid rgba(144,255,70,.22);border-radius:18px;background:linear-gradient(145deg,rgba(144,255,70,.12),rgba(9,188,235,.08));color:#a5f77a;font-size:38px;text-shadow:0 0 18px rgba(144,255,70,.32)}
+.training-hud-badge-art.is-gym-icon span{font-weight:900}
+.training-club-gym .aura-drill-visual{background:linear-gradient(145deg,#182b32,#0a1720);border-color:rgba(144,255,70,.18)}
+.training-club-gym .aura-visual-field{fill:rgba(144,255,70,.025);stroke:rgba(144,255,70,.24)}
+.training-club-gym .aura-visual-route{stroke:#a5f77a}
+.training-club-gym .aura-visual-cone{fill:#09bceb}
+.training-club-gym .training-drill-card{border-color:rgba(144,255,70,.13)}
+@media(max-width:620px){.training-club-gym .training-aura-toolbar{align-items:stretch;gap:10px}.training-club-gym .training-reset-button{width:100%}}
