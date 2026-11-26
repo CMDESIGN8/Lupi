@@ -133,7 +133,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [lastUpgrade, setLastUpgrade] = useState<{ stat: TrainingStat; before: number; after: number; ovr: number } | null>(null);
+  const [lastUpgrade, setLastUpgrade] = useState<{ stat: PlayerStat; before: number; after: number; ovr: number } | null>(null);
   const resultSubmitted = useRef(false);
 
   const load = useCallback(async () => {
@@ -217,7 +217,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     setDrills(current => [...current, { skill_key: skillKey, exercise_index: exerciseIndex, completed_at: new Date().toISOString() }]);
 
     const xpAwarded = row?.success ? Number(row.xp_awarded ?? 0) : 0;
-    let statKey: TrainingStat | undefined;
+    let statKey: PlayerStat | undefined;
     let statBefore = 0;
     let statAfter = 0;
     let statLabel = "ATRIBUTO";
@@ -226,7 +226,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
     if (row?.success) {
       setTrainingXp(Number(row.user_card_exp ?? trainingXp));
       setCardLevel(Number(row.user_card_level ?? cardLevel));
-      statKey = row.stat_key as TrainingStat | undefined;
+      statKey = row.stat_key as PlayerStat | undefined;
       statBefore = statKey ? stats[statKey] : 0;
       statAfter = Number(row.stat_value ?? statBefore);
       if (statKey && statAfter > statBefore) {
