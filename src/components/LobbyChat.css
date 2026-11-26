@@ -1357,8 +1357,6 @@ button.lc-avatar {
     max-height: min(280px, 48dvh) !important;
   }
 }
-<<<<<<< HEAD
-=======
 
 /* =========================================================
    CURSOR PARPADEANTE PARA EFECTO MÁQUINA DE ESCRIBIR
@@ -1384,4 +1382,3 @@ button.lc-avatar {
   background: #28d9ff;
   box-shadow: 0 0 6px #28d9ff;
 }
->>>>>>> 5a26a2f4 (version final 1)

@@ -529,21 +529,13 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
                       return <article className={`lupi-flores-store__product ${owned ? 'is-owned' : ''}`} key={id}>
                         <div className="lupi-flores-store__product-art">{item?.imageUrl ? <img src={item.imageUrl} alt={item.name} /> : <span aria-hidden="true">👕</span>}{owned && <span className="lupi-flores-store__check" aria-label="Obtenido">✓</span>}</div>
                         <div className="lupi-flores-store__product-info"><span>FLORES CLUB · 2026</span><strong>{label}</strong><small>{owned ? 'EN TU ARMARIO' : price == null ? 'NO DISPONIBLE' : `${price} LUPICOINS`}</small></div>
-<<<<<<< HEAD
-                        <button className="lupi-flores-store__buy" type="button" disabled={shopBusy || usingFallback || owned || price == null} onClick={() => void buyFlores([id])}>{owned ? '✓ OBTENIDO' : shopBusy ? 'PROCESANDO…' : price == null ? 'NO DISPONIBLE' : `COMPRAR · ${price} 🪙`}</button>
-=======
                         <button className="lupi-flores-store__buy" type="button" disabled={shopBusy || usingFallback || owned || price == null} onClick={() => void buyFlores([id])}>{owned ? '✓ OBTENIDO' : shopBusy ? 'PROCESANDO…' : price == null ? 'NO DISPONIBLE' : `COMPRAR · ${price} 💰`}</button>
->>>>>>> 5a26a2f4 (version final 1)
                       </article>;
                     })}
                     <article className={`lupi-flores-store__product lupi-flores-store__product--bundle ${complete ? 'is-owned' : ''}`}>
                       <div className="lupi-flores-store__product-art lupi-flores-store__bundle-art">{collection.itemIds.map(id => { const item = items.find(i => i.id === id); return item?.imageUrl ? <img key={id} src={item.imageUrl} alt="" /> : null; })}{complete && <span className="lupi-flores-store__check" aria-label="Conjunto obtenido">✓</span>}</div>
                       <div className="lupi-flores-store__product-info"><span>PACK · TEMPORADA 2026</span><strong>CONJUNTO COMPLETO</strong><small>{complete ? 'COLECCIÓN COMPLETA' : unavailable ? 'NO DISPONIBLE' : `${remaining} LUPICOINS · SOLO PRENDAS FALTANTES`}</small></div>
-<<<<<<< HEAD
-                      <button className="lupi-flores-store__buy lupi-flores-store__buy--bundle" type="button" disabled={shopBusy || usingFallback || complete || unavailable} onClick={() => void buyFlores([...collection.itemIds])}>{complete ? '✓ CONJUNTO OBTENIDO' : shopBusy ? 'PROCESANDO…' : unavailable ? 'NO DISPONIBLE' : `COMPLETAR · ${remaining} 🪙`}</button>
-=======
                       <button className="lupi-flores-store__buy lupi-flores-store__buy--bundle" type="button" disabled={shopBusy || usingFallback || complete || unavailable} onClick={() => void buyFlores([...collection.itemIds])}>{complete ? '✓ CONJUNTO OBTENIDO' : shopBusy ? 'PROCESANDO…' : unavailable ? 'NO DISPONIBLE' : `COMPLETAR · ${remaining} 💰`}</button>
->>>>>>> 5a26a2f4 (version final 1)
                     </article>
                   </div>
                   <button className="lupi-flores-store__wardrobe-link" type="button" onClick={() => setWardrobeTab('wardrobe')}>VER COLECCIÓN EN MI ARMARIO →</button>
@@ -694,11 +686,7 @@ function AvatarEditorReady({ userId, onClose, level = 1, xp, xpNeeded, points, c
                       </button>
                       {item.owned && item.durability != null && item.durability <= 3 && (
                         <button type="button" className="lw-id__renew" disabled={!!renewBusy || usingFallback || shopPrices[item.id] == null} onClick={() => void renewEquipment(item.id)}>
-<<<<<<< HEAD
-                          {renewBusy === item.id ? "RENOVANDO…" : `RENOVAR 10/10 · ${shopPrices[item.id] ?? "—"} 🪙`}
-=======
                           {renewBusy === item.id ? "RENOVANDO…" : `RENOVAR 10/10 · ${shopPrices[item.id] ?? "—"} 💰`}
->>>>>>> 5a26a2f4 (version final 1)
                         </button>
                       )}
                       </div>

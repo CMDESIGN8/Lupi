@@ -1,14 +1,8 @@
-<<<<<<< HEAD
-import { createPortal } from "react-dom";
-import "./LobbyChatFullscreen.css";
-// src/components/LobbyChat.tsx
-=======
 // src/components/LobbyChat.tsx
 import { createPortal } from "react-dom";
 import "./LobbyChatFullscreen.css";
 import { TypewriterText } from "./TypewriterText";
 
->>>>>>> 5a26a2f4 (version final 1)
 import {
   useEffect,
   useCallback,
@@ -665,11 +659,7 @@ const closeMobileChat = () => {
           </div>
 
           <div className="lc-bubble">
-<<<<<<< HEAD
-            {entry.message.text}
-=======
             <TypewriterText text={entry.message.text} speed={20} />
->>>>>>> 5a26a2f4 (version final 1)
           </div>
         </div>
       </li>
@@ -677,36 +667,6 @@ const closeMobileChat = () => {
   }
 
   return (
-<<<<<<< HEAD
-    <li
-      key={entry.key}
-      className="lc-message lc-message--npc"
-      style={
-        {
-          "--lc-color": npc.color,
-        } as CSSProperties
-      }
-    >
-      <div className="lc-avatar lc-avatar--npc" aria-hidden>
-        {npc.emoji}
-      </div>
-
-      <div className="lc-bubble-wrap">
-        <div className="lc-meta">
-          <strong>{npc.name}</strong>
-
-          <span className="lc-badge lc-badge--npc">
-            NPC · {npc.tag}
-          </span>
-        </div>
-
-        <div className="lc-bubble">
-          {entry.message.text}
-        </div>
-      </div>
-    </li>
-  );
-=======
   <li
     key={entry.key}
     className="lc-message lc-message--npc"
@@ -735,7 +695,6 @@ const closeMobileChat = () => {
     </div>
   </li>
 );
->>>>>>> 5a26a2f4 (version final 1)
 }
 
               const m = entry.message;

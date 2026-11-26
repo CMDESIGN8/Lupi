@@ -217,8 +217,6 @@
  .gh-root.gh-root--cinematic{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))!important;overflow-y:visible!important}
  .gh-root.gh-root--cinematic .gh-world__dock{overflow:visible!important}
 }
-<<<<<<< HEAD
-=======
 
 
 /* LUPI WORLD - PRIMARY PLAY BUTTON */
@@ -819,4 +817,3 @@
   }
 }
 
->>>>>>> 5a26a2f4 (version final 1)

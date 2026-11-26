@@ -7,11 +7,8 @@ export type DuelRewardResult = {
   dailyLimit?: number; dailyPlayed?: number; firstWin?: boolean; capped?: boolean; hardCapped?: boolean; rivalCapped?: boolean; vsBot?: boolean;
   h2h?: { wins: number; losses: number; draws: number } | null;
   streak?: number; bestStreak?: number; wins?: number; losses?: number; draws?: number;
-<<<<<<< HEAD
-=======
   activityStreak?: number | null; activityBest?: number | null; activityStreakChanged?: boolean; // racha real (migración B1)
   chestDry?: number; chestPityAfter?: number; chestPity?: boolean; // cofre garantizado (migración 01)
->>>>>>> 5a26a2f4 (version final 1)
 };
 export type ClaimOptions = { vsBot?: boolean; botResult?: "win" | "loss" | "draw"; rivalId?: string };
 

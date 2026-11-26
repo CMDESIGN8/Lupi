@@ -26,10 +26,7 @@ export interface AppUser {
   exp: number;                    // ⚡ NUEVO
   streak: number;
   last_ticket_date: string | null;
-<<<<<<< HEAD
-=======
   last_activity_date?: string | null; // la que actualiza el servidor con cualquier actividad (process_user_action / duelos)
->>>>>>> 5a26a2f4 (version final 1)
   best_streak: number;
   referral_code: string;
   referral_count: number;

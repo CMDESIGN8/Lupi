@@ -10,13 +10,10 @@ import { CommunitiesPanel } from "../components/CommunitiesPanel";
 import { AvatarFace } from "../components/AvatarFace";
 import { AvatarEditor } from "../components/AvatarEditor";
 import { useAvatarAppearance } from "../hooks/useAvatarAppearance";
-<<<<<<< HEAD
-=======
 import iconTeam from '../assets/team.png';
 import ballUcl from '../assets/ball.png'; // Ajusta el nombre real
 
 
->>>>>>> 5a26a2f4 (version final 1)
     // src/pages/GameHub.tsx
     import { useEffect, useMemo, useRef, useState } from "react";
     import { AppUser } from "../lib/api";
@@ -43,10 +40,7 @@ import { TrucoDuel } from "../components/TrucoDuel";
 import { TrucoPvpDuel } from "../components/TrucoPvpDuel";
 import { useQuickDuel } from "../hooks/useQuickDuel";
 import { useDuelStreak } from "../hooks/useDuelStreak";
-<<<<<<< HEAD
-=======
 import { applyServerStreak, confirmedDuel, startPlayStreakTracking } from "../lib/playStreak";
->>>>>>> 5a26a2f4 (version final 1)
 import { BOT_NAMES } from "../hooks/useRpsBotMatch";
 import { TriviaAsyncDuel } from "../components/TriviaAsyncDuel";
 import { TriviaAsyncInbox, AsyncToast } from "../components/TriviaAsyncInbox";
@@ -540,8 +534,6 @@ const {
         document.body.style.overflow='hidden';
         return()=>{document.body.style.overflow=oldOverflow;};
       },[levelUp]);
-<<<<<<< HEAD
-=======
         // 👇 PEGA EL EFECTO DEL MOUSE ACÁ
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -553,7 +545,6 @@ const {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
->>>>>>> 5a26a2f4 (version final 1)
 
 
       const { items: auraItems } = useAuraInventory(user.id, level);
@@ -729,8 +720,6 @@ const {
       }, [auraItems]);
 
       const duelStreak = useDuelStreak(user.id);
-<<<<<<< HEAD
-=======
       // Racha de juego (1 duelo por día) + misión de desafío: ambas se alimentan solo de premios confirmados por el servidor.
       useEffect(() => startPlayStreakTracking(user.id), [user.id]);
       useEffect(() => { applyServerStreak({ count: user.streak ?? 0, best: user.best_streak ?? 0, lastDay: user.last_activity_date ?? null }); }, [user.id, user.streak, user.best_streak, user.last_activity_date]);
@@ -743,7 +732,6 @@ const {
         window.addEventListener("lupi:progression-updated", onDuel);
         return () => window.removeEventListener("lupi:progression-updated", onDuel);
       }, [updateMissionProgress]);
->>>>>>> 5a26a2f4 (version final 1)
       const { players: lobbyPlayers, status: lobbyStatus } = useLobbyPresence({
       room: "global",
       activity: learningPracticeOpen || view === "match" || asyncMatch || activeTruco || activeRps || activeTrivia || activeFutsal || versusChallenge ? "in-match" : "lobby",
@@ -1589,9 +1577,6 @@ onChallengeGame={(player, game) => {
 
                   </aside>
                   <button className={`gh-world__play ${story.progress?.status !== 'completed' ? 'gh-world__play--story' : ''}`} type="button" disabled={story.loading || story.busy} onClick={() => handleGameNavigate("battle")}>
-<<<<<<< HEAD
-                    <span className="gh-world__play-icon" aria-hidden><LobbyActionIcon kind="bolt"/></span>
-=======
                     <span className="gh-world__play-icon" aria-hidden>
   <img 
     src="/src/assets/ball.png" 
@@ -1599,16 +1584,11 @@ onChallengeGame={(player, game) => {
     className="gh-ball-img" 
   />
 </span>
->>>>>>> 5a26a2f4 (version final 1)
                     <span>
                       <small>{story.loading ? 'PREPARANDO TU DEBUT' : story.progress?.status !== 'completed' ? 'MODO HISTORIA · CAPÍTULO 01' : 'LISTO PARA JUGAR'}</small>
                       <strong>{story.loading ? 'CARGANDO…' : story.progress?.status === 'match' ? 'CONTINUAR PARTIDO' : story.progress?.status === 'completed' ? 'JUGAR PARTIDO' : story.progress ? 'CONTINUAR HISTORIA' : 'EMPEZAR HISTORIA'}</strong>
                     </span>
                     <span className="gh-world__play-arrow" aria-hidden>→</span>
-<<<<<<< HEAD
-                    <em className="gh-lobby-play-tagline">Tu próxima jugada empieza acá</em>
-=======
->>>>>>> 5a26a2f4 (version final 1)
                   </button>
 
                   {lobbyCommunity && <button type="button" className="gh-lobby-community" onClick={() => setShowCommunities(true)} title="Abrir mis comunidades" style={{display:"block",margin:"6px auto",padding:"7px 14px",border:"1px solid #2bd7ff",borderRadius:9,background:"#072635",color:"#d7f8ff",fontWeight:800,cursor:"pointer",maxWidth:"min(90vw,320px)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>🏟️ {lobbyCommunity} · Mi comunidad →</button>}
@@ -1655,9 +1635,6 @@ onChallengeGame={(player, game) => {
                   </div>
 
                   <div className="gh-world__discover" aria-label="Exploración y comunidad">
-<<<<<<< HEAD
-                    <button type="button" className="gh-explore-trigger" onClick={() => setShowExploreWorld(true)}>◇ EXPLORAR</button>
-=======
                     <button 
   type="button" 
   className="gh-explore-trigger" 
@@ -1678,20 +1655,12 @@ onChallengeGame={(player, game) => {
   </svg>
   EXPLORAR
 </button>
->>>>>>> 5a26a2f4 (version final 1)
                     <QuickDuelPanel variant="launcher" streak={duelStreak} disabled={learningPracticeOpen||!!incoming||!!outgoing} game={quick.game} seconds={quick.seconds} others={quick.others} notice={quick.notice} onStart={quick.start} onCancel={quick.cancel} onDismissNotice={quick.dismissNotice} onTrucoBot={()=>startBotTruco()}/>
                     {asyncInbox.badge > 0 && <button type="button" className="gh-explore-trigger" onClick={() => setShowPlayersSheet(true)}>🧠 {asyncInbox.badge} POR JUGAR</button>}
                   </div>
                   {showExploreWorld && <ExploreWorld deck={activeDeck} unlocked={unlockedAchievements.length} onClose={()=>setShowExploreWorld(false)} onMatch={()=>handleGameNavigate("battle")} onDeck={()=>handleGameNavigate("deck")} onAlbum={()=>handleGameNavigate("album")} onAchievements={()=>setShowAchievements(true)}/>}
 
                   <nav className="gh-world__dock" aria-label="Navegación del lobby">
-<<<<<<< HEAD
-                    <button type="button" onClick={() => setShowCommunities(true)}><LobbyActionIcon kind="club"/><strong>CLUB</strong></button>
-                    <button className="is-active" type="button" onClick={() => setView("lobby")} aria-current="page"><LobbyActionIcon kind="ball"/><strong>LOBBY</strong></button>
-                    <button type="button" onClick={() => {setShowPackModal(true);updateMissionProgress("open_pack");}}><LobbyActionIcon kind="pack"/><strong>PACK</strong>{packCount > 0 && <em>{packCount}</em>}</button>
-                    <button type="button" onClick={() => handleGameNavigate("deck")}><LobbyActionIcon kind="shirt"/><strong>EQUIPO</strong></button>
-                    <button type="button" onClick={() => setShowAchievements(true)}><LobbyActionIcon kind="trophy"/><strong>LOGROS</strong>{unlockedAchievements.length > 0 && <em>{unlockedAchievements.length}</em>}</button>
-=======
                     <button type="button" onClick={() => setShowCommunities(true)} className="gh-btn-club">
   <img 
     src="/src/assets/icon_escudo_boton.png" 
@@ -1740,7 +1709,6 @@ onChallengeGame={(player, game) => {
   <strong>LOGROS</strong>
   {unlockedAchievements.length > 0 && <em className="gh-badge-count">{unlockedAchievements.length}</em>}
 </button>
->>>>>>> 5a26a2f4 (version final 1)
                   </nav>
                 </div>
               )}

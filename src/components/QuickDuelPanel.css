@@ -46,8 +46,6 @@
 .qd-mode--futsal{background-image:linear-gradient(90deg,#031925ee,#03192577),url('../assets/challenge-futsal-anime.webp')}
 .qd-mode--futsal{background-size:cover;background-position:80% center}
 .qd-chooser{max-height:calc(100dvh - 28px);overflow-y:auto;scrollbar-width:thin}
-<<<<<<< HEAD
-=======
 /* =========================================================
    ESTILO UNIFICADO: DUELO RÁPIDO (LAUNCHER)
    ========================================================= */
@@ -104,4 +102,3 @@
   transform: scale(1.2) rotate(-10deg) !important;
   filter: drop-shadow(0 0 10px #ffc83d) !important;
 }
->>>>>>> 5a26a2f4 (version final 1)
