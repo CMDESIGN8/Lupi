@@ -332,3 +332,8 @@
 .training-club-gym .aura-visual-cone{fill:#09bceb}
 .training-club-gym .training-drill-card{border-color:rgba(144,255,70,.13)}
 @media(max-width:620px){.training-club-gym .training-aura-toolbar{align-items:stretch;gap:10px}.training-club-gym .training-reset-button{width:100%}}
+
+
+.training-gym-skill-icon{display:grid;place-items:center;width:64px;height:64px;flex:0 0 64px;border:1px solid rgba(144,255,70,.25);border-radius:14px;background:linear-gradient(145deg,rgba(144,255,70,.13),rgba(9,188,235,.08));color:#a5f77a;font-size:32px;font-weight:900;text-shadow:0 0 14px rgba(144,255,70,.28)}
+.training-badge-modal-gym-icon{display:grid;place-items:center;width:118px;height:118px;margin:12px auto;border:1px solid rgba(144,255,70,.35);border-radius:50%;background:radial-gradient(circle,rgba(144,255,70,.18),rgba(9,188,235,.08));color:#a5f77a;font-size:56px;font-weight:900}
+@media(max-width:560px){.training-gym-skill-icon{width:52px;height:52px;flex-basis:52px;font-size:26px}}
