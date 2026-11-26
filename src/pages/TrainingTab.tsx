@@ -125,6 +125,8 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
   const [resettingTraining, setResettingTraining] = useState(false);
   const [drillSaving, setDrillSaving] = useState<string | null>(null);
   const [activeDrill, setActiveDrill] = useState<{ skillKey: SkillKey; exerciseIndex: number } | null>(null);
+  const [sessionStarted, setSessionStarted] = useState(false);
+  const [doseCompleted, setDoseCompleted] = useState(false);
   const [resting, setResting] = useState(false);
   const [restSeconds, setRestSeconds] = useState(30);
   const [unlockedBadge, setUnlockedBadge] = useState<BadgeKey | null>(null);
@@ -513,7 +515,7 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
                     return <div className={`training-aura-drill ${completed ? "is-done" : ""} ${!completed && !available ? "is-locked" : ""}`} key={token}>
                       <AuraDrillVisual skillKey={skillKey} exerciseIndex={index} compact />
                       <div className="training-aura-drill-copy"><small>{level.tag} · {drill.reps}</small><strong>{drill.title}</strong><p>{drill.description}</p><em>{completed ? "EJERCICIO REGISTRADO" : level.name + " · " + level.guidance}</em></div>
-                      <button type="button" disabled={completed || !available || drillSaving !== null} onClick={() => { setActiveDrill({ skillKey, exerciseIndex: index }); setResting(false); setRestSeconds(30); }}>{completed ? "COMPLETADO ✓" : available ? "INICIAR ENTRENAMIENTO" : "BLOQUEADO"}</button>
+                      <button type="button" disabled={completed || !available || drillSaving !== null} onClick={() => { setActiveDrill({ skillKey, exerciseIndex: index }); setSessionStarted(false); setDoseCompleted(false); setResting(false); setRestSeconds(30); }}>{completed ? "COMPLETADO ✓" : available ? "INICIAR ENTRENAMIENTO" : "BLOQUEADO"}</button>
                     </div>;
                   })}
                 </div>
@@ -529,29 +531,36 @@ export function TrainingTab({ user, onBackToProfile }: { user: AppUser; onBackTo
           const token = `${activeDrill.skillKey}-${activeDrill.exerciseIndex}`;
           return <div className="training-guided-overlay" role="dialog" aria-modal="true" aria-labelledby="training-guided-title">
             <section className="training-guided-card">
-              <button type="button" className="training-guided-close" aria-label="Cerrar sesión" onClick={() => { setActiveDrill(null); setResting(false); }}>×</button>
+              <button type="button" className="training-guided-close" aria-label="Cerrar sesión" onClick={() => { setActiveDrill(null); setSessionStarted(false); setDoseCompleted(false); setResting(false); }}>×</button>
               <div className="training-guided-kicker">AURA TRAINING / SESIÓN GUIADA</div>
-              <div className="training-guided-discipline"><img src={skill.image} alt="" /><span>{skill.title}</span><b>{DRILL_LEVELS[activeDrill.exerciseIndex].tag}</b></div>
+              <div className="training-guided-discipline">{skill.image ? <img src={skill.image} alt="" /> : <span className="training-guided-gym-icon" aria-hidden="true">{activeDrill.skillKey === "aerobic" ? "♥" : "✚"}</span>}<span>{skill.title}</span><b>{DRILL_LEVELS[activeDrill.exerciseIndex].tag}</b></div>
+              <div className="training-guided-progress" aria-label={sessionStarted ? "Paso 2 de 3" : "Paso 1 de 3"}><i className="is-done" /><i className={sessionStarted ? "is-done" : ""} /><i className={doseCompleted && !resting ? "is-done" : ""} /></div>
               <h2 id="training-guided-title">{drill.title}</h2>
               <AuraDrillVisual skillKey={activeDrill.skillKey} exerciseIndex={activeDrill.exerciseIndex} />
               <div className="training-guided-level"><small>DIFICULTAD PROGRESIVA</small><strong>{DRILL_LEVELS[activeDrill.exerciseIndex].name}</strong><p>{DRILL_LEVELS[activeDrill.exerciseIndex].guidance}</p></div>
-              <div className="training-guided-dose"><small>OBJETIVO DE ESTA SESIÓN</small><strong>{drill.reps}</strong></div>
-              <div className="training-guided-step"><span>01</span><div><strong>PREPARÁ EL ESPACIO</strong><p>Buscá un lugar despejado, prepará los elementos que necesites y empezá a un ritmo que puedas controlar.</p></div></div>
-              <div className="training-guided-step"><span>02</span><div><strong>EJECUTÁ EL EJERCICIO</strong><p>{drill.description}</p></div></div>
-              <div className="training-guided-benefit"><small>TRANSFERENCIA AL JUEGO</small><p>{drill.benefit}</p></div>
-              {!resting ? <div className="training-guided-rest-ready">
-                <strong>¿TERMINASTE LA DOSIS?</strong>
-                <p>Cuando completes las repeticiones o recorridos indicados, iniciá una pausa de recuperación de 30 segundos.</p>
-                <button type="button" onClick={() => { setRestSeconds(30); setResting(true); }}>INICIAR PAUSA · 00:30</button>
-              </div> : <div className="training-guided-timer">
-                <small>PAUSA DE RECUPERACIÓN</small><strong>00:{String(restSeconds).padStart(2,"0")}</strong>
-                <button type="button" onClick={() => setResting(false)}>TERMINAR PAUSA</button>
-              </div>}
-              <div className="training-guided-actions">
-                <button type="button" className="training-guided-secondary" onClick={() => { setActiveDrill(null); setResting(false); }}>SALIR SIN GUARDAR</button>
-                <button type="button" className="training-guided-complete" disabled={resting || drillSaving !== null} onClick={() => { setActiveDrill(null); setResting(false); void completeDrill(activeDrill.skillKey, activeDrill.exerciseIndex); }}>{drillSaving === token ? "GUARDANDO…" : "FINALIZAR Y GUARDAR"}</button>
-              </div>
-              <p className="training-guided-note">El progreso se registra únicamente al finalizar. Adaptá la intensidad y detenete si sentís molestias.</p>
+              {!sessionStarted ? <div className="training-guided-preparation">
+                <div className="training-guided-dose"><small>OBJETIVO DE ESTA SESIÓN</small><strong>{drill.reps}</strong></div>
+                <div className="training-guided-step"><span>01</span><div><strong>PREPARÁ EL ESPACIO</strong><p>Buscá un lugar despejado, prepará los elementos que necesites y tené agua cerca. Empezá a un ritmo que puedas controlar.</p></div></div>
+                <div className="training-guided-benefit"><small>TRANSFERENCIA AL JUEGO</small><p>{drill.benefit}</p></div>
+                <button type="button" className="training-guided-start" onClick={() => setSessionStarted(true)}>COMENZAR EJERCICIO <span>→</span></button>
+              </div> : <>
+                <div className="training-guided-dose"><small>DOSIS DEL EJERCICIO</small><strong>{drill.reps}</strong></div>
+                <div className="training-guided-step"><span>02</span><div><strong>EJECUTÁ EL EJERCICIO</strong><p>{drill.description}</p></div></div>
+                <div className="training-guided-benefit"><small>TRANSFERENCIA AL JUEGO</small><p>{drill.benefit}</p></div>
+                {!doseCompleted ? <div className="training-guided-rest-ready">
+                  <strong>CUANDO COMPLETES LA DOSIS</strong>
+                  <p>Respetá las repeticiones o recorridos indicados. Después registrá el esfuerzo y comenzá la recuperación.</p>
+                  <button type="button" onClick={() => { setDoseCompleted(true); setRestSeconds(30); setResting(true); }}>TERMINÉ LA DOSIS · INICIAR PAUSA</button>
+                </div> : resting ? <div className="training-guided-timer">
+                  <small>03 · PAUSA DE RECUPERACIÓN</small><strong>00:{String(restSeconds).padStart(2,"0")}</strong>
+                  <button type="button" onClick={() => setResting(false)}>TERMINAR PAUSA</button>
+                </div> : <div className="training-guided-rest-ready is-ready"><strong>✓ EJERCICIO COMPLETADO</strong><p>La pausa terminó. Ya podés registrar esta sesión en tu progreso.</p></div>}
+                <div className="training-guided-actions">
+                  <button type="button" className="training-guided-secondary" onClick={() => { setActiveDrill(null); setSessionStarted(false); setDoseCompleted(false); setResting(false); }}>SALIR SIN GUARDAR</button>
+                  <button type="button" className="training-guided-complete" disabled={!doseCompleted || resting || drillSaving !== null} onClick={() => { setActiveDrill(null); setSessionStarted(false); setDoseCompleted(false); setResting(false); void completeDrill(activeDrill.skillKey, activeDrill.exerciseIndex); }}>{drillSaving === token ? "GUARDANDO…" : "FINALIZAR Y GUARDAR"}</button>
+                </div>
+              </>}
+              <p className="training-guided-note">El progreso se registra únicamente al finalizar. Adaptá la intensidad y detenete si sentís molestias. Para ejercicios de fuerza, priorizá la técnica y contá con supervisión adulta cuando corresponda.</p>
             </section>
           </div>;
         })()}
