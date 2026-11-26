@@ -277,6 +277,9 @@ export function TrainingTab({ user }: { user: AppUser }) {
 
 
 
+        <section className="training-aura-program">
+          <div className="training-section-title"><span>02 / AURA TRAINING SYSTEM</span><small>4 DISCIPLINAS · 12 EJERCICIOS</small></div>
+          <p className="training-arena-intro">Completá los tres ejercicios de cada disciplina para desbloquear su badge y ganar 50 XP en tu carta.</p>
         {drillFeedback && <section className={`training-drill-feedback ${drillFeedback.xpAwarded > 0 ? "is-reward" : ""}`} role="status">
           <div className="training-drill-feedback-icon">{drillFeedback.xpAwarded > 0 ? "✦" : "✓"}</div>
           <div className="training-drill-feedback-copy">
@@ -286,10 +289,6 @@ export function TrainingTab({ user }: { user: AppUser }) {
           </div>
           {drillFeedback.xpAwarded > 0 ? <div className="training-drill-feedback-reward"><b>+50 XP</b><span>{drillFeedback.statLabel} +{drillFeedback.statGain}</span></div> : <div className="training-drill-feedback-progress">{drillFeedback.progress}/3</div>}
         </section>}
-
-        <section className="training-aura-program">
-          <div className="training-section-title"><span>02 / AURA TRAINING SYSTEM</span><small>4 DISCIPLINAS · 12 EJERCICIOS</small></div>
-          <p className="training-arena-intro">Completá los tres ejercicios de cada disciplina para desbloquear su badge y ganar 50 XP en tu carta.</p>
           <div className="training-aura-skills">
             {(Object.keys(AURA_SKILLS) as SkillKey[]).map(skillKey => {
               const skill = AURA_SKILLS[skillKey];
