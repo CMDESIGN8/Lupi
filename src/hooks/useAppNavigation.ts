@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { scrollTop } from "../lib/scroll";
 import type { Tab, GameTab } from "../types/nav";
 
-const tabs: readonly string[] = ["home", "character", "shop", "ticket", "ranking", "profile", "benefits", "training"];
+const tabs: readonly string[] = ["home", "character", "shop", "ticket", "ranking", "profile", "benefits"];
 const gameTabs: readonly string[] = ["play", "album", "deck"];
 function readRoute() {
  const params = new URLSearchParams(window.location.search);
