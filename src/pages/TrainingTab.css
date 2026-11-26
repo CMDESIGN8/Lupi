@@ -218,3 +218,77 @@
 .training-arena-map-foot i{height:5px;border-radius:6px;overflow:hidden;background:#26394a}.training-arena-map-foot i b{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#08bce9,#9aff64);transition:width .2s}
 .training-arena-map-foot small{font-size:9px;color:#839cad;letter-spacing:normal;font-weight:500}
 @media(max-width:480px){.training-arena-stage-grid{gap:7px}.training-arena-stage{padding:11px;min-height:138px}.training-arena-stage strong{font-size:11px}.training-arena-stage small{font-size:7px}.training-arena-stage b{font-size:8px}}
+
+/* AURA BOSS CHALLENGE */
+.aura-boss-game{display:flex;flex-direction:column;gap:16px;padding:clamp(12px,3vw,22px);border:1px solid rgba(9,188,235,.28);border-radius:18px;background:linear-gradient(135deg,rgba(8,18,44,.95),rgba(5,8,26,.96));color:#f5fbff}.aura-boss-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.1em;color:#09bceb}.aura-boss-top strong{font-size:28px;color:#90ff46}.aura-boss-stage{text-align:center;padding:8px 0}.aura-boss-stage span,.aura-boss-finish small{color:#90ff46;font-size:11px;letter-spacing:.16em}.aura-boss-stage h3{margin:8px 0;font-size:clamp(20px,5vw,30px);letter-spacing:.05em}.aura-boss-stage p,.aura-boss-finish p{color:#b6c6da;font-size:13px;margin:6px 0}.aura-boss-tap{min-height:150px;border-radius:16px;border:1px solid rgba(144,255,70,.6);background:radial-gradient(circle at center,rgba(9,188,235,.25),rgba(9,10,35,.95));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:transform .08s,filter .12s}.aura-boss-tap:active{transform:scale(.97);filter:brightness(1.3)}.aura-boss-tap span{font-size:34px}.aura-boss-tap strong{font-size:15px;letter-spacing:.06em}.aura-boss-tap small{font-size:10px;color:#90ff46;letter-spacing:.12em}.aura-boss-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.aura-boss-stats>div{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:10px;padding:10px;text-align:center}.aura-boss-stats small{display:block;font-size:9px;color:#8ba0bd;letter-spacing:.1em}.aura-boss-stats strong{display:block;font-size:20px;margin-top:5px;color:#09bceb}.aura-boss-stage-progress{display:flex;gap:6px}.aura-boss-stage-progress i{height:6px;flex:1;border-radius:9px;background:rgba(255,255,255,.1)}.aura-boss-stage-progress i.is-current{background:#09bceb;box-shadow:0 0 10px rgba(9,188,235,.5)}.aura-boss-stage-progress i.is-done{background:#90ff46}.aura-boss-finish{text-align:center;border:1px solid rgba(144,255,70,.35);padding:16px;border-radius:14px}.aura-boss-finish strong{display:block;font-size:clamp(28px,7vw,42px);color:#90ff46;margin:8px 0}.aura-boss-finish button{margin-top:10px;border:0;border-radius:9px;padding:13px 18px;background:#90ff46;color:#081125;font-weight:900;cursor:pointer}.aura-boss-exit{align-self:center;background:transparent;border:1px solid rgba(255,255,255,.15);color:#9ab0c8;padding:10px 14px;border-radius:8px;cursor:pointer}.training-arena-stage.is-boss-open{border-color:rgba(144,255,70,.45);background:linear-gradient(145deg,rgba(144,255,70,.09),rgba(8,18,44,.9))}.training-arena-stage.is-boss-open .training-arena-stage-icon{color:#90ff46}@media(max-width:520px){.aura-boss-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.aura-boss-tap{min-height:125px}}
+
+/* AURA TRAINING unified visual system */
+.training-unified-intro{margin:-3px 0 15px;color:#9bb4c4;font-size:12px;line-height:1.55;max-width:680px}
+.training-aura-program,.training-unified-arena{border:1px solid rgba(9,188,235,.27);background:linear-gradient(145deg,rgba(11,29,47,.97),rgba(7,13,25,.99));box-shadow:0 12px 32px rgba(0,0,0,.16)}
+.training-aura-program{padding:clamp(14px,3vw,20px);border-radius:18px}
+.training-aura-skill{padding:clamp(11px,2.5vw,16px);border-color:rgba(9,188,235,.2);background:rgba(2,12,24,.52)}
+.training-aura-skill-head{grid-template-columns:64px minmax(0,1fr) auto}
+.training-aura-skill-head img{width:64px;height:64px}
+.training-inline-badge{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:9px 11px;border:1px solid rgba(130,165,185,.17);border-radius:10px;background:rgba(2,9,19,.5)}
+.training-inline-badge img{width:42px;height:42px;object-fit:contain;opacity:.62;filter:grayscale(.65)}
+.training-inline-badge>div{display:flex;min-width:0;flex:1;flex-direction:column;gap:3px}
+.training-inline-badge small{font-size:8px;letter-spacing:.13em;color:#66dff0;font-weight:950}
+.training-inline-badge strong{font-size:11px;color:#eafaff;letter-spacing:.06em}
+.training-inline-badge span{font-size:9px;color:#8da7b8}
+.training-inline-badge>b{font-size:15px;color:#7890a1}
+.training-inline-badge.is-unlocked{border-color:rgba(144,255,71,.42);background:linear-gradient(100deg,rgba(48,120,65,.2),rgba(2,9,19,.6))}
+.training-inline-badge.is-unlocked img{opacity:1;filter:drop-shadow(0 0 8px rgba(144,255,71,.3))}
+.training-inline-badge.is-unlocked span,.training-inline-badge.is-unlocked>b{color:#a2ff71}
+.training-unified-arena{margin:18px 0;padding:clamp(14px,3vw,20px);border-radius:18px}
+.training-unified-arena .training-arena-map{padding:0;border:0;background:transparent;box-shadow:none}
+.training-unified-arena .training-arena-stage{min-height:132px}
+.training-unified-selector{margin-top:16px;padding-top:14px;border-top:1px solid rgba(130,180,200,.15)}
+.training-unified-selector>strong{font-size:9px;letter-spacing:.14em;color:#5cdeef}
+.training-unified-selector>p{margin:5px 0 10px;color:#829bad;font-size:10px}
+.training-unified-selector .training-game-selector{max-width:100%}
+.training-card-evolution{border-color:rgba(9,188,235,.27)}
+.training-badges{display:none}
+@media(max-width:560px){.training-aura-skill-head{grid-template-columns:52px minmax(0,1fr) auto;gap:8px}.training-aura-skill-head img{width:52px;height:52px}.training-inline-badge{margin-bottom:10px}.training-unified-arena{margin:14px 0}.training-unified-arena .training-arena-stage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* LUPI WORLD · TRAINING ARENA HUD */
+.training-hud-hero{isolation:isolate;border-color:rgba(9,188,235,.48);background:radial-gradient(ellipse at 88% 4%,rgba(9,188,235,.28),transparent 43%),radial-gradient(ellipse at 0 100%,rgba(144,255,70,.09),transparent 42%),linear-gradient(135deg,#08182a 0%,#0b1222 56%,#070d18 100%);box-shadow:inset 0 1px rgba(255,255,255,.06),0 18px 50px rgba(0,0,0,.32)}
+.training-hud-hero:before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.18;background-image:linear-gradient(rgba(105,190,220,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(105,190,220,.13) 1px,transparent 1px);background-size:28px 28px;mask-image:linear-gradient(110deg,#000,transparent 75%)}
+.training-hud-topline{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.training-hud-live{display:flex;align-items:center;gap:6px;color:#a2ff71;font-size:8px;font-weight:950;letter-spacing:.13em;white-space:nowrap}
+.training-hud-live i{width:6px;height:6px;border-radius:50%;background:#90ff46;box-shadow:0 0 10px #90ff46}
+.training-hud-hero h1{letter-spacing:.015em;text-shadow:0 5px 25px rgba(0,0,0,.35)}
+.training-hud-metrics{gap:8px}
+.training-hud-metrics>div{position:relative;overflow:hidden;border-color:rgba(65,203,235,.23);background:linear-gradient(145deg,rgba(5,22,38,.88),rgba(2,10,21,.8));box-shadow:inset 0 1px rgba(255,255,255,.035)}
+.training-hud-metrics>div:first-child{border-color:rgba(144,255,70,.35)}
+.training-hud-metrics strong{font-size:clamp(27px,5vw,34px);line-height:1;color:#f5fcff}
+.training-hud-metrics>div:first-child strong{color:#a4ff72;text-shadow:0 0 18px rgba(144,255,70,.2)}
+.training-card-evolution,.training-aura-program,.training-unified-arena,.training-hud-badges{position:relative;overflow:hidden;border-radius:17px;border-color:rgba(9,188,235,.25);background:linear-gradient(145deg,rgba(10,28,46,.97),rgba(5,12,24,.99));box-shadow:inset 0 1px rgba(255,255,255,.035),0 12px 30px rgba(0,0,0,.17)}
+.training-card-evolution:before,.training-hud-badges:before{content:"";position:absolute;top:0;left:18px;right:18px;height:1px;background:linear-gradient(90deg,transparent,rgba(69,225,246,.7),transparent)}
+.training-card-evolution .training-section-title>span,.training-hud-badges .training-section-title>span{color:#54e3f5}
+.training-stat-grid{gap:10px}
+.training-stat{border-color:rgba(77,174,206,.16);background:linear-gradient(115deg,rgba(3,18,32,.82),rgba(3,10,21,.68))}
+.training-stat-track{background:rgba(66,94,115,.34)}
+.training-hud-badges{display:block;padding:clamp(14px,3vw,20px)}
+.training-hud-badge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.training-hud-badge{position:relative;display:flex;align-items:center;gap:11px;min-width:0;min-height:142px;padding:12px;border:1px solid rgba(77,174,206,.2);border-radius:13px;background:linear-gradient(145deg,rgba(3,17,31,.92),rgba(5,11,22,.88));}
+.training-hud-badge.is-unlocked{border-color:rgba(144,255,70,.45);background:radial-gradient(ellipse at 20% 50%,rgba(144,255,70,.1),transparent 65%),linear-gradient(145deg,rgba(12,34,34,.9),rgba(5,11,22,.9))}
+.training-hud-badge-art{display:grid;place-items:center;flex:0 0 82px;width:82px;height:82px}
+.training-hud-badge-art img{display:block;width:100%;height:100%;object-fit:contain;opacity:.65;filter:grayscale(.45) drop-shadow(0 0 8px rgba(9,188,235,.18))}
+.training-hud-badge.is-unlocked .training-hud-badge-art img{opacity:1;filter:drop-shadow(0 0 12px rgba(144,255,70,.25))}
+.training-hud-badge-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.training-hud-badge-copy>small{color:#55dff0;font-size:8px;font-weight:950;letter-spacing:.13em}
+.training-hud-badge-copy h3{margin:0;color:#f2fbff;font-family:var(--font-display);font-size:clamp(13px,2vw,16px);line-height:1.1}
+.training-hud-badge-copy p{margin:1px 0 3px;color:#8fa9ba;font-size:9px;line-height:1.4}
+.training-hud-badge-progress{height:5px;overflow:hidden;border-radius:8px;background:#26394a}
+.training-hud-badge-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#078bc7,#37e1ef);transition:width .35s}
+.training-hud-badge.is-unlocked .training-hud-badge-progress i{background:linear-gradient(90deg,#55cf5e,#a4ff70)}
+.training-hud-badge-copy>strong{color:#92aabb;font-size:8px;letter-spacing:.07em}
+.training-hud-badge.is-unlocked .training-hud-badge-copy>strong,.training-hud-badge.is-unlocked .training-hud-badge-state{color:#a4ff72}
+.training-hud-badge-state{align-self:flex-start;color:#6f8798;font-size:8px;font-weight:950;letter-spacing:.06em}
+.training-hud-xp{margin-top:12px;border-color:rgba(9,188,235,.28)}
+.training-hud-xp .training-xp-level-head>div strong{font-size:clamp(23px,4vw,29px)}
+.training-hud-xp .training-xp-level-head>b{color:#a3ff71;font-size:clamp(18px,3vw,23px);text-shadow:0 0 14px rgba(144,255,70,.16)}
+@media(max-width:620px){.training-hud-badge-grid{grid-template-columns:1fr}.training-hud-badge{min-height:120px}.training-hud-badge-art{flex-basis:72px;width:72px;height:72px}}
+@media(max-width:390px){.training-hud-topline{align-items:flex-start;flex-direction:column;gap:7px}.training-hud-live{align-self:flex-end;margin-top:-20px}.training-player-stats{gap:6px}.training-player-stats>div{padding:9px 7px}.training-player-stats small{font-size:7px;letter-spacing:.07em}.training-hud-badge{gap:8px;padding:9px}.training-hud-badge-art{flex-basis:62px;width:62px;height:62px}}
+@media(prefers-reduced-motion:reduce){.training-hud-badge-progress i{transition:none}}
